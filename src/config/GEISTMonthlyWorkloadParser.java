@@ -9,8 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import cloud.Request;
-import cloud.User;
+import commons.cloud.Request;
+import commons.cloud.User;
+import commons.config.WorkloadParser;
 
 /**
  * This class is responsible for parsing the workload to be used. Considering SaaS plans limits, the workload should be separated according to each period
@@ -18,7 +19,7 @@ import cloud.User;
  * @author davidcmm
  *
  */
-public class WorkloadParser {
+public class GEISTMonthlyWorkloadParser implements WorkloadParser<Map<User, List<Request>>>{
 	
 	private static double JAN_L = 60 * 60 * 24 * (31);
 	private static double FEB_L = 60 * 60 * 24 * (31+28);
@@ -105,6 +106,10 @@ public class WorkloadParser {
 		}
 	}
 
+	@Override
+	public Map<User, List<Request>> next() {
+	    return null;
+	}
 }
 
 

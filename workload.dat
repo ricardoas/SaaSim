@@ -1,8 +1,0 @@
-workload.file=workload.dat
-users.file=users.dat
-contracts.file=contracts.dat
-iaas.file=iaas.dat
-
-heuristic=Oblivious
-sla.tr=10
-planning.period=1

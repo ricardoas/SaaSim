@@ -1,4 +1,4 @@
-package cloud;
+package commons.cloud;
 
 public class Contract {
 	

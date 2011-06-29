@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import cloud.CloudProvider;
+import commons.cloud.Provider;
 
 public class ProviderConfiguration extends Configuration{
 	
@@ -24,7 +24,7 @@ public class ProviderConfiguration extends Configuration{
 	public static String TRANSFER_OUT = ".transOut";
 	public static String COST_TRANSFER_OUT = ".costsTransOut";
 	
-	public Map<String, CloudProvider> providers;//Map containing providers to be simulated
+	public Map<String, Provider> providers;//Map containing providers to be simulated
 	
 	@Override
 	public void loadPropertiesFromFile( String file ) throws FileNotFoundException, IOException {
@@ -54,9 +54,9 @@ public class ProviderConfiguration extends Configuration{
 	
 	public void buildProvider() {
 		int numberOfPlans = Integer.valueOf(currentProperties.getProperty(NUM_OF_PROVIDERS));
-		providers = new HashMap<String, CloudProvider>();
+		providers = new HashMap<String, Provider>();
 		for(int i = 1; i <= numberOfPlans; i++){
-			providers.put(currentProperties.getProperty(PROVIDER+i+NAME), new CloudProvider(currentProperties.getProperty(PROVIDER+i+NAME), Double.valueOf(currentProperties.getProperty(PROVIDER+i+CPU_COST)), Double.valueOf(currentProperties.getProperty(PROVIDER+i+ON_DEMAND_LIMIT)),
+			providers.put(currentProperties.getProperty(PROVIDER+i+NAME), new Provider(currentProperties.getProperty(PROVIDER+i+NAME), Double.valueOf(currentProperties.getProperty(PROVIDER+i+CPU_COST)), Double.valueOf(currentProperties.getProperty(PROVIDER+i+ON_DEMAND_LIMIT)),
 					Double.valueOf(currentProperties.getProperty(PROVIDER+i+RESERVATION_LIMIT)), Double.valueOf(currentProperties.getProperty(PROVIDER+i+ONE_YEAR_FEE)), 
 					Double.valueOf(currentProperties.getProperty(PROVIDER+i+THREE_YEARS_FEE)), Double.valueOf(currentProperties.getProperty(PROVIDER+i+MONITORING)),
 					currentProperties.getProperty(PROVIDER+i+TRANSFER_IN), currentProperties.getProperty(PROVIDER+i+COST_TRANSFER_IN), currentProperties.getProperty(PROVIDER+i+TRANSFER_OUT), 

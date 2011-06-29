@@ -1,14 +1,17 @@
 package config;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.*;
+import org.junit.Test;
 
-import cloud.Request;
-import cloud.User;
-import static org.junit.Assert.*;
+import commons.cloud.Request;
+import commons.cloud.User;
 
 
 public class WorkloadParserTest {
@@ -18,23 +21,23 @@ public class WorkloadParserTest {
 	@Test
 	public void testW1(){
 		try {
-			Map<String, Map<User, List<Request>>> workloadPerMonth = WorkloadParser.getWorkloadPerMonth(W1);
+			Map<String, Map<User, List<Request>>> workloadPerMonth = GEISTMonthlyWorkloadParser.getWorkloadPerMonth(W1);
 			assertNotNull(workloadPerMonth);
 			assertEquals(6, workloadPerMonth.size());
 			
-			Map<User, List<Request>> jan = workloadPerMonth.get(WorkloadParser.JAN);
+			Map<User, List<Request>> jan = workloadPerMonth.get(GEISTMonthlyWorkloadParser.JAN);
 			assertNotNull(jan);
 			assertEquals(1, jan.size());//Number of users
 			User user = new User("1");
 			assertEquals(8, jan.get(user).size());//Number of requests
 			
-			Map<User, List<Request>> feb = workloadPerMonth.get(WorkloadParser.FEB);
+			Map<User, List<Request>> feb = workloadPerMonth.get(GEISTMonthlyWorkloadParser.FEB);
 			assertNotNull(feb);
 			assertEquals(1, feb.size());//Number of users
 			user = new User("2");
 			assertEquals(8, feb.get(user).size());//Number of requests
 			
-			Map<User, List<Request>> mar = workloadPerMonth.get(WorkloadParser.MAR);
+			Map<User, List<Request>> mar = workloadPerMonth.get(GEISTMonthlyWorkloadParser.MAR);
 			assertNotNull(mar);
 			assertEquals(2, mar.size());//Number of users
 			user = new User("3");
@@ -42,19 +45,19 @@ public class WorkloadParserTest {
 			user = new User("4");
 			assertEquals(2, mar.get(user).size());//Number of requests
 			
-			Map<User, List<Request>> apr = workloadPerMonth.get(WorkloadParser.APR);
+			Map<User, List<Request>> apr = workloadPerMonth.get(GEISTMonthlyWorkloadParser.APR);
 			assertNotNull(apr);
 			assertEquals(1, apr.size());//Number of users
 			user = new User("4");
 			assertEquals(8, apr.get(user).size());//Number of requests
 			
-			Map<User, List<Request>> nov = workloadPerMonth.get(WorkloadParser.NOV);
+			Map<User, List<Request>> nov = workloadPerMonth.get(GEISTMonthlyWorkloadParser.NOV);
 			assertNotNull(nov);
 			assertEquals(1, nov.size());//Number of users
 			user = new User("5");
 			assertEquals(8, nov.get(user).size());//Number of requests
 			
-			Map<User, List<Request>> dec = workloadPerMonth.get(WorkloadParser.DEC);
+			Map<User, List<Request>> dec = workloadPerMonth.get(GEISTMonthlyWorkloadParser.DEC);
 			assertNotNull(dec);
 			assertEquals(1, dec.size());//Number of users
 			user = new User("6");

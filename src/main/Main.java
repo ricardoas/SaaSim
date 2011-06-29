@@ -5,14 +5,15 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import cloud.Request;
-import cloud.User;
-
 import planning.Planner;
+
+import commons.cloud.Request;
+import commons.cloud.User;
+
 import config.ContractConfiguration;
+import config.GEISTMonthlyWorkloadParser;
 import config.MainConfiguration;
 import config.ProviderConfiguration;
-import config.WorkloadParser;
 
 /**
  * This class is responsible for obtaining input parameters, from a configuration file, such as: workload, cloud provider
@@ -33,7 +34,7 @@ public class Main {
 			mainConfig.loadPropertiesFromFile(args[0]);//Loading main simulation configuration
 			
 			//Parsing workload
-			Map<String, Map<User, List<Request>>> workload = WorkloadParser.getWorkloadPerMonth(mainConfig.getWorkloadFile());
+			Map<String, Map<User, List<Request>>> workload = GEISTMonthlyWorkloadParser.getWorkloadPerMonth(mainConfig.getWorkloadFile());
 			
 			//Loading SaaS provider contracts
 			ContractConfiguration contractConfig = new ContractConfiguration();

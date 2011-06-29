@@ -1,14 +1,16 @@
 package config;
 
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.junit.Test;
 
-import cloud.CloudProvider;
+import commons.cloud.Provider;
 
 public class ProviderConfigurationTest {
 	
@@ -92,7 +94,7 @@ public class ProviderConfigurationTest {
 			assertNotNull(config.providers);
 			assertEquals(3, config.providers.size());
 			
-			CloudProvider provider = config.providers.get("p1");
+			Provider provider = config.providers.get("p1");
 			assertNotNull(provider);
 			assertEquals("p1", provider.name);
 			assertEquals(0.5, provider.cpuCost, 0.0);
@@ -106,7 +108,7 @@ public class ProviderConfigurationTest {
 			assertEquals("200", provider.transferOutLimits);
 			assertEquals("0.10 0.09", provider.transferOutCosts);
 			
-			CloudProvider provider2 = config.providers.get("p2");
+			Provider provider2 = config.providers.get("p2");
 			assertNotNull(provider2);
 			assertEquals("p2", provider2.name);
 			assertEquals(0.5, provider2.cpuCost, 0.0);
@@ -120,7 +122,7 @@ public class ProviderConfigurationTest {
 			assertEquals("200", provider2.transferOutLimits);
 			assertEquals("0.10 0.09", provider2.transferOutCosts);
 			
-			CloudProvider provider3 = config.providers.get("p3");
+			Provider provider3 = config.providers.get("p3");
 			assertNotNull(provider3);
 			assertEquals("p3", provider3.name);
 			assertEquals(0.55, provider3.cpuCost, 0.0);

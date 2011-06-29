@@ -1,14 +1,17 @@
 package config;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.junit.Test;
 
-import cloud.Contract;
-import cloud.User;
+import commons.cloud.Contract;
+import commons.cloud.User;
 
 public class ContractConfigurationTest {
 	

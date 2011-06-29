@@ -1,11 +1,11 @@
-package cloud;
+package commons.cloud;
 
-public class CloudResource {
+public class Resource {
 
 	public long startTime;
 	public long endTime;
 	
-	public CloudResource(long startTime, long endTime){
+	public Resource(long startTime, long endTime){
 		this.startTime = startTime;
 		this.endTime = endTime;
 	}
