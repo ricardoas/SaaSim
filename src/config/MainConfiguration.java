@@ -1,5 +1,7 @@
 package config;
 
+import commons.config.Configuration;
+
 
 public class MainConfiguration extends Configuration{
 

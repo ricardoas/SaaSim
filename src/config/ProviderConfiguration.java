@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import commons.cloud.Provider;
+import commons.config.Configuration;
 
 public class ProviderConfiguration extends Configuration{
 	

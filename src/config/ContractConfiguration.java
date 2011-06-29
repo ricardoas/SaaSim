@@ -6,6 +6,7 @@ import java.util.HashMap;
 
 import commons.cloud.Contract;
 import commons.cloud.User;
+import commons.config.Configuration;
 
 public class ContractConfiguration extends Configuration{
 	
