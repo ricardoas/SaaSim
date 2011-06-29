@@ -1,0 +1,13 @@
+plans.number=2
+
+#First plan
+plan1.name=p1
+plan1.price=100.00
+plan1.setup=5.55
+plan1.cpu_lim=10
+plan1.ex_cpu=1.00
+plan1.transfer_lim=50
+plan1.ex_transfer=0.5
+
+#Associations
+associations=
