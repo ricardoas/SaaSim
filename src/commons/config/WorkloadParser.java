@@ -1,5 +1,8 @@
 package commons.config;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 /**
  * Common set of features for workload parsers.
  * 
@@ -15,7 +18,8 @@ public interface WorkloadParser<T> {
 	 * implementation.
 	 * 
 	 * @return
+	 * @throws IOException 
 	 */
-	T next();
+	T next() throws IOException;
 
 }

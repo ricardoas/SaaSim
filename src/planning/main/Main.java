@@ -1,4 +1,4 @@
-package main;
+package planning.main;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import planning.Planner;
+
 
 import commons.cloud.Request;
 import commons.cloud.User;
@@ -34,7 +35,8 @@ public class Main {
 			mainConfig.loadPropertiesFromFile(args[0]);//Loading main simulation configuration
 			
 			//Parsing workload
-			Map<String, Map<User, List<Request>>> workload = GEISTMonthlyWorkloadParser.getWorkloadPerMonth(mainConfig.getWorkloadFile());
+//			Map<Integer, Map<User, List<Request>>> workload = GEISTMonthlyWorkloadParser.getWorkloadPerMonth(mainConfig.getWorkloadFile());
+			GEISTMonthlyWorkloadParser workloadParser = new GEISTMonthlyWorkloadParser(mainConfig.getWorkloadFile());
 			
 			//Loading SaaS provider contracts
 			ContractConfiguration contractConfig = new ContractConfiguration();
@@ -45,7 +47,7 @@ public class Main {
 			providerConfig.loadPropertiesFromFile(mainConfig.getIAASFile());
 			
 			//Creating planner
-			Planner planner = new Planner(providerConfig.providers, mainConfig.getHeuristic(), contractConfig.usersContracts, workload);
+			Planner planner = new Planner(providerConfig.providers, mainConfig.getHeuristic(), contractConfig.usersContracts, workloadParser);
 			planner.plan();
 			
 		} catch (FileNotFoundException e) {

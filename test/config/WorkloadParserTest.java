@@ -21,23 +21,24 @@ public class WorkloadParserTest {
 	@Test
 	public void testW1(){
 		try {
-			Map<String, Map<User, List<Request>>> workloadPerMonth = GEISTMonthlyWorkloadParser.getWorkloadPerMonth(W1);
-			assertNotNull(workloadPerMonth);
-			assertEquals(6, workloadPerMonth.size());
+			GEISTMonthlyWorkloadParser parser = new GEISTMonthlyWorkloadParser(W1);
 			
-			Map<User, List<Request>> jan = workloadPerMonth.get(GEISTMonthlyWorkloadParser.JAN);
+			//First month
+			Map<User, List<Request>> jan = parser.next();
 			assertNotNull(jan);
 			assertEquals(1, jan.size());//Number of users
 			User user = new User("1");
 			assertEquals(8, jan.get(user).size());//Number of requests
 			
-			Map<User, List<Request>> feb = workloadPerMonth.get(GEISTMonthlyWorkloadParser.FEB);
+			//Second month
+			Map<User, List<Request>> feb = parser.next();
 			assertNotNull(feb);
 			assertEquals(1, feb.size());//Number of users
 			user = new User("2");
 			assertEquals(8, feb.get(user).size());//Number of requests
 			
-			Map<User, List<Request>> mar = workloadPerMonth.get(GEISTMonthlyWorkloadParser.MAR);
+			//Third month
+			Map<User, List<Request>> mar = parser.next();
 			assertNotNull(mar);
 			assertEquals(2, mar.size());//Number of users
 			user = new User("3");
@@ -45,19 +46,22 @@ public class WorkloadParserTest {
 			user = new User("4");
 			assertEquals(2, mar.get(user).size());//Number of requests
 			
-			Map<User, List<Request>> apr = workloadPerMonth.get(GEISTMonthlyWorkloadParser.APR);
+			//Fourth month
+			Map<User, List<Request>> apr = parser.next();
 			assertNotNull(apr);
 			assertEquals(1, apr.size());//Number of users
 			user = new User("4");
 			assertEquals(8, apr.get(user).size());//Number of requests
 			
-			Map<User, List<Request>> nov = workloadPerMonth.get(GEISTMonthlyWorkloadParser.NOV);
+			//FIXME: Fifth month
+			Map<User, List<Request>> nov = parser.next();
 			assertNotNull(nov);
 			assertEquals(1, nov.size());//Number of users
 			user = new User("5");
 			assertEquals(8, nov.get(user).size());//Number of requests
 			
-			Map<User, List<Request>> dec = workloadPerMonth.get(GEISTMonthlyWorkloadParser.DEC);
+			//Sixth month
+			Map<User, List<Request>> dec = parser.next();
 			assertNotNull(dec);
 			assertEquals(1, dec.size());//Number of users
 			user = new User("6");
