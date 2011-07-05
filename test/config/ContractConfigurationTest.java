@@ -97,8 +97,8 @@ public class ContractConfigurationTest {
 			assertEquals("p1", c1.name);
 			assertEquals(100, c1.price, 0.0);
 			assertEquals(5.55, c1.setupCost, 0.0);
-			assertEquals(0.0, c1.transferCost, 0.0);//FIXME: When transference be supported fix this!
-			assertEquals(0, c1.transferLimit, 0.0);//FIXME: When transference be supported fix this!
+			assertEquals(0.0, c1.extraTransferenceCost, 0.0);//FIXME: When transference be supported fix this!
+			assertEquals(0, c1.transferenceLimit, 0.0);//FIXME: When transference be supported fix this!
 			
 			Contract c2 = config.usersContracts.get(new User("u2"));
 			assertNotNull(c2);
@@ -107,8 +107,8 @@ public class ContractConfigurationTest {
 			assertEquals("p2", c2.name);
 			assertEquals(250, c2.price, 0.0);
 			assertEquals(1.11, c2.setupCost, 0.0);
-			assertEquals(0, c2.transferCost, 0.0);//FIXME: When transference be supported fix this!
-			assertEquals(0, c2.transferLimit, 0.0);//FIXME: When transference be supported fix this!
+			assertEquals(0, c2.extraTransferenceCost, 0.0);//FIXME: When transference be supported fix this!
+			assertEquals(0, c2.transferenceLimit, 0.0);//FIXME: When transference be supported fix this!
 			
 			Contract c3 = config.usersContracts.get(new User("u3"));
 			assertNotNull(c3);
@@ -117,8 +117,8 @@ public class ContractConfigurationTest {
 			assertEquals("p1", c3.name);
 			assertEquals(100, c3.price, 0.0);
 			assertEquals(5.55, c3.setupCost, 0.0);
-			assertEquals(0, c3.transferCost, 0.0);//FIXME: When transference be supported fix this!
-			assertEquals(0, c3.transferLimit, 0.0);//FIXME: When transference be supported fix this!
+			assertEquals(0, c3.extraTransferenceCost, 0.0);//FIXME: When transference be supported fix this!
+			assertEquals(0, c3.transferenceLimit, 0.0);//FIXME: When transference be supported fix this!
 			
 			assertTrue(config.contracts.containsKey(c1.name));
 			assertTrue(config.contracts.containsKey(c2.name));

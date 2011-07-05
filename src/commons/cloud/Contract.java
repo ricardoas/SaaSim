@@ -7,8 +7,8 @@ public class Contract {
 	public double setupCost;//in $
 	public double cpuLimit;// in hours
 	public double extraCpuCost;// in $/hour
-	public double transferLimit;//in GB
-	public double transferCost;// in $/GB
+	public double transferenceLimit;//in GB
+	public double extraTransferenceCost;// in $/GB
 	
 	public Contract(String planName, Double setupCost, Double price,
 			Double cpuLimit, Double extraCpuCost) {

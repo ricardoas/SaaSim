@@ -14,9 +14,10 @@ public class ProviderConfiguration extends Configuration{
 	public static String PROVIDER = "prov";
 	
 	public static String NAME = ".name";
-	public static String CPU_COST = ".cpu_cost";
+	public static String ONDEMAND_CPU_COST = ".ondemand_cpu_cost";
 	public static String ON_DEMAND_LIMIT = ".ondemandLimit";
 	public static String RESERVATION_LIMIT = ".reservationLimit";
+	public static String RESERVED_CPU_COST = ".reserved_cpu_cost";
 	public static String ONE_YEAR_FEE = ".oneYearFee";
 	public static String THREE_YEARS_FEE = ".threeYearsFee";
 	public static String MONITORING = ".monit";
@@ -38,12 +39,14 @@ public class ProviderConfiguration extends Configuration{
 		boolean valid = true; 
 		int numberOfPlans = Integer.valueOf(currentProperties.getProperty(NUM_OF_PROVIDERS));
 		for(int i = 1; i <= numberOfPlans; i++){
-			valid = valid && currentProperties.containsKey(PROVIDER+i+NAME) && currentProperties.containsKey(PROVIDER+i+CPU_COST) && currentProperties.containsKey(PROVIDER+i+ON_DEMAND_LIMIT) &&
+			valid = valid && currentProperties.containsKey(PROVIDER+i+NAME) && currentProperties.containsKey(PROVIDER+i+ONDEMAND_CPU_COST) && 
+			currentProperties.containsKey(PROVIDER+i+ON_DEMAND_LIMIT) && currentProperties.containsKey(PROVIDER+i+RESERVED_CPU_COST) &&
 			currentProperties.containsKey(PROVIDER+i+RESERVATION_LIMIT) && currentProperties.containsKey(PROVIDER+i+ONE_YEAR_FEE) && 
 			currentProperties.containsKey(PROVIDER+i+THREE_YEARS_FEE) && currentProperties.containsKey(PROVIDER+i+MONITORING) && 
 			currentProperties.containsKey(PROVIDER+i+TRANSFER_IN) && currentProperties.containsKey(PROVIDER+i+COST_TRANSFER_IN) && 
 			currentProperties.containsKey(PROVIDER+i+TRANSFER_OUT) && currentProperties.containsKey(PROVIDER+i+COST_TRANSFER_OUT) &&
-			!currentProperties.getProperty(PROVIDER+i+CPU_COST).isEmpty() && !currentProperties.getProperty(PROVIDER+i+NAME).isEmpty()
+			!currentProperties.getProperty(PROVIDER+i+ONDEMAND_CPU_COST).isEmpty() && !currentProperties.getProperty(PROVIDER+i+NAME).isEmpty() &&
+			!currentProperties.getProperty(PROVIDER+i+RESERVED_CPU_COST).isEmpty()
 			&& !currentProperties.getProperty(PROVIDER+i+ON_DEMAND_LIMIT).isEmpty() && !currentProperties.getProperty(PROVIDER+i+RESERVATION_LIMIT).isEmpty() 
 			&& !currentProperties.getProperty(PROVIDER+i+ONE_YEAR_FEE).isEmpty() &&	!currentProperties.getProperty(PROVIDER+i+THREE_YEARS_FEE).isEmpty() 
 			&& !currentProperties.getProperty(PROVIDER+i+MONITORING).isEmpty() &&	!currentProperties.getProperty(PROVIDER+i+TRANSFER_IN).isEmpty()
@@ -57,8 +60,9 @@ public class ProviderConfiguration extends Configuration{
 		int numberOfPlans = Integer.valueOf(currentProperties.getProperty(NUM_OF_PROVIDERS));
 		providers = new HashMap<String, Provider>();
 		for(int i = 1; i <= numberOfPlans; i++){
-			providers.put(currentProperties.getProperty(PROVIDER+i+NAME), new Provider(currentProperties.getProperty(PROVIDER+i+NAME), Double.valueOf(currentProperties.getProperty(PROVIDER+i+CPU_COST)), Integer.valueOf(currentProperties.getProperty(PROVIDER+i+ON_DEMAND_LIMIT)),
-					Integer.valueOf(currentProperties.getProperty(PROVIDER+i+RESERVATION_LIMIT)), Double.valueOf(currentProperties.getProperty(PROVIDER+i+ONE_YEAR_FEE)), 
+			providers.put(currentProperties.getProperty(PROVIDER+i+NAME), new Provider(currentProperties.getProperty(PROVIDER+i+NAME), Double.valueOf(currentProperties.getProperty(PROVIDER+i+ONDEMAND_CPU_COST)), Integer.valueOf(currentProperties.getProperty(PROVIDER+i+ON_DEMAND_LIMIT)),
+					Integer.valueOf(currentProperties.getProperty(PROVIDER+i+RESERVATION_LIMIT)), Double.valueOf(currentProperties.getProperty(PROVIDER+i+RESERVED_CPU_COST)),
+					Double.valueOf(currentProperties.getProperty(PROVIDER+i+ONE_YEAR_FEE)), 
 					Double.valueOf(currentProperties.getProperty(PROVIDER+i+THREE_YEARS_FEE)), Double.valueOf(currentProperties.getProperty(PROVIDER+i+MONITORING)),
 					currentProperties.getProperty(PROVIDER+i+TRANSFER_IN), currentProperties.getProperty(PROVIDER+i+COST_TRANSFER_IN), currentProperties.getProperty(PROVIDER+i+TRANSFER_OUT), 
 					currentProperties.getProperty(PROVIDER+i+COST_TRANSFER_OUT)

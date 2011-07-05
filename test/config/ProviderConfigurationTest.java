@@ -97,8 +97,9 @@ public class ProviderConfigurationTest {
 			Provider provider = config.providers.get("p1");
 			assertNotNull(provider);
 			assertEquals("p1", provider.name);
-			assertEquals(0.5, provider.cpuCost, 0.0);
+			assertEquals(0.5, provider.onDemandCpuCost, 0.0);
 			assertEquals(10, provider.onDemandLimit, 0.0);
+			assertEquals(0.1, provider.reservedCpuCost, 0.0);
 			assertEquals(100, provider.reservationLimit, 0.0);
 			assertEquals(1000, provider.reservationOneYearFee, 0.0);
 			assertEquals(800, provider.reservationThreeYearsFee, 0.0);
@@ -111,9 +112,10 @@ public class ProviderConfigurationTest {
 			Provider provider2 = config.providers.get("p2");
 			assertNotNull(provider2);
 			assertEquals("p2", provider2.name);
-			assertEquals(0.5, provider2.cpuCost, 0.0);
+			assertEquals(0.5, provider2.onDemandCpuCost, 0.0);
 			assertEquals(10, provider2.onDemandLimit, 0.0);
 			assertEquals(200, provider2.reservationLimit, 0.0);
+			assertEquals(0.1, provider2.reservedCpuCost, 0.0);
 			assertEquals(1000, provider2.reservationOneYearFee, 0.0);
 			assertEquals(800, provider2.reservationThreeYearsFee, 0.0);
 			assertEquals(0.15, provider2.monitoringCost, 0.0);
@@ -125,9 +127,10 @@ public class ProviderConfigurationTest {
 			Provider provider3 = config.providers.get("p3");
 			assertNotNull(provider3);
 			assertEquals("p3", provider3.name);
-			assertEquals(0.55, provider3.cpuCost, 0.0);
+			assertEquals(0.55, provider3.onDemandCpuCost, 0.0);
 			assertEquals(1, provider3.onDemandLimit, 0.0);
 			assertEquals(10, provider3.reservationLimit, 0.0);
+			assertEquals(0.2, provider3.reservedCpuCost, 0.0);
 			assertEquals(100, provider3.reservationOneYearFee, 0.0);
 			assertEquals(80, provider3.reservationThreeYearsFee, 0.0);
 			assertEquals(0.1, provider3.monitoringCost, 0.0);
@@ -138,9 +141,9 @@ public class ProviderConfigurationTest {
 			
 			
 		} catch (FileNotFoundException e) {
-			fail("Valid file!");
+			fail("Valid file! "+e.getMessage());
 		} catch (IOException e) {
-			fail("Valid file!");
+			fail("Valid file! "+e.getMessage());
 		}
 	}
 	
