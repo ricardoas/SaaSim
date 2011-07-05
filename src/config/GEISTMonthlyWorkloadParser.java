@@ -37,7 +37,7 @@ public class GEISTMonthlyWorkloadParser implements WorkloadParser<Map<User, List
 	
 	private final String[] workloadFiles;
 	private final BufferedReader [] readers;
-	private int currentMonth;
+	public int currentMonth;
 	private Map<User, List<Request>> nextRequests;
 	
 	public GEISTMonthlyWorkloadParser(String ...workloadFiles){

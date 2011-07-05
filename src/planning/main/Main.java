@@ -47,7 +47,7 @@ public class Main {
 			providerConfig.loadPropertiesFromFile(mainConfig.getIAASFile());
 			
 			//Creating planner
-			Planner planner = new Planner(providerConfig.providers, mainConfig.getHeuristic(), contractConfig.usersContracts, workloadParser);
+			Planner planner = new Planner(providerConfig.providers, mainConfig.getHeuristic(), contractConfig.usersContracts, workloadParser, mainConfig.getSLA());
 			planner.plan();
 			
 		} catch (FileNotFoundException e) {

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.jgap.IChromosome;
+
 import planning.heuristic.AGHeuristic;
 import planning.heuristic.PlanningHeuristic;
 
@@ -11,7 +13,7 @@ import commons.cloud.Contract;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
-import commons.cloud.UtilityFunction;
+
 import config.GEISTMonthlyWorkloadParser;
 
 public class Planner {
@@ -20,17 +22,15 @@ public class Planner {
 	private PlanningHeuristic planningHeuristic;
 	private Map<User, Contract> cloudUsers;
 	private GEISTMonthlyWorkloadParser workloadParser;
+	private final double sla;
 	
-	private UtilityFunction utilityFunction;
-	
-	public Planner(Map<String, Provider> providers, String heuristic, Map<User, Contract> cloudUsers, GEISTMonthlyWorkloadParser workloadParser) {
+	public Planner(Map<String, Provider> providers, String heuristic, Map<User, Contract> cloudUsers, GEISTMonthlyWorkloadParser workloadParser, double sla) {
 		this.cloudProvider = providers;
+		this.sla = sla;
 		this.planningHeuristic = new AGHeuristic();
 		
 		this.cloudUsers = cloudUsers;
 		this.workloadParser = workloadParser;
-		
-		this.utilityFunction = new UtilityFunction();
 	}
 	
 	/**
@@ -41,9 +41,12 @@ public class Planner {
 		try {
 			Map<User, List<Request>> currentWorkload = this.workloadParser.next();
 			while(!currentWorkload.isEmpty()){
-				this.planningHeuristic.findPlan(currentWorkload, cloudProvider, cloudUsers);
-				//TODO
+				this.planningHeuristic.findPlan(currentWorkload, cloudProvider, cloudUsers, sla);
 			}
+			
+			//TODO Retrieving whole period plan and other info
+			List plan = this.planningHeuristic.getPlan();
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

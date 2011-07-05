@@ -29,6 +29,7 @@ public class WorkloadParserTest {
 			assertEquals(1, jan.size());//Number of users
 			User user = new User("1");
 			assertEquals(8, jan.get(user).size());//Number of requests
+			assertEquals(2, parser.currentMonth);
 			
 			//Second month
 			Map<User, List<Request>> feb = parser.next();
@@ -36,6 +37,7 @@ public class WorkloadParserTest {
 			assertEquals(1, feb.size());//Number of users
 			user = new User("2");
 			assertEquals(8, feb.get(user).size());//Number of requests
+			assertEquals(3, parser.currentMonth);
 			
 			//Third month
 			Map<User, List<Request>> mar = parser.next();
@@ -45,6 +47,7 @@ public class WorkloadParserTest {
 			assertEquals(6, mar.get(user).size());//Number of requests
 			user = new User("4");
 			assertEquals(2, mar.get(user).size());//Number of requests
+			assertEquals(4, parser.currentMonth);
 			
 			//Fourth month
 			Map<User, List<Request>> apr = parser.next();
@@ -52,13 +55,15 @@ public class WorkloadParserTest {
 			assertEquals(1, apr.size());//Number of users
 			user = new User("4");
 			assertEquals(8, apr.get(user).size());//Number of requests
+			assertEquals(11, parser.currentMonth);
 			
-			//FIXME: Fifth month
+			//Fifth month
 			Map<User, List<Request>> nov = parser.next();
 			assertNotNull(nov);
 			assertEquals(1, nov.size());//Number of users
 			user = new User("5");
 			assertEquals(8, nov.get(user).size());//Number of requests
+			assertEquals(12, parser.currentMonth);
 			
 			//Sixth month
 			Map<User, List<Request>> dec = parser.next();
@@ -66,6 +71,7 @@ public class WorkloadParserTest {
 			assertEquals(1, dec.size());//Number of users
 			user = new User("6");
 			assertEquals(1, dec.get(user).size());//Number of requests
+			assertEquals(13, parser.currentMonth);
 			
 			//Verifying that all users were read correctly
 			for(User currentUser : jan.keySet()){

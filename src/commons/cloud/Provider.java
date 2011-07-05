@@ -6,8 +6,8 @@ public class Provider {
 
 	public List<Resource> resources;
 	public final double cpuCost;// in instance-hour
-	public final double onDemandLimit;// in number of instances
-	public final double reservationLimit;// in number of instances
+	public final int onDemandLimit;// in number of instances
+	public final int reservationLimit;// in number of instances
 	public final double reservationOneYearFee;// in $
 	public final double reservationThreeYearsFee;// in $
 	public final double monitoringCost;// in $
@@ -22,8 +22,8 @@ public class Provider {
 	public final String transferOutCosts;// Transference costs per range
 	public final String name;
 
-	public Provider(String name, double cpuCost, double onDemandLimit,
-			double reservationLimit, double reservationOneYearFee,
+	public Provider(String name, double cpuCost, int onDemandLimit,
+			int reservationLimit, double reservationOneYearFee,
 			double reservationThreeYearsFee, double monitoringCost,
 			String transferInLimits, String transferInCosts,
 			String transferOutLimits, String transferOutCosts) {

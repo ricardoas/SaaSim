@@ -11,7 +11,9 @@ import commons.cloud.User;
 public interface PlanningHeuristic {
 
 	public void findPlan(Map<User, List<Request>> currentWorkload,
-			Map<String, Provider> cloudProvider, Map<User, Contract> cloudUsers);
+			Map<String, Provider> cloudProvider, Map<User, Contract> cloudUsers, double sla);
 	
-	public double getEstimatedProfit();
+	public double getEstimatedProfit(int period);
+	
+	public List getPlan();
 }

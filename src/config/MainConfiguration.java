@@ -43,8 +43,8 @@ public class MainConfiguration extends Configuration{
 		return getProperty(IAAS);
 	}
 	
-	public String getSLA(){
-		return getProperty(SLA);
+	public double getSLA(){
+		return Double.valueOf(getProperty(SLA));
 	}
 	
 	public String getPlanningPeriod(){
