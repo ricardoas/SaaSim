@@ -16,6 +16,8 @@ public class OneTierSimulator implements Simulator {
 	private WorkloadParser<Request> workloadParser;
 	private Monitor monitor;
 	
+	private LoadBalancer applicationServer;
+	
 	/**
 	 * Constructor
 	 */
@@ -26,10 +28,13 @@ public class OneTierSimulator implements Simulator {
 
 	@Override
 	public void start() {
+		
+		Clock.INSTANCE.reset();
 		try {
 			while(workloadParser.hasNext()){
 				Request request = workloadParser.next();
-
+				
+				Clock.INSTANCE.walk();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
