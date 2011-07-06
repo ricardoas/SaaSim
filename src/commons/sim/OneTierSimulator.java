@@ -12,6 +12,7 @@ import provisioning.Monitor;
 public class OneTierSimulator implements Simulator {
 	
 	private WorkloadParser<Request> workloadParser;
+	private Monitor monitor;
 	
 	/**
 	 * Constructor
@@ -29,7 +30,10 @@ public class OneTierSimulator implements Simulator {
 
 	@Override
 	public boolean setMonitor(Monitor monitor) {
-		// TODO Auto-generated method stub
+		if(this.monitor != null){
+			return false;
+		}
+		this.monitor = monitor;
 		return false;
 	}
 

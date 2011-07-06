@@ -26,6 +26,8 @@ public class Main {
 		
 		simulator.setMonitor(monitor);
 		
+		dps.setConfigurable(simulator);
+		
 		simulator.start();
 	}
 
