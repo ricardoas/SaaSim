@@ -50,7 +50,6 @@ public class Provider {
 	}
 
 	private void verifyProperties() {
-		// TODO Auto-generated method stub
 		if(this.onDemandCpuCost < 0){
 			throw new RuntimeException("Invalid provider "+this.name+": onDemandCpuCost "+this.onDemandCpuCost);
 		}
