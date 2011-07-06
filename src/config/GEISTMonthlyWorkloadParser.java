@@ -163,6 +163,12 @@ public class GEISTMonthlyWorkloadParser implements WorkloadParser<Map<User, List
 			return 12;
 		}
 	}
+
+	@Override
+	public boolean hasNext() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
 
 

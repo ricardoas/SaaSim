@@ -1,6 +1,5 @@
 package commons.config;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -21,5 +20,10 @@ public interface WorkloadParser<T> {
 	 * @throws IOException 
 	 */
 	T next() throws IOException;
+
+	/**
+	 * @return
+	 */
+	boolean hasNext();
 
 }

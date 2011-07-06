@@ -1,5 +1,7 @@
 package commons.sim;
 
+import java.io.IOException;
+
 import commons.cloud.Request;
 import commons.config.WorkloadParser;
 import config.GEISTSimpleWorkloadParser;
@@ -24,8 +26,14 @@ public class OneTierSimulator implements Simulator {
 
 	@Override
 	public void start() {
-		// TODO Auto-generated method stub
+		try {
+			while(workloadParser.hasNext()){
+				Request request = workloadParser.next();
 
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
