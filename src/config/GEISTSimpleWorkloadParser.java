@@ -61,7 +61,8 @@ public class GEISTSimpleWorkloadParser implements WorkloadParser<Request> {
 		try {
 			if(queue.isEmpty()){
 				String line;
-				if((line = reader.readLine()) != null){
+				int page = 0;
+				if(page++ < pageSize && (line = reader.readLine()) != null){
 					queue.add(parseRequest(line));
 				}
 			}
