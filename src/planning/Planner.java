@@ -18,21 +18,37 @@ import config.GEISTMonthlyWorkloadParser;
 
 public class Planner {
 
-	private Map<String, Provider> cloudProvider;
+	private Map<String, Provider> cloudProviders;
 	private PlanningHeuristic planningHeuristic;
 	private Map<User, Contract> cloudUsers;
 	private GEISTMonthlyWorkloadParser workloadParser;
 	private final double sla;
 	
 	public Planner(Map<String, Provider> providers, String heuristic, Map<User, Contract> cloudUsers, GEISTMonthlyWorkloadParser workloadParser, double sla) {
-		this.cloudProvider = providers;
+		this.cloudProviders = providers;
 		this.sla = sla;
 		this.planningHeuristic = new AGHeuristic();
 		
 		this.cloudUsers = cloudUsers;
 		this.workloadParser = workloadParser;
+		this.verifyProperties();
 	}
 	
+	private void verifyProperties() {
+		if(this.sla <= 0){
+			throw new RuntimeException("Invalid sla in Planner: "+this.sla);
+		}
+		if(this.cloudUsers == null || this.cloudUsers.size() == 0){
+			throw new RuntimeException("Invalid users in Planner!");
+		}
+		if(this.cloudProviders == null || this.cloudProviders.size() == 0){
+			throw new RuntimeException("Invalid cloud providers in Planner!");
+		}
+		if(this.workloadParser == null){
+			throw new RuntimeException("Invalid workload parser in Planner!");
+		}
+	}
+
 	/**
 	 * Given the heuristic and the scenario data, this method is responsible for requesting the planning
 	 * of the infrastructure
@@ -41,7 +57,7 @@ public class Planner {
 		try {
 			Map<User, List<Request>> currentWorkload = this.workloadParser.next();
 			while(!currentWorkload.isEmpty()){
-				this.planningHeuristic.findPlan(currentWorkload, cloudProvider, cloudUsers, sla);
+				this.planningHeuristic.findPlan(currentWorkload, cloudProviders, cloudUsers, sla);
 			}
 			
 			//TODO Retrieving whole period plan and other info

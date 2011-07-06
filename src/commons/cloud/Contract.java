@@ -12,11 +12,30 @@ public class Contract {
 	
 	public Contract(String planName, Double setupCost, Double price,
 			Double cpuLimit, Double extraCpuCost) {
-			this.name = planName;
-			this.setupCost = setupCost;
-			this.price = price;
-			this.cpuLimit = cpuLimit;
-			this.extraCpuCost = extraCpuCost;
+		this.name = planName;
+		this.setupCost = setupCost;
+		this.price = price;
+		this.cpuLimit = cpuLimit;
+		this.extraCpuCost = extraCpuCost;
+		this.verifyProperties();
+	}
+
+	private void verifyProperties() {
+		if(this.setupCost < 0){
+			throw new RuntimeException("Invalid contract "+this.name+": setUpCost!");
+		}
+		if(this.price < 0){
+			throw new RuntimeException("Invalid contract "+this.name+": setUpCost!");
+		}
+		if(this.cpuLimit < 0){
+			throw new RuntimeException("Invalid contract "+this.name+": setUpCost!");
+		}
+		if(this.extraCpuCost < 0){
+			throw new RuntimeException("Invalid contract "+this.name+": setUpCost!");
+		}
+		if(this.extraTransferenceCost < 0){
+			throw new RuntimeException("Invalid contract "+this.name+": setUpCost!");
+		}
 	}
 
 }

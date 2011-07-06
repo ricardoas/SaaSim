@@ -46,6 +46,32 @@ public class Provider {
 		
 		this.onDemandResources = new ArrayList<Resource>();
 		this.reservedResources = new ArrayList<Resource>();
+		this.verifyProperties();
+	}
+
+	private void verifyProperties() {
+		// TODO Auto-generated method stub
+		if(this.onDemandCpuCost < 0){
+			throw new RuntimeException("Invalid provider "+this.name+": onDemandCpuCost "+this.onDemandCpuCost);
+		}
+		if(this.onDemandLimit <= 0){
+			throw new RuntimeException("Invalid provider "+this.name+": onDemandLimit "+this.onDemandLimit);
+		}
+		if(this.reservationLimit <= 0){
+			throw new RuntimeException("Invalid provider "+this.name+": reservationLimit "+this.reservationLimit);
+		}
+		if(this.reservedCpuCost < 0){
+			throw new RuntimeException("Invalid provider "+this.name+": reservedCpuCost "+this.reservedCpuCost);
+		}
+		if(this.reservationOneYearFee < 0){
+			throw new RuntimeException("Invalid provider "+this.name+": reservationOneYearFee "+this.reservationOneYearFee);
+		}
+		if(this.reservationThreeYearsFee < 0){
+			throw new RuntimeException("Invalid provider "+this.name+": reservationThreeYearsFee "+this.reservationThreeYearsFee);
+		}
+		if(this.monitoringCost < 0){
+			throw new RuntimeException("Invalid provider "+this.name+": monitoringCost "+this.monitoringCost);
+		}
 	}
 
 	public void contractResource(long startTime, long endTime) {

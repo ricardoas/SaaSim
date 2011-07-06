@@ -11,6 +11,200 @@ public class ProviderTest {
 	public static final int HOUR = 1;
 
 	@Test
+	public void providerWithInvalidCpuCost(){
+		double onDemandCpuCost = 0.1;
+		int onDemandLimit = 20;
+		int reservationLimit = 20;
+		double reservedCpuCost = 0.01;
+		double reservationOneYearFee = 100;
+		double reservationThreeYearsFee = 70;
+		double monitoringCost = 0.2;
+		String transferInLimits = "";
+		String transferInCosts = "";
+		String transferOutLimits = "";
+		String transferOutCosts = "";
+		
+		try{
+			new Provider(name, -0.09, onDemandLimit, reservationLimit, 
+					reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			fail("Invalid provider!");
+		}catch(RuntimeException e){
+		}
+	}
+	
+	@Test
+	public void providerWithInvalidCpuLimit(){
+		double onDemandCpuCost = 0.1;
+		int onDemandLimit = 20;
+		int reservationLimit = 20;
+		double reservedCpuCost = 0.01;
+		double reservationOneYearFee = 100;
+		double reservationThreeYearsFee = 70;
+		double monitoringCost = 0.2;
+		String transferInLimits = "";
+		String transferInCosts = "";
+		String transferOutLimits = "";
+		String transferOutCosts = "";
+		
+		try{
+			new Provider(name, onDemandCpuCost, -99999, reservationLimit, 
+					reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			fail("Invalid provider!");
+		}catch(RuntimeException e){
+		}
+		
+		try{
+			new Provider(name, onDemandCpuCost, 0, reservationLimit, 
+					reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			fail("Invalid provider!");
+		}catch(RuntimeException e){
+		}
+	}
+	
+	@Test
+	public void providerWithInvalidReservedCpuLimit(){
+		double onDemandCpuCost = 0.1;
+		int onDemandLimit = 20;
+		int reservationLimit = 20;
+		double reservedCpuCost = 0.01;
+		double reservationOneYearFee = 100;
+		double reservationThreeYearsFee = 70;
+		double monitoringCost = 0.2;
+		String transferInLimits = "";
+		String transferInCosts = "";
+		String transferOutLimits = "";
+		String transferOutCosts = "";
+		
+		try{
+			new Provider(name, onDemandCpuCost, onDemandLimit, 0, 
+					reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			fail("Invalid provider!");
+		}catch(RuntimeException e){
+		}
+		
+		try{
+			new Provider(name, onDemandCpuCost, onDemandLimit, -777, 
+					reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			fail("Invalid provider!");
+		}catch(RuntimeException e){
+		}
+	}
+	
+	@Test
+	public void providerWithInvalidReservedCpuCost(){
+		double onDemandCpuCost = 0.1;
+		int onDemandLimit = 20;
+		int reservationLimit = 20;
+		double reservedCpuCost = 0.01;
+		double reservationOneYearFee = 100;
+		double reservationThreeYearsFee = 70;
+		double monitoringCost = 0.2;
+		String transferInLimits = "";
+		String transferInCosts = "";
+		String transferOutLimits = "";
+		String transferOutCosts = "";
+		
+		try{
+			new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
+					-reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			fail("Invalid provider!");
+		}catch(RuntimeException e){
+		}
+		
+		try{
+			new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
+					-13.9787656, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			fail("Invalid provider!");
+		}catch(RuntimeException e){
+		}
+	}
+	
+	@Test
+	public void providerWithInvalidReservationFee(){
+		double onDemandCpuCost = 0.1;
+		int onDemandLimit = 20;
+		int reservationLimit = 20;
+		double reservedCpuCost = 0.01;
+		double reservationOneYearFee = 100;
+		double reservationThreeYearsFee = 70;
+		double monitoringCost = 0.2;
+		String transferInLimits = "";
+		String transferInCosts = "";
+		String transferOutLimits = "";
+		String transferOutCosts = "";
+		
+		try{
+			new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
+					reservedCpuCost, -reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			fail("Invalid provider!");
+		}catch(RuntimeException e){
+		}
+		
+		try{
+			new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
+					reservedCpuCost, 0, reservationThreeYearsFee, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+		}catch(RuntimeException e){
+			fail("Invalid provider!");
+		}
+		
+		try{
+			new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
+					reservedCpuCost, reservationOneYearFee, -reservationThreeYearsFee, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			fail("Invalid provider!");
+		}catch(RuntimeException e){
+		}
+		
+		try{
+			new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
+					reservedCpuCost, reservationOneYearFee, 0, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+		}catch(RuntimeException e){
+			fail("Invalid provider!");
+		}
+	}
+	
+	@Test
+	public void providerWithInvalidMonitoringCost(){
+		double onDemandCpuCost = 0.1;
+		int onDemandLimit = 20;
+		int reservationLimit = 20;
+		double reservedCpuCost = 0.01;
+		double reservationOneYearFee = 100;
+		double reservationThreeYearsFee = 70;
+		double monitoringCost = 0.2;
+		String transferInLimits = "";
+		String transferInCosts = "";
+		String transferOutLimits = "";
+		String transferOutCosts = "";
+		
+		try{
+			new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
+					reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, -monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			fail("Invalid provider!");
+		}catch(RuntimeException e){
+		}
+		
+		try{
+			new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
+					reservedCpuCost, 0, reservationThreeYearsFee, -0.0000001, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			fail("Invalid provider!");
+		}catch(RuntimeException e){
+		}
+	}
+	
+	@Test
 	public void calculateCostForReservedResources(){
 		double onDemandCpuCost = 0.1;
 		int onDemandLimit = 20;
