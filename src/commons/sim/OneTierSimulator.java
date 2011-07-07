@@ -33,7 +33,7 @@ public class OneTierSimulator implements Simulator {
 		try {
 			while(workloadParser.hasNext()){
 				Request request = workloadParser.next();
-				
+				applicationServer.run(request);
 				Clock.INSTANCE.walk();
 			}
 		} catch (IOException e) {
