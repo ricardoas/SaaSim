@@ -5,111 +5,78 @@ package commons.sim.jeevent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.TreeSet;
-import java.util.Vector;
 
 /**
  * TODO make doc
  *
  * @author thiago - thiago@lsd.ufcg.edu.br
+ * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
  */
 public enum JEEventScheduler {
 	
+	/**
+	 * Single instance.
+	 */
 	SCHEDULER;
 	
-	private JETime now;
-    private Vector<JEEvent> EventList = new Vector<JEEvent>();
-    private Vector<JEEventHandler> HandlerList;
-    private Boolean isActive;
+    private JETime now;
     private JETime simulationEnd;
-    
     private Map<Integer,JEEventHandler> handlerMap;
-    private Set<JEEvent> eventSet;
+    private TreeSet<JEEvent> eventSet;
 
     /**
-     * 
+     * Default private constructor.
      */
     private JEEventScheduler() {
     	clear();
     }
     
     /**
-     * @param aNewEvent
+     * Add a new event to the queue. Duplicates are not allowed.
+     * @param event A new event.
      */
-    public void queue_event(JEEvent aNewEvent) {
+    public void queueEvent(JEEvent event) {
     	
-		JETime anEventTime = aNewEvent.getScheduledTime();
-		
+		JETime anEventTime = event.getScheduledTime();
 		if (anEventTime.isEarlierThan(now())) {
-		    throw new RuntimeException("ERROR: emulation time(" + now() + ") already ahead of event time("+anEventTime+"). Event is outdated and will not be processed.");
+		    throw new JEException("ERROR: emulation time(" + now() + ") already ahead of event time("+anEventTime+"). Event is outdated and will not be processed.");
 		}
-		
-		int queue_size = EventList.size();
-		
-		if (queue_size == 0) {
-			EventList.addElement(aNewEvent);
-		} else if ( EventList.lastElement().getScheduledTime().isEarlierThan(anEventTime)) {
-			EventList.addElement(aNewEvent);
-		} else {
-		    
-			int queue_pos;
-		    
-		    for (queue_pos = queue_size - 1; ( (queue_pos > 0) & anEventTime.isEarlierThan(EventList.elementAt(queue_pos).getScheduledTime())); queue_pos--) {
-			/* empty */
-		    }
-		    
-		    if (++queue_pos == 1 & anEventTime.isEarlierThan(EventList.elementAt(0).getScheduledTime())) {
-		    	queue_pos--;
-		    }
-		    
-		    EventList.insertElementAt(aNewEvent, queue_pos);
-		}
+		eventSet.add(event);
     }
     
     /**
-     * @param anObsoleteEvent
+     * Cancel a future event by removing it from the queue.
+     * @param event Event to cancel.
      */
-    public void cancel_event(JEEvent anObsoleteEvent) {
+    public void cancelEvent(JEEvent event) {
 
-    	if (anObsoleteEvent == null) {
+    	if (event == null) {
 			throw new NullPointerException();
 		}
-		EventList.remove(anObsoleteEvent);
+    	eventSet.remove(event);
     }
     
     /**
-     * @param handler
-     * @return
+     * Register a new handler so that {@link JEEvent} queued to them can be
+     * delivered.
+     * @param handler A new handler
+     * @return The handler unique ID.
      */
     public int registerHandler(JEEventHandler handler) {
     	
-    	
-		Integer id = handler.getHandlerId();
-		id = 1;
-		
-		while((id = new Random().nextInt(100)) <= 0 || handlerMap.containsKey(id)){}//FIXME remove 100
-
-		if (HandlerList.size() < id.intValue() - 1) {
-			HandlerList.setSize(id.intValue() - 1);
-		}
-		
-		if (HandlerList.size() > id.intValue() - 1) {
-			HandlerList.removeElementAt(id.intValue() - 1);
-		}
-		
-		HandlerList.insertElementAt(handler,id.intValue() - 1);
-		
+		int id;
+		while((id = new Random().nextInt()) <= 0 || handlerMap.containsKey(id)){}
 		handlerMap.put(id, handler);
 		return id;
     }
     
     /**
-     * 
+     * Start the emulation.
      */
     public void start() {
     	
-		if (!EventList.isEmpty()) {
+		if (!eventSet.isEmpty()) {
 			schedule();
 		}else{
 			this.now = simulationEnd;
@@ -117,91 +84,66 @@ public enum JEEventScheduler {
     }
     
     /**
-     * @return
-     */
-    private JEEvent peek() {
-    	
-		if (!EventList.isEmpty()) {
-		    JEEvent aNextEvent = EventList.elementAt(0);
-		    EventList.removeElementAt(0);
-		    return aNextEvent;
-		}
-		
-		return null;
-    }
-    
-    /**
-     * 
+     * Emulates until there is no more event to send or end of simulation time is reached.
      */
     private void schedule() {
     	
-		isActive = true;
-		
-		while (!EventList.isEmpty() & isActive.booleanValue() & isEarlierThanEmulationEnd(now()) ) {
-		    
-			JEEvent aNextEvent = peek();
-		    
-			if (aNextEvent != null) {
-				
-				JETime anEventTime = aNextEvent.getScheduledTime();
-		
-				if (anEventTime.isEarlierThan(now())) {
-				    throw new RuntimeException("ERROR: emulation time(" + now() + ") " + "already ahead of event time(" + anEventTime+ "). Event is outdated and will not be processed.");
-				}
-				
-				if (isEarlierThanEmulationEnd(anEventTime)) {
-				    now = anEventTime;
-				    processEvent(aNextEvent);
-				} else {
-				    now = simulationEnd;
-				}
-		    }
-		}
-		
-		isActive = Boolean.valueOf(false);
-    }
-    
-    private boolean isEarlierThanEmulationEnd(JETime time) {
-    	return (simulationEnd != null) ? time.isEarlierThan(simulationEnd) : true;
+    	while(!eventSet.isEmpty() && now().isEarlierThan(simulationEnd)){
+    		JEEvent event = eventSet.pollFirst();
+			JETime scheduledTime = event.getScheduledTime();
+			if (scheduledTime.isEarlierThan(now())) {
+			    throw new JEException("ERROR: emulation time(" + now() + ") " + "already ahead of event time(" + scheduledTime+ "). Event is outdated and will not be processed.");
+			}
+			
+			if(scheduledTime.isEarlierThan(simulationEnd)){
+				now = scheduledTime;
+				processEvent(event);
+			}else{
+				now = simulationEnd;
+			}
+    	}
     }
     
     /**
-     * @param aNextEvent
+     * Searches for the target handler and delivers the event.
+     * @param event Next event to delivers.
      */
-    private void processEvent(JEEvent aNextEvent) {
+    private void processEvent(JEEvent event) {
 		
-    	Integer aTargetHandlerId = aNextEvent.getTargetHandlerId();
-    	
-		if (HandlerList.elementAt(aTargetHandlerId.intValue() - 1) == null) {
-		    throw new RuntimeException ("ERROR: no Handler at vector position "+ (aTargetHandlerId.intValue() - 1)+". Something's wrong here, dude.");
-		}
-		
-		HandlerList.elementAt(aTargetHandlerId.intValue() - 1).handleEvent(aNextEvent);
+    	int targetHandlerId = event.getTargetHandlerId();
+    	if(!handlerMap.containsKey(targetHandlerId)){
+    		throw new JEException ("ERROR: no Handler registered with id " + (targetHandlerId));
+    	}
+    	handlerMap.get(targetHandlerId).handleEvent(event);
     }
     
     /**
      * @return
      */
+    @Deprecated
     public JETime now() {
     	return now;
     }
 
+	/**
+	 * @param time
+	 */
 	public void setEmulationEnd(JETime time) {
 		this.simulationEnd = time;
 	}
 	
+	/**
+	 * @param id
+	 * @return
+	 */
 	public JEEventHandler getHandler(int id){
 		return handlerMap.get(id);
 	}
 
+	/**
+	 * Prepares the scheduler to a new execution.
+	 */
 	public void clear() {
-	   	EventList.setSize(10000);
-		EventList.clear();
-		HandlerList = new Vector<JEEventHandler>();
-		HandlerList.setSize(100);
-		HandlerList.clear();
-		isActive = false;
-		
 		this.now = new JETime(0L);
 		this.simulationEnd = JETime.INFINITY;
 		this.handlerMap = new HashMap<Integer, JEEventHandler>();

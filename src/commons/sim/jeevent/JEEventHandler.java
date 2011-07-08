@@ -30,7 +30,7 @@ public abstract class JEEventHandler {
      * @param event
      */
     public void send(JEEvent event) {
-    	JEEventScheduler.SCHEDULER.queue_event(event);
+    	JEEventScheduler.SCHEDULER.queueEvent(event);
     }
     
     /**
