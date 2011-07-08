@@ -3,6 +3,7 @@
  */
 package commons.sim.jeevent;
 
+
 /**
  * TODO make doc
  *
@@ -22,6 +23,7 @@ public abstract class JEEventHandler {
     }
     
     /**
+     * @param <T>
      * @param event
      */
     public abstract void handleEvent(JEEvent event);

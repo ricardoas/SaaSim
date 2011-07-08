@@ -4,8 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.ArrayList;
+import java.util.List;
 
 import commons.cloud.Request;
 import commons.config.WorkloadParser;
@@ -14,61 +14,47 @@ import commons.config.WorkloadParser;
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public class GEISTSimpleWorkloadParser implements WorkloadParser<Request> {
+public class GEISTSimpleWorkloadParser implements WorkloadParser<List<Request>> {
 	
-	private static final int DEFAULT_PAGE_SIZE = 100;
+
+	private static final int HOUR_IN_MILLIS = 3600000;
 
 	private BufferedReader reader;
 	
-	private Queue<Request> queue;
-	
-	private int pageSize;
+	private Request temp;
 
+	/**
+	 * @param workloadFileName
+	 */
 	public GEISTSimpleWorkloadParser(String workloadFileName) {
 		
 		try {
 			reader = new BufferedReader(new FileReader(workloadFileName));
-			queue = new LinkedList<Request>();
-			pageSize = DEFAULT_PAGE_SIZE;
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Request next() {
-    	checkQueueContent();
-    	return queue.poll();
-    }
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean hasNext() {
-		checkQueueContent();
-		return queue.isEmpty();
+		return temp != null || readNext();
 	}
 	
 	/**
-	 * 
+	 * @return
 	 */
-	private void checkQueueContent(){
+	private boolean readNext() {
+		String line;
 		try {
-			if(queue.isEmpty()){
-				String line;
-				int page = 0;
-				if(page++ < pageSize && (line = reader.readLine()) != null){
-					queue.add(parseRequest(line));
-				}
-			}
+			line = reader.readLine();
+			return line != null? (temp = parseRequest(line)) != null :false;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		return false;
 	}
 
 	/**
@@ -78,10 +64,28 @@ public class GEISTSimpleWorkloadParser implements WorkloadParser<Request> {
 	 */
 	private Request parseRequest(String line) {
 		String[] eventData = line.split("( +|\t+)+");
-		return new Request(eventData[0], eventData[2], Double
-				.valueOf(eventData[3]), Double.valueOf(eventData[4]),
+		return new Request(eventData[0], eventData[2], Long
+				.valueOf(eventData[3]), Long.valueOf(eventData[4]),
 				(eventData[5].contains("1")) ? true : false, eventData[6],
 				eventData[7]);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public List<Request> next() throws IOException {
+		List<Request> requests = new ArrayList<Request>();
+		if(temp == null){
+			readNext();
+		}
+		int currentHour = (int) (temp.time/HOUR_IN_MILLIS);
+		do{
+			requests.add(temp);
+			readNext();
+		}while(temp != null && currentHour != (int)(temp.time/HOUR_IN_MILLIS));
+		
+		return requests;
 	}
 
 }

@@ -42,5 +42,12 @@ public class Machine {
 			return false;
 		return true;
 	}
+
+	public void sendRequest(Request request) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 	
 }

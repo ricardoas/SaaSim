@@ -15,28 +15,27 @@ public class JEEvent implements Comparable<JEEvent>{
 	private static int eventIdSeed = 0;
 	
 	private final int eventId;
-    private final String name;
     private final int targetHandlerId;
     private final JETime scheduledTime;
     private final JEEventType type;
-    
+	private final Object[] value;
     
     
     /**
      * Default constructor
      * @param type TODO
-     * @param name
      * @param targetHandler
      * @param scheduledTime
      */
-    public JEEvent(JEEventType type, String name, JEEventHandler targetHandler, JETime scheduledTime) {
+    public JEEvent(JEEventType type, JEEventHandler targetHandler, JETime scheduledTime, Object... value) {
 	
-    	this.eventId = eventIdSeed++;
+		this.eventId = eventIdSeed++;
     	
-    	this.name = name;
 		this.targetHandlerId = targetHandler.getHandlerId();
 		this.scheduledTime = scheduledTime;
 		this.type = type;
+		this.value = value;
+		
     }
     
     /**
@@ -44,13 +43,6 @@ public class JEEvent implements Comparable<JEEvent>{
      */
     public Integer getTargetHandlerId() {
     	return targetHandlerId;
-    }
-    
-    /**
-     * @return
-     */
-    public String getName() {
-    	return name;
     }
     
     /**
@@ -82,5 +74,11 @@ public class JEEvent implements Comparable<JEEvent>{
 		int result = getScheduledTime().compareTo(o.getScheduledTime());
 		return result != 0? result: type.compareTo(o.getType());
 	}
-    
+
+	/**
+	 * @return
+	 */
+	public Object[] getValue() {
+		return value;
+	}
 }

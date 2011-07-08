@@ -6,12 +6,14 @@ import java.util.Random;
 
 import commons.cloud.Machine;
 import commons.cloud.Request;
+import commons.sim.jeevent.JEEvent;
+import commons.sim.jeevent.JEEventHandler;
 
 /**
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public class LoadBalancer {
+public class LoadBalancer extends JEEventHandler{
 	
 	private List<Machine> servers;
 	
@@ -45,5 +47,17 @@ public class LoadBalancer {
 	 */
 	public void run(Request... request) {
 //		heuristic.nextServer();
+	}
+
+	@Override
+	public void handleEvent(JEEvent event) {
+		switch (event.getType()) {
+		case NEWREQUEST:
+			Request request = (Request) event.getValue()[0];
+			heuristic.getNextServer(request).sendRequest(request);
+			break;
+		default:
+			break;
+		}
 	}
 }

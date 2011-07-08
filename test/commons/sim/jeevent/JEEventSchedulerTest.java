@@ -26,8 +26,8 @@ public class JEEventSchedulerTest {
 		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1).times(2);
 		EasyMock.replay(handler);
-		SCHEDULER.queueEvent(new JEEvent(JEEventType.READWORKLOAD, "eventA", handler, new JETime(1000)));
-		SCHEDULER.queueEvent(new JEEvent(JEEventType.LESSIMPORTANTEVENT, "eventB", handler, new JETime(1000)));
+		SCHEDULER.queueEvent(new JEEvent(JEEventType.READWORKLOAD, handler, new JETime(1000)));
+		SCHEDULER.queueEvent(new JEEvent(JEEventType.NEWREQUEST, handler, new JETime(1000)));
 		SCHEDULER.start();
 		EasyMock.verify(handler);
 	}
@@ -46,7 +46,7 @@ public class JEEventSchedulerTest {
 		EasyMock.expectLastCall().once();
 		EasyMock.replay(handler);
 		
-		SCHEDULER.queueEvent(new JEEvent(JEEventType.READWORKLOAD, "eventA", handler, new JETime(1000)));
+		SCHEDULER.queueEvent(new JEEvent(JEEventType.READWORKLOAD, handler, new JETime(1000)));
 		SCHEDULER.start();
 		
 		EasyMock.verify(handler);
@@ -64,7 +64,7 @@ public class JEEventSchedulerTest {
 		}).once();
 		EasyMock.replay(handler);
 		
-		JEEvent event = new JEEvent(JEEventType.READWORKLOAD, "eventA", handler, new JETime(1000));
+		JEEvent event = new JEEvent(JEEventType.READWORKLOAD, handler, new JETime(1000));
 		SCHEDULER.queueEvent(event);
 		SCHEDULER.cancelEvent(event);
 		SCHEDULER.start();
