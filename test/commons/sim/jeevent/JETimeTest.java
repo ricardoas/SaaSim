@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.util.Random;
 
+import junit.framework.ComparisonCompactor;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -14,12 +16,21 @@ public class JETimeTest {
 	/**
 	 * This is quite realistic for our usage.
 	 */
-	private final int UPPERBOUND = 3 * 365 * 24 * 60 * 60 * 1000;
+	private static final int UPPERBOUND = 3 * 365 * 24 * 60 * 60 * 1000;
 	private Random random;
+	private int firstTime;
+	private int secondTime;
 
-	@BeforeClass
+	@Before
 	public void setUpBeforeClass() throws Exception {
 		this.random = new Random();
+		firstTime = random.nextInt(UPPERBOUND);
+		secondTime = random.nextInt(UPPERBOUND);
+		if(secondTime < firstTime){
+			int tmp = firstTime;
+			firstTime = secondTime;
+			secondTime = tmp;
+		}
 	}
 
 	@After
@@ -28,17 +39,11 @@ public class JETimeTest {
 
 	@Test
 	public void testPlus() {
-		int firstTime = random.nextInt(UPPERBOUND);
-		int secondTime = random.nextInt(UPPERBOUND);
-		int result = firstTime+secondTime;
-		
-		assertEquals(new JETime(result), new JETime(firstTime).plus(new JETime(secondTime)));
+		assertEquals(new JETime(firstTime+secondTime), new JETime(firstTime).plus(new JETime(secondTime)));
 	}
 	
 	@Test
 	public void testPlusWithinfinity() {
-		int firstTime = random.nextInt(UPPERBOUND);
-		
 		assertEquals(JETime.INFINITY, new JETime(firstTime).plus(JETime.INFINITY));
 		assertEquals(JETime.INFINITY, JETime.INFINITY.plus(new JETime(firstTime)));
 		assertEquals(JETime.INFINITY, JETime.INFINITY.plus(JETime.INFINITY));
@@ -47,23 +52,51 @@ public class JETimeTest {
 	
 	
 	@Test
-	public void testIsEarlierThan() {
-		fail("Not yet implemented");
-	}
-
-	@Test
 	public void testCompareTo() {
-		fail("Not yet implemented");
+		assertEquals(-1, new JETime(firstTime).compareTo(new JETime(secondTime)));
+		assertEquals(1, new JETime(secondTime).compareTo(new JETime(firstTime)));
+		assertEquals(0, new JETime(firstTime).compareTo(new JETime(firstTime)));
 	}
 
 	@Test
-	public void testEqualsObject() {
-		fail("Not yet implemented");
+	public void testCompareToInfinity() {
+		assertEquals(-1, new JETime(firstTime).compareTo(JETime.INFINITY));
+		assertEquals(1, JETime.INFINITY.compareTo(new JETime(firstTime)));
+		assertEquals(1, JETime.INFINITY.compareTo(JETime.INFINITY));
+	}
+
+	@Test
+	public void testIsEarlierThan() {
+		assertTrue(new JETime(firstTime).isEarlierThan(new JETime(secondTime)));
+		assertFalse(new JETime(secondTime).isEarlierThan(new JETime(firstTime)));
+		assertFalse(new JETime(firstTime).isEarlierThan(new JETime(firstTime)));
+	}
+
+	@Test
+	public void testIsEarlierThanInfinity() {
+		assertTrue(new JETime(firstTime).isEarlierThan(JETime.INFINITY));
+		assertFalse(JETime.INFINITY.isEarlierThan(new JETime(firstTime)));
+		assertFalse(JETime.INFINITY.isEarlierThan(JETime.INFINITY));
+	}
+
+	@Test
+	public void testEquals() {
+		assertFalse(new JETime(firstTime).equals(new JETime(secondTime)));
+		assertFalse(new JETime(secondTime).equals(new JETime(firstTime)));
+		assertTrue(new JETime(firstTime).equals(new JETime(firstTime)));
+	}
+
+	@Test
+	public void testEqualsToInfinity() {
+		assertFalse(new JETime(firstTime).equals(JETime.INFINITY));
+		assertFalse(JETime.INFINITY.equals(new JETime(firstTime)));
+		assertTrue(JETime.INFINITY.equals(JETime.INFINITY));
 	}
 
 	@Test
 	public void testToString() {
-		fail("Not yet implemented");
+		assertEquals(Integer.toString(firstTime), new JETime(firstTime).toString());
+		assertEquals("INFINITY", JETime.INFINITY.toString());
 	}
 
 }

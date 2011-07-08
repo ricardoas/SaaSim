@@ -86,6 +86,9 @@ public class JETime implements Comparable<JETime> {
      * {@inheritDoc}
      */
     public int compareTo(JETime o) {
+    	if(o.equals(INFINITY)){
+    		return -1;
+    	}
     	long diff = timeMilliSeconds - o.timeMilliSeconds;
     	if (diff < 0) {
     		return -1;
@@ -95,12 +98,37 @@ public class JETime implements Comparable<JETime> {
     	return 0;
     }
     
+    
+    
+/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ (int) (timeMilliSeconds ^ (timeMilliSeconds >>> 32));
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
 		JETime other = (JETime) obj;
-		return this.compareTo(other) == other.compareTo(this);
+		if (timeMilliSeconds != other.timeMilliSeconds)
+			return false;
+		return true;
 	}
-    
+
     /**
      * {@inheritDoc}
      */

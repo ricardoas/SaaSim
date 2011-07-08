@@ -22,7 +22,7 @@ public abstract class JEEventHandler {
 		if (theUniqueHandlerId != null) {
 		    theUniqueHandlerId = new Integer(theUniqueHandlerId.intValue() + 1);
 		} else {
-		    theUniqueHandlerId = new Integer(1);
+		    theUniqueHandlerId = 1;
 		}
 		HandlerId = theUniqueHandlerId;
 		theUniqueEventScheduler = scheduler;
