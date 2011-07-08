@@ -4,6 +4,7 @@
 package commons.sim.jeevent;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -13,13 +14,15 @@ import java.util.Vector;
  *
  * @author thiago - thiago@lsd.ufcg.edu.br
  */
-public final class JEEventScheduler {
+public enum JEEventScheduler {
 	
-    private JETime now = new JETime(0L);
+	SCHEDULER;
+	
+	private JETime now;
     private Vector<JEEvent> EventList = new Vector<JEEvent>();
     private Vector<JEEventHandler> HandlerList;
     private Boolean isActive;
-    private JETime theEmulationEnd;
+    private JETime simulationEnd;
     
     private Map<Integer,JEEventHandler> handlerMap;
     private Set<JEEvent> eventSet;
@@ -27,26 +30,8 @@ public final class JEEventScheduler {
     /**
      * 
      */
-    public JEEventScheduler() {
-		this(JETime.INFINITY);
-    }
-    
-    /**
-     * Default 
-     * @param emulationEnd
-     */
-    public JEEventScheduler(JETime emulationEnd) {
-    	
-    	EventList.setSize(10000);
-		EventList.clear();
-		HandlerList = new Vector<JEEventHandler>();
-		HandlerList.setSize(100);
-		HandlerList.clear();
-		isActive = false;
-		theEmulationEnd = emulationEnd;
-		
-		this.handlerMap = new HashMap<Integer, JEEventHandler>();
-		this.eventSet = new TreeSet<JEEvent>();
+    private JEEventScheduler() {
+    	clear();
     }
     
     /**
@@ -94,23 +79,29 @@ public final class JEEventScheduler {
     }
     
     /**
-     * @param aNewEventHandler
+     * @param handler
      * @return
      */
-    public JEEventScheduler register_handler(JEEventHandler aNewEventHandler) {
+    public int registerHandler(JEEventHandler handler) {
     	
-		Integer aHandlerId = aNewEventHandler.getHandlerId();
+    	
+		Integer id = handler.getHandlerId();
+		id = 1;
+		
+		while((id = new Random().nextInt(100)) <= 0 || handlerMap.containsKey(id)){}//FIXME remove 100
 
-		if (HandlerList.size() < aHandlerId.intValue() - 1) {
-			HandlerList.setSize(aHandlerId.intValue() - 1);
+		if (HandlerList.size() < id.intValue() - 1) {
+			HandlerList.setSize(id.intValue() - 1);
 		}
 		
-		if (HandlerList.size() > aHandlerId.intValue() - 1) {
-			HandlerList.removeElementAt(aHandlerId.intValue() - 1);
+		if (HandlerList.size() > id.intValue() - 1) {
+			HandlerList.removeElementAt(id.intValue() - 1);
 		}
 		
-		HandlerList.insertElementAt(aNewEventHandler,aHandlerId.intValue() - 1);
-		return this;
+		HandlerList.insertElementAt(handler,id.intValue() - 1);
+		
+		handlerMap.put(id, handler);
+		return id;
     }
     
     /**
@@ -120,6 +111,8 @@ public final class JEEventScheduler {
     	
 		if (!EventList.isEmpty()) {
 			schedule();
+		}else{
+			this.now = simulationEnd;
 		}
     }
     
@@ -160,7 +153,7 @@ public final class JEEventScheduler {
 				    now = anEventTime;
 				    processEvent(aNextEvent);
 				} else {
-				    now = theEmulationEnd;
+				    now = simulationEnd;
 				}
 		    }
 		}
@@ -169,7 +162,7 @@ public final class JEEventScheduler {
     }
     
     private boolean isEarlierThanEmulationEnd(JETime time) {
-    	return (theEmulationEnd != null) ? time.isEarlierThan(theEmulationEnd) : true;
+    	return (simulationEnd != null) ? time.isEarlierThan(simulationEnd) : true;
     }
     
     /**
@@ -183,7 +176,7 @@ public final class JEEventScheduler {
 		    throw new RuntimeException ("ERROR: no Handler at vector position "+ (aTargetHandlerId.intValue() - 1)+". Something's wrong here, dude.");
 		}
 		
-		HandlerList.elementAt(aTargetHandlerId.intValue() - 1).event_handler(aNextEvent);
+		HandlerList.elementAt(aTargetHandlerId.intValue() - 1).handleEvent(aNextEvent);
     }
     
     /**
@@ -192,4 +185,26 @@ public final class JEEventScheduler {
     public JETime now() {
     	return now;
     }
+
+	public void setEmulationEnd(JETime time) {
+		this.simulationEnd = time;
+	}
+	
+	public JEEventHandler getHandler(int id){
+		return handlerMap.get(id);
+	}
+
+	public void clear() {
+	   	EventList.setSize(10000);
+		EventList.clear();
+		HandlerList = new Vector<JEEventHandler>();
+		HandlerList.setSize(100);
+		HandlerList.clear();
+		isActive = false;
+		
+		this.now = new JETime(0L);
+		this.simulationEnd = JETime.INFINITY;
+		this.handlerMap = new HashMap<Integer, JEEventHandler>();
+		this.eventSet = new TreeSet<JEEvent>();
+	}
 }

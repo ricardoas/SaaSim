@@ -7,51 +7,66 @@ package commons.sim.jeevent;
  * TODO make doc
  *
  * @author thiago - thiago@lsd.ufcg.edu.br
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public abstract class JEEventHandler {
 	
-    private static Integer theUniqueHandlerId;
-    private final Integer HandlerId;
-    private final JEEventScheduler theUniqueEventScheduler;
+    private final int id;
     
     /**
-     * @param scheduler
+     * Default empty constructor. Creates and registers a handler in the scheduler.
      */
-    public JEEventHandler(JEEventScheduler scheduler) {
+    public JEEventHandler() {
     	
-		if (theUniqueHandlerId != null) {
-		    theUniqueHandlerId = new Integer(theUniqueHandlerId.intValue() + 1);
-		} else {
-		    theUniqueHandlerId = 1;
-		}
-		HandlerId = theUniqueHandlerId;
-		theUniqueEventScheduler = scheduler;
-		theUniqueEventScheduler.register_handler(this);
+		this.id = JEEventScheduler.SCHEDULER.registerHandler(this);
+    }
+    
+    /**
+     * @param event
+     */
+    public abstract void handleEvent(JEEvent event);
+    
+    /**
+     * @param event
+     */
+    public void send(JEEvent event) {
+    	JEEventScheduler.SCHEDULER.queue_event(event);
     }
     
     /**
      * @return
      */
-    protected JEEventScheduler getScheduler() {
-    	return theUniqueEventScheduler;
+    public int getHandlerId() {
+    	return id;
     }
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		JEEventHandler other = (JEEventHandler) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
     
-    /**
-     * @param jeevent
-     */
-    public abstract void event_handler(JEEvent jeevent);
     
-    /**
-     * @param anEvent
-     */
-    public void send(JEEvent anEvent) {
-    	theUniqueEventScheduler.queue_event(anEvent);
-    }
-    
-    /**
-     * @return
-     */
-    public Integer getHandlerId() {
-    	return HandlerId;
-    }
 }
