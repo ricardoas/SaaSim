@@ -58,7 +58,8 @@ public class LoadBalancer extends JEEventHandler{
 			break;
 		case EVALUATEUTILIZATION:
 			Long eventTime = (Long) event.getValue()[0];
-			int numberOfMachinesToAdd = heuristic.evaluateUtilization(eventTime);
+			//TODO
+			int numberOfMachinesToAdd = heuristic.evaluateUtilization(servers, eventTime);
 		default:
 			break;
 		}

@@ -68,9 +68,9 @@ public class GEISTMonthlyWorkloadParser implements WorkloadParser<Map<User, List
 		for(int i = 0; i < this.readers.length; i++){
 			BufferedReader reader = this.readers[i];
 			while(reader.ready()){
-				String[] eventData = reader.readLine().split("( +|\t+)+");//Assuming: clientID, userID, reqID, time, bytes, has expired, http op., URL
+				String[] eventData = reader.readLine().split("( +|\t+)+");//Assuming: clientID, userID, reqID, time, bytes, has expired, http op., URL, demand
 				Request request = new Request(eventData[0], eventData[1], eventData[2], Long.valueOf(eventData[3]), 
-						Long.valueOf(eventData[4]), (eventData[5].contains("1")) ? true : false, eventData[6], eventData[7] );
+						Long.valueOf(eventData[4]), (eventData[5].contains("1")) ? true : false, eventData[6], eventData[7], Long.valueOf(eventData[8]) );
 				
 				//Adding new event to its corresponding user
 				int monthOfEvent = getMonthOfEvent(request.time);
@@ -112,9 +112,9 @@ public class GEISTMonthlyWorkloadParser implements WorkloadParser<Map<User, List
 		for(String workloadFile : workloadFiles){
 			BufferedReader reader = new BufferedReader(new FileReader(new File(workloadFile)));
 			while(reader.ready()){
-				String[] eventData = reader.readLine().split("( +|\t+)+");//Assuming: clientID, userID, reqID, time, bytes, has expired, http op., URL
+				String[] eventData = reader.readLine().split("( +|\t+)+");//Assuming: clientID, userID, reqID, time, bytes, has expired, http op., URL, demand
 				Request request = new Request(eventData[0], eventData[1], eventData[2], Long.valueOf(eventData[3]), 
-						Long.valueOf(eventData[4]), (eventData[5].contains("1")) ? true : false, eventData[6], eventData[7] );
+						Long.valueOf(eventData[4]), (eventData[5].contains("1")) ? true : false, eventData[6], eventData[7], Long.valueOf(eventData[8]) );
 				
 				//Adding new event to its corresponding user and month
 				int monthOfEvent = getMonthOfEvent(request.time);

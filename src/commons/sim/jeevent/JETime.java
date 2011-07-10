@@ -40,6 +40,21 @@ public class JETime implements Comparable<JETime> {
 		public JETime plus(JETime otherETime) {
 			return this;
 		}
+		
+		@Override
+		public JETime multiply(long index){
+	    	return this;
+	    }
+	    
+		@Override
+	    public JETime minus(JETime otherTime){
+	    	return this;
+	    }
+	    
+		@Override
+	    public JETime divide(long index){
+	    	return this;
+	    }
 
 		/**
 		 * {@inheritDoc}
@@ -52,7 +67,7 @@ public class JETime implements Comparable<JETime> {
 
 	public static JETime INFINITY = new InfiniteJEETime();
 
-	private final long timeMilliSeconds;
+	public long timeMilliSeconds;
 
 	/**
      * Default constructor
@@ -72,6 +87,21 @@ public class JETime implements Comparable<JETime> {
     		return INFINITY;
     	}
     	return new JETime(timeMilliSeconds + otherTime.timeMilliSeconds);
+    }
+    
+    public JETime multiply(long index){
+    	return new JETime (this.timeMilliSeconds * index);
+    }
+    
+    public JETime minus(JETime otherTime){
+    	if(otherTime.equals(INFINITY)){
+    		return INFINITY;
+    	}
+    	return new JETime(timeMilliSeconds - otherTime.timeMilliSeconds);
+    }
+    
+    public JETime divide(long index){
+    	return new JETime(timeMilliSeconds / index);
     }
     
     /**

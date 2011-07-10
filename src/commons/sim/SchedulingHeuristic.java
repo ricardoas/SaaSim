@@ -9,5 +9,5 @@ public interface SchedulingHeuristic {
 
 	Machine getNextServer(Request request, List<Machine> servers);
 
-	int evaluateUtilization(Long eventTime);
+	int evaluateUtilization(List<Machine> servers, Long eventTime);
 }
