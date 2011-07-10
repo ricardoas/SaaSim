@@ -22,9 +22,9 @@ public class LoadBalancer extends JEEventHandler{
 	/**
 	 * 
 	 */
-	public LoadBalancer() {
-		servers = new ArrayList<Machine>();
-		heuristic = null;
+	public LoadBalancer(SchedulingHeuristic heuristic) {
+		this.servers = new ArrayList<Machine>();
+		this.heuristic = heuristic;
 	}
 	
 	/**
@@ -54,8 +54,11 @@ public class LoadBalancer extends JEEventHandler{
 		switch (event.getType()) {
 		case NEWREQUEST:
 			Request request = (Request) event.getValue()[0];
-			heuristic.getNextServer(request).sendRequest(request);
+			heuristic.getNextServer(request, servers).sendRequest(request);
 			break;
+		case EVALUATEUTILIZATION:
+			Long eventTime = (Long) event.getValue()[0];
+			int numberOfMachinesToAdd = heuristic.evaluateUtilization(eventTime);
 		default:
 			break;
 		}

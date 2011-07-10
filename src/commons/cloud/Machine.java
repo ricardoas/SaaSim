@@ -1,5 +1,8 @@
 package commons.cloud;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
  *
@@ -7,12 +10,15 @@ package commons.cloud;
 public class Machine {
 	
 	private long id;
+	private List<Request> queue;
+	
 	
 	/**
 	 * @param id
 	 */
 	public Machine(long id) {
 		this.id = id;
+		this.queue = new ArrayList<Request>();
 	}
 
 	/**
@@ -44,7 +50,7 @@ public class Machine {
 	}
 
 	public void sendRequest(Request request) {
-		// TODO Auto-generated method stub
+		// TODO Evaluate finish time, schedule first finish time.
 		
 	}
 	

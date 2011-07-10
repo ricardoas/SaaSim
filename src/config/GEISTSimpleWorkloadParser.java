@@ -64,7 +64,7 @@ public class GEISTSimpleWorkloadParser implements WorkloadParser<List<Request>> 
 	 */
 	private Request parseRequest(String line) {
 		String[] eventData = line.split("( +|\t+)+");
-		return new Request(eventData[0], eventData[2], Long
+		return new Request(eventData[0], eventData[1], eventData[2], Long
 				.valueOf(eventData[3]), Long.valueOf(eventData[4]),
 				(eventData[5].contains("1")) ? true : false, eventData[6],
 				eventData[7]);

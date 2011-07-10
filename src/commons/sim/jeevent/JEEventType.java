@@ -6,6 +6,6 @@ package commons.sim.jeevent;
  */
 public enum JEEventType {
 	
-	READWORKLOAD, NEWREQUEST;
+	READWORKLOAD, EVALUATEUTILIZATION, NEWREQUEST;
 
 }

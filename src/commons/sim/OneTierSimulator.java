@@ -19,10 +19,10 @@ import provisioning.Monitor;
  */
 public class OneTierSimulator extends JEEventHandler implements Simulator {
 
-	private WorkloadParser<List<Request>> workloadParser;
-	private Monitor monitor;
+	protected WorkloadParser<List<Request>> workloadParser;
+	protected Monitor monitor;
 
-	private LoadBalancer applicationServer;
+	protected LoadBalancer loadBalancer;
 
 	/**
 	 * Constructor
@@ -31,7 +31,7 @@ public class OneTierSimulator extends JEEventHandler implements Simulator {
 		this.workloadParser = new GEISTSimpleWorkloadParser("");
 
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -88,7 +88,7 @@ public class OneTierSimulator extends JEEventHandler implements Simulator {
 	 * @param request
 	 * @return
 	 */
-	private JEEvent parseEvent(Request request) {
-		return new JEEvent(JEEventType.NEWREQUEST, applicationServer, new JETime(request.time), request);
+	protected JEEvent parseEvent(Request request) {
+		return new JEEvent(JEEventType.NEWREQUEST, loadBalancer, new JETime(request.time), request);
 	}
 }
