@@ -23,24 +23,25 @@ import commons.config.WorkloadParser;
 public class GEISTMonthlyWorkloadParser implements WorkloadParser<Map<User, List<Request>>>{
 	
 	//Months limits in millis
-	private static double JAN_L = 1000 * 60 * 60 * 24 * (31);
-	private static double FEB_L = 1000 * 60 * 60 * 24 * (31+28);
-	private static double MAR_L = 1000 * 60 * 60 * 24 * (31+28+31);
-	private static double APR_L = 1000 * 60 * 60 * 24 * (31+28+31+30);
-	private static double MAY_L = 1000 * 60 * 60 * 24 * (31+28+31+30+31);
-	private static double JUN_L = 1000 * 60 * 60 * 24 * (31+28+31+30+31+30);
-	private static double JUL_L = 1000 * 60 * 60 * 24 * (31+28+31+30+31+30+31);
-	private static double AUG_L = 1000 * 60 * 60 * 24 * (31+28+31+30+31+30+31+31);
-	private static double SEP_L = 1000 * 60 * 60 * 24 * (31+28+31+30+31+30+31+31+30);
-	private static double OCT_L = 1000 * 60 * 60 * 24 * (31+28+31+30+31+30+31+31+30+31);
-	private static double NOV_L = 1000 * 60 * 60 * 24 * (31+28+31+30+31+30+31+31+30+31+30);
-	private static double DEC_L = 1000 * 60 * 60 * 24 * (31+28+31+30+31+30+31+31+30+31+30+31);
+	private static double JAN_L = 1000.0 * 60 * 60 * 24 * (31);
+	private static double FEB_L = 1000.0 * 60 * 60 * 24 * (31+28);
+	private static double MAR_L = 1000.0 * 60 * 60 * 24 * (31+28+31);
+	private static double APR_L = 1000.0 * 60 * 60 * 24 * (31+28+31+30);
+	private static double MAY_L = 1000.0 * 60 * 60 * 24 * (31+28+31+30+31);
+	private static double JUN_L = 1000.0 * 60 * 60 * 24 * (31+28+31+30+31+30);
+	private static double JUL_L = 1000.0 * 60 * 60 * 24 * (31+28+31+30+31+30+31);
+	private static double AUG_L = 1000.0 * 60 * 60 * 24 * (31+28+31+30+31+30+31+31);
+	private static double SEP_L = 1000.0 * 60 * 60 * 24 * (31+28+31+30+31+30+31+31+30);
+	private static double OCT_L = 1000.0 * 60 * 60 * 24 * (31+28+31+30+31+30+31+31+30+31);
+	private static double NOV_L = 1000.0 * 60 * 60 * 24 * (31+28+31+30+31+30+31+31+30+31+30);
+	private static double DEC_L = 1000.0 * 60 * 60 * 24 * (31+28+31+30+31+30+31+31+30+31+30+31);
 	
 	private final String[] workloadFiles;
 	private final BufferedReader [] readers;
 	public int currentMonth;
 	private Map<User, List<Request>> nextRequests;
 	
+
 	public GEISTMonthlyWorkloadParser(String ...workloadFiles){
 		this.workloadFiles = workloadFiles;
 		this.readers = new BufferedReader[workloadFiles.length];

@@ -162,62 +162,6 @@ public class UtilityFunctionTest {
 		assertEquals(0.45 + price + setupCost, utility.calculateTotalReceipt(contract, user), 0.0);
 	}
 	
-	@Test
-	public void calculateTotalReceiptWithInvalidSetup(){
-		Double setupCost = -100d;
-		Double price = 200d;
-		Double cpuLimit = 11.5d;
-		Double extraCpuCost = 0.9d;
-		Contract contract = new Contract("p1", setupCost, price, cpuLimit, extraCpuCost);
-		
-		User user = new User("us1");
-		user.consumedCpu = 12d;
-		
-		try{
-			utility.calculateTotalReceipt(contract, user);
-			fail("Invalid setup cost!");
-		}catch(RuntimeException e){
-			
-		}
-	}
-	
-	@Test
-	public void calculateTotalReceiptWithInvalidPrice(){
-		Double setupCost = 100d;
-		Double price = -0.999999d;
-		Double cpuLimit = 11.5d;
-		Double extraCpuCost = 0.9d;
-		Contract contract = new Contract("p1", setupCost, price, cpuLimit, extraCpuCost);
-		
-		User user = new User("us1");
-		user.consumedCpu = 12d;
-		
-		try{
-			utility.calculateTotalReceipt(contract, user);
-			fail("Invalid price!");
-		}catch(RuntimeException e){
-			
-		}
-	}
-	
-	@Test
-	public void calculateTotalReceiptWithInvalidCPULimit(){
-		Double setupCost = 100d;
-		Double price = 0.999999d;
-		Double cpuLimit = -11.5d;
-		Double extraCpuCost = 0.9d;
-		Contract contract = new Contract("p1", setupCost, price, cpuLimit, extraCpuCost);
-		
-		User user = new User("us1");
-		user.consumedCpu = 12d;
-		
-		try{
-			utility.calculateTotalReceipt(contract, user);
-			fail("Invalid cpu limit!");
-		}catch(RuntimeException e){
-			
-		}
-	}
 	
 	@Test
 	public void calculateTotalReceipt2(){
