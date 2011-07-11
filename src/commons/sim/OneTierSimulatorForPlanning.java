@@ -11,7 +11,7 @@ import commons.sim.jeevent.JETime;
 public class OneTierSimulatorForPlanning extends OneTierSimulator {
 	
 	private List<Request> workload;
-	private long UTILIZATION_EVALUATION_PERIOD = 1000 * 60 * 5;//in millis
+	public static long UTILIZATION_EVALUATION_PERIOD = 1000 * 60 * 5;//in millis
 	
 	public OneTierSimulatorForPlanning(List<Request> workload){
 		this.workload = workload;

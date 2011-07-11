@@ -62,11 +62,23 @@ public class RanjanScheduler implements SchedulingHeuristic {
 
 	@Override
 	public int evaluateUtilization(List<Machine> servers, Long eventTime){
-		//TODO Collect machines time usage in the last interval, calculate number of machines for next interval based on target utilization
+		double averageUtilization = 0d;
+		double totalNumberOfCompletions = 0d;
+		double totalNumberOfArrivals = 0d;
+		
 		for(Machine machine : servers){
-			
+			averageUtilization += machine.computeUtilization(eventTime);
+			totalNumberOfCompletions += machine.getNumberOfRequestsCompletionsInPreviousInterval();
+			totalNumberOfArrivals += machine.getNumberOfRequestsArrivalsInPreviousInterval();
+			machine.resetCounters();//Resetting completions and arrivals counter
 		}
-		return 0;
+		
+//		averageUtilization = averageUtilization / servers.size();
+		double d = averageUtilization / totalNumberOfCompletions;
+		double u_lign = Math.max(totalNumberOfArrivals, totalNumberOfCompletions) * d;
+		int newNumberOfServers = (int)Math.ceil( servers.size() * u_lign / TARGET_UTILIZATION );
+		
+		return (newNumberOfServers - servers.size());
 	}
 
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import commons.sim.OneTierSimulatorForPlanning;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
@@ -23,7 +24,8 @@ public class Machine extends JEEventHandler{
 	protected List<Request> queue;
 	protected List<Request> finishedRequests;
 	
-	
+	public int numberOfRequestsCompletionsInPreviousInterval;
+	public int numberOfRequestsArrivalsInPreviousInterval;
 	
 	/**
 	 * @param id
@@ -62,6 +64,14 @@ public class Machine extends JEEventHandler{
 			return false;
 		return true;
 	}
+	
+	public int getNumberOfRequestsCompletionsInPreviousInterval() {
+		return numberOfRequestsCompletionsInPreviousInterval;
+	}
+
+	public int getNumberOfRequestsArrivalsInPreviousInterval() {
+		return numberOfRequestsArrivalsInPreviousInterval;
+	}
 
 	public void sendRequest(Request request) {
 		this.queue.add(request);
@@ -85,6 +95,29 @@ public class Machine extends JEEventHandler{
 			
 			JEEventScheduler.SCHEDULER.queueEvent(nextFinish);
 		}
+		
+		this.numberOfRequestsArrivalsInPreviousInterval++;
+	}
+	
+	public void resetCounters(){
+		this.numberOfRequestsArrivalsInPreviousInterval = 0;
+		this.numberOfRequestsCompletionsInPreviousInterval = 0;
+	}
+	
+	public double computeUtilization(long currentTime){
+		if(this.queue.size() != 0){//Requests need to be processed, so resource is full
+			return 1.0;
+		}else{//Requests were processed previously, and no pending requests exist
+			if(currentTime >= OneTierSimulatorForPlanning.UTILIZATION_EVALUATION_PERIOD){
+				double difference = this.lastProcessingEvaluation.timeMilliSeconds - (currentTime - OneTierSimulatorForPlanning.UTILIZATION_EVALUATION_PERIOD);
+				if(difference <= 0){
+					return 0.0;
+				}else{
+					return difference/OneTierSimulatorForPlanning.UTILIZATION_EVALUATION_PERIOD;
+				}
+			}
+		}
+		return 0.0;
 	}
 	
 	@Override
@@ -102,6 +135,7 @@ public class Machine extends JEEventHandler{
 					Request request = iterator.next();
 					request.process(totalProcessingTime.timeMilliSeconds);
 					if(request.isFinished()){
+						this.numberOfRequestsCompletionsInPreviousInterval++;
 						this.finishedRequests.add(request);
 						iterator.remove();
 					}
@@ -128,7 +162,9 @@ public class Machine extends JEEventHandler{
 				
 				break;
 		}
+	}
+
+	public boolean isBusy() {
+		return this.queue.size() != 0 && this.nextFinishEvent != null;
 	}	
-	
-	
 }

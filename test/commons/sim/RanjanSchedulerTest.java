@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,7 +14,7 @@ import commons.cloud.Request;
 
 public class RanjanSchedulerTest {
 	
-	private static final int MILLIS = 1000 * 60;
+	private static final int ONE_MINUTE_IN_MILLIS = 1000 * 60;
 	private static final String URL = null;
 	private RanjanScheduler scheduler;
 
@@ -145,38 +146,38 @@ public class RanjanSchedulerTest {
 		servers.add(machine4);
 		servers.add(machine5);
 		
-		Request request = new Request(clientID, userID, reqID, MILLIS * 1, size, hasExpired, httpOperation, URL, demand);
+		Request request = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 1, size, hasExpired, httpOperation, URL, demand);
 		Machine nextServer = scheduler.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		
-		Request request2 = new Request(clientID, userID, reqID, MILLIS * 3, size, hasExpired, httpOperation, URL, demand);
+		Request request2 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 3, size, hasExpired, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request2, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		
-		Request request3 = new Request(clientID, userID, reqID, MILLIS * 8, size, hasExpired, httpOperation, URL, demand);
+		Request request3 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 8, size, hasExpired, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request3, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		
-		Request request4 = new Request(clientID, userID, reqID, MILLIS * 17, size, hasExpired, httpOperation, URL, demand);
+		Request request4 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 17, size, hasExpired, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request4, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		
-		Request request5 = new Request(clientID, userID, reqID, MILLIS * 30, size, hasExpired, httpOperation, URL, demand);
+		Request request5 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 30, size, hasExpired, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request5, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		
-		Request request6 = new Request(clientID, userID, reqID, MILLIS * 45, size, hasExpired, httpOperation, URL, demand);
+		Request request6 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 45, size, hasExpired, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request6, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		
 		//Request arriving after session limit
-		Request request7 = new Request(clientID, userID, reqID, MILLIS * 61, size, hasExpired, httpOperation, URL, demand);
+		Request request7 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 61, size, hasExpired, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request7, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine2, nextServer);
@@ -208,45 +209,152 @@ public class RanjanSchedulerTest {
 		servers.add(machine4);
 		servers.add(machine5);
 		
-		Request request = new Request(clientID, userID, reqID, MILLIS * 1, size, hasExpired, httpOperation, URL, demand);
+		Request request = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 1, size, hasExpired, httpOperation, URL, demand);
 		Machine nextServer = scheduler.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		
-		Request request2 = new Request(clientID, "u2", reqID, MILLIS * 2, size, hasExpired, httpOperation, URL, demand);
+		Request request2 = new Request(clientID, "u2", reqID, ONE_MINUTE_IN_MILLIS * 2, size, hasExpired, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request2, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine2, nextServer);
 		
-		Request request3 = new Request(clientID, userID, reqID, MILLIS * 5, size, hasExpired, httpOperation, URL, demand);
+		Request request3 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 5, size, hasExpired, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request3, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		
-		Request request4 = new Request(clientID, "u2", reqID, MILLIS * 10, size, hasExpired, httpOperation, URL, demand);
+		Request request4 = new Request(clientID, "u2", reqID, ONE_MINUTE_IN_MILLIS * 10, size, hasExpired, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request4, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine2, nextServer);
 		
 		//Requests after session limit
-		Request request5 = new Request(clientID, userID, reqID, MILLIS * 21, size, hasExpired, httpOperation, URL, demand);
+		Request request5 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 21, size, hasExpired, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request5, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine3, nextServer);
 		
-		Request request6 = new Request(clientID, "u2", reqID, MILLIS * 26, size, hasExpired, httpOperation, URL, demand);
+		Request request6 = new Request(clientID, "u2", reqID, ONE_MINUTE_IN_MILLIS * 26, size, hasExpired, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request6, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine4, nextServer);
 		
-		Request request7 = new Request(clientID, userID, reqID, MILLIS * 37, size, hasExpired, httpOperation, URL, demand);
+		Request request7 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 37, size, hasExpired, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request7, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine5, nextServer);
 		
-		Request request8 = new Request(clientID, "u2", reqID, MILLIS * 42, size, hasExpired, httpOperation, URL, demand);
+		Request request8 = new Request(clientID, "u2", reqID, ONE_MINUTE_IN_MILLIS * 42, size, hasExpired, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request8, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 	}
+	
+	@Test
+	public void simpleMachineUtilization(){
+		Machine machine = EasyMock.createMock(Machine.class);
+		
+		long currentTime = ONE_MINUTE_IN_MILLIS;
+		EasyMock.expect(machine.computeUtilization(currentTime)).andReturn(0.8);
+		EasyMock.expect(machine.getNumberOfRequestsCompletionsInPreviousInterval()).andReturn(10);
+		EasyMock.expect(machine.getNumberOfRequestsArrivalsInPreviousInterval()).andReturn(15);
+		machine.resetCounters();
+		EasyMock.expectLastCall();
+		
+		EasyMock.replay(machine);
+		
+		ArrayList<Machine> servers = new ArrayList<Machine>();
+		servers.add(machine);
+		int machinesToAdd = scheduler.evaluateUtilization(servers, currentTime);
+		
+		EasyMock.verify(machine);
+		
+		assertEquals(1, machinesToAdd);
+	}
+	
+	@Test
+	public void multipleMachinesUtilization(){
+		Machine machine = EasyMock.createMock(Machine.class);
+		Machine machine2 = EasyMock.createMock(Machine.class);
+		Machine machine3 = EasyMock.createMock(Machine.class);
+		
+		long currentTime = ONE_MINUTE_IN_MILLIS;
+		EasyMock.expect(machine.computeUtilization(currentTime)).andReturn(0.3);
+		EasyMock.expect(machine.getNumberOfRequestsCompletionsInPreviousInterval()).andReturn(10);
+		EasyMock.expect(machine.getNumberOfRequestsArrivalsInPreviousInterval()).andReturn(15);
+		machine.resetCounters();
+		EasyMock.expectLastCall();
+		
+		EasyMock.expect(machine2.computeUtilization(currentTime)).andReturn(0.45);
+		EasyMock.expect(machine2.getNumberOfRequestsCompletionsInPreviousInterval()).andReturn(5);
+		EasyMock.expect(machine2.getNumberOfRequestsArrivalsInPreviousInterval()).andReturn(5);
+		machine2.resetCounters();
+		EasyMock.expectLastCall();
+		
+		EasyMock.expect(machine3.computeUtilization(currentTime)).andReturn(1.0);
+		EasyMock.expect(machine3.getNumberOfRequestsCompletionsInPreviousInterval()).andReturn(15);
+		EasyMock.expect(machine3.getNumberOfRequestsArrivalsInPreviousInterval()).andReturn(15);
+		machine3.resetCounters();
+		EasyMock.expectLastCall();
+		
+		EasyMock.replay(machine);
+		EasyMock.replay(machine2);
+		EasyMock.replay(machine3);
+		
+		ArrayList<Machine> servers = new ArrayList<Machine>();
+		servers.add(machine);
+		servers.add(machine2);
+		servers.add(machine3);
+		int machinesToAdd = scheduler.evaluateUtilization(servers, currentTime);
+		
+		EasyMock.verify(machine);
+		EasyMock.verify(machine2);
+		EasyMock.verify(machine3);
+		
+		assertEquals(7, machinesToAdd);
+	}
+	
+	@Test
+	public void multipleMachinesUtilization2(){
+		Machine machine = EasyMock.createMock(Machine.class);
+		Machine machine2 = EasyMock.createMock(Machine.class);
+		Machine machine3 = EasyMock.createMock(Machine.class);
+		
+		long currentTime = ONE_MINUTE_IN_MILLIS;
+		EasyMock.expect(machine.computeUtilization(currentTime)).andReturn(1.0);
+		EasyMock.expect(machine.getNumberOfRequestsCompletionsInPreviousInterval()).andReturn(10);
+		EasyMock.expect(machine.getNumberOfRequestsArrivalsInPreviousInterval()).andReturn(22);
+		machine.resetCounters();
+		EasyMock.expectLastCall();
+		
+		EasyMock.expect(machine2.computeUtilization(currentTime)).andReturn(1.0);
+		EasyMock.expect(machine2.getNumberOfRequestsCompletionsInPreviousInterval()).andReturn(5);
+		EasyMock.expect(machine2.getNumberOfRequestsArrivalsInPreviousInterval()).andReturn(10);
+		machine2.resetCounters();
+		EasyMock.expectLastCall();
+		
+		EasyMock.expect(machine3.computeUtilization(currentTime)).andReturn(1.0);
+		EasyMock.expect(machine3.getNumberOfRequestsCompletionsInPreviousInterval()).andReturn(12);
+		EasyMock.expect(machine3.getNumberOfRequestsArrivalsInPreviousInterval()).andReturn(15);
+		machine3.resetCounters();
+		EasyMock.expectLastCall();
+		
+		EasyMock.replay(machine);
+		EasyMock.replay(machine2);
+		EasyMock.replay(machine3);
+		
+		ArrayList<Machine> servers = new ArrayList<Machine>();
+		servers.add(machine);
+		servers.add(machine2);
+		servers.add(machine3);
+		int machinesToAdd = scheduler.evaluateUtilization(servers, currentTime);
+		
+		EasyMock.verify(machine);
+		EasyMock.verify(machine2);
+		EasyMock.verify(machine3);
+		
+		assertEquals(21, machinesToAdd);
+	}
+
 }

@@ -1,6 +1,7 @@
 package commons.sim;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -25,12 +26,15 @@ public class LoadBalancer extends JEEventHandler{
 	public LoadBalancer(SchedulingHeuristic heuristic) {
 		this.servers = new ArrayList<Machine>();
 		this.heuristic = heuristic;
+		
+		
 	}
 	
 	/**
 	 * 
 	 */
 	public void addMachine(){
+		//FIXME: Add reserved and on demand resources!
 		servers.add(new Machine(new Random().nextLong()));
 	}
 	
@@ -61,10 +65,26 @@ public class LoadBalancer extends JEEventHandler{
 			break;
 		case EVALUATEUTILIZATION:
 			Long eventTime = (Long) event.getValue()[0];
-			//TODO
 			int numberOfMachinesToAdd = heuristic.evaluateUtilization(servers, eventTime);
+			this.manageMachines(numberOfMachinesToAdd);
 		default:
 			break;
+		}
+	}
+
+	private void manageMachines(int numberOfMachinesToAdd) {
+		if(numberOfMachinesToAdd > 0){//Adding machines
+			for(int i = 0; i < numberOfMachinesToAdd; i++){
+				this.addMachine();
+			}
+		}else{//Removing unused machines
+			Iterator<Machine> it = servers.iterator();
+			while(it.hasNext()){
+				Machine machine = it.next();
+				if(!machine.isBusy()){
+					it.remove();
+				}
+			}
 		}
 	}
 }
