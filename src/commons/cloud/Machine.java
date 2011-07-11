@@ -17,11 +17,11 @@ import commons.sim.jeevent.JETime;
 public class Machine extends JEEventHandler{
 	
 	private long id;
-	private JETime lastProcessingEvaluation;
-	private JEEvent nextFinishEvent;
+	protected JETime lastProcessingEvaluation;
+	protected JEEvent nextFinishEvent;
 	
-	private List<Request> queue;
-	private List<Request> finishedRequests;
+	protected List<Request> queue;
+	protected List<Request> finishedRequests;
 	
 	
 	
@@ -31,6 +31,7 @@ public class Machine extends JEEventHandler{
 	public Machine(long id) {
 		this.id = id;
 		this.queue = new ArrayList<Request>();
+		this.finishedRequests = new ArrayList<Request>();
 		this.lastProcessingEvaluation = new JETime(0);
 	}
 
@@ -63,10 +64,9 @@ public class Machine extends JEEventHandler{
 	}
 
 	public void sendRequest(Request request) {
-		// TODO Evaluate finish time, schedule first finish time.
 		int requestsToShare = this.queue.size();
 		if(nextFinishEvent != null){//Should evaluate next finish time
-			JETime estimatedFinishTime = new JETime(request.time); 
+			JETime estimatedFinishTime = new JETime(request.demand); 
 			estimatedFinishTime = estimatedFinishTime.plus(JEEventScheduler.SCHEDULER.now());
 			estimatedFinishTime = estimatedFinishTime.multiply(requestsToShare);
 			
@@ -79,13 +79,14 @@ public class Machine extends JEEventHandler{
 			
 			
 		}else{//Only one request is in this machine
-			JETime eventTime = new JETime(request.time); 
+			JETime eventTime = new JETime(request.demand); 
 			eventTime = eventTime.plus(JEEventScheduler.SCHEDULER.now());
 			JEEvent nextFinish = new JEEvent(JEEventType.FINISHREQUEST, this, eventTime, null);
 			this.nextFinishEvent = nextFinish;
 			
 			JEEventScheduler.SCHEDULER.queueEvent(nextFinish);
 		}
+		this.queue.add(request);
 	}
 	
 	@Override

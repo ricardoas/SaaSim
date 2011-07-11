@@ -31,16 +31,20 @@ public class RanjanScheduler implements SchedulingHeuristic {
 			if(this.roundRobinIndex >= servers.size()){
 				this.roundRobinIndex = 0;
 			}
-			Machine nextServer = servers.get(this.roundRobinIndex);
-			this.roundRobinIndex++;
-			
-			//Updating times
-			Long lastRequestTime = this.lastRequestTimes.get(request.userID);
-			this.lastRequestTimes.put(request.userID, request.time);
-			this.serversOfLastRequests.remove(lastRequestTime);
-			this.serversOfLastRequests.put(request.time, nextServer);
-			
-			return nextServer;
+			if(servers.size() > 0){
+				Machine nextServer = servers.get(this.roundRobinIndex);
+				this.roundRobinIndex++;
+				
+				//Updating times
+				Long lastRequestTime = this.lastRequestTimes.get(request.userID);
+				this.lastRequestTimes.put(request.userID, request.time);
+				this.serversOfLastRequests.remove(lastRequestTime);
+				this.serversOfLastRequests.put(request.time, nextServer);
+				
+				return nextServer;
+			}else{
+				return null;
+			}
 		}
 	}
 

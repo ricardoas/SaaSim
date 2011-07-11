@@ -15,7 +15,7 @@ import commons.sim.jeevent.JEEventHandler;
  */
 public class LoadBalancer extends JEEventHandler{
 	
-	private List<Machine> servers;
+	protected List<Machine> servers;
 	
 	private SchedulingHeuristic heuristic;
 	
@@ -54,7 +54,10 @@ public class LoadBalancer extends JEEventHandler{
 		switch (event.getType()) {
 		case NEWREQUEST:
 			Request request = (Request) event.getValue()[0];
-			heuristic.getNextServer(request, servers).sendRequest(request);
+			Machine nextServer = heuristic.getNextServer(request, servers);
+			if(nextServer != null){
+				nextServer.sendRequest(request);
+			}
 			break;
 		case EVALUATEUTILIZATION:
 			Long eventTime = (Long) event.getValue()[0];

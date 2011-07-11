@@ -7,7 +7,7 @@ public class Request{
 	public String userID;
 	public String reqID;
 	public long time;//in millis
-	private final long demand;//in millis
+	public final long demand;//in millis
 	public long totalProcessed;
 	public long size;//in bytes
 	public boolean hasExpired;
