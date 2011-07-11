@@ -38,4 +38,8 @@ public class Request{
 	public boolean isFinished(){
 		return this.totalProcessed >= this.demand;
 	}
+
+	public long getTotalToProcess() {
+		return this.demand - this.totalProcessed;
+	}
 }

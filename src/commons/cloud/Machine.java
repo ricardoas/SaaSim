@@ -64,11 +64,12 @@ public class Machine extends JEEventHandler{
 	}
 
 	public void sendRequest(Request request) {
+		this.queue.add(request);
 		int requestsToShare = this.queue.size();
+		
 		if(nextFinishEvent != null){//Should evaluate next finish time
-			JETime estimatedFinishTime = new JETime(request.demand); 
+			JETime estimatedFinishTime = new JETime(request.demand * requestsToShare); 
 			estimatedFinishTime = estimatedFinishTime.plus(JEEventScheduler.SCHEDULER.now());
-			estimatedFinishTime = estimatedFinishTime.multiply(requestsToShare);
 			
 			if(estimatedFinishTime.isEarlierThan(nextFinishEvent.getScheduledTime())){
 				JEEventScheduler.SCHEDULER.cancelEvent(nextFinishEvent);
@@ -76,8 +77,6 @@ public class Machine extends JEEventHandler{
 				JEEventScheduler.SCHEDULER.queueEvent(currentFinish);
 				this.nextFinishEvent = currentFinish;
 			}
-			
-			
 		}else{//Only one request is in this machine
 			JETime eventTime = new JETime(request.demand); 
 			eventTime = eventTime.plus(JEEventScheduler.SCHEDULER.now());
@@ -86,48 +85,48 @@ public class Machine extends JEEventHandler{
 			
 			JEEventScheduler.SCHEDULER.queueEvent(nextFinish);
 		}
-		this.queue.add(request);
 	}
 	
 	@Override
 	public void handleEvent(JEEvent event) {
 		switch (event.getType()) {
-		case FINISHREQUEST:
-			//Debit processing time in all queued requests
-			JETime totalProcessingTime = new JETime(0);
-			totalProcessingTime = totalProcessingTime.plus(event.getScheduledTime());
-			totalProcessingTime = totalProcessingTime.minus(lastProcessingEvaluation);
-			totalProcessingTime = totalProcessingTime.divide(this.queue.size());
-			
-			Iterator<Request> iterator = this.queue.iterator();
-			while(iterator.hasNext()){
-				Request request = iterator.next();
-				request.process(totalProcessingTime.timeMilliSeconds);
-				if(request.isFinished()){
-					this.finishedRequests.add(request);
-					iterator.remove();
-				}
-			}
-			this.lastProcessingEvaluation = event.getScheduledTime();
-			
-			//Scheduling next finish event
-			JETime nextFinishTime = JETime.INFINITY;
-			for(Request nextRequest : this.queue){
-				JETime estimatedFinishTime = new JETime(nextRequest.time); 
-				estimatedFinishTime = estimatedFinishTime.plus(JEEventScheduler.SCHEDULER.now());
-				estimatedFinishTime = estimatedFinishTime.multiply(this.queue.size());
+			case FINISHREQUEST:
+				//Debit processing time in all queued requests
+				JETime totalProcessingTime = new JETime(0);
+				totalProcessingTime = totalProcessingTime.plus(event.getScheduledTime());
+				totalProcessingTime = totalProcessingTime.minus(lastProcessingEvaluation);
+				totalProcessingTime = totalProcessingTime.divide(this.queue.size());
 				
-				if(estimatedFinishTime.isEarlierThan(nextFinishTime)){
-					nextFinishTime = estimatedFinishTime;
+				Iterator<Request> iterator = this.queue.iterator();
+				while(iterator.hasNext()){
+					Request request = iterator.next();
+					request.process(totalProcessingTime.timeMilliSeconds);
+					if(request.isFinished()){
+						this.finishedRequests.add(request);
+						iterator.remove();
+					}
 				}
-			}
-			if(nextFinishTime != JETime.INFINITY){
-				JEEvent currentFinish = new JEEvent(JEEventType.FINISHREQUEST, this, nextFinishTime, null);
-				JEEventScheduler.SCHEDULER.queueEvent(currentFinish);
-				this.nextFinishEvent = currentFinish;
-			}
-			
-			break;
+				this.lastProcessingEvaluation = event.getScheduledTime();
+				
+				//Searching for next finish event
+				JETime nextFinishTime = JETime.INFINITY;
+				for(Request nextRequest : this.queue){
+					JETime estimatedFinishTime = new JETime(nextRequest.getTotalToProcess() * this.queue.size()); 
+					estimatedFinishTime = estimatedFinishTime.plus(event.getScheduledTime());
+					
+					if(estimatedFinishTime.isEarlierThan(nextFinishTime)){
+						nextFinishTime = estimatedFinishTime;
+					}
+				}
+				if(nextFinishTime != JETime.INFINITY){//Scheduling next finish event, if it exists
+					JEEvent currentFinish = new JEEvent(JEEventType.FINISHREQUEST, this, nextFinishTime, null);
+					JEEventScheduler.SCHEDULER.queueEvent(currentFinish);
+					this.nextFinishEvent = currentFinish;
+				}else{
+					this.nextFinishEvent = null;
+				}
+				
+				break;
 		}
 	}	
 	
