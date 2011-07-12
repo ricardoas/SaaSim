@@ -356,5 +356,47 @@ public class RanjanSchedulerTest {
 		
 		assertEquals(21, machinesToAdd);
 	}
+	
+	@Test
+	public void utilizationWithNoCompletions(){
+		Machine machine = EasyMock.createMock(Machine.class);
+		Machine machine2 = EasyMock.createMock(Machine.class);
+		Machine machine3 = EasyMock.createMock(Machine.class);
+		
+		long currentTime = ONE_MINUTE_IN_MILLIS;
+		EasyMock.expect(machine.computeUtilization(currentTime)).andReturn(1.0);
+		EasyMock.expect(machine.getNumberOfRequestsCompletionsInPreviousInterval()).andReturn(0);
+		EasyMock.expect(machine.getNumberOfRequestsArrivalsInPreviousInterval()).andReturn(22);
+		machine.resetCounters();
+		EasyMock.expectLastCall();
+		
+		EasyMock.expect(machine2.computeUtilization(currentTime)).andReturn(1.0);
+		EasyMock.expect(machine2.getNumberOfRequestsCompletionsInPreviousInterval()).andReturn(0);
+		EasyMock.expect(machine2.getNumberOfRequestsArrivalsInPreviousInterval()).andReturn(10);
+		machine2.resetCounters();
+		EasyMock.expectLastCall();
+		
+		EasyMock.expect(machine3.computeUtilization(currentTime)).andReturn(1.0);
+		EasyMock.expect(machine3.getNumberOfRequestsCompletionsInPreviousInterval()).andReturn(0);
+		EasyMock.expect(machine3.getNumberOfRequestsArrivalsInPreviousInterval()).andReturn(15);
+		machine3.resetCounters();
+		EasyMock.expectLastCall();
+		
+		EasyMock.replay(machine);
+		EasyMock.replay(machine2);
+		EasyMock.replay(machine3);
+		
+		ArrayList<Machine> servers = new ArrayList<Machine>();
+		servers.add(machine);
+		servers.add(machine2);
+		servers.add(machine3);
+		int machinesToAdd = scheduler.evaluateUtilization(servers, currentTime);
+		
+		EasyMock.verify(machine);
+		EasyMock.verify(machine2);
+		EasyMock.verify(machine3);
+		
+		assertEquals(638, machinesToAdd);
+	}
 
 }
