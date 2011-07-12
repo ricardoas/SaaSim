@@ -32,6 +32,7 @@ public class OneTierSimulatorForPlanning extends OneTierSimulator {
 		//Scheduling first events
 		JEEventScheduler.SCHEDULER.queueEvent(new JEEvent(JEEventType.READWORKLOAD, this, new JETime(0), null));
 		JEEventScheduler.SCHEDULER.queueEvent(new JEEvent(JEEventType.EVALUATEUTILIZATION, this.loadBalancer, new JETime(UTILIZATION_EVALUATION_PERIOD), UTILIZATION_EVALUATION_PERIOD));
+		this.loadBalancer.initOneMachine();
 		JEEventScheduler.SCHEDULER.start();
 	}
 	

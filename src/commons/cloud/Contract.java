@@ -10,8 +10,8 @@ public class Contract {
 	public double transferenceLimit;//in GB
 	public double extraTransferenceCost;// in $/GB
 	
-	public Contract(String planName, Double setupCost, Double price,
-			Double cpuLimit, Double extraCpuCost) {
+	public Contract(String planName, double setupCost, double price,
+			double cpuLimit, double extraCpuCost) {
 		this.name = planName;
 		this.setupCost = setupCost;
 		this.price = price;

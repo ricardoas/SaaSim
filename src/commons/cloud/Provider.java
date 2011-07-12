@@ -77,7 +77,7 @@ public class Provider {
 		// TODO
 	}
 
-	public double calculateCost(double consumedCpu, double consumedTransference) {
+	public double calculateCost(double consumedTransference) {
 		return this.calculateReservationCosts() + this.calculateOnDemandCosts() + this.calculateTransferenceCosts(consumedTransference);
 	}
 	

@@ -84,14 +84,7 @@ public class LoadBalancer extends JEEventHandler{
 
 	private void manageMachines(int numberOfMachinesToAdd) {
 		if(numberOfMachinesToAdd > 0){//Adding machines
-			//Looking for reserved resources to be added
-			Iterator<Machine> it = this.reservedMachinesPool.iterator();
-			while(it.hasNext() && numberOfMachinesToAdd > 0){
-				Machine machine = it.next();
-				this.servers.add(machine);
-				it.remove();
-				numberOfMachinesToAdd--;
-			}
+			numberOfMachinesToAdd = addReservedMachines(numberOfMachinesToAdd);
 			
 			//Machines are missing, add on demand resources
 			if(numberOfMachinesToAdd > 0){
@@ -129,5 +122,26 @@ public class LoadBalancer extends JEEventHandler{
 		for(int i = 0; i < amount; i++){
 			this.reservedMachinesPool.add(new Machine(new Random().nextLong(), true));
 		}
+	}
+
+	
+	public void initOneMachine() {
+		if(this.reservedMachinesPool.size() > 0){
+			int numberOfMachinesToAdd = 1;
+			addReservedMachines(numberOfMachinesToAdd);
+		}else{
+			this.addMachine();
+		}
+	}
+
+	private int addReservedMachines(int numberOfMachinesToAdd) {
+		Iterator<Machine> it = this.reservedMachinesPool.iterator();
+		while(it.hasNext() && numberOfMachinesToAdd > 0){
+			Machine machine = it.next();
+			this.servers.add(machine);
+			it.remove();
+			numberOfMachinesToAdd--;
+		}
+		return numberOfMachinesToAdd;
 	}
 }

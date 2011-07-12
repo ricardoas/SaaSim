@@ -9,11 +9,11 @@ package commons.cloud;
 public class UtilityFunction {
 
 	public double calculateUtility(Contract contract, User user, Provider provider){
-		return calculateTotalReceipt(contract, user) - calculateCost(user, provider);
+		return calculateTotalReceipt(contract, user) - calculateCost(user.consumedTransference, provider);
 	}
 
-	public double calculateCost(User user, Provider provider) {
-		return provider.calculateCost(user.consumedCpu, user.consumedTransference);
+	public double calculateCost(double totalTransferred, Provider provider) {
+		return provider.calculateCost(totalTransferred);
 	}
 
 	public double calculateTotalReceipt(Contract contract, User user) {
@@ -43,7 +43,7 @@ public class UtilityFunction {
 		}
 		
 		if(user.consumedCpu > contract.cpuLimit){
-			extraReceipt += (user.consumedCpu - contract.cpuLimit) * contract.extraCpuCost;
+			extraReceipt += (user.consumedCpu - contract.cpuLimit) * contract.extraCpuCost;//FIXME: verify input unit
 		}
 		if(user.consumedTransference > contract.transferenceLimit){
 			extraReceipt += (user.consumedTransference - contract.transferenceLimit) * contract.extraTransferenceCost;

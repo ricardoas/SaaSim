@@ -149,7 +149,7 @@ public class UtilityFunctionTest {
 		provider.onDemandResources.add(mach11);
 		
 		assertEquals(7 * provider.reservationOneYearFee + 104 * provider.reservedCpuCost + 104 * provider.monitoringCost +
-				105 * provider.onDemandCpuCost + 105 * provider.monitoringCost, utility.calculateCost(user, provider), 0.0);
+				105 * provider.onDemandCpuCost + 105 * provider.monitoringCost, utility.calculateCost(user.consumedTransference, provider), 0.0);
 	}
 	
 	@Test
@@ -181,7 +181,7 @@ public class UtilityFunctionTest {
 		provider.reservedResources.add(mach7);
 		
 		assertEquals(7 * provider.reservationOneYearFee + 104 * provider.reservedCpuCost + 104 * provider.monitoringCost,
-				utility.calculateCost(user, provider), 0.0);
+				utility.calculateCost(user.consumedTransference, provider), 0.0);
 	}
 	
 	@Test
@@ -197,7 +197,6 @@ public class UtilityFunctionTest {
 		
 		assertEquals(0.45 + price + setupCost, utility.calculateTotalReceipt(contract, user), 0.0);
 	}
-	
 	
 	@Test
 	public void calculateTotalReceipt2(){

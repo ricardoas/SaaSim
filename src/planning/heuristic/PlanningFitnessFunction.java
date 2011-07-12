@@ -52,9 +52,11 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		this.updateInformation();
 		
 		//Computing total utility
+		//FIXME
 		double fitness = 0d;
 		for(User user : currentWorkload.keySet()){
-			fitness += this.utilityFunction.calculateUtility(this.cloudUsers.get(user), user, this.cloudProvider);
+			fitness += this.utilityFunction.calculateTotalReceipt(this.cloudUsers.get(user), user);
+			fitness -= this.utilityFunction.calculateCost(user.consumedTransference, this.cloudProvider);
 		}
 		
 		if(fitness < 1){

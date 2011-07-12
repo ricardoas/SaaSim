@@ -242,7 +242,7 @@ public class ProviderTest {
 		machine6.totalProcessed = 15.23 * HOUR;
 		provider.reservedResources.add(machine6);
 		
-		assertEquals(600 + 68 * reservedCpuCost + 68 * monitoringCost, provider.calculateCost(68, 0), 0.0d);
+		assertEquals(600 + 68 * reservedCpuCost + 68 * monitoringCost, provider.calculateCost(0), 0.0d);
 	}
 	
 	@Test
@@ -269,7 +269,7 @@ public class ProviderTest {
 		provider.reservedResources.add(machine1);
 		
 		try{
-			provider.calculateCost(68, 0);
+			provider.calculateCost(0);
 			fail("Invalid resource consumption!");
 		}catch(RuntimeException e){
 		}
@@ -310,7 +310,7 @@ public class ProviderTest {
 		machine5.totalProcessed = 5.14 * HOUR;
 		provider.onDemandResources.add(machine5);
 		
-		assertEquals( 26 * onDemandCpuCost + 26 * monitoringCost, provider.calculateCost(26, 0), 0.0d);
+		assertEquals( 26 * onDemandCpuCost + 26 * monitoringCost, provider.calculateCost(0), 0.0d);
 	}
 	
 	@Test
@@ -337,7 +337,7 @@ public class ProviderTest {
 		provider.onDemandResources.add(machine1);
 		
 		try{
-			provider.calculateCost(26, 0);
+			provider.calculateCost(0);
 			fail("Invalid resource consumption!");
 		}catch(RuntimeException e){
 		}
@@ -398,6 +398,6 @@ public class ProviderTest {
 		provider.onDemandResources.add(machine11);
 		
 		assertEquals( 7 * reservationOneYearFee + 104 * reservedCpuCost + 104 * monitoringCost +
-				105 * onDemandCpuCost + 105 * monitoringCost, provider.calculateCost(209, 0), 0.0d);
+				105 * onDemandCpuCost + 105 * monitoringCost, provider.calculateCost(0), 0.0d);
 	}
 }
