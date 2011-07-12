@@ -74,7 +74,13 @@ public class RanjanScheduler implements SchedulingHeuristic {
 		}
 		
 //		averageUtilization = averageUtilization / servers.size();
-		double d = averageUtilization / totalNumberOfCompletions;
+		double d;
+		if(totalNumberOfCompletions == 0){
+			d = averageUtilization;
+		}else{
+			d = averageUtilization / totalNumberOfCompletions;
+		}
+		
 		double u_lign = Math.max(totalNumberOfArrivals, totalNumberOfCompletions) * d;
 		int newNumberOfServers = (int)Math.ceil( servers.size() * u_lign / TARGET_UTILIZATION );
 		
