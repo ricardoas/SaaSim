@@ -18,6 +18,9 @@ import commons.sim.jeevent.JETime;
 public class Machine extends JEEventHandler{
 	
 	private long id;
+	private boolean isReserved;
+	protected double totalProcessed;
+	
 	protected JETime lastProcessingEvaluation;
 	protected JEEvent nextFinishEvent;
 	
@@ -35,8 +38,15 @@ public class Machine extends JEEventHandler{
 		this.queue = new ArrayList<Request>();
 		this.finishedRequests = new ArrayList<Request>();
 		this.lastProcessingEvaluation = new JETime(0);
+		this.isReserved = false;
+		this.totalProcessed = 0;
 	}
 
+	public Machine(long id, boolean isReserved){
+		this(id);
+		this.isReserved = isReserved;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -139,6 +149,7 @@ public class Machine extends JEEventHandler{
 						this.finishedRequests.add(request);
 						iterator.remove();
 					}
+					this.totalProcessed += totalProcessingTime.timeMilliSeconds;//Accounting
 				}
 				this.lastProcessingEvaluation = event.getScheduledTime();
 				
@@ -167,4 +178,16 @@ public class Machine extends JEEventHandler{
 	public boolean isBusy() {
 		return this.queue.size() != 0 && this.nextFinishEvent != null;
 	}	
+
+	public boolean isReserved(){
+		return this.isReserved;
+	}
+
+	
+	public double calcExecutionTime() {
+		if(this.totalProcessed < 0){
+			throw new RuntimeException("Invalid resource "+this.id+" execution time: "+this.totalProcessed);
+		}
+		return this.totalProcessed;
+	}
 }

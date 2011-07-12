@@ -113,18 +113,40 @@ public class UtilityFunctionTest {
 		user.consumedCpu = 209d;
 		
 		//Adding resources
-		provider.reservedResources.add(new Resource(0, 10 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(1, 21 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(120, 135 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(120, 135 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(120, 135 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(121.5, 134 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(189.1, 204.33 * ProviderTest.HOUR));
+		Machine mach1 = new Machine(1);
+		mach1.totalProcessed = 10 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach1);
+		Machine mach2 = new Machine(2);
+		mach2.totalProcessed = 20 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach2);
+		Machine mach3 = new Machine(3);
+		mach3.totalProcessed = 15 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach3);
+		Machine mach4 = new Machine(4);
+		mach4.totalProcessed = 15 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach4);
+		Machine mach5 = new Machine(5);
+		mach5.totalProcessed = 15 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach5);
+		Machine mach6 = new Machine(6);
+		mach6.totalProcessed = 12.5 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach6);
+		Machine mach7 = new Machine(7);
+		mach7.totalProcessed = 15.23 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach7);
 		
-		provider.onDemandResources.add(new Resource(121, 139 * ProviderTest.HOUR));
-		provider.onDemandResources.add(new Resource(122, 200.5 * ProviderTest.HOUR));
-		provider.onDemandResources.add(new Resource(133.8, 135 * ProviderTest.HOUR));
-		provider.onDemandResources.add(new Resource(378.01, 383.15 * ProviderTest.HOUR));
+		Machine mach8 = new Machine(8);
+		mach8.totalProcessed = 18 * ProviderTest.HOUR;
+		provider.onDemandResources.add(mach8);
+		Machine mach9 = new Machine(9);
+		mach9.totalProcessed = 78.5 * ProviderTest.HOUR;
+		provider.onDemandResources.add(mach9);
+		Machine mach10 = new Machine(10);
+		mach10.totalProcessed = 1.2 * ProviderTest.HOUR;
+		provider.onDemandResources.add(mach10);
+		Machine mach11 = new Machine(11);
+		mach11.totalProcessed = 5.14 * ProviderTest.HOUR;
+		provider.onDemandResources.add(mach11);
 		
 		assertEquals(7 * provider.reservationOneYearFee + 104 * provider.reservedCpuCost + 104 * provider.monitoringCost +
 				105 * provider.onDemandCpuCost + 105 * provider.monitoringCost, utility.calculateCost(user, provider), 0.0);
@@ -136,13 +158,27 @@ public class UtilityFunctionTest {
 		user.consumedCpu = 209d;
 		
 		//Adding resources
-		provider.reservedResources.add(new Resource(0, 10 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(1, 21 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(120, 135 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(120, 135 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(120, 135 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(121.5, 134 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(189.1, 204.33 * ProviderTest.HOUR));
+		Machine mach1 = new Machine(1);
+		mach1.totalProcessed = 10 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach1);
+		Machine mach2 = new Machine(2);
+		mach2.totalProcessed = 20 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach2);
+		Machine mach3 = new Machine(3);
+		mach3.totalProcessed = 15 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach3);
+		Machine mach4 = new Machine(4);
+		mach4.totalProcessed = 15 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach4);
+		Machine mach5 = new Machine(5);
+		mach5.totalProcessed = 15 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach5);
+		Machine mach6 = new Machine(6);
+		mach6.totalProcessed = 12.5 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach6);
+		Machine mach7 = new Machine(7);
+		mach7.totalProcessed = 15.23 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach7);
 		
 		assertEquals(7 * provider.reservationOneYearFee + 104 * provider.reservedCpuCost + 104 * provider.monitoringCost,
 				utility.calculateCost(user, provider), 0.0);
@@ -189,13 +225,27 @@ public class UtilityFunctionTest {
 		user.consumedCpu = 104d;
 		
 		//Adding resources
-		provider.reservedResources.add(new Resource(0, 10 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(1, 21 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(120, 135 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(120, 135 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(120, 135 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(121.5, 134 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(189.1, 204.33 * ProviderTest.HOUR));
+		Machine mach1 = new Machine(1);
+		mach1.totalProcessed = 10 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach1);
+		Machine mach2 = new Machine(2);
+		mach2.totalProcessed = 20 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach2);
+		Machine mach3 = new Machine(3);
+		mach3.totalProcessed = 15 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach3);
+		Machine mach4 = new Machine(4);
+		mach4.totalProcessed = 15 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach4);
+		Machine mach5 = new Machine(5);
+		mach5.totalProcessed = 15 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach5);
+		Machine mach6 = new Machine(6);
+		mach6.totalProcessed = 12.5 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach6);
+		Machine mach7 = new Machine(7);
+		mach7.totalProcessed = 15.23 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach7);
 		
 		double cost = 7 * provider.reservationOneYearFee + 104 * provider.reservedCpuCost + 104 * provider.monitoringCost;
 		double receipt = (user.consumedCpu - cpuLimit)*extraCpuCost + setupCost + price; 
@@ -215,18 +265,40 @@ public class UtilityFunctionTest {
 		user.consumedCpu = 209d;
 		
 		//Adding resources
-		provider.reservedResources.add(new Resource(0, 10 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(1, 21 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(120, 135 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(120, 135 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(120, 135 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(121.5, 134 * ProviderTest.HOUR));
-		provider.reservedResources.add(new Resource(189.1, 204.33 * ProviderTest.HOUR));
+		Machine mach1 = new Machine(1);
+		mach1.totalProcessed = 10 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach1);
+		Machine mach2 = new Machine(2);
+		mach2.totalProcessed = 20 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach2);
+		Machine mach3 = new Machine(3);
+		mach3.totalProcessed = 15 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach3);
+		Machine mach4 = new Machine(4);
+		mach4.totalProcessed = 15 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach4);
+		Machine mach5 = new Machine(5);
+		mach5.totalProcessed = 15 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach5);
+		Machine mach6 = new Machine(6);
+		mach6.totalProcessed = 12.5 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach6);
+		Machine mach7 = new Machine(7);
+		mach7.totalProcessed = 15.23 * ProviderTest.HOUR;
+		provider.reservedResources.add(mach7);
 		
-		provider.onDemandResources.add(new Resource(121, 139 * ProviderTest.HOUR));
-		provider.onDemandResources.add(new Resource(122, 200.5 * ProviderTest.HOUR));
-		provider.onDemandResources.add(new Resource(133.8, 135 * ProviderTest.HOUR));
-		provider.onDemandResources.add(new Resource(378.01, 383.15 * ProviderTest.HOUR));
+		Machine mach8 = new Machine(8);
+		mach8.totalProcessed = 18 * ProviderTest.HOUR;
+		provider.onDemandResources.add(mach8);
+		Machine mach9 = new Machine(9);
+		mach9.totalProcessed = 78.5 * ProviderTest.HOUR;
+		provider.onDemandResources.add(mach9);
+		Machine mach10 = new Machine(10);
+		mach10.totalProcessed = 1.2 * ProviderTest.HOUR;
+		provider.onDemandResources.add(mach10);
+		Machine mach11 = new Machine(11);
+		mach11.totalProcessed = 5.14 * ProviderTest.HOUR;
+		provider.onDemandResources.add(mach11);
 		
 		double cost = 7 * provider.reservationOneYearFee + 104 * provider.reservedCpuCost + 104 * provider.monitoringCost 
 						+ 105 * provider.onDemandCpuCost + 105 * provider.monitoringCost;

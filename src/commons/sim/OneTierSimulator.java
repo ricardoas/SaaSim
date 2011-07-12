@@ -28,7 +28,7 @@ public class OneTierSimulator extends JEEventHandler implements Simulator {
 	 * Constructor
 	 */
 	public OneTierSimulator() {
-		this.workloadParser = new GEISTSimpleWorkloadParser("");
+//		this.workloadParser = new GEISTSimpleWorkloadParser("");
 
 	}
 	

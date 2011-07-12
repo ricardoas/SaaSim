@@ -223,12 +223,24 @@ public class ProviderTest {
 				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
 		
 		//Adding reserved resources
-		provider.reservedResources.add(new Resource(0 * HOUR, 4 * HOUR));
-		provider.reservedResources.add(new Resource(2 * HOUR, 7 * HOUR));
-		provider.reservedResources.add(new Resource(120 * HOUR, 135 * HOUR));
-		provider.reservedResources.add(new Resource(120 * HOUR, 135 * HOUR));
-		provider.reservedResources.add(new Resource(121.5 * HOUR, 134 * HOUR));
-		provider.reservedResources.add(new Resource(189.1 * HOUR, 204.33 * HOUR));
+		Machine machine1 = new Machine(1);
+		machine1.totalProcessed = 4 * HOUR;
+		provider.reservedResources.add(machine1);
+		Machine machine2 = new Machine(2);
+		machine2.totalProcessed = 5 * HOUR;
+		provider.reservedResources.add(machine2);
+		Machine machine3 = new Machine(3);
+		machine3.totalProcessed = 15 * HOUR;
+		provider.reservedResources.add(machine3);
+		Machine machine4 = new Machine(4);
+		machine4.totalProcessed = 15 * HOUR;
+		provider.reservedResources.add(machine4);
+		Machine machine5 = new Machine(5);
+		machine5.totalProcessed = 12.5 * HOUR;
+		provider.reservedResources.add(machine5);
+		Machine machine6 = new Machine(6);
+		machine6.totalProcessed = 15.23 * HOUR;
+		provider.reservedResources.add(machine6);
 		
 		assertEquals(600 + 68 * reservedCpuCost + 68 * monitoringCost, provider.calculateCost(68, 0), 0.0d);
 	}
@@ -252,7 +264,9 @@ public class ProviderTest {
 				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
 		
 		//Adding reserved resources
-		provider.reservedResources.add(new Resource(9 * HOUR, 4 * HOUR));
+		Machine machine1 = new Machine(1);
+		machine1.totalProcessed = -5 * HOUR;
+		provider.reservedResources.add(machine1);
 		
 		try{
 			provider.calculateCost(68, 0);
@@ -280,11 +294,21 @@ public class ProviderTest {
 				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
 		
 		//Adding reserved resources
-		provider.onDemandResources.add(new Resource(1 * HOUR, 3 * HOUR));
-		provider.onDemandResources.add(new Resource(6 * HOUR, 7 * HOUR));
-		provider.onDemandResources.add(new Resource(120 * HOUR, 135 * HOUR));
-		provider.onDemandResources.add(new Resource(133.8 * HOUR, 135 * HOUR));
-		provider.onDemandResources.add(new Resource(378.01 * HOUR, 383.15 * HOUR));
+		Machine machine1 = new Machine(1);
+		machine1.totalProcessed = 2 * HOUR;
+		provider.onDemandResources.add(machine1);
+		Machine machine2 = new Machine(2);
+		machine2.totalProcessed = 1 * HOUR;
+		provider.onDemandResources.add(machine2);
+		Machine machine3 = new Machine(3);
+		machine3.totalProcessed = 15 * HOUR;
+		provider.onDemandResources.add(machine3);
+		Machine machine4 = new Machine(1);
+		machine4.totalProcessed = 1.2 * HOUR;
+		provider.onDemandResources.add(machine4);
+		Machine machine5 = new Machine(5);
+		machine5.totalProcessed = 5.14 * HOUR;
+		provider.onDemandResources.add(machine5);
 		
 		assertEquals( 26 * onDemandCpuCost + 26 * monitoringCost, provider.calculateCost(26, 0), 0.0d);
 	}
@@ -308,7 +332,9 @@ public class ProviderTest {
 				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
 		
 		//Adding reserved resources
-		provider.onDemandResources.add(new Resource(999 * HOUR, 383.15 * HOUR));
+		Machine machine1 = new Machine(1);
+		machine1.totalProcessed = -600 * HOUR;
+		provider.onDemandResources.add(machine1);
 		
 		try{
 			provider.calculateCost(26, 0);
@@ -336,18 +362,40 @@ public class ProviderTest {
 				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
 		
 		//Adding reserved resources
-		provider.reservedResources.add(new Resource(0 * HOUR, 10 * HOUR));
-		provider.reservedResources.add(new Resource(1 * HOUR, 21 * HOUR));
-		provider.reservedResources.add(new Resource(120 * HOUR, 135 * HOUR));
-		provider.reservedResources.add(new Resource(120 * HOUR, 135 * HOUR));
-		provider.reservedResources.add(new Resource(120 * HOUR, 135 * HOUR));
-		provider.reservedResources.add(new Resource(121.5 * HOUR, 134 * HOUR));
-		provider.reservedResources.add(new Resource(189.1 * HOUR, 204.33 * HOUR));
+		Machine machine1 = new Machine(1);
+		machine1.totalProcessed = 10 * HOUR;
+		provider.reservedResources.add(machine1);
+		Machine machine2 = new Machine(2);
+		machine2.totalProcessed = 20 * HOUR;
+		provider.reservedResources.add(machine2);
+		Machine machine3 = new Machine(3);
+		machine3.totalProcessed = 15 * HOUR;
+		provider.reservedResources.add(machine3);
+		Machine machine4 = new Machine(4);
+		machine4.totalProcessed = 15 * HOUR;
+		provider.reservedResources.add(machine4);
+		Machine machine5 = new Machine(5);
+		machine5.totalProcessed = 15 * HOUR;
+		provider.reservedResources.add(machine5);
+		Machine machine6 = new Machine(6);
+		machine6.totalProcessed = 12.5 * HOUR;
+		provider.reservedResources.add(machine6);
+		Machine machine7 = new Machine(7);
+		machine7.totalProcessed = 15.23 * HOUR;
+		provider.reservedResources.add(machine7);
 		
-		provider.onDemandResources.add(new Resource(121 * HOUR, 139 * HOUR));
-		provider.onDemandResources.add(new Resource(122 * HOUR, 200.5 * HOUR));
-		provider.onDemandResources.add(new Resource(133.8 * HOUR, 135 * HOUR));
-		provider.onDemandResources.add(new Resource(378.01 * HOUR, 383.15 * HOUR));
+		Machine machine8 = new Machine(8);
+		machine8.totalProcessed = 18 * HOUR;
+		provider.onDemandResources.add(machine8);
+		Machine machine9 = new Machine(9);
+		machine9.totalProcessed = 78.5 * HOUR;
+		provider.onDemandResources.add(machine9);
+		Machine machine10 = new Machine(10);
+		machine10.totalProcessed = 1.2 * HOUR;
+		provider.onDemandResources.add(machine10);
+		Machine machine11 = new Machine(11);
+		machine11.totalProcessed = 5.14 * HOUR;
+		provider.onDemandResources.add(machine11);
 		
 		assertEquals( 7 * reservationOneYearFee + 104 * reservedCpuCost + 104 * monitoringCost +
 				105 * onDemandCpuCost + 105 * monitoringCost, provider.calculateCost(209, 0), 0.0d);

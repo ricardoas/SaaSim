@@ -32,7 +32,7 @@ public class AGHeuristic implements PlanningHeuristic{
 	private double MINIMUM_IMPROVEMENT = 0.01;//1%
 	private int MINIMUM_NUMBER_OF_EVOLUTIONS = 200;
 	
-	private int resourcesLimit = 0;
+	private int resourcesReservationLimit = 0;
 	
 	private List<IChromosome> bestConfigs = new ArrayList<IChromosome>();
 	
@@ -58,7 +58,7 @@ public class AGHeuristic implements PlanningHeuristic{
 	//		config.setKeepPopulationSizeConstant(true);
 	//		config.setNaturalSelector(null);//Tournament, WeightedRoullete
 
-			FitnessFunction myFunc = createFitnessFunction(currentWorkload, cloudUsers, sla);
+			FitnessFunction myFunc = createFitnessFunction(currentWorkload, cloudUsers, sla, cloudProvider);
 			config.setFitnessFunction(myFunc);
 			
 			IChromosome sampleChromosome = createSampleChromosome(config);
@@ -98,18 +98,18 @@ public class AGHeuristic implements PlanningHeuristic{
 	}
 
 	private void initProperties(Map<String, Provider> cloudProvider) {
-		resourcesLimit = cloudProvider.values().iterator().next().reservationLimit;
+		resourcesReservationLimit = cloudProvider.values().iterator().next().reservationLimit;
 	}
 
 	private IChromosome createSampleChromosome(Configuration config) throws InvalidConfigurationException {
 		Gene[] genes = new IntegerGene[1];
-		genes[0] = new IntegerGene(config, 0, resourcesLimit);
+		genes[0] = new IntegerGene(config, 0, resourcesReservationLimit);
 		IChromosome sampleChromosome = new Chromosome(config, genes);
 		return sampleChromosome;
 	}
 
-	private FitnessFunction createFitnessFunction(Map<User, List<Request>> currentWorkload, Map<User, Contract> cloudUsers, double sla) {
-		return new PlanningFitnessFunction(currentWorkload, cloudUsers, sla);
+	private FitnessFunction createFitnessFunction(Map<User, List<Request>> currentWorkload, Map<User, Contract> cloudUsers, double sla, Map<String, Provider> cloudProvider) {
+		return new PlanningFitnessFunction(currentWorkload, cloudUsers, sla, cloudProvider);
 	}
 
 	@Override

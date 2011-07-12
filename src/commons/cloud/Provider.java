@@ -5,8 +5,8 @@ import java.util.List;
 
 public class Provider {
 
-	public List<Resource> reservedResources;
-	public List<Resource> onDemandResources;
+	public List<Machine> reservedResources;
+	public List<Machine> onDemandResources;
 	
 	public final double onDemandCpuCost;// in $/instance-hour
 	public final int onDemandLimit;// in number of instances
@@ -44,8 +44,8 @@ public class Provider {
 		this.transferOutLimits = transferOutLimits;
 		this.transferOutCosts = transferOutCosts;
 		
-		this.onDemandResources = new ArrayList<Resource>();
-		this.reservedResources = new ArrayList<Resource>();
+		this.onDemandResources = new ArrayList<Machine>();
+		this.reservedResources = new ArrayList<Machine>();
 		this.verifyProperties();
 	}
 
@@ -88,8 +88,8 @@ public class Provider {
 
 	private double calculateOnDemandCosts() {
 		double totalConsumed = 0;
-		for(Resource resource : this.onDemandResources){
-			totalConsumed += Math.ceil(resource.calcExecutionTime());
+		for(Machine machine : this.onDemandResources){
+			totalConsumed += Math.ceil(machine.calcExecutionTime());
 		}
 		
 		return totalConsumed * this.onDemandCpuCost + totalConsumed * monitoringCost;
@@ -97,8 +97,8 @@ public class Provider {
 
 	private double calculateReservationCosts() {
 		double totalConsumed = 0;
-		for(Resource resource : this.reservedResources){
-			totalConsumed += Math.ceil(resource.calcExecutionTime());
+		for(Machine machine : this.reservedResources){
+			totalConsumed += Math.ceil(machine.calcExecutionTime());
 		}
 		
 		return this.reservedResources.size() * this.reservationOneYearFee + 
