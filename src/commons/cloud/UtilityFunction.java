@@ -7,6 +7,8 @@ package commons.cloud;
  *
  */
 public class UtilityFunction {
+	
+	public static long HOUR_IN_MILLIS = 1000 * 60 * 60;
 
 	public double calculateUtility(Contract contract, User user, Provider provider){
 		return calculateTotalReceipt(contract, user) - calculateCost(user.consumedTransference, provider);
@@ -43,7 +45,7 @@ public class UtilityFunction {
 		}
 		
 		if(user.consumedCpu > contract.cpuLimit){
-			extraReceipt += (user.consumedCpu - contract.cpuLimit) * contract.extraCpuCost;//FIXME: verify input unit
+			extraReceipt += Math.ceil((user.consumedCpu - contract.cpuLimit)/HOUR_IN_MILLIS) * contract.extraCpuCost;//FIXME: verify input unit
 		}
 		if(user.consumedTransference > contract.transferenceLimit){
 			extraReceipt += (user.consumedTransference - contract.transferenceLimit) * contract.extraTransferenceCost;

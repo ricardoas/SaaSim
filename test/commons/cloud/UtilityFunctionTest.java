@@ -39,14 +39,14 @@ public class UtilityFunctionTest {
 	public void extraReceiptCalcWithExtraCpuResourcesUsed(){
 		Double setupCost = 100d;
 		Double price = 200d;
-		Double cpuLimit = 11.5d;
+		Double cpuLimit = 11.5d * ProviderTest.HOUR_IN_MILLIS;
 		Double extraCpuCost = 0.9d;
 		Contract contract = new Contract("p1", setupCost, price, cpuLimit, extraCpuCost);
 		
 		User user = new User("us1");
-		user.consumedCpu = 12d;
+		user.consumedCpu = 12d * ProviderTest.HOUR_IN_MILLIS;//Partial hour is billed as a full hour
 		
-		assertEquals(0.45, utility.calcExtraReceipt(contract, user), 0.0);
+		assertEquals(0.9, utility.calcExtraReceipt(contract, user), 0.0);
 	}
 	
 	/**
@@ -57,12 +57,12 @@ public class UtilityFunctionTest {
 	public void extraReceiptCalcWithExtraCpuResourcesUsed2(){
 		Double setupCost = 100d;
 		Double price = 200d;
-		Double cpuLimit = 5d;
+		Double cpuLimit = 5d * ProviderTest.HOUR_IN_MILLIS;
 		Double extraCpuCost = 0.9d;
 		Contract contract = new Contract("p1", setupCost, price, cpuLimit, extraCpuCost);
 		
 		User user = new User("us1");
-		user.consumedCpu = 12d;
+		user.consumedCpu = 12d * ProviderTest.HOUR_IN_MILLIS;
 		
 		
 		assertEquals(6.3, utility.calcExtraReceipt(contract, user), 0.0);
@@ -72,12 +72,12 @@ public class UtilityFunctionTest {
 	public void extraReceiptCalcWithInvalidCPU(){
 		Double setupCost = 100d;
 		Double price = 200d;
-		Double cpuLimit = 5d;
+		Double cpuLimit = 5d * ProviderTest.HOUR_IN_MILLIS;
 		Double extraCpuCost = 0.9d;
 		Contract contract = new Contract("p1", setupCost, price, cpuLimit, extraCpuCost);
 		
 		User user = new User("us1");
-		user.consumedCpu = -12d;
+		user.consumedCpu = -12d * ProviderTest.HOUR_IN_MILLIS;
 		
 		try{
 			utility.calcExtraReceipt(contract, user);
@@ -91,12 +91,12 @@ public class UtilityFunctionTest {
 	public void extraReceiptCalcWithInvalidTransference(){
 		Double setupCost = 100d;
 		Double price = 200d;
-		Double cpuLimit = 5d;
+		Double cpuLimit = 5d * ProviderTest.HOUR_IN_MILLIS;
 		Double extraCpuCost = 0.9d;
 		Contract contract = new Contract("p1", setupCost, price, cpuLimit, extraCpuCost);
 		
 		User user = new User("us1");
-		user.consumedCpu = 12d;
+		user.consumedCpu = 12d * ProviderTest.HOUR_IN_MILLIS;
 		user.consumedTransference = -.01d;
 		
 		try{
@@ -110,77 +110,76 @@ public class UtilityFunctionTest {
 	@Test
 	public void calculateCostForOnDemandAndReservedResources(){
 		User user = new User("us1");
-		user.consumedCpu = 209d;
 		
 		//Adding resources
 		Machine mach1 = new Machine(1);
-		mach1.totalProcessed = 10 * ProviderTest.HOUR;
+		mach1.totalProcessed = 10 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach1);
 		Machine mach2 = new Machine(2);
-		mach2.totalProcessed = 20 * ProviderTest.HOUR;
+		mach2.totalProcessed = 20 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach2);
 		Machine mach3 = new Machine(3);
-		mach3.totalProcessed = 15 * ProviderTest.HOUR;
+		mach3.totalProcessed = 15 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach3);
 		Machine mach4 = new Machine(4);
-		mach4.totalProcessed = 15 * ProviderTest.HOUR;
+		mach4.totalProcessed = 15 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach4);
 		Machine mach5 = new Machine(5);
-		mach5.totalProcessed = 15 * ProviderTest.HOUR;
+		mach5.totalProcessed = 15 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach5);
 		Machine mach6 = new Machine(6);
-		mach6.totalProcessed = 12.5 * ProviderTest.HOUR;
+		mach6.totalProcessed = 12.5 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach6);
 		Machine mach7 = new Machine(7);
-		mach7.totalProcessed = 15.23 * ProviderTest.HOUR;
+		mach7.totalProcessed = 15.23 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach7);
 		
 		Machine mach8 = new Machine(8);
-		mach8.totalProcessed = 18 * ProviderTest.HOUR;
+		mach8.totalProcessed = 18 * ProviderTest.HOUR_IN_MILLIS;
 		provider.onDemandResources.add(mach8);
 		Machine mach9 = new Machine(9);
-		mach9.totalProcessed = 78.5 * ProviderTest.HOUR;
+		mach9.totalProcessed = 78.5 * ProviderTest.HOUR_IN_MILLIS;
 		provider.onDemandResources.add(mach9);
 		Machine mach10 = new Machine(10);
-		mach10.totalProcessed = 1.2 * ProviderTest.HOUR;
+		mach10.totalProcessed = 1.2 * ProviderTest.HOUR_IN_MILLIS;
 		provider.onDemandResources.add(mach10);
 		Machine mach11 = new Machine(11);
-		mach11.totalProcessed = 5.14 * ProviderTest.HOUR;
+		mach11.totalProcessed = 5.14 * ProviderTest.HOUR_IN_MILLIS;
 		provider.onDemandResources.add(mach11);
 		
-		assertEquals(7 * provider.reservationOneYearFee + 104 * provider.reservedCpuCost + 104 * provider.monitoringCost +
-				105 * provider.onDemandCpuCost + 105 * provider.monitoringCost, utility.calculateCost(user.consumedTransference, provider), 0.0);
+		assertEquals(7 * provider.reservationOneYearFee + 103 * provider.reservedCpuCost + 103 * provider.monitoringCost +
+				103 * provider.onDemandCpuCost + 103 * provider.monitoringCost, utility.calculateCost(user.consumedTransference, provider), 0.0);
 	}
 	
 	@Test
 	public void calculateCostForReservedResources(){
 		User user = new User("us1");
-		user.consumedCpu = 209d;
+		user.consumedCpu = 209d * ProviderTest.HOUR_IN_MILLIS;
 		
 		//Adding resources
 		Machine mach1 = new Machine(1);
-		mach1.totalProcessed = 10 * ProviderTest.HOUR;
+		mach1.totalProcessed = 10 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach1);
 		Machine mach2 = new Machine(2);
-		mach2.totalProcessed = 20 * ProviderTest.HOUR;
+		mach2.totalProcessed = 20 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach2);
 		Machine mach3 = new Machine(3);
-		mach3.totalProcessed = 15 * ProviderTest.HOUR;
+		mach3.totalProcessed = 15 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach3);
 		Machine mach4 = new Machine(4);
-		mach4.totalProcessed = 15 * ProviderTest.HOUR;
+		mach4.totalProcessed = 15 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach4);
 		Machine mach5 = new Machine(5);
-		mach5.totalProcessed = 15 * ProviderTest.HOUR;
+		mach5.totalProcessed = 15 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach5);
 		Machine mach6 = new Machine(6);
-		mach6.totalProcessed = 12.5 * ProviderTest.HOUR;
+		mach6.totalProcessed = 12.5 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach6);
 		Machine mach7 = new Machine(7);
-		mach7.totalProcessed = 15.23 * ProviderTest.HOUR;
+		mach7.totalProcessed = 15.23 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach7);
 		
-		assertEquals(7 * provider.reservationOneYearFee + 104 * provider.reservedCpuCost + 104 * provider.monitoringCost,
+		assertEquals(7 * provider.reservationOneYearFee + 103 * provider.reservedCpuCost + 103 * provider.monitoringCost,
 				utility.calculateCost(user.consumedTransference, provider), 0.0);
 	}
 	
@@ -188,26 +187,26 @@ public class UtilityFunctionTest {
 	public void calculateTotalReceipt(){
 		Double setupCost = 100d;
 		Double price = 200d;
-		Double cpuLimit = 11.5d;
+		Double cpuLimit = 11.5d * ProviderTest.HOUR_IN_MILLIS;
 		Double extraCpuCost = 0.9d;
 		Contract contract = new Contract("p1", setupCost, price, cpuLimit, extraCpuCost);
 		
 		User user = new User("us1");
-		user.consumedCpu = 12d;
+		user.consumedCpu = 12d * ProviderTest.HOUR_IN_MILLIS;//partial hour is billed as a full hour
 		
-		assertEquals(0.45 + price + setupCost, utility.calculateTotalReceipt(contract, user), 0.0);
+		assertEquals(0.9 + price + setupCost, utility.calculateTotalReceipt(contract, user), 0.0);
 	}
 	
 	@Test
 	public void calculateTotalReceipt2(){
 		Double setupCost = 100d;
 		Double price = 200d;
-		Double cpuLimit = 1d;
+		Double cpuLimit = 1d * ProviderTest.HOUR_IN_MILLIS;
 		Double extraCpuCost = 0.085d;
 		Contract contract = new Contract("p1", setupCost, price, cpuLimit, extraCpuCost);
 		
 		User user = new User("us1");
-		user.consumedCpu = 199d;
+		user.consumedCpu = 199d * ProviderTest.HOUR_IN_MILLIS;
 		
 		assertEquals(16.83 + price + setupCost, utility.calculateTotalReceipt(contract, user), 0.0);
 	}
@@ -216,38 +215,38 @@ public class UtilityFunctionTest {
 	public void calculateUtility(){
 		Double setupCost = 100d;
 		Double price = 200d;
-		Double cpuLimit = 11.5d;
+		Double cpuLimit = 11.5d * ProviderTest.HOUR_IN_MILLIS;
 		Double extraCpuCost = 0.9d;
 		Contract contract = new Contract("p1", setupCost, price, cpuLimit, extraCpuCost);
 		
 		User user = new User("us1");
-		user.consumedCpu = 104d;
+		user.consumedCpu = 103d * ProviderTest.HOUR_IN_MILLIS;
 		
 		//Adding resources
 		Machine mach1 = new Machine(1);
-		mach1.totalProcessed = 10 * ProviderTest.HOUR;
+		mach1.totalProcessed = 10 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach1);
 		Machine mach2 = new Machine(2);
-		mach2.totalProcessed = 20 * ProviderTest.HOUR;
+		mach2.totalProcessed = 20 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach2);
 		Machine mach3 = new Machine(3);
-		mach3.totalProcessed = 15 * ProviderTest.HOUR;
+		mach3.totalProcessed = 15 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach3);
 		Machine mach4 = new Machine(4);
-		mach4.totalProcessed = 15 * ProviderTest.HOUR;
+		mach4.totalProcessed = 15 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach4);
 		Machine mach5 = new Machine(5);
-		mach5.totalProcessed = 15 * ProviderTest.HOUR;
+		mach5.totalProcessed = 15 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach5);
 		Machine mach6 = new Machine(6);
-		mach6.totalProcessed = 12.5 * ProviderTest.HOUR;
+		mach6.totalProcessed = 12.5 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach6);
 		Machine mach7 = new Machine(7);
-		mach7.totalProcessed = 15.23 * ProviderTest.HOUR;
+		mach7.totalProcessed = 15.23 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach7);
 		
-		double cost = 7 * provider.reservationOneYearFee + 104 * provider.reservedCpuCost + 104 * provider.monitoringCost;
-		double receipt = (user.consumedCpu - cpuLimit)*extraCpuCost + setupCost + price; 
+		double cost = 7 * provider.reservationOneYearFee + 103 * provider.reservedCpuCost + 103 * provider.monitoringCost;
+		double receipt = Math.ceil((user.consumedCpu - cpuLimit)/ProviderTest.HOUR_IN_MILLIS) * extraCpuCost + setupCost + price; 
 		
 		assertEquals(receipt-cost, utility.calculateUtility(contract, user, provider), 0.0);
 	}
@@ -256,52 +255,52 @@ public class UtilityFunctionTest {
 	public void calculateUtility2(){
 		Double setupCost = 100d;
 		Double price = 200d;
-		Double cpuLimit = 1d;
+		Double cpuLimit = 1d * ProviderTest.HOUR_IN_MILLIS;
 		Double extraCpuCost = 0.9d;
 		Contract contract = new Contract("p1", setupCost, price, cpuLimit, extraCpuCost);
 		
 		User user = new User("us1");
-		user.consumedCpu = 209d;
+		user.consumedCpu = 209d * ProviderTest.HOUR_IN_MILLIS;
 		
 		//Adding resources
 		Machine mach1 = new Machine(1);
-		mach1.totalProcessed = 10 * ProviderTest.HOUR;
+		mach1.totalProcessed = 10 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach1);
 		Machine mach2 = new Machine(2);
-		mach2.totalProcessed = 20 * ProviderTest.HOUR;
+		mach2.totalProcessed = 20 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach2);
 		Machine mach3 = new Machine(3);
-		mach3.totalProcessed = 15 * ProviderTest.HOUR;
+		mach3.totalProcessed = 15 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach3);
 		Machine mach4 = new Machine(4);
-		mach4.totalProcessed = 15 * ProviderTest.HOUR;
+		mach4.totalProcessed = 15 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach4);
 		Machine mach5 = new Machine(5);
-		mach5.totalProcessed = 15 * ProviderTest.HOUR;
+		mach5.totalProcessed = 15 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach5);
 		Machine mach6 = new Machine(6);
-		mach6.totalProcessed = 12.5 * ProviderTest.HOUR;
+		mach6.totalProcessed = 12.5 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach6);
 		Machine mach7 = new Machine(7);
-		mach7.totalProcessed = 15.23 * ProviderTest.HOUR;
+		mach7.totalProcessed = 15.23 * ProviderTest.HOUR_IN_MILLIS;
 		provider.reservedResources.add(mach7);
 		
 		Machine mach8 = new Machine(8);
-		mach8.totalProcessed = 18 * ProviderTest.HOUR;
+		mach8.totalProcessed = 18 * ProviderTest.HOUR_IN_MILLIS;
 		provider.onDemandResources.add(mach8);
 		Machine mach9 = new Machine(9);
-		mach9.totalProcessed = 78.5 * ProviderTest.HOUR;
+		mach9.totalProcessed = 78.5 * ProviderTest.HOUR_IN_MILLIS;
 		provider.onDemandResources.add(mach9);
 		Machine mach10 = new Machine(10);
-		mach10.totalProcessed = 1.2 * ProviderTest.HOUR;
+		mach10.totalProcessed = 1.2 * ProviderTest.HOUR_IN_MILLIS;
 		provider.onDemandResources.add(mach10);
 		Machine mach11 = new Machine(11);
-		mach11.totalProcessed = 5.14 * ProviderTest.HOUR;
+		mach11.totalProcessed = 5.14 * ProviderTest.HOUR_IN_MILLIS;
 		provider.onDemandResources.add(mach11);
 		
-		double cost = 7 * provider.reservationOneYearFee + 104 * provider.reservedCpuCost + 104 * provider.monitoringCost 
-						+ 105 * provider.onDemandCpuCost + 105 * provider.monitoringCost;
-		double receipt = (user.consumedCpu - cpuLimit)*extraCpuCost + setupCost + price; 
+		double cost = 7 * provider.reservationOneYearFee + 103 * provider.reservedCpuCost + 103 * provider.monitoringCost 
+						+ 103 * provider.onDemandCpuCost + 103 * provider.monitoringCost;
+		double receipt = Math.ceil((user.consumedCpu - cpuLimit)/ProviderTest.HOUR_IN_MILLIS) * extraCpuCost + setupCost + price; 
 		
 		assertEquals(receipt-cost, utility.calculateUtility(contract, user, provider), 0.0);
 	}

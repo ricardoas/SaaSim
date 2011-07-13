@@ -182,12 +182,15 @@ public class Machine extends JEEventHandler{
 	public boolean isReserved(){
 		return this.isReserved;
 	}
-
 	
 	public double calcExecutionTime() {
 		if(this.totalProcessed < 0){
 			throw new RuntimeException("Invalid resource "+this.id+" execution time: "+this.totalProcessed);
 		}
 		return this.totalProcessed;
+	}
+
+	public String toString(){
+		return "Mac "+this.id;
 	}
 }

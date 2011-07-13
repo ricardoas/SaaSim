@@ -8,7 +8,7 @@ import org.junit.Test;
 public class ProviderTest {
 	
 	private String name = "prov";
-	public static final int HOUR = 1;
+	public static final int HOUR_IN_MILLIS = 1000 * 60 * 60;
 
 	@Test
 	public void providerWithInvalidCpuCost(){
@@ -224,25 +224,25 @@ public class ProviderTest {
 		
 		//Adding reserved resources
 		Machine machine1 = new Machine(1);
-		machine1.totalProcessed = 4 * HOUR;
+		machine1.totalProcessed = 4 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine1);
 		Machine machine2 = new Machine(2);
-		machine2.totalProcessed = 5 * HOUR;
+		machine2.totalProcessed = 5 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine2);
 		Machine machine3 = new Machine(3);
-		machine3.totalProcessed = 15 * HOUR;
+		machine3.totalProcessed = 15 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine3);
 		Machine machine4 = new Machine(4);
-		machine4.totalProcessed = 15 * HOUR;
+		machine4.totalProcessed = 15 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine4);
 		Machine machine5 = new Machine(5);
-		machine5.totalProcessed = 12.5 * HOUR;
+		machine5.totalProcessed = 12.5 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine5);
 		Machine machine6 = new Machine(6);
-		machine6.totalProcessed = 15.23 * HOUR;
+		machine6.totalProcessed = 15.23 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine6);
 		
-		assertEquals(600 + 68 * reservedCpuCost + 68 * monitoringCost, provider.calculateCost(0), 0.0d);
+		assertEquals(600 + 67 * reservedCpuCost + 67 * monitoringCost, provider.calculateCost(0), 0.0d);
 	}
 	
 	@Test
@@ -265,7 +265,7 @@ public class ProviderTest {
 		
 		//Adding reserved resources
 		Machine machine1 = new Machine(1);
-		machine1.totalProcessed = -5 * HOUR;
+		machine1.totalProcessed = -5 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine1);
 		
 		try{
@@ -295,22 +295,22 @@ public class ProviderTest {
 		
 		//Adding reserved resources
 		Machine machine1 = new Machine(1);
-		machine1.totalProcessed = 2 * HOUR;
+		machine1.totalProcessed = 2 * HOUR_IN_MILLIS;
 		provider.onDemandResources.add(machine1);
 		Machine machine2 = new Machine(2);
-		machine2.totalProcessed = 1 * HOUR;
+		machine2.totalProcessed = 1 * HOUR_IN_MILLIS;
 		provider.onDemandResources.add(machine2);
 		Machine machine3 = new Machine(3);
-		machine3.totalProcessed = 15 * HOUR;
+		machine3.totalProcessed = 15 * HOUR_IN_MILLIS;
 		provider.onDemandResources.add(machine3);
 		Machine machine4 = new Machine(1);
-		machine4.totalProcessed = 1.2 * HOUR;
+		machine4.totalProcessed = 1.2 * HOUR_IN_MILLIS;
 		provider.onDemandResources.add(machine4);
 		Machine machine5 = new Machine(5);
-		machine5.totalProcessed = 5.14 * HOUR;
+		machine5.totalProcessed = 5.14 * HOUR_IN_MILLIS;
 		provider.onDemandResources.add(machine5);
 		
-		assertEquals( 26 * onDemandCpuCost + 26 * monitoringCost, provider.calculateCost(0), 0.0d);
+		assertEquals( 25 * onDemandCpuCost + 25 * monitoringCost, provider.calculateCost(0), 0.0d);
 	}
 	
 	@Test
@@ -333,13 +333,24 @@ public class ProviderTest {
 		
 		//Adding reserved resources
 		Machine machine1 = new Machine(1);
-		machine1.totalProcessed = -600 * HOUR;
+		machine1.totalProcessed = -6 * HOUR_IN_MILLIS;
 		provider.onDemandResources.add(machine1);
 		
 		try{
 			provider.calculateCost(0);
 			fail("Invalid resource consumption!");
 		}catch(RuntimeException e){
+		}
+		
+		//FIXME: Double value explodes with large value!
+		machine1.totalProcessed = -600 * HOUR_IN_MILLIS;
+		provider.onDemandResources.clear();
+		provider.onDemandResources.add(machine1);
+		
+		try{
+			provider.calculateCost(0);
+		}catch(RuntimeException e){
+			fail("Invalid resource consumption!");
 		}
 	}
 	
@@ -363,41 +374,41 @@ public class ProviderTest {
 		
 		//Adding reserved resources
 		Machine machine1 = new Machine(1);
-		machine1.totalProcessed = 10 * HOUR;
+		machine1.totalProcessed = 10 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine1);
 		Machine machine2 = new Machine(2);
-		machine2.totalProcessed = 20 * HOUR;
+		machine2.totalProcessed = 20 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine2);
 		Machine machine3 = new Machine(3);
-		machine3.totalProcessed = 15 * HOUR;
+		machine3.totalProcessed = 15 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine3);
 		Machine machine4 = new Machine(4);
-		machine4.totalProcessed = 15 * HOUR;
+		machine4.totalProcessed = 15 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine4);
 		Machine machine5 = new Machine(5);
-		machine5.totalProcessed = 15 * HOUR;
+		machine5.totalProcessed = 15 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine5);
 		Machine machine6 = new Machine(6);
-		machine6.totalProcessed = 12.5 * HOUR;
+		machine6.totalProcessed = 12.5 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine6);
 		Machine machine7 = new Machine(7);
-		machine7.totalProcessed = 15.23 * HOUR;
+		machine7.totalProcessed = 15.23 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine7);
 		
 		Machine machine8 = new Machine(8);
-		machine8.totalProcessed = 18 * HOUR;
+		machine8.totalProcessed = 18 * HOUR_IN_MILLIS;
 		provider.onDemandResources.add(machine8);
 		Machine machine9 = new Machine(9);
-		machine9.totalProcessed = 78.5 * HOUR;
+		machine9.totalProcessed = 78.5 * HOUR_IN_MILLIS;
 		provider.onDemandResources.add(machine9);
 		Machine machine10 = new Machine(10);
-		machine10.totalProcessed = 1.2 * HOUR;
+		machine10.totalProcessed = 1.2 * HOUR_IN_MILLIS;
 		provider.onDemandResources.add(machine10);
 		Machine machine11 = new Machine(11);
-		machine11.totalProcessed = 5.14 * HOUR;
+		machine11.totalProcessed = 5.14 * HOUR_IN_MILLIS;
 		provider.onDemandResources.add(machine11);
 		
-		assertEquals( 7 * reservationOneYearFee + 104 * reservedCpuCost + 104 * monitoringCost +
-				105 * onDemandCpuCost + 105 * monitoringCost, provider.calculateCost(0), 0.0d);
+		assertEquals( 7 * reservationOneYearFee + 103 * reservedCpuCost + 103 * monitoringCost +
+				103 * onDemandCpuCost + 103 * monitoringCost, provider.calculateCost(0), 0.0d);
 	}
 }
