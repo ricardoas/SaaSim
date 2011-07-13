@@ -69,11 +69,13 @@ public class LoadBalancer extends JEEventHandler{
 		case NEWREQUEST:
 			Request request = (Request) event.getValue()[0];
 			Machine nextServer = heuristic.getNextServer(request, servers);
-			if(nextServer != null){
+			if(nextServer != null){//Reusing an existent machine
 				nextServer.sendRequest(request);
+			}else{//Creating a new one
+				this.manageMachines(1);
 			}
 			break;
-		case EVALUATEUTILIZATION:
+		case EVALUATEUTILIZATION://RANJAN Scheduler
 			Long eventTime = (Long) event.getValue()[0];
 			int numberOfMachinesToAdd = heuristic.evaluateUtilization(servers, eventTime);
 			this.manageMachines(numberOfMachinesToAdd);
@@ -94,7 +96,7 @@ public class LoadBalancer extends JEEventHandler{
 					this.addMachine();
 				}
 			}
-		}else{//Removing unused machines
+		}else if(numberOfMachinesToAdd < 0){//Removing unused machines
 			Iterator<Machine> it = servers.iterator();
 			while(it.hasNext()){
 				Machine machine = it.next();
@@ -124,7 +126,6 @@ public class LoadBalancer extends JEEventHandler{
 		}
 	}
 
-	
 	public void initOneMachine() {
 		if(this.reservedMachinesPool.size() > 0){
 			int numberOfMachinesToAdd = 1;

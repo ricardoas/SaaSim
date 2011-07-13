@@ -36,7 +36,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		for(User user : currentWorkload.keySet()){
 			workload.addAll(currentWorkload.get(user));
 		}
-		this.simulator = new OneTierSimulatorForPlanning(workload);
+		this.simulator = new OneTierSimulatorForPlanning(workload, this.sla);
 		this.simulator.setOnDemandResourcesLimit(this.cloudProvider.onDemandLimit);
 		this.simulator.setNumberOfReservedResources(reservedResources);
 	}

@@ -22,9 +22,10 @@ public class OneTierSimulatorForPlanning extends OneTierSimulator {
 	private List<Request> workload;
 	public static long UTILIZATION_EVALUATION_PERIOD = 1000 * 60 * 5;//in millis
 	
-	public OneTierSimulatorForPlanning(List<Request> workload){
+	public OneTierSimulatorForPlanning(List<Request> workload, double sla){
 		this.workload = workload;
-		this.loadBalancer = new LoadBalancer(new RanjanScheduler());
+//		this.loadBalancer = new LoadBalancer(new RanjanScheduler());
+		this.loadBalancer = new LoadBalancer(new ProfitDrivenScheduler(sla));
 	}
 	
 	@Override
@@ -59,43 +60,6 @@ public class OneTierSimulatorForPlanning extends OneTierSimulator {
 		this.loadBalancer.addReservedResources(amount);
 	}
 	
-	public static void main(String[] args) {
-		Map<User, List<Request>> val;
-		List<Request> workload = new ArrayList<Request>();
-		try {
-			val = next();
-			for(User user : val.keySet()){
-				workload.addAll(val.get(user));
-			}
-			OneTierSimulatorForPlanning sim = new OneTierSimulatorForPlanning(workload);
-			sim.start();
-			System.out.println(sim.loadBalancer.servers.size());
-		} catch (IOException e) {
-		}
-	}
-	
-	public static Map<User, List<Request>> next() throws IOException {
-		HashMap<User, List<Request>> currentWorkload = new HashMap<User, List<Request>>();
-		int nextMonth = Integer.MAX_VALUE;
-		
-			BufferedReader reader = new BufferedReader(new FileReader(new File("power.trc")));
-			while(reader.ready()){
-				String[] eventData = reader.readLine().trim().split("( +|\t+)+");//Assuming: clientID, userID, reqID, time, bytes, has expired, http op., URL, demand
-				Request request = new Request(eventData[0], eventData[1], eventData[3], Math.round(Double.valueOf(eventData[4])), 
-						Long.valueOf(eventData[5]), true, eventData[7], eventData[8], 1000 * 60 * 15 );
-				
-				//Adding new event to its corresponding user
-				User user = new User(eventData[1]);//Users are identified uniquely by their ids
-				List<Request> userWorkload = currentWorkload.get(user);
-				if(userWorkload == null){
-					userWorkload = new ArrayList<Request>();
-					currentWorkload.put(user, userWorkload);
-				}
-				userWorkload.add(request);
-			}
-	    return currentWorkload;
-	}
-
 	public List<Machine> getOnDemandResources() {
 		List<Machine> onDemandResources = new ArrayList<Machine>();
 		onDemandResources.addAll(this.loadBalancer.onDemandMachinesPool);
@@ -121,4 +85,44 @@ public class OneTierSimulatorForPlanning extends OneTierSimulator {
 		}
 		return reservedResources;
 	}
+	
+	//TODO: Remove from here
+//	public static void main(String[] args) {
+//		Map<User, List<Request>> val;
+//		List<Request> workload = new ArrayList<Request>();
+//		try {
+//			val = next();
+//			for(User user : val.keySet()){
+//				workload.addAll(val.get(user));
+//			}
+//			OneTierSimulatorForPlanning sim = new OneTierSimulatorForPlanning(workload);
+//			sim.start();
+//			System.out.println(sim.loadBalancer.servers.size());
+//		} catch (IOException e) {
+//		}
+//	}
+//	
+//	public static Map<User, List<Request>> next() throws IOException {
+//		HashMap<User, List<Request>> currentWorkload = new HashMap<User, List<Request>>();
+//		int nextMonth = Integer.MAX_VALUE;
+//		
+//			BufferedReader reader = new BufferedReader(new FileReader(new File("power.trc")));
+//			while(reader.ready()){
+//				String[] eventData = reader.readLine().trim().split("( +|\t+)+");//Assuming: clientID, userID, reqID, time, bytes, has expired, http op., URL, demand
+//				Request request = new Request(eventData[0], eventData[1], eventData[3], Math.round(Double.valueOf(eventData[4])), 
+//						Long.valueOf(eventData[5]), true, eventData[7], eventData[8], 1000 * 60 * 15 );
+//				
+//				//Adding new event to its corresponding user
+//				User user = new User(eventData[1]);//Users are identified uniquely by their ids
+//				List<Request> userWorkload = currentWorkload.get(user);
+//				if(userWorkload == null){
+//					userWorkload = new ArrayList<Request>();
+//					currentWorkload.put(user, userWorkload);
+//				}
+//				userWorkload.add(request);
+//			}
+//	    return currentWorkload;
+//	}
+//
+
 }

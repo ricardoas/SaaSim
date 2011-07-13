@@ -10,6 +10,7 @@ import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
+import commons.util.Triple;
 
 /**
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
@@ -114,6 +115,11 @@ public class Machine extends JEEventHandler{
 		this.numberOfRequestsCompletionsInPreviousInterval = 0;
 	}
 	
+	/**
+	 * Used by RANJAN Scheduler, this method estimates CPU utilization of current machine
+	 * @param currentTime
+	 * @return
+	 */
 	public double computeUtilization(long currentTime){
 		if(this.queue.size() != 0){//Requests need to be processed, so resource is full
 			return 1.0;
@@ -183,6 +189,10 @@ public class Machine extends JEEventHandler{
 		return this.isReserved;
 	}
 	
+	/**
+	 * This method retrieves the total amount of cpu processing time of current machine
+	 * @return
+	 */
 	public double calcExecutionTime() {
 		if(this.totalProcessed < 0){
 			throw new RuntimeException("Invalid resource "+this.id+" execution time: "+this.totalProcessed);
@@ -192,5 +202,34 @@ public class Machine extends JEEventHandler{
 
 	public String toString(){
 		return "Mac "+this.id;
+	}
+
+	
+	/**
+	 * Used by profit driven scheduler. Evaluates the delays created after inserting a new request
+	 * in current machine queue.
+	 * @param request
+	 * @param sla 
+	 * @return
+	 */
+	public List<Triple<Long, Long, Long>> calcExecutionTimesWithNewRequest(Request request, double sla) {
+		int requestsToShare = this.queue.size();
+		
+		List<Triple<Long, Long, Long>> executionTimes = new ArrayList<Triple<Long, Long, Long>>();
+		
+		for(Request currentRequest : this.queue){
+			Triple<Long, Long, Long> triple = new Triple<Long, Long, Long>();
+			JETime estimatedFinishTime = new JETime(currentRequest.getTotalToProcess() * requestsToShare); 
+			estimatedFinishTime = estimatedFinishTime.plus(JEEventScheduler.SCHEDULER.now());
+			triple.firstValue = estimatedFinishTime.timeMilliSeconds;
+			estimatedFinishTime = new JETime(currentRequest.getTotalToProcess() * (requestsToShare+1)); 
+			estimatedFinishTime = estimatedFinishTime.plus(JEEventScheduler.SCHEDULER.now());
+			triple.secondValue = estimatedFinishTime.timeMilliSeconds;
+			triple.thirdValue = currentRequest.demand;
+			
+			executionTimes.add(triple);
+		}
+		
+		return executionTimes;
 	}
 }
