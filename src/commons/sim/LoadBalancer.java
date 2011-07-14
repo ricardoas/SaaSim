@@ -73,12 +73,15 @@ public class LoadBalancer extends JEEventHandler{
 				nextServer.sendRequest(request);
 			}else{//Creating a new one
 				this.manageMachines(1);
+				Machine machine = this.servers.get(this.servers.size()-1);//Retrieving new machine added
+				machine.sendRequest(request);
 			}
 			break;
 		case EVALUATEUTILIZATION://RANJAN Scheduler
 			Long eventTime = (Long) event.getValue()[0];
 			int numberOfMachinesToAdd = heuristic.evaluateUtilization(servers, eventTime);
 			this.manageMachines(numberOfMachinesToAdd);
+			break;
 		default:
 			break;
 		}
