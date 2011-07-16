@@ -13,12 +13,7 @@ import java.util.TreeSet;
  * @author thiago - thiago@lsd.ufcg.edu.br
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
  */
-public enum JEEventScheduler {
-	
-	/**
-	 * Single instance.
-	 */
-	SCHEDULER;
+public class JEEventScheduler {
 	
     private JETime now;
     private JETime simulationEnd;
@@ -28,8 +23,11 @@ public enum JEEventScheduler {
     /**
      * Default private constructor.
      */
-    private JEEventScheduler() {
-    	clear();
+    public JEEventScheduler() {
+    	this.now = new JETime(0L);
+		this.simulationEnd = JETime.INFINITY;
+		this.handlerMap = new HashMap<Integer, JEEventHandler>();
+		this.eventSet = new TreeSet<JEEvent>();
     }
     
     /**
@@ -138,15 +136,5 @@ public enum JEEventScheduler {
 	 */
 	public JEEventHandler getHandler(int id){
 		return handlerMap.get(id);
-	}
-
-	/**
-	 * Prepares the scheduler to a new execution.
-	 */
-	public void clear() {
-		this.now = new JETime(0L);
-		this.simulationEnd = JETime.INFINITY;
-		this.handlerMap = new HashMap<Integer, JEEventHandler>();
-		this.eventSet = new TreeSet<JEEvent>();
 	}
 }

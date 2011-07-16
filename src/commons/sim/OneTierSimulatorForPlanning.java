@@ -1,17 +1,10 @@
 package commons.sim;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import commons.cloud.Machine;
 import commons.cloud.Request;
-import commons.cloud.User;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
@@ -22,19 +15,20 @@ public class OneTierSimulatorForPlanning extends OneTierSimulator {
 	private List<Request> workload;
 	public static long UTILIZATION_EVALUATION_PERIOD = 1000 * 60 * 5;//in millis
 	
-	public OneTierSimulatorForPlanning(List<Request> workload, double sla){
+	public OneTierSimulatorForPlanning(JEEventScheduler scheduler, List<Request> workload, double sla){
+		super(scheduler);
 		this.workload = workload;
-//		this.loadBalancer = new LoadBalancer(new RanjanScheduler());
-		this.loadBalancer = new LoadBalancer(new ProfitDrivenScheduler(sla));
+//		this.loadBalancer = new LoadBalancer(scheduler, new RanjanScheduler());
+		this.loadBalancer = new LoadBalancer(scheduler, new ProfitDrivenScheduler(sla));
 	}
 	
 	@Override
 	public void start() {
 		//Scheduling first events
-		JEEventScheduler.SCHEDULER.queueEvent(new JEEvent(JEEventType.READWORKLOAD, this, new JETime(0), null));
-		JEEventScheduler.SCHEDULER.queueEvent(new JEEvent(JEEventType.EVALUATEUTILIZATION, this.loadBalancer, new JETime(UTILIZATION_EVALUATION_PERIOD), UTILIZATION_EVALUATION_PERIOD));
+		getScheduler().queueEvent(new JEEvent(JEEventType.READWORKLOAD, this, new JETime(0)));
+		getScheduler().queueEvent(new JEEvent(JEEventType.EVALUATEUTILIZATION, this.loadBalancer, new JETime(UTILIZATION_EVALUATION_PERIOD), UTILIZATION_EVALUATION_PERIOD));
 		this.loadBalancer.initOneMachine();
-		JEEventScheduler.SCHEDULER.start();
+		getScheduler().start();
 	}
 	
 	@Override
@@ -43,7 +37,7 @@ public class OneTierSimulatorForPlanning extends OneTierSimulator {
 		case READWORKLOAD:
 			if(this.workload != null & this.workload.size() > 0){
 				for(Request request : this.workload){
-					JEEventScheduler.SCHEDULER.queueEvent(parseEvent(request));
+					getScheduler().queueEvent(parseEvent(request));
 				}
 			}
 			break;

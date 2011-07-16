@@ -9,6 +9,7 @@ import commons.cloud.Machine;
 import commons.cloud.Request;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventHandler;
+import commons.sim.jeevent.JEEventScheduler;
 
 /**
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
@@ -26,9 +27,11 @@ public class LoadBalancer extends JEEventHandler{
 	private SchedulingHeuristic heuristic;
 	
 	/**
+	 * @param scheduler TODO
 	 * 
 	 */
-	public LoadBalancer(SchedulingHeuristic heuristic) {
+	public LoadBalancer(JEEventScheduler scheduler, SchedulingHeuristic heuristic) {
+		super(scheduler);
 		this.servers = new ArrayList<Machine>();
 		this.heuristic = heuristic;
 		this.reservedResourcesAmount = Integer.MAX_VALUE;
@@ -44,7 +47,7 @@ public class LoadBalancer extends JEEventHandler{
 		if(this.onDemandMachinesPool.size() > 0){
 			servers.add(this.onDemandMachinesPool.remove(0));
 		}else{
-			servers.add(new Machine(new Random().nextLong()));
+			servers.add(new Machine(getScheduler(), new Random().nextLong()));
 		}
 	}
 	
@@ -125,7 +128,7 @@ public class LoadBalancer extends JEEventHandler{
 		}
 		this.reservedResourcesAmount = amount;
 		for(int i = 0; i < amount; i++){
-			this.reservedMachinesPool.add(new Machine(new Random().nextLong(), true));
+			this.reservedMachinesPool.add(new Machine(getScheduler(), new Random().nextLong(), true));
 		}
 	}
 

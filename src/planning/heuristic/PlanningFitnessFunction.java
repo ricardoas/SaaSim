@@ -13,8 +13,14 @@ import commons.cloud.Request;
 import commons.cloud.User;
 import commons.cloud.UtilityFunction;
 import commons.sim.OneTierSimulatorForPlanning;
+import commons.sim.jeevent.JEEventScheduler;
 
 public class PlanningFitnessFunction extends FitnessFunction{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7906976193829216027L;
 	
 	private OneTierSimulatorForPlanning simulator;
 	private final Map<User, Contract> cloudUsers;
@@ -36,7 +42,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		for(User user : currentWorkload.keySet()){
 			workload.addAll(currentWorkload.get(user));
 		}
-		this.simulator = new OneTierSimulatorForPlanning(workload, this.sla);
+		this.simulator = new OneTierSimulatorForPlanning(new JEEventScheduler(), workload, this.sla);
 		this.simulator.setOnDemandResourcesLimit(this.cloudProvider.onDemandLimit);
 		this.simulator.setNumberOfReservedResources(reservedResources);
 	}

@@ -1,6 +1,6 @@
 package planning.heuristic;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -15,10 +15,9 @@ import org.junit.Test;
 
 import commons.cloud.Contract;
 import commons.cloud.Provider;
-import commons.cloud.ProviderTest;
 import commons.cloud.Request;
 import commons.cloud.User;
-import commons.sim.jeevent.JEEventScheduler;
+
 import config.GEISTMonthlyWorkloadParser;
 
 
@@ -26,10 +25,11 @@ public class PlanningFitnessFunctionTest {
 	
 	private static final double SLA = 10d;
 	private String simpleWorkload = "test_files/workload/w2.dat";
+	private static final int HOUR_IN_MILLIS = 1000 * 60 * 60;
 	
 	@Before
 	public void setUp(){
-		JEEventScheduler.SCHEDULER.clear();
+//		JEEventScheduler.SCHEDULER.clear();
 	}
 	
 	@Test
@@ -88,7 +88,7 @@ public class PlanningFitnessFunctionTest {
 		
 		double setupCost = 100;
 		double price = 30;
-		double cpuLimit = 20 * ProviderTest.HOUR_IN_MILLIS;
+		double cpuLimit = 20 * HOUR_IN_MILLIS;
 		double extraCpuCost = 0.5;
 		
 		Contract contract = new Contract("p1", setupCost, price, cpuLimit, extraCpuCost);
@@ -147,7 +147,7 @@ public class PlanningFitnessFunctionTest {
 		
 		double setupCost = 1000;
 		double price = 30;
-		double cpuLimit = 20 * ProviderTest.HOUR_IN_MILLIS;
+		double cpuLimit = 20 * HOUR_IN_MILLIS;
 		double extraCpuCost = 0.5;
 		
 		Contract contract = new Contract("p1", setupCost, price, cpuLimit, extraCpuCost);

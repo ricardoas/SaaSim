@@ -11,15 +11,18 @@ import org.junit.Test;
 
 import commons.cloud.Machine;
 import commons.cloud.Request;
+import commons.sim.jeevent.JEEventScheduler;
 
 
 public class ProfitDrivenSchedulerTest {
 	
 	private double sla = 1000 * 50;//50 sec in millis
 	private ProfitDrivenScheduler scheduler;
+	private JEEventScheduler eventScheduler;
 	
 	@Before
 	public void setUp(){
+		this.eventScheduler = new JEEventScheduler();
 		this.scheduler = new ProfitDrivenScheduler(sla);
 	}
 	
@@ -56,7 +59,7 @@ public class ProfitDrivenSchedulerTest {
 		long demand = 1000 * 20;//in millis
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new Machine(1);
+		Machine machine1 = new Machine(eventScheduler, 1);
 		servers.add(machine1);
 		
 		Request request = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
@@ -82,9 +85,9 @@ public class ProfitDrivenSchedulerTest {
 		long demand = 1000 * 20;//in millis
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new Machine(1);
-		Machine machine2 = new Machine(2);
-		Machine machine3 = new Machine(3);
+		Machine machine1 = new Machine(eventScheduler, 1);
+		Machine machine2 = new Machine(eventScheduler, 2);
+		Machine machine3 = new Machine(eventScheduler, 3);
 		servers.add(machine1);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -96,9 +99,9 @@ public class ProfitDrivenSchedulerTest {
 		
 		//Changing machines order
 		servers.clear();
-		machine1 = new Machine(1);
-		machine2 = new Machine(2);
-		machine3 = new Machine(3);
+		machine1 = new Machine(eventScheduler, 1);
+		machine2 = new Machine(eventScheduler, 2);
+		machine3 = new Machine(eventScheduler, 3);
 		servers.add(machine3);
 		servers.add(machine2);
 		servers.add(machine1);
@@ -130,8 +133,8 @@ public class ProfitDrivenSchedulerTest {
 		long demand = 1000 * 10;//in millis
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new Machine(1);
-		Machine machine2 = new Machine(2);
+		Machine machine1 = new Machine(eventScheduler, 1);
+		Machine machine2 = new Machine(eventScheduler, 2);
 		servers.add(machine1);
 		servers.add(machine2);
 		
@@ -168,8 +171,8 @@ public class ProfitDrivenSchedulerTest {
 		long demand = 1000 * 10;//in millis
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new Machine(1);
-		Machine machine2 = new Machine(2);
+		Machine machine1 = new Machine(eventScheduler, 1);
+		Machine machine2 = new Machine(eventScheduler, 2);
 		servers.add(machine1);
 		servers.add(machine2);
 		
@@ -210,8 +213,8 @@ public class ProfitDrivenSchedulerTest {
 		long demand = 1000 * 15;//in millis
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new Machine(1);
-		Machine machine2 = new Machine(2);
+		Machine machine1 = new Machine(eventScheduler, 1);
+		Machine machine2 = new Machine(eventScheduler, 2);
 		servers.add(machine1);
 		servers.add(machine2);
 		

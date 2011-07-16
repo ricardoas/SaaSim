@@ -14,12 +14,15 @@ public abstract class JEEventHandler {
 	
     private final int id;
     
+    private final JEEventScheduler scheduler;
+    
     /**
      * Default empty constructor. Creates and registers a handler in the scheduler.
      */
-    public JEEventHandler() {
+    public JEEventHandler(JEEventScheduler scheduler) {
     	
-		this.id = JEEventScheduler.SCHEDULER.registerHandler(this);
+    	this.scheduler = scheduler;
+		this.id = getScheduler().registerHandler(this);
     }
     
     /**
@@ -32,10 +35,17 @@ public abstract class JEEventHandler {
      * @param event
      */
     public void send(JEEvent event) {
-    	JEEventScheduler.SCHEDULER.queueEvent(event);
+    	getScheduler().queueEvent(event);
     }
     
     /**
+	 * @return the scheduler
+	 */
+	protected JEEventScheduler getScheduler() {
+		return scheduler;
+	}
+
+	/**
      * @return
      */
     public int getHandlerId() {

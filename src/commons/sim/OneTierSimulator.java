@@ -3,6 +3,8 @@ package commons.sim;
 import java.io.IOException;
 import java.util.List;
 
+import provisioning.Monitor;
+
 import commons.cloud.Request;
 import commons.config.WorkloadParser;
 import commons.sim.jeevent.JEEvent;
@@ -11,8 +13,6 @@ import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
 import config.GEISTSimpleWorkloadParser;
-
-import provisioning.Monitor;
 
 /**
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
@@ -26,9 +26,11 @@ public class OneTierSimulator extends JEEventHandler implements Simulator {
 
 	/**
 	 * Constructor
+	 * @param scheduler TODO
 	 */
-	public OneTierSimulator() {
-//		this.workloadParser = new GEISTSimpleWorkloadParser("");
+	public OneTierSimulator(JEEventScheduler scheduler) {
+		super(scheduler);
+		this.workloadParser = new GEISTSimpleWorkloadParser("");
 
 	}
 	
@@ -71,7 +73,7 @@ public class OneTierSimulator extends JEEventHandler implements Simulator {
 				if (workloadParser.hasNext()) {
 					List<Request> list = workloadParser.next();
 					for (Request request : list) {
-						JEEventScheduler.SCHEDULER.queueEvent(parseEvent(request));
+						getScheduler().queueEvent(parseEvent(request));
 					}
 				}
 			} catch (IOException e) {

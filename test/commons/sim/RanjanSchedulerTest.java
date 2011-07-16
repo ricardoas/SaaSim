@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import commons.cloud.Machine;
 import commons.cloud.Request;
+import commons.sim.jeevent.JEEventScheduler;
 
 
 public class RanjanSchedulerTest {
@@ -17,9 +18,11 @@ public class RanjanSchedulerTest {
 	private static final int ONE_MINUTE_IN_MILLIS = 1000 * 60;
 	private static final String URL = null;
 	private RanjanScheduler scheduler;
+	private JEEventScheduler eventScheduler;
 
 	@Before
 	public void setUp(){
+		eventScheduler = new JEEventScheduler();
 		scheduler = new RanjanScheduler();
 	}
 	
@@ -52,7 +55,7 @@ public class RanjanSchedulerTest {
 		long demand = 1000 * 60 * 20;
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new Machine(1);
+		Machine machine1 = new Machine(eventScheduler, 1);
 		servers.add(machine1);
 		
 		Request request = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
@@ -77,11 +80,11 @@ public class RanjanSchedulerTest {
 		long demand = 1000 * 60 * 20;
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new Machine(1);
-		Machine machine2 = new Machine(2);
-		Machine machine3 = new Machine(3);
-		Machine machine4 = new Machine(4);
-		Machine machine5 = new Machine(5);
+		Machine machine1 = new Machine(eventScheduler, 1);
+		Machine machine2 = new Machine(eventScheduler, 2);
+		Machine machine3 = new Machine(eventScheduler, 3);
+		Machine machine4 = new Machine(eventScheduler, 4);
+		Machine machine5 = new Machine(eventScheduler, 5);
 		servers.add(machine1);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -135,11 +138,11 @@ public class RanjanSchedulerTest {
 		long demand = 1000 * 60 * 20;
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new Machine(1);
-		Machine machine2 = new Machine(2);
-		Machine machine3 = new Machine(3);
-		Machine machine4 = new Machine(4);
-		Machine machine5 = new Machine(5);
+		Machine machine1 = new Machine(eventScheduler, 1);
+		Machine machine2 = new Machine(eventScheduler, 2);
+		Machine machine3 = new Machine(eventScheduler, 3);
+		Machine machine4 = new Machine(eventScheduler, 4);
+		Machine machine5 = new Machine(eventScheduler, 5);
 		servers.add(machine1);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -198,11 +201,11 @@ public class RanjanSchedulerTest {
 		long demand = 1000 * 60 * 20;
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new Machine(1);
-		Machine machine2 = new Machine(2);
-		Machine machine3 = new Machine(3);
-		Machine machine4 = new Machine(4);
-		Machine machine5 = new Machine(5);
+		Machine machine1 = new Machine(eventScheduler, 1);
+		Machine machine2 = new Machine(eventScheduler, 2);
+		Machine machine3 = new Machine(eventScheduler, 3);
+		Machine machine4 = new Machine(eventScheduler, 4);
+		Machine machine5 = new Machine(eventScheduler, 5);
 		servers.add(machine1);
 		servers.add(machine2);
 		servers.add(machine3);

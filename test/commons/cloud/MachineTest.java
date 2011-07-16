@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import commons.sim.jeevent.JEEvent;
+import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
 
@@ -17,7 +18,7 @@ public class MachineTest {
 
 	@Before
 	public void setUp(){
-		machine = new Machine(1);
+		machine = new Machine(new JEEventScheduler(), 1);
 	}
 	
 	/**
@@ -151,7 +152,7 @@ public class MachineTest {
 		machine.sendRequest(request2);
 		
 		//Requesting requests processing
-		machine.handleEvent(new JEEvent(JEEventType.FINISHREQUEST, machine, machine.nextFinishEvent.getScheduledTime(), null));
+		machine.handleEvent(new JEEvent(JEEventType.FINISHREQUEST, machine, machine.nextFinishEvent.getScheduledTime()));
 		assertEquals(1, machine.queue.size());
 		assertEquals(JEEventType.FINISHREQUEST, machine.nextFinishEvent.getType());
 		assertEquals(1, machine.finishedRequests.size());
@@ -160,7 +161,7 @@ public class MachineTest {
 		assertEquals(ONE_MINUTE_IN_MILLIS * 18, machine.queue.get(0).getTotalToProcess());
 		
 		//Requesting final processing
-		machine.handleEvent(new JEEvent(JEEventType.FINISHREQUEST, machine, machine.nextFinishEvent.getScheduledTime(), null));
+		machine.handleEvent(new JEEvent(JEEventType.FINISHREQUEST, machine, machine.nextFinishEvent.getScheduledTime()));
 		assertEquals(0, machine.queue.size());
 		assertEquals(2, machine.finishedRequests.size());
 		assertNull(machine.nextFinishEvent);
@@ -198,7 +199,7 @@ public class MachineTest {
 		assertEquals(0, machine.finishedRequests.size());
 		
 		//Requesting requests processing
-		machine.handleEvent(new JEEvent(JEEventType.FINISHREQUEST, machine, machine.nextFinishEvent.getScheduledTime(), null));
+		machine.handleEvent(new JEEvent(JEEventType.FINISHREQUEST, machine, machine.nextFinishEvent.getScheduledTime()));
 		assertEquals(2, machine.queue.size());
 		assertEquals(JEEventType.FINISHREQUEST, machine.nextFinishEvent.getType());
 		assertEquals(0, machine.finishedRequests.size());
@@ -208,7 +209,7 @@ public class MachineTest {
 		assertEquals(ONE_MINUTE_IN_MILLIS * 10, machine.queue.get(1).getTotalToProcess());
 		
 		//Requesting final processing
-		machine.handleEvent(new JEEvent(JEEventType.FINISHREQUEST, machine, machine.nextFinishEvent.getScheduledTime(), null));
+		machine.handleEvent(new JEEvent(JEEventType.FINISHREQUEST, machine, machine.nextFinishEvent.getScheduledTime()));
 		assertEquals(0, machine.queue.size());
 		assertEquals(2, machine.finishedRequests.size());
 		assertNull(machine.nextFinishEvent);
@@ -268,7 +269,7 @@ public class MachineTest {
 		assertEquals(1.0, machine.computeUtilization(ONE_MINUTE_IN_MILLIS * 7), 0.0);
 		
 		//Processing
-		machine.handleEvent(new JEEvent(JEEventType.FINISHREQUEST, machine, new JETime(demand * 2), null));
+		machine.handleEvent(new JEEvent(JEEventType.FINISHREQUEST, machine, new JETime(demand * 2)));
 		
 		assertEquals(1.0, machine.computeUtilization(ONE_MINUTE_IN_MILLIS * 8), 0.0);//exactly at demand end time
 		assertEquals(0.6, machine.computeUtilization(ONE_MINUTE_IN_MILLIS * 10), 0.0);

@@ -1,24 +1,25 @@
 package commons.sim.jeevent;
 
-import static commons.sim.jeevent.JEEventScheduler.SCHEDULER;
 import static org.junit.Assert.assertEquals;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class JEEventSchedulerTest {
+	
+	private JEEventScheduler scheduler;
 
 	@Before
 	public void setUp() throws Exception {
-		SCHEDULER.clear();
+		scheduler = new JEEventScheduler();
 	}
 
-	@AfterClass
-	public static void tearDown() throws Exception {
-		SCHEDULER.clear();
+	@After
+	public void tearDown() throws Exception {
+		scheduler = null;
 	}
 
 	@Test(expected=JEException.class)
@@ -26,9 +27,9 @@ public class JEEventSchedulerTest {
 		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1).times(2);
 		EasyMock.replay(handler);
-		SCHEDULER.queueEvent(new JEEvent(JEEventType.READWORKLOAD, handler, new JETime(1000)));
-		SCHEDULER.queueEvent(new JEEvent(JEEventType.NEWREQUEST, handler, new JETime(1000)));
-		SCHEDULER.start();
+		scheduler.queueEvent(new JEEvent(JEEventType.READWORKLOAD, handler, new JETime(1000)));
+		scheduler.queueEvent(new JEEvent(JEEventType.NEWREQUEST, handler, new JETime(1000)));
+		scheduler.start();
 		EasyMock.verify(handler);
 	}
 
@@ -39,15 +40,15 @@ public class JEEventSchedulerTest {
 		EasyMock.expect(handler.getHandlerId()).andAnswer(new IAnswer<Integer>() {
 			@Override
 			public Integer answer() throws Throwable {
-				return SCHEDULER.registerHandler(handler);
+				return scheduler.registerHandler(handler);
 			}
 		}).once();
 		handler.handleEvent(EasyMock.isA(JEEvent.class));
 		EasyMock.expectLastCall().once();
 		EasyMock.replay(handler);
 		
-		SCHEDULER.queueEvent(new JEEvent(JEEventType.READWORKLOAD, handler, new JETime(1000)));
-		SCHEDULER.start();
+		scheduler.queueEvent(new JEEvent(JEEventType.READWORKLOAD, handler, new JETime(1000)));
+		scheduler.start();
 		
 		EasyMock.verify(handler);
 	}
@@ -59,15 +60,15 @@ public class JEEventSchedulerTest {
 		EasyMock.expect(handler.getHandlerId()).andAnswer(new IAnswer<Integer>() {
 			@Override
 			public Integer answer() throws Throwable {
-				return SCHEDULER.registerHandler(handler);
+				return scheduler.registerHandler(handler);
 			}
 		}).once();
 		EasyMock.replay(handler);
 		
 		JEEvent event = new JEEvent(JEEventType.READWORKLOAD, handler, new JETime(1000));
-		SCHEDULER.queueEvent(event);
-		SCHEDULER.cancelEvent(event);
-		SCHEDULER.start();
+		scheduler.queueEvent(event);
+		scheduler.cancelEvent(event);
+		scheduler.start();
 		
 		EasyMock.verify(handler);
 	}
@@ -76,24 +77,24 @@ public class JEEventSchedulerTest {
 	public void testRegisterHandler() {
 		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
 		EasyMock.replay(handler);
-		int id = SCHEDULER.registerHandler(handler);
-		assertEquals(handler, SCHEDULER.getHandler(id));
+		int id = scheduler.registerHandler(handler);
+		assertEquals(handler, scheduler.getHandler(id));
 		EasyMock.verify(handler);
 	}
 
 	@Test
 	public void testStart() {
-		assertEquals(new JETime(0L), SCHEDULER.now());
-		SCHEDULER.start();
-		assertEquals(JETime.INFINITY, SCHEDULER.now());
+		assertEquals(new JETime(0L), scheduler.now());
+		scheduler.start();
+		assertEquals(JETime.INFINITY, scheduler.now());
 	}
 	
 	@Test
 	public void testNowWithFiniteSimulator() {
-		SCHEDULER.setEmulationEnd(new JETime(3600000L));
-		assertEquals(new JETime(0L), SCHEDULER.now());
-		SCHEDULER.start();
-		assertEquals(new JETime(3600000L), SCHEDULER.now());
+		scheduler.setEmulationEnd(new JETime(3600000L));
+		assertEquals(new JETime(0L), scheduler.now());
+		scheduler.start();
+		assertEquals(new JETime(3600000L), scheduler.now());
 	}
 
 }

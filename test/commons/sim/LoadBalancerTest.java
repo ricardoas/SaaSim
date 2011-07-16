@@ -10,6 +10,7 @@ import org.junit.Test;
 import commons.cloud.Machine;
 import commons.cloud.Request;
 import commons.sim.jeevent.JEEvent;
+import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 
 
@@ -19,7 +20,7 @@ public class LoadBalancerTest {
 
 	@Before
 	public void setUp(){
-		lb = new LoadBalancer(new RanjanScheduler());
+		lb = new LoadBalancer(new JEEventScheduler(), new RanjanScheduler());
 	}
 	
 	/**

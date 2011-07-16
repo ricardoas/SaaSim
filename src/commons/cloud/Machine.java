@@ -34,7 +34,8 @@ public class Machine extends JEEventHandler{
 	/**
 	 * @param id
 	 */
-	public Machine(long id) {
+	public Machine(JEEventScheduler scheduler, long id) {
+		super(scheduler);
 		this.id = id;
 		this.queue = new ArrayList<Request>();
 		this.finishedRequests = new ArrayList<Request>();
@@ -43,8 +44,8 @@ public class Machine extends JEEventHandler{
 		this.totalProcessed = 0;
 	}
 
-	public Machine(long id, boolean isReserved){
-		this(id);
+	public Machine(JEEventScheduler scheduler, long id, boolean isReserved){
+		this(scheduler, id);
 		this.isReserved = isReserved;
 	}
 	
@@ -90,21 +91,21 @@ public class Machine extends JEEventHandler{
 		
 		if(nextFinishEvent != null){//Should evaluate next finish time
 			JETime estimatedFinishTime = new JETime(request.demand * requestsToShare); 
-			estimatedFinishTime = estimatedFinishTime.plus(JEEventScheduler.SCHEDULER.now());
+			estimatedFinishTime = estimatedFinishTime.plus(getScheduler().now());
 			
 			if(estimatedFinishTime.isEarlierThan(nextFinishEvent.getScheduledTime())){
-				JEEventScheduler.SCHEDULER.cancelEvent(nextFinishEvent);
-				JEEvent currentFinish = new JEEvent(JEEventType.FINISHREQUEST, this, estimatedFinishTime, null);
-				JEEventScheduler.SCHEDULER.queueEvent(currentFinish);
+				getScheduler().cancelEvent(nextFinishEvent);
+				JEEvent currentFinish = new JEEvent(JEEventType.FINISHREQUEST, this, estimatedFinishTime);
+				getScheduler().queueEvent(currentFinish);
 				this.nextFinishEvent = currentFinish;
 			}
 		}else{//Only one request is in this machine
 			JETime eventTime = new JETime(request.demand); 
-			eventTime = eventTime.plus(JEEventScheduler.SCHEDULER.now());
-			JEEvent nextFinish = new JEEvent(JEEventType.FINISHREQUEST, this, eventTime, null);
+			eventTime = eventTime.plus(getScheduler().now());
+			JEEvent nextFinish = new JEEvent(JEEventType.FINISHREQUEST, this, eventTime);
 			this.nextFinishEvent = nextFinish;
 			
-			JEEventScheduler.SCHEDULER.queueEvent(nextFinish);
+			getScheduler().queueEvent(nextFinish);
 		}
 		
 		this.numberOfRequestsArrivalsInPreviousInterval++;
@@ -170,8 +171,8 @@ public class Machine extends JEEventHandler{
 					}
 				}
 				if(nextFinishTime != JETime.INFINITY){//Scheduling next finish event, if it exists
-					JEEvent currentFinish = new JEEvent(JEEventType.FINISHREQUEST, this, nextFinishTime, null);
-					JEEventScheduler.SCHEDULER.queueEvent(currentFinish);
+					JEEvent currentFinish = new JEEvent(JEEventType.FINISHREQUEST, this, nextFinishTime);
+					getScheduler().queueEvent(currentFinish);
 					this.nextFinishEvent = currentFinish;
 				}else{
 					this.nextFinishEvent = null;
@@ -220,10 +221,10 @@ public class Machine extends JEEventHandler{
 		for(Request currentRequest : this.queue){
 			Triple<Long, Long, Long> triple = new Triple<Long, Long, Long>();
 			JETime estimatedFinishTime = new JETime(currentRequest.getTotalToProcess() * requestsToShare); 
-			estimatedFinishTime = estimatedFinishTime.plus(JEEventScheduler.SCHEDULER.now());
+			estimatedFinishTime = estimatedFinishTime.plus(getScheduler().now());
 			triple.firstValue = estimatedFinishTime.timeMilliSeconds;
 			estimatedFinishTime = new JETime(currentRequest.getTotalToProcess() * (requestsToShare+1)); 
-			estimatedFinishTime = estimatedFinishTime.plus(JEEventScheduler.SCHEDULER.now());
+			estimatedFinishTime = estimatedFinishTime.plus(getScheduler().now());
 			triple.secondValue = estimatedFinishTime.timeMilliSeconds;
 			triple.thirdValue = currentRequest.demand;
 			

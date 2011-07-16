@@ -2,13 +2,22 @@ package commons.cloud;
 
 import static org.junit.Assert.*;
 
+import org.junit.Before;
 import org.junit.Test;
+
+import commons.sim.jeevent.JEEventScheduler;
 
 
 public class ProviderTest {
 	
 	private String name = "prov";
-	public static final int HOUR_IN_MILLIS = 1000 * 60 * 60;
+	private static final int HOUR_IN_MILLIS = 1000 * 60 * 60;
+	private JEEventScheduler scheduler;
+	
+	@Before
+	public void setUp(){
+		scheduler = new JEEventScheduler();
+	}
 
 	@Test
 	public void providerWithInvalidCpuCost(){
@@ -223,22 +232,22 @@ public class ProviderTest {
 				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
 		
 		//Adding reserved resources
-		Machine machine1 = new Machine(1);
+		Machine machine1 = new Machine(scheduler, 1);
 		machine1.totalProcessed = 4 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine1);
-		Machine machine2 = new Machine(2);
+		Machine machine2 = new Machine(scheduler, 2);
 		machine2.totalProcessed = 5 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine2);
-		Machine machine3 = new Machine(3);
+		Machine machine3 = new Machine(scheduler, 3);
 		machine3.totalProcessed = 15 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine3);
-		Machine machine4 = new Machine(4);
+		Machine machine4 = new Machine(scheduler, 4);
 		machine4.totalProcessed = 15 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine4);
-		Machine machine5 = new Machine(5);
+		Machine machine5 = new Machine(scheduler, 5);
 		machine5.totalProcessed = 12.5 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine5);
-		Machine machine6 = new Machine(6);
+		Machine machine6 = new Machine(scheduler, 6);
 		machine6.totalProcessed = 15.23 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine6);
 		
@@ -264,7 +273,7 @@ public class ProviderTest {
 				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
 		
 		//Adding reserved resources
-		Machine machine1 = new Machine(1);
+		Machine machine1 = new Machine(scheduler, 1);
 		machine1.totalProcessed = -5 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine1);
 		
@@ -294,19 +303,19 @@ public class ProviderTest {
 				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
 		
 		//Adding reserved resources
-		Machine machine1 = new Machine(1);
+		Machine machine1 = new Machine(scheduler, 1);
 		machine1.totalProcessed = 2 * HOUR_IN_MILLIS;
 		provider.onDemandResources.add(machine1);
-		Machine machine2 = new Machine(2);
+		Machine machine2 = new Machine(scheduler, 2);
 		machine2.totalProcessed = 1 * HOUR_IN_MILLIS;
 		provider.onDemandResources.add(machine2);
-		Machine machine3 = new Machine(3);
+		Machine machine3 = new Machine(scheduler, 3);
 		machine3.totalProcessed = 15 * HOUR_IN_MILLIS;
 		provider.onDemandResources.add(machine3);
-		Machine machine4 = new Machine(1);
+		Machine machine4 = new Machine(scheduler, 1);
 		machine4.totalProcessed = 1.2 * HOUR_IN_MILLIS;
 		provider.onDemandResources.add(machine4);
-		Machine machine5 = new Machine(5);
+		Machine machine5 = new Machine(scheduler, 5);
 		machine5.totalProcessed = 5.14 * HOUR_IN_MILLIS;
 		provider.onDemandResources.add(machine5);
 		
@@ -332,7 +341,7 @@ public class ProviderTest {
 				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
 		
 		//Adding reserved resources
-		Machine machine1 = new Machine(1);
+		Machine machine1 = new Machine(scheduler, 1);
 		machine1.totalProcessed = -6 * HOUR_IN_MILLIS;
 		provider.onDemandResources.add(machine1);
 		
@@ -373,38 +382,38 @@ public class ProviderTest {
 				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
 		
 		//Adding reserved resources
-		Machine machine1 = new Machine(1);
+		Machine machine1 = new Machine(scheduler, 1);
 		machine1.totalProcessed = 10 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine1);
-		Machine machine2 = new Machine(2);
+		Machine machine2 = new Machine(scheduler, 2);
 		machine2.totalProcessed = 20 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine2);
-		Machine machine3 = new Machine(3);
+		Machine machine3 = new Machine(scheduler, 3);
 		machine3.totalProcessed = 15 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine3);
-		Machine machine4 = new Machine(4);
+		Machine machine4 = new Machine(scheduler, 4);
 		machine4.totalProcessed = 15 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine4);
-		Machine machine5 = new Machine(5);
+		Machine machine5 = new Machine(scheduler, 5);
 		machine5.totalProcessed = 15 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine5);
-		Machine machine6 = new Machine(6);
+		Machine machine6 = new Machine(scheduler, 6);
 		machine6.totalProcessed = 12.5 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine6);
-		Machine machine7 = new Machine(7);
+		Machine machine7 = new Machine(scheduler, 7);
 		machine7.totalProcessed = 15.23 * HOUR_IN_MILLIS;
 		provider.reservedResources.add(machine7);
 		
-		Machine machine8 = new Machine(8);
+		Machine machine8 = new Machine(scheduler, 8);
 		machine8.totalProcessed = 18 * HOUR_IN_MILLIS;
 		provider.onDemandResources.add(machine8);
-		Machine machine9 = new Machine(9);
+		Machine machine9 = new Machine(scheduler, 9);
 		machine9.totalProcessed = 78.5 * HOUR_IN_MILLIS;
 		provider.onDemandResources.add(machine9);
-		Machine machine10 = new Machine(10);
+		Machine machine10 = new Machine(scheduler, 10);
 		machine10.totalProcessed = 1.2 * HOUR_IN_MILLIS;
 		provider.onDemandResources.add(machine10);
-		Machine machine11 = new Machine(11);
+		Machine machine11 = new Machine(scheduler, 11);
 		machine11.totalProcessed = 5.14 * HOUR_IN_MILLIS;
 		provider.onDemandResources.add(machine11);
 		
