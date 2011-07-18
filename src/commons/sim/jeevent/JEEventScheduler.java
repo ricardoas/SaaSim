@@ -17,7 +17,7 @@ public class JEEventScheduler {
 	
     private JETime now;
     private JETime simulationEnd;
-    private Map<Integer,JEEventHandler> handlerMap;
+    private Map<Integer,JEAbstractEventHandler> handlerMap;
     private TreeSet<JEEvent> eventSet;
 
     /**
@@ -26,7 +26,7 @@ public class JEEventScheduler {
     public JEEventScheduler() {
     	this.now = new JETime(0L);
 		this.simulationEnd = JETime.INFINITY;
-		this.handlerMap = new HashMap<Integer, JEEventHandler>();
+		this.handlerMap = new HashMap<Integer, JEAbstractEventHandler>();
 		this.eventSet = new TreeSet<JEEvent>();
     }
     
@@ -61,7 +61,7 @@ public class JEEventScheduler {
      * @param handler A new handler
      * @return The handler unique ID.
      */
-    public int registerHandler(JEEventHandler handler) {
+    public int registerHandler(JEAbstractEventHandler handler) {
     	
 		int id;
 		while((id = new Random().nextInt()) <= 0 || handlerMap.containsKey(id)){}

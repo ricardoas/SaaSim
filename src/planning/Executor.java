@@ -73,7 +73,7 @@ public class Executor {
 			}
 			
 			//Starting simulation data to start a new simulation
-			OneTierSimulatorForPlanning simulator = new OneTierSimulatorForPlanning(new JEEventScheduler(), workload, this.sla);
+			OneTierSimulatorForPlanning simulator = new OneTierSimulatorForPlanning(new JEEventScheduler(), null, workload, this.sla);
 			simulator.setOnDemandResourcesLimit(this.provider.onDemandLimit);
 			int numberOfMachinesToReserve = parseNumberOfReservedResources(plan, periodIndex);
 			simulator.setNumberOfReservedResources(numberOfMachinesToReserve);

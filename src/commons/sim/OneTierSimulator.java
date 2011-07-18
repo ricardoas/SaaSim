@@ -7,31 +7,33 @@ import provisioning.Monitor;
 
 import commons.cloud.Request;
 import commons.config.WorkloadParser;
+import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
+
 import config.GEISTSimpleWorkloadParser;
 
 /**
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class OneTierSimulator extends JEEventHandler implements Simulator {
+public class OneTierSimulator extends JEAbstractEventHandler implements Simulator, JEEventHandler{
 
 	protected WorkloadParser<List<Request>> workloadParser;
-	protected Monitor monitor;
 
+	private final Monitor monitor;
 	protected LoadBalancer loadBalancer;
 
 	/**
 	 * Constructor
 	 * @param scheduler TODO
 	 */
-	public OneTierSimulator(JEEventScheduler scheduler) {
+	public OneTierSimulator(JEEventScheduler scheduler, Monitor monitor) {
 		super(scheduler);
+		this.monitor = monitor;
 		this.workloadParser = new GEISTSimpleWorkloadParser("");
-
 	}
 	
 	/**
@@ -51,15 +53,10 @@ public class OneTierSimulator extends JEEventHandler implements Simulator {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * @return
 	 */
-	@Override
-	public boolean setMonitor(Monitor monitor) {
-		if (this.monitor != null) {
-			return false;
-		}
-		this.monitor = monitor;
-		return false;
+	public Monitor getMonitor() {
+		return monitor;
 	}
 
 	/**

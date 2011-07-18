@@ -9,7 +9,7 @@ public class JEEventTest {
 
 	@Test
 	public void testCompareToWithDifferentTimes(){
-		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
+		JEEventHandler handler = EasyMock.createStrictMock(JEAbstractEventHandler.class);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1).times(2);
 		EasyMock.replay(handler);
 		JEEvent eventA = new JEEvent(JEEventType.READWORKLOAD, handler, new JETime(1000));
@@ -21,7 +21,7 @@ public class JEEventTest {
 	
 	@Test
 	public void testCompareToWithSameTimeDifferentType(){
-		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
+		JEEventHandler handler = EasyMock.createStrictMock(JEAbstractEventHandler.class);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1).times(2);
 		EasyMock.replay(handler);
 		JEEvent eventA = new JEEvent(JEEventType.READWORKLOAD, handler, new JETime(1000));

@@ -17,12 +17,11 @@ public class JEEventHandlerTest {
 
 	@Test
 	public void testJEEventHandler(){
-		JEEventHandler handler = new JEEventHandler(scheduler){
+		JEEventHandler handler = new JEAbstractEventHandler(scheduler){
 			@Override
 			public void handleEvent(JEEvent event) {}
 		};
 		assertEquals(handler, scheduler.getHandler(handler.getHandlerId()));
-		
 	}
 
 }

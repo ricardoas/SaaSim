@@ -6,6 +6,7 @@ import java.util.List;
 
 import commons.sim.OneTierSimulatorForPlanning;
 import commons.sim.jeevent.JEEvent;
+import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
@@ -16,9 +17,9 @@ import commons.util.Triple;
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public class Machine extends JEEventHandler{
+public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	
-	private long id;
+	private long machineID;
 	private boolean isReserved;
 	protected double totalProcessed;
 	
@@ -32,11 +33,11 @@ public class Machine extends JEEventHandler{
 	public int numberOfRequestsArrivalsInPreviousInterval;
 	
 	/**
-	 * @param id
+	 * @param machineID
 	 */
-	public Machine(JEEventScheduler scheduler, long id) {
+	public Machine(JEEventScheduler scheduler, long machineID) {
 		super(scheduler);
-		this.id = id;
+		this.machineID = machineID;
 		this.queue = new ArrayList<Request>();
 		this.finishedRequests = new ArrayList<Request>();
 		this.lastProcessingEvaluation = new JETime(0);
@@ -56,7 +57,7 @@ public class Machine extends JEEventHandler{
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (id ^ (id >>> 32));
+		result = prime * result + (int) (machineID ^ (machineID >>> 32));
 		return result;
 	}
 
@@ -72,7 +73,7 @@ public class Machine extends JEEventHandler{
 		if (getClass() != obj.getClass())
 			return false;
 		Machine other = (Machine) obj;
-		if (id != other.id)
+		if (machineID != other.machineID)
 			return false;
 		return true;
 	}
@@ -197,13 +198,13 @@ public class Machine extends JEEventHandler{
 	 */
 	public double calcExecutionTime() {
 		if(this.totalProcessed < 0){
-			throw new RuntimeException("Invalid resource "+this.id+" execution time: "+this.totalProcessed);
+			throw new RuntimeException("Invalid resource "+this.machineID+" execution time: "+this.totalProcessed);
 		}
 		return this.totalProcessed;
 	}
 
 	public String toString(){
-		return "Mac "+this.id;
+		return "Mac "+this.machineID;
 	}
 
 	

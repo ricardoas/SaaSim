@@ -9,7 +9,5 @@ import provisioning.Monitor;
 public interface Simulator {
 	
 	void start();
-	
-	boolean setMonitor(Monitor monitor);
 
 }

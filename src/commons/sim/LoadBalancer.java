@@ -1,21 +1,28 @@
 package commons.sim;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
+
+import provisioning.Monitor;
 
 import commons.cloud.Machine;
 import commons.cloud.Request;
 import commons.sim.jeevent.JEEvent;
+import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
+import commons.sim.jeevent.JEEventType;
 
 /**
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public class LoadBalancer extends JEEventHandler{
+public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandler{
 	
 	protected List<Machine> reservedMachinesPool;//reserved resources
 	protected List<Machine> onDemandMachinesPool;
@@ -25,19 +32,26 @@ public class LoadBalancer extends JEEventHandler{
 	private int onDemandResourcesLimit;
 	
 	private SchedulingHeuristic heuristic;
+	private Queue<Request> requestsToBeProcessed;
+	private Monitor monitor;
 	
 	/**
 	 * @param scheduler TODO
+	 * @param machine 
 	 * 
 	 */
-	public LoadBalancer(JEEventScheduler scheduler, SchedulingHeuristic heuristic) {
+	public LoadBalancer(JEEventScheduler scheduler, Monitor monitor, SchedulingHeuristic heuristic, Machine... machines) {
 		super(scheduler);
-		this.servers = new ArrayList<Machine>();
+		this.monitor = monitor;
 		this.heuristic = heuristic;
+		this.servers = new ArrayList<Machine>();
+		this.servers.addAll(Arrays.asList(machines));
+		
 		this.reservedResourcesAmount = Integer.MAX_VALUE;
 		this.onDemandResourcesLimit = Integer.MAX_VALUE;
 		this.onDemandMachinesPool = new ArrayList<Machine>();
 		this.reservedMachinesPool = new ArrayList<Machine>();
+		this.requestsToBeProcessed = new LinkedList<Request>();
 	}
 	
 	/**
@@ -66,6 +80,9 @@ public class LoadBalancer extends JEEventHandler{
 //		heuristic.nextServer();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void handleEvent(JEEvent event) {
 		switch (event.getType()) {
@@ -75,9 +92,10 @@ public class LoadBalancer extends JEEventHandler{
 			if(nextServer != null){//Reusing an existent machine
 				nextServer.sendRequest(request);
 			}else{//Creating a new one
-				this.manageMachines(1);
-				Machine machine = this.servers.get(this.servers.size()-1);//Retrieving new machine added
-				machine.sendRequest(request);
+				getScheduler().queueEvent(new JEEvent(JEEventType.REQUESTQUEUED, monitor, getScheduler().now(), request));
+//				this.manageMachines(1);
+//				Machine machine = this.servers.get(this.servers.size()-1);//Retrieving new machine added
+//				machine.sendRequest(request);
 			}
 			break;
 		case EVALUATEUTILIZATION://RANJAN Scheduler
@@ -90,6 +108,9 @@ public class LoadBalancer extends JEEventHandler{
 		}
 	}
 
+	/**
+	 * @param numberOfMachinesToAdd
+	 */
 	private void manageMachines(int numberOfMachinesToAdd) {
 		if(numberOfMachinesToAdd > 0){//Adding machines
 			numberOfMachinesToAdd = addReservedMachines(numberOfMachinesToAdd);

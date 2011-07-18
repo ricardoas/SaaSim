@@ -6,8 +6,8 @@ import commons.sim.Simulator;
 import commons.sim.jeevent.JEEventScheduler;
 
 /**
+ * 
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
- *
  */
 public class Main {
 	
@@ -24,11 +24,9 @@ public class Main {
 		
 		DPS dps = null;
 		
-		Simulator simulator = new OneTierSimulator(scheduler);
+		Simulator simulator = new OneTierSimulator(scheduler, monitor);
 		
 		monitor.setDPS(dps);
-		
-		simulator.setMonitor(monitor);
 		
 		dps.setConfigurable(simulator);
 		

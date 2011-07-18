@@ -24,7 +24,7 @@ public class JEEventSchedulerTest {
 
 	@Test(expected=JEException.class)
 	public void testQueueEventWithUnregisteredHandler() {
-		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
+		JEEventHandler handler = EasyMock.createStrictMock(JEAbstractEventHandler.class);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1).times(2);
 		EasyMock.replay(handler);
 		scheduler.queueEvent(new JEEvent(JEEventType.READWORKLOAD, handler, new JETime(1000)));
@@ -36,7 +36,7 @@ public class JEEventSchedulerTest {
 	@Test
 	public void testQueueEventWithRegisteredHandler() {
 		
-		final JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
+		final JEAbstractEventHandler handler = EasyMock.createStrictMock(JEAbstractEventHandler.class);
 		EasyMock.expect(handler.getHandlerId()).andAnswer(new IAnswer<Integer>() {
 			@Override
 			public Integer answer() throws Throwable {
@@ -56,7 +56,7 @@ public class JEEventSchedulerTest {
 	@Test
 	public void testCancelEvent() {
 		
-		final JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
+		final JEAbstractEventHandler handler = EasyMock.createStrictMock(JEAbstractEventHandler.class);
 		EasyMock.expect(handler.getHandlerId()).andAnswer(new IAnswer<Integer>() {
 			@Override
 			public Integer answer() throws Throwable {
@@ -75,7 +75,7 @@ public class JEEventSchedulerTest {
 
 	@Test
 	public void testRegisterHandler() {
-		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
+		JEAbstractEventHandler handler = EasyMock.createStrictMock(JEAbstractEventHandler.class);
 		EasyMock.replay(handler);
 		int id = scheduler.registerHandler(handler);
 		assertEquals(handler, scheduler.getHandler(id));

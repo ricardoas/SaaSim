@@ -3,23 +3,26 @@ package commons.sim;
 import java.util.ArrayList;
 import java.util.List;
 
+import provisioning.Monitor;
+
 import commons.cloud.Machine;
 import commons.cloud.Request;
 import commons.sim.jeevent.JEEvent;
+import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
 
-public class OneTierSimulatorForPlanning extends OneTierSimulator {
+public class OneTierSimulatorForPlanning extends OneTierSimulator implements JEEventHandler {
 	
 	private List<Request> workload;
 	public static long UTILIZATION_EVALUATION_PERIOD = 1000 * 60 * 5;//in millis
 	
-	public OneTierSimulatorForPlanning(JEEventScheduler scheduler, List<Request> workload, double sla){
-		super(scheduler);
+	public OneTierSimulatorForPlanning(JEEventScheduler scheduler, Monitor monitor, List<Request> workload, double sla){
+		super(scheduler, monitor);
 		this.workload = workload;
-//		this.loadBalancer = new LoadBalancer(scheduler, new RanjanScheduler());
-		this.loadBalancer = new LoadBalancer(scheduler, new ProfitDrivenScheduler(sla));
+//		this.loadBalancer = new LoadBalancer(scheduler, monitor, new RanjanScheduler());
+		this.loadBalancer = new LoadBalancer(scheduler, monitor, new ProfitDrivenScheduler(sla));
 	}
 	
 	@Override
