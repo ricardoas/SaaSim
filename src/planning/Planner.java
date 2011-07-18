@@ -1,10 +1,11 @@
 package planning;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
-import org.jgap.IChromosome;
 
 import planning.heuristic.AGHeuristic;
 import planning.heuristic.PlanningHeuristic;
@@ -23,6 +24,8 @@ public class Planner {
 	private Map<User, Contract> cloudUsers;
 	private GEISTMonthlyWorkloadParser workloadParser;
 	private final double sla;
+	
+	private final String OUTUPUT_FILE = "planning.dat"; 
 	
 	public Planner(Map<String, Provider> providers, String heuristic, Map<User, Contract> cloudUsers, GEISTMonthlyWorkloadParser workloadParser, double sla) {
 		this.cloudProviders = providers;
@@ -53,19 +56,35 @@ public class Planner {
 	 * Given the heuristic and the scenario data, this method is responsible for requesting the planning
 	 * of the infrastructure
 	 */
-	public void plan() {
+	public List<String> plan() {
 		try {
 			Map<User, List<Request>> currentWorkload = this.workloadParser.next();
 			while(!currentWorkload.isEmpty()){
 				this.planningHeuristic.findPlan(currentWorkload, cloudProviders, cloudUsers, sla);
 			}
 			
-			//TODO Retrieving whole period plan and other info
-			List plan = this.planningHeuristic.getPlan();
+			//Persisting planning
+			List<String> plan = this.planningHeuristic.getPlan();
+			persistPlanning(plan);
+			
+			return plan;
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		return null;
 	}
 
+	private void persistPlanning(List<String> plan) {
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(new File(OUTUPUT_FILE)));
+			for(String data : plan){
+				writer.write(data+"\n");
+			}
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

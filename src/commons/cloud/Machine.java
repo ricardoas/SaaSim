@@ -89,6 +89,7 @@ public class Machine extends JEEventHandler{
 		this.queue.add(request);
 		int requestsToShare = this.queue.size();
 		
+		//FIXME: Should compute time from previous arrival until now before adding a new request!
 		if(nextFinishEvent != null){//Should evaluate next finish time
 			JETime estimatedFinishTime = new JETime(request.demand * requestsToShare); 
 			estimatedFinishTime = estimatedFinishTime.plus(getScheduler().now());

@@ -45,7 +45,7 @@ public class UtilityFunction {
 		}
 		
 		if(user.consumedCpu > contract.cpuLimit){
-			extraReceipt += Math.ceil((user.consumedCpu - contract.cpuLimit)/HOUR_IN_MILLIS) * contract.extraCpuCost;//FIXME: verify input unit
+			extraReceipt += Math.ceil((user.consumedCpu - contract.cpuLimit)/HOUR_IN_MILLIS) * contract.extraCpuCost;
 		}
 		if(user.consumedTransference > contract.transferenceLimit){
 			extraReceipt += (user.consumedTransference - contract.transferenceLimit) * contract.extraTransferenceCost;

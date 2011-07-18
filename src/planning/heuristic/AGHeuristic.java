@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
-import org.jgap.FitnessFunction;
 import org.jgap.Gene;
 import org.jgap.Genotype;
 import org.jgap.IChromosome;
@@ -23,6 +22,7 @@ import commons.cloud.Contract;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
+import commons.util.SimulationData;
 
 public class AGHeuristic implements PlanningHeuristic{
 	
@@ -34,7 +34,7 @@ public class AGHeuristic implements PlanningHeuristic{
 	
 	private int resourcesReservationLimit = 0;
 	
-	private List<IChromosome> bestConfigs = new ArrayList<IChromosome>();
+	private List<SimulationData> bestConfigs = new ArrayList<SimulationData>();
 	
 	@Override
 	public void findPlan(Map<User, List<Request>> currentWorkload,
@@ -58,7 +58,7 @@ public class AGHeuristic implements PlanningHeuristic{
 	//		config.setKeepPopulationSizeConstant(true);
 	//		config.setNaturalSelector(null);//Tournament, WeightedRoullete
 
-			FitnessFunction myFunc = createFitnessFunction(currentWorkload, cloudUsers, sla, cloudProvider);
+			PlanningFitnessFunction myFunc = createFitnessFunction(currentWorkload, cloudUsers, sla, cloudProvider);
 			config.setFitnessFunction(myFunc);
 			
 			IChromosome sampleChromosome = createSampleChromosome(config);
@@ -70,17 +70,18 @@ public class AGHeuristic implements PlanningHeuristic{
 			for(int i = 0; i < MINIMUM_NUMBER_OF_EVOLUTIONS; i++){
 				population.evolve();
 			}
-			IChromosome fittestChromosome = population.getFittestChromosome();
+			IChromosome previosFittestChromosome = population.getFittestChromosome();
 			population.evolve();
 			IChromosome lastFittestChromosome = population.getFittestChromosome();
-			while(!isEvolutionComplete(fittestChromosome, lastFittestChromosome)){
+			while(!isEvolutionComplete(previosFittestChromosome, lastFittestChromosome)){
 				population.evolve();
-				fittestChromosome = lastFittestChromosome;
+				previosFittestChromosome = lastFittestChromosome;
 				lastFittestChromosome = population.getFittestChromosome();
 			}
 			
 			//store best config
-			this.bestConfigs.add(population.getFittestChromosome());
+			IChromosome fittestChromosome = population.getFittestChromosome();
+			this.bestConfigs.add(myFunc.getDetailedEntry((Integer) fittestChromosome.getGene(0).getAllele()));
 			
 		} catch (InvalidConfigurationException e) {
 			e.printStackTrace();
@@ -108,25 +109,28 @@ public class AGHeuristic implements PlanningHeuristic{
 		return sampleChromosome;
 	}
 
-	private FitnessFunction createFitnessFunction(Map<User, List<Request>> currentWorkload, Map<User, Contract> cloudUsers, double sla, Map<String, Provider> cloudProvider) {
+	private PlanningFitnessFunction createFitnessFunction(Map<User, List<Request>> currentWorkload, Map<User, Contract> cloudUsers, double sla, Map<String, Provider> cloudProvider) {
 		return new PlanningFitnessFunction(currentWorkload, cloudUsers, sla, cloudProvider);
 	}
 
 	@Override
 	public double getEstimatedProfit(int period) {
 		if(period > 0 && period < this.bestConfigs.size()){
-			return this.bestConfigs.get(period).getFitnessValue();
+			return this.bestConfigs.get(period).estimatedUtility;
 		}
 		
 		return Double.POSITIVE_INFINITY;
 	}
 
 	@Override
-	public List getPlan() {
-		List<Integer> amountsToReserve = new ArrayList<Integer>();
-		for(IChromosome chrom : this.bestConfigs){
-			amountsToReserve.add((Integer) chrom.getGene(0).getAllele());
+	public List<String> getPlan() {
+		List<String> planningData = new ArrayList<String>();
+		for(SimulationData data : this.bestConfigs){
+			planningData.add(data.numberOfMachinesReserved + "\t" + data.totalReservedConsumedTime
+					+ "\t" + data.numberOfOnDemandMachines + "\t" + data.totalOnDemandConsumedTime +
+					"\t" + data.totalTransferred + "\t" + data.estimatedUtility + "\t" + data.estimatedReceipt
+					+ "\t" + data.estimatedCost);
 		}
-		return amountsToReserve;
+		return planningData;
 	}
 }

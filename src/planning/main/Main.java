@@ -3,14 +3,9 @@ package planning.main;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
+import planning.Executor;
 import planning.Planner;
-
-
-import commons.cloud.Request;
-import commons.cloud.User;
-
 import config.ContractConfiguration;
 import config.GEISTMonthlyWorkloadParser;
 import config.MainConfiguration;
@@ -48,7 +43,11 @@ public class Main {
 			
 			//Creating planner
 			Planner planner = new Planner(providerConfig.providers, mainConfig.getHeuristic(), contractConfig.usersContracts, workloadParser, mainConfig.getSLA());
-			planner.plan();
+			List<String> plan = planner.plan();
+			
+			//FIXME: Change workload! Performing plan execution!
+			Executor executor = new Executor(providerConfig.providers, contractConfig.usersContracts, workloadParser, mainConfig.getSLA());
+			executor.execute(plan);
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();

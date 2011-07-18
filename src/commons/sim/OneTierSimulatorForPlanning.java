@@ -37,6 +37,7 @@ public class OneTierSimulatorForPlanning extends OneTierSimulator {
 		case READWORKLOAD:
 			if(this.workload != null & this.workload.size() > 0){
 				for(Request request : this.workload){
+					request.totalProcessed = 0;
 					getScheduler().queueEvent(parseEvent(request));
 				}
 			}

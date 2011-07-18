@@ -87,21 +87,29 @@ public class Provider {
 	}
 
 	private double calculateOnDemandCosts() {
+		double totalConsumed = this.onDemandConsumption();
+		return totalConsumed * this.onDemandCpuCost + totalConsumed * monitoringCost;
+	}
+
+	private double calculateReservationCosts() {
+		double totalConsumed = this.reservedConsumption();
+		return this.reservedResources.size() * this.reservationOneYearFee + 
+		totalConsumed * this.reservedCpuCost + totalConsumed * monitoringCost;
+	}
+
+	public double onDemandConsumption() {
 		double totalConsumed = 0;
 		for(Machine machine : this.onDemandResources){
 			double executionTime = machine.calcExecutionTime();
 			if(executionTime < 0){
 				throw new RuntimeException("Invalid cpu usage in machine "+machine.toString()+" : "+executionTime);
 			}
-			totalConsumed += Math.ceil(executionTime);
+			totalConsumed += Math.ceil(executionTime / UtilityFunction.HOUR_IN_MILLIS);
 		}
-		
-		totalConsumed = Math.ceil(totalConsumed / UtilityFunction.HOUR_IN_MILLIS);
-		
-		return totalConsumed * this.onDemandCpuCost + totalConsumed * monitoringCost;
+		return totalConsumed;
 	}
 
-	private double calculateReservationCosts() {
+	public double reservedConsumption() {
 		double totalConsumed = 0;
 		for(Machine machine : this.reservedResources){
 			double executionTime = machine.calcExecutionTime();
@@ -110,8 +118,6 @@ public class Provider {
 			}
 			totalConsumed += Math.ceil(executionTime / UtilityFunction.HOUR_IN_MILLIS);
 		}
-		
-		return this.reservedResources.size() * this.reservationOneYearFee + 
-		totalConsumed * this.reservedCpuCost + totalConsumed * monitoringCost;
+		return totalConsumed;
 	}
 }

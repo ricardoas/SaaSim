@@ -183,11 +183,72 @@ public class PlanningFitnessFunctionTest {
 		
 		EasyMock.verify(gene);
 		EasyMock.verify(chrom);
-		
+		//FIXME
 		double receipt = 1030 + 1030;//1000+30; 1000+30
 		double cost = 500.64;//10*50+(4*0.01)+(4*0.15)
 		
 		assertEquals(receipt-cost, fitness, 0.01);
 	}
+	
+//	@Test
+//	public void simpleWorkloadBeingEvaluatedRepeatdly() throws IOException{
+//		
+//		GEISTMonthlyWorkloadParser parser = new GEISTMonthlyWorkloadParser(this.simpleWorkload);
+//		
+//		User user = new User("1");
+//		User user2 = new User("2");
+//		
+//		double setupCost = 1000;
+//		double price = 30;
+//		double cpuLimit = 20 * ProviderTest.HOUR_IN_MILLIS;
+//		double extraCpuCost = 0.5;
+//		
+//		Contract contract = new Contract("p1", setupCost, price, cpuLimit, extraCpuCost);
+//		Map<User, Contract> cloudUsers = new HashMap<User, Contract>();
+//		cloudUsers.put(user, contract);
+//		cloudUsers.put(user2, contract);
+//		
+//		double cpuCost = 0.2;
+//		int onDemandLimit = 10;
+//		int reservationLimit = 10;
+//		double reservedCpuCost = 0.01;
+//		double reservationOneYearFee = 50;
+//		double reservationThreeYearsFee = 75;
+//		double monitoringCost = 0.15;
+//		String transferInLimits = "";
+//		String transferInCosts = "";
+//		String transferOutLimits = "";
+//		String transferOutCosts = "";
+//		Provider prov = new Provider("prov1", cpuCost, onDemandLimit, reservationLimit, reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+//		Map<String, Provider> providers = new HashMap<String, Provider>();
+//		providers.put(prov.name, prov);
+//		
+//		Map<User, List<Request>> requests = parser.next();
+//		PlanningFitnessFunction fc = new PlanningFitnessFunction(requests, cloudUsers, SLA, providers);
+//		
+//		IChromosome chrom = EasyMock.createMock(IChromosome.class);
+//		Gene gene = EasyMock.createMock(Gene.class);
+//		EasyMock.expect(chrom.getGene(0)).andReturn(gene).anyTimes();
+//		EasyMock.expect(gene.getAllele()).andReturn(10).anyTimes();
+//		EasyMock.replay(gene);
+//		EasyMock.replay(chrom);
+//		
+//		double fitness = fc.evaluate(chrom);
+//		fitness = fc.evaluate(chrom);
+//		
+//		EasyMock.verify(gene);
+//		EasyMock.verify(chrom);
+//		
+//		//Evaluating that accountability is correct
+//		List<Request> userRequests = requests.get(user);
+//		for(Request request : userRequests){
+//			assertEquals(request.totalProcessed, request.demand);
+//		}
+//		
+//		userRequests = requests.get(user2);
+//		for(Request request : userRequests){
+//			assertEquals(request.totalProcessed, request.demand);
+//		}
+//	}
 	
 }
