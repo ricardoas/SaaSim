@@ -1,0 +1,3 @@
+In order to install it to the local maven repository run:
+
+mvn install:install-file -Dfile=jgap.jar -DpomFile=pom.xml
