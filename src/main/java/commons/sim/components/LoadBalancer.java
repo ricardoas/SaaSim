@@ -29,7 +29,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	@Deprecated//FIXME not needed anymore
 	public List<Machine> onDemandMachinesPool;
 	
-	public List<Machine> servers; // FIXME Not public please!
+	private final List<Machine> servers;
 	
 	@Deprecated//FIXME move me to DPS
 	private int reservedResourcesAmount;
@@ -50,7 +50,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 		this.monitor = monitor;
 		this.heuristic = heuristic;
 		this.servers = new ArrayList<Machine>();
-		this.servers.addAll(Arrays.asList(machines));
+		this.getServers().addAll(Arrays.asList(machines));
 		
 		this.reservedResourcesAmount = Integer.MAX_VALUE;
 		this.onDemandResourcesLimit = Integer.MAX_VALUE;
@@ -64,9 +64,9 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	 */
 	public void addMachine(){
 		if(this.onDemandMachinesPool.size() > 0){
-			servers.add(this.onDemandMachinesPool.remove(0));
+			getServers().add(this.onDemandMachinesPool.remove(0));
 		}else{
-			servers.add(new Machine(getScheduler(), new Random().nextLong()));
+			getServers().add(new Machine(getScheduler(), new Random().nextLong()));
 		}
 	}
 	
@@ -74,7 +74,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	 * 
 	 */
 	public void removeMachine(){
-		servers.remove(servers.size()-1);
+		getServers().remove(getServers().size()-1);
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 		switch (event.getType()) {
 		case NEWREQUEST:
 			Request request = (Request) event.getValue()[0];
-			Machine nextServer = heuristic.getNextServer(request, servers);
+			Machine nextServer = heuristic.getNextServer(request, getServers());
 			if(nextServer != null){//Reusing an existent machine
 				nextServer.sendRequest(request);
 			}else{//Creating a new one
@@ -105,7 +105,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 			break;
 		case EVALUATEUTILIZATION://RANJAN Scheduler
 			Long eventTime = (Long) event.getValue()[0];
-			int numberOfMachinesToAdd = heuristic.evaluateUtilization(servers, eventTime);
+			int numberOfMachinesToAdd = heuristic.evaluateUtilization(getServers(), eventTime);
 			this.manageMachines(numberOfMachinesToAdd);
 			break;
 		default:
@@ -122,14 +122,14 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 			
 			//Machines are missing, add on demand resources
 			if(numberOfMachinesToAdd > 0){
-				int onDemandResourcesAlreadyAdded = this.servers.size() - this.reservedResourcesAmount;
+				int onDemandResourcesAlreadyAdded = this.getServers().size() - this.reservedResourcesAmount;
 				numberOfMachinesToAdd = Math.min(numberOfMachinesToAdd, onDemandResourcesLimit - onDemandResourcesAlreadyAdded);
 				for(int i = 0; i < numberOfMachinesToAdd; i++){
 					this.addMachine();
 				}
 			}
 		}else if(numberOfMachinesToAdd < 0){//Removing unused machines
-			Iterator<Machine> it = servers.iterator();
+			Iterator<Machine> it = getServers().iterator();
 			while(it.hasNext()){
 				Machine machine = it.next();
 				if(!machine.isBusy()){
@@ -172,10 +172,17 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 		Iterator<Machine> it = this.reservedMachinesPool.iterator();
 		while(it.hasNext() && numberOfMachinesToAdd > 0){
 			Machine machine = it.next();
-			this.servers.add(machine);
+			this.getServers().add(machine);
 			it.remove();
 			numberOfMachinesToAdd--;
 		}
 		return numberOfMachinesToAdd;
+	}
+
+	/**
+	 * @return the servers
+	 */
+	public List<Machine> getServers() {
+		return servers;
 	}
 }

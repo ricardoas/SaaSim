@@ -98,7 +98,7 @@ public class LoadBalancerTest {
 		requests[0] = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
 		
 		Machine machine = EasyMock.createStrictMock(Machine.class);
-		lb.servers.add(machine);//Creating a machine to serve the request
+		lb.getServers().add(machine);//Creating a machine to serve the request
 		
 		JEEvent event = EasyMock.createStrictMock(JEEvent.class);
 		EasyMock.expect(event.getType()).andReturn(JEEventType.NEWREQUEST).once();
@@ -114,8 +114,8 @@ public class LoadBalancerTest {
 		EasyMock.verify(event);
 		EasyMock.verify(machine);
 		
-		assertNotNull(lb.servers);
-		assertEquals(1, lb.servers.size());
+		assertNotNull(lb.getServers());
+		assertEquals(1, lb.getServers().size());
 	}
 	
 }

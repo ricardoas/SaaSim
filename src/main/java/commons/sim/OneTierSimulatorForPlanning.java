@@ -62,8 +62,8 @@ public class OneTierSimulatorForPlanning extends SimpleSimulator implements JEEv
 	public List<Machine> getOnDemandResources() {
 		List<Machine> onDemandResources = new ArrayList<Machine>();
 		onDemandResources.addAll(this.loadBalancer.onDemandMachinesPool);
-		if(this.loadBalancer.servers.size() != 0){
-			for(Machine machine : this.loadBalancer.servers){
+		if(this.loadBalancer.getServers().size() != 0){
+			for(Machine machine : this.loadBalancer.getServers()){
 				if(!machine.isReserved()){
 					onDemandResources.add(machine);
 				}
@@ -75,8 +75,8 @@ public class OneTierSimulatorForPlanning extends SimpleSimulator implements JEEv
 	public List<Machine> getReservedResources() {
 		List<Machine> reservedResources = new ArrayList<Machine>();
 		reservedResources.addAll(this.loadBalancer.reservedMachinesPool);
-		if(this.loadBalancer.servers.size() != 0){
-			for(Machine machine : this.loadBalancer.servers){
+		if(this.loadBalancer.getServers().size() != 0){
+			for(Machine machine : this.loadBalancer.getServers()){
 				if(machine.isReserved()){
 					reservedResources.add(machine);
 				}

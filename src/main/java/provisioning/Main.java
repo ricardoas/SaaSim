@@ -2,8 +2,10 @@ package provisioning;
 
 import java.util.List;
 
+import org.apache.commons.configuration.ConfigurationException;
+
 import commons.cloud.Request;
-import commons.config.Configuration;
+import commons.config.SimulatorConfiguration;
 import commons.config.WorkloadParser;
 import commons.sim.SimpleSimulator;
 import commons.sim.Simulator;
@@ -17,10 +19,11 @@ public class Main {
 	
 	/**
 	 * @param args
+	 * @throws ConfigurationException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ConfigurationException {
 		
-		Configuration config;// = Configuration.INSTANCE;
+		SimulatorConfiguration.buildInstance(args[0]);
 		
 		JEEventScheduler scheduler = new JEEventScheduler();
 		
