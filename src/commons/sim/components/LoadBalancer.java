@@ -1,4 +1,4 @@
-package commons.sim;
+package commons.sim.components;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,13 +10,13 @@ import java.util.Random;
 
 import provisioning.Monitor;
 
-import commons.cloud.Machine;
 import commons.cloud.Request;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
+import commons.sim.schedulingheuristics.SchedulingHeuristic;
 
 /**
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
@@ -24,11 +24,16 @@ import commons.sim.jeevent.JEEventType;
  */
 public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandler{
 	
-	protected List<Machine> reservedMachinesPool;//reserved resources
-	protected List<Machine> onDemandMachinesPool;
-	protected List<Machine> servers;//resources being used
+	@Deprecated//FIXME not needed anymore
+	public List<Machine> reservedMachinesPool;//reserved resources
+	@Deprecated//FIXME not needed anymore
+	public List<Machine> onDemandMachinesPool;
 	
+	public List<Machine> servers; // FIXME Not public please!
+	
+	@Deprecated//FIXME move me to DPS
 	private int reservedResourcesAmount;
+	@Deprecated//FIXME move me to DPS
 	private int onDemandResourcesLimit;
 	
 	private SchedulingHeuristic heuristic;

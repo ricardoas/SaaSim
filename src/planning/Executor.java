@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import commons.cloud.Contract;
 import commons.cloud.Provider;
@@ -68,8 +69,8 @@ public class Executor {
 			
 			//Gathering all requests
 			List<Request> workload = new ArrayList<Request>();
-			for(User user : currentWorkload.keySet()){
-				workload.addAll(currentWorkload.get(user));
+			for(Entry<User, List<Request>> entry : currentWorkload.entrySet()){
+				workload.addAll(entry.getValue());
 			}
 			
 			//Starting simulation data to start a new simulation
@@ -132,16 +133,16 @@ public class Executor {
 	
 	private void updateInformation(Map<User, List<Request>> currentWorkload, OneTierSimulatorForPlanning simulator) {
 		//Updating users
-		for(User user : currentWorkload.keySet()){
-			List<Request> requests = currentWorkload.get(user);
+		for (Entry<User, List<Request>> entry : currentWorkload.entrySet()) {
+			List<Request> requests = entry.getValue();
 			double totalProcessed = 0;
 			double totalTransfered = 0;
 			for(Request request : requests){
 				totalProcessed += request.totalProcessed;
 				totalTransfered += request.size;
 			}
-			user.consumedCpu = totalProcessed;
-			user.consumedTransference = totalTransfered;
+			entry.getKey().consumedCpu = totalProcessed;
+			entry.getKey().consumedTransference = totalTransfered;
 		}
 		
 		//Updating provider

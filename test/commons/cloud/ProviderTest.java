@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import commons.sim.components.Machine;
 import commons.sim.jeevent.JEEventScheduler;
 
 
@@ -233,22 +234,22 @@ public class ProviderTest {
 		
 		//Adding reserved resources
 		Machine machine1 = new Machine(scheduler, 1);
-		machine1.totalProcessed = 4 * HOUR_IN_MILLIS;
+		machine1.setTotalProcessed(4 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(machine1);
 		Machine machine2 = new Machine(scheduler, 2);
-		machine2.totalProcessed = 5 * HOUR_IN_MILLIS;
+		machine2.setTotalProcessed(5 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(machine2);
 		Machine machine3 = new Machine(scheduler, 3);
-		machine3.totalProcessed = 15 * HOUR_IN_MILLIS;
+		machine3.setTotalProcessed(15 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(machine3);
 		Machine machine4 = new Machine(scheduler, 4);
-		machine4.totalProcessed = 15 * HOUR_IN_MILLIS;
+		machine4.setTotalProcessed(15 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(machine4);
 		Machine machine5 = new Machine(scheduler, 5);
-		machine5.totalProcessed = 12.5 * HOUR_IN_MILLIS;
+		machine5.setTotalProcessed(12.5 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(machine5);
 		Machine machine6 = new Machine(scheduler, 6);
-		machine6.totalProcessed = 15.23 * HOUR_IN_MILLIS;
+		machine6.setTotalProcessed(15.23 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(machine6);
 		
 		assertEquals(600 + 67 * reservedCpuCost + 67 * monitoringCost, provider.calculateCost(0), 0.0d);
@@ -274,7 +275,7 @@ public class ProviderTest {
 		
 		//Adding reserved resources
 		Machine machine1 = new Machine(scheduler, 1);
-		machine1.totalProcessed = -5 * HOUR_IN_MILLIS;
+		machine1.setTotalProcessed(-5 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(machine1);
 		
 		try{
@@ -304,19 +305,19 @@ public class ProviderTest {
 		
 		//Adding reserved resources
 		Machine machine1 = new Machine(scheduler, 1);
-		machine1.totalProcessed = 2 * HOUR_IN_MILLIS;
+		machine1.setTotalProcessed(2 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(machine1);
 		Machine machine2 = new Machine(scheduler, 2);
-		machine2.totalProcessed = 1 * HOUR_IN_MILLIS;
+		machine2.setTotalProcessed(1 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(machine2);
 		Machine machine3 = new Machine(scheduler, 3);
-		machine3.totalProcessed = 15 * HOUR_IN_MILLIS;
+		machine3.setTotalProcessed(15 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(machine3);
 		Machine machine4 = new Machine(scheduler, 1);
-		machine4.totalProcessed = 1.2 * HOUR_IN_MILLIS;
+		machine4.setTotalProcessed(1.2 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(machine4);
 		Machine machine5 = new Machine(scheduler, 5);
-		machine5.totalProcessed = 5.14 * HOUR_IN_MILLIS;
+		machine5.setTotalProcessed(5.14 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(machine5);
 		
 		assertEquals( 25 * onDemandCpuCost + 25 * monitoringCost, provider.calculateCost(0), 0.0d);
@@ -342,7 +343,7 @@ public class ProviderTest {
 		
 		//Adding reserved resources
 		Machine machine1 = new Machine(scheduler, 1);
-		machine1.totalProcessed = -6 * HOUR_IN_MILLIS;
+		machine1.setTotalProcessed(-6 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(machine1);
 		
 		try{
@@ -352,7 +353,7 @@ public class ProviderTest {
 		}
 		
 		//FIXME: Double value explodes with large value!
-		machine1.totalProcessed = -600 * HOUR_IN_MILLIS;
+		machine1.setTotalProcessed(-600 * HOUR_IN_MILLIS);
 		provider.onDemandResources.clear();
 		provider.onDemandResources.add(machine1);
 		
@@ -383,38 +384,38 @@ public class ProviderTest {
 		
 		//Adding reserved resources
 		Machine machine1 = new Machine(scheduler, 1);
-		machine1.totalProcessed = 10 * HOUR_IN_MILLIS;
+		machine1.setTotalProcessed(10 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(machine1);
 		Machine machine2 = new Machine(scheduler, 2);
-		machine2.totalProcessed = 20 * HOUR_IN_MILLIS;
+		machine2.setTotalProcessed(20 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(machine2);
 		Machine machine3 = new Machine(scheduler, 3);
-		machine3.totalProcessed = 15 * HOUR_IN_MILLIS;
+		machine3.setTotalProcessed(15 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(machine3);
 		Machine machine4 = new Machine(scheduler, 4);
-		machine4.totalProcessed = 15 * HOUR_IN_MILLIS;
+		machine4.setTotalProcessed(15 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(machine4);
 		Machine machine5 = new Machine(scheduler, 5);
-		machine5.totalProcessed = 15 * HOUR_IN_MILLIS;
+		machine5.setTotalProcessed(15 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(machine5);
 		Machine machine6 = new Machine(scheduler, 6);
-		machine6.totalProcessed = 12.5 * HOUR_IN_MILLIS;
+		machine6.setTotalProcessed(12.5 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(machine6);
 		Machine machine7 = new Machine(scheduler, 7);
-		machine7.totalProcessed = 15.23 * HOUR_IN_MILLIS;
+		machine7.setTotalProcessed(15.23 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(machine7);
 		
 		Machine machine8 = new Machine(scheduler, 8);
-		machine8.totalProcessed = 18 * HOUR_IN_MILLIS;
+		machine8.setTotalProcessed(18 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(machine8);
 		Machine machine9 = new Machine(scheduler, 9);
-		machine9.totalProcessed = 78.5 * HOUR_IN_MILLIS;
+		machine9.setTotalProcessed(78.5 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(machine9);
 		Machine machine10 = new Machine(scheduler, 10);
-		machine10.totalProcessed = 1.2 * HOUR_IN_MILLIS;
+		machine10.setTotalProcessed(1.2 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(machine10);
 		Machine machine11 = new Machine(scheduler, 11);
-		machine11.totalProcessed = 5.14 * HOUR_IN_MILLIS;
+		machine11.setTotalProcessed(5.14 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(machine11);
 		
 		assertEquals( 7 * reservationOneYearFee + 103 * reservedCpuCost + 103 * monitoringCost +

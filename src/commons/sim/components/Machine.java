@@ -1,9 +1,10 @@
-package commons.cloud;
+package commons.sim.components;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import commons.cloud.Request;
 import commons.sim.OneTierSimulatorForPlanning;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEAbstractEventHandler;
@@ -21,7 +22,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	
 	private long machineID;
 	private boolean isReserved;
-	protected double totalProcessed;
+	private double totalProcessed;
 	
 	protected JETime lastProcessingEvaluation;
 	protected JEEvent nextFinishEvent;
@@ -42,7 +43,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 		this.finishedRequests = new ArrayList<Request>();
 		this.lastProcessingEvaluation = new JETime(0);
 		this.isReserved = false;
-		this.totalProcessed = 0;
+		this.setTotalProcessed(0);
 	}
 
 	public Machine(JEEventScheduler scheduler, long id, boolean isReserved){
@@ -158,7 +159,8 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 						this.finishedRequests.add(request);
 						iterator.remove();
 					}
-					this.totalProcessed += totalProcessingTime.timeMilliSeconds;//Accounting
+					this.setTotalProcessed(this.getTotalProcessed()
+							+ totalProcessingTime.timeMilliSeconds);//Accounting
 				}
 				this.lastProcessingEvaluation = event.getScheduledTime();
 				
@@ -197,10 +199,10 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	 * @return
 	 */
 	public double calcExecutionTime() {
-		if(this.totalProcessed < 0){
-			throw new RuntimeException("Invalid resource "+this.machineID+" execution time: "+this.totalProcessed);
+		if(this.getTotalProcessed() < 0){
+			throw new RuntimeException("Invalid resource "+this.machineID+" execution time: "+this.getTotalProcessed());
 		}
-		return this.totalProcessed;
+		return this.getTotalProcessed();
 	}
 
 	public String toString(){
@@ -234,5 +236,13 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 		}
 		
 		return executionTimes;
+	}
+
+	public void setTotalProcessed(double totalProcessed) {
+		this.totalProcessed = totalProcessed;
+	}
+
+	public double getTotalProcessed() {
+		return totalProcessed;
 	}
 }

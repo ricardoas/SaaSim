@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.*;
 
+import commons.sim.components.Machine;
 import commons.sim.jeevent.JEEventScheduler;
 
 
@@ -119,38 +120,38 @@ public class UtilityFunctionTest {
 		
 		//Adding resources
 		Machine mach1 = new Machine(scheduler, 1);
-		mach1.totalProcessed = 10 * HOUR_IN_MILLIS;
+		mach1.setTotalProcessed(10 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach1);
 		Machine mach2 = new Machine(scheduler, 2);
-		mach2.totalProcessed = 20 * HOUR_IN_MILLIS;
+		mach2.setTotalProcessed(20 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach2);
 		Machine mach3 = new Machine(scheduler, 3);
-		mach3.totalProcessed = 15 * HOUR_IN_MILLIS;
+		mach3.setTotalProcessed(15 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach3);
 		Machine mach4 = new Machine(scheduler, 4);
-		mach4.totalProcessed = 15 * HOUR_IN_MILLIS;
+		mach4.setTotalProcessed(15 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach4);
 		Machine mach5 = new Machine(scheduler, 5);
-		mach5.totalProcessed = 15 * HOUR_IN_MILLIS;
+		mach5.setTotalProcessed(15 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach5);
 		Machine mach6 = new Machine(scheduler, 6);
-		mach6.totalProcessed = 12.5 * HOUR_IN_MILLIS;
+		mach6.setTotalProcessed(12.5 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach6);
 		Machine mach7 = new Machine(scheduler, 7);
-		mach7.totalProcessed = 15.23 * HOUR_IN_MILLIS;
+		mach7.setTotalProcessed(15.23 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach7);
 		
 		Machine mach8 = new Machine(scheduler, 8);
-		mach8.totalProcessed = 18 * HOUR_IN_MILLIS;
+		mach8.setTotalProcessed(18 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(mach8);
 		Machine mach9 = new Machine(scheduler, 9);
-		mach9.totalProcessed = 78.5 * HOUR_IN_MILLIS;
+		mach9.setTotalProcessed(78.5 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(mach9);
 		Machine mach10 = new Machine(scheduler, 10);
-		mach10.totalProcessed = 1.2 * HOUR_IN_MILLIS;
+		mach10.setTotalProcessed(1.2 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(mach10);
 		Machine mach11 = new Machine(scheduler, 11);
-		mach11.totalProcessed = 5.14 * HOUR_IN_MILLIS;
+		mach11.setTotalProcessed(5.14 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(mach11);
 		
 		assertEquals(7 * provider.reservationOneYearFee + 103 * provider.reservedCpuCost + 103 * provider.monitoringCost +
@@ -164,25 +165,25 @@ public class UtilityFunctionTest {
 		
 		//Adding resources
 		Machine mach1 = new Machine(scheduler, 1);
-		mach1.totalProcessed = 10 * HOUR_IN_MILLIS;
+		mach1.setTotalProcessed(10 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach1);
 		Machine mach2 = new Machine(scheduler, 2);
-		mach2.totalProcessed = 20 * HOUR_IN_MILLIS;
+		mach2.setTotalProcessed(20 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach2);
 		Machine mach3 = new Machine(scheduler, 3);
-		mach3.totalProcessed = 15 * HOUR_IN_MILLIS;
+		mach3.setTotalProcessed(15 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach3);
 		Machine mach4 = new Machine(scheduler, 4);
-		mach4.totalProcessed = 15 * HOUR_IN_MILLIS;
+		mach4.setTotalProcessed(15 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach4);
 		Machine mach5 = new Machine(scheduler, 5);
-		mach5.totalProcessed = 15 * HOUR_IN_MILLIS;
+		mach5.setTotalProcessed(15 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach5);
 		Machine mach6 = new Machine(scheduler, 6);
-		mach6.totalProcessed = 12.5 * HOUR_IN_MILLIS;
+		mach6.setTotalProcessed(12.5 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach6);
 		Machine mach7 = new Machine(scheduler, 7);
-		mach7.totalProcessed = 15.23 * HOUR_IN_MILLIS;
+		mach7.setTotalProcessed(15.23 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach7);
 		
 		assertEquals(7 * provider.reservationOneYearFee + 103 * provider.reservedCpuCost + 103 * provider.monitoringCost,
@@ -230,25 +231,25 @@ public class UtilityFunctionTest {
 		
 		//Adding resources
 		Machine mach1 = new Machine(scheduler, 1);
-		mach1.totalProcessed = 10 * HOUR_IN_MILLIS;
+		mach1.setTotalProcessed(10 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach1);
 		Machine mach2 = new Machine(scheduler, 2);
-		mach2.totalProcessed = 20 * HOUR_IN_MILLIS;
+		mach2.setTotalProcessed(20 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach2);
 		Machine mach3 = new Machine(scheduler, 3);
-		mach3.totalProcessed = 15 * HOUR_IN_MILLIS;
+		mach3.setTotalProcessed(15 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach3);
 		Machine mach4 = new Machine(scheduler, 4);
-		mach4.totalProcessed = 15 * HOUR_IN_MILLIS;
+		mach4.setTotalProcessed(15 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach4);
 		Machine mach5 = new Machine(scheduler, 5);
-		mach5.totalProcessed = 15 * HOUR_IN_MILLIS;
+		mach5.setTotalProcessed(15 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach5);
 		Machine mach6 = new Machine(scheduler, 6);
-		mach6.totalProcessed = 12.5 * HOUR_IN_MILLIS;
+		mach6.setTotalProcessed(12.5 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach6);
 		Machine mach7 = new Machine(scheduler, 7);
-		mach7.totalProcessed = 15.23 * HOUR_IN_MILLIS;
+		mach7.setTotalProcessed(15.23 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach7);
 		
 		double cost = 7 * provider.reservationOneYearFee + 103 * provider.reservedCpuCost + 103 * provider.monitoringCost;
@@ -270,38 +271,38 @@ public class UtilityFunctionTest {
 		
 		//Adding resources
 		Machine mach1 = new Machine(scheduler, 1);
-		mach1.totalProcessed = 10 * HOUR_IN_MILLIS;
+		mach1.setTotalProcessed(10 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach1);
 		Machine mach2 = new Machine(scheduler, 2);
-		mach2.totalProcessed = 20 * HOUR_IN_MILLIS;
+		mach2.setTotalProcessed(20 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach2);
 		Machine mach3 = new Machine(scheduler, 3);
-		mach3.totalProcessed = 15 * HOUR_IN_MILLIS;
+		mach3.setTotalProcessed(15 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach3);
 		Machine mach4 = new Machine(scheduler, 4);
-		mach4.totalProcessed = 15 * HOUR_IN_MILLIS;
+		mach4.setTotalProcessed(15 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach4);
 		Machine mach5 = new Machine(scheduler, 5);
-		mach5.totalProcessed = 15 * HOUR_IN_MILLIS;
+		mach5.setTotalProcessed(15 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach5);
 		Machine mach6 = new Machine(scheduler, 6);
-		mach6.totalProcessed = 12.5 * HOUR_IN_MILLIS;
+		mach6.setTotalProcessed(12.5 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach6);
 		Machine mach7 = new Machine(scheduler, 7);
-		mach7.totalProcessed = 15.23 * HOUR_IN_MILLIS;
+		mach7.setTotalProcessed(15.23 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach7);
 		
 		Machine mach8 = new Machine(scheduler, 8);
-		mach8.totalProcessed = 18 * HOUR_IN_MILLIS;
+		mach8.setTotalProcessed(18 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(mach8);
 		Machine mach9 = new Machine(scheduler, 9);
-		mach9.totalProcessed = 78.5 * HOUR_IN_MILLIS;
+		mach9.setTotalProcessed(78.5 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(mach9);
 		Machine mach10 = new Machine(scheduler, 10);
-		mach10.totalProcessed = 1.2 * HOUR_IN_MILLIS;
+		mach10.setTotalProcessed(1.2 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(mach10);
 		Machine mach11 = new Machine(scheduler, 11);
-		mach11.totalProcessed = 5.14 * HOUR_IN_MILLIS;
+		mach11.setTotalProcessed(5.14 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(mach11);
 		
 		double cost = 7 * provider.reservationOneYearFee + 103 * provider.reservedCpuCost + 103 * provider.monitoringCost 

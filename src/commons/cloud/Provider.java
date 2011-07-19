@@ -3,6 +3,8 @@ package commons.cloud;
 import java.util.ArrayList;
 import java.util.List;
 
+import commons.sim.components.Machine;
+
 public class Provider {
 
 	public List<Machine> reservedResources;

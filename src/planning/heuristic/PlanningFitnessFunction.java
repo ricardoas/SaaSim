@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
@@ -48,8 +49,8 @@ public class PlanningFitnessFunction extends FitnessFunction{
 
 	private void initSimulator(Map<User, List<Request>> currentWorkload, Integer reservedResources) {
 		List<Request> workload = new ArrayList<Request>();
-		for(User user : currentWorkload.keySet()){
-			workload.addAll(currentWorkload.get(user));
+		for (Entry<User, List<Request>> entry : currentWorkload.entrySet()) {
+			workload.addAll(entry.getValue());
 		}
 		//Starting simulation data to start a new simulation
 		this.simulator = new OneTierSimulatorForPlanning(new JEEventScheduler(), null, workload, this.sla);

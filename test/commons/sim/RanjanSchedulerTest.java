@@ -8,8 +8,8 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
-import commons.cloud.Machine;
 import commons.cloud.Request;
+import commons.sim.components.Machine;
 import commons.sim.jeevent.JEEventScheduler;
 
 

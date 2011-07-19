@@ -7,6 +7,7 @@ import provisioning.Monitor;
 
 import commons.cloud.Request;
 import commons.config.WorkloadParser;
+import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventHandler;
@@ -14,15 +15,12 @@ import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
 
-import config.GEISTSimpleWorkloadParser;
-
 /**
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
  */
 public class OneTierSimulator extends JEAbstractEventHandler implements Simulator, JEEventHandler{
 
-	protected WorkloadParser<List<Request>> workloadParser;
-
+	private final WorkloadParser<List<Request>> workloadParser;
 	private final Monitor monitor;
 	protected LoadBalancer loadBalancer;
 
@@ -30,10 +28,10 @@ public class OneTierSimulator extends JEAbstractEventHandler implements Simulato
 	 * Constructor
 	 * @param scheduler TODO
 	 */
-	public OneTierSimulator(JEEventScheduler scheduler, Monitor monitor) {
+	public OneTierSimulator(JEEventScheduler scheduler, Monitor monitor, WorkloadParser<List<Request>> parser) {
 		super(scheduler);
 		this.monitor = monitor;
-		this.workloadParser = new GEISTSimpleWorkloadParser("");
+		this.workloadParser = parser;//new GEISTSimpleWorkloadParser("");
 	}
 	
 	/**

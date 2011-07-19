@@ -13,10 +13,14 @@ public class Configuration {
 
 	protected Properties currentProperties = new Properties( System.getProperties() );
 
-	public void loadPropertiesFromFile( String file ) throws FileNotFoundException, IOException {
+	public void loadPropertiesFromFile( String fileName ) throws FileNotFoundException, IOException {
 
-		File propertiesFile = new File( file );
-		currentProperties.load( new FileInputStream( propertiesFile ) );
+		FileInputStream stream = new FileInputStream( new File( fileName ) );
+		try{
+			currentProperties.load( stream );
+		}finally{
+			stream.close();
+		}
 		
 		if(!verifyPropertiesExist()){
 			throw new IOException("Missing data in file!");

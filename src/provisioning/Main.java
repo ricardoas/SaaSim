@@ -1,6 +1,10 @@
 package provisioning;
 
+import java.util.List;
+
+import commons.cloud.Request;
 import commons.config.Configuration;
+import commons.config.WorkloadParser;
 import commons.sim.OneTierSimulator;
 import commons.sim.Simulator;
 import commons.sim.jeevent.JEEventScheduler;
@@ -24,7 +28,9 @@ public class Main {
 		
 		DPS dps = null;
 		
-		Simulator simulator = new OneTierSimulator(scheduler, monitor);
+		WorkloadParser<List<Request>> parser = null;
+		
+		Simulator simulator = new OneTierSimulator(scheduler, monitor, parser);
 		
 		monitor.setDPS(dps);
 		

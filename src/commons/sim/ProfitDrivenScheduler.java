@@ -2,8 +2,9 @@ package commons.sim;
 
 import java.util.List;
 
-import commons.cloud.Machine;
 import commons.cloud.Request;
+import commons.sim.components.Machine;
+import commons.sim.schedulingheuristics.SchedulingHeuristic;
 import commons.util.Triple;
 
 public class ProfitDrivenScheduler implements SchedulingHeuristic {

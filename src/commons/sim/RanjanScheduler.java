@@ -4,8 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import commons.cloud.Machine;
 import commons.cloud.Request;
+import commons.sim.components.Machine;
+import commons.sim.schedulingheuristics.SchedulingHeuristic;
 
 public class RanjanScheduler implements SchedulingHeuristic {
 

@@ -5,13 +5,15 @@ import java.util.List;
 
 import provisioning.Monitor;
 
-import commons.cloud.Machine;
 import commons.cloud.Request;
+import commons.sim.components.LoadBalancer;
+import commons.sim.components.Machine;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
+import config.GEISTSimpleWorkloadParser;
 
 public class OneTierSimulatorForPlanning extends OneTierSimulator implements JEEventHandler {
 	
@@ -19,7 +21,7 @@ public class OneTierSimulatorForPlanning extends OneTierSimulator implements JEE
 	public static long UTILIZATION_EVALUATION_PERIOD = 1000 * 60 * 5;//in millis
 	
 	public OneTierSimulatorForPlanning(JEEventScheduler scheduler, Monitor monitor, List<Request> workload, double sla){
-		super(scheduler, monitor);
+		super(scheduler, monitor, new GEISTSimpleWorkloadParser(""));
 		this.workload = workload;
 //		this.loadBalancer = new LoadBalancer(scheduler, monitor, new RanjanScheduler());
 		this.loadBalancer = new LoadBalancer(scheduler, monitor, new ProfitDrivenScheduler(sla));
@@ -38,7 +40,7 @@ public class OneTierSimulatorForPlanning extends OneTierSimulator implements JEE
 	public void handleEvent(JEEvent event) {
 		switch (event.getType()) {
 		case READWORKLOAD:
-			if(this.workload != null & this.workload.size() > 0){
+			if(this.workload != null && this.workload.size() > 0){
 				for(Request request : this.workload){
 					request.totalProcessed = 0;
 					getScheduler().queueEvent(parseEvent(request));
