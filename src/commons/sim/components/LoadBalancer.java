@@ -11,8 +11,8 @@ import java.util.Random;
 import provisioning.Monitor;
 
 import commons.cloud.Request;
-import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEAbstractEventHandler;
+import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
@@ -158,6 +158,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 		}
 	}
 
+	@Deprecated
 	public void initOneMachine() {
 		if(this.reservedMachinesPool.size() > 0){
 			int numberOfMachinesToAdd = 1;

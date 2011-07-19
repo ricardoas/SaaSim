@@ -14,11 +14,12 @@ import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
+import commons.sim.util.ApplicationFactory;
 
 /**
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class OneTierSimulator extends JEAbstractEventHandler implements Simulator, JEEventHandler{
+public class SimpleSimulator extends JEAbstractEventHandler implements Simulator, JEEventHandler{
 
 	private final WorkloadParser<List<Request>> workloadParser;
 	private final Monitor monitor;
@@ -28,10 +29,11 @@ public class OneTierSimulator extends JEAbstractEventHandler implements Simulato
 	 * Constructor
 	 * @param scheduler TODO
 	 */
-	public OneTierSimulator(JEEventScheduler scheduler, Monitor monitor, WorkloadParser<List<Request>> parser) {
+	public SimpleSimulator(JEEventScheduler scheduler, Monitor monitor, WorkloadParser<List<Request>> parser) {
 		super(scheduler);
 		this.monitor = monitor;
-		this.workloadParser = parser;//new GEISTSimpleWorkloadParser("");
+		this.workloadParser = parser;
+		this.loadBalancer = ApplicationFactory.getInstance().createNewApplication(scheduler, monitor);
 	}
 	
 	/**
@@ -40,20 +42,19 @@ public class OneTierSimulator extends JEAbstractEventHandler implements Simulato
 	@Override
 	public void start() {
 
-		// try {
-		// while(workloadParser.hasNext()){
-		// Request request = workloadParser.next();
-		// applicationServer.run(request);
-		// }
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
+		prepareBeforeStart();
+		getScheduler().start();
+	}
+
+	protected void prepareBeforeStart() {
+		send(new JEEvent(JEEventType.READWORKLOAD, this, getScheduler().now()));
 	}
 
 	/**
 	 * @return
 	 */
 	public Monitor getMonitor() {
+		
 		return monitor;
 	}
 
@@ -86,6 +87,7 @@ public class OneTierSimulator extends JEAbstractEventHandler implements Simulato
 	 * @return
 	 */
 	protected JEEvent parseEvent(Request request) {
+		
 		return new JEEvent(JEEventType.NEWREQUEST, loadBalancer, new JETime(request.time), request);
 	}
 }

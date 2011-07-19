@@ -30,7 +30,7 @@ public class Configuration {
 	public boolean verifyPropertiesExist(){
 		return true;
 	}
-
+	
 	/**
 	 * Returns a value for a given key.
 	 * @param key The property name.

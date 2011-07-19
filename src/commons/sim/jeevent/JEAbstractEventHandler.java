@@ -84,6 +84,4 @@ public abstract class JEAbstractEventHandler implements JEEventHandler {
 			return false;
 		return true;
 	}
-    
-    
 }

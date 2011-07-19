@@ -13,9 +13,10 @@ import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
+
 import config.GEISTSimpleWorkloadParser;
 
-public class OneTierSimulatorForPlanning extends OneTierSimulator implements JEEventHandler {
+public class OneTierSimulatorForPlanning extends SimpleSimulator implements JEEventHandler {
 	
 	private List<Request> workload;
 	public static long UTILIZATION_EVALUATION_PERIOD = 1000 * 60 * 5;//in millis
@@ -28,12 +29,10 @@ public class OneTierSimulatorForPlanning extends OneTierSimulator implements JEE
 	}
 	
 	@Override
-	public void start() {
-		//Scheduling first events
-		getScheduler().queueEvent(new JEEvent(JEEventType.READWORKLOAD, this, new JETime(0)));
-		getScheduler().queueEvent(new JEEvent(JEEventType.EVALUATEUTILIZATION, this.loadBalancer, new JETime(UTILIZATION_EVALUATION_PERIOD), UTILIZATION_EVALUATION_PERIOD));
+	protected void prepareBeforeStart() {
+		super.prepareBeforeStart();
+		send(new JEEvent(JEEventType.EVALUATEUTILIZATION, this.loadBalancer, new JETime(UTILIZATION_EVALUATION_PERIOD), UTILIZATION_EVALUATION_PERIOD));
 		this.loadBalancer.initOneMachine();
-		getScheduler().start();
 	}
 	
 	@Override

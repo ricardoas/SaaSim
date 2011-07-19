@@ -120,7 +120,6 @@ public class JEEventScheduler {
     /**
      * @return
      */
-    @Deprecated
     public JETime now() {
     	return now;
     }

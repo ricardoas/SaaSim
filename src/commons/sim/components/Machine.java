@@ -6,8 +6,8 @@ import java.util.List;
 
 import commons.cloud.Request;
 import commons.sim.OneTierSimulatorForPlanning;
-import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEAbstractEventHandler;
+import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
@@ -20,7 +20,7 @@ import commons.util.Triple;
  */
 public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	
-	private long machineID;
+	private final long machineID;
 	private boolean isReserved;
 	private double totalProcessed;
 	
@@ -51,6 +51,13 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 		this.isReserved = isReserved;
 	}
 	
+	/**
+	 * @return the machineID
+	 */
+	public long getMachineID() {
+		return machineID;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
