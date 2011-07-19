@@ -1,8 +1,13 @@
 package commons.config;
 
+import javax.management.RuntimeErrorException;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
+import commons.sim.ProfitDrivenScheduler;
+import commons.sim.RanjanScheduler;
+import commons.sim.schedulingheuristics.RoundRobinHeuristic;
 import commons.sim.util.SimpleApplicationFactory;
 import commons.sim.util.SimulatorProperties;
 
@@ -60,6 +65,28 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 	 */
 	public int getApplicationNumOfTiers() {
 		return Math.max(getInt(SimulatorProperties.APPLICATION_NUM_OF_TIERS, 1), 1);
+	}
+
+	/**
+	 * @return
+	 */
+	public String[] getApplicationHeuristics() {
+		String[] strings = getStringArray(SimulatorProperties.APPLICATION_HEURISTIC);
+		String customHeuristic = getString(SimulatorProperties.APPLICATION_CUSTOM_HEURISTIC);
+		for (int i = 0; i < strings.length; i++) {
+			if(strings[i].isEmpty() || strings[i].equalsIgnoreCase("ROUNDROBIN")){
+				strings[i] = RoundRobinHeuristic.class.getCanonicalName();
+			} else if(strings[i].equalsIgnoreCase("RANJAN")){
+				strings[i] = RanjanScheduler.class.getCanonicalName();
+			} else if(strings[i].equalsIgnoreCase("PROFITDRIVEN")){
+				strings[i] = ProfitDrivenScheduler.class.getCanonicalName();
+			} else if(strings[i].equalsIgnoreCase("CUSTOMIZED")){
+				strings[i] = customHeuristic;
+			} else {
+				throw new RuntimeException("Unsupported value for " + SimulatorProperties.APPLICATION_HEURISTIC + ": " + strings[i]);
+			}
+		}
+		return strings;
 	}
 	
 }
