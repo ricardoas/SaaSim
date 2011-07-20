@@ -19,4 +19,6 @@ public class SimulatorProperties {
 	public static final String DPS_HEURISTIC = "dps.heuristic";
 
 	public static final String DPS_CUSTOM_HEURISTIC = "dps.heuristicclass";
+
+	public static final String SETUP_TIME = "sim.setuptime";
 }

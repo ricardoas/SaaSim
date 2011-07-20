@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
 
+import provisioning.util.DPSFactory;
+
 import commons.cloud.Request;
 import commons.config.SimulatorConfiguration;
 import commons.config.WorkloadParser;
@@ -31,7 +33,7 @@ public class Main {
 		
 		Monitor monitor = null;
 		
-		DPS dps = null;
+		DPS dps = DPSFactory.INSTANCE.createDPS();
 		
 		WorkloadParser<List<Request>> parser = new GEISTSimpleWorkloadParser();
 		
@@ -42,6 +44,8 @@ public class Main {
 		dps.setConfigurable(simulator);
 		
 		simulator.start();
+		
+				
 	}
 
 }

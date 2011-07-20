@@ -162,4 +162,8 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 		return null;
 		
 	}
+
+	public long getSetUpTime() {
+		return Math.max(0, getLong(SimulatorProperties.SETUP_TIME, 0));
+	}
 }

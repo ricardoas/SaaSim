@@ -11,12 +11,15 @@ import java.util.Random;
 import provisioning.Monitor;
 
 import commons.cloud.Request;
+import commons.config.SimulatorConfiguration;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
+import commons.sim.jeevent.JETime;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
+import commons.sim.util.SimulatorProperties;
 
 /**
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
@@ -64,12 +67,12 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	/**
 	 * 
 	 */
-	public void addMachine(){
-		if(this.onDemandMachinesPool.size() > 0){
-			getServers().add(this.onDemandMachinesPool.remove(0));
-		}else{
-			getServers().add(new Machine(getScheduler(), new Random().nextLong()));
-		}
+	public void addServer(Machine server){
+		send(new JEEvent(JEEventType.ADD_SERVER, this, getServerUpTime(), server));
+	}
+	
+	private JETime getServerUpTime(){
+		return getScheduler().now().plus(new JETime(SimulatorConfiguration.getInstance().getSetUpTime()));
 	}
 	
 	/**
@@ -127,7 +130,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 				int onDemandResourcesAlreadyAdded = this.getServers().size() - this.reservedResourcesAmount;
 				numberOfMachinesToAdd = Math.min(numberOfMachinesToAdd, onDemandResourcesLimit - onDemandResourcesAlreadyAdded);
 				for(int i = 0; i < numberOfMachinesToAdd; i++){
-					this.addMachine();
+//					this.addMachine();
 				}
 			}
 		}else if(numberOfMachinesToAdd < 0){//Removing unused machines
@@ -166,7 +169,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 			int numberOfMachinesToAdd = 1;
 			addReservedMachines(numberOfMachinesToAdd);
 		}else{
-			this.addMachine();
+//			this.addMachine();
 		}
 	}
 
