@@ -4,6 +4,7 @@ import java.util.List;
 
 import commons.sim.Simulator;
 import commons.sim.components.Machine;
+import commons.sim.jeevent.JEEventHandler;
 
 /**
  * Dynamic Provisioning System
@@ -11,7 +12,7 @@ import commons.sim.components.Machine;
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public interface DPS {
+public interface DPS extends JEEventHandler{
 
 	void setConfigurable(Simulator simulator);
 
