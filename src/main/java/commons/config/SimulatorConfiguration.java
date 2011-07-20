@@ -21,14 +21,6 @@ import commons.sim.util.SimulatorProperties;
  */
 public class SimulatorConfiguration	extends PropertiesConfiguration{
 	
-	private enum AppHeuristicValues {
-		ROUNDROBIN, RANJAN, PROFITDRIVEN, CUSTOM
-	}
-	
-	private enum DPSHeuristicValues {
-		STATIC, RANJAN, PROFITDRIVEN, CUSTOM
-	}
-	
 	/**
 	 * Unique instance.
 	 */
@@ -153,17 +145,17 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 			switch (value) {
 			case STATIC:
 				return StaticProvisioningSystem.class;
-			case RANJAN:
-				return StaticProvisioningSystem.class;//FIXME
-			case PROFITDRIVEN:
-				return StaticProvisioningSystem.class;//FIXME
+//			case RANJAN:
+//				return StaticProvisioningSystem.class;//FIXME
+//			case PROFITDRIVEN:
+//				return StaticProvisioningSystem.class;//FIXME
 			case CUSTOM:
 				return Class.forName(customHeuristicClass);
 			}
 			
 		} catch (IllegalArgumentException iae) {
 			throw new ConfigurationRuntimeException("Unsupported value for " + 
-						SimulatorProperties.APPLICATION_HEURISTIC + ": " + heuristicName, iae);
+						SimulatorProperties.DPS_HEURISTIC + ": " + heuristicName, iae);
 		} catch (ClassNotFoundException e) {
 			throw new ConfigurationRuntimeException("Problem loading " + customHeuristicClass, e);
 		}
