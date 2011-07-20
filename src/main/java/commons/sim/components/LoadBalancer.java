@@ -39,16 +39,18 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	private SchedulingHeuristic heuristic;
 	private Queue<Request> requestsToBeProcessed;
 	private Monitor monitor;
+	private final int maxServersAllowed;
 	
 	/**
 	 * @param scheduler TODO
 	 * @param machine 
 	 * 
 	 */
-	public LoadBalancer(JEEventScheduler scheduler, Monitor monitor, SchedulingHeuristic heuristic, Machine... machines) {
+	public LoadBalancer(JEEventScheduler scheduler, Monitor monitor, SchedulingHeuristic heuristic, int maxServersAllowed, Machine... machines) {
 		super(scheduler);
 		this.monitor = monitor;
 		this.heuristic = heuristic;
+		this.maxServersAllowed = maxServersAllowed;
 		this.servers = new ArrayList<Machine>();
 		this.getServers().addAll(Arrays.asList(machines));
 		

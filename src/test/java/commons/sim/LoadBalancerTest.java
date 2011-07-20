@@ -49,7 +49,7 @@ public class LoadBalancerTest {
 		
 		EasyMock.replay(event, schedulingHeuristic, machine, request);
 		
-		lb = new LoadBalancer(eventScheduler, null, schedulingHeuristic, machine);
+		lb = new LoadBalancer(eventScheduler, null, schedulingHeuristic, Integer.MAX_VALUE, machine);
 		lb.handleEvent(event);
 		
 		EasyMock.verify(event, schedulingHeuristic, machine, request);
@@ -73,7 +73,7 @@ public class LoadBalancerTest {
 		
 		EasyMock.replay(event, schedulingHeuristic, request);
 		
-		lb = new LoadBalancer(eventScheduler, null, schedulingHeuristic);
+		lb = new LoadBalancer(eventScheduler, null, schedulingHeuristic, Integer.MAX_VALUE);
 		lb.handleEvent(event);
 		
 		EasyMock.verify(event, schedulingHeuristic, request);

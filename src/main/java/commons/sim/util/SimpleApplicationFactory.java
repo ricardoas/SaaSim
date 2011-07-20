@@ -1,5 +1,7 @@
 package commons.sim.util;
 
+import java.util.List;
+
 import provisioning.Monitor;
 
 import commons.config.SimulatorConfiguration;
@@ -13,20 +15,23 @@ import commons.sim.schedulingheuristics.SchedulingHeuristic;
  *
  */
 public class SimpleApplicationFactory extends ApplicationFactory {
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public LoadBalancer createNewApplication(JEEventScheduler scheduler,
-			Monitor monitor) {
+			Monitor monitor, List<Machine> setupMachines) {
 		SimulatorConfiguration config = SimulatorConfiguration.getInstance();
 		int numOfTiers = config.getApplicationNumOfTiers();
 		String[] heuristicClassName = config.getApplicationHeuristics();
-		LoadBalancer entryPoint = buildLoadBalancer(scheduler, monitor, heuristicClassName[0]);
+		int [] serverPerTier = config.getApplicationInitialServersPerTier();
+		int [] maxServerPerTier = config.getApplicationMaxServersPerTier();
+		
+		LoadBalancer entryPoint = buildLoadBalancer(scheduler, monitor, heuristicClassName[0], serverPerTier[0], maxServerPerTier[0], setupMachines);
 		LoadBalancer currentTier = entryPoint;
 		for (int i = 1; i < numOfTiers; i++) {
-			LoadBalancer nextTier = buildLoadBalancer(scheduler, monitor, heuristicClassName[i]);
+			LoadBalancer nextTier = buildLoadBalancer(scheduler, monitor, heuristicClassName[i], serverPerTier[i], maxServerPerTier[i], setupMachines);
 			linkTiers(currentTier, nextTier);
 			currentTier = nextTier;
 		}
@@ -47,12 +52,21 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 	 * @param scheduler
 	 * @param monitor
 	 * @param heuristicClassName
+	 * @param serverPerTier 
+	 * @param maxServerPerTier 
+	 * @param setupMachines 
 	 * @return
 	 */
 	private LoadBalancer buildLoadBalancer(JEEventScheduler scheduler, Monitor monitor,
-			String heuristicClassName) {
+			String heuristicClassName, int serverPerTier, int maxServerPerTier, List<Machine> setupMachines) {
 		try {
-			return new LoadBalancer(scheduler, monitor, (SchedulingHeuristic) Class.forName(heuristicClassName).newInstance());
+			Machine [] servers = new Machine[serverPerTier];
+			for (int i = 0; i < servers.length; i++) {
+				servers[i] = setupMachines.remove(0);
+			}
+			return new LoadBalancer(scheduler, monitor, 
+					(SchedulingHeuristic) Class.forName(heuristicClassName).newInstance(), 
+					maxServerPerTier, servers);
 		} catch (Exception e) {
 			throw new RuntimeException("Something went wrong when loading "+ heuristicClassName, e);
 		}

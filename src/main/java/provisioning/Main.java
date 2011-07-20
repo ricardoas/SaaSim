@@ -10,6 +10,7 @@ import commons.config.WorkloadParser;
 import commons.sim.SimpleSimulator;
 import commons.sim.Simulator;
 import commons.sim.jeevent.JEEventScheduler;
+import config.GEISTSimpleWorkloadParser;
 
 /**
  * 
@@ -31,9 +32,9 @@ public class Main {
 		
 		DPS dps = null;
 		
-		WorkloadParser<List<Request>> parser = null;
+		WorkloadParser<List<Request>> parser = new GEISTSimpleWorkloadParser();
 		
-		Simulator simulator = new SimpleSimulator(scheduler, monitor, parser);
+		Simulator simulator = new SimpleSimulator(scheduler, monitor, parser, dps.getSetupMachines());
 		
 		monitor.setDPS(dps);
 		

@@ -6,7 +6,6 @@ import java.util.List;
 import provisioning.Monitor;
 
 import commons.cloud.Request;
-import commons.sim.components.LoadBalancer;
 import commons.sim.components.Machine;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventHandler;
@@ -21,18 +20,18 @@ public class OneTierSimulatorForPlanning extends SimpleSimulator implements JEEv
 	private List<Request> workload;
 	public static long UTILIZATION_EVALUATION_PERIOD = 1000 * 60 * 5;//in millis
 	
-	public OneTierSimulatorForPlanning(JEEventScheduler scheduler, Monitor monitor, List<Request> workload, double sla){
-		super(scheduler, monitor, new GEISTSimpleWorkloadParser(""));
-		this.workload = workload;
-//		this.loadBalancer = new LoadBalancer(scheduler, monitor, new RanjanScheduler());
-		this.loadBalancer = new LoadBalancer(scheduler, monitor, new ProfitDrivenScheduler(sla));
+	public OneTierSimulatorForPlanning(JEEventScheduler scheduler, Monitor monitor, List<Request> workload, 
+			double sla, List<Machine> setUpMachines){
+		super(scheduler, monitor, new GEISTSimpleWorkloadParser(), setUpMachines);
+		this.workload = workload;// FIXME por que workload direto e não o parser? Vai ter como ler toda a workload antes?
+//		this.loadBalancer = new LoadBalancer(scheduler, monitor, new RanjanScheduler()); TODO acho que essas linhas podem ser deletadas.
+//		this.loadBalancer = new LoadBalancer(scheduler, monitor, new ProfitDrivenScheduler(sla));
 	}
 	
 	@Override
 	protected void prepareBeforeStart() {
 		super.prepareBeforeStart();
 		send(new JEEvent(JEEventType.EVALUATEUTILIZATION, this.loadBalancer, new JETime(UTILIZATION_EVALUATION_PERIOD), UTILIZATION_EVALUATION_PERIOD));
-		this.loadBalancer.initOneMachine();
 	}
 	
 	@Override
@@ -84,44 +83,4 @@ public class OneTierSimulatorForPlanning extends SimpleSimulator implements JEEv
 		}
 		return reservedResources;
 	}
-	
-	//TODO: Remove from here
-//	public static void main(String[] args) {
-//		Map<User, List<Request>> val;
-//		List<Request> workload = new ArrayList<Request>();
-//		try {
-//			val = next();
-//			for(User user : val.keySet()){
-//				workload.addAll(val.get(user));
-//			}
-//			OneTierSimulatorForPlanning sim = new OneTierSimulatorForPlanning(workload);
-//			sim.start();
-//			System.out.println(sim.loadBalancer.servers.size());
-//		} catch (IOException e) {
-//		}
-//	}
-//	
-//	public static Map<User, List<Request>> next() throws IOException {
-//		HashMap<User, List<Request>> currentWorkload = new HashMap<User, List<Request>>();
-//		int nextMonth = Integer.MAX_VALUE;
-//		
-//			BufferedReader reader = new BufferedReader(new FileReader(new File("power.trc")));
-//			while(reader.ready()){
-//				String[] eventData = reader.readLine().trim().split("( +|\t+)+");//Assuming: clientID, userID, reqID, time, bytes, has expired, http op., URL, demand
-//				Request request = new Request(eventData[0], eventData[1], eventData[3], Math.round(Double.valueOf(eventData[4])), 
-//						Long.valueOf(eventData[5]), true, eventData[7], eventData[8], 1000 * 60 * 15 );
-//				
-//				//Adding new event to its corresponding user
-//				User user = new User(eventData[1]);//Users are identified uniquely by their ids
-//				List<Request> userWorkload = currentWorkload.get(user);
-//				if(userWorkload == null){
-//					userWorkload = new ArrayList<Request>();
-//					currentWorkload.put(user, userWorkload);
-//				}
-//				userWorkload.add(request);
-//			}
-//	    return currentWorkload;
-//	}
-//
-
 }

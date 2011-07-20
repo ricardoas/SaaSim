@@ -10,8 +10,10 @@ public class SimulatorProperties {
 	public static final String APPLICATION_HEURISTIC = "sim.application.heuristic";
 
 	public static final String APPLICATION_CUSTOM_HEURISTIC = "sim.application.heuristicclass";
-	
-	
-	
-	
+
+	public static final String APPLICATION_INITIAL_SERVER_PER_TIER = "sim.application.startreplicas";
+
+	public static final String APPLICATION_MAX_SERVER_PER_TIER = "sim.application.maxreplicas";
+
+	public static final String WORKLOAD_PATH = "workload.file";
 }

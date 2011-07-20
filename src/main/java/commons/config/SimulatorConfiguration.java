@@ -1,6 +1,6 @@
 package commons.config;
 
-import javax.management.RuntimeErrorException;
+import java.util.Arrays;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -89,4 +89,35 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 		return strings;
 	}
 	
+	public int[] getApplicationInitialServersPerTier() {
+		String[] stringArray = getStringArray(SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER);
+		if(getApplicationNumOfTiers() != stringArray.length){
+			throw new RuntimeException("Check number of values in " + 
+					SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER + ". It must be equals to what is specified at" + 
+					SimulatorProperties.APPLICATION_NUM_OF_TIERS);
+		}
+		int [] serversPerTier = new int[stringArray.length];
+		for (int i = 0; i < serversPerTier.length; i++) {
+			serversPerTier[i] = Math.max(1, Integer.valueOf(stringArray[i]));
+		}
+		return serversPerTier;
+	}
+
+	public int[] getApplicationMaxServersPerTier() {
+		String[] stringArray = getStringArray(SimulatorProperties.APPLICATION_MAX_SERVER_PER_TIER);
+		if(stringArray.length == 0){
+			stringArray = new String[getApplicationNumOfTiers()];
+			Arrays.fill(stringArray, "");
+		}
+		if(getApplicationNumOfTiers() != stringArray.length){
+			throw new RuntimeException("Check number of values in " + 
+					SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER + ". It must be equals to what is specified at" + 
+					SimulatorProperties.APPLICATION_NUM_OF_TIERS);
+		}
+		int [] serversPerTier = new int[stringArray.length];
+		for (int i = 0; i < serversPerTier.length; i++) {
+			serversPerTier[i] = Math.max(1, Integer.valueOf(stringArray[i].isEmpty()? "1": stringArray[i]));
+		}
+		return serversPerTier;
+	}
 }

@@ -53,7 +53,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 			workload.addAll(entry.getValue());
 		}
 		//Starting simulation data to start a new simulation
-		this.simulator = new OneTierSimulatorForPlanning(new JEEventScheduler(), null, workload, this.sla);
+		this.simulator = new OneTierSimulatorForPlanning(new JEEventScheduler(), null, workload, this.sla, null);//FIXME remove null (dont know how)
 		this.simulator.setOnDemandResourcesLimit(this.cloudProvider.onDemandLimit);
 		this.simulator.setNumberOfReservedResources(reservedResources);
 	}

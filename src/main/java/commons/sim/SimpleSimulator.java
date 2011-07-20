@@ -8,6 +8,7 @@ import provisioning.Monitor;
 import commons.cloud.Request;
 import commons.config.WorkloadParser;
 import commons.sim.components.LoadBalancer;
+import commons.sim.components.Machine;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventHandler;
@@ -28,12 +29,13 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	/**
 	 * Constructor
 	 * @param scheduler TODO
+	 * @param list 
 	 */
-	public SimpleSimulator(JEEventScheduler scheduler, Monitor monitor, WorkloadParser<List<Request>> parser) {
+	public SimpleSimulator(JEEventScheduler scheduler, Monitor monitor, WorkloadParser<List<Request>> parser, List<Machine> setupMachines) {
 		super(scheduler);
 		this.monitor = monitor;
 		this.workloadParser = parser;
-		this.loadBalancer = ApplicationFactory.getInstance().createNewApplication(scheduler, monitor);
+		this.loadBalancer = ApplicationFactory.getInstance().createNewApplication(scheduler, monitor, setupMachines);
 	}
 	
 	/**

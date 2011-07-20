@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import commons.cloud.Request;
+import commons.config.SimulatorConfiguration;
 import commons.config.WorkloadParser;
+import commons.sim.util.SimulatorProperties;
 
 /**
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
@@ -26,12 +28,12 @@ public class GEISTSimpleWorkloadParser implements WorkloadParser<List<Request>> 
 	/**
 	 * @param workloadFileName
 	 */
-	public GEISTSimpleWorkloadParser(String workloadFileName) {
+	public GEISTSimpleWorkloadParser() {
 		
 		try {
-			reader = new BufferedReader(new FileReader(workloadFileName));
+			reader = new BufferedReader(new FileReader(SimulatorConfiguration.getInstance().getString(SimulatorProperties.WORKLOAD_PATH)));
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			throw new RuntimeException("Problem reading workload file.", e);
 		}
 	}
 

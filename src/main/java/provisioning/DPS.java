@@ -1,6 +1,9 @@
 package provisioning;
 
+import java.util.List;
+
 import commons.sim.Simulator;
+import commons.sim.components.Machine;
 
 /**
  * Dynamic Provisioning System
@@ -11,5 +14,7 @@ import commons.sim.Simulator;
 public interface DPS {
 
 	void setConfigurable(Simulator simulator);
+
+	List<Machine> getSetupMachines();
 
 }

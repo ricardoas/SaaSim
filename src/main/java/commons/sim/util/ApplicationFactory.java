@@ -1,9 +1,12 @@
 package commons.sim.util;
 
+import java.util.List;
+
 import provisioning.Monitor;
 
 import commons.config.SimulatorConfiguration;
 import commons.sim.components.LoadBalancer;
+import commons.sim.components.Machine;
 import commons.sim.jeevent.JEEventScheduler;
 
 /**
@@ -40,7 +43,8 @@ public abstract class ApplicationFactory {
 	 * 
 	 * @param scheduler
 	 * @param monitor
+	 * @param setupMachines 
 	 * @return
 	 */
-	public abstract LoadBalancer createNewApplication(JEEventScheduler scheduler, Monitor monitor);
+	public abstract LoadBalancer createNewApplication(JEEventScheduler scheduler, Monitor monitor, List<Machine> setupMachines);
 }
