@@ -3,7 +3,10 @@ package commons.config;
 import java.util.Arrays;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.ConfigurationRuntimeException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+
+import provisioning.StaticProvisioningSystem;
 
 import commons.sim.ProfitDrivenScheduler;
 import commons.sim.RanjanScheduler;
@@ -18,6 +21,13 @@ import commons.sim.util.SimulatorProperties;
  */
 public class SimulatorConfiguration	extends PropertiesConfiguration{
 	
+	private enum AppHeuristicValues {
+		ROUNDROBIN, RANJAN, PROFITDRIVEN, CUSTOM
+	}
+	
+	private enum DPSHeuristicValues {
+		STATIC, RANJAN, PROFITDRIVEN, CUSTOM
+	}
 	
 	/**
 	 * Unique instance.
@@ -70,29 +80,43 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 	/**
 	 * @return
 	 */
-	public String[] getApplicationHeuristics() {
+	public Class<?>[] getApplicationHeuristics() {
 		String[] strings = getStringArray(SimulatorProperties.APPLICATION_HEURISTIC);
 		String customHeuristic = getString(SimulatorProperties.APPLICATION_CUSTOM_HEURISTIC);
+		Class<?> [] heuristicClasses = new Class<?>[strings.length]; 
 		for (int i = 0; i < strings.length; i++) {
-			if(strings[i].isEmpty() || strings[i].equalsIgnoreCase("ROUNDROBIN")){
-				strings[i] = RoundRobinHeuristic.class.getCanonicalName();
-			} else if(strings[i].equalsIgnoreCase("RANJAN")){
-				strings[i] = RanjanScheduler.class.getCanonicalName();
-			} else if(strings[i].equalsIgnoreCase("PROFITDRIVEN")){
-				strings[i] = ProfitDrivenScheduler.class.getCanonicalName();
-			} else if(strings[i].equalsIgnoreCase("CUSTOMIZED")){
-				strings[i] = customHeuristic;
-			} else {
-				throw new RuntimeException("Unsupported value for " + SimulatorProperties.APPLICATION_HEURISTIC + ": " + strings[i]);
+			if(strings[i].isEmpty()){
+				strings[i] = AppHeuristicValues.ROUNDROBIN.name();
+			}
+			AppHeuristicValues value = AppHeuristicValues.valueOf(strings[i]);
+			switch (value) {
+			case ROUNDROBIN:
+				heuristicClasses[i] = RoundRobinHeuristic.class;
+				break;
+			case RANJAN:
+				heuristicClasses[i] = RanjanScheduler.class;
+				break;
+			case PROFITDRIVEN:
+				heuristicClasses[i] = ProfitDrivenScheduler.class;
+				break;
+			case CUSTOM:
+				try {
+					heuristicClasses[i] = Class.forName(customHeuristic);
+				} catch (ClassNotFoundException e) {
+					throw new ConfigurationRuntimeException("Problem loading " + customHeuristic, e);
+				}
+				break;
+			default:
+				throw new ConfigurationRuntimeException("Unsupported value for " + SimulatorProperties.APPLICATION_HEURISTIC + ": " + strings[i]);
 			}
 		}
-		return strings;
+		return heuristicClasses;
 	}
 	
 	public int[] getApplicationInitialServersPerTier() {
 		String[] stringArray = getStringArray(SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER);
 		if(getApplicationNumOfTiers() != stringArray.length){
-			throw new RuntimeException("Check number of values in " + 
+			throw new ConfigurationRuntimeException("Check number of values in " + 
 					SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER + ". It must be equals to what is specified at" + 
 					SimulatorProperties.APPLICATION_NUM_OF_TIERS);
 		}
@@ -110,7 +134,7 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 			Arrays.fill(stringArray, "");
 		}
 		if(getApplicationNumOfTiers() != stringArray.length){
-			throw new RuntimeException("Check number of values in " + 
+			throw new ConfigurationRuntimeException("Check number of values in " + 
 					SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER + ". It must be equals to what is specified at" + 
 					SimulatorProperties.APPLICATION_NUM_OF_TIERS);
 		}
@@ -119,5 +143,31 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 			serversPerTier[i] = Math.max(1, Integer.valueOf(stringArray[i].isEmpty()? "1": stringArray[i]));
 		}
 		return serversPerTier;
+	}
+
+	public Class<?> getDPSHeuristicClass() {
+		String heuristicName = getString(SimulatorProperties.DPS_HEURISTIC);
+		String customHeuristicClass = getString(SimulatorProperties.DPS_CUSTOM_HEURISTIC);
+		try{
+			DPSHeuristicValues value = DPSHeuristicValues.valueOf(heuristicName);
+			switch (value) {
+			case STATIC:
+				return StaticProvisioningSystem.class;
+			case RANJAN:
+				return StaticProvisioningSystem.class;//FIXME
+			case PROFITDRIVEN:
+				return StaticProvisioningSystem.class;//FIXME
+			case CUSTOM:
+				return Class.forName(customHeuristicClass);
+			}
+			
+		} catch (IllegalArgumentException iae) {
+			throw new ConfigurationRuntimeException("Unsupported value for " + 
+						SimulatorProperties.APPLICATION_HEURISTIC + ": " + heuristicName, iae);
+		} catch (ClassNotFoundException e) {
+			throw new ConfigurationRuntimeException("Problem loading " + customHeuristicClass, e);
+		}
+		return null;
+		
 	}
 }

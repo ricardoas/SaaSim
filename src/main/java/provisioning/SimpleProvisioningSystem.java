@@ -4,18 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import commons.config.SimulatorConfiguration;
-import commons.sim.Simulator;
 import commons.sim.components.Machine;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 
-public class StaticProvisioningSystem extends JEAbstractEventHandler implements DPS{
+public class SimpleProvisioningSystem extends JEAbstractEventHandler implements DPS{
 
 	private long availableIDs;
-	private Simulator simulator;
+	private DynamicallyConfigurable configurable;
+	
 
-	public StaticProvisioningSystem(JEEventScheduler scheduler) {
+	public SimpleProvisioningSystem(JEEventScheduler scheduler) {
 		super(scheduler);
 		availableIDs = 0;
 	}
@@ -41,8 +41,7 @@ public class StaticProvisioningSystem extends JEAbstractEventHandler implements 
 
 	@Override
 	public void setConfigurable(DynamicallyConfigurable configurable) {
-		// TODO Auto-generated method stub
-		
+		this.configurable = configurable;
 	}
 
 }

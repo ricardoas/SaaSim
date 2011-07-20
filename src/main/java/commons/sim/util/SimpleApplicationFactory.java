@@ -24,14 +24,14 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 			Monitor monitor, List<Machine> setupMachines) {
 		SimulatorConfiguration config = SimulatorConfiguration.getInstance();
 		int numOfTiers = config.getApplicationNumOfTiers();
-		String[] heuristicClassName = config.getApplicationHeuristics();
+		Class<?>[] heuristicClasses = config.getApplicationHeuristics();
 		int [] serverPerTier = config.getApplicationInitialServersPerTier();
 		int [] maxServerPerTier = config.getApplicationMaxServersPerTier();
 		
-		LoadBalancer entryPoint = buildLoadBalancer(scheduler, monitor, heuristicClassName[0], serverPerTier[0], maxServerPerTier[0], setupMachines);
+		LoadBalancer entryPoint = buildLoadBalancer(scheduler, monitor, heuristicClasses[0], serverPerTier[0], maxServerPerTier[0], setupMachines);
 		LoadBalancer currentTier = entryPoint;
 		for (int i = 1; i < numOfTiers; i++) {
-			LoadBalancer nextTier = buildLoadBalancer(scheduler, monitor, heuristicClassName[i], serverPerTier[i], maxServerPerTier[i], setupMachines);
+			LoadBalancer nextTier = buildLoadBalancer(scheduler, monitor, heuristicClasses[i], serverPerTier[i], maxServerPerTier[i], setupMachines);
 			linkTiers(currentTier, nextTier);
 			currentTier = nextTier;
 		}
@@ -51,24 +51,24 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 	/**
 	 * @param scheduler
 	 * @param monitor
-	 * @param heuristicClassName
+	 * @param heuristic
 	 * @param serverPerTier 
 	 * @param maxServerPerTier 
 	 * @param setupMachines 
 	 * @return
 	 */
 	private LoadBalancer buildLoadBalancer(JEEventScheduler scheduler, Monitor monitor,
-			String heuristicClassName, int serverPerTier, int maxServerPerTier, List<Machine> setupMachines) {
+			Class<?> heuristic, int serverPerTier, int maxServerPerTier, List<Machine> setupMachines) {
 		try {
 			Machine [] servers = new Machine[serverPerTier];
 			for (int i = 0; i < servers.length; i++) {
 				servers[i] = setupMachines.remove(0);
 			}
 			return new LoadBalancer(scheduler, monitor, 
-					(SchedulingHeuristic) Class.forName(heuristicClassName).newInstance(), 
+					(SchedulingHeuristic) heuristic.newInstance(), 
 					maxServerPerTier, servers);
 		} catch (Exception e) {
-			throw new RuntimeException("Something went wrong when loading "+ heuristicClassName, e);
+			throw new RuntimeException("Something went wrong when loading "+ heuristic, e);
 		}
 	}
 
