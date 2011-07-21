@@ -71,7 +71,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 				if (workloadParser.hasNext()) {
 					List<Request> list = workloadParser.next();
 					for (Request request : list) {
-						getScheduler().queueEvent(parseEvent(request));
+						send(parseEvent(request));
 					}
 				}
 			} catch (IOException e) {

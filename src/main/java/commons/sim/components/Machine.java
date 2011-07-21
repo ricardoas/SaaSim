@@ -32,6 +32,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	
 	public int numberOfRequestsCompletionsInPreviousInterval;
 	public int numberOfRequestsArrivalsInPreviousInterval;
+	private boolean shutdownOnFinish;
 	
 	/**
 	 * @param machineID
@@ -251,5 +252,9 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 
 	public double getTotalProcessed() {
 		return totalProcessed;
+	}
+
+	public void shutdownOnFinish() {
+		this.shutdownOnFinish = true;
 	}
 }

@@ -19,7 +19,6 @@ import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
-import commons.sim.util.SimulatorProperties;
 
 /**
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
@@ -78,16 +77,17 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	/**
 	 * 
 	 */
-	public void removeMachine(){
-		getServers().remove(getServers().size()-1);
+	public void removeMachine(Machine server, boolean force){
+		if(force){
+			queueEvents(server);
+		}else{
+			servers.remove(server);
+			server.shutdownOnFinish();
+//			send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this, scheduledTime, value))
+		}
 	}
 
-	/**
-	 * 
-	 * @param request
-	 */
-	public void run(Request... request) {
-//		heuristic.nextServer();
+	private void queueEvents(Machine server) {
 	}
 
 	/**
@@ -101,17 +101,24 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 			Machine nextServer = heuristic.getNextServer(request, getServers());
 			if(nextServer != null){//Reusing an existent machine
 				nextServer.sendRequest(request);
-			}else{//Creating a new one
-				getScheduler().queueEvent(new JEEvent(JEEventType.REQUESTQUEUED, monitor, getScheduler().now(), request));
-//				this.manageMachines(1);
-//				Machine machine = this.servers.get(this.servers.size()-1);//Retrieving new machine added
-//				machine.sendRequest(request);
+			}else{
+				send(new JEEvent(JEEventType.REQUESTQUEUED, monitor, getScheduler().now(), request));
 			}
 			break;
 		case EVALUATEUTILIZATION://RANJAN Scheduler
 			Long eventTime = (Long) event.getValue()[0];
 			int numberOfMachinesToAdd = heuristic.evaluateUtilization(getServers(), eventTime);
 			this.manageMachines(numberOfMachinesToAdd);
+			break;
+		case ADD_SERVER:
+			Machine newServer = (Machine) event.getValue()[0];
+			getServers().add(newServer);
+			for (Request queuedRequest : requestsToBeProcessed) {
+				send(new JEEvent(JEEventType.NEWREQUEST, this, getScheduler().now(), queuedRequest));
+			}
+			break;
+		case MACHINE_TURNED_OFF:
+//			send()
 			break;
 		default:
 			break;
