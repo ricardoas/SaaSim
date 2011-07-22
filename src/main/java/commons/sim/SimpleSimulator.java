@@ -18,7 +18,7 @@ import commons.sim.jeevent.JETime;
 import commons.sim.util.ApplicationFactory;
 
 /**
- * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public class SimpleSimulator extends JEAbstractEventHandler implements Simulator, JEEventHandler{
 
@@ -89,7 +89,6 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 * @return
 	 */
 	protected JEEvent parseEvent(Request request) {
-		
 		return new JEEvent(JEEventType.NEWREQUEST, loadBalancer, new JETime(request.time), request);
 	}
 }

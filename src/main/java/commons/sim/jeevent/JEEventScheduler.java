@@ -11,7 +11,7 @@ import java.util.TreeSet;
  * TODO make doc
  *
  * @author thiago - thiago@lsd.ufcg.edu.br
- * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public class JEEventScheduler {
 	

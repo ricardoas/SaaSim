@@ -13,7 +13,7 @@ import commons.sim.jeevent.JEEventScheduler;
  * Factory to encapsulate Application creation. An application is composed of tiers, each
  * represented by a load balancer linked to pool of servers.
  *  
- * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public abstract class ApplicationFactory {
 	

@@ -5,7 +5,7 @@ import commons.sim.jeevent.JEEventHandler;
 /**
  * 
  * 
- * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
 public interface Monitor extends JEEventHandler{

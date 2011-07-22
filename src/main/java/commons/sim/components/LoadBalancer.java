@@ -21,7 +21,7 @@ import commons.sim.jeevent.JETime;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
 
 /**
- * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
 public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandler{
@@ -118,7 +118,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 			}
 			break;
 		case MACHINE_TURNED_OFF:
-//			send()
+			send(new JEEvent(event, monitor));
 			break;
 		default:
 			break;
@@ -167,16 +167,6 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 		this.reservedResourcesAmount = amount;
 		for(int i = 0; i < amount; i++){
 			this.reservedMachinesPool.add(new Machine(getScheduler(), new Random().nextLong(), true));
-		}
-	}
-
-	@Deprecated
-	public void initOneMachine() {
-		if(this.reservedMachinesPool.size() > 0){
-			int numberOfMachinesToAdd = 1;
-			addReservedMachines(numberOfMachinesToAdd);
-		}else{
-//			this.addMachine();
 		}
 	}
 

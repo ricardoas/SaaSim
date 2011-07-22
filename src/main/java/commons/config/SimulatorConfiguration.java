@@ -16,7 +16,7 @@ import commons.sim.util.SimulatorProperties;
 
 
 /**
- * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
 public class SimulatorConfiguration	extends PropertiesConfiguration{

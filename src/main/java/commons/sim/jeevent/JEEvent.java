@@ -3,6 +3,7 @@
  */
 package commons.sim.jeevent;
 
+
 /**
  * TODO make doc
  *
@@ -39,6 +40,14 @@ public class JEEvent implements Comparable<JEEvent>{
     }
     
     /**
+     * @param event
+     * @param targetHandler
+     */
+    public JEEvent(JEEvent event, JEEventHandler targetHandler) {
+		this(event.getType(), targetHandler, event.getScheduledTime(), event.getValue());
+	}
+
+	/**
      * @return
      */
     public Integer getTargetHandlerId() {

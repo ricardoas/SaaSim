@@ -7,7 +7,7 @@ import provisioning.DynamicallyConfigurable;
  * Defines simulator operations. All simulators are dynamically 
  * configurable entities.
  * 
- * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public interface Simulator extends DynamicallyConfigurable{
 	
