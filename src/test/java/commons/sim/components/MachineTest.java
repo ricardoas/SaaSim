@@ -44,8 +44,8 @@ public class MachineTest {
 		
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(request.getDemand()).andReturn(600000L).once();
-		EasyMock.replay(request);
-		PowerMock.replay(scheduler);
+		EasyMock.replay(request, scheduler);
+//		PowerMock.replay(scheduler);
 		
 		machine = new Machine(scheduler, 1);
 		machine.sendRequest(request);
@@ -54,22 +54,14 @@ public class MachineTest {
 		
 		assertFalse(queue.isEmpty());
 		assertEquals(request, queue.get(0));
-		EasyMock.verify(request);
-		PowerMock.verify(scheduler);
+		EasyMock.verify(request, scheduler);
+//		PowerMock.verify(scheduler);
 	}
 	
 	@Test
-	public void sendTwoIdenticalRequestsAtSameTime(){
-		scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
-		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(Machine.class))).andReturn(1);
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(2);
-		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
-		EasyMock.expectLastCall();
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(3);
-		scheduler.cancelEvent(EasyMock.isA(JEEvent.class));
-		EasyMock.expectLastCall();
-		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
-		EasyMock.expectLastCall();
+	public void sendTwoIdenticalRequestsAtSameTime() throws Exception{
+		scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
+		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(7);
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(firstRequest.getDemand()).andReturn(600000L).once();
@@ -100,9 +92,9 @@ public class MachineTest {
 	}
 	
 	@Test
-	public void sendDifferentRequestsAtSameTime(){
-		scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
-		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(Machine.class))).andReturn(1);
+	public void sendDifferentRequestsAtSameTime() throws Exception{
+		scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
+		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(7);
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(firstRequest.getDemand()).andReturn(600000L).once();
@@ -110,7 +102,6 @@ public class MachineTest {
 
 		Request secondRequest = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(secondRequest.getDemand()).andReturn(300000L).once();
-		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(0L).once();
 
 		EasyMock.replay(scheduler, firstRequest, secondRequest);
 		
@@ -123,33 +114,27 @@ public class MachineTest {
 		assertFalse(queue.isEmpty());
 		Request firstRequestAtQueue = queue.get(0);
 		assertEquals(firstRequest, firstRequestAtQueue);
-		assertEquals(600000L, firstRequestAtQueue.getTotalToProcess());
 		
 		Request secondRequestAtQueue = queue.get(1);
 		assertEquals(secondRequest, secondRequestAtQueue);
-		assertEquals(300000L, secondRequestAtQueue.getTotalToProcess());
 		
 		EasyMock.verify(scheduler, firstRequest, secondRequest);
 	}
 	
 	@Test
-	public void sendTwoIdenticalRequestsAtDifferentOverlappingTimes(){
-		scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
-		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(Machine.class))).andReturn(1);
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(0L));
-		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(100000L));
+	public void sendTwoIdenticalRequestsAtDifferentOverlappingTimes() throws Exception{
+		scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
+		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(3);
+		EasyMock.expect(scheduler.now()).andReturn(new JETime(100000L)).times(4);
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(firstRequest.getDemand()).andReturn(600000L).once();
 		firstRequest.update(100000L);
 		EasyMock.expectLastCall();
-		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(0L).once();
-		
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(500000L).once();
 
 		Request secondRequest = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(secondRequest.getDemand()).andReturn(600000L).once();
-		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(0L).once();
 
 		EasyMock.replay(scheduler, firstRequest, secondRequest);
 		
@@ -163,11 +148,11 @@ public class MachineTest {
 		assertFalse(queue.isEmpty());
 		Request firstRequestAtQueue = queue.get(0);
 		assertEquals(firstRequest, firstRequestAtQueue);
-		assertEquals(500000L, firstRequestAtQueue.getTotalToProcess());
+//		assertEquals(500000L, firstRequestAtQueue.getTotalToProcess());
 		
 		Request secondRequestAtQueue = queue.get(1);
 		assertEquals(secondRequest, secondRequestAtQueue);
-		assertEquals(0, secondRequestAtQueue.getTotalToProcess());
+//		assertEquals(0, secondRequestAtQueue.getTotalToProcess());
 		
 		EasyMock.verify(scheduler, firstRequest, secondRequest);
 	}

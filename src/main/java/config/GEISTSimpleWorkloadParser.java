@@ -81,11 +81,11 @@ public class GEISTSimpleWorkloadParser implements WorkloadParser<List<Request>> 
 		if(temp == null){
 			readNext();
 		}
-		int currentHour = (int) (temp.time/HOUR_IN_MILLIS);
+		int currentHour = (int) (temp.getTimeInMillis()/HOUR_IN_MILLIS);
 		do{
 			requests.add(temp);
 			readNext();
-		}while(temp != null && currentHour != (int)(temp.time/HOUR_IN_MILLIS));
+		}while(temp != null && currentHour != (int)(temp.getTimeInMillis()/HOUR_IN_MILLIS));
 		
 		return requests;
 	}

@@ -37,10 +37,10 @@ public class RanjanScheduler implements SchedulingHeuristic {
 				this.roundRobinIndex++;
 				
 				//Updating times
-				Long lastRequestTime = this.lastRequestTimes.get(request.userID);
-				this.lastRequestTimes.put(request.userID, request.time);
+				Long lastRequestTime = this.lastRequestTimes.get(request.getUserID());
+				this.lastRequestTimes.put(request.getUserID(), request.getTimeInMillis());
 				this.serversOfLastRequests.remove(lastRequestTime);
-				this.serversOfLastRequests.put(request.time, nextServer);
+				this.serversOfLastRequests.put(request.getTimeInMillis(), nextServer);
 				
 				return nextServer;
 			}else{
@@ -50,12 +50,12 @@ public class RanjanScheduler implements SchedulingHeuristic {
 	}
 
 	private Machine getServerOfPreviousRequestInSession(Request request) {
-		Long lastRequestTime = this.lastRequestTimes.get(request.userID);
-		if(lastRequestTime != null && request.time - lastRequestTime <= SESSION_LIMIT){
-			this.lastRequestTimes.put(request.userID, request.time);
+		Long lastRequestTime = this.lastRequestTimes.get(request.getUserID());
+		if(lastRequestTime != null && request.getTimeInMillis() - lastRequestTime <= SESSION_LIMIT){
+			this.lastRequestTimes.put(request.getUserID(), request.getTimeInMillis());
 			Machine lastMachine = this.serversOfLastRequests.get(lastRequestTime);
 			this.serversOfLastRequests.remove(lastRequestTime);
-			this.serversOfLastRequests.put(request.time, lastMachine);
+			this.serversOfLastRequests.put(request.getTimeInMillis(), lastMachine);
 			return lastMachine;
 		}
 		return null;

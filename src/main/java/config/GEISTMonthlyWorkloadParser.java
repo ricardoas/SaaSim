@@ -74,7 +74,7 @@ public class GEISTMonthlyWorkloadParser implements WorkloadParser<Map<User, List
 						Long.valueOf(eventData[4]), (eventData[5].contains("1")) ? true : false, eventData[6], eventData[7], Long.valueOf(eventData[8]) );
 				
 				//Adding new event to its corresponding user
-				int monthOfEvent = getMonthOfEvent(request.time);
+				int monthOfEvent = getMonthOfEvent(request.getTimeInMillis());
 				if(monthOfEvent == this.currentMonth){//An event of current iteration was found
 					User user = new User(eventData[1]);//Users are identified uniquely by their ids
 					List<Request> userWorkload = currentWorkload.get(user);
@@ -118,7 +118,7 @@ public class GEISTMonthlyWorkloadParser implements WorkloadParser<Map<User, List
 						Long.valueOf(eventData[4]), (eventData[5].contains("1")) ? true : false, eventData[6], eventData[7], Long.valueOf(eventData[8]) );
 				
 				//Adding new event to its corresponding user and month
-				int monthOfEvent = getMonthOfEvent(request.time);
+				int monthOfEvent = getMonthOfEvent(request.getTimeInMillis());
 				Map<User, List<Request>> monthWorkload  = workload.get(monthOfEvent);
 				if(monthWorkload == null){
 					monthWorkload = new HashMap<User, List<Request>>();

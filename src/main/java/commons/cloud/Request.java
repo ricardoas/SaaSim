@@ -67,4 +67,25 @@ public class Request{
 	public long getDemand() {
 		return demandInMillis;
 	}
+
+	/**
+	 * @return the timeInMillis
+	 */
+	public long getTimeInMillis() {
+		return timeInMillis;
+	}
+
+	/**
+	 * @return the userID
+	 */
+	public String getUserID() {
+		return userID;
+	}
+
+	/**
+	 * @return the sizeInBytes
+	 */
+	public long getSizeInBytes() {
+		return sizeInBytes;
+	}
 }

@@ -87,8 +87,10 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 				JETime estimatedFinishTime = calcEstimatedFinishTime(request, queue.size());
 				JETime correctedFinishTime = getCorrectedFinishTime((Request) nextFinishEvent.getValue()[0]);
 				if(estimatedFinishTime.isEarlierThan(correctedFinishTime)){
+					System.out.println("earlier");
 					event = new JEEvent(JEEventType.REQUEST_FINISHED, this, estimatedFinishTime, request);
 				}else{
+					System.out.println("later");
 					event = new JEEvent(JEEventType.REQUEST_FINISHED, this, correctedFinishTime, nextFinishEvent.getValue());
 				}
 				getScheduler().cancelEvent(nextFinishEvent);
@@ -102,7 +104,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	//		
 	//		//FIXME: Should compute time from previous arrival until now before adding a new request!
 	//		if(nextFinishEvent != null){//Should evaluate next finish time
-	//			JETime estimatedFinishTime = new JETime(request.demand * requestsToShare); 
+	//			JETime estimatedFinishTime = new JETime(request.getDemand() * requestsToShare); 
 	//			estimatedFinishTime = estimatedFinishTime.plus(getScheduler().now());
 	//			
 	//			if(estimatedFinishTime.isEarlierThan(nextFinishEvent.getScheduledTime())){
@@ -112,7 +114,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	//				this.nextFinishEvent = currentFinish;
 	//			}
 	//		}else{//Only one request is in this machine
-	//			JETime eventTime = new JETime(request.demand); 
+	//			JETime eventTime = new JETime(request.getDemand()); 
 	//			eventTime = eventTime.plus(getScheduler().now());
 	//			JEEvent nextFinish = new JEEvent(JEEventType.FINISHREQUEST, this, eventTime);
 	//			this.nextFinishEvent = nextFinish;
@@ -129,7 +131,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	 * @return
 	 */
 	private JETime getCorrectedFinishTime(Request nextRequestToFinish) {
-		return new JETime( (nextRequestToFinish.getTotalToProcess() + getScheduler().now().timeMilliSeconds) * queue.size() / queue.size() -1);
+		return new JETime( getScheduler().now().timeMilliSeconds + nextRequestToFinish.getTotalToProcess() * queue.size());
 	}
 
 	private void updateFinishedDemand() {
@@ -140,6 +142,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 				request.update(processedDemand);
 			}
 		}
+		lastUpdate = now;
 	}
 
 	/**

@@ -242,12 +242,12 @@ public class PlanningFitnessFunctionTest {
 //		//Evaluating that accountability is correct
 //		List<Request> userRequests = requests.get(user);
 //		for(Request request : userRequests){
-//			assertEquals(request.totalProcessed, request.demand);
+//			assertEquals(request.totalProcessed, request.getDemand());
 //		}
 //		
 //		userRequests = requests.get(user2);
 //		for(Request request : userRequests){
-//			assertEquals(request.totalProcessed, request.demand);
+//			assertEquals(request.totalProcessed, request.getDemand());
 //		}
 //	}
 	

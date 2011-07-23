@@ -89,6 +89,6 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 * @return
 	 */
 	protected JEEvent parseEvent(Request request) {
-		return new JEEvent(JEEventType.NEWREQUEST, loadBalancer, new JETime(request.time), request);
+		return new JEEvent(JEEventType.NEWREQUEST, loadBalancer, new JETime(request.getTimeInMillis()), request);
 	}
 }

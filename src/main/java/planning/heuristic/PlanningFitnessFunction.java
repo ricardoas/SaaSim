@@ -104,7 +104,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 			double totalTransfered = 0;
 			for(Request request : requests){
 				totalProcessed += request.totalProcessed;
-				totalTransfered += request.size;
+				totalTransfered += request.getSizeInBytes();
 			}
 			user.consumedCpu = totalProcessed;
 			user.consumedTransference = totalTransfered;
