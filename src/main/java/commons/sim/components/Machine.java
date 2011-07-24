@@ -19,23 +19,23 @@ import commons.util.Triple;
  *
  */
 public class Machine extends JEAbstractEventHandler implements JEEventHandler{
-	
+
 	private final long machineID;
 	private boolean isReserved;
 	private double totalProcessed;
-	
+
 	protected JETime lastProcessingEvaluation;
 	private JEEvent nextFinishEvent;
-	
+
 	private final List<Request> queue;
 	protected List<Request> finishedRequests;
-	
+
 	public int numberOfRequestsCompletionsInPreviousInterval;
 	public int numberOfRequestsArrivalsInPreviousInterval;
 	private boolean shutdownOnFinish;
 	private JETime lastUpdate;
-	
-	
+
+
 	/**
 	 * @param machineID
 	 */
@@ -60,70 +60,46 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 		this(scheduler, id);
 		this.isReserved = isReserved;
 	}
-	
+
 	/**
 	 * @return the machineID
 	 */
 	public long getMachineID() {
 		return machineID;
 	}
-	
+
+	/**
+	 * @return
+	 */
 	public List<Request> getQueue() {
 		return queue;
 	}
 
 	/**
-		 * @param request
-		 */
-		public void sendRequest(Request request) {
-			
-			updateFinishedDemand();
-			queue.add(request);
+	 * @param request
+	 */
+	public void sendRequest(Request request) {
 
-			JEEvent event;
-			if(nextFinishEvent == null){
-				event = new JEEvent(JEEventType.REQUEST_FINISHED, this, calcEstimatedFinishTime(request, queue.size()), request);
+		updateFinishedDemand();
+		queue.add(request);
+
+		JEEvent event;
+		if(nextFinishEvent == null){
+			event = new JEEvent(JEEventType.REQUEST_FINISHED, this, calcEstimatedFinishTime(request, queue.size()), request);
+		}else{
+			JETime estimatedFinishTime = calcEstimatedFinishTime(request, queue.size());
+			JETime correctedFinishTime = getCorrectedFinishTime((Request) nextFinishEvent.getValue()[0]);
+			if(estimatedFinishTime.isEarlierThan(correctedFinishTime)){
+				event = new JEEvent(JEEventType.REQUEST_FINISHED, this, estimatedFinishTime, request);
 			}else{
-				JETime estimatedFinishTime = calcEstimatedFinishTime(request, queue.size());
-				JETime correctedFinishTime = getCorrectedFinishTime((Request) nextFinishEvent.getValue()[0]);
-				if(estimatedFinishTime.isEarlierThan(correctedFinishTime)){
-					System.out.println("earlier");
-					event = new JEEvent(JEEventType.REQUEST_FINISHED, this, estimatedFinishTime, request);
-				}else{
-					System.out.println("later");
-					event = new JEEvent(JEEventType.REQUEST_FINISHED, this, correctedFinishTime, nextFinishEvent.getValue());
-				}
-				getScheduler().cancelEvent(nextFinishEvent);
+				event = new JEEvent(JEEventType.REQUEST_FINISHED, this, correctedFinishTime, nextFinishEvent.getValue());
 			}
-			nextFinishEvent = event;
-			send(event);
-			
-			
-	//		this.queue.add(request);
-	//		int requestsToShare = this.queue.size();
-	//		
-	//		//FIXME: Should compute time from previous arrival until now before adding a new request!
-	//		if(nextFinishEvent != null){//Should evaluate next finish time
-	//			JETime estimatedFinishTime = new JETime(request.getDemand() * requestsToShare); 
-	//			estimatedFinishTime = estimatedFinishTime.plus(getScheduler().now());
-	//			
-	//			if(estimatedFinishTime.isEarlierThan(nextFinishEvent.getScheduledTime())){
-	//				getScheduler().cancelEvent(nextFinishEvent);
-	//				JEEvent currentFinish = new JEEvent(JEEventType.FINISHREQUEST, this, estimatedFinishTime);
-	//				getScheduler().queueEvent(currentFinish);
-	//				this.nextFinishEvent = currentFinish;
-	//			}
-	//		}else{//Only one request is in this machine
-	//			JETime eventTime = new JETime(request.getDemand()); 
-	//			eventTime = eventTime.plus(getScheduler().now());
-	//			JEEvent nextFinish = new JEEvent(JEEventType.FINISHREQUEST, this, eventTime);
-	//			this.nextFinishEvent = nextFinish;
-	//			
-	//			getScheduler().queueEvent(nextFinish);
-	//		}
-	//		
-	//		this.numberOfRequestsArrivalsInPreviousInterval++;
+			getScheduler().cancelEvent(nextFinishEvent);
 		}
+		nextFinishEvent = event;
+		send(event);
+		//		this.numberOfRequestsArrivalsInPreviousInterval++;
+	}
 
 	/**
 	 * TODO check is this correction does not alters the total demand.
@@ -134,6 +110,9 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 		return new JETime( getScheduler().now().timeMilliSeconds + nextRequestToFinish.getTotalToProcess() * queue.size());
 	}
 
+	/**
+	 * 
+	 */
 	private void updateFinishedDemand() {
 		JETime now = getScheduler().now();
 		if(lastUpdate.isEarlierThan(now) && !queue.isEmpty()){
@@ -157,46 +136,46 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	@Override
 	public void handleEvent(JEEvent event) {
 		switch (event.getType()) {
-			case REQUEST_FINISHED:
-				//Debit processing time in all queued requests
-				JETime totalProcessingTime = new JETime(0);
-				totalProcessingTime = totalProcessingTime.plus(event.getScheduledTime());
-				totalProcessingTime = totalProcessingTime.minus(lastProcessingEvaluation);
-				totalProcessingTime = totalProcessingTime.divide(this.queue.size());
-				
-				Iterator<Request> iterator = this.queue.iterator();
-				while(iterator.hasNext()){
-					Request request = iterator.next();
-					request.update(totalProcessingTime.timeMilliSeconds);
-					if(request.isFinished()){
-						this.numberOfRequestsCompletionsInPreviousInterval++;
-						this.finishedRequests.add(request);
-						iterator.remove();
-					}
-					this.setTotalProcessed(this.getTotalProcessed()
-							+ totalProcessingTime.timeMilliSeconds);//Accounting
+		case REQUEST_FINISHED:
+			//Debit processing time in all queued requests
+			JETime totalProcessingTime = new JETime(0);
+			totalProcessingTime = totalProcessingTime.plus(event.getScheduledTime());
+			totalProcessingTime = totalProcessingTime.minus(lastProcessingEvaluation);
+			totalProcessingTime = totalProcessingTime.divide(this.queue.size());
+
+			Iterator<Request> iterator = this.queue.iterator();
+			while(iterator.hasNext()){
+				Request request = iterator.next();
+				request.update(totalProcessingTime.timeMilliSeconds);
+				if(request.isFinished()){
+					this.numberOfRequestsCompletionsInPreviousInterval++;
+					this.finishedRequests.add(request);
+					iterator.remove();
 				}
-				this.lastProcessingEvaluation = event.getScheduledTime();
-				
-				//Searching for next finish event
-				JETime nextFinishTime = JETime.INFINITY;
-				for(Request nextRequest : this.queue){
-					JETime estimatedFinishTime = new JETime(nextRequest.getTotalToProcess() * this.queue.size()); 
-					estimatedFinishTime = estimatedFinishTime.plus(event.getScheduledTime());
-					
-					if(estimatedFinishTime.isEarlierThan(nextFinishTime)){
-						nextFinishTime = estimatedFinishTime;
-					}
+				this.setTotalProcessed(this.getTotalProcessed()
+						+ totalProcessingTime.timeMilliSeconds);//Accounting
+			}
+			this.lastProcessingEvaluation = event.getScheduledTime();
+
+			//Searching for next finish event
+			JETime nextFinishTime = JETime.INFINITY;
+			for(Request nextRequest : this.queue){
+				JETime estimatedFinishTime = new JETime(nextRequest.getTotalToProcess() * this.queue.size()); 
+				estimatedFinishTime = estimatedFinishTime.plus(event.getScheduledTime());
+
+				if(estimatedFinishTime.isEarlierThan(nextFinishTime)){
+					nextFinishTime = estimatedFinishTime;
 				}
-				if(nextFinishTime != JETime.INFINITY){//Scheduling next finish event, if it exists
-					JEEvent currentFinish = new JEEvent(JEEventType.REQUEST_FINISHED, this, nextFinishTime);
-					getScheduler().queueEvent(currentFinish);
-					this.nextFinishEvent = currentFinish;
-				}else{
-					this.nextFinishEvent = null;
-				}
-				
-				break;
+			}
+			if(nextFinishTime != JETime.INFINITY){//Scheduling next finish event, if it exists
+				JEEvent currentFinish = new JEEvent(JEEventType.REQUEST_FINISHED, this, nextFinishTime);
+				getScheduler().queueEvent(currentFinish);
+				this.nextFinishEvent = currentFinish;
+			}else{
+				this.nextFinishEvent = null;
+			}
+
+			break;
 		}
 	}
 
@@ -227,7 +206,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 			return false;
 		return true;
 	}
-	
+
 	public String toString(){
 		return "Mac "+this.machineID;
 	}
@@ -247,7 +226,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 		this.numberOfRequestsArrivalsInPreviousInterval = 0;
 		this.numberOfRequestsCompletionsInPreviousInterval = 0;
 	}
-	
+
 	/**
 	 * Used by RANJAN Scheduler, this method estimates CPU utilization of current machine
 	 * @param currentTime
@@ -269,7 +248,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 		}
 		return 0.0;
 	}
-	
+
 	public boolean isBusy() {
 		return this.queue.size() != 0 && this.nextFinishEvent != null;
 	}	
@@ -277,7 +256,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	public boolean isReserved(){
 		return this.isReserved;
 	}
-	
+
 	/**
 	 * This method retrieves the total amount of cpu processing time of current machine
 	 * @return
@@ -298,9 +277,9 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	 */
 	public List<Triple<Long, Long, Long>> calcExecutionTimesWithNewRequest(Request request, double sla) {
 		int requestsToShare = this.queue.size();
-		
+
 		List<Triple<Long, Long, Long>> executionTimes = new ArrayList<Triple<Long, Long, Long>>();
-		
+
 		for(Request currentRequest : this.queue){
 			Triple<Long, Long, Long> triple = new Triple<Long, Long, Long>();
 			JETime estimatedFinishTime = new JETime(currentRequest.getTotalToProcess() * requestsToShare); 
@@ -310,10 +289,10 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 			estimatedFinishTime = estimatedFinishTime.plus(getScheduler().now());
 			triple.secondValue = estimatedFinishTime.timeMilliSeconds;
 			triple.thirdValue = currentRequest.getDemand();
-			
+
 			executionTimes.add(triple);
 		}
-		
+
 		return executionTimes;
 	}
 
