@@ -29,6 +29,7 @@ public class RanjanSchedulerTest {
 	}
 	
 	@Test
+	@Deprecated
 	public void testGetServerWithoutMachines(){
 		String clientID = "c1";
 		String userID = "u1";
@@ -46,6 +47,7 @@ public class RanjanSchedulerTest {
 	}
 	
 	@Test
+	@Deprecated
 	public void testGetServerForFirstRequest(){
 		String clientID = "c1";
 		String userID = "u1";
@@ -71,6 +73,7 @@ public class RanjanSchedulerTest {
 	 * requests arriving from different users.
 	 */
 	@Test
+	@Deprecated
 	public void testGetServerForFirstRequestsWithMultipleServers(){
 		String clientID = "c1";
 		String userID = "u1";
@@ -130,6 +133,7 @@ public class RanjanSchedulerTest {
 	 * are redirected to the same server
 	 */
 	@Test
+	@Deprecated
 	public void testGetServerForFirstRequestsWithMultipleServers2(){
 		String clientID = "c1";
 		String userID = "u1";
@@ -193,6 +197,7 @@ public class RanjanSchedulerTest {
 	 * are redirected to the same server
 	 */
 	@Test
+	@Deprecated
 	public void testGetServerForFirstRequestsWithMultipleServers3(){
 		String clientID = "c1";
 		String userID = "u1";

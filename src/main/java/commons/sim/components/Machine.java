@@ -34,6 +34,8 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	public int numberOfRequestsArrivalsInPreviousInterval;
 	private boolean shutdownOnFinish;
 	private JETime lastUpdate;
+	
+	//TODO: Create RANJAN MACHINE: backlog, tokens, etc.!
 
 
 	/**
@@ -114,6 +116,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	 * 
 	 */
 	private void updateFinishedDemand() {
+		//TODO: A quantidade de tempo computada é essa? Isso deveria ser dividido pela fila não?
 		JETime now = getScheduler().now();
 		if(lastUpdate.isEarlierThan(now) && !queue.isEmpty()){
 			long processedDemand = now.timeMilliSeconds - lastUpdate.timeMilliSeconds;
