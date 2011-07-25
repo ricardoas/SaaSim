@@ -31,17 +31,11 @@ public class Main {
 		
 		JEEventScheduler scheduler = new JEEventScheduler();
 		
-		Monitor monitor = null;
-		
 		DPS dps = DPSFactory.INSTANCE.createDPS();
 		
 		WorkloadParser<List<Request>> parser = new GEISTSimpleWorkloadParser();
 		
-		Simulator simulator = new SimpleSimulator(scheduler, monitor, parser, dps.getSetupMachines());
-		
-		monitor.setDPS(dps);
-		
-		dps.setConfigurable(simulator);
+		Simulator simulator = new SimpleSimulator(scheduler, dps, parser, dps.getSetupMachines());
 		
 		simulator.start();
 		

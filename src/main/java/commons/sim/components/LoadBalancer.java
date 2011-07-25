@@ -67,6 +67,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	 * 
 	 */
 	public void addServer(Machine server){
+		server.setLoadBalancer(this);
 		send(new JEEvent(JEEventType.ADD_SERVER, this, getServerUpTime(), server));
 	}
 	
@@ -83,7 +84,6 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 		}else{
 			servers.remove(server);
 			server.shutdownOnFinish();
-//			send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this, scheduledTime, value))
 		}
 	}
 
@@ -186,5 +186,9 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	 */
 	public List<Machine> getServers() {
 		return servers;
+	}
+
+	public void report(Request requestFinished) {
+		monitor.report(requestFinished);
 	}
 }

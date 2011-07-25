@@ -3,6 +3,7 @@ package commons.sim;
 import java.io.IOException;
 import java.util.List;
 
+import provisioning.DPS;
 import provisioning.Monitor;
 
 import commons.cloud.Request;
@@ -31,11 +32,12 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 * @param scheduler TODO
 	 * @param list 
 	 */
-	public SimpleSimulator(JEEventScheduler scheduler, Monitor monitor, WorkloadParser<List<Request>> parser, List<Machine> setupMachines) {
+	public SimpleSimulator(JEEventScheduler scheduler, Monitor dps, WorkloadParser<List<Request>> parser, List<Machine> setupMachines) {
 		super(scheduler);
-		this.monitor = monitor;
+		this.monitor = dps;
+		monitor.setConfigurable(this);
 		this.workloadParser = parser;
-		this.loadBalancer = ApplicationFactory.getInstance().createNewApplication(scheduler, monitor, setupMachines);
+		this.loadBalancer = ApplicationFactory.getInstance().createNewApplication(scheduler, dps, setupMachines);
 	}
 	
 	/**

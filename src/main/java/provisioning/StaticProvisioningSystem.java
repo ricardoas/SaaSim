@@ -3,6 +3,7 @@ package provisioning;
 import java.util.ArrayList;
 import java.util.List;
 
+import commons.cloud.Request;
 import commons.config.SimulatorConfiguration;
 import commons.sim.Simulator;
 import commons.sim.components.Machine;
@@ -41,6 +42,12 @@ public class StaticProvisioningSystem extends JEAbstractEventHandler implements 
 
 	@Override
 	public void setConfigurable(DynamicallyConfigurable configurable) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void report(Request requestFinished) {
 		// TODO Auto-generated method stub
 		
 	}

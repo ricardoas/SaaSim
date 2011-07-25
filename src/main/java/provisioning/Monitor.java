@@ -1,5 +1,6 @@
 package provisioning;
 
+import commons.cloud.Request;
 import commons.sim.jeevent.JEEventHandler;
 
 /**
@@ -10,6 +11,13 @@ import commons.sim.jeevent.JEEventHandler;
  */
 public interface Monitor extends JEEventHandler{
 	
-	void setDPS(DPS dps);
+	void report(Request requestFinished);
+
+	/**
+	 * Configurable system.
+	 * 
+	 * @param configurable
+	 */
+	void setConfigurable(DynamicallyConfigurable configurable);
 
 }

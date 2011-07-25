@@ -1,7 +1,6 @@
 package commons.sim.components;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import commons.cloud.Request;
@@ -34,6 +33,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	public int numberOfRequestsArrivalsInPreviousInterval;
 	private boolean shutdownOnFinish;
 	private JETime lastUpdate;
+	private LoadBalancer loadBalancer;
 	
 	//TODO: Create RANJAN MACHINE: backlog, tokens, etc.!
 
@@ -100,7 +100,6 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 		}
 		nextFinishEvent = event;
 		send(event);
-		//		this.numberOfRequestsArrivalsInPreviousInterval++;
 	}
 
 	/**
@@ -116,10 +115,9 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	 * 
 	 */
 	private void updateFinishedDemand() {
-		//TODO: A quantidade de tempo computada é essa? Isso deveria ser dividido pela fila não?
 		JETime now = getScheduler().now();
 		if(lastUpdate.isEarlierThan(now) && !queue.isEmpty()){
-			long processedDemand = now.timeMilliSeconds - lastUpdate.timeMilliSeconds;
+			long processedDemand = (now.timeMilliSeconds - lastUpdate.timeMilliSeconds)/(queue.size() + 1);
 			for (Request request : queue) {
 				request.update(processedDemand);
 			}
@@ -136,48 +134,37 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 		return new JETime(request.getDemand() * queueSize).plus(getScheduler().now());
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void handleEvent(JEEvent event) {
 		switch (event.getType()) {
 		case REQUEST_FINISHED:
-			//Debit processing time in all queued requests
-			JETime totalProcessingTime = new JETime(0);
-			totalProcessingTime = totalProcessingTime.plus(event.getScheduledTime());
-			totalProcessingTime = totalProcessingTime.minus(lastProcessingEvaluation);
-			totalProcessingTime = totalProcessingTime.divide(this.queue.size());
+			updateFinishedDemand();
 
-			Iterator<Request> iterator = this.queue.iterator();
-			while(iterator.hasNext()){
-				Request request = iterator.next();
-				request.update(totalProcessingTime.timeMilliSeconds);
-				if(request.isFinished()){
-					this.numberOfRequestsCompletionsInPreviousInterval++;
-					this.finishedRequests.add(request);
-					iterator.remove();
+			Request requestFinished = (Request) event.getValue()[0];
+			
+			queue.remove(requestFinished);
+			
+			getLoadBalancer().report(requestFinished);
+
+			if (!queue.isEmpty()) {
+				Request nextToFinish = queue.get(0);
+				for (Request request : queue) {
+					if (request.getTotalToProcess() < nextToFinish
+							.getTotalToProcess()) {
+						nextToFinish = request;
+					}
 				}
-				this.setTotalProcessed(this.getTotalProcessed()
-						+ totalProcessingTime.timeMilliSeconds);//Accounting
-			}
-			this.lastProcessingEvaluation = event.getScheduledTime();
-
-			//Searching for next finish event
-			JETime nextFinishTime = JETime.INFINITY;
-			for(Request nextRequest : this.queue){
-				JETime estimatedFinishTime = new JETime(nextRequest.getTotalToProcess() * this.queue.size()); 
-				estimatedFinishTime = estimatedFinishTime.plus(event.getScheduledTime());
-
-				if(estimatedFinishTime.isEarlierThan(nextFinishTime)){
-					nextFinishTime = estimatedFinishTime;
-				}
-			}
-			if(nextFinishTime != JETime.INFINITY){//Scheduling next finish event, if it exists
-				JEEvent currentFinish = new JEEvent(JEEventType.REQUEST_FINISHED, this, nextFinishTime);
-				getScheduler().queueEvent(currentFinish);
-				this.nextFinishEvent = currentFinish;
+				send(new JEEvent(JEEventType.REQUEST_FINISHED, this,
+						calcEstimatedFinishTime(nextToFinish, queue.size()),
+						nextToFinish));
 			}else{
-				this.nextFinishEvent = null;
+				if(shutdownOnFinish){
+					send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this, getScheduler().now(), this));
+				}
 			}
-
 			break;
 		}
 	}
@@ -309,5 +296,13 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 
 	public void shutdownOnFinish() {
 		this.shutdownOnFinish = true;
+	}
+
+	public void setLoadBalancer(LoadBalancer loadBalancer) {
+		this.loadBalancer = loadBalancer;
+	}
+
+	public LoadBalancer getLoadBalancer() {
+		return loadBalancer;
 	}
 }

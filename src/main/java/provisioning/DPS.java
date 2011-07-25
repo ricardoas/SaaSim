@@ -11,7 +11,7 @@ import commons.sim.jeevent.JEEventHandler;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public interface DPS extends JEEventHandler{
+public interface DPS extends JEEventHandler, Monitor{
 
 	/**
 	 * Configurable system.
