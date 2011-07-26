@@ -6,6 +6,8 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationRuntimeException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
+import provisioning.ProfitDrivenProvisioningSystem;
+import provisioning.RanjanProvisioningSystem;
 import provisioning.StaticProvisioningSystem;
 
 import commons.sim.ProfitDrivenScheduler;
@@ -145,10 +147,10 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 			switch (value) {
 			case STATIC:
 				return StaticProvisioningSystem.class;
-//			case RANJAN:
-//				return StaticProvisioningSystem.class;//FIXME
-//			case PROFITDRIVEN:
-//				return StaticProvisioningSystem.class;//FIXME
+			case RANJAN:
+				return RanjanProvisioningSystem.class;//FIXME
+			case PROFITDRIVEN:
+				return ProfitDrivenProvisioningSystem.class;//FIXME
 			case CUSTOM:
 				return Class.forName(customHeuristicClass);
 			}

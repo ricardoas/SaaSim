@@ -89,13 +89,13 @@ public class LoadBalancerTest {
 		String reqID = "1";
 		long time = 1000 * 60 * 1;
 		long size = 1024;
-		boolean hasExpired = false;
+		Integer requestOption = 0;
 		String URL = "";
 		String httpOperation = "GET";
 		long demand = 1000 * 60 * 20;
 
 		Request[] requests = new Request[1];
-		requests[0] = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
+		requests[0] = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
 		
 		Machine machine = EasyMock.createStrictMock(Machine.class);
 		lb.getServers().add(machine);//Creating a machine to serve the request

@@ -1,10 +1,7 @@
 package provisioning;
 
-import java.util.List;
-
 import commons.cloud.Request;
 import commons.sim.jeevent.JEEventHandler;
-import commons.util.Triple;
 
 /**
  * 
@@ -22,6 +19,4 @@ public interface Monitor extends JEEventHandler{
 	 * @param configurable
 	 */
 	void setConfigurable(DynamicallyConfigurable configurable);
-
-	void reportUtilization(double utilization, List<Triple> arrivalsAndCompletions);
 }

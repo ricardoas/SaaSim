@@ -12,7 +12,7 @@ import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 
-public class StaticProvisioningSystem extends JEAbstractEventHandler implements DPS{
+public class ProfitDrivenProvisioningSystem extends JEAbstractEventHandler implements DPS{
 
 	private long availableIDs;
 	
@@ -20,7 +20,7 @@ public class StaticProvisioningSystem extends JEAbstractEventHandler implements 
 	
 	private AccountingSystem accountingSystem;
 
-	public StaticProvisioningSystem(JEEventScheduler scheduler, LoadBalancer loadBalancer) {
+	public ProfitDrivenProvisioningSystem(JEEventScheduler scheduler, LoadBalancer loadBalancer) {
 		super(scheduler);
 		availableIDs = 0;
 		
@@ -39,10 +39,25 @@ public class StaticProvisioningSystem extends JEAbstractEventHandler implements 
 				//Nothing to do
 				break;
 			case REQUESTQUEUED:
-				//Nothing to do
+				evaluateMachinesToBeAdded();
 				break;
 		}
 	}
+
+	private void evaluateMachinesToBeAdded() {
+		boolean canAddAReservedMachine = this.accountingSystem.canAddAReservedMachine();
+		boolean canAddAOnDemandMachine = this.accountingSystem.canAddAOnDemandMachine();
+		if(canAddAReservedMachine){
+			this.loadBalancer.addServer(new Machine(getScheduler(), availableIDs++, canAddAReservedMachine));
+			//Registering machines for accounting
+			this.accountingSystem.createMachine(availableIDs-1, canAddAReservedMachine, getScheduler().now().timeMilliSeconds);
+		}else if(canAddAOnDemandMachine){
+			this.loadBalancer.addServer(new Machine(getScheduler(), availableIDs++, canAddAOnDemandMachine));
+			//Registering machines for accounting
+			this.accountingSystem.createMachine(availableIDs-1, canAddAOnDemandMachine, getScheduler().now().timeMilliSeconds);
+		}
+	}
+	
 
 	@Override
 	public List<Machine> getSetupMachines() {

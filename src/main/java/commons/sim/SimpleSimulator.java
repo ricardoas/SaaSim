@@ -34,7 +34,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	public SimpleSimulator(JEEventScheduler scheduler, Monitor dps, WorkloadParser<List<Request>> parser, List<Machine> setupMachines) {
 		super(scheduler);
 		this.monitor = dps;
-		monitor.setConfigurable(this);
+		this.monitor.setConfigurable(this);
 		this.workloadParser = parser;
 		this.loadBalancer = ApplicationFactory.getInstance().createNewApplication(scheduler, dps, setupMachines);
 	}

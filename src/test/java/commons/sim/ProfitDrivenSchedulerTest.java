@@ -33,12 +33,12 @@ public class ProfitDrivenSchedulerTest {
 		String reqID = "1";
 		long time = 1000 * 60 * 1;
 		long size = 1024;
-		boolean hasExpired = false;
+		Integer requestOption = 0;
 		String URL = "";
 		String httpOperation = "GET";
 		long demand = 1000 * 60 * 20;
 		
-		Request request = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
+		Request request = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
 		Machine nextServer = scheduler.getNextServer(request, new ArrayList<Machine>());
 		assertNull(nextServer);
 	}
@@ -53,7 +53,7 @@ public class ProfitDrivenSchedulerTest {
 		String reqID = "1";
 		long time = 1000 * 60 * 1;//in millis
 		long size = 1024;
-		boolean hasExpired = false;
+		Integer requestOption = 0;
 		String URL = "";
 		String httpOperation = "GET";
 		long demand = 1000 * 20;//in millis
@@ -62,7 +62,7 @@ public class ProfitDrivenSchedulerTest {
 		Machine machine1 = new Machine(eventScheduler, 1);
 		servers.add(machine1);
 		
-		Request request = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
+		Request request = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
 		Machine nextServer = scheduler.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
@@ -79,7 +79,7 @@ public class ProfitDrivenSchedulerTest {
 		String reqID = "1";
 		long time = 1000 * 60 * 1;//in millis
 		long size = 1024;
-		boolean hasExpired = false;
+		Integer requestOption = 0;
 		String URL = "";
 		String httpOperation = "GET";
 		long demand = 1000 * 20;//in millis
@@ -92,7 +92,7 @@ public class ProfitDrivenSchedulerTest {
 		servers.add(machine2);
 		servers.add(machine3);
 		
-		Request request = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
+		Request request = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
 		Machine nextServer = scheduler.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
@@ -106,7 +106,7 @@ public class ProfitDrivenSchedulerTest {
 		servers.add(machine2);
 		servers.add(machine1);
 		
-		request = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
+		request = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine3, nextServer);
@@ -127,7 +127,7 @@ public class ProfitDrivenSchedulerTest {
 		String reqID = "1";
 		long time = 1000 * 60 * 1;//in millis
 		long size = 1024;
-		boolean hasExpired = false;
+		Integer requestOption = 0;
 		String URL = "";
 		String httpOperation = "GET";
 		long demand = 1000 * 10;//in millis
@@ -138,13 +138,13 @@ public class ProfitDrivenSchedulerTest {
 		servers.add(machine1);
 		servers.add(machine2);
 		
-		Request request = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
-		Request request2 = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
+		Request request = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
+		Request request2 = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
 		machine1.sendRequest(request);
 		machine1.sendRequest(request2);
 		
 		demand = 1000 * 15;//in millis
-		Request request3 = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
+		Request request3 = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
 		Machine nextServer = scheduler.getNextServer(request3, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine2, nextServer);
@@ -165,7 +165,7 @@ public class ProfitDrivenSchedulerTest {
 		String reqID = "1";
 		long time = 1000 * 60 * 1;//in millis
 		long size = 1024;
-		boolean hasExpired = false;
+		Integer requestOption = 0;
 		String URL = "";
 		String httpOperation = "GET";
 		long demand = 1000 * 10;//in millis
@@ -176,18 +176,18 @@ public class ProfitDrivenSchedulerTest {
 		servers.add(machine1);
 		servers.add(machine2);
 		
-		Request request = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
-		Request request2 = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
+		Request request = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
+		Request request2 = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
 		machine1.sendRequest(request);
 		machine1.sendRequest(request2);
 		
-		Request request3 = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
-		Request request4 = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
+		Request request3 = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
+		Request request4 = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
 		machine2.sendRequest(request3);
 		machine2.sendRequest(request4);
 		
 		demand = 1000 * 15;//in millis
-		Request request5 = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
+		Request request5 = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
 		Machine nextServer = scheduler.getNextServer(request5, servers);
 		assertNull(nextServer);
 	}
@@ -207,7 +207,7 @@ public class ProfitDrivenSchedulerTest {
 		String reqID = "1";
 		long time = 1000 * 60 * 1;//in millis
 		long size = 1024;
-		boolean hasExpired = false;
+		Integer requestOption = 0;
 		String URL = "";
 		String httpOperation = "GET";
 		long demand = 1000 * 15;//in millis
@@ -218,13 +218,13 @@ public class ProfitDrivenSchedulerTest {
 		servers.add(machine1);
 		servers.add(machine2);
 		
-		Request request = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
+		Request request = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
 		machine1.sendRequest(request);
 		
-		Request request3 = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
+		Request request3 = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
 		machine2.sendRequest(request3);
 		
-		Request request5 = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
+		Request request5 = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
 		Machine nextServer = scheduler.getNextServer(request5, servers);
 		assertNull(nextServer);
 	}

@@ -18,8 +18,8 @@ import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
+import commons.sim.provisioningheuristics.RanjanStatistics;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
-import commons.util.Triple;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -108,11 +108,10 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 			break;
 		case EVALUATEUTILIZATION://RANJAN Scheduler
 			Long eventTime = (Long) event.getValue()[0];
-			double utilization = heuristic.evaluateUtilization(getServers(), eventTime);
 			
-			//TODO: Finish this!
-			this.monitor.reportUtilization(utilization, this.gatherArrivals(getServers()));
-//			this.manageMachines(numberOfMachinesToAdd);
+			RanjanStatistics statistics = this.collectStatistics(getServers(), eventTime);
+			send(new JEEvent(JEEventType.EVALUATEUTILIZATION, this.monitor, getScheduler().now(), statistics));
+
 			break;
 		case ADD_SERVER:
 			Machine newServer = (Machine) event.getValue()[0];
@@ -129,16 +128,24 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 		}
 	}
 
-	private List<Triple> gatherArrivals(List<Machine> servers) {
-		List<Triple> data = new ArrayList<Triple>();
+	private RanjanStatistics collectStatistics(List<Machine> servers, long eventTime) {
+		
+		//Gathering total utilization
+		double totalUtilization = 0d;
 		for(Machine machine : servers){
-			Triple<Integer, Integer, Integer> triple = new Triple<Integer, Integer, Integer>();
-			triple.firstValue = machine.getNumberOfRequestsArrivalsInPreviousInterval();
-			triple.secondValue = machine.getNumberOfRequestsCompletionsInPreviousInterval();
-			data.add(triple);
+			totalUtilization += machine.computeUtilization(eventTime);
+		}
+		
+		long totalRequestsArrivals = 0;
+		long totalRequestsCompletions = 0;
+		
+		for(Machine machine : servers){
+			totalRequestsArrivals += machine.getNumberOfRequestsArrivalsInPreviousInterval();
+			totalRequestsCompletions += machine.getNumberOfRequestsCompletionsInPreviousInterval();
 			machine.resetCounters();
 		}
-		return data;
+		
+		return new RanjanStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, servers.size());
 	}
 	
 

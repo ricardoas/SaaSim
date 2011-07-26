@@ -2,6 +2,7 @@ package provisioning;
 
 import java.util.List;
 
+import commons.sim.AccountingSystem;
 import commons.sim.components.Machine;
 import commons.sim.jeevent.JEEventHandler;
 
@@ -28,4 +29,5 @@ public interface DPS extends JEEventHandler, Monitor{
 	 */
 	List<Machine> getSetupMachines();
 
+	void setAccountingSystem(AccountingSystem system);
 }

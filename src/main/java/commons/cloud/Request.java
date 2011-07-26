@@ -13,7 +13,7 @@ public class Request{
 	private final long timeInMillis;
 	private final long demandInMillis;
 	private final long sizeInBytes;
-	private final boolean hasExpired; // TODO verify usage 
+	private final int requestOption;//Indicates whether the request is a non-SSL (expired or not) or a SSL one 
 	private final String httpOperation;
 	private final String URL;
 	
@@ -25,20 +25,20 @@ public class Request{
 	 * @param reqID
 	 * @param time
 	 * @param size
-	 * @param hasExpired
+	 * @param requestOption
 	 * @param httpOperation
 	 * @param URL
 	 * @param demand
 	 */
 	public Request(String clientID, String userID, String reqID, long time,
-			long size, boolean hasExpired, String httpOperation, String URL, long demand) {
+			long size, int requestOption, String httpOperation, String URL, long demand) {
 		this.clientID = clientID;
 		this.userID = userID;
 		this.reqID = reqID;
 		this.timeInMillis = time;
 		this.demandInMillis = demand;
 		this.sizeInBytes = size;
-		this.hasExpired = hasExpired;
+		this.requestOption = requestOption;
 		this.httpOperation = httpOperation;
 		this.URL = URL;
 		this.totalProcessed = 0;
@@ -87,5 +87,9 @@ public class Request{
 	 */
 	public long getSizeInBytes() {
 		return sizeInBytes;
+	}
+
+	public String getRequestID(){
+		return this.reqID;
 	}
 }

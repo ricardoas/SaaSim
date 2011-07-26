@@ -61,8 +61,8 @@ public class RanjanScheduler implements SchedulingHeuristic {
 		return null;
 	}
 
-	@Override
-	public int evaluateUtilization(List<Machine> servers, Long eventTime){
+	@Deprecated
+	public double evaluateUtilization(List<Machine> servers, Long eventTime){
 		double averageUtilization = 0d;
 		double totalNumberOfCompletions = 0d;
 		double totalNumberOfArrivals = 0d;

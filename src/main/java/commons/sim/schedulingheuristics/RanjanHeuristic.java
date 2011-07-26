@@ -38,7 +38,7 @@ public class RanjanHeuristic implements SchedulingHeuristic {
 	 * This method gathers the utilisation of each machine being used in order to forward such
 	 * information to provisioning heuristics.
 	 */
-	@Override
+	@Deprecated
 	public double evaluateUtilization(List<Machine> servers, Long eventTime) {
 		double totalUtilization = 0d;
 		

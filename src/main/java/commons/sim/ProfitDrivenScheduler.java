@@ -60,7 +60,7 @@ public class ProfitDrivenScheduler implements SchedulingHeuristic {
 		return machineToSchedule;
 	}
 
-	@Override
+	@Deprecated
 	public double evaluateUtilization(List<Machine> servers, Long eventTime) {
 		return 0;
 	}

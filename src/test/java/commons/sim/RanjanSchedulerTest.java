@@ -36,12 +36,12 @@ public class RanjanSchedulerTest {
 		String reqID = "1";
 		long time = 1000 * 60 * 1;
 		long size = 1024;
-		boolean hasExpired = false;
+		Integer requestOption = 0;
 		String httpOperation = "GET";
 		long demand = 1000 * 60 * 20;
 		
 		
-		Request request = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
+		Request request = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
 		Machine nextServer = scheduler.getNextServer(request, new ArrayList<Machine>());
 		assertNull(nextServer);
 	}
@@ -54,7 +54,7 @@ public class RanjanSchedulerTest {
 		String reqID = "1";
 		long time = 1000 * 60 * 1;
 		long size = 1024;
-		boolean hasExpired = false;
+		Integer requestOption = 0;
 		String httpOperation = "GET";
 		long demand = 1000 * 60 * 20;
 		
@@ -62,7 +62,7 @@ public class RanjanSchedulerTest {
 		Machine machine1 = new Machine(eventScheduler, 1);
 		servers.add(machine1);
 		
-		Request request = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
+		Request request = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
 		Machine nextServer = scheduler.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
@@ -80,7 +80,7 @@ public class RanjanSchedulerTest {
 		String reqID = "1";
 		long time = 1000 * 60 * 1;
 		long size = 1024;
-		boolean hasExpired = false;
+		Integer requestOption = 0;
 		String httpOperation = "GET";
 		long demand = 1000 * 60 * 20;
 		
@@ -96,33 +96,33 @@ public class RanjanSchedulerTest {
 		servers.add(machine4);
 		servers.add(machine5);
 		
-		Request request = new Request(clientID, userID, reqID, time, size, hasExpired, httpOperation, URL, demand);
+		Request request = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
 		Machine nextServer = scheduler.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		
-		Request request2 = new Request(clientID, "u2", reqID, time, size, hasExpired, httpOperation, URL, demand);
+		Request request2 = new Request(clientID, "u2", reqID, time, size, requestOption, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request2, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine2, nextServer);
 		
-		Request request3 = new Request(clientID, "u3", reqID, time, size, hasExpired, httpOperation, URL, demand);
+		Request request3 = new Request(clientID, "u3", reqID, time, size, requestOption, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request3, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine3, nextServer);
 		
-		Request request4 = new Request(clientID, "u4", reqID, time, size, hasExpired, httpOperation, URL, demand);
+		Request request4 = new Request(clientID, "u4", reqID, time, size, requestOption, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request4, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine4, nextServer);
 		
-		Request request5 = new Request(clientID, "u5", reqID, time, size, hasExpired, httpOperation, URL, demand);
+		Request request5 = new Request(clientID, "u5", reqID, time, size, requestOption, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request5, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine5, nextServer);
 		
 		//Restarting again
-		Request request6 = new Request(clientID, "u6", reqID, time, size, hasExpired, httpOperation, URL, demand);
+		Request request6 = new Request(clientID, "u6", reqID, time, size, requestOption, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request6, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
@@ -139,7 +139,7 @@ public class RanjanSchedulerTest {
 		String userID = "u1";
 		String reqID = "1";
 		long size = 1024;
-		boolean hasExpired = false;
+		Integer requestOption = 0;
 		String httpOperation = "GET";
 		long demand = 1000 * 60 * 20;
 		
@@ -155,38 +155,38 @@ public class RanjanSchedulerTest {
 		servers.add(machine4);
 		servers.add(machine5);
 		
-		Request request = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 1, size, hasExpired, httpOperation, URL, demand);
+		Request request = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 1, size, requestOption, httpOperation, URL, demand);
 		Machine nextServer = scheduler.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		
-		Request request2 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 3, size, hasExpired, httpOperation, URL, demand);
+		Request request2 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 3, size, requestOption, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request2, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		
-		Request request3 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 8, size, hasExpired, httpOperation, URL, demand);
+		Request request3 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 8, size, requestOption, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request3, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		
-		Request request4 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 17, size, hasExpired, httpOperation, URL, demand);
+		Request request4 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 17, size, requestOption, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request4, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		
-		Request request5 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 30, size, hasExpired, httpOperation, URL, demand);
+		Request request5 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 30, size, requestOption, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request5, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		
-		Request request6 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 45, size, hasExpired, httpOperation, URL, demand);
+		Request request6 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 45, size, requestOption, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request6, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		
 		//Request arriving after session limit
-		Request request7 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 61, size, hasExpired, httpOperation, URL, demand);
+		Request request7 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 61, size, requestOption, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request7, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine2, nextServer);
@@ -203,7 +203,7 @@ public class RanjanSchedulerTest {
 		String userID = "u1";
 		String reqID = "1";
 		long size = 1024;
-		boolean hasExpired = false;
+		Integer requestOption = 0;
 		String httpOperation = "GET";
 		long demand = 1000 * 60 * 20;
 		
@@ -219,43 +219,43 @@ public class RanjanSchedulerTest {
 		servers.add(machine4);
 		servers.add(machine5);
 		
-		Request request = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 1, size, hasExpired, httpOperation, URL, demand);
+		Request request = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 1, size, requestOption, httpOperation, URL, demand);
 		Machine nextServer = scheduler.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		
-		Request request2 = new Request(clientID, "u2", reqID, ONE_MINUTE_IN_MILLIS * 2, size, hasExpired, httpOperation, URL, demand);
+		Request request2 = new Request(clientID, "u2", reqID, ONE_MINUTE_IN_MILLIS * 2, size, requestOption, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request2, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine2, nextServer);
 		
-		Request request3 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 5, size, hasExpired, httpOperation, URL, demand);
+		Request request3 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 5, size, requestOption, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request3, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		
-		Request request4 = new Request(clientID, "u2", reqID, ONE_MINUTE_IN_MILLIS * 10, size, hasExpired, httpOperation, URL, demand);
+		Request request4 = new Request(clientID, "u2", reqID, ONE_MINUTE_IN_MILLIS * 10, size, requestOption, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request4, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine2, nextServer);
 		
 		//Requests after session limit
-		Request request5 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 21, size, hasExpired, httpOperation, URL, demand);
+		Request request5 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 21, size, requestOption, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request5, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine3, nextServer);
 		
-		Request request6 = new Request(clientID, "u2", reqID, ONE_MINUTE_IN_MILLIS * 26, size, hasExpired, httpOperation, URL, demand);
+		Request request6 = new Request(clientID, "u2", reqID, ONE_MINUTE_IN_MILLIS * 26, size, requestOption, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request6, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine4, nextServer);
 		
-		Request request7 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 37, size, hasExpired, httpOperation, URL, demand);
+		Request request7 = new Request(clientID, userID, reqID, ONE_MINUTE_IN_MILLIS * 37, size, requestOption, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request7, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine5, nextServer);
 		
-		Request request8 = new Request(clientID, "u2", reqID, ONE_MINUTE_IN_MILLIS * 42, size, hasExpired, httpOperation, URL, demand);
+		Request request8 = new Request(clientID, "u2", reqID, ONE_MINUTE_IN_MILLIS * 42, size, requestOption, httpOperation, URL, demand);
 		nextServer = scheduler.getNextServer(request8, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);

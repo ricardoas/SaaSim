@@ -27,7 +27,7 @@ public class RoundRobinHeuristic implements SchedulingHeuristic {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
+	@Deprecated
 	public double evaluateUtilization(List<Machine> servers, Long eventTime) {
 		// TODO Auto-generated method stub
 		return 0;
