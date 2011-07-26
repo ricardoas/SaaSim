@@ -261,6 +261,7 @@ public class RanjanSchedulerTest {
 		assertEquals(machine1, nextServer);
 	}
 	
+	//FIXME: Evaluate utilization behaviour changed!
 	@Test
 	public void simpleMachineUtilization(){
 		Machine machine = EasyMock.createMock(Machine.class);
@@ -276,7 +277,7 @@ public class RanjanSchedulerTest {
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
 		servers.add(machine);
-		int machinesToAdd = scheduler.evaluateUtilization(servers, currentTime);
+		double machinesToAdd = scheduler.evaluateUtilization(servers, currentTime);
 		
 		EasyMock.verify(machine);
 		
@@ -316,7 +317,7 @@ public class RanjanSchedulerTest {
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
-		int machinesToAdd = scheduler.evaluateUtilization(servers, currentTime);
+		double machinesToAdd = scheduler.evaluateUtilization(servers, currentTime);
 		
 		EasyMock.verify(machine);
 		EasyMock.verify(machine2);
@@ -358,7 +359,7 @@ public class RanjanSchedulerTest {
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
-		int machinesToAdd = scheduler.evaluateUtilization(servers, currentTime);
+		double machinesToAdd = scheduler.evaluateUtilization(servers, currentTime);
 		
 		EasyMock.verify(machine);
 		EasyMock.verify(machine2);
@@ -400,7 +401,7 @@ public class RanjanSchedulerTest {
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
-		int machinesToAdd = scheduler.evaluateUtilization(servers, currentTime);
+		double machinesToAdd = scheduler.evaluateUtilization(servers, currentTime);
 		
 		EasyMock.verify(machine);
 		EasyMock.verify(machine2);

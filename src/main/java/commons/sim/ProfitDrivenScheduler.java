@@ -61,7 +61,7 @@ public class ProfitDrivenScheduler implements SchedulingHeuristic {
 	}
 
 	@Override
-	public int evaluateUtilization(List<Machine> servers, Long eventTime) {
+	public double evaluateUtilization(List<Machine> servers, Long eventTime) {
 		return 0;
 	}
 }

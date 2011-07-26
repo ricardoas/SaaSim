@@ -113,7 +113,6 @@ public class WorkloadParserTest {
 		} catch (NumberFormatException e) {
 			fail("Invalid data read!");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			fail("Invalid file!");
 		}
 	}

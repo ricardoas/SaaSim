@@ -19,6 +19,7 @@ import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
+import commons.util.Triple;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -107,8 +108,11 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 			break;
 		case EVALUATEUTILIZATION://RANJAN Scheduler
 			Long eventTime = (Long) event.getValue()[0];
-			int numberOfMachinesToAdd = heuristic.evaluateUtilization(getServers(), eventTime);
-			this.manageMachines(numberOfMachinesToAdd);
+			double utilization = heuristic.evaluateUtilization(getServers(), eventTime);
+			
+			//TODO: Finish this!
+			this.monitor.reportUtilization(utilization, this.gatherArrivals(getServers()));
+//			this.manageMachines(numberOfMachinesToAdd);
 			break;
 		case ADD_SERVER:
 			Machine newServer = (Machine) event.getValue()[0];
@@ -124,6 +128,19 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 			break;
 		}
 	}
+
+	private List<Triple> gatherArrivals(List<Machine> servers) {
+		List<Triple> data = new ArrayList<Triple>();
+		for(Machine machine : servers){
+			Triple<Integer, Integer, Integer> triple = new Triple<Integer, Integer, Integer>();
+			triple.firstValue = machine.getNumberOfRequestsArrivalsInPreviousInterval();
+			triple.secondValue = machine.getNumberOfRequestsCompletionsInPreviousInterval();
+			data.add(triple);
+			machine.resetCounters();
+		}
+		return data;
+	}
+	
 
 	/**
 	 * @param numberOfMachinesToAdd
@@ -189,6 +206,6 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	}
 
 	public void report(Request requestFinished) {
-		monitor.report(requestFinished);
+		monitor.reportRequestFinished(requestFinished);
 	}
 }

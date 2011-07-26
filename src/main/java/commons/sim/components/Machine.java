@@ -23,7 +23,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	private boolean isReserved;
 	private double totalProcessed;
 
-	protected JETime lastProcessingEvaluation;
+//	protected JETime lastProcessingEvaluation;
 	private JEEvent nextFinishEvent;
 
 	private final List<Request> queue;
@@ -46,11 +46,14 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 		this.machineID = machineID;
 		this.queue = new ArrayList<Request>();
 		this.finishedRequests = new ArrayList<Request>();
-		this.lastProcessingEvaluation = new JETime(0);
+//		this.lastProcessingEvaluation = new JETime(0);
 		this.isReserved = false;
 		this.setTotalProcessed(0);
 		this.shutdownOnFinish = false;
 		this.lastUpdate = new JETime(0);
+		
+		this.numberOfRequestsArrivalsInPreviousInterval = 0;
+		this.numberOfRequestsCompletionsInPreviousInterval = 0;
 	}
 
 	/**
@@ -100,6 +103,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 		}
 		nextFinishEvent = event;
 		send(event);
+		this.numberOfRequestsArrivalsInPreviousInterval++;
 	}
 
 	/**
@@ -146,8 +150,9 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 			Request requestFinished = (Request) event.getValue()[0];
 			
 			queue.remove(requestFinished);
+			this.numberOfRequestsCompletionsInPreviousInterval++;
 			
-			getLoadBalancer().report(requestFinished);
+			getLoadBalancer().report(requestFinished);//Asking for accounting of a finished request
 
 			if (!queue.isEmpty()) {
 				Request nextToFinish = queue.get(0);
@@ -162,7 +167,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 						nextToFinish));
 			}else{
 				if(shutdownOnFinish){
-					send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this, getScheduler().now(), this));
+					send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, getScheduler().now(), this));
 				}
 			}
 			break;
@@ -228,7 +233,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 			return 1.0;
 		}else{//Requests were processed previously, and no pending requests exist
 			if(currentTime >= OneTierSimulatorForPlanning.UTILIZATION_EVALUATION_PERIOD){
-				double difference = this.lastProcessingEvaluation.timeMilliSeconds - (currentTime - OneTierSimulatorForPlanning.UTILIZATION_EVALUATION_PERIOD);
+				double difference = this.lastUpdate.timeMilliSeconds - (currentTime - OneTierSimulatorForPlanning.UTILIZATION_EVALUATION_PERIOD);
 				if(difference <= 0){
 					return 0.0;
 				}else{

@@ -3,7 +3,6 @@ package commons.sim;
 import java.io.IOException;
 import java.util.List;
 
-import provisioning.DPS;
 import provisioning.Monitor;
 
 import commons.cloud.Request;
