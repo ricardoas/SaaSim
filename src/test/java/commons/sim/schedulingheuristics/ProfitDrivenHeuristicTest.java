@@ -1,4 +1,4 @@
-package commons.sim;
+package commons.sim.schedulingheuristics;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -6,24 +6,25 @@ import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 
+import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
 import commons.cloud.Request;
 import commons.sim.components.Machine;
+import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
+import commons.sim.jeevent.JETime;
 
 
-public class ProfitDrivenSchedulerTest {
+public class ProfitDrivenHeuristicTest {
 	
 	private double sla = 1000 * 50;//50 sec in millis
-	private ProfitDrivenScheduler scheduler;
-	private JEEventScheduler eventScheduler;
+	private ProfitDrivenHeuristic heuristic;
 	
 	@Before
 	public void setUp(){
-		this.eventScheduler = new JEEventScheduler();
-		this.scheduler = new ProfitDrivenScheduler(sla);
+		this.heuristic = new ProfitDrivenHeuristic(sla);
 	}
 	
 	@Test
@@ -39,7 +40,7 @@ public class ProfitDrivenSchedulerTest {
 		long demand = 1000 * 60 * 20;
 		
 		Request request = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
-		Machine nextServer = scheduler.getNextServer(request, new ArrayList<Machine>());
+		Machine nextServer = this.heuristic.getNextServer(request, new ArrayList<Machine>());
 		assertNull(nextServer);
 	}
 	
@@ -58,12 +59,15 @@ public class ProfitDrivenSchedulerTest {
 		String httpOperation = "GET";
 		long demand = 1000 * 20;//in millis
 		
+		JEEventScheduler eventScheduler = EasyMock.createMock(JEEventScheduler.class);
+		EasyMock.expect(eventScheduler.registerHandler(EasyMock.isA(Machine.class))).andReturn(1);
+		EasyMock.replay(eventScheduler);
 		ArrayList<Machine> servers = new ArrayList<Machine>();
 		Machine machine1 = new Machine(eventScheduler, 1);
 		servers.add(machine1);
 		
 		Request request = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
-		Machine nextServer = scheduler.getNextServer(request, servers);
+		Machine nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 	}
@@ -84,6 +88,11 @@ public class ProfitDrivenSchedulerTest {
 		String httpOperation = "GET";
 		long demand = 1000 * 20;//in millis
 		
+		JEEventScheduler eventScheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EasyMock.expect(eventScheduler.registerHandler(EasyMock.isA(Machine.class))).andReturn(1).times(2);
+		EasyMock.expect(eventScheduler.registerHandler(EasyMock.isA(Machine.class))).andReturn(2).times(2);
+		EasyMock.expect(eventScheduler.registerHandler(EasyMock.isA(Machine.class))).andReturn(3).times(2);
+		EasyMock.replay(eventScheduler);
 		ArrayList<Machine> servers = new ArrayList<Machine>();
 		Machine machine1 = new Machine(eventScheduler, 1);
 		Machine machine2 = new Machine(eventScheduler, 2);
@@ -93,7 +102,7 @@ public class ProfitDrivenSchedulerTest {
 		servers.add(machine3);
 		
 		Request request = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
-		Machine nextServer = scheduler.getNextServer(request, servers);
+		Machine nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		
@@ -107,9 +116,11 @@ public class ProfitDrivenSchedulerTest {
 		servers.add(machine1);
 		
 		request = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
-		nextServer = scheduler.getNextServer(request, servers);
+		nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine3, nextServer);
+		
+		EasyMock.verify(eventScheduler);
 	}
 	
 	/**
@@ -120,7 +131,7 @@ public class ProfitDrivenSchedulerTest {
 	@Test
 	public void testGetServerWithBusyMachine(){
 		double sla = 1000 * 20;
-		this.scheduler = new ProfitDrivenScheduler(sla);
+		this.heuristic = new ProfitDrivenHeuristic(sla);
 		
 		String clientID = "c1";
 		String userID = "u1";
@@ -133,6 +144,8 @@ public class ProfitDrivenSchedulerTest {
 		long demand = 1000 * 10;//in millis
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
+		JEEventScheduler eventScheduler = new JEEventScheduler();
+		
 		Machine machine1 = new Machine(eventScheduler, 1);
 		Machine machine2 = new Machine(eventScheduler, 2);
 		servers.add(machine1);
@@ -145,7 +158,7 @@ public class ProfitDrivenSchedulerTest {
 		
 		demand = 1000 * 15;//in millis
 		Request request3 = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
-		Machine nextServer = scheduler.getNextServer(request3, servers);
+		Machine nextServer = this.heuristic.getNextServer(request3, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine2, nextServer);
 	}
@@ -158,7 +171,7 @@ public class ProfitDrivenSchedulerTest {
 	@Test
 	public void testGetServerWithBusyMachine2(){
 		double sla = 1000 * 20;
-		this.scheduler = new ProfitDrivenScheduler(sla);
+		this.heuristic = new ProfitDrivenHeuristic(sla);
 		
 		String clientID = "c1";
 		String userID = "u1";
@@ -170,6 +183,7 @@ public class ProfitDrivenSchedulerTest {
 		String httpOperation = "GET";
 		long demand = 1000 * 10;//in millis
 		
+		JEEventScheduler eventScheduler = new JEEventScheduler();
 		ArrayList<Machine> servers = new ArrayList<Machine>();
 		Machine machine1 = new Machine(eventScheduler, 1);
 		Machine machine2 = new Machine(eventScheduler, 2);
@@ -188,7 +202,7 @@ public class ProfitDrivenSchedulerTest {
 		
 		demand = 1000 * 15;//in millis
 		Request request5 = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
-		Machine nextServer = scheduler.getNextServer(request5, servers);
+		Machine nextServer = this.heuristic.getNextServer(request5, servers);
 		assertNull(nextServer);
 	}
 	
@@ -200,7 +214,7 @@ public class ProfitDrivenSchedulerTest {
 	@Test
 	public void testGetServerWithBusyMachine3(){
 		double sla = 1000 * 20;
-		this.scheduler = new ProfitDrivenScheduler(sla);
+		this.heuristic = new ProfitDrivenHeuristic(sla);
 		
 		String clientID = "c1";
 		String userID = "u1";
@@ -212,6 +226,7 @@ public class ProfitDrivenSchedulerTest {
 		String httpOperation = "GET";
 		long demand = 1000 * 15;//in millis
 		
+		JEEventScheduler eventScheduler = new JEEventScheduler();
 		ArrayList<Machine> servers = new ArrayList<Machine>();
 		Machine machine1 = new Machine(eventScheduler, 1);
 		Machine machine2 = new Machine(eventScheduler, 2);
@@ -225,7 +240,7 @@ public class ProfitDrivenSchedulerTest {
 		machine2.sendRequest(request3);
 		
 		Request request5 = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
-		Machine nextServer = scheduler.getNextServer(request5, servers);
+		Machine nextServer = this.heuristic.getNextServer(request5, servers);
 		assertNull(nextServer);
 	}
 }

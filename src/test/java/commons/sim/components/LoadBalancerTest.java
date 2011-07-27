@@ -1,4 +1,4 @@
-package commons.sim;
+package commons.sim.components;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

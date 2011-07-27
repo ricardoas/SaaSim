@@ -10,8 +10,8 @@ import provisioning.ProfitDrivenProvisioningSystem;
 import provisioning.RanjanProvisioningSystem;
 import provisioning.StaticProvisioningSystem;
 
-import commons.sim.ProfitDrivenScheduler;
-import commons.sim.RanjanScheduler;
+import commons.sim.schedulingheuristics.ProfitDrivenHeuristic;
+import commons.sim.schedulingheuristics.RanjanHeuristic;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
 import commons.sim.util.SimpleApplicationFactory;
 import commons.sim.util.SimulatorProperties;
@@ -88,10 +88,10 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 				heuristicClasses[i] = RoundRobinHeuristic.class;
 				break;
 			case RANJAN:
-				heuristicClasses[i] = RanjanScheduler.class;
+				heuristicClasses[i] = RanjanHeuristic.class;
 				break;
 			case PROFITDRIVEN:
-				heuristicClasses[i] = ProfitDrivenScheduler.class;
+				heuristicClasses[i] = ProfitDrivenHeuristic.class;
 				break;
 			case CUSTOM:
 				try {
