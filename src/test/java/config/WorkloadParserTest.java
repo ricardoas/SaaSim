@@ -16,7 +16,7 @@ import commons.cloud.User;
 
 public class WorkloadParserTest {
 	
-	private static String W1 = "test_files/workload/w1.dat";
+	private static String W1 = "src/test/resources/workload/w1.dat";
 	
 	@Test
 	public void testW1(){

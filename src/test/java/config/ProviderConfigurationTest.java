@@ -14,11 +14,11 @@ import commons.cloud.Provider;
 
 public class ProviderConfigurationTest {
 	
-	private String INVALID_FILE = "test_files/providers/invalid.properties";
-	private String INVALID_FILE2 = "test_files/providers/invalid2.properties";
-	private String INVALID_FILE3 = "test_files/providers/invalid3.properties";
-	private String INEXISTENT_FILE = "test_files/providers/inexistent.properties";
-	private String VALID_FILE = "test_files/providers/iaas.properties";
+	private String INVALID_FILE = "src/test/resources/providers/invalid.properties";
+	private String INVALID_FILE2 = "src/test/resources/providers/invalid2.properties";
+	private String INVALID_FILE3 = "src/test/resources/providers/invalid3.properties";
+	private String INEXISTENT_FILE = "src/test/resources/providers/inexistent.properties";
+	private String VALID_FILE = "src/test/resources/providers/iaas.properties";
 	
 	/**
 	 * This test verifies an invalid file with transfer data missing.

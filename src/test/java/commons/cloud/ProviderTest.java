@@ -253,7 +253,7 @@ public class ProviderTest {
 		machine6.setTotalProcessed(15.23 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(machine6);
 		
-		assertEquals(600 + 67 * reservedCpuCost + 67 * monitoringCost, provider.calculateCost(0), 0.0d);
+		assertEquals(600 + 68 * reservedCpuCost + 68 * monitoringCost, provider.calculateCost(0), 0.0d);
 	}
 	
 	@Test
@@ -321,7 +321,7 @@ public class ProviderTest {
 		machine5.setTotalProcessed(5.14 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(machine5);
 		
-		assertEquals( 25 * onDemandCpuCost + 25 * monitoringCost, provider.calculateCost(0), 0.0d);
+		assertEquals( 26 * onDemandCpuCost + 26 * monitoringCost, provider.calculateCost(0), 0.0d);
 	}
 	
 	@Test
@@ -419,7 +419,7 @@ public class ProviderTest {
 		machine11.setTotalProcessed(5.14 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(machine11);
 		
-		assertEquals( 7 * reservationOneYearFee + 103 * reservedCpuCost + 103 * monitoringCost +
-				103 * onDemandCpuCost + 103 * monitoringCost, provider.calculateCost(0), 0.0d);
+		assertEquals( 7 * reservationOneYearFee + 104 * reservedCpuCost + 104 * monitoringCost +
+				105 * onDemandCpuCost + 105 * monitoringCost, provider.calculateCost(0), 0.0d);
 	}
 }

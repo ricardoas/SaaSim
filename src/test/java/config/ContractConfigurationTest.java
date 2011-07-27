@@ -15,11 +15,11 @@ import commons.cloud.User;
 
 public class ContractConfigurationTest {
 	
-	private String INVALID_FILE = "test_files/contracts/invalid.contracts";
-	private String INVALID_FILE2 = "test_files/contracts/invalid2.contracts";
-	private String INVALID_FILE3 = "test_files/contracts/invalid3.contracts";
-	private String INEXISTENT_FILE = "test_files/contracts/inexistent.dat";
-	private String VALID_FILE = "test_files/contracts/contracts.properties";
+	private String INVALID_FILE = "src/test/resources/contracts/invalid.contracts";
+	private String INVALID_FILE2 = "src/test/resources/contracts/invalid2.contracts";
+	private String INVALID_FILE3 = "src/test/resources/contracts/invalid3.contracts";
+	private String INEXISTENT_FILE = "src/test/resources/contracts/inexistent.dat";
+	private String VALID_FILE = "src/test/resources/contracts/contracts.properties";
 	
 	/**
 	 * This test verifies that a contracts file missing user associations with SaaS plans is not valid.

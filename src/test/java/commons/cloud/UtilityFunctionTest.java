@@ -156,8 +156,8 @@ public class UtilityFunctionTest {
 		mach11.setTotalProcessed(5.14 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(mach11);
 		
-		assertEquals(7 * provider.reservationOneYearFee + 103 * provider.reservedCpuCost + 103 * provider.monitoringCost +
-				103 * provider.onDemandCpuCost + 103 * provider.monitoringCost, utility.calculateCost(user.consumedTransference, provider), 0.0);
+		assertEquals(7 * provider.reservationOneYearFee + 104 * provider.reservedCpuCost + 104 * provider.monitoringCost +
+				105 * provider.onDemandCpuCost + 105 * provider.monitoringCost, utility.calculateCost(user.consumedTransference, provider), 0.0);
 	}
 	
 	@Test
@@ -188,7 +188,7 @@ public class UtilityFunctionTest {
 		mach7.setTotalProcessed(15.23 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach7);
 		
-		assertEquals(7 * provider.reservationOneYearFee + 103 * provider.reservedCpuCost + 103 * provider.monitoringCost,
+		assertEquals(7 * provider.reservationOneYearFee + 104 * provider.reservedCpuCost + 104 * provider.monitoringCost,
 				utility.calculateCost(user.consumedTransference, provider), 0.0);
 	}
 	
@@ -229,7 +229,7 @@ public class UtilityFunctionTest {
 		Contract contract = new Contract("p1", setupCost, price, cpuLimit, extraCpuCost);
 		
 		User user = new User("us1");
-		user.consumedCpu = 103d * HOUR_IN_MILLIS;
+		user.consumedCpu = 104d * HOUR_IN_MILLIS;
 		
 		//Adding resources
 		Machine mach1 = new Machine(scheduler, 1);
@@ -254,7 +254,7 @@ public class UtilityFunctionTest {
 		mach7.setTotalProcessed(15.23 * HOUR_IN_MILLIS);
 		provider.reservedResources.add(mach7);
 		
-		double cost = 7 * provider.reservationOneYearFee + 103 * provider.reservedCpuCost + 103 * provider.monitoringCost;
+		double cost = 7 * provider.reservationOneYearFee + 104 * provider.reservedCpuCost + 104 * provider.monitoringCost;
 		double receipt = Math.ceil((user.consumedCpu - cpuLimit)/HOUR_IN_MILLIS) * extraCpuCost + setupCost + price; 
 		
 		assertEquals(receipt-cost, utility.calculateUtility(contract, user, provider), 0.0);
@@ -307,8 +307,8 @@ public class UtilityFunctionTest {
 		mach11.setTotalProcessed(5.14 * HOUR_IN_MILLIS);
 		provider.onDemandResources.add(mach11);
 		
-		double cost = 7 * provider.reservationOneYearFee + 103 * provider.reservedCpuCost + 103 * provider.monitoringCost 
-						+ 103 * provider.onDemandCpuCost + 103 * provider.monitoringCost;
+		double cost = 7 * provider.reservationOneYearFee + 104 * provider.reservedCpuCost + 104 * provider.monitoringCost 
+						+ 105 * provider.onDemandCpuCost + 105 * provider.monitoringCost;
 		double receipt = Math.ceil((user.consumedCpu - cpuLimit)/HOUR_IN_MILLIS) * extraCpuCost + setupCost + price; 
 		
 		assertEquals(receipt-cost, utility.calculateUtility(contract, user, provider), 0.0);

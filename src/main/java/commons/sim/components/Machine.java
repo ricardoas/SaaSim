@@ -121,7 +121,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	private void updateFinishedDemand() {
 		JETime now = getScheduler().now();
 		if(lastUpdate.isEarlierThan(now) && !queue.isEmpty()){
-			long processedDemand = (now.timeMilliSeconds - lastUpdate.timeMilliSeconds)/(queue.size() + 1);
+			long processedDemand = (now.timeMilliSeconds - lastUpdate.timeMilliSeconds)/(queue.size());
 			for (Request request : queue) {
 				request.update(processedDemand);
 			}

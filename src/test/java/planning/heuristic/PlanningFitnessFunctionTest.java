@@ -24,7 +24,7 @@ import config.GEISTMonthlyWorkloadParser;
 public class PlanningFitnessFunctionTest {
 	
 	private static final double SLA = 10d;
-	private String simpleWorkload = "test_files/workload/w2.dat";
+	private String simpleWorkload = "src/test/resources/workload/w2.dat";
 	private static final int HOUR_IN_MILLIS = 1000 * 60 * 60;
 	
 	@Before

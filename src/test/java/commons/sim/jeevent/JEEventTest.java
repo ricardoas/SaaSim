@@ -26,8 +26,8 @@ public class JEEventTest {
 		EasyMock.replay(handler);
 		JEEvent eventA = new JEEvent(JEEventType.READWORKLOAD, handler, new JETime(1000));
 		JEEvent eventB = new JEEvent(JEEventType.NEWREQUEST, handler, new JETime(1000));
-		assertEquals(-3, eventA.compareTo(eventB));
-		assertEquals(3, eventB.compareTo(eventA));
+		assertEquals(-4, eventA.compareTo(eventB));
+		assertEquals(4, eventB.compareTo(eventA));
 		EasyMock.verify(handler);
 	}
 	

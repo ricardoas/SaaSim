@@ -150,6 +150,7 @@ public class MachineTest {
 	}
 	
 	@Test
+	//FIXME: Esse teste está sem muito sentido! :P
 	public void sendTwoDifferentRequestsAtDifferentOverlappingTimesFinishingBefore() throws Exception{
 		scheduler = PowerMock.createStrictPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(3);

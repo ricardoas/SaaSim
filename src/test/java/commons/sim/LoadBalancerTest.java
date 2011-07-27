@@ -9,6 +9,8 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
+import provisioning.DPS;
+
 import commons.cloud.Request;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.Machine;
@@ -63,27 +65,30 @@ public class LoadBalancerTest {
 	public void handleEventNewRequestWithNoAvailableMachine(){
 		Request request = EasyMock.createStrictMock(Request.class);
 		JEEvent event = EasyMock.createStrictMock(JEEvent.class);
+		DPS dps = EasyMock.createStrictMock(DPS.class);
+		
 		this.schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
 		
 		EasyMock.expect(event.getType()).andReturn(JEEventType.NEWREQUEST).once();
 		EasyMock.expect(event.getValue()).andReturn(new Request [] {request}).once();
+		EasyMock.expect(dps.getHandlerId()).andReturn(1).once();
 		
 		EasyMock.expect(schedulingHeuristic.getNextServer(
 				EasyMock.isA(Request.class) , EasyMock.isA(List.class))).andReturn(null);
 		
-		EasyMock.replay(event, schedulingHeuristic, request);
+		EasyMock.replay(event, schedulingHeuristic, request, dps);
 		
-		lb = new LoadBalancer(eventScheduler, null, schedulingHeuristic, Integer.MAX_VALUE);
+		lb = new LoadBalancer(eventScheduler, dps, schedulingHeuristic, Integer.MAX_VALUE);
 		lb.handleEvent(event);
 		
-		EasyMock.verify(event, schedulingHeuristic, request);
+		EasyMock.verify(event, schedulingHeuristic, request, dps);
 	}
 	
 	/**
 	 * Scheduling a new request without machines does not throws any error
 	 */
 	@Test
-	public void handleEventNewRequestWithNoMachinessasa(){
+	public void handleEventNewRequestWithOneMachines(){
 		String clientID = "c1";
 		String userID = "u1";
 		String reqID = "1";
@@ -97,22 +102,25 @@ public class LoadBalancerTest {
 		Request[] requests = new Request[1];
 		requests[0] = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
 		
+		this.schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
+		DPS dps = EasyMock.createStrictMock(DPS.class);
 		Machine machine = EasyMock.createStrictMock(Machine.class);
-		lb.getServers().add(machine);//Creating a machine to serve the request
 		
 		JEEvent event = EasyMock.createStrictMock(JEEvent.class);
 		EasyMock.expect(event.getType()).andReturn(JEEventType.NEWREQUEST).once();
 		EasyMock.expect(event.getValue()).andReturn(requests).once();
+		EasyMock.expect(schedulingHeuristic.getNextServer(
+				EasyMock.isA(Request.class) , EasyMock.isA(List.class))).andReturn(machine);
 		machine.sendRequest(requests[0]);
 		EasyMock.expectLastCall().once();
 		
-		EasyMock.replay(event);
-		EasyMock.replay(machine);
+		EasyMock.replay(event, machine, dps, schedulingHeuristic);
 		
+		lb = new LoadBalancer(eventScheduler, dps, schedulingHeuristic, Integer.MAX_VALUE);
+		lb.getServers().add(machine);//Creating a machine to serve the request
 		lb.handleEvent(event);
 		
-		EasyMock.verify(event);
-		EasyMock.verify(machine);
+		EasyMock.verify(event, machine, dps, schedulingHeuristic);
 		
 		assertNotNull(lb.getServers());
 		assertEquals(1, lb.getServers().size());
