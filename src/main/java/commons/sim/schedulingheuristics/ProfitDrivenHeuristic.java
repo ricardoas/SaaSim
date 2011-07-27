@@ -3,15 +3,20 @@ package commons.sim.schedulingheuristics;
 import java.util.List;
 
 import commons.cloud.Request;
+import commons.config.SimulatorConfiguration;
 import commons.sim.components.Machine;
 import commons.util.Triple;
 
 public class ProfitDrivenHeuristic implements SchedulingHeuristic{
 	
-	private final double sla;
-
-	//FIXME: Verify how to create this heuristic in simulator startup!
-	public ProfitDrivenHeuristic(double sla){
+	private double sla;
+	
+	public ProfitDrivenHeuristic(){
+		SimulatorConfiguration config = SimulatorConfiguration.getInstance();
+		this.sla = config.getSLA();
+	}
+	
+	public void setSLA(double sla){
 		this.sla = sla;
 	}
 	

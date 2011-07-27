@@ -7,12 +7,16 @@ import static org.junit.Assert.fail;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Map;
 
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.ConversionException;
 import org.junit.Test;
 
 import commons.cloud.Provider;
+import commons.config.SimulatorConfiguration;
 
-public class ProviderConfigurationTest {
+public class ProviderInputTest {
 	
 	private String INVALID_FILE = "src/test/resources/providers/invalid.properties";
 	private String INVALID_FILE2 = "src/test/resources/providers/invalid2.properties";
@@ -25,13 +29,15 @@ public class ProviderConfigurationTest {
 	 */
 	@Test
 	public void testInvalidFile(){
-		ProviderConfiguration config = new ProviderConfiguration();
 		try {
-			config.loadPropertiesFromFile(INVALID_FILE);
-			fail("Invalid file!");
-		} catch (FileNotFoundException e) {
+			SimulatorConfiguration.buildInstance(INVALID_FILE);
+			SimulatorConfiguration config = SimulatorConfiguration.getInstance();
+			config.getProviders();
 			fail("Invalid file!");
 		} catch (IOException e) {
+			System.err.println(e.getMessage());
+		} catch (ConfigurationException e) {
+			fail("Invalid file!");
 		}
 	}
 	
@@ -40,17 +46,18 @@ public class ProviderConfigurationTest {
 	 */
 	@Test
 	public void testInvalidFile2(){
-		ProviderConfiguration config = new ProviderConfiguration();
 		try {
-			config.loadPropertiesFromFile(INVALID_FILE2);
-			fail("Invalid file!");
-		} catch (FileNotFoundException e) {
+			SimulatorConfiguration.buildInstance(INVALID_FILE2);
+			SimulatorConfiguration config = SimulatorConfiguration.getInstance();
+			config.getProviders();
 			fail("Invalid file!");
 		} catch (IOException e) {
 			fail("Invalid file!");
-		} catch (NumberFormatException e){
-			
-		}
+		} catch (ConfigurationException e) {
+			fail("Invalid file!");
+		} catch (ConversionException e){
+			System.err.println(e.getClass()+" "+e.getMessage());
+		} 
 	}
 	
 	/**
@@ -58,13 +65,17 @@ public class ProviderConfigurationTest {
 	 */
 	@Test
 	public void testInvalidFile3(){
-		ProviderConfiguration config = new ProviderConfiguration();
 		try {
-			config.loadPropertiesFromFile(INVALID_FILE3);
+			SimulatorConfiguration.buildInstance(INVALID_FILE3);
+			SimulatorConfiguration config = SimulatorConfiguration.getInstance();
+			config.getProviders();
 			fail("Invalid file!");
 		} catch (FileNotFoundException e) {
 			fail("Invalid file!");
 		} catch (IOException e) {
+			System.err.println(e.getClass()+" "+e.getMessage());
+		} catch (ConfigurationException e) {
+			fail("Invalid file!");
 		}
 	}
 	
@@ -73,13 +84,15 @@ public class ProviderConfigurationTest {
 	 */
 	@Test
 	public void testInexistentFile(){
-		ProviderConfiguration config = new ProviderConfiguration();
 		try {
-			config.loadPropertiesFromFile(INEXISTENT_FILE);
+			SimulatorConfiguration.buildInstance(INEXISTENT_FILE);
+			SimulatorConfiguration config = SimulatorConfiguration.getInstance();
+			config.getProviders();
 			fail("Invalid file!");
-		} catch (FileNotFoundException e) {
 		} catch (IOException e) {
 			fail("Invalid file!");
+		} catch (ConfigurationException e) {
+			System.err.println(e.getMessage());
 		}
 	}
 	
@@ -88,13 +101,14 @@ public class ProviderConfigurationTest {
 	 */
 	@Test
 	public void testValidFile(){
-		ProviderConfiguration config = new ProviderConfiguration();
 		try {
-			config.loadPropertiesFromFile(VALID_FILE);
-			assertNotNull(config.providers);
-			assertEquals(3, config.providers.size());
+			SimulatorConfiguration.buildInstance(VALID_FILE);
+			SimulatorConfiguration config = SimulatorConfiguration.getInstance();
+			Map<String, Provider> providers = config.getProviders();
+			assertNotNull(providers);
+			assertEquals(3, providers.size());
 			
-			Provider provider = config.providers.get("p1");
+			Provider provider = providers.get("p1");
 			assertNotNull(provider);
 			assertEquals("p1", provider.name);
 			assertEquals(0.5, provider.onDemandCpuCost, 0.0);
@@ -109,7 +123,7 @@ public class ProviderConfigurationTest {
 			assertEquals("200", provider.transferOutLimits);
 			assertEquals("0.10 0.09", provider.transferOutCosts);
 			
-			Provider provider2 = config.providers.get("p2");
+			Provider provider2 = providers.get("p2");
 			assertNotNull(provider2);
 			assertEquals("p2", provider2.name);
 			assertEquals(0.5, provider2.onDemandCpuCost, 0.0);
@@ -124,7 +138,7 @@ public class ProviderConfigurationTest {
 			assertEquals("200", provider2.transferOutLimits);
 			assertEquals("0.10 0.09", provider2.transferOutCosts);
 			
-			Provider provider3 = config.providers.get("p3");
+			Provider provider3 = providers.get("p3");
 			assertNotNull(provider3);
 			assertEquals("p3", provider3.name);
 			assertEquals(0.55, provider3.onDemandCpuCost, 0.0);
@@ -138,14 +152,12 @@ public class ProviderConfigurationTest {
 			assertEquals("0.1 0.0", provider3.transferInCosts);
 			assertEquals("20", provider3.transferOutLimits);
 			assertEquals("0.1 0.0", provider3.transferOutCosts);
-			
-			
 		} catch (FileNotFoundException e) {
 			fail("Valid file! "+e.getMessage());
 		} catch (IOException e) {
 			fail("Valid file! "+e.getMessage());
+		} catch (ConfigurationException e) {
+			fail("Valid file! "+e.getMessage());
 		}
 	}
-	
-
 }

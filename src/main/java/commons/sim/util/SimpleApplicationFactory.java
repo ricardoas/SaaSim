@@ -25,13 +25,13 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 		SimulatorConfiguration config = SimulatorConfiguration.getInstance();
 		int numOfTiers = config.getApplicationNumOfTiers();
 		Class<?>[] heuristicClasses = config.getApplicationHeuristics();
-		int [] serverPerTier = config.getApplicationInitialServersPerTier();
+		int [] serversPerTier = config.getApplicationInitialServersPerTier();
 		int [] maxServerPerTier = config.getApplicationMaxServersPerTier();
 		
-		LoadBalancer entryPoint = buildLoadBalancer(scheduler, monitor, heuristicClasses[0], serverPerTier[0], maxServerPerTier[0], setupMachines);
+		LoadBalancer entryPoint = buildLoadBalancer(scheduler, monitor, heuristicClasses[0], serversPerTier[0], maxServerPerTier[0], setupMachines);
 		LoadBalancer currentTier = entryPoint;
 		for (int i = 1; i < numOfTiers; i++) {
-			LoadBalancer nextTier = buildLoadBalancer(scheduler, monitor, heuristicClasses[i], serverPerTier[i], maxServerPerTier[i], setupMachines);
+			LoadBalancer nextTier = buildLoadBalancer(scheduler, monitor, heuristicClasses[i], serversPerTier[i], maxServerPerTier[i], setupMachines);
 			linkTiers(currentTier, nextTier);
 			currentTier = nextTier;
 		}
@@ -52,15 +52,15 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 	 * @param scheduler
 	 * @param monitor
 	 * @param heuristic
-	 * @param serverPerTier 
+	 * @param serversPerTier 
 	 * @param maxServerPerTier 
 	 * @param setupMachines 
 	 * @return
 	 */
 	private LoadBalancer buildLoadBalancer(JEEventScheduler scheduler, Monitor monitor,
-			Class<?> heuristic, int serverPerTier, int maxServerPerTier, List<Machine> setupMachines) {
+			Class<?> heuristic, int serversPerTier, int maxServerPerTier, List<Machine> setupMachines) {
 		try {
-			Machine [] servers = new Machine[serverPerTier];
+			Machine [] servers = new Machine[serversPerTier];
 			for (int i = 0; i < servers.length; i++) {
 				servers[i] = setupMachines.remove(0);
 			}

@@ -17,8 +17,6 @@ public class MainConfiguration extends Configuration{
 	private static String SIM = "sim.";
 	private static String SIM_APP_FACTORY = SIM + "applicationfactory";
 	
-	
-	
 	@Override
 	public boolean verifyPropertiesExist(){
 		return currentProperties.containsKey(WORKLOAD) && currentProperties.containsKey(HEURISTIC) &&

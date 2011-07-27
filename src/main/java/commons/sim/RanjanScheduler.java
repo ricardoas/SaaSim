@@ -8,6 +8,7 @@ import commons.cloud.Request;
 import commons.sim.components.Machine;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
 
+@Deprecated
 public class RanjanScheduler implements SchedulingHeuristic {
 
 	private long SESSION_LIMIT = 1000 * 60 * 15;//in millis
@@ -61,7 +62,6 @@ public class RanjanScheduler implements SchedulingHeuristic {
 		return null;
 	}
 
-	@Deprecated
 	public double evaluateUtilization(List<Machine> servers, Long eventTime){
 		double averageUtilization = 0d;
 		double totalNumberOfCompletions = 0d;

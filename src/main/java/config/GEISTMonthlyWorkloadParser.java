@@ -168,7 +168,7 @@ public class GEISTMonthlyWorkloadParser implements WorkloadParser<Map<User, List
 
 	@Override
 	public boolean hasNext() {
-		return true;
+		return this.nextRequests.size() > 0;
 	}
 }
 

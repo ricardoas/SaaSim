@@ -7,13 +7,16 @@ import static org.junit.Assert.fail;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Map;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Test;
 
 import commons.cloud.Contract;
 import commons.cloud.User;
+import commons.config.SimulatorConfiguration;
 
-public class ContractConfigurationTest {
+public class ContractInputTest {
 	
 	private String INVALID_FILE = "src/test/resources/contracts/invalid.contracts";
 	private String INVALID_FILE2 = "src/test/resources/contracts/invalid2.contracts";
@@ -26,14 +29,18 @@ public class ContractConfigurationTest {
 	 */
 	@Test
 	public void testIncompleteFile(){
-		ContractConfiguration config = new ContractConfiguration();
 		try {
-			config.loadPropertiesFromFile(INVALID_FILE);
+			SimulatorConfiguration.buildInstance(INVALID_FILE);
+			SimulatorConfiguration config = SimulatorConfiguration.getInstance();
+			config.getContractsPerName();
 			fail("Data is incomplete!");
 		} catch (FileNotFoundException e) {
 			fail("Data is incomplete!");
 		} catch (IOException e) {
+		} catch (ConfigurationException e1) {
+			fail("Data is incomplete!");
 		}
+		
 	}
 	
 	/**
@@ -41,13 +48,16 @@ public class ContractConfigurationTest {
 	 */
 	@Test
 	public void testIncompleteFile2(){
-		ContractConfiguration config = new ContractConfiguration();
 		try {
-			config.loadPropertiesFromFile(INVALID_FILE2);
+			SimulatorConfiguration.buildInstance(INVALID_FILE2);
+			SimulatorConfiguration config = SimulatorConfiguration.getInstance();
+			config.getContractsPerName();
 			fail("Data is incomplete!");
 		} catch (FileNotFoundException e) {
 			fail("Data is incomplete!");
 		} catch (IOException e) {
+		} catch (ConfigurationException e1) {
+			fail("Data is incomplete!");
 		}
 	}
 	
@@ -56,13 +66,16 @@ public class ContractConfigurationTest {
 	 */
 	@Test
 	public void testInvalidFile(){
-		ContractConfiguration config = new ContractConfiguration();
 		try {
-			config.loadPropertiesFromFile(INVALID_FILE3);
+			SimulatorConfiguration.buildInstance(INVALID_FILE3);
+			SimulatorConfiguration config = SimulatorConfiguration.getInstance();
+			config.getContractsPerName();
 			fail("Data is incomplete!");
 		} catch (FileNotFoundException e) {
 			fail("Data is incomplete!");
 		} catch (IOException e) {
+		} catch (ConfigurationException e1) {
+			fail("Data is incomplete!");
 		}
 	}
 	
@@ -71,26 +84,32 @@ public class ContractConfigurationTest {
 	 */
 	@Test
 	public void testInexistentFile(){
-		ContractConfiguration config = new ContractConfiguration();
 		try {
-			config.loadPropertiesFromFile(INEXISTENT_FILE);
+			SimulatorConfiguration.buildInstance(INEXISTENT_FILE);
+			SimulatorConfiguration config = SimulatorConfiguration.getInstance();
+			config.getContractsPerName();
 			fail("File is missing!");
 		} catch (FileNotFoundException e) {
+			fail("Data is incomplete!");
 		} catch (IOException e) {
 			fail("File is missing!");
+		} catch (ConfigurationException e1) {
+			System.err.println(e1.getMessage());
 		}
 	}
 	
 	@Test
 	public void testValidFile(){
 		try {
-			ContractConfiguration config = new ContractConfiguration();
-			config.loadPropertiesFromFile(VALID_FILE);
-			assertNotNull(config.usersContracts);
-			assertEquals(3, config.usersContracts.size());
-			assertEquals(2, config.contracts.size());
+			SimulatorConfiguration.buildInstance(VALID_FILE);
+			SimulatorConfiguration config = SimulatorConfiguration.getInstance();
+			Map<User, Contract> usersContracts = config.getContractsPerUser();
+			Map<String, Contract> contracts = config.getContractsPerName();
+			assertNotNull(usersContracts);
+			assertEquals(3, usersContracts.size());
+			assertEquals(2, contracts.size());
 			
-			Contract c1 = config.usersContracts.get(new User("u1"));
+			Contract c1 = usersContracts.get(new User("u1"));
 			assertNotNull(c1);
 			assertEquals(10, c1.cpuLimit, 0.0);
 			assertEquals(1, c1.extraCpuCost, 0.0);
@@ -100,7 +119,7 @@ public class ContractConfigurationTest {
 			assertEquals(0.0, c1.extraTransferenceCost, 0.0);//FIXME: When transference be supported fix this!
 			assertEquals(0, c1.transferenceLimit, 0.0);//FIXME: When transference be supported fix this!
 			
-			Contract c2 = config.usersContracts.get(new User("u2"));
+			Contract c2 = usersContracts.get(new User("u2"));
 			assertNotNull(c2);
 			assertEquals(55, c2.cpuLimit, 0.0);
 			assertEquals(2, c2.extraCpuCost, 0.0);
@@ -110,7 +129,7 @@ public class ContractConfigurationTest {
 			assertEquals(0, c2.extraTransferenceCost, 0.0);//FIXME: When transference be supported fix this!
 			assertEquals(0, c2.transferenceLimit, 0.0);//FIXME: When transference be supported fix this!
 			
-			Contract c3 = config.usersContracts.get(new User("u3"));
+			Contract c3 = usersContracts.get(new User("u3"));
 			assertNotNull(c3);
 			assertEquals(10, c3.cpuLimit, 0.0);
 			assertEquals(1, c3.extraCpuCost, 0.0);
@@ -120,16 +139,14 @@ public class ContractConfigurationTest {
 			assertEquals(0, c3.extraTransferenceCost, 0.0);//FIXME: When transference be supported fix this!
 			assertEquals(0, c3.transferenceLimit, 0.0);//FIXME: When transference be supported fix this!
 			
-			assertTrue(config.contracts.containsKey(c1.name));
-			assertTrue(config.contracts.containsKey(c2.name));
-			
+			assertTrue(contracts.containsKey(c1.name));
+			assertTrue(contracts.containsKey(c2.name));
 		} catch (FileNotFoundException e) {
 			fail("Valid file!");
 		} catch (IOException e) {
 			fail("Valid file!");
+		} catch (ConfigurationException e) {
+			fail("Valid file!");
 		}
 	}
-	
-	
-
 }
