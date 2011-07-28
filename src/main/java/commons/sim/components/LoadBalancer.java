@@ -147,7 +147,6 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 		
 		return new RanjanStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, servers.size());
 	}
-	
 
 	/**
 	 * @param numberOfMachinesToAdd

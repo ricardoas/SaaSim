@@ -24,7 +24,7 @@ public class Executor {
 
 	private static final String OUTUPUT_FILE = "executor.dat";
 	private final Provider provider;
-	private final HashMap<User, Contract> usersContracts;
+	private final Map<User, Contract> usersContracts;
 	private final GEISTMonthlyWorkloadParser workloadParser;
 	private final double sla;
 	private UtilityFunction utilityFunction;
@@ -33,7 +33,7 @@ public class Executor {
 	
 
 	public Executor(Map<String, Provider> providers,
-			HashMap<User, Contract> usersContracts,
+			Map<User, Contract> usersContracts,
 			GEISTMonthlyWorkloadParser workloadParser, double sla) {
 		this.provider = providers.values().iterator().next();
 		this.usersContracts = usersContracts;

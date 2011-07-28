@@ -4,12 +4,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.commons.configuration.ConfigurationException;
+
+import commons.config.SimulatorConfiguration;
+
 import planning.Executor;
 import planning.Planner;
-import config.ContractConfiguration;
 import config.GEISTMonthlyWorkloadParser;
 import config.MainConfiguration;
-import config.ProviderConfiguration;
 
 /**
  * This class is responsible for obtaining input parameters, from a configuration file, such as: workload, cloud provider
@@ -25,34 +27,29 @@ public class Main {
 			System.exit(1);
 		}
 		
-		MainConfiguration mainConfig = new MainConfiguration();
 		try {
-			mainConfig.loadPropertiesFromFile(args[0]);//Loading main simulation configuration
+			//Loading simulator configuration data
+			SimulatorConfiguration.buildInstance(args[0]);
+			SimulatorConfiguration config = SimulatorConfiguration.getInstance();
 			
 			//Parsing workload
-//			Map<Integer, Map<User, List<Request>>> workload = GEISTMonthlyWorkloadParser.getWorkloadPerMonth(mainConfig.getWorkloadFile());
-			GEISTMonthlyWorkloadParser workloadParser = new GEISTMonthlyWorkloadParser(mainConfig.getWorkloadFile());
-			
-			//Loading SaaS provider contracts
-			ContractConfiguration contractConfig = new ContractConfiguration();
-			contractConfig.loadPropertiesFromFile(mainConfig.getContractsFile());
-			
-			//Loading IaaS provider config
-			ProviderConfiguration providerConfig = new ProviderConfiguration();
-			providerConfig.loadPropertiesFromFile(mainConfig.getIAASFile());
+			GEISTMonthlyWorkloadParser workloadParser = new GEISTMonthlyWorkloadParser();
 			
 			//Creating planner
-			Planner planner = new Planner(providerConfig.providers, mainConfig.getHeuristic(), contractConfig.usersContracts, workloadParser, mainConfig.getSLA());
+			Planner planner = new Planner(config.getProviders(), config.getPlanningHeuristic(), config.getContractsPerUser(), workloadParser, config.getSLA());
 			List<String> plan = planner.plan();
 			
 			//FIXME: Change workload! Performing plan execution!
-			Executor executor = new Executor(providerConfig.providers, contractConfig.usersContracts, workloadParser, mainConfig.getSLA());
+			Executor executor = new Executor(config.getProviders(), config.getContractsPerUser(), workloadParser, config.getSLA());
 			executor.execute(plan);
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			System.exit(1);
 		} catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		} catch (ConfigurationException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}

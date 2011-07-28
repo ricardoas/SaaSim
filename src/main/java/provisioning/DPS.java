@@ -30,4 +30,6 @@ public interface DPS extends JEEventHandler, Monitor{
 	List<Machine> getSetupMachines();
 
 	void setAccountingSystem(AccountingSystem system);
+	
+	AccountingSystem getAccountingSystem();
 }

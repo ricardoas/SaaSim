@@ -1,5 +1,7 @@
 package planning.heuristic;
 
+import static commons.sim.util.SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,15 +11,26 @@ import java.util.Map.Entry;
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 
+import provisioning.DPS;
+import provisioning.util.DPSFactory;
+
 import commons.cloud.Contract;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
 import commons.cloud.UtilityFunction;
+import commons.config.SimulatorConfiguration;
+import commons.config.WorkloadParser;
+import commons.sim.AccountingSystem;
 import commons.sim.OneTierSimulatorForPlanning;
+import commons.sim.SimpleSimulator;
+import commons.sim.Simulator;
 import commons.sim.jeevent.JEEventScheduler;
+import commons.sim.util.SimulatorProperties;
 import commons.util.Dashboard;
 import commons.util.SimulationData;
+import config.GEISTMonthlyWorkloadParser;
+import config.GEISTSimpleWorkloadParser;
 
 public class PlanningFitnessFunction extends FitnessFunction{
 	
@@ -25,38 +38,46 @@ public class PlanningFitnessFunction extends FitnessFunction{
 	 * 
 	 */
 	private static final long serialVersionUID = 7906976193829216027L;
-	
-	private OneTierSimulatorForPlanning simulator;
+	private final GEISTMonthlyWorkloadParser parser;
 	private final Map<User, Contract> cloudUsers;
-	private UtilityFunction utilityFunction;
 	private final double sla;
 	private final Provider cloudProvider;
-	private final Map<User, List<Request>> currentWorkload;
+	
+//	private OneTierSimulatorForPlanning simulator;
+//	private UtilityFunction utilityFunction;
+//	private final Map<User, List<Request>> currentWorkload;
 	
 	private Dashboard dashboard;
 	private Map<Integer, Double> solvedProblems;
+	private SimpleSimulator simulator;
+	private DPS dps;
+
 	
-	public PlanningFitnessFunction(Map<User, List<Request>> currentWorkload, Map<User, Contract> cloudUsers, double sla, Map<String, Provider> cloudProvider){
-		this.currentWorkload = currentWorkload;
+	public PlanningFitnessFunction(GEISTMonthlyWorkloadParser parser, Map<User, Contract> cloudUsers, double sla, Map<String, Provider> cloudProvider){
+		this.parser = parser;
+		//		this.currentWorkload = currentWorkload;
 		this.cloudUsers = cloudUsers;
 		this.sla = sla;
 		this.cloudProvider = cloudProvider.values().iterator().next();
-		this.utilityFunction = new UtilityFunction();
+		//		this.utilityFunction = new UtilityFunction();
 		
 		this.dashboard = new Dashboard();//Place to store detailed information
 		this.solvedProblems = new HashMap<Integer, Double>();//Used to reuse previous calculated scenarios
 	}
 
-	private void initSimulator(Map<User, List<Request>> currentWorkload, Integer reservedResources) {
-		List<Request> workload = new ArrayList<Request>();
-		for (Entry<User, List<Request>> entry : currentWorkload.entrySet()) {
-			workload.addAll(entry.getValue());
-		}
-		
+	private void initSimulator(Integer reservedResources) {
 		//TODO: CHANGE ME! Starting simulation data to start a new simulation
-		this.simulator = new OneTierSimulatorForPlanning(new JEEventScheduler(), null, workload, this.sla, null);//FIXME remove null (dont know how)
-		this.simulator.setOnDemandResourcesLimit(this.cloudProvider.onDemandLimit);
-		this.simulator.setNumberOfReservedResources(reservedResources);
+//		this.simulator = new OneTierSimulatorForPlanning(new JEEventScheduler(), null, workload, this.sla, null);//FIXME remove null (dont know how)
+//		this.simulator.setOnDemandResourcesLimit(this.cloudProvider.onDemandLimit);
+//		this.simulator.setNumberOfReservedResources(reservedResources);
+		
+		JEEventScheduler scheduler = new JEEventScheduler();
+		dps = DPSFactory.INSTANCE.createDPS();
+		this.dps.setAccountingSystem(new AccountingSystem(this.cloudProvider.reservationLimit, this.cloudProvider.onDemandLimit));
+		
+		//Setting the number of machines that should be available at startup
+		SimulatorConfiguration.getInstance().setProperty(SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER, reservedResources+"");
+		simulator = new SimpleSimulator(scheduler, dps, parser, dps.getSetupMachines());
 	}
 	
 	@Override
@@ -69,20 +90,23 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		}
 		
 		//Simulating requests
-		this.initSimulator(this.currentWorkload, numberOfMachinesToReserve);
+		this.initSimulator(numberOfMachinesToReserve);
 		this.simulator.start();
 		
 		//Updating consumption information
-		this.updateInformation();
+		Map<User, List<Request>> currentWorkload = this.parser.getWorkloadPerUser();
+		this.updateInformation(currentWorkload);
 		
 		//Computing total utility
 		double fitness = 0d;
 		double totalTransferred = 0d;
+		AccountingSystem accountingSystem = this.dps.getAccountingSystem();
+		
 		for(User user : currentWorkload.keySet()){
-			fitness += this.utilityFunction.calculateTotalReceipt(this.cloudUsers.get(user), user);
+			fitness += accountingSystem.calculateTotalReceipt(this.cloudUsers.get(user), user);
 			totalTransferred += user.consumedTransference;
 		}
-		double cost = this.utilityFunction.calculateCost(totalTransferred, this.cloudProvider);
+		double cost = accountingSystem.calculateCost(this.cloudProvider);
 		fitness -= cost;
 		
 		//Storing information
@@ -97,7 +121,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		return fitness;
 	}
 
-	private void updateInformation() {
+	private void updateInformation(Map<User, List<Request>> currentWorkload) {
 		//Updating users
 		for(User user : currentWorkload.keySet()){
 			List<Request> requests = currentWorkload.get(user);

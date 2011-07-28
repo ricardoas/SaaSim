@@ -90,4 +90,9 @@ public class ProfitDrivenProvisioningSystem extends JEAbstractEventHandler imple
 	public void setAccountingSystem(AccountingSystem system){
 		this.accountingSystem = system;
 	}
+
+	@Override
+	public AccountingSystem getAccountingSystem() {
+		return this.accountingSystem;
+	}
 }

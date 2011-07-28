@@ -6,13 +6,16 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import commons.cloud.Request;
 import commons.cloud.User;
+import commons.config.SimulatorConfiguration;
 import commons.config.WorkloadParser;
+import commons.sim.util.SimulatorProperties;
 
 /**
  * This class is responsible for parsing the workload to be used. Considering SaaS plans limits, the workload should be separated according to each period
@@ -20,7 +23,7 @@ import commons.config.WorkloadParser;
  * @author davidcmm
  *
  */
-public class GEISTMonthlyWorkloadParser implements WorkloadParser<Map<User, List<Request>>>{
+public class GEISTMonthlyWorkloadParser implements WorkloadParser<List<Request>>{
 	
 	//Months limits in millis
 	private static double JAN_L = 1000.0 * 60 * 60 * 24 * (31);
@@ -40,10 +43,13 @@ public class GEISTMonthlyWorkloadParser implements WorkloadParser<Map<User, List
 	private final BufferedReader [] readers;
 	public int currentMonth;
 	private Map<User, List<Request>> nextRequests;
+	private Map<User, List<Request>> lastWorkloadRead;
 	
 
-	public GEISTMonthlyWorkloadParser(String ...workloadFiles){
-		this.workloadFiles = workloadFiles;
+	public GEISTMonthlyWorkloadParser(){
+		this.workloadFiles = new String[1];
+		this.workloadFiles[0] = SimulatorConfiguration.getInstance().getString(SimulatorProperties.WORKLOAD_PATH);
+		
 		this.readers = new BufferedReader[workloadFiles.length];
 		for(int i = 0; i < workloadFiles.length; i++){
 			try {
@@ -52,17 +58,22 @@ public class GEISTMonthlyWorkloadParser implements WorkloadParser<Map<User, List
 			}
 		}
 		this.currentMonth = 1;
+		
 		this.nextRequests = new HashMap<User, List<Request>>();
+		this.lastWorkloadRead = new HashMap<User, List<Request>>();
 	}
 	
 	@Override
-	public Map<User, List<Request>> next() throws IOException {
-		HashMap<User, List<Request>> currentWorkload = new HashMap<User, List<Request>>();
+	public List<Request> next() throws IOException {
+		
+		this.lastWorkloadRead = new HashMap<User, List<Request>>();
+		List<Request> workloadList = new ArrayList<Request>();
+		
 		int nextMonth = Integer.MAX_VALUE;
 		
 		//Verifying if any event was stored in previous read
 		if(this.nextRequests.size() != 0){
-			currentWorkload.putAll(this.nextRequests);
+			lastWorkloadRead.putAll(this.nextRequests);
 			this.nextRequests.clear();
 		}
 		
@@ -77,10 +88,10 @@ public class GEISTMonthlyWorkloadParser implements WorkloadParser<Map<User, List
 				int monthOfEvent = getMonthOfEvent(request.getTimeInMillis());
 				if(monthOfEvent == this.currentMonth){//An event of current iteration was found
 					User user = new User(eventData[1]);//Users are identified uniquely by their ids
-					List<Request> userWorkload = currentWorkload.get(user);
+					List<Request> userWorkload = lastWorkloadRead.get(user);
 					if(userWorkload == null){
 						userWorkload = new ArrayList<Request>();
-						currentWorkload.put(user, userWorkload);
+						lastWorkloadRead.put(user, userWorkload);
 					}
 					userWorkload.add(request);
 				}else{
@@ -103,39 +114,14 @@ public class GEISTMonthlyWorkloadParser implements WorkloadParser<Map<User, List
 		}else{
 			this.currentMonth++;
 		}
-	    return currentWorkload;
+		
+		//Adding all read requests
+		workloadList.addAll((Collection<? extends Request>) lastWorkloadRead.values());
+	    return workloadList;
 	}
 	
-	@Deprecated
-	public static Map<Integer, Map<User, List<Request>>> getWorkloadPerMonth(String ... workloadFiles) throws NumberFormatException, IOException{
-		HashMap<Integer, Map<User, List<Request>>> workload = new HashMap<Integer, Map<User, List<Request>>>();
-		
-		for(String workloadFile : workloadFiles){
-			BufferedReader reader = new BufferedReader(new FileReader(new File(workloadFile)));
-			while(reader.ready()){
-				String[] eventData = reader.readLine().trim().split("( +|\t+)+");//Assuming: clientID, userID, reqID, time, bytes, has expired, http op., URL, demand
-				Request request = new Request(eventData[0], eventData[1], eventData[2], Long.valueOf(eventData[3]), 
-						Long.valueOf(eventData[4]), Integer.valueOf(eventData[5]), eventData[6], eventData[7], Long.valueOf(eventData[8]) );
-				
-				//Adding new event to its corresponding user and month
-				int monthOfEvent = getMonthOfEvent(request.getTimeInMillis());
-				Map<User, List<Request>> monthWorkload  = workload.get(monthOfEvent);
-				if(monthWorkload == null){
-					monthWorkload = new HashMap<User, List<Request>>();
-					workload.put(monthOfEvent, monthWorkload);
-				}
-				
-				User user = new User(eventData[1]);//Users are identified uniquely by their ids
-				List<Request> userWorkload = monthWorkload.get(user);
-				if(userWorkload == null){
-					userWorkload = new ArrayList<Request>();
-					monthWorkload.put(user, userWorkload);
-				}
-				userWorkload.add(request);
-			}
-		}
-		
-		return workload;
+	public Map<User, List<Request>> getWorkloadPerUser(){
+		return this.lastWorkloadRead;
 	}
 	
 	private static int getMonthOfEvent(double time){
