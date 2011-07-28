@@ -6,25 +6,29 @@ import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
 import commons.cloud.Request;
+import commons.config.SimulatorConfiguration;
 import commons.sim.components.Machine;
-import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
-import commons.sim.jeevent.JETime;
+import commons.sim.util.SimulatorProperties;
 
 
 public class ProfitDrivenHeuristicTest {
 	
+	private final String CONFIG_FILE = "src/test/resources/config.properties";
 	private double sla = 1000 * 50;//50 sec in millis
 	private ProfitDrivenHeuristic heuristic;
 	
 	@Before
-	public void setUp(){
-		this.heuristic = new ProfitDrivenHeuristic(sla);
+	public void setUp() throws ConfigurationException{
+		SimulatorConfiguration.buildInstance(CONFIG_FILE);
+		SimulatorConfiguration.getInstance().setProperty(SimulatorProperties.SLA, this.sla);
+		this.heuristic = new ProfitDrivenHeuristic();
 	}
 	
 	@Test
@@ -131,7 +135,8 @@ public class ProfitDrivenHeuristicTest {
 	@Test
 	public void testGetServerWithBusyMachine(){
 		double sla = 1000 * 20;
-		this.heuristic = new ProfitDrivenHeuristic(sla);
+		SimulatorConfiguration.getInstance().setProperty(SimulatorProperties.SLA, sla);
+		this.heuristic = new ProfitDrivenHeuristic();
 		
 		String clientID = "c1";
 		String userID = "u1";
@@ -171,7 +176,8 @@ public class ProfitDrivenHeuristicTest {
 	@Test
 	public void testGetServerWithBusyMachine2(){
 		double sla = 1000 * 20;
-		this.heuristic = new ProfitDrivenHeuristic(sla);
+		SimulatorConfiguration.getInstance().setProperty(SimulatorProperties.SLA, sla);
+		this.heuristic = new ProfitDrivenHeuristic();
 		
 		String clientID = "c1";
 		String userID = "u1";
@@ -214,7 +220,8 @@ public class ProfitDrivenHeuristicTest {
 	@Test
 	public void testGetServerWithBusyMachine3(){
 		double sla = 1000 * 20;
-		this.heuristic = new ProfitDrivenHeuristic(sla);
+		SimulatorConfiguration.getInstance().setProperty(SimulatorProperties.SLA, sla);
+		this.heuristic = new ProfitDrivenHeuristic();
 		
 		String clientID = "c1";
 		String userID = "u1";

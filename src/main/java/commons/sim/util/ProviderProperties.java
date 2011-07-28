@@ -7,7 +7,7 @@ public class ProviderProperties {
 	public static final String PROVIDER = "prov";
 	
 	public static final String PROVIDER_NAME = ".name";
-	public static final String ONDEMAND_CPU_COST = "ondemand_cpu_cost";
+	public static final String ONDEMAND_CPU_COST = ".ondemand_cpu_cost";
 	public static final String ON_DEMAND_LIMIT = ".ondemandLimit";
 	public static final String RESERVATION_LIMIT = ".reservationLimit";
 	public static final String RESERVED_CPU_COST = ".reserved_cpu_cost";
