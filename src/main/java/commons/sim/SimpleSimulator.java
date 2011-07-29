@@ -3,12 +3,13 @@ package commons.sim;
 import java.io.IOException;
 import java.util.List;
 
+import provisioning.DPS;
 import provisioning.Monitor;
+import provisioning.util.DPSFactory;
 
 import commons.cloud.Request;
 import commons.config.WorkloadParser;
 import commons.sim.components.LoadBalancer;
-import commons.sim.components.Machine;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventHandler;
@@ -17,13 +18,15 @@ import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
 import commons.sim.util.ApplicationFactory;
 
+import config.GEISTSimpleWorkloadParser;
+
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public class SimpleSimulator extends JEAbstractEventHandler implements Simulator, JEEventHandler{
 
 	private final WorkloadParser<List<Request>> workloadParser;
-	private final Monitor monitor;
+	private final DPS monitor;
 	protected LoadBalancer loadBalancer;
 
 	/**
@@ -31,12 +34,21 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 * @param scheduler TODO
 	 * @param list 
 	 */
-	public SimpleSimulator(JEEventScheduler scheduler, Monitor dps, WorkloadParser<List<Request>> parser, List<Machine> setupMachines) {
+	public SimpleSimulator(JEEventScheduler scheduler, DPS dps, WorkloadParser<List<Request>> parser) {
 		super(scheduler);
 		this.monitor = dps;
 		this.monitor.setConfigurable(this);
 		this.workloadParser = parser;
-		this.loadBalancer = ApplicationFactory.getInstance().createNewApplication(scheduler, dps, setupMachines);
+		this.loadBalancer = ApplicationFactory.getInstance().createNewApplication(scheduler, getMonitor(), dps.getSetupMachines());
+	}
+	
+	/**
+	 * Constructor
+	 * @param scheduler TODO
+	 * @param list 
+	 */
+	public SimpleSimulator() {
+		this(new JEEventScheduler(), DPSFactory.INSTANCE.createDPS(), new GEISTSimpleWorkloadParser());
 	}
 	
 	/**

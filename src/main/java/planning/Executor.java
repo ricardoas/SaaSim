@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -73,7 +72,7 @@ public class Executor {
 			}
 			
 			//Starting simulation data to start a new simulation
-			OneTierSimulatorForPlanning simulator = new OneTierSimulatorForPlanning(new JEEventScheduler(), null, workload, this.sla, null);//FIXME remove null (dont know how)
+			OneTierSimulatorForPlanning simulator = new OneTierSimulatorForPlanning(new JEEventScheduler(), null, workload, this.sla);//FIXME remove null (dont know how)
 			simulator.setOnDemandResourcesLimit(this.provider.onDemandLimit);
 			int numberOfMachinesToReserve = parseNumberOfReservedResources(plan, periodIndex);
 			simulator.setNumberOfReservedResources(numberOfMachinesToReserve);

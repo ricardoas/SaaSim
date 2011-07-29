@@ -6,12 +6,12 @@ import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
 
-import commons.config.SimulatorConfiguration;
-
 import planning.Executor;
 import planning.Planner;
+
+import commons.config.SimulatorConfiguration;
+
 import config.GEISTMonthlyWorkloadParser;
-import config.MainConfiguration;
 
 /**
  * This class is responsible for obtaining input parameters, from a configuration file, such as: workload, cloud provider

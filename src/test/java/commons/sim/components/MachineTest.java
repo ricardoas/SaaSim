@@ -2,13 +2,10 @@ package commons.sim.components;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
@@ -16,9 +13,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import commons.cloud.Request;
-import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
-import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
 
 @RunWith(PowerMockRunner.class)

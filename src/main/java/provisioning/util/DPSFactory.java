@@ -5,14 +5,26 @@ import provisioning.DPS;
 import commons.config.SimulatorConfiguration;
 
 
+/**
+ * 
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ */
 public enum DPSFactory {
 	
+	/**
+	 * Single instance.
+	 */
 	INSTANCE;
 	
-	private DPSFactory() {
-		
-	}
+	/**
+	 * Private constructor
+	 */
+	private DPSFactory() {}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public DPS createDPS(){
 		Class<?> clazz = SimulatorConfiguration.getInstance().getDPSHeuristicClass();
 		

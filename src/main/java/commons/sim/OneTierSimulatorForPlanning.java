@@ -3,7 +3,7 @@ package commons.sim;
 import java.util.ArrayList;
 import java.util.List;
 
-import provisioning.Monitor;
+import provisioning.DPS;
 
 import commons.cloud.Request;
 import commons.sim.components.Machine;
@@ -20,9 +20,9 @@ public class OneTierSimulatorForPlanning extends SimpleSimulator implements JEEv
 	private List<Request> workload;
 	public static long UTILIZATION_EVALUATION_PERIOD = 1000 * 60 * 5;//in millis
 	
-	public OneTierSimulatorForPlanning(JEEventScheduler scheduler, Monitor monitor, List<Request> workload, 
-			double sla, List<Machine> setUpMachines){
-		super(scheduler, monitor, new GEISTSimpleWorkloadParser(), setUpMachines);
+	public OneTierSimulatorForPlanning(JEEventScheduler scheduler, DPS monitor, List<Request> workload, 
+			double sla){
+		super(scheduler, monitor, new GEISTSimpleWorkloadParser());
 		this.workload = workload;// FIXME por que workload direto e não o parser? Vai ter como ler toda a workload antes?
 //		this.loadBalancer = new LoadBalancer(scheduler, monitor, new RanjanScheduler()); TODO acho que essas linhas podem ser deletadas.
 //		this.loadBalancer = new LoadBalancer(scheduler, monitor, new ProfitDrivenScheduler(sla));

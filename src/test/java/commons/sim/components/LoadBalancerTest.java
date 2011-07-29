@@ -12,8 +12,6 @@ import org.junit.Test;
 import provisioning.DPS;
 
 import commons.cloud.Request;
-import commons.sim.components.LoadBalancer;
-import commons.sim.components.Machine;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;

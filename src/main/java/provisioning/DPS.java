@@ -15,13 +15,6 @@ import commons.sim.jeevent.JEEventHandler;
 public interface DPS extends JEEventHandler, Monitor{
 
 	/**
-	 * Configurable system.
-	 * 
-	 * @param configurable
-	 */
-	void setConfigurable(DynamicallyConfigurable configurable);
-
-	/**
 	 * These machines are started up artificially with no delay so 
 	 * that the application can start running.
 	 *  

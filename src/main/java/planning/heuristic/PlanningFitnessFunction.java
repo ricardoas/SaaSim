@@ -1,12 +1,8 @@
 package planning.heuristic;
 
-import static commons.sim.util.SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
@@ -18,19 +14,15 @@ import commons.cloud.Contract;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
-import commons.cloud.UtilityFunction;
 import commons.config.SimulatorConfiguration;
-import commons.config.WorkloadParser;
 import commons.sim.AccountingSystem;
-import commons.sim.OneTierSimulatorForPlanning;
 import commons.sim.SimpleSimulator;
-import commons.sim.Simulator;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.SimulatorProperties;
 import commons.util.Dashboard;
 import commons.util.SimulationData;
+
 import config.GEISTMonthlyWorkloadParser;
-import config.GEISTSimpleWorkloadParser;
 
 public class PlanningFitnessFunction extends FitnessFunction{
 	
@@ -77,7 +69,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		
 		//Setting the number of machines that should be available at startup
 		SimulatorConfiguration.getInstance().setProperty(SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER, reservedResources+"");
-		simulator = new SimpleSimulator(scheduler, dps, parser, dps.getSetupMachines());
+		simulator = new SimpleSimulator(scheduler, dps, parser);
 	}
 	
 	@Override
