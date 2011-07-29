@@ -18,4 +18,6 @@ public interface JEEventHandler {
 	 */
 	int getHandlerId();
 
+	void forward(JEEvent event, JEEventHandler handler);
+
 }

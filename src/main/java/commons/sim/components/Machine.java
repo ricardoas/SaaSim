@@ -23,7 +23,6 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	private boolean isReserved;
 	private double totalProcessed;
 
-//	protected JETime lastProcessingEvaluation;
 	private JEEvent nextFinishEvent;
 
 	private final List<Request> queue;
@@ -46,7 +45,6 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 		this.machineID = machineID;
 		this.queue = new ArrayList<Request>();
 		this.finishedRequests = new ArrayList<Request>();
-//		this.lastProcessingEvaluation = new JETime(0);
 		this.isReserved = false;
 		this.setTotalProcessed(0);
 		this.shutdownOnFinish = false;

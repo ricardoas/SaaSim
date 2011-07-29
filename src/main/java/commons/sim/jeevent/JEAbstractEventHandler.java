@@ -41,6 +41,11 @@ public abstract class JEAbstractEventHandler implements JEEventHandler {
     	getScheduler().queueEvent(event);
     }
     
+    @Override
+	public void forward(JEEvent event, JEEventHandler handler) {
+    	getScheduler().queueEvent(new JEEvent(event, handler));
+    }
+    
     /**
 	 * @return the scheduler
 	 */

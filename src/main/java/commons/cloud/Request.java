@@ -92,4 +92,11 @@ public class Request{
 	public String getRequestID(){
 		return this.reqID;
 	}
+
+	/**
+	 * 
+	 */
+	public void reset() {
+		this.totalProcessed = 0;
+	}
 }

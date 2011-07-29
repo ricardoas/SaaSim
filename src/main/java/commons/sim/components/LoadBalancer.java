@@ -2,8 +2,10 @@ package commons.sim.components;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 import provisioning.Monitor;
@@ -25,7 +27,7 @@ import commons.sim.schedulingheuristics.SchedulingHeuristic;
  */
 public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandler{
 	
-	private final List<Machine> servers;
+	private final Map<Long, Machine> servers;
 	
 	private SchedulingHeuristic heuristic;
 	private Queue<Request> requestsToBeProcessed;
@@ -43,7 +45,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 		this.monitor = monitor;
 		this.heuristic = heuristic;
 		this.maxServersAllowed = maxServersAllowed;
-		this.servers = new ArrayList<Machine>();
+		this.servers = new HashMap<Long, Machine>();
 		this.getServers().addAll(Arrays.asList(machines));
 		
 		this.requestsToBeProcessed = new LinkedList<Request>();
@@ -54,26 +56,34 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	 */
 	public void addServer(Machine server){
 		server.setLoadBalancer(this);
-		send(new JEEvent(JEEventType.ADD_SERVER, this, getServerUpTime(), server));
-	}
-	
-	private JETime getServerUpTime(){
-		return getScheduler().now().plus(new JETime(SimulatorConfiguration.getInstance().getSetUpTime()));
+		JETime serverUpTime = getScheduler().now().plus(new JETime(SimulatorConfiguration.getInstance().getSetUpTime()));
+		send(new JEEvent(JEEventType.ADD_SERVER, this, serverUpTime, server));
 	}
 	
 	/**
 	 * 
 	 */
-	public void removeMachine(Machine server, boolean force){
+	public void removeServer(long serverID, boolean force){
 		if(force){
-			queueEvents(server);
-		}else{
-			servers.remove(server);
+			Machine server = servers.get(serverID);
+			migrateRequests(server);
+			send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this, getScheduler().now(), server));
+		}
+		Machine server = servers.remove(serverID);
+		if(server != null){
 			server.shutdownOnFinish();
 		}
 	}
 
-	private void queueEvents(Machine server) {
+	/**
+	 * @param server
+	 */
+	private void migrateRequests(Machine server) {
+		JETime now = getScheduler().now();
+		for (Request request : server.getQueue()) {
+			request.reset();
+			send(new JEEvent(JEEventType.NEWREQUEST, this, now, request));
+		}
 	}
 
 	/**
@@ -106,7 +116,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 			}
 			break;
 		case MACHINE_TURNED_OFF:
-			send(new JEEvent(event, monitor));
+			forward(event, monitor);
 			break;
 		default:
 			break;
@@ -189,7 +199,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	 * @return the servers
 	 */
 	public List<Machine> getServers() {
-		return servers;
+		return new ArrayList<Machine>(servers.values());
 	}
 
 	public void reportRequestFinished(Request requestFinished) {
