@@ -9,7 +9,7 @@ import java.util.List;
 
 import commons.cloud.Request;
 import commons.config.SimulatorConfiguration;
-import commons.config.WorkloadParser;
+import commons.io.WorkloadParser;
 import commons.sim.util.SimulatorProperties;
 
 /**

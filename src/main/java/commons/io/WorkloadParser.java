@@ -1,4 +1,4 @@
-package commons.config;
+package commons.io;
 
 import java.io.IOException;
 
@@ -13,8 +13,7 @@ public interface WorkloadParser<T> {
 
 	/**
 	 * Reads and returns the next portion of data from the workload. Note that
-	 * the read and return process can be independent depending on the
-	 * implementation.
+	 * the read and return process depends on the implementation.
 	 * 
 	 * @return
 	 * @throws IOException 

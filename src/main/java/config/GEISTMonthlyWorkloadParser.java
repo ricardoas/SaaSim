@@ -14,7 +14,7 @@ import java.util.Map;
 import commons.cloud.Request;
 import commons.cloud.User;
 import commons.config.SimulatorConfiguration;
-import commons.config.WorkloadParser;
+import commons.io.WorkloadParser;
 import commons.sim.util.SimulatorProperties;
 
 /**

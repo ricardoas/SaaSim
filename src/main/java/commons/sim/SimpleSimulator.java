@@ -8,7 +8,7 @@ import provisioning.Monitor;
 import provisioning.util.DPSFactory;
 
 import commons.cloud.Request;
-import commons.config.WorkloadParser;
+import commons.io.WorkloadParser;
 import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
