@@ -20,9 +20,10 @@ import org.jgap.impl.WeightedRouletteSelector;
 
 import commons.cloud.Contract;
 import commons.cloud.Provider;
-import commons.cloud.Request;
 import commons.cloud.User;
 import commons.util.SimulationData;
+
+import config.GEISTMonthlyWorkloadParser;
 
 public class AGHeuristic implements PlanningHeuristic{
 	
@@ -37,7 +38,7 @@ public class AGHeuristic implements PlanningHeuristic{
 	private List<SimulationData> bestConfigs = new ArrayList<SimulationData>();
 	
 	@Override
-	public void findPlan(Map<User, List<Request>> currentWorkload,
+	public void findPlan(GEISTMonthlyWorkloadParser workloadParser,
 			Map<String, Provider> cloudProvider, Map<User, Contract> cloudUsers, double sla) {
 		
 		initProperties(cloudProvider);
@@ -58,7 +59,7 @@ public class AGHeuristic implements PlanningHeuristic{
 	//		config.setKeepPopulationSizeConstant(true);
 	//		config.setNaturalSelector(null);//Tournament, WeightedRoullete
 
-			PlanningFitnessFunction myFunc = createFitnessFunction(currentWorkload, cloudUsers, sla, cloudProvider);
+			PlanningFitnessFunction myFunc = createFitnessFunction(workloadParser, cloudUsers, sla, cloudProvider);
 			config.setFitnessFunction(myFunc);
 			
 			IChromosome sampleChromosome = createSampleChromosome(config);
@@ -109,8 +110,8 @@ public class AGHeuristic implements PlanningHeuristic{
 		return sampleChromosome;
 	}
 
-	private PlanningFitnessFunction createFitnessFunction(Map<User, List<Request>> currentWorkload, Map<User, Contract> cloudUsers, double sla, Map<String, Provider> cloudProvider) {
-		return new PlanningFitnessFunction(currentWorkload, cloudUsers, sla, cloudProvider);
+	private PlanningFitnessFunction createFitnessFunction(GEISTMonthlyWorkloadParser workloadParser, Map<User, Contract> cloudUsers, double sla, Map<String, Provider> cloudProvider) {
+		return new PlanningFitnessFunction(workloadParser, cloudUsers, sla, cloudProvider);
 	}
 
 	@Override

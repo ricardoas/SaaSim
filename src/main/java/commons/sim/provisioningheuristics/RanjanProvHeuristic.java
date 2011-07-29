@@ -9,6 +9,7 @@ package commons.sim.provisioningheuristics;
 public class RanjanProvHeuristic implements ProvisioningHeuristic {
 
 	private double TARGET_UTILIZATION = 0.66;
+	public static long UTILIZATION_EVALUATION_PERIOD_IN_MILLIS = 1000 * 60 * 5;//in millis
 	
 	public long evaluateNumberOfServersForNextInterval(RanjanStatistics statistics) {
 		double averageUtilization = statistics.totalUtilizationInLastInterval / statistics.totalNumberOfServers;

@@ -1,40 +1,8 @@
 package commons.config;
 
-import static commons.sim.util.ContractProperties.ASSOCIATIONS;
-import static commons.sim.util.ContractProperties.CPU_LIMIT;
-import static commons.sim.util.ContractProperties.EXTRA_CPU_COST;
-import static commons.sim.util.ContractProperties.PLAN;
-import static commons.sim.util.ContractProperties.PLANS_NUM;
-import static commons.sim.util.ContractProperties.PLAN_NAME;
-import static commons.sim.util.ContractProperties.PLAN_PRICE;
-import static commons.sim.util.ContractProperties.PLAN_SETUP;
-import static commons.sim.util.ProviderProperties.COST_TRANSFER_IN;
-import static commons.sim.util.ProviderProperties.COST_TRANSFER_OUT;
-import static commons.sim.util.ProviderProperties.MONITORING;
-import static commons.sim.util.ProviderProperties.NUM_OF_PROVIDERS;
-import static commons.sim.util.ProviderProperties.ONDEMAND_CPU_COST;
-import static commons.sim.util.ProviderProperties.ONE_YEAR_FEE;
-import static commons.sim.util.ProviderProperties.ON_DEMAND_LIMIT;
-import static commons.sim.util.ProviderProperties.PROVIDER;
-import static commons.sim.util.ProviderProperties.PROVIDER_NAME;
-import static commons.sim.util.ProviderProperties.RESERVATION_LIMIT;
-import static commons.sim.util.ProviderProperties.RESERVED_CPU_COST;
-import static commons.sim.util.ProviderProperties.THREE_YEARS_FEE;
-import static commons.sim.util.ProviderProperties.TRANSFER_IN;
-import static commons.sim.util.ProviderProperties.TRANSFER_OUT;
-import static commons.sim.util.SimulatorProperties.APPLICATION_CUSTOM_HEURISTIC;
-import static commons.sim.util.SimulatorProperties.APPLICATION_FACTORY;
-import static commons.sim.util.SimulatorProperties.APPLICATION_HEURISTIC;
-import static commons.sim.util.SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER;
-import static commons.sim.util.SimulatorProperties.APPLICATION_MAX_SERVER_PER_TIER;
-import static commons.sim.util.SimulatorProperties.APPLICATION_NUM_OF_TIERS;
-import static commons.sim.util.SimulatorProperties.DEFAULT_PLANNING_HEURISTIC;
-import static commons.sim.util.SimulatorProperties.DPS_CUSTOM_HEURISTIC;
-import static commons.sim.util.SimulatorProperties.DPS_HEURISTIC;
-import static commons.sim.util.SimulatorProperties.PLANNING_HEURISTIC;
-import static commons.sim.util.SimulatorProperties.PLANNING_PERIOD;
-import static commons.sim.util.SimulatorProperties.SETUP_TIME;
-import static commons.sim.util.SimulatorProperties.SLA;
+import static commons.sim.util.ProviderProperties.*;
+import static commons.sim.util.SimulatorProperties.*;
+import static commons.sim.util.ContractProperties.*;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -195,14 +163,14 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 		try{
 			DPSHeuristicValues value = DPSHeuristicValues.valueOf(heuristicName);
 			switch (value) {
-			case STATIC:
-				return StaticProvisioningSystem.class;
-			case RANJAN:
-				return RanjanProvisioningSystem.class;//FIXME
-			case PROFITDRIVEN:
-				return ProfitDrivenProvisioningSystem.class;//FIXME
-			case CUSTOM:
-				return Class.forName(customHeuristicClass);
+				case STATIC:
+					return StaticProvisioningSystem.class;
+				case RANJAN:
+					return RanjanProvisioningSystem.class;
+				case PROFITDRIVEN:
+					return ProfitDrivenProvisioningSystem.class;
+				case CUSTOM:
+					return Class.forName(customHeuristicClass);
 			}
 			
 		} catch (IllegalArgumentException iae) {

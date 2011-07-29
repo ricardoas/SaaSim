@@ -116,7 +116,9 @@ public class GEISTMonthlyWorkloadParser implements WorkloadParser<List<Request>>
 		}
 		
 		//Adding all read requests
-		workloadList.addAll((Collection<? extends Request>) lastWorkloadRead.values());
+		for(List<Request> requests : this.lastWorkloadRead.values()){
+			workloadList.addAll(requests);
+		}
 	    return workloadList;
 	}
 	

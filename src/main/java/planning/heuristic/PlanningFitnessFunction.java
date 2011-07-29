@@ -58,7 +58,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 	}
 
 	private void initSimulator(Integer reservedResources) {
-		//TODO: CHANGE ME! Starting simulation data to start a new simulation
+		//Starting simulation data to start a new simulation
 //		this.simulator = new OneTierSimulatorForPlanning(new JEEventScheduler(), null, workload, this.sla, null);//FIXME remove null (dont know how)
 //		this.simulator.setOnDemandResourcesLimit(this.cloudProvider.onDemandLimit);
 //		this.simulator.setNumberOfReservedResources(reservedResources);
@@ -128,8 +128,8 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		}
 		
 		//Updating provider
-		this.cloudProvider.onDemandResources = this.simulator.getOnDemandResources();
-		this.cloudProvider.reservedResources = this.simulator.getReservedResources();
+		this.cloudProvider.onDemandResources = this.dps.getAccountingSystem().getOnDemandMachinesData();
+		this.cloudProvider.reservedResources = this.dps.getAccountingSystem().getReservedMachinesData();
 	}
 
 	public SimulationData getDetailedEntry(Integer reservedResources) {

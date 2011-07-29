@@ -57,11 +57,11 @@ public class Planner {
 	 * of the infrastructure
 	 */
 	public List<String> plan() {
-		try {
-			Map<User, List<Request>> currentWorkload = this.workloadParser.next();
-			while(!currentWorkload.isEmpty()){
-				this.planningHeuristic.findPlan(currentWorkload, cloudProviders, cloudUsers, sla);
-			}
+//		try {
+//			Map<User, List<Request>> currentWorkload = this.workloadParser.next();
+//			while(!currentWorkload.isEmpty()){
+			this.planningHeuristic.findPlan(this.workloadParser, cloudProviders, cloudUsers, sla);
+//			}
 			
 			//Persisting planning
 			List<String> plan = this.planningHeuristic.getPlan();
@@ -69,11 +69,11 @@ public class Planner {
 			
 			return plan;
 			
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return null;
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		return null;
 	}
 
 	private void persistPlanning(List<String> plan) {

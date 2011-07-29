@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import commons.cloud.Request;
-import commons.sim.OneTierSimulatorForPlanning;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
+import commons.sim.provisioningheuristics.RanjanProvHeuristic;
 import commons.util.Triple;
 
 /**
@@ -152,7 +152,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 			queue.remove(requestFinished);
 			this.numberOfRequestsCompletionsInPreviousInterval++;
 			
-			getLoadBalancer().report(requestFinished);//Asking for accounting of a finished request
+			getLoadBalancer().reportRequestFinished(requestFinished);//Asking for accounting of a finished request
 
 			if (!queue.isEmpty()) {
 				Request nextToFinish = queue.get(0);
@@ -232,12 +232,12 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 		if(this.queue.size() != 0){//Requests need to be processed, so resource is full
 			return 1.0;
 		}else{//Requests were processed previously, and no pending requests exist
-			if(currentTime >= OneTierSimulatorForPlanning.UTILIZATION_EVALUATION_PERIOD){
-				double difference = this.lastUpdate.timeMilliSeconds - (currentTime - OneTierSimulatorForPlanning.UTILIZATION_EVALUATION_PERIOD);
+			if(currentTime >= RanjanProvHeuristic.UTILIZATION_EVALUATION_PERIOD_IN_MILLIS){
+				double difference = this.lastUpdate.timeMilliSeconds - (currentTime - RanjanProvHeuristic.UTILIZATION_EVALUATION_PERIOD_IN_MILLIS);
 				if(difference <= 0){
 					return 0.0;
 				}else{
-					return difference/OneTierSimulatorForPlanning.UTILIZATION_EVALUATION_PERIOD;
+					return difference/RanjanProvHeuristic.UTILIZATION_EVALUATION_PERIOD_IN_MILLIS;
 				}
 			}
 		}

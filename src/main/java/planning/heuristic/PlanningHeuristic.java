@@ -5,12 +5,13 @@ import java.util.Map;
 
 import commons.cloud.Contract;
 import commons.cloud.Provider;
-import commons.cloud.Request;
 import commons.cloud.User;
+
+import config.GEISTMonthlyWorkloadParser;
 
 public interface PlanningHeuristic {
 
-	public void findPlan(Map<User, List<Request>> currentWorkload,
+	public void findPlan(GEISTMonthlyWorkloadParser workloadParser,
 			Map<String, Provider> cloudProvider, Map<User, Contract> cloudUsers, double sla);
 	
 	public double getEstimatedProfit(int period);

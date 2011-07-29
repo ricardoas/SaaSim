@@ -2,11 +2,9 @@ package commons.sim.components;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.Random;
 
 import provisioning.Monitor;
 
@@ -27,21 +25,12 @@ import commons.sim.schedulingheuristics.SchedulingHeuristic;
  */
 public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandler{
 	
-	@Deprecated//FIXME not needed anymore
-	public List<Machine> reservedMachinesPool;//reserved resources
-	@Deprecated//FIXME not needed anymore
-	public List<Machine> onDemandMachinesPool;
-	
 	private final List<Machine> servers;
-	
-	@Deprecated//FIXME move me to DPS
-	private int reservedResourcesAmount;
-	@Deprecated//FIXME move me to DPS
-	private int onDemandResourcesLimit;
 	
 	private SchedulingHeuristic heuristic;
 	private Queue<Request> requestsToBeProcessed;
 	private Monitor monitor;
+	
 	private final int maxServersAllowed;
 	
 	/**
@@ -57,10 +46,6 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 		this.servers = new ArrayList<Machine>();
 		this.getServers().addAll(Arrays.asList(machines));
 		
-		this.reservedResourcesAmount = Integer.MAX_VALUE;
-		this.onDemandResourcesLimit = Integer.MAX_VALUE;
-		this.onDemandMachinesPool = new ArrayList<Machine>();
-		this.reservedMachinesPool = new ArrayList<Machine>();
 		this.requestsToBeProcessed = new LinkedList<Request>();
 	}
 	
@@ -151,58 +136,54 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	/**
 	 * @param numberOfMachinesToAdd
 	 */
-	private void manageMachines(int numberOfMachinesToAdd) {
-		if(numberOfMachinesToAdd > 0){//Adding machines
-			numberOfMachinesToAdd = addReservedMachines(numberOfMachinesToAdd);
-			
-			//Machines are missing, add on demand resources
-			if(numberOfMachinesToAdd > 0){
-				int onDemandResourcesAlreadyAdded = this.getServers().size() - this.reservedResourcesAmount;
-				numberOfMachinesToAdd = Math.min(numberOfMachinesToAdd, onDemandResourcesLimit - onDemandResourcesAlreadyAdded);
-				for(int i = 0; i < numberOfMachinesToAdd; i++){
-//					this.addMachine();
-				}
-			}
-		}else if(numberOfMachinesToAdd < 0){//Removing unused machines
-			Iterator<Machine> it = getServers().iterator();
-			while(it.hasNext()){
-				Machine machine = it.next();
-				if(!machine.isBusy()){
-					it.remove();
-					if(machine.isReserved()){
-						this.reservedMachinesPool.add(machine);	
-					}else{
-						this.onDemandMachinesPool.add(machine);
-					}
-				}
-			}
-		}
-	}
-
-	public void setOnDemandResourcesLimit(int limit) {
-		this.onDemandResourcesLimit = limit;
-	}
-
-	public void addReservedResources(int amount) {
-		if(amount < 0){
-			throw new RuntimeException("Negative amount of resources reserved!");
-		}
-		this.reservedResourcesAmount = amount;
-		for(int i = 0; i < amount; i++){
-			this.reservedMachinesPool.add(new Machine(getScheduler(), new Random().nextLong(), true));
-		}
-	}
-
-	private int addReservedMachines(int numberOfMachinesToAdd) {
-		Iterator<Machine> it = this.reservedMachinesPool.iterator();
-		while(it.hasNext() && numberOfMachinesToAdd > 0){
-			Machine machine = it.next();
-			this.getServers().add(machine);
-			it.remove();
-			numberOfMachinesToAdd--;
-		}
-		return numberOfMachinesToAdd;
-	}
+//	private void manageMachines(int numberOfMachinesToAdd) {
+//		if(numberOfMachinesToAdd > 0){//Adding machines
+//			numberOfMachinesToAdd = addReservedMachines(numberOfMachinesToAdd);
+//			
+//			//Machines are missing, add on demand resources
+//			if(numberOfMachinesToAdd > 0){
+//				int onDemandResourcesAlreadyAdded = this.getServers().size() - this.reservedResourcesAmount;
+//				numberOfMachinesToAdd = Math.min(numberOfMachinesToAdd, onDemandResourcesLimit - onDemandResourcesAlreadyAdded);
+//				for(int i = 0; i < numberOfMachinesToAdd; i++){
+////					this.addMachine();
+//				}
+//			}
+//		}else if(numberOfMachinesToAdd < 0){//Removing unused machines
+//			Iterator<Machine> it = getServers().iterator();
+//			while(it.hasNext()){
+//				Machine machine = it.next();
+//				if(!machine.isBusy()){
+//					it.remove();
+//					if(machine.isReserved()){
+//						this.reservedMachinesPool.add(machine);	
+//					}else{
+//						this.onDemandMachinesPool.add(machine);
+//					}
+//				}
+//			}
+//		}
+//	}
+//
+//	public void addReservedResources(int amount) {
+//		if(amount < 0){
+//			throw new RuntimeException("Negative amount of resources reserved!");
+//		}
+//		this.reservedResourcesAmount = amount;
+//		for(int i = 0; i < amount; i++){
+//			this.reservedMachinesPool.add(new Machine(getScheduler(), new Random().nextLong(), true));
+//		}
+//	}
+//
+//	private int addReservedMachines(int numberOfMachinesToAdd) {
+//		Iterator<Machine> it = this.reservedMachinesPool.iterator();
+//		while(it.hasNext() && numberOfMachinesToAdd > 0){
+//			Machine machine = it.next();
+//			this.getServers().add(machine);
+//			it.remove();
+//			numberOfMachinesToAdd--;
+//		}
+//		return numberOfMachinesToAdd;
+//	}
 
 	/**
 	 * @return the servers
@@ -211,7 +192,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 		return servers;
 	}
 
-	public void report(Request requestFinished) {
+	public void reportRequestFinished(Request requestFinished) {
 		monitor.reportRequestFinished(requestFinished);
 	}
 }

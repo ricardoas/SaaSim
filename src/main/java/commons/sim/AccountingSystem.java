@@ -15,7 +15,7 @@ import commons.util.Triple;
 public class AccountingSystem {
 	
 	protected Map<String, List<String>> requestsFinishedPerUser;
-	protected Map<Long, Triple> machineUtilization;
+	protected Map<Long, Triple<Double, Double, Double>> machineUtilization;
 	
 	protected List<Long> reservedMachinesIDs;
 	protected List<Long> onDemandMachinesIDs;
@@ -37,7 +37,7 @@ public class AccountingSystem {
 		this.totalTransferred = 0d;
 		
 		this.requestsFinishedPerUser = new HashMap<String, List<String>>();
-		this.machineUtilization = new HashMap<Long, Triple>();
+		this.machineUtilization = new HashMap<Long, Triple<Double, Double, Double>>();
 		
 		this.reservedMachinesIDs = new ArrayList<Long>();
 		this.onDemandMachinesIDs = new ArrayList<Long>();
@@ -56,15 +56,15 @@ public class AccountingSystem {
 		this.totalTransferred += request.getSizeInBytes();
 	}
 	
-	public void reportMachineFinish(long machineID, double machineEndTime){
+	public void reportMachineFinish(long machineID, double machineEndTimeInMillis){
 		Triple machineData = this.machineUtilization.get(machineID);
 		if(machineData == null){
 			throw new RuntimeException("Could not report utilization for inexistent machine: "+machineID);
 		}
-		if(machineEndTime <= (Double) machineData.firstValue){
-			throw new RuntimeException("Machine can not finish before start: "+machineData.firstValue+" to "+machineEndTime);
+		if(machineEndTimeInMillis <= (Double) machineData.firstValue){
+			throw new RuntimeException("Machine can not finish before start: "+machineData.firstValue+" to "+machineEndTimeInMillis);
 		}
-		machineData.secondValue = machineEndTime;
+		machineData.secondValue = machineEndTimeInMillis;
 		this.machineUtilization.put(machineID, machineData);
 		
 		//Indicating that a new machine can be created
@@ -86,7 +86,7 @@ public class AccountingSystem {
 		}
 	}
 
-	public void createMachine(long machineID, boolean isReserved, double machineStartTime) {
+	public void createMachine(long machineID, boolean isReserved, double machineStartTimeInMillis) {
 		if(isReserved){
 			this.reservedMachinesIDs.add(machineID);
 		}else{
@@ -94,7 +94,7 @@ public class AccountingSystem {
 		}
 		
 		Triple machineData = new Triple();
-		machineData.firstValue = machineStartTime;
+		machineData.firstValue = machineStartTimeInMillis;
 		this.machineUtilization.put(machineID, machineData);
 	}
 
@@ -120,5 +120,23 @@ public class AccountingSystem {
 	
 	public double calcExtraReceipt(Contract contract, User user) {
 		return this.utilityFunction.calcExtraReceipt(contract, user);
+	}
+
+	public Map<Long, Triple<Double, Double, Double>> getReservedMachinesData(){
+		Map<Long, Triple<Double, Double, Double>> result = new HashMap<Long, Triple<Double,Double,Double>>();
+		for(Long machineID : this.reservedMachinesIDs){
+			Triple<Double, Double, Double> data = this.machineUtilization.get(machineID);
+			result.put(machineID, data);
+		}
+		return result;
+	}
+	
+	public Map<Long, Triple<Double, Double, Double>> getOnDemandMachinesData(){
+		Map<Long, Triple<Double, Double, Double>> result = new HashMap<Long, Triple<Double,Double,Double>>();
+		for(Long machineID : this.onDemandMachinesIDs){
+			Triple<Double, Double, Double> data = this.machineUtilization.get(machineID);
+			result.put(machineID, data);
+		}
+		return result;
 	}
 }
