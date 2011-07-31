@@ -46,5 +46,5 @@ public abstract class ApplicationFactory {
 	 * @param setupMachines 
 	 * @return
 	 */
-	public abstract LoadBalancer createNewApplication(JEEventScheduler scheduler, Monitor monitor, List<Machine> setupMachines);
+	public abstract List<LoadBalancer> createNewApplication(JEEventScheduler scheduler, Monitor monitor, List<Machine> setupMachines);
 }

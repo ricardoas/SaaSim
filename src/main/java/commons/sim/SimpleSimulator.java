@@ -4,12 +4,16 @@ import java.io.IOException;
 import java.util.List;
 
 import provisioning.DPS;
+import provisioning.DynamicallyConfigurable;
 import provisioning.Monitor;
 import provisioning.util.DPSFactory;
 
 import commons.cloud.Request;
+import commons.io.GEISTWorkloadParser;
+import commons.io.TimeBasedWorkloadParser;
 import commons.io.WorkloadParser;
 import commons.sim.components.LoadBalancer;
+import commons.sim.components.Machine;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventHandler;
@@ -18,16 +22,15 @@ import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
 import commons.sim.util.ApplicationFactory;
 
-import config.GEISTSimpleWorkloadParser;
-
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class SimpleSimulator extends JEAbstractEventHandler implements Simulator, JEEventHandler{
+public class SimpleSimulator extends JEAbstractEventHandler implements Simulator, JEEventHandler, DynamicallyConfigurable{
 
 	private final WorkloadParser<List<Request>> workloadParser;
 	private final DPS monitor;
 	protected LoadBalancer loadBalancer;
+	private List<LoadBalancer> tiers;
 
 	/**
 	 * Constructor
@@ -39,7 +42,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 		this.monitor = dps;
 		this.monitor.setConfigurable(this);
 		this.workloadParser = parser;
-		this.loadBalancer = ApplicationFactory.getInstance().createNewApplication(scheduler, getMonitor(), dps.getSetupMachines());
+		this.tiers = ApplicationFactory.getInstance().createNewApplication(scheduler, getMonitor(), dps.getSetupMachines());
 	}
 	
 	/**
@@ -48,7 +51,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 * @param list 
 	 */
 	public SimpleSimulator() {
-		this(new JEEventScheduler(), DPSFactory.INSTANCE.createDPS(), new GEISTSimpleWorkloadParser());
+		this(new JEEventScheduler(), DPSFactory.INSTANCE.createDPS(), new TimeBasedWorkloadParser(new GEISTWorkloadParser(), TimeBasedWorkloadParser.HOUR_IN_MILLIS));
 	}
 	
 	/**
@@ -102,5 +105,21 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 */
 	protected JEEvent parseEvent(Request request) {
 		return new JEEvent(JEEventType.NEWREQUEST, loadBalancer, new JETime(request.getTimeInMillis()), request);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void addServer(int tier, Machine server) {
+		tiers.get(tier).addServer(server);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void removeServer(int tier, long serverID, boolean force) {
+		tiers.get(tier).removeServer(serverID, force);
 	}
 }

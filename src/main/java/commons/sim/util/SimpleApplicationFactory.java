@@ -1,5 +1,6 @@
 package commons.sim.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import provisioning.Monitor;
@@ -20,7 +21,7 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public LoadBalancer createNewApplication(JEEventScheduler scheduler,
+	public List<LoadBalancer> createNewApplication(JEEventScheduler scheduler,
 			Monitor monitor, List<Machine> setupMachines) {
 		SimulatorConfiguration config = SimulatorConfiguration.getInstance();
 		int numOfTiers = config.getApplicationNumOfTiers();
@@ -28,14 +29,16 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 		int [] serversPerTier = config.getApplicationInitialServersPerTier();
 		int [] maxServerPerTier = config.getApplicationMaxServersPerTier();
 		
-		LoadBalancer entryPoint = buildLoadBalancer(scheduler, monitor, heuristicClasses[0], serversPerTier[0], maxServerPerTier[0], setupMachines);
-		LoadBalancer currentTier = entryPoint;
+		List<LoadBalancer> loadBalancers = new ArrayList<LoadBalancer>();
+		
+		loadBalancers.add(buildLoadBalancer(scheduler, monitor, heuristicClasses[0], serversPerTier[0], maxServerPerTier[0], setupMachines));
+		
 		for (int i = 1; i < numOfTiers; i++) {
-			LoadBalancer nextTier = buildLoadBalancer(scheduler, monitor, heuristicClasses[i], serversPerTier[i], maxServerPerTier[i], setupMachines);
-			linkTiers(currentTier, nextTier);
-			currentTier = nextTier;
+			loadBalancers.add(buildLoadBalancer(scheduler, monitor, heuristicClasses[i], serversPerTier[i], maxServerPerTier[i], setupMachines));
+			linkTiers(loadBalancers.get(i), loadBalancers.get(i-1));
 		}
-		return entryPoint;
+		
+		return loadBalancers;
 	}
 
 	/**
