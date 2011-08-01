@@ -25,30 +25,18 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 			Monitor monitor, List<Machine> setupMachines) {
 		SimulatorConfiguration config = SimulatorConfiguration.getInstance();
 		int numOfTiers = config.getApplicationNumOfTiers();
+		
 		Class<?>[] heuristicClasses = config.getApplicationHeuristics();
 		int [] serversPerTier = config.getApplicationInitialServersPerTier();
 		int [] maxServerPerTier = config.getApplicationMaxServersPerTier();
 		
 		List<LoadBalancer> loadBalancers = new ArrayList<LoadBalancer>();
 		
-		loadBalancers.add(buildLoadBalancer(scheduler, monitor, heuristicClasses[0], serversPerTier[0], maxServerPerTier[0], setupMachines));
-		
-		for (int i = 1; i < numOfTiers; i++) {
+		for (int i = 0; i < numOfTiers; i++) {
 			loadBalancers.add(buildLoadBalancer(scheduler, monitor, heuristicClasses[i], serversPerTier[i], maxServerPerTier[i], setupMachines));
-			linkTiers(loadBalancers.get(i), loadBalancers.get(i-1));
 		}
 		
 		return loadBalancers;
-	}
-
-	/**
-	 * @param formerTier
-	 * @param latterTier
-	 */
-	private void linkTiers(LoadBalancer formerTier, LoadBalancer latterTier) {
-		for (Machine machine : formerTier.getServers()) {
-//				machine.setLoadBalancer(latterTier); TODO add this feature to allow multiple tiers
-		}
 	}
 
 	/**

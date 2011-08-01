@@ -51,6 +51,7 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 	 */
 	public static void buildInstance(String propertiesFileName) throws ConfigurationException{
 		instance = new SimulatorConfiguration(propertiesFileName);
+		instance.verifyProperties();
 	}
 
 	/**
@@ -71,12 +72,51 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 		super(propertiesFileName);
 	}
 	
+	private void verifyProperties() throws ConfigurationException{
+		verifySimulatorProperties();
+		if(!verifyContractPropertiesExist() || !verifyProviderPropertiesExist()){
+			throw new ConfigurationException();
+		}
+	}
+	
+	private void verifySimulatorProperties() {
+		setProperty(APPLICATION_FACTORY, 
+				getString(APPLICATION_FACTORY, SimpleApplicationFactory.class.getCanonicalName()));
+		setProperty(APPLICATION_NUM_OF_TIERS, 
+				Math.max(getInt(APPLICATION_NUM_OF_TIERS, 1), 1));
+		String[] serverPerTier = getStringArray(APPLICATION_INITIAL_SERVER_PER_TIER);
+		if(serverPerTier.length == 0){
+			serverPerTier = new String[getApplicationNumOfTiers()];
+			Arrays.fill(serverPerTier, "");
+			setProperty(APPLICATION_INITIAL_SERVER_PER_TIER, serverPerTier);
+		}else if (serverPerTier.length == getApplicationNumOfTiers()){
+			throw new ConfigurationRuntimeException("Check number of values in " + 
+					APPLICATION_INITIAL_SERVER_PER_TIER + ". It must be equals to what is specified at" + 
+					APPLICATION_NUM_OF_TIERS);
+		}
+	
+		String[] maxServerPerTier = getStringArray(APPLICATION_INITIAL_SERVER_PER_TIER);
+		if(maxServerPerTier.length == 0){
+			maxServerPerTier = new String[getApplicationNumOfTiers()];
+			Arrays.fill(maxServerPerTier, "");
+			setProperty(APPLICATION_INITIAL_SERVER_PER_TIER, maxServerPerTier);
+		}else if (maxServerPerTier.length == getApplicationNumOfTiers()){
+			throw new ConfigurationRuntimeException("Check number of values in " + 
+					APPLICATION_INITIAL_SERVER_PER_TIER + ". It must be equals to what is specified at" + 
+					APPLICATION_NUM_OF_TIERS);
+		}
+		if(getApplicationNumOfTiers() != getStringArray(APPLICATION_MAX_SERVER_PER_TIER).length){
+			throw new ConfigurationRuntimeException("Check number of values in " + 
+					APPLICATION_MAX_SERVER_PER_TIER + ". It must be equals to what is specified at" + 
+					APPLICATION_NUM_OF_TIERS);
+		}
+	}
+
 	/**
 	 * @return
 	 */
 	public String getApplicationFactoryClassName() {
-		return getString(APPLICATION_FACTORY, 
-				SimpleApplicationFactory.class.getCanonicalName());
+		return getString(APPLICATION_FACTORY);
 	}
 	
 	/**
@@ -84,7 +124,7 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 	 * @return
 	 */
 	public int getApplicationNumOfTiers() {
-		return Math.max(getInt(APPLICATION_NUM_OF_TIERS, 1), 1);
+		return getInt(APPLICATION_NUM_OF_TIERS);
 	}
 	
 	/**
@@ -147,7 +187,7 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 		}
 		if(getApplicationNumOfTiers() != stringArray.length){
 			throw new ConfigurationRuntimeException("Check number of values in " + 
-					APPLICATION_INITIAL_SERVER_PER_TIER + ". It must be equals to what is specified at" + 
+					APPLICATION_MAX_SERVER_PER_TIER + ". It must be equals to what is specified at" + 
 					APPLICATION_NUM_OF_TIERS);
 		}
 		int [] serversPerTier = new int[stringArray.length];

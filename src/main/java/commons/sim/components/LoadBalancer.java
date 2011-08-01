@@ -2,10 +2,8 @@ package commons.sim.components;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 
 import provisioning.Monitor;
@@ -27,7 +25,7 @@ import commons.sim.schedulingheuristics.SchedulingHeuristic;
  */
 public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandler{
 	
-	private final Map<Long, Machine> servers;
+	private final List<Machine> servers;
 	
 	private SchedulingHeuristic heuristic;
 	private Queue<Request> requestsToBeProcessed;
@@ -45,9 +43,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 		this.monitor = monitor;
 		this.heuristic = heuristic;
 		this.maxServersAllowed = maxServersAllowed;
-		this.servers = new HashMap<Long, Machine>();
-		this.getServers().addAll(Arrays.asList(machines));
-		
+		this.servers = new ArrayList<Machine>(Arrays.asList(machines));
 		this.requestsToBeProcessed = new LinkedList<Request>();
 	}
 	
@@ -64,14 +60,18 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	 * 
 	 */
 	public void removeServer(long serverID, boolean force){
-		if(force){
-			Machine server = servers.get(serverID);
-			migrateRequests(server);
-			send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this, getScheduler().now(), server));
-		}
-		Machine server = servers.remove(serverID);
-		if(server != null){
-			server.shutdownOnFinish();
+		for (Machine server : servers) {
+			if(server.getMachineID() == serverID){
+				if(force){
+					migrateRequests(server);
+					send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this, getScheduler().now(), server));
+				}
+				servers.remove(server);
+				if(server != null){
+					server.shutdownOnFinish();
+				}
+			}
+			break;// not a concurrent modification because of "break" statement.
 		}
 	}
 
@@ -109,8 +109,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 
 			break;
 		case ADD_SERVER:
-			Machine newServer = (Machine) event.getValue()[0];
-			getServers().add(newServer);
+			servers.add((Machine) event.getValue()[0]);
 			for (Request queuedRequest : requestsToBeProcessed) {
 				send(new JEEvent(JEEventType.NEWREQUEST, this, getScheduler().now(), queuedRequest));
 			}
@@ -144,62 +143,11 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	}
 
 	/**
-	 * @param numberOfMachinesToAdd
-	 */
-//	private void manageMachines(int numberOfMachinesToAdd) {
-//		if(numberOfMachinesToAdd > 0){//Adding machines
-//			numberOfMachinesToAdd = addReservedMachines(numberOfMachinesToAdd);
-//			
-//			//Machines are missing, add on demand resources
-//			if(numberOfMachinesToAdd > 0){
-//				int onDemandResourcesAlreadyAdded = this.getServers().size() - this.reservedResourcesAmount;
-//				numberOfMachinesToAdd = Math.min(numberOfMachinesToAdd, onDemandResourcesLimit - onDemandResourcesAlreadyAdded);
-//				for(int i = 0; i < numberOfMachinesToAdd; i++){
-////					this.addMachine();
-//				}
-//			}
-//		}else if(numberOfMachinesToAdd < 0){//Removing unused machines
-//			Iterator<Machine> it = getServers().iterator();
-//			while(it.hasNext()){
-//				Machine machine = it.next();
-//				if(!machine.isBusy()){
-//					it.remove();
-//					if(machine.isReserved()){
-//						this.reservedMachinesPool.add(machine);	
-//					}else{
-//						this.onDemandMachinesPool.add(machine);
-//					}
-//				}
-//			}
-//		}
-//	}
-//
-//	public void addReservedResources(int amount) {
-//		if(amount < 0){
-//			throw new RuntimeException("Negative amount of resources reserved!");
-//		}
-//		this.reservedResourcesAmount = amount;
-//		for(int i = 0; i < amount; i++){
-//			this.reservedMachinesPool.add(new Machine(getScheduler(), new Random().nextLong(), true));
-//		}
-//	}
-//
-//	private int addReservedMachines(int numberOfMachinesToAdd) {
-//		Iterator<Machine> it = this.reservedMachinesPool.iterator();
-//		while(it.hasNext() && numberOfMachinesToAdd > 0){
-//			Machine machine = it.next();
-//			this.getServers().add(machine);
-//			it.remove();
-//			numberOfMachinesToAdd--;
-//		}
-//		return numberOfMachinesToAdd;
-//	}
-
-	/**
+	 * Copy of the servers list.
 	 * @return the servers
 	 */
 	public List<Machine> getServers() {
-		return new ArrayList<Machine>(servers.values());
+		return new ArrayList<Machine>(servers);
 	}
 
 	public void reportRequestFinished(Request requestFinished) {

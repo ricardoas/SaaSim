@@ -8,16 +8,21 @@ import java.util.List;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import provisioning.DPS;
 
 import commons.cloud.Request;
+import commons.config.SimulatorConfiguration;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
 
-
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(SimulatorConfiguration.class)
 public class LoadBalancerTest {
 	
 	private LoadBalancer lb;
@@ -103,6 +108,8 @@ public class LoadBalancerTest {
 		this.schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
 		DPS dps = EasyMock.createStrictMock(DPS.class);
 		Machine machine = EasyMock.createStrictMock(Machine.class);
+		machine.setLoadBalancer(EasyMock.isA(LoadBalancer.class));
+		EasyMock.expectLastCall();
 		
 		JEEvent event = EasyMock.createStrictMock(JEEvent.class);
 		EasyMock.expect(event.getType()).andReturn(JEEventType.NEWREQUEST).once();
@@ -115,7 +122,8 @@ public class LoadBalancerTest {
 		EasyMock.replay(event, machine, dps, schedulingHeuristic);
 		
 		lb = new LoadBalancer(eventScheduler, dps, schedulingHeuristic, Integer.MAX_VALUE);
-		lb.getServers().add(machine);//Creating a machine to serve the request
+		lb.addServer(machine);//Creating a machine to serve the request
+		lb.handleEvent(new JEEvent(JEEventType.ADD_SERVER, lb, eventScheduler.now(), machine));
 		lb.handleEvent(event);
 		
 		EasyMock.verify(event, machine, dps, schedulingHeuristic);
