@@ -1,5 +1,7 @@
 package commons.sim.util;
 
+import static commons.sim.util.SimulatorProperties.APPLICATION_FACTORY;
+
 import java.util.List;
 
 import provisioning.Monitor;
@@ -29,7 +31,7 @@ public abstract class ApplicationFactory {
 	public static ApplicationFactory getInstance(){
 		
 		if(instance == null){
-			String className = SimulatorConfiguration.getInstance().getApplicationFactoryClassName();
+			String className = SimulatorConfiguration.getInstance().getString(APPLICATION_FACTORY);
 			try {
 				instance = (ApplicationFactory) Class.forName(className).newInstance();
 			} catch (Exception e) {

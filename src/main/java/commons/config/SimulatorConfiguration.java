@@ -1,8 +1,40 @@
 package commons.config;
 
-import static commons.sim.util.ProviderProperties.*;
-import static commons.sim.util.SimulatorProperties.*;
-import static commons.sim.util.ContractProperties.*;
+import static commons.sim.util.ContractProperties.ASSOCIATIONS;
+import static commons.sim.util.ContractProperties.CPU_LIMIT;
+import static commons.sim.util.ContractProperties.EXTRA_CPU_COST;
+import static commons.sim.util.ContractProperties.PLAN;
+import static commons.sim.util.ContractProperties.PLANS_NUM;
+import static commons.sim.util.ContractProperties.PLAN_NAME;
+import static commons.sim.util.ContractProperties.PLAN_PRICE;
+import static commons.sim.util.ContractProperties.PLAN_SETUP;
+import static commons.sim.util.ProviderProperties.COST_TRANSFER_IN;
+import static commons.sim.util.ProviderProperties.COST_TRANSFER_OUT;
+import static commons.sim.util.ProviderProperties.MONITORING;
+import static commons.sim.util.ProviderProperties.NUM_OF_PROVIDERS;
+import static commons.sim.util.ProviderProperties.ONDEMAND_CPU_COST;
+import static commons.sim.util.ProviderProperties.ONE_YEAR_FEE;
+import static commons.sim.util.ProviderProperties.ON_DEMAND_LIMIT;
+import static commons.sim.util.ProviderProperties.PROVIDER;
+import static commons.sim.util.ProviderProperties.PROVIDER_NAME;
+import static commons.sim.util.ProviderProperties.RESERVATION_LIMIT;
+import static commons.sim.util.ProviderProperties.RESERVED_CPU_COST;
+import static commons.sim.util.ProviderProperties.THREE_YEARS_FEE;
+import static commons.sim.util.ProviderProperties.TRANSFER_IN;
+import static commons.sim.util.ProviderProperties.TRANSFER_OUT;
+import static commons.sim.util.SimulatorProperties.APPLICATION_CUSTOM_HEURISTIC;
+import static commons.sim.util.SimulatorProperties.APPLICATION_FACTORY;
+import static commons.sim.util.SimulatorProperties.APPLICATION_HEURISTIC;
+import static commons.sim.util.SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER;
+import static commons.sim.util.SimulatorProperties.APPLICATION_MAX_SERVER_PER_TIER;
+import static commons.sim.util.SimulatorProperties.APPLICATION_NUM_OF_TIERS;
+import static commons.sim.util.SimulatorProperties.DEFAULT_PLANNING_HEURISTIC;
+import static commons.sim.util.SimulatorProperties.DPS_CUSTOM_HEURISTIC;
+import static commons.sim.util.SimulatorProperties.DPS_HEURISTIC;
+import static commons.sim.util.SimulatorProperties.PLANNING_HEURISTIC;
+import static commons.sim.util.SimulatorProperties.PLANNING_PERIOD;
+import static commons.sim.util.SimulatorProperties.SETUP_TIME;
+import static commons.sim.util.SimulatorProperties.SLA;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -82,78 +114,58 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 	private void verifySimulatorProperties() {
 		setProperty(APPLICATION_FACTORY, 
 				getString(APPLICATION_FACTORY, SimpleApplicationFactory.class.getCanonicalName()));
-		setProperty(APPLICATION_NUM_OF_TIERS, 
-				Math.max(getInt(APPLICATION_NUM_OF_TIERS, 1), 1));
-		String[] serverPerTier = getStringArray(APPLICATION_INITIAL_SERVER_PER_TIER);
-		if(serverPerTier.length == 0){
-			serverPerTier = new String[getApplicationNumOfTiers()];
-			Arrays.fill(serverPerTier, "");
-			setProperty(APPLICATION_INITIAL_SERVER_PER_TIER, serverPerTier);
-		}else if (serverPerTier.length == getApplicationNumOfTiers()){
-			throw new ConfigurationRuntimeException("Check number of values in " + 
-					APPLICATION_INITIAL_SERVER_PER_TIER + ". It must be equals to what is specified at" + 
-					APPLICATION_NUM_OF_TIERS);
-		}
-	
-		String[] maxServerPerTier = getStringArray(APPLICATION_INITIAL_SERVER_PER_TIER);
-		if(maxServerPerTier.length == 0){
-			maxServerPerTier = new String[getApplicationNumOfTiers()];
-			Arrays.fill(maxServerPerTier, "");
-			setProperty(APPLICATION_INITIAL_SERVER_PER_TIER, maxServerPerTier);
-		}else if (maxServerPerTier.length == getApplicationNumOfTiers()){
-			throw new ConfigurationRuntimeException("Check number of values in " + 
-					APPLICATION_INITIAL_SERVER_PER_TIER + ". It must be equals to what is specified at" + 
-					APPLICATION_NUM_OF_TIERS);
-		}
-		if(getApplicationNumOfTiers() != getStringArray(APPLICATION_MAX_SERVER_PER_TIER).length){
-			throw new ConfigurationRuntimeException("Check number of values in " + 
-					APPLICATION_MAX_SERVER_PER_TIER + ". It must be equals to what is specified at" + 
-					APPLICATION_NUM_OF_TIERS);
-		}
+		
+		int numOfTiers = Math.max(getInt(APPLICATION_NUM_OF_TIERS, 1), 1);
+		setProperty(APPLICATION_NUM_OF_TIERS, numOfTiers);
+		
+		checkSizeAndContent(APPLICATION_INITIAL_SERVER_PER_TIER, numOfTiers, "1");
+		checkSizeAndContent(APPLICATION_MAX_SERVER_PER_TIER, numOfTiers, Integer.MAX_VALUE+"");
+		checkSizeAndContent(APPLICATION_HEURISTIC, numOfTiers, AppHeuristicValues.ROUNDROBIN.name());
+		
+		changeHeuristicNames();
+		checkDPSHeuristic();
+		
 	}
 
 	/**
-	 * @return
+	 * @param propertyName
+	 * @param size
 	 */
-	public String getApplicationFactoryClassName() {
-		return getString(APPLICATION_FACTORY);
+	private void checkSizeAndContent(String propertyName, int size, String defaultValue) {
+		String[] values = getStringArray(propertyName);
+		if(values.length == 0){
+			values = new String[size];
+			Arrays.fill(values, defaultValue);
+			setProperty(propertyName, values);
+		}else if (values.length == size){
+			throw new ConfigurationRuntimeException("Check number of values in " + 
+					propertyName + ". It must be equals to what is specified at" + 
+					APPLICATION_NUM_OF_TIERS);
+		}else{
+			for (int i = 0; i < values.length; i++) {
+				values[i] = values[i].trim().isEmpty()? defaultValue: values[i];
+			}
+		}
 	}
-	
-	/**
-	 * 
-	 * @return
-	 */
-	public int getApplicationNumOfTiers() {
-		return getInt(APPLICATION_NUM_OF_TIERS);
-	}
-	
-	/**
-	 * @return
-	 */
-	public Class<?>[] getApplicationHeuristics() {
+
+	private void changeHeuristicNames() {
 		String[] strings = getStringArray(APPLICATION_HEURISTIC);
 		String customHeuristic = getString(APPLICATION_CUSTOM_HEURISTIC);
-		Class<?> [] heuristicClasses = new Class<?>[strings.length]; 
-		
 		for (int i = 0; i < strings.length; i++) {
-			if(strings[i].isEmpty()){
-				strings[i] = AppHeuristicValues.ROUNDROBIN.name();
-			}
 			AppHeuristicValues value = AppHeuristicValues.valueOf(strings[i]);
 			switch (value) {
 				case ROUNDROBIN:
-					heuristicClasses[i] = RoundRobinHeuristic.class;
+					strings[i] = RoundRobinHeuristic.class.getCanonicalName();
 					break;
 				case RANJAN:
-					heuristicClasses[i] = RanjanHeuristic.class;
+					strings[i] = RanjanHeuristic.class.getCanonicalName();
 					break;
 				case PROFITDRIVEN:
-					//FIXME: This heuristic needs a SLA in its construction!
-					heuristicClasses[i] = ProfitDrivenHeuristic.class;
+					strings[i] = ProfitDrivenHeuristic.class.getCanonicalName();
 					break;
 				case CUSTOM:
 					try {
-						heuristicClasses[i] = Class.forName(customHeuristic);
+						strings[i] = Class.forName(customHeuristic).getCanonicalName();
 					} catch (ClassNotFoundException e) {
 						throw new ConfigurationRuntimeException("Problem loading " + customHeuristic, e);
 					}
@@ -162,65 +174,72 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 					throw new ConfigurationRuntimeException("Unsupported value for " + SimulatorProperties.APPLICATION_HEURISTIC + ": " + strings[i]);
 			}
 		}
-		return heuristicClasses;
+		
 	}
 	
 	public int[] getApplicationInitialServersPerTier() {
 		String[] stringArray = getStringArray(APPLICATION_INITIAL_SERVER_PER_TIER);
-		if(getApplicationNumOfTiers() != stringArray.length){
-			throw new ConfigurationRuntimeException("Check number of values in " + 
-					APPLICATION_INITIAL_SERVER_PER_TIER + ". It must be equals to what is specified at" + 
-					APPLICATION_NUM_OF_TIERS);
-		}
 		int [] serversPerTier = new int[stringArray.length];
 		for (int i = 0; i < serversPerTier.length; i++) {
-			serversPerTier[i] = Math.max(1, Integer.valueOf(stringArray[i]));
+			serversPerTier[i] = Integer.valueOf(stringArray[i]);
 		}
 		return serversPerTier;
 	}
 
 	public int[] getApplicationMaxServersPerTier() {
 		String[] stringArray = getStringArray(APPLICATION_MAX_SERVER_PER_TIER);
-		if(stringArray.length == 0){
-			stringArray = new String[getApplicationNumOfTiers()];
-			Arrays.fill(stringArray, "");
-		}
-		if(getApplicationNumOfTiers() != stringArray.length){
-			throw new ConfigurationRuntimeException("Check number of values in " + 
-					APPLICATION_MAX_SERVER_PER_TIER + ". It must be equals to what is specified at" + 
-					APPLICATION_NUM_OF_TIERS);
-		}
 		int [] serversPerTier = new int[stringArray.length];
 		for (int i = 0; i < serversPerTier.length; i++) {
-			serversPerTier[i] = Math.max(1, Integer.valueOf(stringArray[i].isEmpty()? "1": stringArray[i]));
+			serversPerTier[i] = Integer.valueOf(stringArray[i]);
 		}
 		return serversPerTier;
 	}
 
-	public Class<?> getDPSHeuristicClass() {
+	/**
+	 * @return
+	 */
+	public Class<?>[] getApplicationHeuristics() {
+		String[] strings = getStringArray(APPLICATION_HEURISTIC);
+		Class<?> [] heuristicClasses = new Class<?>[strings.length]; 
+		
+		for (int i = 0; i < strings.length; i++) {
+			try {
+				heuristicClasses[i] = Class.forName(strings[i]);
+			} catch (ClassNotFoundException e) {
+				throw new ConfigurationRuntimeException("Problem loading " + strings[i], e);
+			}
+		}
+		return heuristicClasses;
+	}
+	
+	private void checkDPSHeuristic() {
 		String heuristicName = getString(DPS_HEURISTIC);
 		String customHeuristicClass = getString(DPS_CUSTOM_HEURISTIC);
 		try{
 			DPSHeuristicValues value = DPSHeuristicValues.valueOf(heuristicName);
 			switch (value) {
 				case STATIC:
-					return StaticProvisioningSystem.class;
+					heuristicName = StaticProvisioningSystem.class.getCanonicalName();
 				case RANJAN:
-					return RanjanProvisioningSystem.class;
+					heuristicName = RanjanProvisioningSystem.class.getCanonicalName();
 				case PROFITDRIVEN:
-					return ProfitDrivenProvisioningSystem.class;
+					heuristicName = ProfitDrivenProvisioningSystem.class.getCanonicalName();
 				case CUSTOM:
-					return Class.forName(customHeuristicClass);
+					heuristicName = Class.forName(customHeuristicClass).getCanonicalName();
 			}
-			
-		} catch (IllegalArgumentException iae) {
-			throw new ConfigurationRuntimeException("Unsupported value for " + 
-						DPS_HEURISTIC + ": " + heuristicName, iae);
+			setProperty(DPS_HEURISTIC, heuristicName);
 		} catch (ClassNotFoundException e) {
 			throw new ConfigurationRuntimeException("Problem loading " + customHeuristicClass, e);
 		}
-		return null;
-		
+	}
+
+	public Class<?> getDPSHeuristicClass() {
+		String heuristicName = getString(DPS_HEURISTIC);
+		try {
+			return Class.forName(heuristicName);
+		} catch (ClassNotFoundException e) {
+			throw new ConfigurationRuntimeException("Problem loading " + heuristicName, e);
+		}
 	}
 
 	public long getSetUpTime() {
@@ -366,3 +385,5 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 		return valid;
 	}
 }
+
+
