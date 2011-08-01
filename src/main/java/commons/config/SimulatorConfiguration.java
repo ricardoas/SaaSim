@@ -1,40 +1,8 @@
 package commons.config;
 
-import static commons.sim.util.ContractProperties.ASSOCIATIONS;
-import static commons.sim.util.ContractProperties.CPU_LIMIT;
-import static commons.sim.util.ContractProperties.EXTRA_CPU_COST;
-import static commons.sim.util.ContractProperties.PLAN;
-import static commons.sim.util.ContractProperties.PLANS_NUM;
-import static commons.sim.util.ContractProperties.PLAN_NAME;
-import static commons.sim.util.ContractProperties.PLAN_PRICE;
-import static commons.sim.util.ContractProperties.PLAN_SETUP;
-import static commons.sim.util.ProviderProperties.COST_TRANSFER_IN;
-import static commons.sim.util.ProviderProperties.COST_TRANSFER_OUT;
-import static commons.sim.util.ProviderProperties.MONITORING;
-import static commons.sim.util.ProviderProperties.NUM_OF_PROVIDERS;
-import static commons.sim.util.ProviderProperties.ONDEMAND_CPU_COST;
-import static commons.sim.util.ProviderProperties.ONE_YEAR_FEE;
-import static commons.sim.util.ProviderProperties.ON_DEMAND_LIMIT;
-import static commons.sim.util.ProviderProperties.PROVIDER;
-import static commons.sim.util.ProviderProperties.PROVIDER_NAME;
-import static commons.sim.util.ProviderProperties.RESERVATION_LIMIT;
-import static commons.sim.util.ProviderProperties.RESERVED_CPU_COST;
-import static commons.sim.util.ProviderProperties.THREE_YEARS_FEE;
-import static commons.sim.util.ProviderProperties.TRANSFER_IN;
-import static commons.sim.util.ProviderProperties.TRANSFER_OUT;
-import static commons.sim.util.SimulatorProperties.APPLICATION_CUSTOM_HEURISTIC;
-import static commons.sim.util.SimulatorProperties.APPLICATION_FACTORY;
-import static commons.sim.util.SimulatorProperties.APPLICATION_HEURISTIC;
-import static commons.sim.util.SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER;
-import static commons.sim.util.SimulatorProperties.APPLICATION_MAX_SERVER_PER_TIER;
-import static commons.sim.util.SimulatorProperties.APPLICATION_NUM_OF_TIERS;
-import static commons.sim.util.SimulatorProperties.DEFAULT_PLANNING_HEURISTIC;
-import static commons.sim.util.SimulatorProperties.DPS_CUSTOM_HEURISTIC;
-import static commons.sim.util.SimulatorProperties.DPS_HEURISTIC;
-import static commons.sim.util.SimulatorProperties.PLANNING_HEURISTIC;
-import static commons.sim.util.SimulatorProperties.PLANNING_PERIOD;
-import static commons.sim.util.SimulatorProperties.SETUP_TIME;
-import static commons.sim.util.SimulatorProperties.SLA;
+import static commons.sim.util.ContractProperties.*;
+import static commons.sim.util.ProviderProperties.*;
+import static commons.sim.util.SimulatorProperties.*;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -74,6 +42,7 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 	
 	//Users SaaS plans
 	public Map<String, Contract> contractsPerName;
+	
 	public Map<User, Contract> usersContracts;
 	
 	/**
@@ -106,10 +75,17 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 	
 	private void verifyProperties() throws ConfigurationException{
 		verifySimulatorProperties();
-		if(!verifyContractPropertiesExist() || !verifyProviderPropertiesExist()){
+		verifyIaaSProperties();
+		verifySaaSProperties();
+		
+		
+		if(!verifyProviderPropertiesExist()){
 			throw new ConfigurationException();
 		}
 	}
+	
+	// ************************************* SIMULATOR ************************************/
+	
 	
 	private void verifySimulatorProperties() {
 		setProperty(APPLICATION_FACTORY, 
@@ -118,33 +94,58 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 		int numOfTiers = Math.max(getInt(APPLICATION_NUM_OF_TIERS, 1), 1);
 		setProperty(APPLICATION_NUM_OF_TIERS, numOfTiers);
 		
-		checkSizeAndContent(APPLICATION_INITIAL_SERVER_PER_TIER, numOfTiers, "1");
-		checkSizeAndContent(APPLICATION_MAX_SERVER_PER_TIER, numOfTiers, Integer.MAX_VALUE+"");
-		checkSizeAndContent(APPLICATION_HEURISTIC, numOfTiers, AppHeuristicValues.ROUNDROBIN.name());
+		checkSizeAndContent(APPLICATION_INITIAL_SERVER_PER_TIER, numOfTiers, APPLICATION_NUM_OF_TIERS, "1");
+		checkSizeAndContent(APPLICATION_MAX_SERVER_PER_TIER, numOfTiers, APPLICATION_NUM_OF_TIERS, Integer.MAX_VALUE+"");
+		checkSizeAndContent(APPLICATION_HEURISTIC, numOfTiers, APPLICATION_NUM_OF_TIERS, AppHeuristicValues.ROUNDROBIN.name());
 		
 		changeHeuristicNames();
 		checkDPSHeuristic();
+		
+		setProperty(SETUP_TIME, Math.max(getLong(SETUP_TIME, 0), 0));
+		
 		
 	}
 
 	/**
 	 * @param propertyName
 	 * @param size
+	 * @param sizeProperty TODO
 	 */
-	private void checkSizeAndContent(String propertyName, int size, String defaultValue) {
+	private void checkSizeAndContent(String propertyName, int size, String sizeProperty, String defaultValue) {
 		String[] values = getStringArray(propertyName);
+		checkSize(propertyName, size, sizeProperty);
 		if(values.length == 0){
 			values = new String[size];
 			Arrays.fill(values, defaultValue);
 			setProperty(propertyName, values);
-		}else if (values.length == size){
-			throw new ConfigurationRuntimeException("Check number of values in " + 
-					propertyName + ". It must be equals to what is specified at" + 
-					APPLICATION_NUM_OF_TIERS);
 		}else{
 			for (int i = 0; i < values.length; i++) {
 				values[i] = values[i].trim().isEmpty()? defaultValue: values[i];
 			}
+		}
+	}
+
+	/**
+	 * @param propertyName
+	 * @param size
+	 */
+	private void checkSizeAndContent(String propertyName, int size, String sizeProperty) {
+		String[] values = getStringArray(propertyName);
+		checkSize(propertyName, size, sizeProperty);
+		for (String value : values) {
+			if(value.trim().isEmpty()){
+				throw new ConfigurationRuntimeException("Mandatory property " + 
+						propertyName + " has no value associated with it.");
+			}
+		}
+	}
+	
+	private void checkSize(String propertyName, int size, String sizePropertyName) {
+		String[] values = getStringArray(propertyName);
+		if (values.length == size){
+			throw new ConfigurationRuntimeException("Check number of values in " + 
+					propertyName + ". It must be equals to what is specified at" + 
+					sizePropertyName);
 		}
 	}
 
@@ -241,11 +242,42 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 			throw new ConfigurationRuntimeException("Problem loading " + heuristicName, e);
 		}
 	}
-
-	public long getSetUpTime() {
-		return Math.max(0, getLong(SETUP_TIME, 0));
-	}
 	
+	
+	// ************************************* PROVIDERS ************************************/
+	
+	private void verifyIaaSProperties() {
+		int numberOfProviders = getInt(IAAS_NUMBER_OF_PROVIDERS);
+		
+		checkSizeAndContent(IAAS_NAME, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndContent(IAAS_ONDEMAND_CPU_COST, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndContent(IAAS_ONDEMAND_LIMIT, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndContent(IAAS_RESERVED_CPU_COST, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndContent(IAAS_RESERVED_LIMIT, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndContent(IAAS_ONE_YEAR_FEE, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndContent(IAAS_THREE_YEARS_FEE, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndContent(IAAS_MONITORING, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndContent(IAAS_TRANSFER_IN, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndContent(IAAS_COST_TRANSFER_IN, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndContent(IAAS_TRANSFER_OUT, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndContent(IAAS_COST_TRANSFER_OUT, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+
+	}
+
+	// ************************************* SAAS ************************************/
+
+	private void verifySaaSProperties() {
+		int numberOfPlans = getInt(NUMBER_OF_PLANS);
+		
+		checkSizeAndContent(PLAN_NAME, numberOfPlans,NUMBER_OF_PLANS);
+		checkSizeAndContent(PLAN_PRICE, numberOfPlans, NUMBER_OF_PLANS);
+		checkSizeAndContent(PLAN_SETUP, numberOfPlans, NUMBER_OF_PLANS);
+		checkSizeAndContent(PLAN_CPU_LIMIT, numberOfPlans, NUMBER_OF_PLANS);
+		checkSizeAndContent(PLAN_EXTRA_CPU_COST, numberOfPlans, NUMBER_OF_PLANS);
+		checkSizeAndContent(PLAN_TRANSFER_LIMIT, numberOfPlans, NUMBER_OF_PLANS);
+		checkSizeAndContent(PLAN_EXTRA_TRANSFER_COST, numberOfPlans, NUMBER_OF_PLANS);
+	}
+
 	public String getPlanningHeuristic(){
 		return getString(PLANNING_HEURISTIC, DEFAULT_PLANNING_HEURISTIC);
 	}
@@ -278,37 +310,37 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 	
 	private boolean verifyProviderPropertiesExist(){
 		boolean valid = true; 
-		int numberOfPlans = getInt(NUM_OF_PROVIDERS);
-		for(int i = 1; i <= numberOfPlans; i++){
-			valid = valid && containsKey(PROVIDER+i+PROVIDER_NAME) && containsKey(PROVIDER+i+ONDEMAND_CPU_COST) && 
-			containsKey(PROVIDER+i+ON_DEMAND_LIMIT) && containsKey(PROVIDER+i+RESERVED_CPU_COST) &&
-			containsKey(PROVIDER+i+RESERVATION_LIMIT) && containsKey(PROVIDER+i+ONE_YEAR_FEE) && 
-			containsKey(PROVIDER+i+THREE_YEARS_FEE) && containsKey(PROVIDER+i+MONITORING) && 
-			containsKey(PROVIDER+i+TRANSFER_IN) && containsKey(PROVIDER+i+COST_TRANSFER_IN) && 
-			containsKey(PROVIDER+i+TRANSFER_OUT) && containsKey(PROVIDER+i+COST_TRANSFER_OUT) &&
-			!getString(PROVIDER+i+ONDEMAND_CPU_COST).isEmpty() && !getString(PROVIDER+i+PROVIDER_NAME).isEmpty() &&
-			!getString(PROVIDER+i+RESERVED_CPU_COST).isEmpty()
-			&& !getString(PROVIDER+i+ON_DEMAND_LIMIT).isEmpty() && !getString(PROVIDER+i+RESERVATION_LIMIT).isEmpty() 
-			&& !getString(PROVIDER+i+ONE_YEAR_FEE).isEmpty() &&	!getString(PROVIDER+i+THREE_YEARS_FEE).isEmpty() 
-			&& !getString(PROVIDER+i+MONITORING).isEmpty() &&	!getString(PROVIDER+i+TRANSFER_IN).isEmpty()
-			&& !getString(PROVIDER+i+COST_TRANSFER_IN).isEmpty() &&	!getString(PROVIDER+i+TRANSFER_OUT).isEmpty()
-			&& !getString(PROVIDER+i+COST_TRANSFER_OUT).isEmpty(); 
-		}
+//		int numberOfPlans = getInt(NUM_OF_PROVIDERS);
+//		for(int i = 1; i <= numberOfPlans; i++){
+//			valid = valid && containsKey(PROVIDER+i+PROVIDER_NAME) && containsKey(PROVIDER+i+ONDEMAND_CPU_COST) && 
+//			containsKey(PROVIDER+i+ON_DEMAND_LIMIT) && containsKey(PROVIDER+i+RESERVED_CPU_COST) &&
+//			containsKey(PROVIDER+i+RESERVATION_LIMIT) && containsKey(PROVIDER+i+ONE_YEAR_FEE) && 
+//			containsKey(PROVIDER+i+THREE_YEARS_FEE) && containsKey(PROVIDER+i+MONITORING) && 
+//			containsKey(PROVIDER+i+TRANSFER_IN) && containsKey(PROVIDER+i+COST_TRANSFER_IN) && 
+//			containsKey(PROVIDER+i+TRANSFER_OUT) && containsKey(PROVIDER+i+COST_TRANSFER_OUT) &&
+//			!getString(PROVIDER+i+ONDEMAND_CPU_COST).isEmpty() && !getString(PROVIDER+i+PROVIDER_NAME).isEmpty() &&
+//			!getString(PROVIDER+i+RESERVED_CPU_COST).isEmpty()
+//			&& !getString(PROVIDER+i+ON_DEMAND_LIMIT).isEmpty() && !getString(PROVIDER+i+RESERVATION_LIMIT).isEmpty() 
+//			&& !getString(PROVIDER+i+ONE_YEAR_FEE).isEmpty() &&	!getString(PROVIDER+i+THREE_YEARS_FEE).isEmpty() 
+//			&& !getString(PROVIDER+i+MONITORING).isEmpty() &&	!getString(PROVIDER+i+TRANSFER_IN).isEmpty()
+//			&& !getString(PROVIDER+i+COST_TRANSFER_IN).isEmpty() &&	!getString(PROVIDER+i+TRANSFER_OUT).isEmpty()
+//			&& !getString(PROVIDER+i+COST_TRANSFER_OUT).isEmpty(); 
+//		}
 		return valid;
 	}
 	
 	private void buildProvider() {
-		int numberOfPlans = Integer.valueOf(getInt(NUM_OF_PROVIDERS));
-		providers = new HashMap<String, Provider>();
-		for(int i = 1; i <= numberOfPlans; i++){
-			providers.put(getString(PROVIDER+i+PROVIDER_NAME), 
-					new Provider(getString(PROVIDER+i+PROVIDER_NAME), getDouble(PROVIDER+i+ONDEMAND_CPU_COST), getInt(PROVIDER+i+ON_DEMAND_LIMIT),
-					getInt(PROVIDER+i+RESERVATION_LIMIT), getDouble(PROVIDER+i+RESERVED_CPU_COST),
-					getDouble(PROVIDER+i+ONE_YEAR_FEE), getDouble(PROVIDER+i+THREE_YEARS_FEE), 
-					getDouble(PROVIDER+i+MONITORING), getString(PROVIDER+i+TRANSFER_IN), getString(PROVIDER+i+COST_TRANSFER_IN), 
-					getString(PROVIDER+i+TRANSFER_OUT), getString(PROVIDER+i+COST_TRANSFER_OUT))
-			);
-		}
+//		int numberOfPlans = Integer.valueOf(getInt(NUM_OF_PROVIDERS));
+//		providers = new HashMap<String, Provider>();
+//		for(int i = 1; i <= numberOfPlans; i++){
+//			providers.put(getString(PROVIDER+i+PROVIDER_NAME), 
+//					new Provider(getString(PROVIDER+i+PROVIDER_NAME), getDouble(PROVIDER+i+ONDEMAND_CPU_COST), getInt(PROVIDER+i+ON_DEMAND_LIMIT),
+//					getInt(PROVIDER+i+RESERVATION_LIMIT), getDouble(PROVIDER+i+RESERVED_CPU_COST),
+//					getDouble(PROVIDER+i+ONE_YEAR_FEE), getDouble(PROVIDER+i+THREE_YEARS_FEE), 
+//					getDouble(PROVIDER+i+MONITORING), getString(PROVIDER+i+TRANSFER_IN), getString(PROVIDER+i+COST_TRANSFER_IN), 
+//					getString(PROVIDER+i+TRANSFER_OUT), getString(PROVIDER+i+COST_TRANSFER_OUT))
+//			);
+//		}
 	}
 	
 	/**
@@ -318,13 +350,13 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 	 * @throws IOException
 	 */
 	public Map<User, Contract> getContractsPerUser() throws IOException{
-		if(this.usersContracts == null){
-			if(this.verifyContractPropertiesExist()){
-				this.buildPlans();
-			}else{
-				throw new IOException("Missing data in contracts file!");
-			}
-		}
+//		if(this.usersContracts == null){
+//			if(this.verifyContractPropertiesExist()){
+//				this.buildPlans();
+//			}else{
+//				throw new IOException("Missing data in contracts file!");
+//			}
+//		}
 		
 		return this.usersContracts;
 	}
@@ -337,11 +369,7 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 	 */
 	public Map<String, Contract> getContractsPerName() throws IOException{
 		if(this.contractsPerName == null){
-			if(this.verifyContractPropertiesExist()){
-				this.buildPlans();
-			}else{
-				throw new IOException("Missing data in contracts file!");
-			}
+			this.buildPlans();
 		}
 		
 		return this.contractsPerName;
@@ -349,40 +377,30 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 	
 	private void buildPlans() {
 		
-		//Extract plans
-		int numberOfPlans = getInt(PLANS_NUM);
 		contractsPerName = new HashMap<String, Contract>();
+		
+		int numberOfPlans = getInt(NUMBER_OF_PLANS);
+		String[] planNames = getStringArray(PLAN_NAME);
+		String[] prices = getStringArray(PLAN_PRICE);
+		String[] setupCosts = getStringArray(PLAN_SETUP);
+		String[] cpuLimits = getStringArray(PLAN_CPU_LIMIT);
+		String[] extraCpuCosts = getStringArray(PLAN_EXTRA_CPU_COST);
+		String[] planTransferLimits = getStringArray(PLAN_TRANSFER_LIMIT);
+		String[] planExtraTransferCost = getStringArray(PLAN_EXTRA_TRANSFER_COST);
+		String[] users = getStringArray(PLAN_USERS);
+		
 		for(int i = 1; i <= numberOfPlans; i++){
-			contractsPerName.put(getString(PLAN+i+PLAN_NAME), new Contract( getString(PLAN+i+PLAN_NAME),
-			getDouble(PLAN+i+PLAN_SETUP), getDouble(PLAN+i+PLAN_PRICE),
-			getDouble(PLAN+i+CPU_LIMIT), getDouble(PLAN+i+EXTRA_CPU_COST) ));
+			contractsPerName.put(planNames[i], 
+					new Contract(planNames[i], Double.valueOf(setupCosts[i]), Double.valueOf(prices[i]), 
+							Double.valueOf(cpuLimits[i]), Double.valueOf(extraCpuCosts[i])));
 		}
 		
 		//Extract users associations
-		String value = getString(ASSOCIATIONS);
-		boolean valid = containsKey(ASSOCIATIONS) && !value.isEmpty();
-		String[] usersPlans = value.split(";");
-		valid = valid && usersPlans.length > 0;
-		usersContracts = new HashMap<User, Contract>();
-		for(String userPlan : usersPlans){
-			String[] split = userPlan.split("\\s+");
-			usersContracts.put(new User(split[0]), contractsPerName.get(split[1]));
-		}
-	}
-	
-	private boolean verifyContractPropertiesExist(){
-		boolean valid = true; 
-		int numberOfPlans = getInt(PLANS_NUM);
-		for(int i = 1; i <= numberOfPlans; i++){
-			valid = valid && containsKey(PLAN+i+PLAN_NAME) && containsKey(PLAN+i+PLAN_PRICE) &&
-			containsKey(PLAN+i+PLAN_SETUP) && containsKey(PLAN+i+CPU_LIMIT) && 
-			containsKey(PLAN+i+EXTRA_CPU_COST) && //currentProperties.containsKey(IAAS) && currentProperties.containsKey(PLANNING_PERIOD) &&
-			!getString(PLAN+i+PLAN_NAME).isEmpty() && !getString(PLAN+i+PLAN_PRICE).isEmpty() &&
-			!getString(PLAN+i+PLAN_SETUP).isEmpty() && !getString(PLAN+i+CPU_LIMIT).isEmpty() && 
-			!getString(PLAN+i+EXTRA_CPU_COST).isEmpty(); //&& !currentProperties.getProperty(IAAS).isEmpty() &&
-			//!currentProperties.getProperty(PLANNING_PERIOD).isEmpty();
-		}
-		return valid;
+//		usersContracts = new HashMap<User, Contract>();
+//		for(String userPlan : users){
+//			String[] split = userPlan.split("\\s+");
+//			usersContracts.put(new User(split[0]), contractsPerName.get(split[1]));
+//		}
 	}
 }
 

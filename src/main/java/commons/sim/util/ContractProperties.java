@@ -2,15 +2,23 @@ package commons.sim.util;
 
 public class ContractProperties {
 	
-	public static final String PLANS_NUM = "plans.number";
-	public static final String ASSOCIATIONS = "associations";
+	public static final String NUMBER_OF_PLANS = "plan.availableplans";
+
+	// PROPERTY ARRAYS //
+	public static final String PLAN_NAME = "plan.name";
+
+	public static final String PLAN_PRICE = "plan.price";
 	
-	public static final String PLAN = "plan";
-	public static final String PLAN_NAME = ".name";
-	public static final String PLAN_PRICE = ".price";
-	public static final String PLAN_SETUP = ".setup";
-	public static final String CPU_LIMIT = ".cpu_lim";
-	public static final String EXTRA_CPU_COST = ".ex_cpu";
-	public static final String TRANSFER_LIMIT = ".transfer_lim";
-	public static final String EXTRA_TRANSFER_COST = ".ex_transfer";
+	public static final String PLAN_SETUP = "plan.setup";
+	
+	public static final String PLAN_CPU_LIMIT = "plan.cpu_lim";
+	
+	public static final String PLAN_EXTRA_CPU_COST = "plan.ex_cpu";
+	
+	public static final String PLAN_TRANSFER_LIMIT = "plan.transfer_lim";
+	
+	public static final String PLAN_EXTRA_TRANSFER_COST = "plan.ex_transfer";
+	
+	public static final String PLAN_USERS = "plan.users";
 }
+

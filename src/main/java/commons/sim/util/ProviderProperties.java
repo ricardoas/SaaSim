@@ -1,22 +1,32 @@
 package commons.sim.util;
 
 public class ProviderProperties {
-	
+
 	//Cloud providers properties
-	public static final String NUM_OF_PROVIDERS = "providers.number";
-	public static final String PROVIDER = "prov";
-	
-	public static final String PROVIDER_NAME = ".name";
-	public static final String ONDEMAND_CPU_COST = ".ondemand_cpu_cost";
-	public static final String ON_DEMAND_LIMIT = ".ondemandLimit";
-	public static final String RESERVATION_LIMIT = ".reservationLimit";
-	public static final String RESERVED_CPU_COST = ".reserved_cpu_cost";
-	public static final String ONE_YEAR_FEE = ".oneYearFee";
-	public static final String THREE_YEARS_FEE = ".threeYearsFee";
-	public static final String MONITORING = ".monit";
-	public static final String TRANSFER_IN = ".transIn";
-	public static final String COST_TRANSFER_IN = ".costsTransIn";
-	public static final String TRANSFER_OUT = ".transOut";
-	public static final String COST_TRANSFER_OUT = ".costsTransOut";
-	
+	public static final String IAAS_NUMBER_OF_PROVIDERS = "providers.number";
+
+	public static final String IAAS_NAME = "prov.name";
+
+	public static final String IAAS_ONDEMAND_CPU_COST = "prov.ondemand_cpu_cost";
+
+	public static final String IAAS_ONDEMAND_LIMIT = "prov.ondemandLimit";
+
+	public static final String IAAS_RESERVED_CPU_COST = "prov.reserved_cpu_cost";
+
+	public static final String IAAS_RESERVED_LIMIT = "prov.reservationLimit";
+
+	public static final String IAAS_ONE_YEAR_FEE = "prov.oneYearFee";
+
+	public static final String IAAS_THREE_YEARS_FEE = "prov.threeYearsFee";
+
+	public static final String IAAS_MONITORING = "prov.monit";
+
+	public static final String IAAS_TRANSFER_IN = "prov.transIn";
+
+	public static final String IAAS_COST_TRANSFER_IN = "prov.costsTransIn";
+
+	public static final String IAAS_TRANSFER_OUT = "prov.transOut";
+
+	public static final String IAAS_COST_TRANSFER_OUT = "prov.costsTransOut";
+
 }

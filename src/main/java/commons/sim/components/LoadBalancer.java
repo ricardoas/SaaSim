@@ -1,5 +1,7 @@
 package commons.sim.components;
 
+import static commons.sim.util.SimulatorProperties.SETUP_TIME;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -52,7 +54,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	 */
 	public void addServer(Machine server){
 		server.setLoadBalancer(this);
-		JETime serverUpTime = getScheduler().now().plus(new JETime(SimulatorConfiguration.getInstance().getSetUpTime()));
+		JETime serverUpTime = getScheduler().now().plus(new JETime(SimulatorConfiguration.getInstance().getLong(SETUP_TIME)));
 		send(new JEEvent(JEEventType.ADD_SERVER, this, serverUpTime, server));
 	}
 	
