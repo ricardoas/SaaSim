@@ -3,6 +3,8 @@ package commons.sim.components;
 import java.util.ArrayList;
 import java.util.List;
 
+import provisioning.RanjanProvisioningSystem;
+
 import commons.cloud.Request;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
@@ -156,9 +158,10 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 							nextToFinish = request;
 						}
 					}
-					send(new JEEvent(JEEventType.REQUEST_FINISHED, this,
-							calcEstimatedFinishTime(nextToFinish, queue.size()),
-							nextToFinish));
+					
+					nextFinishEvent = new JEEvent(JEEventType.REQUEST_FINISHED, this,
+							getCorrectedFinishTime(nextToFinish), nextToFinish); 
+					send(nextFinishEvent);
 				}else{
 					if(shutdownOnFinish){
 						send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, getScheduler().now(), this));
@@ -225,12 +228,12 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 		if(this.queue.size() != 0){//Requests need to be processed, so resource is full
 			return 1.0;
 		}else{//Requests were processed previously, and no pending requests exist
-			if(currentTime >= RanjanProvHeuristic.UTILIZATION_EVALUATION_PERIOD_IN_MILLIS){
-				double difference = this.lastUpdate.timeMilliSeconds - (currentTime - RanjanProvHeuristic.UTILIZATION_EVALUATION_PERIOD_IN_MILLIS);
+			if(currentTime >= RanjanProvisioningSystem.UTILIZATION_EVALUATION_PERIOD_IN_MILLIS){
+				double difference = this.lastUpdate.timeMilliSeconds - (currentTime - RanjanProvisioningSystem.UTILIZATION_EVALUATION_PERIOD_IN_MILLIS);
 				if(difference <= 0){
 					return 0.0;
 				}else{
-					return difference/RanjanProvHeuristic.UTILIZATION_EVALUATION_PERIOD_IN_MILLIS;
+					return difference/RanjanProvisioningSystem.UTILIZATION_EVALUATION_PERIOD_IN_MILLIS;
 				}
 			}
 		}

@@ -19,8 +19,8 @@ import commons.sim.jeevent.JEEventType;
  */
 public class RanjanMachine extends Machine {
 	
-	private long maximumNumberOfSimultaneousThreads;
-	private long backlogMaximumNumberOfRequests;
+	protected long maximumNumberOfSimultaneousThreads;
+	protected long backlogMaximumNumberOfRequests;
 	private List<Request> backlog;//This list represents the set of requests waiting to be processed by a thread in this server
 	
 	/**
