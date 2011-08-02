@@ -29,4 +29,8 @@ public class SimulatorProperties {
 	public static final String SLA = "sim.sla";
 	
 	public static final String PLANNING_PERIOD = "sim.planning.period";
+	
+	public static final String MAX_NUM_OF_THREADS_PER_SERVER = "sim.threads";
+	
+	public static final String MAX_BACKLOG_SIZE = "sim.backlog.size";
 }

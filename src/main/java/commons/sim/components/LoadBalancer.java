@@ -94,33 +94,36 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	@Override
 	public void handleEvent(JEEvent event) {
 		switch (event.getType()) {
-		case NEWREQUEST:
-			Request request = (Request) event.getValue()[0];
-			Machine nextServer = heuristic.getNextServer(request, getServers());
-			if(nextServer != null){//Reusing an existent machine
-				nextServer.sendRequest(request);
-			}else{
-				send(new JEEvent(JEEventType.REQUESTQUEUED, monitor, getScheduler().now(), request));
-			}
-			break;
-		case EVALUATEUTILIZATION://RANJAN Scheduler
-			Long eventTime = (Long) event.getValue()[0];
-			
-			RanjanStatistics statistics = this.collectStatistics(getServers(), eventTime);
-			send(new JEEvent(JEEventType.EVALUATEUTILIZATION, this.monitor, getScheduler().now(), statistics));
-
-			break;
-		case ADD_SERVER:
-			servers.add((Machine) event.getValue()[0]);
-			for (Request queuedRequest : requestsToBeProcessed) {
-				send(new JEEvent(JEEventType.NEWREQUEST, this, getScheduler().now(), queuedRequest));
-			}
-			break;
-		case MACHINE_TURNED_OFF:
-			forward(event, monitor);
-			break;
-		default:
-			break;
+			case NEWREQUEST:
+				Request request = (Request) event.getValue()[0];
+				Machine nextServer = heuristic.getNextServer(request, getServers());
+				if(nextServer != null){//Reusing an existent machine
+					nextServer.sendRequest(request);
+				}else{
+					send(new JEEvent(JEEventType.REQUESTQUEUED, monitor, getScheduler().now(), request));
+				}
+				break;
+			case EVALUATEUTILIZATION://RANJAN Scheduler
+				Long eventTime = (Long) event.getValue()[0];
+				
+				RanjanStatistics statistics = this.collectStatistics(getServers(), eventTime);
+				send(new JEEvent(JEEventType.EVALUATEUTILIZATION, this.monitor, getScheduler().now(), statistics));
+	
+				break;
+			case ADD_SERVER:
+				servers.add((Machine) event.getValue()[0]);
+				for (Request queuedRequest : requestsToBeProcessed) {
+					send(new JEEvent(JEEventType.NEWREQUEST, this, getScheduler().now(), queuedRequest));
+				}
+				break;
+			case MACHINE_TURNED_OFF:
+				forward(event, monitor);
+				break;
+			case REQUESTQUEUED:
+				forward(event, monitor);
+				break;
+			default:
+				break;
 		}
 	}
 

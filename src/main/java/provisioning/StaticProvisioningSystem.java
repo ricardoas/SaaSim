@@ -11,6 +11,7 @@ import commons.sim.components.Machine;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
+import commons.sim.util.MachineFactory;
 
 public class StaticProvisioningSystem extends JEAbstractEventHandler implements DPS{
 
@@ -52,8 +53,10 @@ public class StaticProvisioningSystem extends JEAbstractEventHandler implements 
 		for (int i : initialServersPerTier) {
 			totalServers += i;
 		}
+		
+		MachineFactory machineFactory = MachineFactory.getInstance();
 		for (int i = 0; i < totalServers; i++) {
-			machines.add(new Machine(getScheduler(), availableIDs++, i < 20));
+			machines.add(machineFactory.createMachine(getScheduler(), availableIDs++, i < 20));
 			
 			//Registering machines for accounting
 			this.accountingSystem.createMachine(availableIDs-1, i < 20, getScheduler().now().timeMilliSeconds);

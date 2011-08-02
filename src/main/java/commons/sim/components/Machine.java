@@ -19,24 +19,21 @@ import commons.util.Triple;
  */
 public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 
-	private final long machineID;
-	private boolean isReserved;
-	private double totalProcessed;
+	protected final long machineID;
+	protected boolean isReserved;
+	protected double totalProcessed;
 
-	private JEEvent nextFinishEvent;
+	protected JEEvent nextFinishEvent;
 
-	private final List<Request> queue;
+	protected final List<Request> queue;
 	protected List<Request> finishedRequests;
 
 	public int numberOfRequestsCompletionsInPreviousInterval;
 	public int numberOfRequestsArrivalsInPreviousInterval;
-	private boolean shutdownOnFinish;
-	private JETime lastUpdate;
-	private LoadBalancer loadBalancer;
+	protected boolean shutdownOnFinish;
+	protected JETime lastUpdate;
+	protected LoadBalancer loadBalancer;
 	
-	//TODO: Create RANJAN MACHINE: backlog, tokens, etc.!
-
-
 	/**
 	 * @param machineID
 	 */
@@ -109,14 +106,14 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	 * @param nextRequestToFinish 
 	 * @return
 	 */
-	private JETime getCorrectedFinishTime(Request nextRequestToFinish) {
+	protected JETime getCorrectedFinishTime(Request nextRequestToFinish) {
 		return new JETime( getScheduler().now().timeMilliSeconds + nextRequestToFinish.getTotalToProcess() * queue.size());
 	}
 
 	/**
 	 * 
 	 */
-	private void updateFinishedDemand() {
+	protected void updateFinishedDemand() {
 		JETime now = getScheduler().now();
 		if(lastUpdate.isEarlierThan(now) && !queue.isEmpty()){
 			long processedDemand = (now.timeMilliSeconds - lastUpdate.timeMilliSeconds)/(queue.size());
@@ -132,7 +129,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	 * @param queueSize
 	 * @return
 	 */
-	private JETime calcEstimatedFinishTime(Request request, int queueSize) {
+	protected JETime calcEstimatedFinishTime(Request request, int queueSize) {
 		return new JETime(request.getDemand() * queueSize).plus(getScheduler().now());
 	}
 
@@ -142,33 +139,33 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	@Override
 	public void handleEvent(JEEvent event) {
 		switch (event.getType()) {
-		case REQUEST_FINISHED:
-			updateFinishedDemand();
-
-			Request requestFinished = (Request) event.getValue()[0];
-			
-			queue.remove(requestFinished);
-			this.numberOfRequestsCompletionsInPreviousInterval++;
-			
-			getLoadBalancer().reportRequestFinished(requestFinished);//Asking for accounting of a finished request
-
-			if (!queue.isEmpty()) {
-				Request nextToFinish = queue.get(0);
-				for (Request request : queue) {
-					if (request.getTotalToProcess() < nextToFinish
-							.getTotalToProcess()) {
-						nextToFinish = request;
+			case REQUEST_FINISHED:
+				updateFinishedDemand();
+	
+				Request requestFinished = (Request) event.getValue()[0];
+				
+				queue.remove(requestFinished);
+				this.numberOfRequestsCompletionsInPreviousInterval++;
+				
+				getLoadBalancer().reportRequestFinished(requestFinished);//Asking for accounting of a finished request
+	
+				if (!queue.isEmpty()) {
+					Request nextToFinish = queue.get(0);
+					for (Request request : queue) {
+						if (request.getTotalToProcess() < nextToFinish
+								.getTotalToProcess()) {
+							nextToFinish = request;
+						}
+					}
+					send(new JEEvent(JEEventType.REQUEST_FINISHED, this,
+							calcEstimatedFinishTime(nextToFinish, queue.size()),
+							nextToFinish));
+				}else{
+					if(shutdownOnFinish){
+						send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, getScheduler().now(), this));
 					}
 				}
-				send(new JEEvent(JEEventType.REQUEST_FINISHED, this,
-						calcEstimatedFinishTime(nextToFinish, queue.size()),
-						nextToFinish));
-			}else{
-				if(shutdownOnFinish){
-					send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, getScheduler().now(), this));
-				}
-			}
-			break;
+				break;
 		}
 	}
 
@@ -221,11 +218,10 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	}
 
 	/**
-	 * Used by RANJAN Scheduler, this method estimates CPU utilization of current machine
+	 * This method estimates CPU utilisation of current machine
 	 * @param currentTime
 	 * @return
 	 */
-	@Deprecated
 	public double computeUtilization(long currentTime){
 		if(this.queue.size() != 0){//Requests need to be processed, so resource is full
 			return 1.0;

@@ -11,6 +11,7 @@ import commons.sim.components.Machine;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
+import commons.sim.util.MachineFactory;
 
 public class ProfitDrivenProvisioningSystem extends JEAbstractEventHandler implements DPS{
 
@@ -47,12 +48,14 @@ public class ProfitDrivenProvisioningSystem extends JEAbstractEventHandler imple
 	private void evaluateMachinesToBeAdded() {
 		boolean canAddAReservedMachine = this.accountingSystem.canAddAReservedMachine();
 		boolean canAddAOnDemandMachine = this.accountingSystem.canAddAOnDemandMachine();
+		MachineFactory machineFactory = MachineFactory.getInstance();
+		
 		if(canAddAReservedMachine){
-			this.loadBalancer.addServer(new Machine(getScheduler(), availableIDs++, canAddAReservedMachine));
+			this.loadBalancer.addServer(machineFactory.createMachine(getScheduler(), availableIDs++, canAddAReservedMachine));
 			//Registering machines for accounting
 			this.accountingSystem.createMachine(availableIDs-1, canAddAReservedMachine, getScheduler().now().timeMilliSeconds);
 		}else if(canAddAOnDemandMachine){
-			this.loadBalancer.addServer(new Machine(getScheduler(), availableIDs++, canAddAOnDemandMachine));
+			this.loadBalancer.addServer(machineFactory.createMachine(getScheduler(), availableIDs++, canAddAOnDemandMachine));
 			//Registering machines for accounting
 			this.accountingSystem.createMachine(availableIDs-1, canAddAOnDemandMachine, getScheduler().now().timeMilliSeconds);
 		}
@@ -67,8 +70,9 @@ public class ProfitDrivenProvisioningSystem extends JEAbstractEventHandler imple
 		for (int i : initialServersPerTier) {
 			totalServers += i;
 		}
+		MachineFactory machineFactory = MachineFactory.getInstance();
 		for (int i = 0; i < totalServers; i++) {
-			machines.add(new Machine(getScheduler(), availableIDs++, i < 20));
+			machines.add(machineFactory.createMachine(getScheduler(), availableIDs++, i < 20));
 			
 			//Registering machines for accounting
 			this.accountingSystem.createMachine(availableIDs-1, i < 20, getScheduler().now().timeMilliSeconds);

@@ -402,6 +402,13 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 //			usersContracts.put(new User(split[0]), contractsPerName.get(split[1]));
 //		}
 	}
+
+	
+	public long getMaximumNumberOfThreadsPerMachine() {
+		return getLong(MAX_NUM_OF_THREADS_PER_SERVER, Long.MAX_VALUE);
+	}
+
+	public long getMaximumBacklogSize() {
+		return getLong(MAX_BACKLOG_SIZE, Long.MAX_VALUE);
+	}
 }
-
-
