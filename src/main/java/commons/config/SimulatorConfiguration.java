@@ -77,11 +77,6 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 		verifySimulatorProperties();
 		verifyIaaSProperties();
 		verifySaaSProperties();
-		
-		
-		if(!verifyProviderPropertiesExist()){
-			throw new ConfigurationException();
-		}
 	}
 	
 	// ************************************* SIMULATOR ************************************/
@@ -139,7 +134,7 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 			}
 		}
 	}
-	
+
 	private void checkSize(String propertyName, int size, String sizePropertyName) {
 		String[] values = getStringArray(propertyName);
 		if (values.length == size){
@@ -263,6 +258,46 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 		checkSizeAndContent(IAAS_COST_TRANSFER_OUT, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
 
 	}
+	
+	/**
+	 * This method is responsible for reading providers properties and creating the
+	 * cloud providers to be used in simulation.
+	 * @return
+	 * @throws IOException
+	 */
+	public Map<String, Provider> getProviders() throws IOException{
+		if(this.providers == null){
+			this.buildProvider();
+		}
+		
+		return this.providers;
+	}
+	
+	private void buildProvider() {
+		int numberOfProviders = getInt(IAAS_NUMBER_OF_PROVIDERS);
+		String[] names = getStringArray(IAAS_NAME);
+		String[] cpuCosts = getStringArray(IAAS_ONDEMAND_CPU_COST);
+		String[] onDemandLimits = getStringArray(IAAS_ONDEMAND_LIMIT);
+		String[] reservedCpuCosts = getStringArray(IAAS_RESERVED_CPU_COST);
+		String[] reservedLimits = getStringArray(IAAS_RESERVED_LIMIT);
+		String[] reservationOneYearFees = getStringArray(IAAS_ONE_YEAR_FEE);
+		String[] reservationThreeYearsFees = getStringArray(IAAS_THREE_YEARS_FEE);
+		String[] monitoringCosts = getStringArray(IAAS_MONITORING);
+		String[] transferInLimits = getStringArray(IAAS_TRANSFER_IN);
+		String[] transferInCosts = getStringArray(IAAS_COST_TRANSFER_IN);
+		String[] transferOutLimits = getStringArray(IAAS_TRANSFER_OUT);
+		String[] transferOutCosts = getStringArray(IAAS_COST_TRANSFER_OUT);
+		
+		for(int i = 1; i <= numberOfProviders; i++){
+			providers.put(names[i], 
+					new Provider(names[i], Double.valueOf(cpuCosts[i]), Integer.valueOf(onDemandLimits[i]),
+							Integer.valueOf(reservedLimits[i]), Double.valueOf(reservedCpuCosts[i]),
+							Double.valueOf(reservationOneYearFees[i]), Double.valueOf(reservationThreeYearsFees[i]),
+							Double.valueOf(monitoringCosts[i]), transferInLimits[i], transferInCosts[i], 
+							transferOutLimits[i], transferOutCosts[i]));
+		}
+	}
+
 
 	// ************************************* SAAS ************************************/
 
@@ -290,58 +325,7 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 		return getLong(PLANNING_PERIOD);
 	}
 	
-	/**
-	 * This method is responsible for reading providers properties and creating the
-	 * cloud providers to be used in simulation.
-	 * @return
-	 * @throws IOException
-	 */
-	public Map<String, Provider> getProviders() throws IOException{
-		if(this.providers == null){
-			if(this.verifyProviderPropertiesExist()){
-				this.buildProvider();
-			}else{
-				throw new IOException("Missing data in providers file!");
-			}
-		}
-		
-		return this.providers;
-	}
 	
-	private boolean verifyProviderPropertiesExist(){
-		boolean valid = true; 
-//		int numberOfPlans = getInt(NUM_OF_PROVIDERS);
-//		for(int i = 1; i <= numberOfPlans; i++){
-//			valid = valid && containsKey(PROVIDER+i+PROVIDER_NAME) && containsKey(PROVIDER+i+ONDEMAND_CPU_COST) && 
-//			containsKey(PROVIDER+i+ON_DEMAND_LIMIT) && containsKey(PROVIDER+i+RESERVED_CPU_COST) &&
-//			containsKey(PROVIDER+i+RESERVATION_LIMIT) && containsKey(PROVIDER+i+ONE_YEAR_FEE) && 
-//			containsKey(PROVIDER+i+THREE_YEARS_FEE) && containsKey(PROVIDER+i+MONITORING) && 
-//			containsKey(PROVIDER+i+TRANSFER_IN) && containsKey(PROVIDER+i+COST_TRANSFER_IN) && 
-//			containsKey(PROVIDER+i+TRANSFER_OUT) && containsKey(PROVIDER+i+COST_TRANSFER_OUT) &&
-//			!getString(PROVIDER+i+ONDEMAND_CPU_COST).isEmpty() && !getString(PROVIDER+i+PROVIDER_NAME).isEmpty() &&
-//			!getString(PROVIDER+i+RESERVED_CPU_COST).isEmpty()
-//			&& !getString(PROVIDER+i+ON_DEMAND_LIMIT).isEmpty() && !getString(PROVIDER+i+RESERVATION_LIMIT).isEmpty() 
-//			&& !getString(PROVIDER+i+ONE_YEAR_FEE).isEmpty() &&	!getString(PROVIDER+i+THREE_YEARS_FEE).isEmpty() 
-//			&& !getString(PROVIDER+i+MONITORING).isEmpty() &&	!getString(PROVIDER+i+TRANSFER_IN).isEmpty()
-//			&& !getString(PROVIDER+i+COST_TRANSFER_IN).isEmpty() &&	!getString(PROVIDER+i+TRANSFER_OUT).isEmpty()
-//			&& !getString(PROVIDER+i+COST_TRANSFER_OUT).isEmpty(); 
-//		}
-		return valid;
-	}
-	
-	private void buildProvider() {
-//		int numberOfPlans = Integer.valueOf(getInt(NUM_OF_PROVIDERS));
-//		providers = new HashMap<String, Provider>();
-//		for(int i = 1; i <= numberOfPlans; i++){
-//			providers.put(getString(PROVIDER+i+PROVIDER_NAME), 
-//					new Provider(getString(PROVIDER+i+PROVIDER_NAME), getDouble(PROVIDER+i+ONDEMAND_CPU_COST), getInt(PROVIDER+i+ON_DEMAND_LIMIT),
-//					getInt(PROVIDER+i+RESERVATION_LIMIT), getDouble(PROVIDER+i+RESERVED_CPU_COST),
-//					getDouble(PROVIDER+i+ONE_YEAR_FEE), getDouble(PROVIDER+i+THREE_YEARS_FEE), 
-//					getDouble(PROVIDER+i+MONITORING), getString(PROVIDER+i+TRANSFER_IN), getString(PROVIDER+i+COST_TRANSFER_IN), 
-//					getString(PROVIDER+i+TRANSFER_OUT), getString(PROVIDER+i+COST_TRANSFER_OUT))
-//			);
-//		}
-	}
 	
 	/**
 	 * This method is responsible for reading contracts properties and creating the
