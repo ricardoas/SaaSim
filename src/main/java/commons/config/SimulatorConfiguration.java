@@ -15,7 +15,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 
 import provisioning.ProfitDrivenProvisioningSystem;
 import provisioning.RanjanProvisioningSystem;
-import provisioning.StaticProvisioningSystem;
+import provisioning.DynamicProvisioningSystem;
 
 import commons.cloud.Contract;
 import commons.cloud.Provider;
@@ -215,7 +215,7 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 			DPSHeuristicValues value = DPSHeuristicValues.valueOf(heuristicName);
 			switch (value) {
 				case STATIC:
-					heuristicName = StaticProvisioningSystem.class.getCanonicalName();
+					heuristicName = DynamicProvisioningSystem.class.getCanonicalName();
 				case RANJAN:
 					heuristicName = RanjanProvisioningSystem.class.getCanonicalName();
 				case PROFITDRIVEN:

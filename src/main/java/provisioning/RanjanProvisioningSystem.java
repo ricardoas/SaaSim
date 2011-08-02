@@ -1,60 +1,54 @@
 package provisioning;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import commons.cloud.Request;
-import commons.config.SimulatorConfiguration;
-import commons.sim.AccountingSystem;
-import commons.sim.components.LoadBalancer;
-import commons.sim.components.Machine;
-import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
-import commons.sim.provisioningheuristics.RanjanProvHeuristic;
 import commons.sim.provisioningheuristics.RanjanStatistics;
 import commons.sim.util.MachineFactory;
 
-public class RanjanProvisioningSystem extends JEAbstractEventHandler implements DPS{
+public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 
-	private long availableIDs;
-	
-	private LoadBalancer loadBalancer;
-	
-	private AccountingSystem accountingSystem;
-	private RanjanProvHeuristic heuristic;
+	private double TARGET_UTILIZATION = 0.66;
+	public static long UTILIZATION_EVALUATION_PERIOD_IN_MILLIS = 1000 * 60 * 5;//in millis
 
-	public RanjanProvisioningSystem(JEEventScheduler scheduler, LoadBalancer loadBalancer) {
+	public RanjanProvisioningSystem(JEEventScheduler scheduler) {
 		super(scheduler);
-		availableIDs = 0;
-		
-		this.loadBalancer = loadBalancer;
-		this.heuristic = new RanjanProvHeuristic();
 	}
 	
 	@Override
-	public void handleEvent(JEEvent event) {
-		// TODO Auto-generated method stub
-		switch (event.getType()) {
-			case MACHINE_TURNED_OFF:
-				Machine machine = (Machine) event.getValue()[0];
-				this.accountingSystem.reportMachineFinish(machine.getMachineID(), event.getScheduledTime().timeMilliSeconds);
-				break;
-			case EVALUATEUTILIZATION:
-				RanjanStatistics statistics = (RanjanStatistics) event.getValue()[0];
-				long numberOfServersToAdd = this.heuristic.evaluateNumberOfServersForNextInterval(statistics);
-				if(numberOfServersToAdd > 0){
-					for(int i = 0; i < numberOfServersToAdd; i++){
-						evaluateMachinesToBeAdded();
-					}
-				}
-				break;
-			case REQUESTQUEUED:
-				//Nothing to do
-				break;
+	protected void handleEventEvaluateUtilization(JEEvent event) {
+		RanjanStatistics statistics = (RanjanStatistics) event.getValue()[0];
+		long numberOfServersToAdd = evaluateNumberOfServersForNextInterval(statistics);
+		if(numberOfServersToAdd > 0){
+			for(int i = 0; i < numberOfServersToAdd; i++){
+				evaluateMachinesToBeAdded();
+			}
 		}
 	}
 
+	public long evaluateNumberOfServersForNextInterval(RanjanStatistics statistics) {
+		double averageUtilization = statistics.totalUtilizationInLastInterval / statistics.totalNumberOfServers;
+		double d;
+		if(statistics.numberOfRequestsCompletionsInLastInterval == 0){
+			d = averageUtilization;
+		}else{
+			d = averageUtilization / statistics.numberOfRequestsCompletionsInLastInterval;
+		}
+		
+		double u_lign = Math.max(statistics.numberOfRequestsArrivalInLastInterval, statistics.numberOfRequestsCompletionsInLastInterval) * d;
+		long newNumberOfServers = (int)Math.ceil( statistics.totalNumberOfServers * u_lign / TARGET_UTILIZATION );
+		
+		long numberOfServersToAdd = (newNumberOfServers - statistics.totalNumberOfServers);
+		if(numberOfServersToAdd != 0){
+			return numberOfServersToAdd;
+		}else{
+			if(statistics.numberOfRequestsArrivalInLastInterval > 0 && 
+					statistics.totalNumberOfServers == 0){
+				return 1l;
+			}
+			return numberOfServersToAdd;
+		}
+	}
+	
 	private void evaluateMachinesToBeAdded() {
 		boolean canAddAReservedMachine = this.accountingSystem.canAddAReservedMachine();
 		boolean canAddAOnDemandMachine = this.accountingSystem.canAddAOnDemandMachine();
@@ -68,45 +62,5 @@ public class RanjanProvisioningSystem extends JEAbstractEventHandler implements 
 			//Registering machines for accounting
 			this.accountingSystem.createMachine(availableIDs-1, canAddAOnDemandMachine, getScheduler().now().timeMilliSeconds);
 		}
-	}
-	
-
-	@Override
-	public List<Machine> getSetupMachines() {
-		int[] initialServersPerTier = SimulatorConfiguration.getInstance().getApplicationInitialServersPerTier();
-		int totalServers = 0;
-		List<Machine> machines = new ArrayList<Machine>();
-		for (int i : initialServersPerTier) {
-			totalServers += i;
-		}
-		
-		MachineFactory machineFactory = MachineFactory.getInstance();
-		for (int i = 0; i < totalServers; i++) {
-			machines.add(machineFactory.createMachine(getScheduler(), availableIDs++, i < 20));
-			
-			//Registering machines for accounting
-			this.accountingSystem.createMachine(availableIDs-1, i < 20, getScheduler().now().timeMilliSeconds);
-		}
-		return machines;
-	}
-
-	@Override
-	public void setConfigurable(DynamicallyConfigurable configurable) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void reportRequestFinished(Request requestFinished) {
-		this.accountingSystem.reportRequestFinished(requestFinished);
-	}
-	
-	@Override
-	public void setAccountingSystem(AccountingSystem system){
-		this.accountingSystem = system;
-	}
-
-	@Override
-	public AccountingSystem getAccountingSystem() {
-		return this.accountingSystem;
 	}
 }

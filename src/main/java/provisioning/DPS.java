@@ -5,6 +5,7 @@ import java.util.List;
 import commons.sim.AccountingSystem;
 import commons.sim.components.Machine;
 import commons.sim.jeevent.JEEventHandler;
+import commons.sim.jeevent.JEEventScheduler;
 
 /**
  * Dynamic Provisioning System
@@ -13,7 +14,7 @@ import commons.sim.jeevent.JEEventHandler;
  *
  */
 public interface DPS extends JEEventHandler, Monitor{
-
+	
 	/**
 	 * These machines are started up artificially with no delay so 
 	 * that the application can start running.

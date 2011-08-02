@@ -1,31 +1,30 @@
 package provisioning;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 import commons.cloud.Request;
 import commons.config.SimulatorConfiguration;
 import commons.sim.AccountingSystem;
-import commons.sim.components.LoadBalancer;
 import commons.sim.components.Machine;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.MachineFactory;
 
-public class StaticProvisioningSystem extends JEAbstractEventHandler implements DPS{
+public class DynamicProvisioningSystem extends JEAbstractEventHandler implements DPS{
 
 	private long availableIDs;
 	
-	private LoadBalancer loadBalancer;
+	protected AccountingSystem accountingSystem;
 	
-	private AccountingSystem accountingSystem;
+	private DynamicallyConfigurable configurable;
 
-	public StaticProvisioningSystem(JEEventScheduler scheduler, LoadBalancer loadBalancer) {
+	public DynamicProvisioningSystem(JEEventScheduler scheduler) {
 		super(scheduler);
-		availableIDs = 0;
-		
-		this.loadBalancer = loadBalancer;
+		this.availableIDs = 0;
 	}
 	
 	@Override
@@ -33,16 +32,34 @@ public class StaticProvisioningSystem extends JEAbstractEventHandler implements 
 		// TODO Auto-generated method stub
 		switch (event.getType()) {
 			case MACHINE_TURNED_OFF:
-				Machine machine = (Machine) event.getValue()[0];
-				this.accountingSystem.reportMachineFinish(machine.getMachineID(), event.getScheduledTime().timeMilliSeconds);
-				break;
-			case EVALUATEUTILIZATION:
-				//Nothing to do
+				handleEventMachineTurnedOff(event);
 				break;
 			case REQUESTQUEUED:
-				//Nothing to do
+				handleEventRequestQueued(event);
+				break;
+			case EVALUATEUTILIZATION:
+				handleEventEvaluateUtilization(event);
+				break;
+			default:
+				//FIXME throw an exception?
 				break;
 		}
+	}
+	
+	/**
+	 * @param timeInMillis
+	 * @param machine
+	 */
+	protected void handleEventMachineTurnedOff(JEEvent event){
+		this.accountingSystem.reportMachineFinish(((Machine)event.getValue()[0]).getMachineID(), event.getScheduledTime().timeMilliSeconds);
+	}
+
+	protected void handleEventRequestQueued(JEEvent event) {
+		
+	}
+
+	protected void handleEventEvaluateUtilization(JEEvent event) {
+		
 	}
 
 	@Override
@@ -66,7 +83,7 @@ public class StaticProvisioningSystem extends JEAbstractEventHandler implements 
 
 	@Override
 	public void setConfigurable(DynamicallyConfigurable configurable) {
-		// TODO Auto-generated method stub
+		this.configurable = configurable;
 	}
 
 	@Override

@@ -100,7 +100,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 				if(nextServer != null){//Reusing an existent machine
 					nextServer.sendRequest(request);
 				}else{
-					send(new JEEvent(JEEventType.REQUESTQUEUED, monitor, getScheduler().now(), request));
+					send(new JEEvent(JEEventType.REQUESTQUEUED, monitor, getScheduler().now(), request, this));
 				}
 				break;
 			case EVALUATEUTILIZATION://RANJAN Scheduler

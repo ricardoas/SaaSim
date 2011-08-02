@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.List;
 
 import provisioning.DPS;
+import provisioning.DynamicProvisioningSystem;
 import provisioning.DynamicallyConfigurable;
 import provisioning.Monitor;
-import provisioning.util.DPSFactory;
 
 import commons.cloud.Request;
 import commons.io.GEISTWorkloadParser;
@@ -21,6 +21,7 @@ import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
 import commons.sim.util.ApplicationFactory;
+import commons.sim.util.DPSFactory;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -28,7 +29,7 @@ import commons.sim.util.ApplicationFactory;
 public class SimpleSimulator extends JEAbstractEventHandler implements Simulator, JEEventHandler, DynamicallyConfigurable{
 
 	private final WorkloadParser<List<Request>> workloadParser;
-	private final DPS monitor;
+	private final Monitor monitor;
 	protected LoadBalancer loadBalancer;
 	private List<LoadBalancer> tiers;
 
@@ -37,11 +38,12 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 * @param scheduler TODO
 	 * @param list 
 	 */
-	public SimpleSimulator(JEEventScheduler scheduler, DPS dps, WorkloadParser<List<Request>> parser) {
+	public SimpleSimulator(JEEventScheduler scheduler, WorkloadParser<List<Request>> parser) {
 		super(scheduler);
+		this.workloadParser = parser;
+		DPS dps = DPSFactory.INSTANCE.createDPS(scheduler);
 		this.monitor = dps;
 		this.monitor.setConfigurable(this);
-		this.workloadParser = parser;
 		this.tiers = ApplicationFactory.getInstance().createNewApplication(scheduler, getMonitor(), dps.getSetupMachines());
 	}
 	
@@ -51,7 +53,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 * @param list 
 	 */
 	public SimpleSimulator() {
-		this(new JEEventScheduler(), DPSFactory.INSTANCE.createDPS(), new TimeBasedWorkloadParser(new GEISTWorkloadParser(), TimeBasedWorkloadParser.HOUR_IN_MILLIS));
+		this(new JEEventScheduler(), new TimeBasedWorkloadParser(new GEISTWorkloadParser(), TimeBasedWorkloadParser.HOUR_IN_MILLIS));
 	}
 	
 	/**

@@ -8,7 +8,6 @@ import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 
 import provisioning.DPS;
-import provisioning.util.DPSFactory;
 
 import commons.cloud.Contract;
 import commons.cloud.Provider;
@@ -18,6 +17,7 @@ import commons.config.SimulatorConfiguration;
 import commons.sim.AccountingSystem;
 import commons.sim.SimpleSimulator;
 import commons.sim.jeevent.JEEventScheduler;
+import commons.sim.util.DPSFactory;
 import commons.sim.util.SimulatorProperties;
 import commons.util.Dashboard;
 import commons.util.SimulationData;
@@ -69,7 +69,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		
 		//Setting the number of machines that should be available at startup
 		SimulatorConfiguration.getInstance().setProperty(SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER, reservedResources+"");
-		simulator = new SimpleSimulator(scheduler, dps, parser);
+		simulator = new SimpleSimulator(scheduler, parser);
 	}
 	
 	@Override

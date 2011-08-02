@@ -10,7 +10,6 @@ import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
-import commons.sim.provisioningheuristics.RanjanProvHeuristic;
 import commons.util.Triple;
 
 /**

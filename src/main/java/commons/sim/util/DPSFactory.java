@@ -1,4 +1,4 @@
-package provisioning.util;
+package commons.sim.util;
 
 import provisioning.DPS;
 
@@ -23,13 +23,14 @@ public enum DPSFactory {
 	
 	/**
 	 * 
+	 * @param initargs 
 	 * @return
 	 */
-	public DPS createDPS(){
+	public DPS createDPS(Object... initargs){
 		Class<?> clazz = SimulatorConfiguration.getInstance().getDPSHeuristicClass();
 		
 		try {
-			return (DPS) clazz.newInstance();
+			return (DPS) clazz.getDeclaredConstructors()[0].newInstance(initargs);
 		} catch (Exception e) {
 			throw new RuntimeException("Something went wrong when loading "+ clazz.getCanonicalName(), e);
 		}
