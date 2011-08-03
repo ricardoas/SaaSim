@@ -22,11 +22,11 @@ public class ProfitDrivenProvisioningSystem extends DynamicProvisioningSystem{
 		MachineFactory machineFactory = MachineFactory.getInstance();
 		
 		if(canAddAReservedMachine){
-			this.loadBalancer.addServer(machineFactory.createMachine(getScheduler(), availableIDs++, canAddAReservedMachine));
+			this.configurable.addServer(0, machineFactory.createMachine(getScheduler(), availableIDs++, canAddAReservedMachine));
 			//Registering machines for accounting
 			this.accountingSystem.createMachine(availableIDs-1, canAddAReservedMachine, getScheduler().now().timeMilliSeconds);
 		}else if(canAddAOnDemandMachine){
-			this.loadBalancer.addServer(machineFactory.createMachine(getScheduler(), availableIDs++, canAddAOnDemandMachine));
+			this.configurable.addServer(0, machineFactory.createMachine(getScheduler(), availableIDs++, canAddAOnDemandMachine));
 			//Registering machines for accounting
 			this.accountingSystem.createMachine(availableIDs-1, canAddAOnDemandMachine, getScheduler().now().timeMilliSeconds);
 		}

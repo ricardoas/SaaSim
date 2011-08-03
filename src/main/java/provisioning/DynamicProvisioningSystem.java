@@ -1,7 +1,5 @@
 package provisioning;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,11 +14,11 @@ import commons.sim.util.MachineFactory;
 
 public class DynamicProvisioningSystem extends JEAbstractEventHandler implements DPS{
 
-	private long availableIDs;
+	protected long availableIDs;
 	
 	protected AccountingSystem accountingSystem;
 	
-	private DynamicallyConfigurable configurable;
+	protected DynamicallyConfigurable configurable;
 
 	public DynamicProvisioningSystem(JEEventScheduler scheduler) {
 		super(scheduler);
@@ -55,11 +53,9 @@ public class DynamicProvisioningSystem extends JEAbstractEventHandler implements
 	}
 
 	protected void handleEventRequestQueued(JEEvent event) {
-		
 	}
 
 	protected void handleEventEvaluateUtilization(JEEvent event) {
-		
 	}
 
 	@Override

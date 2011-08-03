@@ -1,5 +1,7 @@
 package provisioning;
 
+import java.util.Iterator;
+
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.provisioningheuristics.RanjanStatistics;
@@ -21,6 +23,21 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 		if(numberOfServersToAdd > 0){
 			for(int i = 0; i < numberOfServersToAdd; i++){
 				evaluateMachinesToBeAdded();
+			}
+		}else if(numberOfServersToAdd < 0){
+			//Removing on demand machines first
+			Iterator<Long> iterator = this.accountingSystem.getOnDemandMachinesData().keySet().iterator();
+			while(numberOfServersToAdd < 0 && iterator.hasNext()){
+				long serverID = iterator.next();
+				this.configurable.removeServer(0, serverID, false);
+				numberOfServersToAdd++;
+			}
+			//Removing reserved machines
+			iterator = this.accountingSystem.getReservedMachinesData().keySet().iterator();
+			while(numberOfServersToAdd < 0 && iterator.hasNext()){
+				long serverID = iterator.next();
+				this.configurable.removeServer(0, serverID, false);
+				numberOfServersToAdd++;
 			}
 		}
 	}
@@ -54,11 +71,11 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 		boolean canAddAOnDemandMachine = this.accountingSystem.canAddAOnDemandMachine();
 		MachineFactory machineFactory = MachineFactory.getInstance();
 		if(canAddAReservedMachine){
-			this.loadBalancer.addServer(machineFactory.createMachine(getScheduler(), availableIDs++, canAddAReservedMachine));
+			this.configurable.addServer(0, machineFactory.createMachine(getScheduler(), availableIDs++, canAddAReservedMachine));
 			//Registering machines for accounting
 			this.accountingSystem.createMachine(availableIDs-1, canAddAReservedMachine, getScheduler().now().timeMilliSeconds);
 		}else if(canAddAOnDemandMachine){
-			this.loadBalancer.addServer(machineFactory.createMachine(getScheduler(), availableIDs++, canAddAOnDemandMachine));
+			this.configurable.addServer(0, machineFactory.createMachine(getScheduler(), availableIDs++, canAddAOnDemandMachine));
 			//Registering machines for accounting
 			this.accountingSystem.createMachine(availableIDs-1, canAddAOnDemandMachine, getScheduler().now().timeMilliSeconds);
 		}
