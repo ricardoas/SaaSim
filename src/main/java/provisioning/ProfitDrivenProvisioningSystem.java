@@ -8,7 +8,6 @@ public class ProfitDrivenProvisioningSystem extends DynamicProvisioningSystem{
 
 	public ProfitDrivenProvisioningSystem(JEEventScheduler scheduler) {
 		super(scheduler);
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override
@@ -28,7 +27,7 @@ public class ProfitDrivenProvisioningSystem extends DynamicProvisioningSystem{
 		}else if(canAddAOnDemandMachine){
 			this.configurable.addServer(0, machineFactory.createMachine(getScheduler(), availableIDs++, canAddAOnDemandMachine));
 			//Registering machines for accounting
-			this.accountingSystem.createMachine(availableIDs-1, canAddAOnDemandMachine, getScheduler().now().timeMilliSeconds);
+			this.accountingSystem.createMachine(availableIDs-1, canAddAReservedMachine, getScheduler().now().timeMilliSeconds);
 		}
 	}
 }

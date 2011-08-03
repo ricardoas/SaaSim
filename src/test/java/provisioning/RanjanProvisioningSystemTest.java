@@ -24,7 +24,7 @@ import commons.sim.schedulingheuristics.RanjanHeuristic;
 @RunWith(PowerMockRunner.class)
 public class RanjanProvisioningSystemTest {
 	
-	private static final double ONE_HOUR_IN_MILLIS = 1000 * 60 * 60;
+	private static final long ONE_HOUR_IN_MILLIS = 1000 * 60 * 60;
 	private RanjanProvisioningSystem heuristic;
 
 	@Test
@@ -237,6 +237,53 @@ public class RanjanProvisioningSystemTest {
 		
 		PowerMock.verify(SimulatorConfiguration.class);
 		EasyMock.verify(scheduler, event, configurable, config);
+		
+		assertEquals(1, this.heuristic.getAccountingSystem().getReservedMachinesData().size());
+		assertEquals(0, this.heuristic.getAccountingSystem().getOnDemandMachinesData().size());
+	}
+	
+	@PrepareForTest(SimulatorConfiguration.class)
+	@Test
+	public void handleEventEvaluateUtilizationWithOneServerToBeAddedAndLimitsReached(){
+		int resourcesReservationLimit = 1;
+		int onDemandLimit = 1;
+
+		double totalUtilization = 0.0;
+		long totalRequestsArrivals = 100;
+		long totalRequestsCompletions = 0;
+		long totalNumberOfServers = 0;
+		RanjanStatistics statistics = new RanjanStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
+		
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(RanjanProvisioningSystem.class))).andReturn(1);
+		EasyMock.replay(scheduler);
+		
+		SimulatorConfiguration config = EasyMock.createStrictMock(SimulatorConfiguration.class);
+		PowerMock.mockStatic(SimulatorConfiguration.class);
+		EasyMock.expect(SimulatorConfiguration.getInstance()).andReturn(config);
+		EasyMock.expect(config.getApplicationHeuristics()).andReturn(new Class<?>[] {RanjanHeuristic.class});
+		PowerMock.replay(SimulatorConfiguration.class);
+		EasyMock.replay(config);
+		
+		JEEvent event = EasyMock.createStrictMock(JEEvent.class);
+		EasyMock.expect(event.getValue()).andReturn(new RanjanStatistics[]{statistics});
+		
+		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
+		
+		EasyMock.replay(event, configurable);
+		
+		this.heuristic = new RanjanProvisioningSystem(scheduler);
+		this.heuristic.setConfigurable(configurable);
+		
+		AccountingSystem system = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
+		system.createMachine(1, true, 0);
+		system.createMachine(2, false, 0);
+		this.heuristic.setAccountingSystem(system);
+		
+		this.heuristic.handleEventEvaluateUtilization(event);
+		
+		PowerMock.verify(SimulatorConfiguration.class);
+		EasyMock.verify(scheduler, event, configurable, config);
 	}
 	
 	/**
@@ -256,6 +303,7 @@ public class RanjanProvisioningSystemTest {
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(RanjanProvisioningSystem.class))).andReturn(1);
+		EasyMock.expect(scheduler.now()).andReturn(new JETime(ONE_HOUR_IN_MILLIS * 2)).times(6);
 		EasyMock.replay(scheduler);
 		
 		JEEvent event = EasyMock.createStrictMock(JEEvent.class);
@@ -293,7 +341,8 @@ public class RanjanProvisioningSystemTest {
 		this.heuristic.handleEventEvaluateUtilization(event);
 		
 		EasyMock.verify(scheduler, event, configurable);
+		
+		assertEquals(0, this.heuristic.getAccountingSystem().getReservedMachinesData().size());
+		assertEquals(0, this.heuristic.getAccountingSystem().getOnDemandMachinesData().size());
 	}
 }
-
-

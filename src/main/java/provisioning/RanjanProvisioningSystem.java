@@ -30,6 +30,7 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 			while(numberOfServersToAdd < 0 && iterator.hasNext()){
 				long serverID = iterator.next();
 				this.configurable.removeServer(0, serverID, false);
+				this.accountingSystem.reportMachineFinish(serverID, getScheduler().now().timeMilliSeconds);
 				numberOfServersToAdd++;
 			}
 			//Removing reserved machines
@@ -37,6 +38,7 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 			while(numberOfServersToAdd < 0 && iterator.hasNext()){
 				long serverID = iterator.next();
 				this.configurable.removeServer(0, serverID, false);
+				this.accountingSystem.reportMachineFinish(serverID, getScheduler().now().timeMilliSeconds);
 				numberOfServersToAdd++;
 			}
 		}
@@ -70,6 +72,7 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 		boolean canAddAReservedMachine = this.accountingSystem.canAddAReservedMachine();
 		boolean canAddAOnDemandMachine = this.accountingSystem.canAddAOnDemandMachine();
 		MachineFactory machineFactory = MachineFactory.getInstance();
+		
 		if(canAddAReservedMachine){
 			this.configurable.addServer(0, machineFactory.createMachine(getScheduler(), availableIDs++, canAddAReservedMachine));
 			//Registering machines for accounting
@@ -77,7 +80,7 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 		}else if(canAddAOnDemandMachine){
 			this.configurable.addServer(0, machineFactory.createMachine(getScheduler(), availableIDs++, canAddAOnDemandMachine));
 			//Registering machines for accounting
-			this.accountingSystem.createMachine(availableIDs-1, canAddAOnDemandMachine, getScheduler().now().timeMilliSeconds);
+			this.accountingSystem.createMachine(availableIDs-1, canAddAReservedMachine, getScheduler().now().timeMilliSeconds);
 		}
 	}
 }
