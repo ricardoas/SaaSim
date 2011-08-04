@@ -73,7 +73,7 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 		super(propertiesFileName);
 	}
 	
-	private void verifyProperties() throws ConfigurationException{
+	private void verifyProperties(){
 		verifySimulatorProperties();
 		verifyIaaSProperties();
 		verifySaaSProperties();
@@ -97,8 +97,6 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 		checkDPSHeuristic();
 		
 		setProperty(SETUP_TIME, Math.max(getLong(SETUP_TIME, 0), 0));
-		
-		
 	}
 
 	/**
@@ -128,18 +126,56 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 		String[] values = getStringArray(propertyName);
 		checkSize(propertyName, size, sizeProperty);
 		for (String value : values) {
-			if(value.trim().isEmpty()){
-				throw new ConfigurationRuntimeException("Mandatory property " + 
-						propertyName + " has no value associated with it.");
-			}
+			checkIsNotEmpty(propertyName, value);
 		}
+	}
+
+	/**
+	 * @param propertyName
+	 * @param size
+	 */
+	private void checkSizeAndIntegerContent(String propertyName, int size, String sizeProperty) {
+		String[] values = getStringArray(propertyName);
+		checkSize(propertyName, size, sizeProperty);
+		for (String value : values) {
+			checkIsInteger(propertyName, value);
+		}
+	}
+
+	/**
+	 * @param propertyName
+	 * @param size
+	 */
+	private void checkSizeAndDoubleContent(String propertyName, int size, String sizeProperty) {
+		String[] values = getStringArray(propertyName);
+		checkSize(propertyName, size, sizeProperty);
+		for (String value : values) {
+			checkIsDouble(propertyName, value);
+		}
+	}
+
+	private void checkIsNotEmpty(String propertyName, String value) {
+		if(value.trim().isEmpty()){
+			throw new ConfigurationRuntimeException("Mandatory property " + 
+					propertyName + " has no value associated with it.");
+		}
+	}
+
+	private void checkIsInteger(String propertyName, String value) {
+		checkIsNotEmpty(propertyName, value);
+		Integer.valueOf(value);
+	}
+
+	private void checkIsDouble(String propertyName, String value) {
+		checkIsNotEmpty(propertyName, value);
+		Double.valueOf(value);
 	}
 
 	private void checkSize(String propertyName, int size, String sizePropertyName) {
 		String[] values = getStringArray(propertyName);
 		if (values.length != size){
 			throw new ConfigurationRuntimeException("Check number of values in " + 
-					propertyName + ". It must be equals to what is specified at" + 
+					propertyName + ". It must be equals to what is specified at " + 
 					sizePropertyName);
 		}
 	}
@@ -247,21 +283,25 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 	// ************************************* PROVIDERS ************************************/
 	
 	private void verifyIaaSProperties() {
+		
+		checkIsInteger(IAAS_NUMBER_OF_PROVIDERS,getString(IAAS_NUMBER_OF_PROVIDERS));
+		
 		int numberOfProviders = getInt(IAAS_NUMBER_OF_PROVIDERS);
 		
 		checkSizeAndContent(IAAS_NAME, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndContent(IAAS_ONDEMAND_CPU_COST, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndContent(IAAS_ONDEMAND_LIMIT, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndContent(IAAS_RESERVED_CPU_COST, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndContent(IAAS_RESERVED_LIMIT, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndContent(IAAS_ONE_YEAR_FEE, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndContent(IAAS_THREE_YEARS_FEE, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndContent(IAAS_MONITORING, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndDoubleContent(IAAS_ONDEMAND_CPU_COST, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndIntegerContent(IAAS_ONDEMAND_LIMIT, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndDoubleContent(IAAS_RESERVED_CPU_COST, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndIntegerContent(IAAS_RESERVED_LIMIT, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndIntegerContent(IAAS_ONE_YEAR_FEE, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndIntegerContent(IAAS_THREE_YEARS_FEE, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndDoubleContent(IAAS_MONITORING, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		
+		//FIXME change the way this properties are being read.
 		checkSizeAndContent(IAAS_TRANSFER_IN, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
 		checkSizeAndContent(IAAS_COST_TRANSFER_IN, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
 		checkSizeAndContent(IAAS_TRANSFER_OUT, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
 		checkSizeAndContent(IAAS_COST_TRANSFER_OUT, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-
 	}
 	
 	/**
@@ -270,7 +310,7 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 	 * @return
 	 * @throws IOException
 	 */
-	public Map<String, Provider> getProviders() throws IOException{
+	public Map<String, Provider> getProviders() {
 		if(this.providers == null){
 			this.buildProvider();
 		}
@@ -281,6 +321,7 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 	private void buildProvider() {
 		int numberOfProviders = getInt(IAAS_NUMBER_OF_PROVIDERS);
 		String[] names = getStringArray(IAAS_NAME);
+		
 		String[] cpuCosts = getStringArray(IAAS_ONDEMAND_CPU_COST);
 		String[] onDemandLimits = getStringArray(IAAS_ONDEMAND_LIMIT);
 		String[] reservedCpuCosts = getStringArray(IAAS_RESERVED_CPU_COST);
@@ -308,15 +349,19 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 	// ************************************* SAAS ************************************/
 
 	private void verifySaaSProperties() {
+
+		
+		checkIsInteger(NUMBER_OF_PLANS,getString(NUMBER_OF_PLANS));
+
 		int numberOfPlans = getInt(NUMBER_OF_PLANS);
 		
 		checkSizeAndContent(PLAN_NAME, numberOfPlans,NUMBER_OF_PLANS);
-		checkSizeAndContent(PLAN_PRICE, numberOfPlans, NUMBER_OF_PLANS);
-		checkSizeAndContent(PLAN_SETUP, numberOfPlans, NUMBER_OF_PLANS);
-		checkSizeAndContent(PLAN_CPU_LIMIT, numberOfPlans, NUMBER_OF_PLANS);
-		checkSizeAndContent(PLAN_EXTRA_CPU_COST, numberOfPlans, NUMBER_OF_PLANS);
-		checkSizeAndContent(PLAN_TRANSFER_LIMIT, numberOfPlans, NUMBER_OF_PLANS);
-		checkSizeAndContent(PLAN_EXTRA_TRANSFER_COST, numberOfPlans, NUMBER_OF_PLANS);
+		checkSizeAndDoubleContent(PLAN_PRICE, numberOfPlans, NUMBER_OF_PLANS);
+		checkSizeAndDoubleContent(PLAN_SETUP, numberOfPlans, NUMBER_OF_PLANS);
+		checkSizeAndDoubleContent(PLAN_CPU_LIMIT, numberOfPlans, NUMBER_OF_PLANS);
+		checkSizeAndDoubleContent(PLAN_EXTRA_CPU_COST, numberOfPlans, NUMBER_OF_PLANS);
+		checkSizeAndDoubleContent(PLAN_TRANSFER_LIMIT, numberOfPlans, NUMBER_OF_PLANS);
+		checkSizeAndDoubleContent(PLAN_EXTRA_TRANSFER_COST, numberOfPlans, NUMBER_OF_PLANS);
 	}
 
 	public String getPlanningHeuristic(){
@@ -339,7 +384,7 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 	 * @return A map containing each contract name and its characterization
 	 * @throws IOException
 	 */
-	public Map<User, Contract> getContractsPerUser() throws IOException{
+	public Map<User, Contract> getContractsPerUser() {
 		if(this.usersContracts == null){
 			this.buildPlans();
 		}
@@ -353,7 +398,7 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 	 * @return A map containing each user in the system and its signed contract
 	 * @throws IOException
 	 */
-	public Map<String, Contract> getContractsPerName() throws IOException{
+	public Map<String, Contract> getContractsPerName() {
 		if(this.contractsPerName == null){
 			this.buildPlans();
 		}

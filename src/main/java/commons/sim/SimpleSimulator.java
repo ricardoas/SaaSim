@@ -6,6 +6,7 @@ import java.util.List;
 import provisioning.DPS;
 import provisioning.DynamicallyConfigurable;
 import provisioning.Monitor;
+import provisioning.util.DPSFactory;
 
 import commons.cloud.Provider;
 import commons.cloud.Request;
@@ -22,7 +23,6 @@ import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
 import commons.sim.util.ApplicationFactory;
-import commons.sim.util.DPSFactory;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
