@@ -149,7 +149,7 @@ public class WorkloadParserTest {
 		} catch (IOException e) {
 			fail("Valid file!");
 		} catch (ConfigurationException e) {
-			fail("Valid file!");
+			fail("Valid file! "+e.getMessage());
 		}
 	}
 	

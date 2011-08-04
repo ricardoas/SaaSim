@@ -1,13 +1,13 @@
-plans.number=2
+plan.availableplans=2
 
 #First plan
-plan1.name=p1
-plan1.price=0.1
-plan1.setup=5.55
-plan1.cpu_lim=10
-plan1.ex_cpu=1.00
-plan1.transfer_lim=
-plan1.ex_transfer=0.5
+plan.name=p1
+plan.price=0.1
+plan.setup=5.55
+plan.cpu_lim=10
+plan.ex_cpu=1.00
+plan.transfer_lim=
+plan.ex_transfer=0.5
 
 #Associations
 associations=u1 p1

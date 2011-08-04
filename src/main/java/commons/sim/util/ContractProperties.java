@@ -20,5 +20,7 @@ public class ContractProperties {
 	public static final String PLAN_EXTRA_TRANSFER_COST = "plan.ex_transfer";
 	
 	public static final String PLAN_USERS = "plan.users";
+	
+	public static final String ASSOCIATIONS = "associations";
 }
 

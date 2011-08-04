@@ -137,7 +137,7 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 
 	private void checkSize(String propertyName, int size, String sizePropertyName) {
 		String[] values = getStringArray(propertyName);
-		if (values.length == size){
+		if (values.length != size){
 			throw new ConfigurationRuntimeException("Check number of values in " + 
 					propertyName + ". It must be equals to what is specified at" + 
 					sizePropertyName);
@@ -216,12 +216,16 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 			switch (value) {
 				case STATIC:
 					heuristicName = DynamicProvisioningSystem.class.getCanonicalName();
+					break;
 				case RANJAN:
 					heuristicName = RanjanProvisioningSystem.class.getCanonicalName();
+					break;
 				case PROFITDRIVEN:
 					heuristicName = ProfitDrivenProvisioningSystem.class.getCanonicalName();
+					break;
 				case CUSTOM:
 					heuristicName = Class.forName(customHeuristicClass).getCanonicalName();
+					break;
 			}
 			setProperty(DPS_HEURISTIC, heuristicName);
 		} catch (ClassNotFoundException e) {
@@ -288,7 +292,8 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 		String[] transferOutLimits = getStringArray(IAAS_TRANSFER_OUT);
 		String[] transferOutCosts = getStringArray(IAAS_COST_TRANSFER_OUT);
 		
-		for(int i = 1; i <= numberOfProviders; i++){
+		providers = new HashMap<String, Provider>();
+		for(int i = 0; i < numberOfProviders; i++){
 			providers.put(names[i], 
 					new Provider(names[i], Double.valueOf(cpuCosts[i]), Integer.valueOf(onDemandLimits[i]),
 							Integer.valueOf(reservedLimits[i]), Double.valueOf(reservedCpuCosts[i]),
@@ -334,13 +339,9 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 	 * @throws IOException
 	 */
 	public Map<User, Contract> getContractsPerUser() throws IOException{
-//		if(this.usersContracts == null){
-//			if(this.verifyContractPropertiesExist()){
-//				this.buildPlans();
-//			}else{
-//				throw new IOException("Missing data in contracts file!");
-//			}
-//		}
+		if(this.usersContracts == null){
+			this.buildPlans();
+		}
 		
 		return this.usersContracts;
 	}
@@ -371,20 +372,22 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 		String[] extraCpuCosts = getStringArray(PLAN_EXTRA_CPU_COST);
 		String[] planTransferLimits = getStringArray(PLAN_TRANSFER_LIMIT);
 		String[] planExtraTransferCost = getStringArray(PLAN_EXTRA_TRANSFER_COST);
-		String[] users = getStringArray(PLAN_USERS);
+//		String[] users = getStringArray(PLAN_USERS);
+		String associations = getString(ASSOCIATIONS);	
 		
-		for(int i = 1; i <= numberOfPlans; i++){
+		for(int i = 0; i < numberOfPlans; i++){
 			contractsPerName.put(planNames[i], 
 					new Contract(planNames[i], Double.valueOf(setupCosts[i]), Double.valueOf(prices[i]), 
 							Double.valueOf(cpuLimits[i]), Double.valueOf(extraCpuCosts[i])));
 		}
 		
 		//Extract users associations
-//		usersContracts = new HashMap<User, Contract>();
-//		for(String userPlan : users){
-//			String[] split = userPlan.split("\\s+");
-//			usersContracts.put(new User(split[0]), contractsPerName.get(split[1]));
-//		}
+		usersContracts = new HashMap<User, Contract>();
+		String[] usersAssociated = associations.split(";");
+		for(String association : usersAssociated){
+			String[] split = association.split("\\s+");
+			usersContracts.put(new User(split[0]), contractsPerName.get(split[1]));
+		}
 	}
 
 	

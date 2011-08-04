@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.ConfigurationRuntimeException;
 import org.apache.commons.configuration.ConversionException;
 import org.junit.Test;
 
@@ -18,11 +19,11 @@ import commons.config.SimulatorConfiguration;
 
 public class ProviderInputTest {
 	
-	private String INVALID_FILE = "src/test/resources/providers/invalid.properties";
-	private String INVALID_FILE2 = "src/test/resources/providers/invalid2.properties";
-	private String INVALID_FILE3 = "src/test/resources/providers/invalid3.properties";
+	private String INVALID_FILE = "src/test/resources/providers/invalidConfig.properties";
+	private String INVALID_FILE2 = "src/test/resources/providers/invalidConfig2.properties";
+	private String INVALID_FILE3 = "src/test/resources/providers/invalidConfig3.properties";
 	private String INEXISTENT_FILE = "src/test/resources/providers/inexistent.properties";
-	private String VALID_FILE = "src/test/resources/providers/iaas.properties";
+	private String VALID_FILE = "src/test/resources/providers/config.properties";
 	
 	/**
 	 * This test verifies an invalid file with transfer data missing.
@@ -38,6 +39,7 @@ public class ProviderInputTest {
 			System.err.println(e.getMessage());
 		} catch (ConfigurationException e) {
 			fail("Invalid file!");
+		} catch(ConfigurationRuntimeException e){
 		}
 	}
 	
@@ -76,6 +78,7 @@ public class ProviderInputTest {
 			System.err.println(e.getClass()+" "+e.getMessage());
 		} catch (ConfigurationException e) {
 			fail("Invalid file!");
+		} catch(ConfigurationRuntimeException e){
 		}
 	}
 	

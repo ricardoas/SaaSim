@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.ConfigurationRuntimeException;
 import org.junit.Test;
 
 import commons.cloud.Contract;
@@ -18,11 +19,11 @@ import commons.config.SimulatorConfiguration;
 
 public class ContractInputTest {
 	
-	private String INVALID_FILE = "src/test/resources/contracts/invalid.contracts";
-	private String INVALID_FILE2 = "src/test/resources/contracts/invalid2.contracts";
-	private String INVALID_FILE3 = "src/test/resources/contracts/invalid3.contracts";
+	private String INVALID_FILE = "src/test/resources/contracts/invalid.properties";
+	private String INVALID_FILE2 = "src/test/resources/contracts/invalid2.properties";
+	private String INVALID_FILE3 = "src/test/resources/contracts/invalid3.properties";
 	private String INEXISTENT_FILE = "src/test/resources/contracts/inexistent.dat";
-	private String VALID_FILE = "src/test/resources/contracts/contracts.properties";
+	private String VALID_FILE = "src/test/resources/contracts/config.properties";
 	
 	/**
 	 * This test verifies that a contracts file missing user associations with SaaS plans is not valid.
@@ -37,10 +38,11 @@ public class ContractInputTest {
 		} catch (FileNotFoundException e) {
 			fail("Data is incomplete!");
 		} catch (IOException e) {
-		} catch (ConfigurationException e1) {
-			fail("Data is incomplete!");
+			fail("Data is incomplete! ");
+		} catch (ConfigurationRuntimeException e1) {
+		} catch (ConfigurationException e) {
+			fail("Data is incomplete! ");
 		}
-		
 	}
 	
 	/**
@@ -56,8 +58,10 @@ public class ContractInputTest {
 		} catch (FileNotFoundException e) {
 			fail("Data is incomplete!");
 		} catch (IOException e) {
+			fail("Data is incomplete!");
 		} catch (ConfigurationException e1) {
 			fail("Data is incomplete!");
+		} catch(ConfigurationRuntimeException e){
 		}
 	}
 	
@@ -74,8 +78,10 @@ public class ContractInputTest {
 		} catch (FileNotFoundException e) {
 			fail("Data is incomplete!");
 		} catch (IOException e) {
+			fail("Data is incomplete!");
 		} catch (ConfigurationException e1) {
 			fail("Data is incomplete!");
+		} catch(ConfigurationRuntimeException e){
 		}
 	}
 	
