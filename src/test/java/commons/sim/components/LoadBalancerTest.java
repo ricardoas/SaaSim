@@ -9,6 +9,7 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -20,11 +21,13 @@ import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
+import commons.sim.util.SimulatorProperties;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(SimulatorConfiguration.class)
 public class LoadBalancerTest {
 	
+	private static final long ONE_MINUTE_IN_MILLIS = 1000 * 60l;
 	private LoadBalancer lb;
 	private JEEventScheduler eventScheduler;
 	private SchedulingHeuristic schedulingHeuristic;
@@ -90,6 +93,7 @@ public class LoadBalancerTest {
 	/**
 	 * Scheduling a new request without machines does not throws any error
 	 */
+	@PrepareForTest(SimulatorConfiguration.class)
 	@Test
 	public void handleEventNewRequestWithOneMachines(){
 		String clientID = "c1";
@@ -119,14 +123,21 @@ public class LoadBalancerTest {
 		machine.sendRequest(requests[0]);
 		EasyMock.expectLastCall().once();
 		
-		EasyMock.replay(event, machine, dps, schedulingHeuristic);
+		SimulatorConfiguration config = EasyMock.createStrictMock(SimulatorConfiguration.class);
+		PowerMock.mockStatic(SimulatorConfiguration.class);
+		EasyMock.expect(SimulatorConfiguration.getInstance()).andReturn(config);
+		EasyMock.expect(config.getLong(SimulatorProperties.SETUP_TIME)).andReturn(ONE_MINUTE_IN_MILLIS);
+		
+		PowerMock.replay(SimulatorConfiguration.class);
+		EasyMock.replay(event, machine, dps, schedulingHeuristic, config);
 		
 		lb = new LoadBalancer(eventScheduler, dps, schedulingHeuristic, Integer.MAX_VALUE);
 		lb.addServer(machine);//Creating a machine to serve the request
 		lb.handleEvent(new JEEvent(JEEventType.ADD_SERVER, lb, eventScheduler.now(), machine));
 		lb.handleEvent(event);
 		
-		EasyMock.verify(event, machine, dps, schedulingHeuristic);
+		PowerMock.verify(SimulatorConfiguration.class);
+		EasyMock.verify(event, machine, dps, schedulingHeuristic, config);
 		
 		assertNotNull(lb.getServers());
 		assertEquals(1, lb.getServers().size());

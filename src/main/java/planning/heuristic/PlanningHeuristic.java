@@ -12,7 +12,7 @@ import config.GEISTMonthlyWorkloadParser;
 public interface PlanningHeuristic {
 
 	public void findPlan(GEISTMonthlyWorkloadParser workloadParser,
-			Map<String, Provider> cloudProvider, Map<User, Contract> cloudUsers, double sla);
+			Map<String, Provider> cloudProvider, Map<User, Contract> cloudUsers);
 	
 	public double getEstimatedProfit(int period);
 	

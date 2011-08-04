@@ -4,11 +4,12 @@ import java.io.IOException;
 import java.util.List;
 
 import provisioning.DPS;
-import provisioning.DynamicProvisioningSystem;
 import provisioning.DynamicallyConfigurable;
 import provisioning.Monitor;
 
+import commons.cloud.Provider;
 import commons.cloud.Request;
+import commons.config.SimulatorConfiguration;
 import commons.io.GEISTWorkloadParser;
 import commons.io.TimeBasedWorkloadParser;
 import commons.io.WorkloadParser;
@@ -37,11 +38,15 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 * Constructor
 	 * @param scheduler TODO
 	 * @param list 
+	 * @throws IOException 
 	 */
-	public SimpleSimulator(JEEventScheduler scheduler, WorkloadParser<List<Request>> parser) {
+	public SimpleSimulator(JEEventScheduler scheduler, WorkloadParser<List<Request>> parser) throws IOException {
 		super(scheduler);
 		this.workloadParser = parser;
 		DPS dps = DPSFactory.INSTANCE.createDPS(scheduler);
+		Provider cloudProvider = SimulatorConfiguration.getInstance().getProviders().values().iterator().next();
+		dps.setAccountingSystem(new AccountingSystem(cloudProvider.reservationLimit, cloudProvider.onDemandLimit));
+		
 		this.monitor = dps;
 		this.monitor.setConfigurable(this);
 		this.tiers = ApplicationFactory.getInstance().createNewApplication(scheduler, getMonitor(), dps.getSetupMachines());
@@ -51,8 +56,9 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 * Constructor
 	 * @param scheduler TODO
 	 * @param list 
+	 * @throws IOException 
 	 */
-	public SimpleSimulator() {
+	public SimpleSimulator() throws IOException {
 		this(new JEEventScheduler(), new TimeBasedWorkloadParser(new GEISTWorkloadParser(), TimeBasedWorkloadParser.HOUR_IN_MILLIS));
 	}
 	
@@ -78,6 +84,10 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 		return monitor;
 	}
 
+	public AccountingSystem getAccounting(){
+		return ((DPS)this.monitor).getAccountingSystem();
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

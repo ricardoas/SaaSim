@@ -16,10 +16,6 @@ public class ProfitDrivenHeuristic implements SchedulingHeuristic{
 		this.sla = config.getSLA();
 	}
 	
-	public void setSLA(double sla){
-		this.sla = sla;
-	}
-	
 	/**
 	 * {@inheritDoc}
 	 */

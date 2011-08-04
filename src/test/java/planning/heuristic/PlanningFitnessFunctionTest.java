@@ -6,6 +6,7 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -20,6 +21,7 @@ import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
 import commons.config.SimulatorConfiguration;
+import commons.sim.util.SimulatorProperties;
 
 import config.GEISTMonthlyWorkloadParser;
 
@@ -27,7 +29,7 @@ import config.GEISTMonthlyWorkloadParser;
 public class PlanningFitnessFunctionTest {
 	
 	private static final double SLA = 10d;
-	private String simpleWorkload = "src/test/resources/workload/w2.dat";
+	private String SIMPLE_WORKLOAD = "src/test/resources/workload/w2.dat";
 	private static final String CONFIG_FILE = "src/test/resources/config.properties";
 	private static final int HOUR_IN_MILLIS = 1000 * 60 * 60;
 	
@@ -65,9 +67,13 @@ public class PlanningFitnessFunctionTest {
 		
 		try {
 			SimulatorConfiguration.buildInstance(CONFIG_FILE);
+			SimulatorConfiguration.getInstance().setProperty(SimulatorProperties.WORKLOAD_PATH, SIMPLE_WORKLOAD);
+			
 			GEISTMonthlyWorkloadParser parser = EasyMock.createStrictMock(GEISTMonthlyWorkloadParser.class);
+			EasyMock.expect(parser.hasNext()).andReturn(true);
 			EasyMock.expect(parser.next()).andReturn(new ArrayList<Request>());
-			PlanningFitnessFunction fc = new PlanningFitnessFunction(parser, cloudUsers, 10d, providers);
+			EasyMock.expect(parser.getWorkloadPerUser()).andReturn(new HashMap<User, List<Request>>());
+			PlanningFitnessFunction fc = new PlanningFitnessFunction(parser, cloudUsers, providers);
 			
 			IChromosome chrom = EasyMock.createMock(IChromosome.class);
 			Gene gene = EasyMock.createMock(Gene.class);
@@ -87,6 +93,7 @@ public class PlanningFitnessFunctionTest {
 		}
 	}
 	
+	//TODO: Add more tests!
 //	@Test
 //	public void simpleWorkloadWithTwoUsersAndLowReceipts() throws IOException{
 //		

@@ -116,7 +116,14 @@ public class Provider {
 		double totalConsumed = 0;
 		for(Long machineID : this.reservedResources.keySet()){
 			Triple<Double, Double, Double> triple = this.reservedResources.get(machineID);
-			double executionTime = triple.secondValue - triple.firstValue;
+			
+			double executionTime;
+			if(triple.secondValue != null){
+				executionTime = triple.secondValue - triple.firstValue;
+			}else{
+				executionTime = 0;
+			}
+			
 			if(executionTime < 0){
 				throw new RuntimeException("Invalid cpu usage in machine "+machineID.toString()+" : "+executionTime);
 			}

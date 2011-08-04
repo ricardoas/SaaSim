@@ -5,7 +5,6 @@ import java.util.List;
 import commons.sim.AccountingSystem;
 import commons.sim.components.Machine;
 import commons.sim.jeevent.JEEventHandler;
-import commons.sim.jeevent.JEEventScheduler;
 
 /**
  * Dynamic Provisioning System

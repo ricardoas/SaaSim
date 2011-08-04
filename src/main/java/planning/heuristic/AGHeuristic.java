@@ -39,7 +39,7 @@ public class AGHeuristic implements PlanningHeuristic{
 	
 	@Override
 	public void findPlan(GEISTMonthlyWorkloadParser workloadParser,
-			Map<String, Provider> cloudProvider, Map<User, Contract> cloudUsers, double sla) {
+			Map<String, Provider> cloudProvider, Map<User, Contract> cloudUsers) {
 		
 		initProperties(cloudProvider);
 		
@@ -59,7 +59,7 @@ public class AGHeuristic implements PlanningHeuristic{
 	//		config.setKeepPopulationSizeConstant(true);
 	//		config.setNaturalSelector(null);//Tournament, WeightedRoullete
 
-			PlanningFitnessFunction myFunc = createFitnessFunction(workloadParser, cloudUsers, sla, cloudProvider);
+			PlanningFitnessFunction myFunc = createFitnessFunction(workloadParser, cloudUsers, cloudProvider);
 			config.setFitnessFunction(myFunc);
 			
 			IChromosome sampleChromosome = createSampleChromosome(config);
@@ -110,8 +110,8 @@ public class AGHeuristic implements PlanningHeuristic{
 		return sampleChromosome;
 	}
 
-	private PlanningFitnessFunction createFitnessFunction(GEISTMonthlyWorkloadParser workloadParser, Map<User, Contract> cloudUsers, double sla, Map<String, Provider> cloudProvider) {
-		return new PlanningFitnessFunction(workloadParser, cloudUsers, sla, cloudProvider);
+	private PlanningFitnessFunction createFitnessFunction(GEISTMonthlyWorkloadParser workloadParser, Map<User, Contract> cloudUsers, Map<String, Provider> cloudProvider) {
+		return new PlanningFitnessFunction(workloadParser, cloudUsers, cloudProvider);
 	}
 
 	@Override

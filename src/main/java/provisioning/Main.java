@@ -1,5 +1,7 @@
 package provisioning;
 
+import java.io.IOException;
+
 import org.apache.commons.configuration.ConfigurationException;
 
 import commons.config.SimulatorConfiguration;
@@ -14,8 +16,9 @@ public class Main {
 	/**
 	 * @param args
 	 * @throws ConfigurationException 
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) throws ConfigurationException {
+	public static void main(String[] args) throws ConfigurationException, IOException {
 		
 		SimulatorConfiguration.buildInstance(args[0]);
 		

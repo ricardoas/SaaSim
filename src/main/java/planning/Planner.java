@@ -12,7 +12,6 @@ import planning.heuristic.PlanningHeuristic;
 
 import commons.cloud.Contract;
 import commons.cloud.Provider;
-import commons.cloud.Request;
 import commons.cloud.User;
 
 import config.GEISTMonthlyWorkloadParser;
@@ -23,13 +22,11 @@ public class Planner {
 	private PlanningHeuristic planningHeuristic;
 	private Map<User, Contract> cloudUsers;
 	private GEISTMonthlyWorkloadParser workloadParser;
-	private final double sla;
 	
 	private final String OUTUPUT_FILE = "planning.dat"; 
 	
-	public Planner(Map<String, Provider> providers, String heuristic, Map<User, Contract> cloudUsers, GEISTMonthlyWorkloadParser workloadParser, double sla) {
+	public Planner(Map<String, Provider> providers, String heuristic, Map<User, Contract> cloudUsers, GEISTMonthlyWorkloadParser workloadParser) {
 		this.cloudProviders = providers;
-		this.sla = sla;
 		this.planningHeuristic = new AGHeuristic();
 		
 		this.cloudUsers = cloudUsers;
@@ -38,9 +35,6 @@ public class Planner {
 	}
 	
 	private void verifyProperties() {
-		if(this.sla <= 0){
-			throw new RuntimeException("Invalid sla in Planner: "+this.sla);
-		}
 		if(this.cloudUsers == null || this.cloudUsers.size() == 0){
 			throw new RuntimeException("Invalid users in Planner!");
 		}
@@ -60,7 +54,7 @@ public class Planner {
 //		try {
 //			Map<User, List<Request>> currentWorkload = this.workloadParser.next();
 //			while(!currentWorkload.isEmpty()){
-			this.planningHeuristic.findPlan(this.workloadParser, cloudProviders, cloudUsers, sla);
+			this.planningHeuristic.findPlan(this.workloadParser, cloudProviders, cloudUsers);
 //			}
 			
 			//Persisting planning

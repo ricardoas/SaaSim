@@ -36,7 +36,7 @@ public class Main {
 			GEISTMonthlyWorkloadParser workloadParser = new GEISTMonthlyWorkloadParser();
 			
 			//Creating planner
-			Planner planner = new Planner(config.getProviders(), config.getPlanningHeuristic(), config.getContractsPerUser(), workloadParser, config.getSLA());
+			Planner planner = new Planner(config.getProviders(), config.getPlanningHeuristic(), config.getContractsPerUser(), workloadParser);
 			List<String> plan = planner.plan();
 			
 			//FIXME: Change workload! Performing plan execution!

@@ -171,6 +171,7 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 			}
 		}
 		
+		setProperty(APPLICATION_HEURISTIC, strings);
 	}
 	
 	public int[] getApplicationInitialServersPerTier() {
