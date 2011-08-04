@@ -1,8 +1,8 @@
-plan.availableplans=number
+plan.availableplans=1
 
 #First plan
 plan.name=p1
-plan.price=0.3
+plan.price=price
 plan.setup=5.55
 plan.cpu_lim=10
 plan.ex_cpu=1.00

@@ -6,7 +6,7 @@ plan.price=0.1
 plan.setup=5.55
 plan.cpu_lim=10
 plan.ex_cpu=1.00
-plan.transfer_lim=
+plan.transfer_lim=10
 plan.ex_transfer=0.5
 
 #Associations
