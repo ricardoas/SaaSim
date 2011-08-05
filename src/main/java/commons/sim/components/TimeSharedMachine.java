@@ -12,13 +12,14 @@ import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
+import commons.sim.jeevent.JEEventTest;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
 import commons.util.Triple;
 
 /**
+ * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
- *
  */
 public class TimeSharedMachine extends JEAbstractEventHandler implements JEEventHandler{
 	
@@ -40,9 +41,10 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements JEEvent
 	protected JETime lastUpdate;
 	
 	/**
-	 * @param scheduler
-	 * @param descriptor
-	 * @param loadBalancer
+	 * Default constructor
+	 * @param scheduler Event scheduler.
+	 * @param descriptor Machine descriptor.
+	 * @param loadBalancer {@link LoadBalancer} responsible for this machine.
 	 */
 	public TimeSharedMachine(JEEventScheduler scheduler, MachineDescriptor descriptor, 
 			LoadBalancer loadBalancer) {
@@ -53,6 +55,9 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements JEEvent
 		this.cpuQuantumInMilis = DEFAULT_QUANTUM;
 	}
 	
+	/**
+	 * @return
+	 */
 	public LoadBalancer getLoadBalancer() {
 		return loadBalancer;
 	}
@@ -79,55 +84,33 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements JEEvent
 		this.processorQueue.add(request);
 		
 		if(processorQueue.size() == 1){
-			send(new JEEvent(JEEventType.PREEMPTION, this, new JETime(Math.min(request.getTotalToProcess(), cpuQuantumInMilis)), request));
+			long quantum = Math.min(request.getTotalToProcess(), cpuQuantumInMilis);
+			send(new JEEvent(JEEventType.PREEMPTION, this, new JETime(quantum), request, quantum));
 		}
 	}
 
+	/**
+	 * 
+	 */
 	public void shutdownOnFinish() {
 		this.shutdownOnFinish = true;
 		if(processorQueue.isEmpty()){
 			send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, getScheduler().now(), this));
 		}
 	}
-
-	/**
-	 * TODO check is this correction does not alters the total demand.
-	 * @param nextRequestToFinish 
-	 * @return
-	 */
-	protected JETime getCorrectedFinishTime(Request nextRequestToFinish) {
-		return new JETime( getScheduler().now().timeMilliSeconds + nextRequestToFinish.getTotalToProcess() * processorQueue.size());
-	}
-
-	/**
-	 * 
-	 */
-	protected void updateFinishedDemand() {
-		JETime now = getScheduler().now();
-		if(lastUpdate.isEarlierThan(now) && !processorQueue.isEmpty()){
-			long processedDemand = (now.timeMilliSeconds - lastUpdate.timeMilliSeconds)/(processorQueue.size());
-			for (Request request : processorQueue) {
-				request.update(processedDemand);
-			}
-		}
-		lastUpdate = now;
-	}
-
-	/**
-	 * @param request
-	 * @param queueSize
-	 * @return
-	 */
-	protected JETime calcEstimatedFinishTime(Request request, int queueSize) {
-		return new JETime(request.getDemand() * queueSize).plus(getScheduler().now());
-	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void handleEvent(JEEvent event) {
 		switch (event.getType()) {
+		case PREEMPTION:
+			Request request = (Request) event.getValue()[0];
+			Long quantum = (Long) event.getValue()[1];
+			request.update(processedDemand)
+			
+			break;
 			case REQUEST_FINISHED:
 				updateFinishedDemand();
 	
@@ -159,22 +142,6 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements JEEvent
 		}
 	}
 	
-	@Deprecated
-	public int getNumberOfRequestsCompletionsInPreviousInterval() {
-		return numberOfRequestsCompletionsInPreviousInterval;
-	}
-
-	@Deprecated
-	public int getNumberOfRequestsArrivalsInPreviousInterval() {
-		return numberOfRequestsArrivalsInPreviousInterval;
-	}
-
-	@Deprecated
-	public void resetCounters(){
-		this.numberOfRequestsArrivalsInPreviousInterval = 0;
-		this.numberOfRequestsCompletionsInPreviousInterval = 0;
-	}
-
 	/**
 	 * This method estimates CPU utilisation of current machine
 	 * @param currentTime
@@ -202,17 +169,6 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements JEEvent
 
 	public boolean isReserved(){
 		return this.isReserved;
-	}
-
-	/**
-	 * This method retrieves the total amount of cpu processing time of current machine
-	 * @return
-	 */
-	public double calcExecutionTime() {
-		if(this.getTotalProcessed() < 0){
-			throw new RuntimeException("Invalid resource "+this.machineID+" execution time: "+this.getTotalProcessed());
-		}
-		return this.getTotalProcessed();
 	}
 
 	/**
