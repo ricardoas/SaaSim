@@ -61,6 +61,15 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	/**
 	 * 
 	 */
+	public void addServer(MachineDescriptor descriptor){
+		TimeSharedMachine server = new TimeSharedMachine(getScheduler(), descriptor, this);
+		JETime serverUpTime = getScheduler().now().plus(new JETime(SimulatorConfiguration.getInstance().getLong(SETUP_TIME)));
+		send(new JEEvent(JEEventType.ADD_SERVER, this, serverUpTime, server));
+	}
+	
+	/**
+	 * 
+	 */
 	public void removeServer(long serverID, boolean force){
 		for (Machine server : servers) {
 			if(server.getMachineID() == serverID){

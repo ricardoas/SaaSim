@@ -1,7 +1,9 @@
 package commons.sim.components;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import provisioning.RanjanProvisioningSystem;
 
@@ -18,88 +20,74 @@ import commons.util.Triple;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public class Machine extends JEAbstractEventHandler implements JEEventHandler{
+public class TimeSharedMachine extends JEAbstractEventHandler implements JEEventHandler{
+	
+	private static final long DEFAULT_QUANTUM = 100;
 
-	protected final long machineID;
-	protected boolean isReserved;
+	private final LoadBalancer loadBalancer;
+	private final Queue<Request> processorQueue;
+	private final MachineDescriptor descriptor;
+	private final long cpuQuantumInMilis;
+	
 	protected double totalProcessed;
-
 	protected JEEvent nextFinishEvent;
 
-	protected final List<Request> queue;
 	protected List<Request> finishedRequests;
 
 	public int numberOfRequestsCompletionsInPreviousInterval;
 	public int numberOfRequestsArrivalsInPreviousInterval;
 	protected boolean shutdownOnFinish;
 	protected JETime lastUpdate;
-	protected LoadBalancer loadBalancer;
 	
 	/**
-	 * @param machineID
-	 */
-	public Machine(JEEventScheduler scheduler, long machineID) {
-		super(scheduler);
-		this.machineID = machineID;
-		this.queue = new ArrayList<Request>();
-		this.finishedRequests = new ArrayList<Request>();
-		this.isReserved = false;
-		this.totalProcessed = 0;
-		this.shutdownOnFinish = false;
-		this.lastUpdate = new JETime(0);
-		
-		this.numberOfRequestsArrivalsInPreviousInterval = 0;
-		this.numberOfRequestsCompletionsInPreviousInterval = 0;
-	}
-
-	/**
 	 * @param scheduler
-	 * @param id
-	 * @param isReserved
+	 * @param descriptor
+	 * @param loadBalancer
 	 */
-	public Machine(JEEventScheduler scheduler, long id, boolean isReserved){
-		this(scheduler, id);
-		this.isReserved = isReserved;
+	public TimeSharedMachine(JEEventScheduler scheduler, MachineDescriptor descriptor, 
+			LoadBalancer loadBalancer) {
+		super(scheduler);
+		this.descriptor = descriptor;
+		this.loadBalancer = loadBalancer;
+		this.processorQueue = new LinkedList<Request>();
+		this.cpuQuantumInMilis = DEFAULT_QUANTUM;
 	}
-
-	/**
-	 * @return the machineID
-	 */
-	public long getMachineID() {
-		return machineID;
+	
+	public LoadBalancer getLoadBalancer() {
+		return loadBalancer;
 	}
 
 	/**
 	 * @return
 	 */
-	public List<Request> getQueue() {
-		return queue;
+	public Queue<Request> getProcessorQueue() {
+		return new LinkedList<Request>(processorQueue);
+	}
+
+	/**
+	 * @return
+	 */
+	public MachineDescriptor getDescriptor() {
+		return descriptor;
 	}
 
 	/**
 	 * @param request
 	 */
 	public void sendRequest(Request request) {
-
-		updateFinishedDemand();
-		queue.add(request);
-
-		JEEvent event;
-		if(nextFinishEvent == null){
-			event = new JEEvent(JEEventType.REQUEST_FINISHED, this, calcEstimatedFinishTime(request, queue.size()), request);
-		}else{
-			JETime estimatedFinishTime = calcEstimatedFinishTime(request, queue.size());
-			JETime correctedFinishTime = getCorrectedFinishTime((Request) nextFinishEvent.getValue()[0]);
-			if(estimatedFinishTime.isEarlierThan(correctedFinishTime)){
-				event = new JEEvent(JEEventType.REQUEST_FINISHED, this, estimatedFinishTime, request);
-			}else{
-				event = new JEEvent(JEEventType.REQUEST_FINISHED, this, correctedFinishTime, nextFinishEvent.getValue());
-			}
-			getScheduler().cancelEvent(nextFinishEvent);
+		
+		this.processorQueue.add(request);
+		
+		if(processorQueue.size() == 1){
+			send(new JEEvent(JEEventType.PREEMPTION, this, new JETime(Math.min(request.getTotalToProcess(), cpuQuantumInMilis)), request));
 		}
-		nextFinishEvent = event;
-		send(event);
-		this.numberOfRequestsArrivalsInPreviousInterval++;
+	}
+
+	public void shutdownOnFinish() {
+		this.shutdownOnFinish = true;
+		if(processorQueue.isEmpty()){
+			send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, getScheduler().now(), this));
+		}
 	}
 
 	/**
@@ -108,7 +96,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	 * @return
 	 */
 	protected JETime getCorrectedFinishTime(Request nextRequestToFinish) {
-		return new JETime( getScheduler().now().timeMilliSeconds + nextRequestToFinish.getTotalToProcess() * queue.size());
+		return new JETime( getScheduler().now().timeMilliSeconds + nextRequestToFinish.getTotalToProcess() * processorQueue.size());
 	}
 
 	/**
@@ -116,9 +104,9 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	 */
 	protected void updateFinishedDemand() {
 		JETime now = getScheduler().now();
-		if(lastUpdate.isEarlierThan(now) && !queue.isEmpty()){
-			long processedDemand = (now.timeMilliSeconds - lastUpdate.timeMilliSeconds)/(queue.size());
-			for (Request request : queue) {
+		if(lastUpdate.isEarlierThan(now) && !processorQueue.isEmpty()){
+			long processedDemand = (now.timeMilliSeconds - lastUpdate.timeMilliSeconds)/(processorQueue.size());
+			for (Request request : processorQueue) {
 				request.update(processedDemand);
 			}
 		}
@@ -145,14 +133,14 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	
 				Request requestFinished = (Request) event.getValue()[0];
 				
-				queue.remove(requestFinished);
+				processorQueue.remove(requestFinished);
 				this.numberOfRequestsCompletionsInPreviousInterval++;
 				
 				getLoadBalancer().reportRequestFinished(requestFinished);//Asking for accounting of a finished request
 	
-				if (!queue.isEmpty()) {
-					Request nextToFinish = queue.get(0);
-					for (Request request : queue) {
+				if (!processorQueue.isEmpty()) {
+					Request nextToFinish = processorQueue.get(0);
+					for (Request request : processorQueue) {
 						if (request.getTotalToProcess() < nextToFinish
 								.getTotalToProcess()) {
 							nextToFinish = request;
@@ -170,39 +158,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 				break;
 		}
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (machineID ^ (machineID >>> 32));
-		return result;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Machine other = (Machine) obj;
-		if (machineID != other.machineID)
-			return false;
-		return true;
-	}
-
-	public String toString(){
-		return "Mac "+this.machineID;
-	}
-
+	
 	@Deprecated
 	public int getNumberOfRequestsCompletionsInPreviousInterval() {
 		return numberOfRequestsCompletionsInPreviousInterval;
@@ -225,7 +181,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	 * @return
 	 */
 	public double computeUtilization(long currentTime){
-		if(this.queue.size() != 0){//Requests need to be processed, so resource is full
+		if(this.processorQueue.size() != 0){//Requests need to be processed, so resource is full
 			return 1.0;
 		}else{//Requests were processed previously, and no pending requests exist
 			if(currentTime >= RanjanProvisioningSystem.UTILIZATION_EVALUATION_PERIOD_IN_MILLIS){
@@ -241,7 +197,7 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	}
 
 	public boolean isBusy() {
-		return this.queue.size() != 0 && this.nextFinishEvent != null;
+		return this.processorQueue.size() != 0 && this.nextFinishEvent != null;
 	}	
 
 	public boolean isReserved(){
@@ -267,11 +223,11 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 	 * @return
 	 */
 	public List<Triple<Long, Long, Long>> calcExecutionTimesWithNewRequest(Request request, double sla) {
-		int requestsToShare = this.queue.size();
+		int requestsToShare = this.processorQueue.size();
 
 		List<Triple<Long, Long, Long>> executionTimes = new ArrayList<Triple<Long, Long, Long>>();
 
-		for(Request currentRequest : this.queue){
+		for(Request currentRequest : this.processorQueue){
 			Triple<Long, Long, Long> triple = new Triple<Long, Long, Long>();
 			JETime estimatedFinishTime = new JETime(currentRequest.getTotalToProcess() * requestsToShare); 
 			estimatedFinishTime = estimatedFinishTime.plus(getScheduler().now());
@@ -291,15 +247,33 @@ public class Machine extends JEAbstractEventHandler implements JEEventHandler{
 		return totalProcessed;
 	}
 
-	public void shutdownOnFinish() {
-		this.shutdownOnFinish = true;
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result
+				+ ((descriptor == null) ? 0 : descriptor.hashCode());
+		return result;
 	}
 
-	public void setLoadBalancer(LoadBalancer loadBalancer) {
-		this.loadBalancer = loadBalancer;
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		TimeSharedMachine other = (TimeSharedMachine) obj;
+		if (descriptor == null) {
+			if (other.descriptor != null)
+				return false;
+		} else if (!descriptor.equals(other.descriptor))
+			return false;
+		return true;
 	}
 
-	public LoadBalancer getLoadBalancer() {
-		return loadBalancer;
+	public String toString(){
+		return getClass().getName() + " " + descriptor;
 	}
 }
