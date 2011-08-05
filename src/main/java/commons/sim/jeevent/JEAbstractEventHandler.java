@@ -22,7 +22,7 @@ public abstract class JEAbstractEventHandler implements JEEventHandler {
     public JEAbstractEventHandler(JEEventScheduler scheduler) {
     	
     	this.scheduler = scheduler;
-		this.id = getScheduler().registerHandler(this);
+		this.id = this.scheduler.registerHandler(this);
     }
     
     /**

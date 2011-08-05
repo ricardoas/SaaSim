@@ -68,7 +68,7 @@ public class ContractInputTest {
 		SimulatorConfiguration.buildInstance(INEXISTENT_FILE);
 	}
 	
-	@Test(expected=ConfigurationException.class)
+	@Test
 	public void testValidFile() throws ConfigurationException{
 		SimulatorConfiguration.buildInstance(VALID_FILE);
 		SimulatorConfiguration config = SimulatorConfiguration.getInstance();
