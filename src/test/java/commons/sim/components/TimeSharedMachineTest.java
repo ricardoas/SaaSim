@@ -11,7 +11,6 @@ import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
@@ -116,7 +115,6 @@ public class TimeSharedMachineTest {
 		EasyMock.verify(loadBalancer, request, machine);
 	}
 
-	@Ignore("essa estrutura deveria testar o handleEvent")
 	@Test
 	public void testSendTwoRequestWithEmptyMachine(){
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
@@ -132,6 +130,8 @@ public class TimeSharedMachineTest {
 		Queue<Request> queue = machine.getProcessorQueue();
 		assertNotNull(queue);
 		assertFalse(queue.isEmpty());
+		assertEquals(firstRequest, queue.poll());
+		assertEquals(secondRequest, queue.poll());
 		
 		EasyMock.verify(loadBalancer, firstRequest, secondRequest);
 	}
@@ -155,6 +155,7 @@ public class TimeSharedMachineTest {
 		JEEvent event = captured.getValue();
 		assertNotNull(event);
 		assertEquals(JEEventType.MACHINE_TURNED_OFF, event.getType());
+		assertEquals(machine.getDescriptor(), event.getValue()[0]);
 		
 		EasyMock.verify(loadBalancer);
 	}
@@ -191,6 +192,80 @@ public class TimeSharedMachineTest {
 		EasyMock.verify(loadBalancer, request, machine);
 	}
 	
-	
+	@Test
+	public void testHandlePreemptionOfLastRequestOnQueueWithShutdown(){
+		JEEventScheduler scheduler = new JEEventScheduler();
+
+		Request request = EasyMock.createStrictMock(Request.class);
+		EasyMock.expect(request.getTotalToProcess()).andReturn(250L);
+		request.update(100L);
+		EasyMock.expect(request.isFinished()).andReturn(false);
+		EasyMock.expect(request.getTotalToProcess()).andReturn(150L);
+		request.update(100L);
+		EasyMock.expect(request.isFinished()).andReturn(false);
+		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
+		request.update(50L);
+		EasyMock.expect(request.isFinished()).andReturn(true);
+		
+		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		loadBalancer.reportRequestFinished(request);
+		EasyMock.expect(loadBalancer.getHandlerId()).andReturn(scheduler.registerHandler(loadBalancer));
+		Capture<JEEvent> captured = new Capture<JEEvent>();
+		loadBalancer.handleEvent(EasyMock.capture(captured));
+		EasyMock.expectLastCall();
+
+		
+		EasyMock.replay(loadBalancer, request);
+		
+		TimeSharedMachine machine = new TimeSharedMachine(scheduler, descriptor, loadBalancer);
+		machine.sendRequest(request);
+		machine.shutdownOnFinish();
+		
+		scheduler.start();
+		
+		JEEvent event = captured.getValue();
+		assertNotNull(event);
+		assertEquals(JEEventType.MACHINE_TURNED_OFF, event.getType());
+		assertEquals(machine.getDescriptor(), event.getValue()[0]);
+		
+		EasyMock.verify(loadBalancer, request);
+	}
+
+	/**
+	 * The second request finishes first.
+	 */
+	@Test
+	public void testHandlePreemptionOfTwoRequestOnQueueWithOutShutdown(){
+		JEEventScheduler scheduler = new JEEventScheduler();
+
+		Request firstRequest = EasyMock.createStrictMock(Request.class);
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(150L);
+		firstRequest.update(100L);
+		EasyMock.expect(firstRequest.isFinished()).andReturn(false);
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(50L);
+		firstRequest.update(50L);
+		EasyMock.expect(firstRequest.isFinished()).andReturn(true);
+		
+		Request secondRequest = EasyMock.createStrictMock(Request.class);
+		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(50L);
+		secondRequest.update(50L);
+		EasyMock.expect(secondRequest.isFinished()).andReturn(true);
+		
+		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		loadBalancer.reportRequestFinished(secondRequest);
+		EasyMock.expectLastCall();
+		loadBalancer.reportRequestFinished(firstRequest);
+		EasyMock.expectLastCall();
+		
+		EasyMock.replay(loadBalancer, firstRequest, secondRequest);
+		
+		TimeSharedMachine machine = new TimeSharedMachine(scheduler, descriptor, loadBalancer);
+		machine.sendRequest(firstRequest);
+		machine.sendRequest(secondRequest);
+		
+		scheduler.start();
+		
+		EasyMock.verify(loadBalancer, firstRequest, secondRequest);
+	}
 
 }

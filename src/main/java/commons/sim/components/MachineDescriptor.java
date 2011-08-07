@@ -4,16 +4,22 @@ package commons.sim.components;
 public class MachineDescriptor {
 	
 	private final long machineID;
+	private final boolean reserved;
 
 	/**
 	 * @param machineID
 	 */
 	public MachineDescriptor(long machineID) {
 		this.machineID = machineID;
+		this.reserved = false;
 	}
 
 	public long getMachineID() {
 		return machineID;
+	}
+	
+	public boolean isReserved() {
+		return reserved;
 	}
 
 	@Override
@@ -37,4 +43,5 @@ public class MachineDescriptor {
 			return false;
 		return true;
 	}
+
 }

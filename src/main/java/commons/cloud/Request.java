@@ -57,7 +57,7 @@ public class Request{
 	}
 	
 	public boolean isFinished(){
-		return this.totalProcessed >= this.demandInMillis;
+		return this.totalProcessed >= this.demandInMillis;//FIXME >= ??? shouldnt it be == ?
 	}
 
 	public long getTotalToProcess() {
@@ -99,4 +99,31 @@ public class Request{
 	public void reset() {
 		this.totalProcessed = 0;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((reqID == null) ? 0 : reqID.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Request other = (Request) obj;
+		if (reqID == null) {
+			if (other.reqID != null)
+				return false;
+		} else if (!reqID.equals(other.reqID))
+			return false;
+		return true;
+	}
+	
+	
 }
