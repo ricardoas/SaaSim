@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import commons.cloud.Request;
-import commons.sim.components.Machine;
+import commons.sim.components.ProcessorSharedMachine;
 import commons.sim.jeevent.JEEventScheduler;
 
 
@@ -42,7 +42,7 @@ public class RanjanHeuristicTest {
 		EasyMock.replay(request);
 		
 		try{
-			heuristic.getNextServer(request, new ArrayList<Machine>());
+			heuristic.getNextServer(request, new ArrayList<ProcessorSharedMachine>());
 			fail("Error while selecting inexistent servers!");
 		}catch(ArithmeticException e){
 		}
@@ -59,11 +59,11 @@ public class RanjanHeuristicTest {
 		EasyMock.expect(request.getUserID()).andReturn(userID).times(2);
 		EasyMock.replay(request);
 		
-		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new Machine(eventScheduler, 1);
+		ArrayList<ProcessorSharedMachine> servers = new ArrayList<ProcessorSharedMachine>();
+		ProcessorSharedMachine machine1 = new ProcessorSharedMachine(eventScheduler, 1);
 		servers.add(machine1);
 		
-		Machine nextServer = heuristic.getNextServer(request, servers);
+		ProcessorSharedMachine nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		
@@ -85,12 +85,12 @@ public class RanjanHeuristicTest {
 
 		long time = ONE_MINUTE_IN_MILLIS * 1;
 		
-		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new Machine(eventScheduler, 1);
-		Machine machine2 = new Machine(eventScheduler, 2);
-		Machine machine3 = new Machine(eventScheduler, 3);
-		Machine machine4 = new Machine(eventScheduler, 4);
-		Machine machine5 = new Machine(eventScheduler, 5);
+		ArrayList<ProcessorSharedMachine> servers = new ArrayList<ProcessorSharedMachine>();
+		ProcessorSharedMachine machine1 = new ProcessorSharedMachine(eventScheduler, 1);
+		ProcessorSharedMachine machine2 = new ProcessorSharedMachine(eventScheduler, 2);
+		ProcessorSharedMachine machine3 = new ProcessorSharedMachine(eventScheduler, 3);
+		ProcessorSharedMachine machine4 = new ProcessorSharedMachine(eventScheduler, 4);
+		ProcessorSharedMachine machine5 = new ProcessorSharedMachine(eventScheduler, 5);
 		servers.add(machine1);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -102,7 +102,7 @@ public class RanjanHeuristicTest {
 		EasyMock.expect(request.getTimeInMillis()).andReturn(time).times(2);
 		EasyMock.expect(request.getUserID()).andReturn(userID).times(2);
 		EasyMock.replay(request);
-		Machine nextServer = heuristic.getNextServer(request, servers);
+		ProcessorSharedMachine nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		EasyMock.verify(request);
@@ -166,12 +166,12 @@ public class RanjanHeuristicTest {
 	public void testGetServerForFirstRequestsWithMultipleServers2(){
 		String userID = "u1";
 		
-		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new Machine(eventScheduler, 1);
-		Machine machine2 = new Machine(eventScheduler, 2);
-		Machine machine3 = new Machine(eventScheduler, 3);
-		Machine machine4 = new Machine(eventScheduler, 4);
-		Machine machine5 = new Machine(eventScheduler, 5);
+		ArrayList<ProcessorSharedMachine> servers = new ArrayList<ProcessorSharedMachine>();
+		ProcessorSharedMachine machine1 = new ProcessorSharedMachine(eventScheduler, 1);
+		ProcessorSharedMachine machine2 = new ProcessorSharedMachine(eventScheduler, 2);
+		ProcessorSharedMachine machine3 = new ProcessorSharedMachine(eventScheduler, 3);
+		ProcessorSharedMachine machine4 = new ProcessorSharedMachine(eventScheduler, 4);
+		ProcessorSharedMachine machine5 = new ProcessorSharedMachine(eventScheduler, 5);
 		servers.add(machine1);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -183,7 +183,7 @@ public class RanjanHeuristicTest {
 		EasyMock.expect(request.getTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 1).times(2);
 		EasyMock.expect(request.getUserID()).andReturn(userID).times(2);
 		EasyMock.replay(request);
-		Machine nextServer = heuristic.getNextServer(request, servers);
+		ProcessorSharedMachine nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		EasyMock.verify(request);
@@ -258,12 +258,12 @@ public class RanjanHeuristicTest {
 		String userID = "u1";
 		String secondUserID = "u2";
 		
-		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new Machine(eventScheduler, 1);
-		Machine machine2 = new Machine(eventScheduler, 2);
-		Machine machine3 = new Machine(eventScheduler, 3);
-		Machine machine4 = new Machine(eventScheduler, 4);
-		Machine machine5 = new Machine(eventScheduler, 5);
+		ArrayList<ProcessorSharedMachine> servers = new ArrayList<ProcessorSharedMachine>();
+		ProcessorSharedMachine machine1 = new ProcessorSharedMachine(eventScheduler, 1);
+		ProcessorSharedMachine machine2 = new ProcessorSharedMachine(eventScheduler, 2);
+		ProcessorSharedMachine machine3 = new ProcessorSharedMachine(eventScheduler, 3);
+		ProcessorSharedMachine machine4 = new ProcessorSharedMachine(eventScheduler, 4);
+		ProcessorSharedMachine machine5 = new ProcessorSharedMachine(eventScheduler, 5);
 		servers.add(machine1);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -275,7 +275,7 @@ public class RanjanHeuristicTest {
 		EasyMock.expect(request.getTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 1).times(2);
 		EasyMock.expect(request.getUserID()).andReturn(userID).times(2);
 		EasyMock.replay(request);
-		Machine nextServer = heuristic.getNextServer(request, servers);
+		ProcessorSharedMachine nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		EasyMock.verify(request);

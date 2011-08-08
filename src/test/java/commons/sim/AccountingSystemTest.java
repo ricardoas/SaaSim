@@ -13,7 +13,7 @@ import commons.cloud.Contract;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
-import commons.sim.components.Machine;
+import commons.sim.components.ProcessorSharedMachine;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.util.Triple;
 

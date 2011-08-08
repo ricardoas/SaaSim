@@ -7,7 +7,6 @@ import java.util.Queue;
 import commons.cloud.Request;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
-import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
@@ -16,7 +15,7 @@ import commons.sim.jeevent.JETime;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class TimeSharedMachine extends JEAbstractEventHandler implements JEEventHandler{
+public class TimeSharedMachine extends JEAbstractEventHandler implements Machine{
 	
 	private static final long DEFAULT_QUANTUM = 100;
 
@@ -51,29 +50,37 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements JEEvent
 	}
 	
 	/**
-	 * @return
+	 * {@inheritDoc}
 	 */
+	
+	@Override
 	public LoadBalancer getLoadBalancer() {
 		return loadBalancer;
 	}
 
 	/**
-	 * @return
+	 * {@inheritDoc}
 	 */
+	
+	@Override
 	public Queue<Request> getProcessorQueue() {
 		return new LinkedList<Request>(processorQueue);
 	}
 
 	/**
-	 * @return
+	 * {@inheritDoc}
 	 */
+	
+	@Override
 	public MachineDescriptor getDescriptor() {
 		return descriptor;
 	}
 
 	/**
-	 * @param request
+	 * {@inheritDoc}
 	 */
+	
+	@Override
 	public void sendRequest(Request request) {
 		this.processorQueue.add(request);
 		if(processorQueue.size() == 1){
@@ -82,8 +89,10 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements JEEvent
 	}
 
 	/**
-	 * 
+	 * {@inheritDoc}
 	 */
+	
+	@Override
 	public void shutdownOnFinish() {
 		this.shutdownOnFinish = true;
 		tryToShutdown();

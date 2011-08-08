@@ -44,7 +44,7 @@ public class TimeSharedMachineTest {
 		
 		EasyMock.replay(loadBalancer);
 		
-		TimeSharedMachine machine = new TimeSharedMachine(new JEEventScheduler(), descriptor, loadBalancer);
+		Machine machine = new TimeSharedMachine(new JEEventScheduler(), descriptor, loadBalancer);
 		Queue<Request> queue = machine.getProcessorQueue();
 		assertNotNull(queue);
 		assertTrue(queue.isEmpty());
@@ -124,7 +124,7 @@ public class TimeSharedMachineTest {
 		
 		EasyMock.replay(loadBalancer, firstRequest, secondRequest);
 		
-		TimeSharedMachine machine = new TimeSharedMachine(new JEEventScheduler(), descriptor, loadBalancer);
+		Machine machine = new TimeSharedMachine(new JEEventScheduler(), descriptor, loadBalancer);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
 		Queue<Request> queue = machine.getProcessorQueue();
@@ -148,7 +148,7 @@ public class TimeSharedMachineTest {
 		
 		EasyMock.replay(loadBalancer);
 		
-		TimeSharedMachine machine = new TimeSharedMachine(scheduler, descriptor, loadBalancer);
+		Machine machine = new TimeSharedMachine(scheduler, descriptor, loadBalancer);
 		machine.shutdownOnFinish();
 		scheduler.start();
 		
@@ -217,7 +217,7 @@ public class TimeSharedMachineTest {
 		
 		EasyMock.replay(loadBalancer, request);
 		
-		TimeSharedMachine machine = new TimeSharedMachine(scheduler, descriptor, loadBalancer);
+		Machine machine = new TimeSharedMachine(scheduler, descriptor, loadBalancer);
 		machine.sendRequest(request);
 		machine.shutdownOnFinish();
 		
@@ -259,7 +259,7 @@ public class TimeSharedMachineTest {
 		
 		EasyMock.replay(loadBalancer, firstRequest, secondRequest);
 		
-		TimeSharedMachine machine = new TimeSharedMachine(scheduler, descriptor, loadBalancer);
+		Machine machine = new TimeSharedMachine(scheduler, descriptor, loadBalancer);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
 		

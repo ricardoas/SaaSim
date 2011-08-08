@@ -45,7 +45,7 @@ public class LoadBalancerTest {
 	public void handleEventNewRequestWithOneMachine(){
 		Request request = EasyMock.createStrictMock(Request.class);
 		JEEvent event = EasyMock.createStrictMock(JEEvent.class);
-		Machine machine = EasyMock.createStrictMock(Machine.class);
+		ProcessorSharedMachine machine = EasyMock.createStrictMock(ProcessorSharedMachine.class);
 		this.schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
 		
 		EasyMock.expect(event.getType()).andReturn(JEEventType.NEWREQUEST).once();
@@ -111,7 +111,7 @@ public class LoadBalancerTest {
 		
 		this.schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
 		DPS dps = EasyMock.createStrictMock(DPS.class);
-		Machine machine = EasyMock.createStrictMock(Machine.class);
+		ProcessorSharedMachine machine = EasyMock.createStrictMock(ProcessorSharedMachine.class);
 		machine.setLoadBalancer(EasyMock.isA(LoadBalancer.class));
 		EasyMock.expectLastCall();
 		

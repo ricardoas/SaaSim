@@ -6,11 +6,11 @@ import java.util.List;
 import commons.cloud.Request;
 import commons.config.SimulatorConfiguration;
 import commons.sim.AccountingSystem;
-import commons.sim.components.Machine;
+import commons.sim.components.MachineDescriptor;
+import commons.sim.components.ProcessorSharedMachine;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
-import commons.sim.util.MachineFactory;
 
 public class DynamicProvisioningSystem extends JEAbstractEventHandler implements DPS{
 
@@ -49,7 +49,7 @@ public class DynamicProvisioningSystem extends JEAbstractEventHandler implements
 	 * @param machine
 	 */
 	protected void handleEventMachineTurnedOff(JEEvent event){
-		this.accountingSystem.reportMachineFinish(((Machine)event.getValue()[0]).getMachineID(), event.getScheduledTime().timeMilliSeconds);
+		this.accountingSystem.reportMachineFinish(((ProcessorSharedMachine)event.getValue()[0]).getMachineID(), event.getScheduledTime().timeMilliSeconds);
 	}
 
 	protected void handleEventRequestQueued(JEEvent event) {
@@ -59,17 +59,16 @@ public class DynamicProvisioningSystem extends JEAbstractEventHandler implements
 	}
 
 	@Override
-	public List<Machine> getSetupMachines() {
+	public List<MachineDescriptor> getSetupMachines() {
 		int[] initialServersPerTier = SimulatorConfiguration.getInstance().getApplicationInitialServersPerTier();
 		int totalServers = 0;
-		List<Machine> machines = new ArrayList<Machine>();
+		List<MachineDescriptor> machines = new ArrayList<MachineDescriptor>();
 		for (int i : initialServersPerTier) {
 			totalServers += i;
 		}
 		
-		MachineFactory machineFactory = MachineFactory.getInstance();
 		for (int i = 0; i < totalServers; i++) {
-			machines.add(machineFactory.createMachine(getScheduler(), availableIDs++, i < 20));
+			machines.add(new MachineDescriptor(availableIDs++));
 			
 			//Registering machines for accounting
 			this.accountingSystem.createMachine(availableIDs-1, i < 20, getScheduler().now().timeMilliSeconds);

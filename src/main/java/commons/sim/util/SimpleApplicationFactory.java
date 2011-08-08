@@ -9,7 +9,7 @@ import provisioning.Monitor;
 
 import commons.config.SimulatorConfiguration;
 import commons.sim.components.LoadBalancer;
-import commons.sim.components.Machine;
+import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
 
@@ -24,7 +24,7 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 	 */
 	@Override
 	public List<LoadBalancer> createNewApplication(JEEventScheduler scheduler,
-			Monitor monitor, List<Machine> setupMachines) {
+			Monitor monitor, List<MachineDescriptor> setupMachines) {
 		SimulatorConfiguration config = SimulatorConfiguration.getInstance();
 		int numOfTiers = config.getInt(APPLICATION_NUM_OF_TIERS);
 		
@@ -51,9 +51,9 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 	 * @return
 	 */
 	private LoadBalancer buildLoadBalancer(JEEventScheduler scheduler, Monitor monitor,
-			Class<?> heuristic, int serversPerTier, int maxServerPerTier, List<Machine> setupMachines) {
+			Class<?> heuristic, int serversPerTier, int maxServerPerTier, List<MachineDescriptor> setupMachines) {
 		try {
-			Machine [] servers = new Machine[serversPerTier];
+			MachineDescriptor [] servers = new MachineDescriptor[serversPerTier];
 			for (int i = 0; i < servers.length; i++) {
 				servers[i] = setupMachines.remove(0);
 			}

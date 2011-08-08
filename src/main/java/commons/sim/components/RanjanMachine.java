@@ -17,27 +17,17 @@ import commons.sim.jeevent.JEEventType;
  * @author David Candeia
  *
  */
-public class RanjanMachine extends Machine {
+public class RanjanMachine extends ProcessorSharedMachine {
 	
 	protected long maximumNumberOfSimultaneousThreads;
 	protected long backlogMaximumNumberOfRequests;
 	private List<Request> backlog;//This list represents the set of requests waiting to be processed by a thread in this server
 	
 	/**
-	 * @see commons.sim.components.Machine
+	 * @see commons.sim.components.ProcessorSharedMachine
 	 */
-	public RanjanMachine(JEEventScheduler scheduler, long machineID){
-		super(scheduler, machineID);
-		this.maximumNumberOfSimultaneousThreads = SimulatorConfiguration.getInstance().getMaximumNumberOfThreadsPerMachine();
-		this.backlogMaximumNumberOfRequests = SimulatorConfiguration.getInstance().getMaximumBacklogSize();
-		this.backlog = new ArrayList<Request>();
-	}
-	
-	/**
-	 * @see commons.sim.components.Machine
-	 */
-	public RanjanMachine(JEEventScheduler scheduler, long id, boolean isReserved){
-		super(scheduler, id, isReserved);
+	public RanjanMachine(JEEventScheduler scheduler, MachineDescriptor descriptor, LoadBalancer loadBalancer){
+		super(scheduler, descriptor, loadBalancer);
 		this.maximumNumberOfSimultaneousThreads = SimulatorConfiguration.getInstance().getMaximumNumberOfThreadsPerMachine();
 		this.backlogMaximumNumberOfRequests = SimulatorConfiguration.getInstance().getMaximumBacklogSize();
 		this.backlog = new ArrayList<Request>();

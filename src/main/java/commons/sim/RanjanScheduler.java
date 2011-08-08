@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import commons.cloud.Request;
-import commons.sim.components.Machine;
+import commons.sim.components.ProcessorSharedMachine;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
 
 @Deprecated
@@ -15,18 +15,18 @@ public class RanjanScheduler implements SchedulingHeuristic {
 	private double TARGET_UTILIZATION = 0.66;
 	
 	private Map<String, Long> lastRequestTimes; 
-	private Map<Long, Machine> serversOfLastRequests;
+	private Map<Long, ProcessorSharedMachine> serversOfLastRequests;
 	private int roundRobinIndex;
 	
 	public RanjanScheduler(){
 		this.lastRequestTimes = new HashMap<String, Long>();
-		this.serversOfLastRequests = new HashMap<Long, Machine>();
+		this.serversOfLastRequests = new HashMap<Long, ProcessorSharedMachine>();
 		this.roundRobinIndex = 0;
 	}
 	
 	@Override
-	public Machine getNextServer(Request request, List<Machine> servers) {
-		Machine machine = getServerOfPreviousRequestInSession(request);
+	public ProcessorSharedMachine getNextServer(Request request, List<ProcessorSharedMachine> servers) {
+		ProcessorSharedMachine machine = getServerOfPreviousRequestInSession(request);
 		if(machine != null){//Allocates to server already serving the session
 			return machine;
 		}else{//Round-robin
@@ -34,7 +34,7 @@ public class RanjanScheduler implements SchedulingHeuristic {
 				this.roundRobinIndex = 0;
 			}
 			if(servers.size() > 0){
-				Machine nextServer = servers.get(this.roundRobinIndex);
+				ProcessorSharedMachine nextServer = servers.get(this.roundRobinIndex);
 				this.roundRobinIndex++;
 				
 				//Updating times
@@ -50,11 +50,11 @@ public class RanjanScheduler implements SchedulingHeuristic {
 		}
 	}
 
-	private Machine getServerOfPreviousRequestInSession(Request request) {
+	private ProcessorSharedMachine getServerOfPreviousRequestInSession(Request request) {
 		Long lastRequestTime = this.lastRequestTimes.get(request.getUserID());
 		if(lastRequestTime != null && request.getTimeInMillis() - lastRequestTime <= SESSION_LIMIT){
 			this.lastRequestTimes.put(request.getUserID(), request.getTimeInMillis());
-			Machine lastMachine = this.serversOfLastRequests.get(lastRequestTime);
+			ProcessorSharedMachine lastMachine = this.serversOfLastRequests.get(lastRequestTime);
 			this.serversOfLastRequests.remove(lastRequestTime);
 			this.serversOfLastRequests.put(request.getTimeInMillis(), lastMachine);
 			return lastMachine;
@@ -62,12 +62,12 @@ public class RanjanScheduler implements SchedulingHeuristic {
 		return null;
 	}
 
-	public double evaluateUtilization(List<Machine> servers, Long eventTime){
+	public double evaluateUtilization(List<ProcessorSharedMachine> servers, Long eventTime){
 		double averageUtilization = 0d;
 		double totalNumberOfCompletions = 0d;
 		double totalNumberOfArrivals = 0d;
 		
-		for(Machine machine : servers){
+		for(ProcessorSharedMachine machine : servers){
 			averageUtilization += machine.computeUtilization(eventTime);
 			totalNumberOfCompletions += machine.getNumberOfRequestsCompletionsInPreviousInterval();
 			totalNumberOfArrivals += machine.getNumberOfRequestsArrivalsInPreviousInterval();

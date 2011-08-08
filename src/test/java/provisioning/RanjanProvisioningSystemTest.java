@@ -13,7 +13,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import commons.config.SimulatorConfiguration;
 import commons.sim.AccountingSystem;
 import commons.sim.SimpleSimulator;
-import commons.sim.components.Machine;
+import commons.sim.components.ProcessorSharedMachine;
 import commons.sim.components.RanjanMachine;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
@@ -202,9 +202,9 @@ public class RanjanProvisioningSystemTest {
 		RanjanStatistics statistics = new RanjanStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
-		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(Machine.class))).andReturn(2);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(ProcessorSharedMachine.class))).andReturn(2);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(RanjanProvisioningSystem.class))).andReturn(1);
-		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(Machine.class))).andReturn(3);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(ProcessorSharedMachine.class))).andReturn(3);
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(0));
 		EasyMock.replay(scheduler);
 		

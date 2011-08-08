@@ -20,6 +20,7 @@ import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
 import commons.sim.provisioningheuristics.RanjanStatistics;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
+import commons.sim.util.MachineFactory;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -40,39 +41,38 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	 * @param machine 
 	 * 
 	 */
-	public LoadBalancer(JEEventScheduler scheduler, Monitor monitor, SchedulingHeuristic heuristic, int maxServersAllowed, Machine... machines) {
+	public LoadBalancer(JEEventScheduler scheduler, Monitor monitor, SchedulingHeuristic heuristic, int maxServersAllowed, MachineDescriptor... machines) {
 		super(scheduler);
 		this.monitor = monitor;
 		this.heuristic = heuristic;
 		this.maxServersAllowed = maxServersAllowed;
-		this.servers = new ArrayList<Machine>(Arrays.asList(machines));
+		this.servers = new ArrayList<Machine>();
+		for (MachineDescriptor machineDescriptor : machines) {
+			servers.add(buildMachine(machineDescriptor));
+		}
 		this.requestsToBeProcessed = new LinkedList<Request>();
 	}
 	
 	/**
 	 * 
 	 */
-	public void addServer(Machine server){
-		server.setLoadBalancer(this);
-		JETime serverUpTime = getScheduler().now().plus(new JETime(SimulatorConfiguration.getInstance().getLong(SETUP_TIME)));
-		send(new JEEvent(JEEventType.ADD_SERVER, this, serverUpTime, server));
-	}
-	
-	/**
-	 * 
-	 */
 	public void addServer(MachineDescriptor descriptor){
-		TimeSharedMachine server = new TimeSharedMachine(getScheduler(), descriptor, this);
+		Machine server = buildMachine(descriptor);
 		JETime serverUpTime = getScheduler().now().plus(new JETime(SimulatorConfiguration.getInstance().getLong(SETUP_TIME)));
 		send(new JEEvent(JEEventType.ADD_SERVER, this, serverUpTime, server));
+	}
+	
+	private Machine buildMachine(MachineDescriptor machineDescriptor) {
+
+		return MachineFactory.getInstance().createMachine(getScheduler(), machineDescriptor, this);
 	}
 	
 	/**
 	 * 
 	 */
-	public void removeServer(long serverID, boolean force){
+	public void removeServer(MachineDescriptor descriptor, boolean force){
 		for (Machine server : servers) {
-			if(server.getMachineID() == serverID){
+			if(server.getDescriptor().equals(descriptor)){
 				if(force){
 					migrateRequests(server);
 					send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this, getScheduler().now(), server));
@@ -91,7 +91,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	 */
 	private void migrateRequests(Machine server) {
 		JETime now = getScheduler().now();
-		for (Request request : server.getQueue()) {
+		for (Request request : server.getProcessorQueue()) {
 			request.reset();
 			send(new JEEvent(JEEventType.NEWREQUEST, this, now, request));
 		}

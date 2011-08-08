@@ -12,7 +12,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import commons.config.SimulatorConfiguration;
 import commons.sim.AccountingSystem;
 import commons.sim.SimpleSimulator;
-import commons.sim.components.Machine;
+import commons.sim.components.ProcessorSharedMachine;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JETime;
@@ -75,9 +75,9 @@ public class ProfitDrivenProvisioningSystemTest {
 		int onDemandLimit = 1;
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
-		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(Machine.class))).andReturn(2);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(ProcessorSharedMachine.class))).andReturn(2);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(ProfitDrivenProvisioningSystem.class))).andReturn(1);
-		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(Machine.class))).andReturn(2);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(ProcessorSharedMachine.class))).andReturn(2);
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(0));
 		EasyMock.replay(scheduler);
 		
@@ -86,7 +86,7 @@ public class ProfitDrivenProvisioningSystemTest {
 		accounting.createMachine(2, false, 0);
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
-		configurable.addServer(0, new Machine(scheduler, 0));
+		configurable.addServer(0, new ProcessorSharedMachine(scheduler, 0));
 		EasyMock.expectLastCall();
 		
 		ProfitDrivenProvisioningSystem dps = new ProfitDrivenProvisioningSystem(scheduler);
@@ -125,9 +125,9 @@ public class ProfitDrivenProvisioningSystemTest {
 		int onDemandLimit = 2;
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
-		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(Machine.class))).andReturn(2);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(ProcessorSharedMachine.class))).andReturn(2);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(ProfitDrivenProvisioningSystem.class))).andReturn(1);
-		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(Machine.class))).andReturn(3);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(ProcessorSharedMachine.class))).andReturn(3);
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(0));
 		EasyMock.replay(scheduler);
 		
@@ -136,7 +136,7 @@ public class ProfitDrivenProvisioningSystemTest {
 		accounting.createMachine(2, false, 0);
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
-		configurable.addServer(0, new Machine(scheduler, 0, false));
+		configurable.addServer(0, new ProcessorSharedMachine(scheduler, 0, false));
 		EasyMock.expectLastCall();
 		
 		ProfitDrivenProvisioningSystem dps = new ProfitDrivenProvisioningSystem(scheduler);

@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import commons.cloud.Request;
 import commons.config.SimulatorConfiguration;
-import commons.sim.components.Machine;
+import commons.sim.components.ProcessorSharedMachine;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.SimulatorProperties;
 
@@ -44,7 +44,7 @@ public class ProfitDrivenHeuristicTest {
 		long demand = 1000 * 60 * 20;
 		
 		Request request = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
-		Machine nextServer = this.heuristic.getNextServer(request, new ArrayList<Machine>());
+		ProcessorSharedMachine nextServer = this.heuristic.getNextServer(request, new ArrayList<ProcessorSharedMachine>());
 		assertNull(nextServer);
 	}
 	
@@ -64,14 +64,14 @@ public class ProfitDrivenHeuristicTest {
 		long demand = 1000 * 20;//in millis
 		
 		JEEventScheduler eventScheduler = EasyMock.createMock(JEEventScheduler.class);
-		EasyMock.expect(eventScheduler.registerHandler(EasyMock.isA(Machine.class))).andReturn(1);
+		EasyMock.expect(eventScheduler.registerHandler(EasyMock.isA(ProcessorSharedMachine.class))).andReturn(1);
 		EasyMock.replay(eventScheduler);
-		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new Machine(eventScheduler, 1);
+		ArrayList<ProcessorSharedMachine> servers = new ArrayList<ProcessorSharedMachine>();
+		ProcessorSharedMachine machine1 = new ProcessorSharedMachine(eventScheduler, 1);
 		servers.add(machine1);
 		
 		Request request = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
-		Machine nextServer = this.heuristic.getNextServer(request, servers);
+		ProcessorSharedMachine nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 	}
@@ -93,28 +93,28 @@ public class ProfitDrivenHeuristicTest {
 		long demand = 1000 * 20;//in millis
 		
 		JEEventScheduler eventScheduler = EasyMock.createStrictMock(JEEventScheduler.class);
-		EasyMock.expect(eventScheduler.registerHandler(EasyMock.isA(Machine.class))).andReturn(1).times(2);
-		EasyMock.expect(eventScheduler.registerHandler(EasyMock.isA(Machine.class))).andReturn(2).times(2);
-		EasyMock.expect(eventScheduler.registerHandler(EasyMock.isA(Machine.class))).andReturn(3).times(2);
+		EasyMock.expect(eventScheduler.registerHandler(EasyMock.isA(ProcessorSharedMachine.class))).andReturn(1).times(2);
+		EasyMock.expect(eventScheduler.registerHandler(EasyMock.isA(ProcessorSharedMachine.class))).andReturn(2).times(2);
+		EasyMock.expect(eventScheduler.registerHandler(EasyMock.isA(ProcessorSharedMachine.class))).andReturn(3).times(2);
 		EasyMock.replay(eventScheduler);
-		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new Machine(eventScheduler, 1);
-		Machine machine2 = new Machine(eventScheduler, 2);
-		Machine machine3 = new Machine(eventScheduler, 3);
+		ArrayList<ProcessorSharedMachine> servers = new ArrayList<ProcessorSharedMachine>();
+		ProcessorSharedMachine machine1 = new ProcessorSharedMachine(eventScheduler, 1);
+		ProcessorSharedMachine machine2 = new ProcessorSharedMachine(eventScheduler, 2);
+		ProcessorSharedMachine machine3 = new ProcessorSharedMachine(eventScheduler, 3);
 		servers.add(machine1);
 		servers.add(machine2);
 		servers.add(machine3);
 		
 		Request request = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
-		Machine nextServer = this.heuristic.getNextServer(request, servers);
+		ProcessorSharedMachine nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		
 		//Changing machines order
 		servers.clear();
-		machine1 = new Machine(eventScheduler, 1);
-		machine2 = new Machine(eventScheduler, 2);
-		machine3 = new Machine(eventScheduler, 3);
+		machine1 = new ProcessorSharedMachine(eventScheduler, 1);
+		machine2 = new ProcessorSharedMachine(eventScheduler, 2);
+		machine3 = new ProcessorSharedMachine(eventScheduler, 3);
 		servers.add(machine3);
 		servers.add(machine2);
 		servers.add(machine1);
@@ -148,11 +148,11 @@ public class ProfitDrivenHeuristicTest {
 		String httpOperation = "GET";
 		long demand = 1000 * 10;//in millis
 		
-		ArrayList<Machine> servers = new ArrayList<Machine>();
+		ArrayList<ProcessorSharedMachine> servers = new ArrayList<ProcessorSharedMachine>();
 		JEEventScheduler eventScheduler = new JEEventScheduler();
 		
-		Machine machine1 = new Machine(eventScheduler, 1);
-		Machine machine2 = new Machine(eventScheduler, 2);
+		ProcessorSharedMachine machine1 = new ProcessorSharedMachine(eventScheduler, 1);
+		ProcessorSharedMachine machine2 = new ProcessorSharedMachine(eventScheduler, 2);
 		servers.add(machine1);
 		servers.add(machine2);
 		
@@ -163,7 +163,7 @@ public class ProfitDrivenHeuristicTest {
 		
 		demand = 1000 * 15;//in millis
 		Request request3 = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
-		Machine nextServer = this.heuristic.getNextServer(request3, servers);
+		ProcessorSharedMachine nextServer = this.heuristic.getNextServer(request3, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine2, nextServer);
 	}
@@ -190,9 +190,9 @@ public class ProfitDrivenHeuristicTest {
 		long demand = 1000 * 10;//in millis
 		
 		JEEventScheduler eventScheduler = new JEEventScheduler();
-		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new Machine(eventScheduler, 1);
-		Machine machine2 = new Machine(eventScheduler, 2);
+		ArrayList<ProcessorSharedMachine> servers = new ArrayList<ProcessorSharedMachine>();
+		ProcessorSharedMachine machine1 = new ProcessorSharedMachine(eventScheduler, 1);
+		ProcessorSharedMachine machine2 = new ProcessorSharedMachine(eventScheduler, 2);
 		servers.add(machine1);
 		servers.add(machine2);
 		
@@ -208,7 +208,7 @@ public class ProfitDrivenHeuristicTest {
 		
 		demand = 1000 * 15;//in millis
 		Request request5 = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
-		Machine nextServer = this.heuristic.getNextServer(request5, servers);
+		ProcessorSharedMachine nextServer = this.heuristic.getNextServer(request5, servers);
 		assertNull(nextServer);
 	}
 	
@@ -234,9 +234,9 @@ public class ProfitDrivenHeuristicTest {
 		long demand = 1000 * 15;//in millis
 		
 		JEEventScheduler eventScheduler = new JEEventScheduler();
-		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new Machine(eventScheduler, 1);
-		Machine machine2 = new Machine(eventScheduler, 2);
+		ArrayList<ProcessorSharedMachine> servers = new ArrayList<ProcessorSharedMachine>();
+		ProcessorSharedMachine machine1 = new ProcessorSharedMachine(eventScheduler, 1);
+		ProcessorSharedMachine machine2 = new ProcessorSharedMachine(eventScheduler, 2);
 		servers.add(machine1);
 		servers.add(machine2);
 		
@@ -247,7 +247,7 @@ public class ProfitDrivenHeuristicTest {
 		machine2.sendRequest(request3);
 		
 		Request request5 = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
-		Machine nextServer = this.heuristic.getNextServer(request5, servers);
+		ProcessorSharedMachine nextServer = this.heuristic.getNextServer(request5, servers);
 		assertNull(nextServer);
 	}
 }

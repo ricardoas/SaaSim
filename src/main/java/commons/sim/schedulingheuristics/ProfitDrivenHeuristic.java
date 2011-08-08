@@ -5,6 +5,7 @@ import java.util.List;
 import commons.cloud.Request;
 import commons.config.SimulatorConfiguration;
 import commons.sim.components.Machine;
+import commons.sim.components.ProcessorSharedMachine;
 import commons.util.Triple;
 
 public class ProfitDrivenHeuristic implements SchedulingHeuristic{

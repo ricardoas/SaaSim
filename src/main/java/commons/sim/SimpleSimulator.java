@@ -15,7 +15,7 @@ import commons.io.GEISTWorkloadParser;
 import commons.io.TimeBasedWorkloadParser;
 import commons.io.WorkloadParser;
 import commons.sim.components.LoadBalancer;
-import commons.sim.components.Machine;
+import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventHandler;
@@ -123,15 +123,16 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void addServer(int tier, Machine server) {
-		tiers.get(tier).addServer(server);
+	public void addServer(int tier, MachineDescriptor machineDescriptor) {
+		tiers.get(tier).addServer(machineDescriptor);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void removeServer(int tier, long serverID, boolean force) {
-		tiers.get(tier).removeServer(serverID, force);
+	public void removeServer(int tier, MachineDescriptor machineDescriptor,
+			boolean force) {
+		tiers.get(tier).removeServer(machineDescriptor, force);
 	}
 }

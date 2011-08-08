@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import commons.cloud.Request;
-import commons.sim.components.Machine;
+import commons.sim.components.ProcessorSharedMachine;
 import commons.sim.jeevent.JEEventScheduler;
 
 public class RoundRobinHeuristicTest {
@@ -29,7 +29,7 @@ public class RoundRobinHeuristicTest {
 		EasyMock.replay(request);
 		
 		try{
-			this.heuristic.getNextServer(request, new ArrayList<Machine>());
+			this.heuristic.getNextServer(request, new ArrayList<ProcessorSharedMachine>());
 			fail("Error allocating request to empty set of machines!");
 		}catch(ArithmeticException e){
 		}
@@ -42,12 +42,12 @@ public class RoundRobinHeuristicTest {
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.replay(request);
 		
-		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new Machine(new JEEventScheduler(), 1);
+		ArrayList<ProcessorSharedMachine> servers = new ArrayList<ProcessorSharedMachine>();
+		ProcessorSharedMachine machine = new ProcessorSharedMachine(new JEEventScheduler(), 1);
 		servers.add(machine);
 		
 		//Retrieving for the first time
-		Machine nextServer = this.heuristic.getNextServer(request, servers);
+		ProcessorSharedMachine nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
 		
@@ -72,16 +72,16 @@ public class RoundRobinHeuristicTest {
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.replay(request);
 		
-		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new Machine(new JEEventScheduler(), 1);
-		Machine machine2 = new Machine(new JEEventScheduler(), 2);
-		Machine machine3 = new Machine(new JEEventScheduler(), 3);
+		ArrayList<ProcessorSharedMachine> servers = new ArrayList<ProcessorSharedMachine>();
+		ProcessorSharedMachine machine = new ProcessorSharedMachine(new JEEventScheduler(), 1);
+		ProcessorSharedMachine machine2 = new ProcessorSharedMachine(new JEEventScheduler(), 2);
+		ProcessorSharedMachine machine3 = new ProcessorSharedMachine(new JEEventScheduler(), 3);
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
 		
 		//Retrieving for the first time
-		Machine nextServer = this.heuristic.getNextServer(request, servers);
+		ProcessorSharedMachine nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
 		
