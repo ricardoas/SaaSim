@@ -13,7 +13,7 @@ import commons.util.Triple;
 public class UtilityFunctionTest {
 	
 	private Provider provider;
-	private static final int HOUR_IN_MILLIS = 1000 * 60 * 60;
+	private static final long HOUR_IN_MILLIS = 1000 * 60 * 60;
 	private UtilityFunction utility;
 	private JEEventScheduler scheduler;
 
@@ -122,69 +122,69 @@ public class UtilityFunctionTest {
 		
 		//Adding resources
 		Long mach1ID = 1l;
-		Triple<Double, Double, Double> triple = new Triple<Double, Double, Double>();
-		triple.firstValue = 0d;
-		triple.secondValue = 10d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple = new Triple<Long, Long, Double>();
+		triple.firstValue = 0l;
+		triple.secondValue = 10 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach1ID, triple);
 		
 		Long mach2ID = 2l;
-		Triple<Double, Double, Double> triple2 = new Triple<Double, Double, Double>();
-		triple2.firstValue = 0d;
-		triple2.secondValue = 20d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple2 = new Triple<Long, Long, Double>();
+		triple2.firstValue = 0l;
+		triple2.secondValue = 20 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach2ID, triple2);
 		
 		Long mach3ID = 3l;
-		Triple<Double, Double, Double> triple3 = new Triple<Double, Double, Double>();
-		triple3.firstValue = 1d * HOUR_IN_MILLIS;
-		triple3.secondValue = 16d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple3 = new Triple<Long, Long, Double>();
+		triple3.firstValue = 1 * HOUR_IN_MILLIS;
+		triple3.secondValue = 16 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach3ID, triple3);
 		
 		Long mach4ID = 4l;
-		Triple<Double, Double, Double> triple4 = new Triple<Double, Double, Double>();
-		triple4.firstValue = 15d * HOUR_IN_MILLIS;
-		triple4.secondValue = 30d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple4 = new Triple<Long, Long, Double>();
+		triple4.firstValue = 15 * HOUR_IN_MILLIS;
+		triple4.secondValue = 30 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach4ID, triple4);
 		
 		Long mach5ID = 5l;
-		Triple<Double, Double, Double> triple5 = new Triple<Double, Double, Double>();
-		triple5.firstValue = 0d;
-		triple5.secondValue = 15d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple5 = new Triple<Long, Long, Double>();
+		triple5.firstValue = 0l;
+		triple5.secondValue = 15 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach5ID, triple5);
 		
 		Long mach6ID = 6l;
-		Triple<Double, Double, Double> triple6 = new Triple<Double, Double, Double>();
-		triple6.firstValue = 12.5d * HOUR_IN_MILLIS;
-		triple6.secondValue = 25d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple6 = new Triple<Long, Long, Double>();
+		triple6.firstValue = (long)(12.5d * HOUR_IN_MILLIS);
+		triple6.secondValue = 25 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach6ID, triple6);
 		
 		Long mach7ID = 7l;
-		Triple<Double, Double, Double> triple7 = new Triple<Double, Double, Double>();
-		triple7.firstValue = 0d;
-		triple7.secondValue = 15.23d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple7 = new Triple<Long, Long, Double>();
+		triple7.firstValue = 0l;
+		triple7.secondValue = (long)(15.23d * HOUR_IN_MILLIS);
 		provider.reservedResources.put(mach7ID, triple7);
 		
 		Long mach8ID = 8l;
-		Triple<Double, Double, Double> triple8 = new Triple<Double, Double, Double>();
-		triple8.firstValue = 0d;
-		triple8.secondValue = 18d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple8 = new Triple<Long, Long, Double>();
+		triple8.firstValue = 0l;
+		triple8.secondValue = 18 * HOUR_IN_MILLIS;
 		provider.onDemandResources.put(mach8ID, triple8);
 		
 		Long mach9ID = 9l;
-		Triple<Double, Double, Double> triple9 = new Triple<Double, Double, Double>();
-		triple9.firstValue = 0d;
-		triple9.secondValue = 78.5d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple9 = new Triple<Long, Long, Double>();
+		triple9.firstValue = 0l;
+		triple9.secondValue = (long)(78.5d * HOUR_IN_MILLIS);
 		provider.onDemandResources.put(mach9ID, triple9);
 		
 		Long mach10ID = 10l;
-		Triple<Double, Double, Double> triple10 = new Triple<Double, Double, Double>();
-		triple10.firstValue = 2.4d * HOUR_IN_MILLIS;
-		triple10.secondValue = 3.6d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple10 = new Triple<Long, Long, Double>();
+		triple10.firstValue = (long)(2.4d * HOUR_IN_MILLIS);
+		triple10.secondValue = (long)(3.6d * HOUR_IN_MILLIS);
 		provider.onDemandResources.put(mach10ID, triple10);
 		
 		Long mach11ID = 11l;
-		Triple<Double, Double, Double> triple11 = new Triple<Double, Double, Double>();
-		triple11.firstValue = 0d;
-		triple11.secondValue = 5.14d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple11 = new Triple<Long, Long, Double>();
+		triple11.firstValue = 0l;
+		triple11.secondValue = (long)(5.14d * HOUR_IN_MILLIS);
 		provider.onDemandResources.put(mach11ID, triple11);
 		
 		assertEquals(7 * provider.reservationOneYearFee + 104 * provider.reservedCpuCost + 104 * provider.monitoringCost +
@@ -198,45 +198,45 @@ public class UtilityFunctionTest {
 		
 		//Adding resources
 		Long mach1ID = 1l;
-		Triple<Double, Double, Double> triple = new Triple<Double, Double, Double>();
-		triple.firstValue = 0d;
-		triple.secondValue = 10d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple = new Triple<Long, Long, Double>();
+		triple.firstValue = 0l;
+		triple.secondValue = 10 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach1ID, triple);
 		
 		Long mach2ID = 2l;
-		Triple<Double, Double, Double> triple2 = new Triple<Double, Double, Double>();
-		triple2.firstValue = 10d * HOUR_IN_MILLIS;
-		triple2.secondValue = 30d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple2 = new Triple<Long, Long, Double>();
+		triple2.firstValue = 10 * HOUR_IN_MILLIS;
+		triple2.secondValue = 30 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach2ID, triple2);
 		
 		Long mach3ID = 3l;
-		Triple<Double, Double, Double> triple3 = new Triple<Double, Double, Double>();
-		triple3.firstValue = 0d;
-		triple3.secondValue = 15d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple3 = new Triple<Long, Long, Double>();
+		triple3.firstValue = 0l;
+		triple3.secondValue = 15 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach3ID, triple3);
 		
 		Long mach4ID = 4l;
-		Triple<Double, Double, Double> triple4 = new Triple<Double, Double, Double>();
-		triple4.firstValue = 15d * HOUR_IN_MILLIS;
-		triple4.secondValue = 30d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple4 = new Triple<Long, Long, Double>();
+		triple4.firstValue = 15 * HOUR_IN_MILLIS;
+		triple4.secondValue = 30 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach4ID, triple4);
 		
 		Long mach5ID = 5l;
-		Triple<Double, Double, Double> triple5 = new Triple<Double, Double, Double>();
-		triple5.firstValue = 0d;
-		triple5.secondValue = 15d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple5 = new Triple<Long, Long, Double>();
+		triple5.firstValue = 0l;
+		triple5.secondValue = 15 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach5ID, triple5);
 		
 		Long mach6ID = 6l;
-		Triple<Double, Double, Double> triple6 = new Triple<Double, Double, Double>();
-		triple6.firstValue = 10d * HOUR_IN_MILLIS;
-		triple6.secondValue = 22.5d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple6 = new Triple<Long, Long, Double>();
+		triple6.firstValue = 10 * HOUR_IN_MILLIS;
+		triple6.secondValue = (long)(22.5d * HOUR_IN_MILLIS);
 		provider.reservedResources.put(mach6ID, triple6);
 		
 		Long mach7ID = 7l;
-		Triple<Double, Double, Double> triple7 = new Triple<Double, Double, Double>();
-		triple7.firstValue = 0d;
-		triple7.secondValue = 15.23d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple7 = new Triple<Long, Long, Double>();
+		triple7.firstValue = 0l;
+		triple7.secondValue = (long)(15.23d * HOUR_IN_MILLIS);
 		provider.reservedResources.put(mach7ID, triple7);
 		
 		assertEquals(7 * provider.reservationOneYearFee + 104 * provider.reservedCpuCost + 104 * provider.monitoringCost,
@@ -284,45 +284,45 @@ public class UtilityFunctionTest {
 		
 		//Adding resources
 		Long mach1ID = 1l;
-		Triple<Double, Double, Double> triple = new Triple<Double, Double, Double>();
-		triple.firstValue = 0d;
-		triple.secondValue = 10d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple = new Triple<Long, Long, Double>();
+		triple.firstValue = 0l;
+		triple.secondValue = 10 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach1ID, triple);
 		
 		Long mach2ID = 2l;
-		Triple<Double, Double, Double> triple2 = new Triple<Double, Double, Double>();
-		triple2.firstValue = 0d;
-		triple2.secondValue = 20d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple2 = new Triple<Long, Long, Double>();
+		triple2.firstValue = 0l;
+		triple2.secondValue = 20 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach2ID, triple2);
 		
 		Long mach3ID = 3l;
-		Triple<Double, Double, Double> triple3 = new Triple<Double, Double, Double>();
-		triple3.firstValue = 0d;
-		triple3.secondValue = 15d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple3 = new Triple<Long, Long, Double>();
+		triple3.firstValue = 0l;
+		triple3.secondValue = 15 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach3ID, triple3);
 		
 		Long mach4ID = 4l;
-		Triple<Double, Double, Double> triple4 = new Triple<Double, Double, Double>();
-		triple4.firstValue = 0d;
-		triple4.secondValue = 15d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple4 = new Triple<Long, Long, Double>();
+		triple4.firstValue = 0l;
+		triple4.secondValue = 15 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach4ID, triple4);
 		
 		Long mach5ID = 5l;
-		Triple<Double, Double, Double> triple5 = new Triple<Double, Double, Double>();
-		triple5.firstValue = 0d;
-		triple5.secondValue = 15d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple5 = new Triple<Long, Long, Double>();
+		triple5.firstValue = 0l;
+		triple5.secondValue = 15 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach5ID, triple5);
 		
 		Long mach6ID = 6l;
-		Triple<Double, Double, Double> triple6 = new Triple<Double, Double, Double>();
-		triple6.firstValue = 0d;
-		triple6.secondValue = 12.5d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple6 = new Triple<Long, Long, Double>();
+		triple6.firstValue = 0l;
+		triple6.secondValue = (long)(12.5d * HOUR_IN_MILLIS);
 		provider.reservedResources.put(mach6ID, triple6);
 		
 		Long mach7ID = 7l;
-		Triple<Double, Double, Double> triple7 = new Triple<Double, Double, Double>();
-		triple7.firstValue = 0d;
-		triple7.secondValue = 20d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple7 = new Triple<Long, Long, Double>();
+		triple7.firstValue = 0l;
+		triple7.secondValue = 20 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach7ID, triple7);
 		
 		double cost = 7 * provider.reservationOneYearFee + 108 * provider.reservedCpuCost + 108 * provider.monitoringCost;
@@ -344,70 +344,70 @@ public class UtilityFunctionTest {
 		
 		//Adding reserved resources data
 		Long mach1ID = 1l;
-		Triple<Double, Double, Double> triple = new Triple<Double, Double, Double>();
-		triple.firstValue = 0d;
-		triple.secondValue = 10d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple = new Triple<Long, Long, Double>();
+		triple.firstValue = 0l;
+		triple.secondValue = 10 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach1ID, triple);
 		
 		Long mach2ID = 2l;
-		Triple<Double, Double, Double> triple2 = new Triple<Double, Double, Double>();
-		triple2.firstValue = 0d;
-		triple2.secondValue = 20d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple2 = new Triple<Long, Long, Double>();
+		triple2.firstValue = 0l;
+		triple2.secondValue = 20 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach2ID, triple2);
 		
 		Long mach3ID = 3l;
-		Triple<Double, Double, Double> triple3 = new Triple<Double, Double, Double>();
-		triple3.firstValue = 0d;
-		triple3.secondValue = 15d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple3 = new Triple<Long, Long, Double>();
+		triple3.firstValue = 0l;
+		triple3.secondValue = 15 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach3ID, triple3);
 		
 		Long mach4ID = 4l;
-		Triple<Double, Double, Double> triple4 = new Triple<Double, Double, Double>();
-		triple4.firstValue = 0d;
-		triple4.secondValue = 15d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple4 = new Triple<Long, Long, Double>();
+		triple4.firstValue = 0l;
+		triple4.secondValue = 15 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach4ID, triple4);
 		
 		Long mach5ID = 5l;
-		Triple<Double, Double, Double> triple5 = new Triple<Double, Double, Double>();
-		triple5.firstValue = 0d;
-		triple5.secondValue = 15d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple5 = new Triple<Long, Long, Double>();
+		triple5.firstValue = 0l;
+		triple5.secondValue = 15 * HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach5ID, triple5);
 		
 		Long mach6ID = 6l;
-		Triple<Double, Double, Double> triple6 = new Triple<Double, Double, Double>();
-		triple6.firstValue = 0d;
-		triple6.secondValue = 15.5d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple6 = new Triple<Long, Long, Double>();
+		triple6.firstValue = 0l;
+		triple6.secondValue = (long)(15.5d * HOUR_IN_MILLIS);
 		provider.reservedResources.put(mach6ID, triple6);
 		
 		Long mach7ID = 7l;
-		Triple<Double, Double, Double> triple7 = new Triple<Double, Double, Double>();
-		triple7.firstValue = 0d;
-		triple7.secondValue = 15.23d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple7 = new Triple<Long, Long, Double>();
+		triple7.firstValue = 0l;
+		triple7.secondValue = (long)(15.23d * HOUR_IN_MILLIS);
 		provider.reservedResources.put(mach7ID, triple7);
 		
 		//On-demand resources data
 		Long mach8ID = 8l;
-		Triple<Double, Double, Double> triple8 = new Triple<Double, Double, Double>();
-		triple8.firstValue = 0d;
-		triple8.secondValue = 18d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple8 = new Triple<Long, Long, Double>();
+		triple8.firstValue = 0l;
+		triple8.secondValue = 18 * HOUR_IN_MILLIS;
 		provider.onDemandResources.put(mach8ID, triple8);
 		
 		Long mach9ID = 9l;
-		Triple<Double, Double, Double> triple9 = new Triple<Double, Double, Double>();
-		triple9.firstValue = 0d;
-		triple9.secondValue = 78.5d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple9 = new Triple<Long, Long, Double>();
+		triple9.firstValue = 0l;
+		triple9.secondValue = (long)(78.5d * HOUR_IN_MILLIS);
 		provider.onDemandResources.put(mach9ID, triple9);
 		
 		Long mach10ID = 10l;
-		Triple<Double, Double, Double> triple10 = new Triple<Double, Double, Double>();
-		triple10.firstValue = 0d;
-		triple10.secondValue = 1.2d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple10 = new Triple<Long, Long, Double>();
+		triple10.firstValue = 0l;
+		triple10.secondValue = (long)(1.2d * HOUR_IN_MILLIS);
 		provider.onDemandResources.put(mach10ID, triple10);
 		
 		Long mach11ID = 11l;
-		Triple<Double, Double, Double> triple11 = new Triple<Double, Double, Double>();
-		triple11.firstValue = 0d;
-		triple11.secondValue = 5.14d * HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple11 = new Triple<Long, Long, Double>();
+		triple11.firstValue = 0l;
+		triple11.secondValue = (long)(5.14d * HOUR_IN_MILLIS);
 		provider.onDemandResources.put(mach11ID, triple11);
 		
 		double cost = 7 * provider.reservationOneYearFee + 107 * provider.reservedCpuCost + 107 * provider.monitoringCost 
