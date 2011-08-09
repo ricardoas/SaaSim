@@ -1,7 +1,7 @@
 package commons.sim.components;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import commons.cloud.Request;
 import commons.config.SimulatorConfiguration;
@@ -15,22 +15,24 @@ import commons.sim.jeevent.JEEventType;
  * used to store requests waiting for a thread.
  * 
  * @author David Candeia
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public class RanjanMachine extends ProcessorSharedMachine {
+public class RanjanMachine extends TimeSharedMachine {
+	
+	private Queue<Request> backlog;
 	
 	protected long maximumNumberOfSimultaneousThreads;
 	protected long backlogMaximumNumberOfRequests;
-	private List<Request> backlog;//This list represents the set of requests waiting to be processed by a thread in this server
 	
 	/**
 	 * @see commons.sim.components.ProcessorSharedMachine
 	 */
 	public RanjanMachine(JEEventScheduler scheduler, MachineDescriptor descriptor, LoadBalancer loadBalancer){
 		super(scheduler, descriptor, loadBalancer);
+		this.backlog = new LinkedList<Request>();
 		this.maximumNumberOfSimultaneousThreads = SimulatorConfiguration.getInstance().getMaximumNumberOfThreadsPerMachine();
 		this.backlogMaximumNumberOfRequests = SimulatorConfiguration.getInstance().getMaximumBacklogSize();
-		this.backlog = new ArrayList<Request>();
 	}
 	
 	/**
@@ -38,63 +40,33 @@ public class RanjanMachine extends ProcessorSharedMachine {
 	 */
 	@Override
 	public void sendRequest(Request request) {
-		if(this.queue.size() < this.maximumNumberOfSimultaneousThreads){//Can process new request
+		if(hasTokenLeft()){
 			super.sendRequest(request);
-		}else{//Number of maximum threads allowed was alreay achieved!
-			if(this.backlog.size() < this.backlogMaximumNumberOfRequests){//Request can be added to backlog
-				this.backlog.add(request);
-			}else{//Request missed!
-				send(new JEEvent(JEEventType.REQUESTQUEUED, this.loadBalancer, getScheduler().now(), request));
-			}
+		}else if(canWaitForToken()){
+			this.backlog.add(request);
+		}else{
+			send(new JEEvent(JEEventType.REQUESTQUEUED, getLoadBalancer(), getScheduler().now(), request));
 		}
 	}
+
+	private boolean hasTokenLeft() {
+		return processorQueue.size() < maximumNumberOfSimultaneousThreads;
+	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
+	private boolean canWaitForToken() {
+		return this.backlog.size() < backlogMaximumNumberOfRequests;
+	}
+	
 	@Override
-	public void handleEvent(JEEvent event) {
-		switch (event.getType()) {
-			case REQUEST_FINISHED:
-				updateFinishedDemand();
-	
-				Request requestFinished = (Request) event.getValue()[0];
-				
-				queue.remove(requestFinished);
-				this.numberOfRequestsCompletionsInPreviousInterval++;
-				
-				getLoadBalancer().reportRequestFinished(requestFinished);//Asking for accounting of a finished request
-	
-				//Since a request finished, now requests from backlog can be transferred to queue to be processed
-				while(this.queue.size() < this.maximumNumberOfSimultaneousThreads && this.backlog.size() > 0){
-					this.queue.add(this.backlog.remove(0));
-				}
-				
-				if (!queue.isEmpty()) {
-					Request nextToFinish = queue.get(0);
-					for (Request request : queue) {
-						if (request.getTotalToProcess() < nextToFinish.getTotalToProcess()) {
-							nextToFinish = request;
-						}
-					}
-					send(new JEEvent(JEEventType.REQUEST_FINISHED, this,
-							calcEstimatedFinishTime(nextToFinish, queue.size()),
-							nextToFinish));
-				}else{
-					if(shutdownOnFinish){
-						send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, getScheduler().now(), this));
-					}
-				}
-				break;
+	protected void requestFinished(Request request) {
+		if(!backlog.isEmpty()){
+			processorQueue.add(backlog.poll());
 		}
+		super.requestFinished(request);
 	}
 	
 	@Override
 	public double computeUtilisation(long currentTime){
-		return ((double)this.queue.size()) / this.maximumNumberOfSimultaneousThreads;
-	}
-
-	public List<Request> getBacklog(){
-		return this.backlog;
+		return ((double)processorQueue.size()) / this.maximumNumberOfSimultaneousThreads;
 	}
 }

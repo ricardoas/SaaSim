@@ -3,8 +3,11 @@ package commons.sim.components;
 import static org.junit.Assert.*;
 
 import java.util.List;
+import java.util.Queue;
 
+import org.easymock.Capture;
 import org.easymock.EasyMock;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
@@ -19,50 +22,44 @@ import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(JEEventScheduler.class)
+@PrepareForTest({JEEventScheduler.class, SimulatorConfiguration.class})
 public class RanjanMachineTest {
 	
-	private static final long DEFAULT_BACKLOG_SIZE = 100;
-	private static final long DEFAULT_MAX_NUM_OF_THREADS = 10;
+	private static final long DEFAULT_BACKLOG_SIZE = 5;
+	private static final long DEFAULT_MAX_NUM_OF_THREADS = 3;
 	
-	private RanjanMachine machine;
-	private JEEventScheduler scheduler;
-	private SimulatorConfiguration config;
-	
-	@PrepareForTest(SimulatorConfiguration.class)
+	private MachineDescriptor descriptor;
+
+	@Before
+	public void setUp() throws Exception {
+		this.descriptor = new MachineDescriptor(1, false, 0);
+	}
+
 	@Test
-	public void construction() throws Exception{
-		scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
+	public void testConstructor(){
 		
-		config = EasyMock.createStrictMock(SimulatorConfiguration.class);
+		JEEventScheduler scheduler = new JEEventScheduler();
+		
+		SimulatorConfiguration config = mockConfiguration();
+		
+		PowerMock.replayAll(config);
+		
+		Machine machine = new RanjanMachine(scheduler, descriptor, null);
+		assertEquals(descriptor, machine.getDescriptor());
+		assertNull(machine.getLoadBalancer());
+		assertNotNull(machine.getProcessorQueue());
+		assertTrue(machine.getProcessorQueue().isEmpty());
+		
+		PowerMock.verifyAll();
+	}
+
+	private SimulatorConfiguration mockConfiguration() {
+		SimulatorConfiguration config = EasyMock.createStrictMock(SimulatorConfiguration.class);
 		PowerMock.mockStatic(SimulatorConfiguration.class);
 		EasyMock.expect(SimulatorConfiguration.getInstance()).andReturn(config).times(2);
 		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(DEFAULT_MAX_NUM_OF_THREADS);
 		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(DEFAULT_BACKLOG_SIZE);
-		
-		PowerMock.replay(SimulatorConfiguration.class);
-		EasyMock.replay(scheduler, config);
-		
-		int machineID = 1;
-		machine = new RanjanMachine(scheduler, new MachineDescriptor(machineID, false, 0), null);
-		
-		assertNotNull(machine.getBacklog());
-		assertEquals(0, machine.getBacklog().size());
-		assertEquals(machineID, machine.getMachineID());
-		assertNull(machine.getLoadBalancer());
-		assertNotNull(machine.getQueue());
-		assertEquals(0, machine.getQueue().size());
-		assertEquals(0, machine.getTotalProcessed(), 0.0);
-		assertFalse(machine.isReserved);
-		assertFalse(machine.shutdownOnFinish);
-		assertNull(machine.nextFinishEvent);
-		assertEquals(0, machine.numberOfRequestsArrivalsInPreviousInterval);
-		assertEquals(0, machine.numberOfRequestsCompletionsInPreviousInterval);
-		assertEquals(DEFAULT_MAX_NUM_OF_THREADS, machine.maximumNumberOfSimultaneousThreads);
-		assertEquals(DEFAULT_BACKLOG_SIZE, machine.backlogMaximumNumberOfRequests);
-		
-		PowerMock.verify(SimulatorConfiguration.class);
-		EasyMock.verify(scheduler, config);
+		return config;
 	}
 	
 	/**
@@ -70,98 +67,142 @@ public class RanjanMachineTest {
 	 * processing requests, since the limit of threads is not reached
 	 * @throws Exception 
 	 */
-	@PrepareForTest(SimulatorConfiguration.class)
 	@Test
-	public void sendRequestWithEmptyServer() throws Exception{
+	public void sendBigRequestWithEmptyServer(){
 		
-		config = EasyMock.createStrictMock(SimulatorConfiguration.class);
-		PowerMock.mockStatic(SimulatorConfiguration.class);
-		EasyMock.expect(SimulatorConfiguration.getInstance()).andReturn(config).times(2);
-		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(DEFAULT_MAX_NUM_OF_THREADS);
-		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(DEFAULT_BACKLOG_SIZE);
+		SimulatorConfiguration config = mockConfiguration();
 		
-		scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(0L)).times(3);
+		JEEventScheduler scheduler = new JEEventScheduler();
 		
+		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getDemand()).andReturn(600000L).once();
-		PowerMock.replay(SimulatorConfiguration.class);
-		EasyMock.replay(request, scheduler, config);
+		EasyMock.expect(request.getTotalToProcess()).andReturn(5000L);
 		
-		machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
+		PowerMock.replayAll(config);
+		
+		Machine machine = PowerMock.createStrictPartialMock(RanjanMachine.class, new String[]{"handleEvent"}, scheduler, descriptor, loadBalancer);
+		Capture<JEEvent> captured = new Capture<JEEvent>();
+		machine.handleEvent(EasyMock.capture(captured));
+		EasyMock.expectLastCall();
+		
+		PowerMock.replay(loadBalancer, request, machine);
+		
 		machine.sendRequest(request);
-		
-		List<Request> queue = machine.getQueue();
-		
+		Queue<Request> queue = machine.getProcessorQueue();
+		assertNotNull(queue);
 		assertFalse(queue.isEmpty());
-		assertEquals(request, queue.get(0));
-		PowerMock.verify(SimulatorConfiguration.class);
-		EasyMock.verify(request, scheduler, config);
+		
+		scheduler.start();
+		
+		JEEvent event = captured.getValue();
+		assertNotNull(event);
+		assertEquals(JEEventType.PREEMPTION, event.getType());
+		assertEquals(new JETime(100L), event.getScheduledTime());
+		
+		PowerMock.verifyAll();
 	}
 	
-	/**
-	 * This method verifies that two identical requests are correctly added to a machine since the limit of
-	 * threads is not reached
-	 * @throws Exception 
-	 */
-	@PrepareForTest(SimulatorConfiguration.class)
 	@Test
-	public void sendTwoIdenticalRequestsAtSameTime() throws Exception{
-		
-		config = EasyMock.createStrictMock(SimulatorConfiguration.class);
-		PowerMock.mockStatic(SimulatorConfiguration.class);
-		EasyMock.expect(SimulatorConfiguration.getInstance()).andReturn(config).times(2);
-		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(DEFAULT_MAX_NUM_OF_THREADS);
-		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(DEFAULT_BACKLOG_SIZE);
-		
-		scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(7);
+	public void testSendSmallRequestWithEmptyMachine() throws Exception{
 
+		SimulatorConfiguration config = mockConfiguration();
+		
+		JEEventScheduler scheduler = new JEEventScheduler();
+		
+		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		Request request = EasyMock.createStrictMock(Request.class);
+		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
+		
+		PowerMock.replayAll(config);
+		
+		Machine machine = PowerMock.createStrictPartialMock(RanjanMachine.class, new String[]{"handleEvent"}, scheduler, descriptor, loadBalancer);
+		Capture<JEEvent> captured = new Capture<JEEvent>();
+		machine.handleEvent(EasyMock.capture(captured));
+		EasyMock.expectLastCall();
+		
+		EasyMock.replay(loadBalancer, request, machine);
+		
+		machine.sendRequest(request);
+		Queue<Request> queue = machine.getProcessorQueue();
+		assertNotNull(queue);
+		assertFalse(queue.isEmpty());
+		
+		scheduler.start();
+		
+		JEEvent event = captured.getValue();
+		assertNotNull(event);
+		assertEquals(JEEventType.PREEMPTION, event.getType());
+		assertEquals(new JETime(50L), event.getScheduledTime());
+		
+		PowerMock.verifyAll();
+	}
+
+	@Test
+	public void testSendTwoRequestWithEmptyMachine(){
+		SimulatorConfiguration config = mockConfiguration();
+		
+		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(firstRequest.getDemand()).andReturn(600000L).once();
-		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(600000L).times(2);
-
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(5000L);
 		Request secondRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(secondRequest.getDemand()).andReturn(600000L).once();
-		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(600000L).once();
 		
-		PowerMock.replay(SimulatorConfiguration.class);
-		EasyMock.replay(scheduler, firstRequest, secondRequest, config);
+		PowerMock.replayAll(config, loadBalancer, firstRequest, secondRequest);
 		
-		machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
+		Machine machine = new RanjanMachine(new JEEventScheduler(), descriptor, loadBalancer);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
-		
-		List<Request> queue = machine.getQueue();
-		
+		Queue<Request> queue = machine.getProcessorQueue();
+		assertNotNull(queue);
 		assertFalse(queue.isEmpty());
-		Request firstRequestAtQueue = queue.get(0);
-		assertEquals(firstRequest, firstRequestAtQueue);
-		assertEquals(600000L, firstRequestAtQueue.getTotalToProcess());
+		assertEquals(firstRequest, queue.poll());
+		assertEquals(secondRequest, queue.poll());
 		
-		Request secondRequestAtQueue = queue.get(1);
-		assertEquals(secondRequest, secondRequestAtQueue);
-		assertEquals(600000L, secondRequestAtQueue.getTotalToProcess());
-		
-		PowerMock.verify(SimulatorConfiguration.class);
-		EasyMock.verify(scheduler, firstRequest, secondRequest, config);
+		PowerMock.verify();
 	}
-	
+
+	@Test
+	public void testSendMoreRequestThanCanRun(){
+		SimulatorConfiguration config = mockConfiguration();
+		
+		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		Request firstRequest = EasyMock.createStrictMock(Request.class);
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(5000L);
+		Request secondRequest = EasyMock.createStrictMock(Request.class);
+		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(5000L);
+		Request thirdRequest = EasyMock.createStrictMock(Request.class);
+		EasyMock.expect(thirdRequest.getTotalToProcess()).andReturn(5000L);
+		Request fourthRequest = EasyMock.createStrictMock(Request.class);
+		
+		PowerMock.replayAll(config, loadBalancer, firstRequest, secondRequest, thirdRequest, fourthRequest);
+		
+		Machine machine = new RanjanMachine(new JEEventScheduler(), descriptor, loadBalancer);
+		machine.sendRequest(firstRequest);
+		machine.sendRequest(secondRequest);
+		machine.sendRequest(thirdRequest);
+		machine.sendRequest(fourthRequest);
+		Queue<Request> queue = machine.getProcessorQueue();
+		assertNotNull(queue);
+		assertFalse(queue.isEmpty());
+		assertEquals(firstRequest, queue.poll());
+		assertEquals(secondRequest, queue.poll());
+		assertEquals(thirdRequest, queue.poll());
+		assertNull(queue.poll());
+		
+		PowerMock.verify();
+	}
+
 	/**
 	 * This method verifies that two different requests are correctly added to a machine since the limit of
 	 * threads is not reached
 	 * @throws Exception 
 	 */
-	@PrepareForTest(SimulatorConfiguration.class)
 	@Test
 	public void sendDifferentRequestsAtSameTime() throws Exception{
-		config = EasyMock.createStrictMock(SimulatorConfiguration.class);
-		PowerMock.mockStatic(SimulatorConfiguration.class);
-		EasyMock.expect(SimulatorConfiguration.getInstance()).andReturn(config).times(2);
+		SimulatorConfiguration config = mockConfiguration();
 		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(DEFAULT_MAX_NUM_OF_THREADS);
 		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(DEFAULT_BACKLOG_SIZE);
 		
-		scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
+		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(7);
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
@@ -174,17 +215,17 @@ public class RanjanMachineTest {
 		PowerMock.replay(SimulatorConfiguration.class);
 		EasyMock.replay(scheduler, firstRequest, secondRequest, config);
 		
-		machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
+		Machine machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
 		
-		List<Request> queue = machine.getQueue();
+		Queue<Request> queue = machine.getProcessorQueue();
 		
 		assertFalse(queue.isEmpty());
-		Request firstRequestAtQueue = queue.get(0);
+		Request firstRequestAtQueue = queue.poll();
 		assertEquals(firstRequest, firstRequestAtQueue);
 		
-		Request secondRequestAtQueue = queue.get(1);
+		Request secondRequestAtQueue = queue.poll();
 		assertEquals(secondRequest, secondRequestAtQueue);
 		
 		PowerMock.verify(SimulatorConfiguration.class);
@@ -197,16 +238,13 @@ public class RanjanMachineTest {
 	 * part of the first request is processed and both requests remain in the processing queue.
 	 * @throws Exception 
 	 */
-	@PrepareForTest(SimulatorConfiguration.class)
 	@Test
 	public void sendTwoIdenticalRequestsAtDifferentOverlappingTimes() throws Exception{
-		config = EasyMock.createStrictMock(SimulatorConfiguration.class);
-		PowerMock.mockStatic(SimulatorConfiguration.class);
-		EasyMock.expect(SimulatorConfiguration.getInstance()).andReturn(config).times(2);
+		SimulatorConfiguration config = mockConfiguration();
 		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(DEFAULT_MAX_NUM_OF_THREADS);
 		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(DEFAULT_BACKLOG_SIZE);
 		
-		scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
+		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(3);
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(100000L)).times(4);
 
@@ -222,18 +260,18 @@ public class RanjanMachineTest {
 		PowerMock.replay(SimulatorConfiguration.class);
 		EasyMock.replay(scheduler, firstRequest, secondRequest, config);
 		
-		machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
+		Machine machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
 
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
 		
-		List<Request> queue = machine.getQueue();
+		Queue<Request> queue = machine.getProcessorQueue();
 		
 		assertFalse(queue.isEmpty());
-		Request firstRequestAtQueue = queue.get(0);
+		Request firstRequestAtQueue = queue.poll();
 		assertEquals(firstRequest, firstRequestAtQueue);
 		
-		Request secondRequestAtQueue = queue.get(1);
+		Request secondRequestAtQueue = queue.poll();
 		assertEquals(secondRequest, secondRequestAtQueue);
 		
 		PowerMock.verify(SimulatorConfiguration.class);
@@ -246,18 +284,15 @@ public class RanjanMachineTest {
 	 * to a backlog to be processed later.
 	 * @throws Exception
 	 */
-	@PrepareForTest(SimulatorConfiguration.class)
 	@Test
 	public void sendMoreRequestsThanMaxNumberOfThreads() throws Exception{
 		long localMaxNumberOfThreads = 1l;
 		
-		config = EasyMock.createStrictMock(SimulatorConfiguration.class);
-		PowerMock.mockStatic(SimulatorConfiguration.class);
-		EasyMock.expect(SimulatorConfiguration.getInstance()).andReturn(config).times(2);
+		SimulatorConfiguration config = mockConfiguration();
 		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(localMaxNumberOfThreads);
 		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(DEFAULT_BACKLOG_SIZE);
 		
-		scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
+		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(3);
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
@@ -268,17 +303,17 @@ public class RanjanMachineTest {
 		PowerMock.replay(SimulatorConfiguration.class);
 		EasyMock.replay(scheduler, firstRequest, secondRequest, config);
 		
-		machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
+		Machine machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
 
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
 		
 		//Verifying queue of requests that are being processed
-		List<Request> queue = machine.getQueue();
+		Queue<Request> queue = machine.getProcessorQueue();
 		
 		assertFalse(queue.isEmpty());
 		assertEquals(1, queue.size());
-		Request firstRequestAtQueue = queue.get(0);
+		Request firstRequestAtQueue = queue.poll();
 		assertEquals(firstRequest, firstRequestAtQueue);
 		
 		//Verifying backlog
@@ -297,19 +332,16 @@ public class RanjanMachineTest {
 	 * request is simply thrown away.
 	 * @throws Exception
 	 */
-	@PrepareForTest(SimulatorConfiguration.class)
 	@Test
 	public void sendMoreRequestsThanMaxNumberOfThreadsAndBacklog() throws Exception{
 		long localMaxNumberOfThreads = 1l;
 		long backlogSize = 0l;
 		
-		config = EasyMock.createStrictMock(SimulatorConfiguration.class);
-		PowerMock.mockStatic(SimulatorConfiguration.class);
-		EasyMock.expect(SimulatorConfiguration.getInstance()).andReturn(config).times(2);
+		SimulatorConfiguration config = mockConfiguration();
 		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(localMaxNumberOfThreads);
 		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(backlogSize);
 		
-		scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
+		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(5);
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
@@ -323,17 +355,17 @@ public class RanjanMachineTest {
 		PowerMock.replay(SimulatorConfiguration.class);
 		EasyMock.replay(scheduler, firstRequest, secondRequest, config, loadBalancer);
 		
-		machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
+		Machine machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
 		machine.setLoadBalancer(loadBalancer);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
 		
 		//Verifying queue of requests that are being processed
-		List<Request> queue = machine.getQueue();
+		Queue<Request> queue = machine.getProcessorQueue();
 		
 		assertFalse(queue.isEmpty());
 		assertEquals(1, queue.size());
-		Request firstRequestAtQueue = queue.get(0);
+		Request firstRequestAtQueue = queue.poll();
 		assertEquals(firstRequest, firstRequestAtQueue);
 		
 		//Verifying backlog
@@ -350,19 +382,16 @@ public class RanjanMachineTest {
 	 * collected and added to the current processing queue.
 	 * @throws Exception
 	 */
-	@PrepareForTest(SimulatorConfiguration.class)
 	@Test
 	public void finishRequestAndAllowsAnotherRequestToBeProcessed() throws Exception{
 		long localMaxNumberOfThreads = 1l;
 		long backlogSize = 1l;
 		
-		config = EasyMock.createStrictMock(SimulatorConfiguration.class);
-		PowerMock.mockStatic(SimulatorConfiguration.class);
-		EasyMock.expect(SimulatorConfiguration.getInstance()).andReturn(config).times(2);
+		SimulatorConfiguration config = mockConfiguration();
 		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(localMaxNumberOfThreads);
 		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(backlogSize);
 		
-		scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
+		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(3);
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(60000L)).times(3);
 
@@ -382,17 +411,16 @@ public class RanjanMachineTest {
 		PowerMock.replay(SimulatorConfiguration.class);
 		EasyMock.replay(scheduler, firstRequest, secondRequest, config, loadBalancer);
 		
-		machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
-		machine.setLoadBalancer(loadBalancer);
+		Machine machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), loadBalancer);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
 		
 		//Verifying queue of requests that are being processed
-		List<Request> queue = machine.getQueue();
+		Queue<Request> queue = machine.getProcessorQueue();
 		
 		assertFalse(queue.isEmpty());
 		assertEquals(1, queue.size());
-		Request firstRequestAtQueue = queue.get(0);
+		Request firstRequestAtQueue = queue.poll();
 		assertEquals(firstRequest, firstRequestAtQueue);
 		
 		//Verifying backlog
@@ -414,11 +442,11 @@ public class RanjanMachineTest {
 		EasyMock.verify(scheduler, firstRequest, secondRequest, config, loadBalancer, event);
 		
 		//Verifying queue of requests that are being processed
-		queue = machine.getQueue();
+		queue = machine.getProcessorQueue();
 		
 		assertFalse(queue.isEmpty());
 		assertEquals(1, queue.size());
-		firstRequestAtQueue = queue.get(0);
+		firstRequestAtQueue = queue.poll();
 		assertEquals(secondRequest, firstRequestAtQueue);
 		
 		//Verifying backlog
@@ -432,19 +460,16 @@ public class RanjanMachineTest {
 	 * this test, the maximum number of threads and the current number of threads executing are equal.
 	 * @throws Exception
 	 */
-	@PrepareForTest(SimulatorConfiguration.class)
 	@Test
 	public void computeUtilizationWithThreadLimitReached() throws Exception{
 		long localMaxNumberOfThreads = 1l;
 		long backlogSize = 1l;
 		
-		config = EasyMock.createStrictMock(SimulatorConfiguration.class);
-		PowerMock.mockStatic(SimulatorConfiguration.class);
-		EasyMock.expect(SimulatorConfiguration.getInstance()).andReturn(config).times(2);
+		SimulatorConfiguration config = mockConfiguration();
 		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(localMaxNumberOfThreads);
 		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(backlogSize);
 		
-		scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
+		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(3);
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(60000L)).times(3);
 
@@ -464,8 +489,7 @@ public class RanjanMachineTest {
 		PowerMock.replay(SimulatorConfiguration.class);
 		EasyMock.replay(scheduler, firstRequest, secondRequest, config, loadBalancer);
 		
-		machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
-		machine.setLoadBalancer(loadBalancer);
+		Machine machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), loadBalancer);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
 		
@@ -494,16 +518,13 @@ public class RanjanMachineTest {
 	 * this test, the maximum number of threads and the current number of threads executing are different.
 	 * @throws Exception
 	 */
-	@PrepareForTest(SimulatorConfiguration.class)
 	@Test
 	public void computeUtilizationWithThreadLimitNotReached() throws Exception{
-		config = EasyMock.createStrictMock(SimulatorConfiguration.class);
-		PowerMock.mockStatic(SimulatorConfiguration.class);
-		EasyMock.expect(SimulatorConfiguration.getInstance()).andReturn(config).times(2);
+		SimulatorConfiguration config = mockConfiguration();
 		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(DEFAULT_MAX_NUM_OF_THREADS);
 		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(DEFAULT_BACKLOG_SIZE);
 		
-		scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
+		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(0L)).times(7);
 		
 		Request request = EasyMock.createStrictMock(Request.class);
@@ -512,7 +533,7 @@ public class RanjanMachineTest {
 		PowerMock.replay(SimulatorConfiguration.class);
 		EasyMock.replay(request, scheduler, config);
 		
-		machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
+		Machine machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
 		machine.sendRequest(request);
 		
 		//Verifying utilization

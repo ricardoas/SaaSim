@@ -20,7 +20,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	private static final long DEFAULT_QUANTUM = 100;
 
 	private final LoadBalancer loadBalancer;
-	private final Queue<Request> processorQueue;
+	protected final Queue<Request> processorQueue;
 	private final MachineDescriptor descriptor;
 	private final long cpuQuantumInMilis;
 	private boolean shutdownOnFinish;
@@ -120,7 +120,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 			request.update(processedDemand);
 			
 			if(request.isFinished()){
-				getLoadBalancer().reportRequestFinished(request);
+				requestFinished(request);
 			}else{
 				processorQueue.add(request);
 			}
@@ -135,6 +135,10 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 			
 			break;
 		}
+	}
+
+	protected void requestFinished(Request request) {
+		getLoadBalancer().reportRequestFinished(request);
 	}
 
 	/**
