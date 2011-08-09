@@ -1,17 +1,25 @@
 package commons.sim.components;
 
 
+/**
+ * Machine information.
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ */
 public class MachineDescriptor {
 	
 	private final long machineID;
 	private final boolean reserved;
+	private final long startTimeInMillis;
 
 	/**
-	 * @param machineID
+	 * Default constructor.
+	 * @param machineID Machine unique ID.
+	 * @param reserved A {@link Boolean} value indicating if this machine has been bought on reservation market.
 	 */
-	public MachineDescriptor(long machineID) {
+	public MachineDescriptor(long machineID, boolean reserved, long startTimeInMillis) {
 		this.machineID = machineID;
-		this.reserved = false;
+		this.reserved = reserved;
+		this.startTimeInMillis = startTimeInMillis;
 	}
 
 	public long getMachineID() {
@@ -20,6 +28,10 @@ public class MachineDescriptor {
 	
 	public boolean isReserved() {
 		return reserved;
+	}
+	
+	public long getStartTimeInMillis() {
+		return startTimeInMillis;
 	}
 
 	@Override

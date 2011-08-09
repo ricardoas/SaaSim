@@ -68,10 +68,11 @@ public class DynamicProvisioningSystem extends JEAbstractEventHandler implements
 		}
 		
 		for (int i = 0; i < totalServers; i++) {
-			machines.add(new MachineDescriptor(availableIDs++));
+			MachineDescriptor descriptor = new MachineDescriptor(availableIDs++, i < 20, getScheduler().now().timeMilliSeconds);
+			machines.add(descriptor);
 			
 			//Registering machines for accounting
-			this.accountingSystem.createMachine(availableIDs-1, i < 20, getScheduler().now().timeMilliSeconds);
+			this.accountingSystem.createMachine(descriptor);
 		}
 		return machines;
 	}

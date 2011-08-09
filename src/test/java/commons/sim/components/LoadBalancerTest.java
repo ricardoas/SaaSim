@@ -40,12 +40,12 @@ public class LoadBalancerTest {
 	/**
 	 * Scheduling a new request with one machine artificially chosen by the heuristic
 	 */
-	@SuppressWarnings("unchecked")
 	@Test
 	public void handleEventNewRequestWithOneMachine(){
 		Request request = EasyMock.createStrictMock(Request.class);
 		JEEvent event = EasyMock.createStrictMock(JEEvent.class);
-		ProcessorSharedMachine machine = EasyMock.createStrictMock(ProcessorSharedMachine.class);
+		MachineDescriptor descriptor = EasyMock.createStrictMock(MachineDescriptor.class);
+		Machine machine = EasyMock.createStrictMock(Machine.class);
 		this.schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
 		
 		EasyMock.expect(event.getType()).andReturn(JEEventType.NEWREQUEST).once();
@@ -55,12 +55,12 @@ public class LoadBalancerTest {
 				EasyMock.isA(Request.class) , EasyMock.isA(List.class))).andReturn(machine);
 		machine.sendRequest(request);
 		
-		EasyMock.replay(event, schedulingHeuristic, machine, request);
+		EasyMock.replay(event, schedulingHeuristic, descriptor, request, machine);
 		
-		lb = new LoadBalancer(eventScheduler, null, schedulingHeuristic, Integer.MAX_VALUE, machine);
+		lb = new LoadBalancer(eventScheduler, null, schedulingHeuristic, Integer.MAX_VALUE, descriptor);
 		lb.handleEvent(event);
 		
-		EasyMock.verify(event, schedulingHeuristic, machine, request);
+		EasyMock.verify(event, schedulingHeuristic, descriptor, request, machine);
 	}
 	
 	/**

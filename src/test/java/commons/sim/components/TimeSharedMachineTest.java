@@ -31,7 +31,7 @@ public class TimeSharedMachineTest {
 
 	@Before
 	public void setUp() throws Exception {
-		this.descriptor = new MachineDescriptor(1);
+		this.descriptor = new MachineDescriptor(1, false, 0);
 	}
 
 	@After

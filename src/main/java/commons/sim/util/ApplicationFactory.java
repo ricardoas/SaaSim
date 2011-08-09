@@ -9,7 +9,6 @@ import provisioning.Monitor;
 import commons.config.SimulatorConfiguration;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.MachineDescriptor;
-import commons.sim.components.ProcessorSharedMachine;
 import commons.sim.jeevent.JEEventScheduler;
 
 /**

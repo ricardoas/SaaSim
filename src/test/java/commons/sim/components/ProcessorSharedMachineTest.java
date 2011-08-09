@@ -19,7 +19,7 @@ import commons.sim.jeevent.JETime;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(JEEventScheduler.class)
-public class MachineTest {
+public class ProcessorSharedMachineTest {
 	
 	private ProcessorSharedMachine machine;
 	private long ONE_MINUTE_IN_MILLIS = 1000 * 60;
@@ -35,7 +35,7 @@ public class MachineTest {
 		EasyMock.replay(scheduler);
 		
 		long machineID = 1l;
-		machine = new ProcessorSharedMachine(scheduler, machineID);
+		machine = new ProcessorSharedMachine(scheduler, new MachineDescriptor(machineID, false, 0), null);
 		
 		EasyMock.verify(scheduler);
 		
@@ -64,7 +64,8 @@ public class MachineTest {
 		EasyMock.expect(request.getDemand()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
 		EasyMock.replay(request, scheduler);
 		
-		machine = new ProcessorSharedMachine(scheduler, 1);
+		long machineID = 1l;
+		machine = new ProcessorSharedMachine(scheduler, new MachineDescriptor(machineID, true, 0), null);
 		machine.sendRequest(request);
 		
 		List<Request> queue = machine.getQueue();
@@ -94,7 +95,8 @@ public class MachineTest {
 
 		EasyMock.replay(scheduler, firstRequest, secondRequest);
 		
-		machine = new ProcessorSharedMachine(scheduler, 1);
+		long machineID = 1l;
+		machine = new ProcessorSharedMachine(scheduler, new MachineDescriptor(machineID, true, 0), null);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
 		
@@ -131,7 +133,8 @@ public class MachineTest {
 
 		EasyMock.replay(scheduler, firstRequest, secondRequest);
 		
-		machine = new ProcessorSharedMachine(scheduler, 1);
+		long machineID = 1l;
+		machine = new ProcessorSharedMachine(scheduler, new MachineDescriptor(machineID, true, 0), null);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
 
@@ -170,7 +173,8 @@ public class MachineTest {
 
 		EasyMock.replay(scheduler, firstRequest, secondRequest);
 		
-		machine = new ProcessorSharedMachine(scheduler, 1);
+		long machineID = 1l;
+		machine = new ProcessorSharedMachine(scheduler, new MachineDescriptor(machineID, true, 0), null);
 
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
@@ -220,7 +224,8 @@ public class MachineTest {
 		
 		EasyMock.replay(scheduler, firstRequest, secondRequest, thirdRequest);
 		
-		machine = new ProcessorSharedMachine(scheduler, 1);
+		long machineID = 1l;
+		machine = new ProcessorSharedMachine(scheduler, new MachineDescriptor(machineID, true, 0), null);
 
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
@@ -262,7 +267,8 @@ public class MachineTest {
 		
 		EasyMock.replay(request, scheduler, loadBalancer);
 		
-		machine = new ProcessorSharedMachine(scheduler, 1);
+		long machineID = 1l;
+		machine = new ProcessorSharedMachine(scheduler, new MachineDescriptor(machineID, true, 0), null);
 		machine.setLoadBalancer(loadBalancer);
 		machine.sendRequest(request);
 		
@@ -310,7 +316,8 @@ public class MachineTest {
 		
 		EasyMock.replay(scheduler, firstRequest, secondRequest, loadBalancer);
 		
-		machine = new ProcessorSharedMachine(scheduler, 1);
+		long machineID = 1l;
+		machine = new ProcessorSharedMachine(scheduler, new MachineDescriptor(machineID, true, 0), null);
 		machine.setLoadBalancer(loadBalancer);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
@@ -350,7 +357,8 @@ public class MachineTest {
 		
 		EasyMock.replay(scheduler, firstRequest, secondRequest, loadBalancer);
 		
-		machine = new ProcessorSharedMachine(scheduler, 1);
+		long machineID = 1l;
+		machine = new ProcessorSharedMachine(scheduler, new MachineDescriptor(machineID, true, 0), null);
 		machine.setLoadBalancer(loadBalancer);
 		assertEquals(0, machine.getQueue().size());
 
@@ -379,7 +387,7 @@ public class MachineTest {
 		
 		//Without requests arriving machine is not busy
 		long machineID = 1l;
-		machine = new ProcessorSharedMachine(scheduler, machineID);
+		machine = new ProcessorSharedMachine(scheduler, new MachineDescriptor(machineID, true, 0), null);
 		assertFalse(machine.isBusy());
 		
 		EasyMock.verify(scheduler);
@@ -400,7 +408,8 @@ public class MachineTest {
 		EasyMock.replay(request, scheduler);
 		
 		//After requests arriving, machine becomes busy
-		machine = new ProcessorSharedMachine(scheduler, 1);
+		long machineID = 1l;
+		machine = new ProcessorSharedMachine(scheduler, new MachineDescriptor(machineID, true, 0), null);
 		
 		assertFalse(machine.isBusy());
 		machine.sendRequest(request);
@@ -429,7 +438,8 @@ public class MachineTest {
 		
 		EasyMock.replay(request, scheduler, loadBalancer);
 		
-		machine = new ProcessorSharedMachine(scheduler, 1);
+		long machineID = 1l;
+		machine = new ProcessorSharedMachine(scheduler, new MachineDescriptor(machineID, true, 0), null);
 		machine.setLoadBalancer(loadBalancer);
 		assertFalse(machine.isBusy());
 		machine.sendRequest(request);
@@ -477,7 +487,8 @@ public class MachineTest {
 		
 		EasyMock.replay(scheduler, firstRequest, secondRequest, loadBalancer);
 		
-		machine = new ProcessorSharedMachine(scheduler, 1);
+		long machineID = 1l;
+		machine = new ProcessorSharedMachine(scheduler, new MachineDescriptor(machineID, true, 0), null);
 		machine.setLoadBalancer(loadBalancer);
 		
 		assertFalse(machine.isBusy());

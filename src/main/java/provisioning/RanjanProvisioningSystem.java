@@ -2,6 +2,7 @@ package provisioning;
 
 import java.util.Iterator;
 
+import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.provisioningheuristics.RanjanStatistics;
@@ -71,16 +72,17 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 	private void evaluateMachinesToBeAdded() {
 		boolean canAddAReservedMachine = this.accountingSystem.canAddAReservedMachine();
 		boolean canAddAOnDemandMachine = this.accountingSystem.canAddAOnDemandMachine();
-		MachineFactory machineFactory = MachineFactory.getInstance();
 		
 		if(canAddAReservedMachine){
-			this.configurable.addServer(0, machineFactory.createMachine(getScheduler(), availableIDs++, canAddAReservedMachine));
+			MachineDescriptor descriptor = new MachineDescriptor(availableIDs++, canAddAReservedMachine, getScheduler().now().timeMilliSeconds);
+			this.configurable.addServer(0, descriptor);
 			//Registering machines for accounting
-			this.accountingSystem.createMachine(availableIDs-1, canAddAReservedMachine, getScheduler().now().timeMilliSeconds);
+			this.accountingSystem.createMachine(descriptor);
 		}else if(canAddAOnDemandMachine){
-			this.configurable.addServer(0, machineFactory.createMachine(getScheduler(), availableIDs++, canAddAOnDemandMachine));
+			MachineDescriptor descriptor = new MachineDescriptor(availableIDs++, canAddAReservedMachine, getScheduler().now().timeMilliSeconds);
+			this.configurable.addServer(0, descriptor);
 			//Registering machines for accounting
-			this.accountingSystem.createMachine(availableIDs-1, canAddAReservedMachine, getScheduler().now().timeMilliSeconds);
+			this.accountingSystem.createMachine(descriptor);
 		}
 	}
 }

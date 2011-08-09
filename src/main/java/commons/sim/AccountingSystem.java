@@ -10,6 +10,7 @@ import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
 import commons.cloud.UtilityFunction;
+import commons.sim.components.MachineDescriptor;
 import commons.util.Triple;
 
 public class AccountingSystem {
@@ -86,16 +87,16 @@ public class AccountingSystem {
 		}
 	}
 
-	public void createMachine(long machineID, boolean isReserved, double machineStartTimeInMillis) {
-		if(isReserved){
-			this.reservedMachinesIDs.add(machineID);
+	public void createMachine(MachineDescriptor descriptor) {
+		if(descriptor.isReserved()){
+			this.reservedMachinesIDs.add(descriptor.getMachineID());
 		}else{
-			this.onDemandMachinesIDs.add(machineID);
+			this.onDemandMachinesIDs.add(descriptor.getMachineID());
 		}
 		
 		Triple machineData = new Triple();
-		machineData.firstValue = machineStartTimeInMillis;
-		this.machineUtilization.put(machineID, machineData);
+		machineData.firstValue = descriptor.getStartTimeInMillis();
+		this.machineUtilization.put(descriptor.getMachineID(), machineData);
 	}
 
 	public boolean canAddAReservedMachine() {

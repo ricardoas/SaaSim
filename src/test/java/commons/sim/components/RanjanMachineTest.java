@@ -44,7 +44,7 @@ public class RanjanMachineTest {
 		EasyMock.replay(scheduler, config);
 		
 		int machineID = 1;
-		machine = new RanjanMachine(scheduler, machineID);
+		machine = new RanjanMachine(scheduler, new MachineDescriptor(machineID, false, 0), null);
 		
 		assertNotNull(machine.getBacklog());
 		assertEquals(0, machine.getBacklog().size());
@@ -88,7 +88,7 @@ public class RanjanMachineTest {
 		PowerMock.replay(SimulatorConfiguration.class);
 		EasyMock.replay(request, scheduler, config);
 		
-		machine = new RanjanMachine(scheduler, 1);
+		machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
 		machine.sendRequest(request);
 		
 		List<Request> queue = machine.getQueue();
@@ -128,7 +128,7 @@ public class RanjanMachineTest {
 		PowerMock.replay(SimulatorConfiguration.class);
 		EasyMock.replay(scheduler, firstRequest, secondRequest, config);
 		
-		machine = new RanjanMachine(scheduler, 1);
+		machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
 		
@@ -174,7 +174,7 @@ public class RanjanMachineTest {
 		PowerMock.replay(SimulatorConfiguration.class);
 		EasyMock.replay(scheduler, firstRequest, secondRequest, config);
 		
-		machine = new RanjanMachine(scheduler, 1);
+		machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
 		
@@ -222,7 +222,7 @@ public class RanjanMachineTest {
 		PowerMock.replay(SimulatorConfiguration.class);
 		EasyMock.replay(scheduler, firstRequest, secondRequest, config);
 		
-		machine = new RanjanMachine(scheduler, 1);
+		machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
 
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
@@ -268,7 +268,7 @@ public class RanjanMachineTest {
 		PowerMock.replay(SimulatorConfiguration.class);
 		EasyMock.replay(scheduler, firstRequest, secondRequest, config);
 		
-		machine = new RanjanMachine(scheduler, 1);
+		machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
 
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
@@ -323,7 +323,7 @@ public class RanjanMachineTest {
 		PowerMock.replay(SimulatorConfiguration.class);
 		EasyMock.replay(scheduler, firstRequest, secondRequest, config, loadBalancer);
 		
-		machine = new RanjanMachine(scheduler, 1);
+		machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
 		machine.setLoadBalancer(loadBalancer);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
@@ -382,7 +382,7 @@ public class RanjanMachineTest {
 		PowerMock.replay(SimulatorConfiguration.class);
 		EasyMock.replay(scheduler, firstRequest, secondRequest, config, loadBalancer);
 		
-		machine = new RanjanMachine(scheduler, 1);
+		machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
 		machine.setLoadBalancer(loadBalancer);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
@@ -464,7 +464,7 @@ public class RanjanMachineTest {
 		PowerMock.replay(SimulatorConfiguration.class);
 		EasyMock.replay(scheduler, firstRequest, secondRequest, config, loadBalancer);
 		
-		machine = new RanjanMachine(scheduler, 1);
+		machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
 		machine.setLoadBalancer(loadBalancer);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
@@ -512,7 +512,7 @@ public class RanjanMachineTest {
 		PowerMock.replay(SimulatorConfiguration.class);
 		EasyMock.replay(request, scheduler, config);
 		
-		machine = new RanjanMachine(scheduler, 1);
+		machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
 		machine.sendRequest(request);
 		
 		//Verifying utilization
