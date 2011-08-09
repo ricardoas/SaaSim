@@ -4,8 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import provisioning.RanjanProvisioningSystem;
-
 import commons.cloud.Request;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;

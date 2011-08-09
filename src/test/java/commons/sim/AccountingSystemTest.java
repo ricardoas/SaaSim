@@ -14,7 +14,6 @@ import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
 import commons.sim.components.MachineDescriptor;
-import commons.sim.components.ProcessorSharedMachine;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.util.Triple;
 
