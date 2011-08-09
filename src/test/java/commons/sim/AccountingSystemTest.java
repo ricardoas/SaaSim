@@ -13,6 +13,7 @@ import commons.cloud.Contract;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
+import commons.sim.components.MachineDescriptor;
 import commons.sim.components.ProcessorSharedMachine;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.util.Triple;
@@ -20,7 +21,7 @@ import commons.util.Triple;
 
 public class AccountingSystemTest {
 	
-	private double ONE_HOUR_IN_MILLIS = 1000 * 60 * 60; 
+	private long ONE_HOUR_IN_MILLIS = 1000 * 60 * 60; 
 	
 	@Test
 	public void testCreateAccountingWithInvalidReservationData(){
@@ -48,7 +49,7 @@ public class AccountingSystemTest {
 		boolean isReserved = true;
 
 		AccountingSystem acc = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		acc.createMachine(machineID, isReserved, 0);
+		acc.createMachine(new MachineDescriptor(machineID, isReserved, 0));
 		
 		Class cls;
 		try {
@@ -68,10 +69,10 @@ public class AccountingSystemTest {
 			
 			//Checking that machine start times where registered
 			fld = cls.getDeclaredField("machineUtilization");
-			Map<Long, Triple> machineUtilization = (Map<Long, Triple>) fld.get(acc);
+			Map<Long, Triple<Long, Long, Double>> machineUtilization = (Map<Long, Triple<Long, Long, Double>>) fld.get(acc);
 			assertNotNull(machineUtilization);
 			assertEquals(1, machineUtilization.size());
-			assertEquals(0.0, machineUtilization.get(machineID).firstValue);
+			assertEquals(0, (long)machineUtilization.get(machineID).firstValue);
 			assertNull(machineUtilization.get(machineID).secondValue);
 			assertNull(machineUtilization.get(machineID).thirdValue);
 			
@@ -96,7 +97,7 @@ public class AccountingSystemTest {
 		boolean isReserved = false;
 
 		AccountingSystem acc = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		acc.createMachine(machineID, isReserved, 0);
+		acc.createMachine(new MachineDescriptor(machineID, isReserved, 0));
 		
 		Class cls;
 		try {
@@ -116,15 +117,15 @@ public class AccountingSystemTest {
 			
 			//Checking that machine start times where registered
 			fld = cls.getDeclaredField("machineUtilization");
-			Map<Long, Triple> machineUtilization = (Map<Long, Triple>) fld.get(acc);
+			Map<Long, Triple<Long, Long, Double>> machineUtilization = (Map<Long, Triple<Long, Long, Double>>) fld.get(acc);
 			assertNotNull(machineUtilization);
 			assertEquals(1, machineUtilization.size());
-			assertEquals(0.0, machineUtilization.get(machineID).firstValue);
+			assertEquals(0, (long)machineUtilization.get(machineID).firstValue);
 			assertNull(machineUtilization.get(machineID).secondValue);
 			assertNull(machineUtilization.get(machineID).thirdValue);
 			
 			//Creating a second machine
-			acc.createMachine(machineID+1, false, 10000);
+			acc.createMachine(new MachineDescriptor(machineID+1, false, 10000));
 			
 			//Checking reserved machines created
 			fld = cls.getDeclaredField("reservedMachinesIDs");
@@ -142,13 +143,13 @@ public class AccountingSystemTest {
 			
 			//Checking that machine start times where registered
 			fld = cls.getDeclaredField("machineUtilization");
-			machineUtilization = (Map<Long, Triple>) fld.get(acc);
+			machineUtilization = (Map<Long, Triple<Long, Long, Double>>) fld.get(acc);
 			assertNotNull(machineUtilization);
 			assertEquals(2, machineUtilization.size());
-			assertEquals(0.0, machineUtilization.get(machineID).firstValue);
+			assertEquals(0, (long)machineUtilization.get(machineID).firstValue);
 			assertNull(machineUtilization.get(machineID).secondValue);
 			assertNull(machineUtilization.get(machineID).thirdValue);
-			assertEquals(10000.0, machineUtilization.get(machineID+1).firstValue);
+			assertEquals(10000, (long)machineUtilization.get(machineID+1).firstValue);
 			assertNull(machineUtilization.get(machineID+1).secondValue);
 			assertNull(machineUtilization.get(machineID+1).thirdValue);
 			
@@ -173,8 +174,10 @@ public class AccountingSystemTest {
 		boolean isReserved = false;
 
 		AccountingSystem acc = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		acc.createMachine(machineID, isReserved, 0);
-		acc.createMachine(machineID+1, !isReserved, ONE_HOUR_IN_MILLIS * 2);
+		acc.createMachine(new MachineDescriptor(machineID, isReserved, 0));
+		acc.createMachine(new MachineDescriptor(machineID+1, !isReserved, ONE_HOUR_IN_MILLIS * 2));
+//		acc.createMachine(machineID, isReserved, 0);
+//		acc.createMachine(machineID+1, !isReserved, ONE_HOUR_IN_MILLIS * 2);
 		
 		//Finishing machine
 		acc.reportMachineFinish(machineID, ONE_HOUR_IN_MILLIS);
@@ -184,21 +187,21 @@ public class AccountingSystemTest {
 			//Verifying machine status
 			Class cls = Class.forName("commons.sim.AccountingSystem");
 			Field fld = cls.getDeclaredField("machineUtilization");
-			Map<Long, Triple> machineUtilization = (Map<Long, Triple>) fld.get(acc);
-			assertEquals(0.0, machineUtilization.get(machineID).firstValue);
-			assertEquals(ONE_HOUR_IN_MILLIS, machineUtilization.get(machineID).secondValue);
+			Map<Long, Triple<Long, Long, Double>> machineUtilization = (Map<Long, Triple<Long, Long, Double>>) fld.get(acc);
+			assertEquals(0, (long)machineUtilization.get(machineID).firstValue);
+			assertEquals(ONE_HOUR_IN_MILLIS, (long)machineUtilization.get(machineID).secondValue);
 			
-			assertEquals(ONE_HOUR_IN_MILLIS * 2, machineUtilization.get(machineID+1).firstValue);
+			assertEquals(ONE_HOUR_IN_MILLIS * 2, (long)machineUtilization.get(machineID+1).firstValue);
 			assertNull(machineUtilization.get(machineID+1).secondValue);
 			
 			//Finishing second machine
 			acc.reportMachineFinish(machineID+1, ONE_HOUR_IN_MILLIS * 100);
-			machineUtilization = (Map<Long, Triple>) fld.get(acc);
-			assertEquals(0.0, machineUtilization.get(machineID).firstValue);
-			assertEquals(ONE_HOUR_IN_MILLIS, machineUtilization.get(machineID).secondValue);
+			machineUtilization = (Map<Long, Triple<Long, Long, Double>>) fld.get(acc);
+			assertEquals(0, (long)machineUtilization.get(machineID).firstValue);
+			assertEquals(ONE_HOUR_IN_MILLIS, (long)machineUtilization.get(machineID).secondValue);
 			
-			assertEquals(ONE_HOUR_IN_MILLIS * 2, machineUtilization.get(machineID+1).firstValue);
-			assertEquals(ONE_HOUR_IN_MILLIS * 100, machineUtilization.get(machineID+1).secondValue);
+			assertEquals(ONE_HOUR_IN_MILLIS * 2, (long)machineUtilization.get(machineID+1).firstValue);
+			assertEquals(ONE_HOUR_IN_MILLIS * 100, (long)machineUtilization.get(machineID+1).secondValue);
 			
 		} catch (ClassNotFoundException e) {
 			fail("Valid scenario!");
@@ -221,7 +224,8 @@ public class AccountingSystemTest {
 		boolean isReserved = false;
 
 		AccountingSystem acc = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		acc.createMachine(machineID, isReserved, 0);
+		acc.createMachine(new MachineDescriptor(machineID, isReserved, 0));
+//		acc.createMachine(machineID, isReserved, 0);
 		
 		//Finishing inexistent machine
 		try{
@@ -248,16 +252,21 @@ public class AccountingSystemTest {
 		assertTrue(acc.canAddAReservedMachine());
 		
 		//Adding a number of machines below limits defined: 2 reserved machines, 1 on-demand
-		acc.createMachine(machineID, isReserved, 0);
-		acc.createMachine(machineID+1, isReserved, ONE_HOUR_IN_MILLIS);
-		acc.createMachine(machineID+2, !isReserved, ONE_HOUR_IN_MILLIS * 2);
+		acc.createMachine(new MachineDescriptor(machineID, isReserved, 0));
+		acc.createMachine(new MachineDescriptor(machineID+1, isReserved, ONE_HOUR_IN_MILLIS));
+		acc.createMachine(new MachineDescriptor(machineID+2, !isReserved, ONE_HOUR_IN_MILLIS * 2));
+//		acc.createMachine(machineID, isReserved, 0);
+//		acc.createMachine(machineID+1, isReserved, ONE_HOUR_IN_MILLIS);
+//		acc.createMachine(machineID+2, !isReserved, ONE_HOUR_IN_MILLIS * 2);
 		
 		assertTrue(acc.canAddAOnDemandMachine());
 		assertTrue(acc.canAddAReservedMachine());
 		
 		//Adding machines that reaches limits: 1 reserved, 1 on-demand
-		acc.createMachine(machineID+3, isReserved, ONE_HOUR_IN_MILLIS * 1.5);
-		acc.createMachine(machineID+4, !isReserved, ONE_HOUR_IN_MILLIS * 2.5);
+		acc.createMachine(new MachineDescriptor(machineID+3, isReserved, (long)(ONE_HOUR_IN_MILLIS * 1.5)));
+		acc.createMachine(new MachineDescriptor(machineID, !isReserved, (long)(ONE_HOUR_IN_MILLIS * 2.5)));
+//		acc.createMachine(machineID+3, isReserved, ONE_HOUR_IN_MILLIS * 1.5);
+//		acc.createMachine(machineID+4, !isReserved, ONE_HOUR_IN_MILLIS * 2.5);
 		
 		assertFalse(acc.canAddAOnDemandMachine());
 		assertFalse(acc.canAddAReservedMachine());
@@ -273,16 +282,26 @@ public class AccountingSystemTest {
 		AccountingSystem acc = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
 		
 		//Adding a number of machines that reaches limits defined: 2 reserved machines, 1 on-demand
-		acc.createMachine(machineID, isReserved, 0);
-		acc.createMachine(machineID+1, isReserved, ONE_HOUR_IN_MILLIS * 0.5);
-		acc.createMachine(machineID+2, isReserved, ONE_HOUR_IN_MILLIS);
-		acc.createMachine(machineID+3, isReserved, ONE_HOUR_IN_MILLIS * 1.5);
-		acc.createMachine(machineID+4, !isReserved, ONE_HOUR_IN_MILLIS * 2);
-		acc.createMachine(machineID+5, !isReserved, ONE_HOUR_IN_MILLIS * 2.5);
-		acc.createMachine(machineID+6, !isReserved, ONE_HOUR_IN_MILLIS * 3);
-		acc.createMachine(machineID+7, !isReserved, ONE_HOUR_IN_MILLIS * 3);
-		acc.createMachine(machineID+8, !isReserved, ONE_HOUR_IN_MILLIS * 3.5);
-		acc.createMachine(machineID+9, !isReserved, ONE_HOUR_IN_MILLIS * 7);
+		acc.createMachine(new MachineDescriptor(machineID, isReserved, 0));
+		acc.createMachine(new MachineDescriptor(machineID+1, isReserved, (long)(ONE_HOUR_IN_MILLIS * 0.5)));
+		acc.createMachine(new MachineDescriptor(machineID+2, isReserved, (long)(ONE_HOUR_IN_MILLIS)));
+		acc.createMachine(new MachineDescriptor(machineID+3, isReserved, (long)(ONE_HOUR_IN_MILLIS * 1.5)));
+		acc.createMachine(new MachineDescriptor(machineID+4, !isReserved, (long)(ONE_HOUR_IN_MILLIS * 2)));
+		acc.createMachine(new MachineDescriptor(machineID+5, !isReserved, (long)(ONE_HOUR_IN_MILLIS * 2.5)));
+		acc.createMachine(new MachineDescriptor(machineID+6, !isReserved, (long)(ONE_HOUR_IN_MILLIS * 3)));
+		acc.createMachine(new MachineDescriptor(machineID+7, !isReserved, (long)(ONE_HOUR_IN_MILLIS * 3)));
+		acc.createMachine(new MachineDescriptor(machineID+8, !isReserved, (long)(ONE_HOUR_IN_MILLIS * 3.5)));
+		acc.createMachine(new MachineDescriptor(machineID+9, !isReserved, (long)(ONE_HOUR_IN_MILLIS * 7)));
+//		acc.createMachine(machineID, isReserved, 0);
+//		acc.createMachine(machineID+1, isReserved, ONE_HOUR_IN_MILLIS * 0.5);
+//		acc.createMachine(machineID+2, isReserved, ONE_HOUR_IN_MILLIS);
+//		acc.createMachine(machineID+3, isReserved, ONE_HOUR_IN_MILLIS * 1.5);
+//		acc.createMachine(machineID+4, !isReserved, ONE_HOUR_IN_MILLIS * 2);
+//		acc.createMachine(machineID+5, !isReserved, ONE_HOUR_IN_MILLIS * 2.5);
+//		acc.createMachine(machineID+6, !isReserved, ONE_HOUR_IN_MILLIS * 3);
+//		acc.createMachine(machineID+7, !isReserved, ONE_HOUR_IN_MILLIS * 3);
+//		acc.createMachine(machineID+8, !isReserved, ONE_HOUR_IN_MILLIS * 3.5);
+//		acc.createMachine(machineID+9, !isReserved, ONE_HOUR_IN_MILLIS * 7);
 		
 		//Verifying that no more machines can be added
 		assertFalse(acc.canAddAOnDemandMachine());
@@ -290,7 +309,7 @@ public class AccountingSystemTest {
 		
 		//Finishing some reserved machines
 		acc.reportMachineFinish(machineID, ONE_HOUR_IN_MILLIS * 9);
-		acc.reportMachineFinish(machineID+3, ONE_HOUR_IN_MILLIS * 9.5);
+		acc.reportMachineFinish(machineID+3, (long)(ONE_HOUR_IN_MILLIS * 9.5));
 		
 		assertFalse(acc.canAddAOnDemandMachine());
 		assertTrue(acc.canAddAReservedMachine());
@@ -311,8 +330,10 @@ public class AccountingSystemTest {
 		boolean isReserved = false;
 
 		AccountingSystem acc = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		acc.createMachine(machineID, isReserved, 0);
-		acc.createMachine(machineID+1, !isReserved, ONE_HOUR_IN_MILLIS * 2);
+		acc.createMachine(new MachineDescriptor(machineID, isReserved, 0));
+		acc.createMachine(new MachineDescriptor(machineID+1, !isReserved, ONE_HOUR_IN_MILLIS * 2));
+//		acc.createMachine(machineID, isReserved, 0);
+//		acc.createMachine(machineID+1, !isReserved, ONE_HOUR_IN_MILLIS * 2);
 		
 		//Verifying utilization for machines not finished
 		try{
@@ -336,8 +357,10 @@ public class AccountingSystemTest {
 		boolean isReserved = false;
 
 		AccountingSystem acc = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		acc.createMachine(machineID, isReserved, 0);
-		acc.createMachine(machineID+1, !isReserved, ONE_HOUR_IN_MILLIS * 2);
+		acc.createMachine(new MachineDescriptor(machineID, isReserved, 0));
+		acc.createMachine(new MachineDescriptor(machineID+1, !isReserved, ONE_HOUR_IN_MILLIS * 2));
+//		acc.createMachine(machineID, isReserved, 0);
+//		acc.createMachine(machineID+1, !isReserved, ONE_HOUR_IN_MILLIS * 2);
 		
 		acc.reportMachineFinish(machineID, ONE_HOUR_IN_MILLIS * 10);
 		acc.reportMachineFinish(machineID+1, ONE_HOUR_IN_MILLIS * 7);
@@ -355,8 +378,10 @@ public class AccountingSystemTest {
 		boolean isReserved = false;
 
 		AccountingSystem acc = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		acc.createMachine(machineID, isReserved, 0);
-		acc.createMachine(machineID+1, !isReserved, ONE_HOUR_IN_MILLIS * 2);
+		acc.createMachine(new MachineDescriptor(machineID, isReserved, 0));
+		acc.createMachine(new MachineDescriptor(machineID+1, !isReserved, ONE_HOUR_IN_MILLIS * 2));
+//		acc.createMachine(machineID, isReserved, 0);
+//		acc.createMachine(machineID+1, !isReserved, ONE_HOUR_IN_MILLIS * 2);
 		
 		//Verifying utilization for inexistent machines
 		assertEquals(0, acc.getMachineUtilization(100), 0.0);
@@ -537,69 +562,69 @@ public class AccountingSystemTest {
 		
 		//Adding reserved resources
 		Long machine1ID = 1l;
-		Triple<Double, Double, Double> triple = new Triple<Double, Double, Double>();
-		triple.firstValue = 0d;
-		triple.secondValue = 10d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple = new Triple<Long, Long, Double>();
+		triple.firstValue = 0l;
+		triple.secondValue = 10 * ONE_HOUR_IN_MILLIS;
 		provider.reservedResources.put(machine1ID, triple);
 		
 		Long machine2ID = 2l;
-		Triple<Double, Double, Double> triple2 = new Triple<Double, Double, Double>();
-		triple2.firstValue = 10d * ONE_HOUR_IN_MILLIS;
-		triple2.secondValue = 30d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple2 = new Triple<Long, Long, Double>();
+		triple2.firstValue = 10 * ONE_HOUR_IN_MILLIS;
+		triple2.secondValue = 30 * ONE_HOUR_IN_MILLIS;
 		provider.reservedResources.put(machine2ID, triple2);
 		
 		Long machine3ID = 3l;
-		Triple<Double, Double, Double> triple3 = new Triple<Double, Double, Double>();
-		triple3.firstValue = 1d * ONE_HOUR_IN_MILLIS;
-		triple3.secondValue = 16d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple3 = new Triple<Long, Long, Double>();
+		triple3.firstValue = 1 * ONE_HOUR_IN_MILLIS;
+		triple3.secondValue = 16 * ONE_HOUR_IN_MILLIS;
 		provider.reservedResources.put(machine3ID, triple3);
 		
 		Long machine4ID = 4l;
-		Triple<Double, Double, Double> triple4 = new Triple<Double, Double, Double>();
-		triple4.firstValue = 50d * ONE_HOUR_IN_MILLIS;
-		triple4.secondValue = 65d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple4 = new Triple<Long, Long, Double>();
+		triple4.firstValue = 50 * ONE_HOUR_IN_MILLIS;
+		triple4.secondValue = 65 * ONE_HOUR_IN_MILLIS;
 		provider.reservedResources.put(machine4ID, triple4);
 		
 		Long machine5ID = 5l;
-		Triple<Double, Double, Double> triple5 = new Triple<Double, Double, Double>();
-		triple5.firstValue = 0d;
-		triple5.secondValue = 15d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple5 = new Triple<Long, Long, Double>();
+		triple5.firstValue = 0l;
+		triple5.secondValue = 15 * ONE_HOUR_IN_MILLIS;
 		provider.reservedResources.put(machine5ID, triple5);
 		
 		Long machine6ID = 6l;
-		Triple<Double, Double, Double> triple6 = new Triple<Double, Double, Double>();
-		triple6.firstValue = 11.5d * ONE_HOUR_IN_MILLIS;
-		triple6.secondValue = 24d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple6 = new Triple<Long, Long, Double>();
+		triple6.firstValue = (long)(11.5 * ONE_HOUR_IN_MILLIS);
+		triple6.secondValue = 24 * ONE_HOUR_IN_MILLIS;
 		provider.reservedResources.put(machine6ID, triple6);
 		
 		Long machine7ID = 7l;
-		Triple<Double, Double, Double> triple7 = new Triple<Double, Double, Double>();
-		triple7.firstValue = 0d;
-		triple7.secondValue = 15.23d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple7 = new Triple<Long, Long, Double>();
+		triple7.firstValue = 0l;
+		triple7.secondValue = (long)(15.23 * ONE_HOUR_IN_MILLIS);
 		provider.reservedResources.put(machine7ID, triple7);
 		
 		Long machine8ID = 8l;
-		Triple<Double, Double, Double> triple8 = new Triple<Double, Double, Double>();
-		triple8.firstValue = 18d * ONE_HOUR_IN_MILLIS;
-		triple8.secondValue = 36d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple8 = new Triple<Long, Long, Double>();
+		triple8.firstValue = 18 * ONE_HOUR_IN_MILLIS;
+		triple8.secondValue = 36 * ONE_HOUR_IN_MILLIS;
 		provider.onDemandResources.put(machine8ID, triple8);
 		
 		Long machine9ID = 9l;
-		Triple<Double, Double, Double> triple9 = new Triple<Double, Double, Double>();
-		triple9.firstValue = 0d;
-		triple9.secondValue = 78.5d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple9 = new Triple<Long, Long, Double>();
+		triple9.firstValue = 0l;
+		triple9.secondValue = (long)(78.5 * ONE_HOUR_IN_MILLIS);
 		provider.onDemandResources.put(machine9ID, triple9);
 		
 		Long machine10ID = 10l;
-		Triple<Double, Double, Double> triple10 = new Triple<Double, Double, Double>();
-		triple10.firstValue = 2.4d * ONE_HOUR_IN_MILLIS;
-		triple10.secondValue = 3.6d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple10 = new Triple<Long, Long, Double>();
+		triple10.firstValue = (long)(2.4 * ONE_HOUR_IN_MILLIS);
+		triple10.secondValue = (long)(3.6d * ONE_HOUR_IN_MILLIS);
 		provider.onDemandResources.put(machine10ID, triple10);
 		
 		Long machine11ID = 11l;
-		Triple<Double, Double, Double> triple11 = new Triple<Double, Double, Double>();
-		triple11.firstValue = 0d;
-		triple11.secondValue = 5.14d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple11 = new Triple<Long, Long, Double>();
+		triple11.firstValue = 0l;
+		triple11.secondValue = (long)(5.14d * ONE_HOUR_IN_MILLIS);
 		provider.onDemandResources.put(machine11ID, triple11);
 		
 		//Verifying total cost
@@ -680,70 +705,70 @@ public class AccountingSystemTest {
 		
 		//Adding reserved resources data
 		Long mach1ID = 1l;
-		Triple<Double, Double, Double> triple = new Triple<Double, Double, Double>();
-		triple.firstValue = 0d;
-		triple.secondValue = 10d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple = new Triple<Long, Long, Double>();
+		triple.firstValue = 0l;
+		triple.secondValue = 10 * ONE_HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach1ID, triple);
 		
 		Long mach2ID = 2l;
-		Triple<Double, Double, Double> triple2 = new Triple<Double, Double, Double>();
-		triple2.firstValue = 0d;
-		triple2.secondValue = 20d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple2 = new Triple<Long, Long, Double>();
+		triple2.firstValue = 0l;
+		triple2.secondValue = 20 * ONE_HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach2ID, triple2);
 		
 		Long mach3ID = 3l;
-		Triple<Double, Double, Double> triple3 = new Triple<Double, Double, Double>();
-		triple3.firstValue = 0d;
-		triple3.secondValue = 15d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple3 = new Triple<Long, Long, Double>();
+		triple3.firstValue = 0l;
+		triple3.secondValue = 15 * ONE_HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach3ID, triple3);
 		
 		Long mach4ID = 4l;
-		Triple<Double, Double, Double> triple4 = new Triple<Double, Double, Double>();
-		triple4.firstValue = 0d;
-		triple4.secondValue = 15d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple4 = new Triple<Long, Long, Double>();
+		triple4.firstValue = 0l;
+		triple4.secondValue = 15 * ONE_HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach4ID, triple4);
 		
 		Long mach5ID = 5l;
-		Triple<Double, Double, Double> triple5 = new Triple<Double, Double, Double>();
-		triple5.firstValue = 0d;
-		triple5.secondValue = 15d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple5 = new Triple<Long, Long, Double>();
+		triple5.firstValue = 0l;
+		triple5.secondValue = 15 * ONE_HOUR_IN_MILLIS;
 		provider.reservedResources.put(mach5ID, triple5);
 		
 		Long mach6ID = 6l;
-		Triple<Double, Double, Double> triple6 = new Triple<Double, Double, Double>();
-		triple6.firstValue = 0d;
-		triple6.secondValue = 15.5d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple6 = new Triple<Long, Long, Double>();
+		triple6.firstValue = 0l;
+		triple6.secondValue = (long)(15.5d * ONE_HOUR_IN_MILLIS);
 		provider.reservedResources.put(mach6ID, triple6);
 		
 		Long mach7ID = 7l;
-		Triple<Double, Double, Double> triple7 = new Triple<Double, Double, Double>();
-		triple7.firstValue = 0d;
-		triple7.secondValue = 15.23d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple7 = new Triple<Long, Long, Double>();
+		triple7.firstValue = 0l;
+		triple7.secondValue = (long)(15.23d * ONE_HOUR_IN_MILLIS);
 		provider.reservedResources.put(mach7ID, triple7);
 		
 		//On-demand resources data
 		Long mach8ID = 8l;
-		Triple<Double, Double, Double> triple8 = new Triple<Double, Double, Double>();
-		triple8.firstValue = 0d;
-		triple8.secondValue = 18d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple8 = new Triple<Long, Long, Double>();
+		triple8.firstValue = 0l;
+		triple8.secondValue = 18 * ONE_HOUR_IN_MILLIS;
 		provider.onDemandResources.put(mach8ID, triple8);
 		
 		Long mach9ID = 9l;
-		Triple<Double, Double, Double> triple9 = new Triple<Double, Double, Double>();
-		triple9.firstValue = 0d;
-		triple9.secondValue = 78.5d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple9 = new Triple<Long, Long, Double>();
+		triple9.firstValue = 0l;
+		triple9.secondValue = (long)(78.5d * ONE_HOUR_IN_MILLIS);
 		provider.onDemandResources.put(mach9ID, triple9);
 		
 		Long mach10ID = 10l;
-		Triple<Double, Double, Double> triple10 = new Triple<Double, Double, Double>();
-		triple10.firstValue = 0d;
-		triple10.secondValue = 1.2d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple10 = new Triple<Long, Long, Double>();
+		triple10.firstValue = 0l;
+		triple10.secondValue = (long)(1.2d * ONE_HOUR_IN_MILLIS);
 		provider.onDemandResources.put(mach10ID, triple10);
 		
 		Long mach11ID = 11l;
-		Triple<Double, Double, Double> triple11 = new Triple<Double, Double, Double>();
-		triple11.firstValue = 0d;
-		triple11.secondValue = 5.14d * ONE_HOUR_IN_MILLIS;
+		Triple<Long, Long, Double> triple11 = new Triple<Long, Long, Double>();
+		triple11.firstValue = 0l;
+		triple11.secondValue = (long)(5.14d * ONE_HOUR_IN_MILLIS);
 		provider.onDemandResources.put(mach11ID, triple11);
 		
 		double cost = 7 * provider.reservationOneYearFee + 107 * provider.reservedCpuCost + 107 * provider.monitoringCost 

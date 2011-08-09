@@ -7,8 +7,8 @@ import commons.util.Triple;
 
 public class Provider {
 
-	public Map<Long, Triple<Double, Double, Double>> reservedResources;
-	public Map<Long, Triple<Double, Double, Double>> onDemandResources;
+	public Map<Long, Triple<Long, Long, Double>> reservedResources;
+	public Map<Long, Triple<Long, Long, Double>> onDemandResources;
 	
 	public final double onDemandCpuCost;// in $/instance-hour
 	public final int onDemandLimit;// in number of instances
@@ -46,8 +46,8 @@ public class Provider {
 		this.transferOutLimits = transferOutLimits;
 		this.transferOutCosts = transferOutCosts;
 		
-		this.onDemandResources = new HashMap<Long, Triple<Double, Double, Double>>();
-		this.reservedResources = new HashMap<Long, Triple<Double, Double, Double>>();
+		this.onDemandResources = new HashMap<Long, Triple<Long, Long, Double>>();
+		this.reservedResources = new HashMap<Long, Triple<Long, Long, Double>>();
 		this.verifyProperties();
 	}
 
@@ -102,12 +102,12 @@ public class Provider {
 	public double onDemandConsumption() {
 		double totalConsumed = 0;
 		for(Long machineID : this.onDemandResources.keySet()){
-			Triple<Double, Double, Double> triple = this.onDemandResources.get(machineID);
-			double executionTime = triple.secondValue - triple.firstValue;
+			Triple<Long, Long, Double> triple = this.onDemandResources.get(machineID);
+			long executionTime = triple.secondValue - triple.firstValue;
 			if(executionTime < 0){
 				throw new RuntimeException("Invalid cpu usage in machine "+machineID.toString()+" : "+executionTime);
 			}
-			totalConsumed += Math.ceil(executionTime / UtilityFunction.HOUR_IN_MILLIS);
+			totalConsumed += Math.ceil(1.0 * executionTime / UtilityFunction.HOUR_IN_MILLIS);
 		}
 		return totalConsumed;
 	}
@@ -115,9 +115,9 @@ public class Provider {
 	public double reservedConsumption() {
 		double totalConsumed = 0;
 		for(Long machineID : this.reservedResources.keySet()){
-			Triple<Double, Double, Double> triple = this.reservedResources.get(machineID);
+			Triple<Long, Long, Double> triple = this.reservedResources.get(machineID);
 			
-			double executionTime;
+			long executionTime;
 			if(triple.secondValue != null){
 				executionTime = triple.secondValue - triple.firstValue;
 			}else{
@@ -127,7 +127,7 @@ public class Provider {
 			if(executionTime < 0){
 				throw new RuntimeException("Invalid cpu usage in machine "+machineID.toString()+" : "+executionTime);
 			}
-			totalConsumed += Math.ceil(executionTime / UtilityFunction.HOUR_IN_MILLIS);
+			totalConsumed += Math.ceil(1.0 * executionTime / UtilityFunction.HOUR_IN_MILLIS);
 		}
 		return totalConsumed;
 	}
