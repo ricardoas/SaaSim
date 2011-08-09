@@ -43,7 +43,7 @@ public class RanjanHeuristic implements SchedulingHeuristic {
 		double totalUtilization = 0d;
 		
 		for(Machine machine : servers){
-			totalUtilization += machine.computeUtilization(eventTime);
+			totalUtilization += machine.computeUtilisation(eventTime);
 		}
 		
 		return totalUtilization;

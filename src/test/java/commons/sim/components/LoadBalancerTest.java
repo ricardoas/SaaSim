@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,9 +40,12 @@ public class LoadBalancerTest {
 	
 	/**
 	 * Scheduling a new request with one machine artificially chosen by the heuristic
+	 * @throws ConfigurationException 
 	 */
 	@Test
-	public void handleEventNewRequestWithOneMachine(){
+	public void handleEventNewRequestWithOneMachine() throws ConfigurationException{
+//		SimulatorConfiguration.buildInstance("./config.properties");
+
 		Request request = EasyMock.createStrictMock(Request.class);
 		JEEvent event = EasyMock.createStrictMock(JEEvent.class);
 		MachineDescriptor descriptor = EasyMock.createStrictMock(MachineDescriptor.class);

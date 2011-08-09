@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import provisioning.RanjanProvisioningSystem;
+
 import commons.cloud.Request;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
@@ -12,7 +14,7 @@ import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
 
 /**
- * 
+ * Time sharing machine.
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public class TimeSharedMachine extends JEAbstractEventHandler implements Machine{
@@ -24,15 +26,16 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	private final MachineDescriptor descriptor;
 	private final long cpuQuantumInMilis;
 	private boolean shutdownOnFinish;
+	private long lastUtilizationCalcTime;
+	private long totalTimeUsed;
+	protected JETime lastUpdate;
 	
-	protected double totalProcessed;
 	protected JEEvent nextFinishEvent;
 	
 	protected List<Request> finishedRequests;
 	
 	public int numberOfRequestsCompletionsInPreviousInterval;
 	public int numberOfRequestsArrivalsInPreviousInterval;
-	protected JETime lastUpdate;
 	
 	/**
 	 * Default constructor
@@ -47,6 +50,8 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		this.loadBalancer = loadBalancer;
 		this.processorQueue = new LinkedList<Request>();
 		this.cpuQuantumInMilis = DEFAULT_QUANTUM;
+		this.lastUtilizationCalcTime = 0;
+		this.lastUpdate = scheduler.now();
 	}
 	
 	/**
@@ -61,7 +66,6 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	/**
 	 * {@inheritDoc}
 	 */
-	
 	@Override
 	public Queue<Request> getProcessorQueue() {
 		return new LinkedList<Request>(processorQueue);
@@ -70,7 +74,6 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	/**
 	 * {@inheritDoc}
 	 */
-	
 	@Override
 	public MachineDescriptor getDescriptor() {
 		return descriptor;
@@ -79,7 +82,6 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	/**
 	 * {@inheritDoc}
 	 */
-	
 	@Override
 	public void sendRequest(Request request) {
 		this.processorQueue.add(request);
@@ -91,7 +93,6 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	/**
 	 * {@inheritDoc}
 	 */
-	
 	@Override
 	public void shutdownOnFinish() {
 		this.shutdownOnFinish = true;
@@ -115,7 +116,11 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		switch (event.getType()) {
 		case PREEMPTION:
 			Request request = processorQueue.poll();
-			request.update((Long) event.getValue()[0]);
+			
+			long processedDemand = (Long) event.getValue()[0];
+			totalTimeUsed += processedDemand;
+			request.update(processedDemand);
+			
 			if(request.isFinished()){
 				getLoadBalancer().reportRequestFinished(request);
 			}else{
@@ -127,6 +132,8 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 			}
 			
 			tryToShutdown();
+			
+			lastUpdate = event.getScheduledTime();
 			
 			break;
 		}
@@ -144,14 +151,6 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	public boolean isBusy() {
 		return this.processorQueue.size() != 0 && this.nextFinishEvent != null;
 	}	
-
-	public boolean isReserved(){
-		return this.descriptor.isReserved();
-	}
-
-	public double getTotalProcessed() {
-		return totalProcessed;
-	}
 
 	@Override
 	public int hashCode() {
@@ -182,4 +181,23 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	public String toString(){
 		return getClass().getName() + " " + descriptor;
 	}
+	
+	/**
+	 * This method estimates CPU utilisation of current machine
+	 * @param timeInMillis
+	 * @return
+	 */
+	public double computeUtilisation(long timeInMillis){
+		if(processorQueue.isEmpty()){
+			double utilization = (1.0*totalTimeUsed)/(timeInMillis-lastUtilizationCalcTime);
+			totalTimeUsed = 0;
+			return utilization;
+		}
+		
+		long totalBeingProcessedNow = timeInMillis - lastUpdate.timeMilliSeconds;
+		double utilization = (1.0* (totalTimeUsed + totalBeingProcessedNow) )/(timeInMillis-lastUtilizationCalcTime);
+		totalTimeUsed = -totalBeingProcessedNow;
+		return utilization;
+	}
+
 }

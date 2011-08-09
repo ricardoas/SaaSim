@@ -90,7 +90,7 @@ public class RanjanMachine extends ProcessorSharedMachine {
 	}
 	
 	@Override
-	public double computeUtilization(long currentTime){
+	public double computeUtilisation(long currentTime){
 		return ((double)this.queue.size()) / this.maximumNumberOfSimultaneousThreads;
 	}
 

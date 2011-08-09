@@ -470,7 +470,7 @@ public class RanjanMachineTest {
 		machine.sendRequest(secondRequest);
 		
 		//Verifying utilization with one request in the queue, requests in backlog
-		assertEquals(1.0 / localMaxNumberOfThreads, machine.computeUtilization(0l), 0.0);
+		assertEquals(1.0 / localMaxNumberOfThreads, machine.computeUtilisation(0l), 0.0);
 		
 		//Simulating that end event has arrived
 		JEEvent event = EasyMock.createStrictMock(JEEvent.class);
@@ -485,7 +485,7 @@ public class RanjanMachineTest {
 		EasyMock.verify(scheduler, firstRequest, secondRequest, config, loadBalancer, event);
 		
 		//Verifying queue of requests that are being processed
-		assertEquals(1.0 / localMaxNumberOfThreads, machine.computeUtilization(0l), 0.0);
+		assertEquals(1.0 / localMaxNumberOfThreads, machine.computeUtilisation(0l), 0.0);
 	}
 	
 	/**
@@ -516,7 +516,7 @@ public class RanjanMachineTest {
 		machine.sendRequest(request);
 		
 		//Verifying utilization
-		assertEquals(1.0 / DEFAULT_MAX_NUM_OF_THREADS, machine.computeUtilization(0l), 0.0);
+		assertEquals(1.0 / DEFAULT_MAX_NUM_OF_THREADS, machine.computeUtilisation(0l), 0.0);
 		
 		//Sending another request in the same time
 		Request request2 = EasyMock.createStrictMock(Request.class);
@@ -526,7 +526,7 @@ public class RanjanMachineTest {
 		machine.sendRequest(request2);
 		
 		//Verifying utilization
-		assertEquals(2.0 / DEFAULT_MAX_NUM_OF_THREADS, machine.computeUtilization(0l), 0.0);
+		assertEquals(2.0 / DEFAULT_MAX_NUM_OF_THREADS, machine.computeUtilisation(0l), 0.0);
 		
 		PowerMock.verify(SimulatorConfiguration.class);
 		EasyMock.verify(request, scheduler, config, request2);

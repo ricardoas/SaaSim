@@ -215,7 +215,7 @@ public class ProcessorSharedMachine extends JEAbstractEventHandler implements Ma
 	 * @param currentTime
 	 * @return
 	 */
-	public double computeUtilization(long currentTime){
+	public double computeUtilisation(long currentTime){
 		if(this.queue.size() != 0){//Requests need to be processed, so resource is full
 			return 1.0;
 		}else{//Requests were processed previously, and no pending requests exist

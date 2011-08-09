@@ -68,7 +68,7 @@ public class RanjanScheduler implements SchedulingHeuristic {
 		double totalNumberOfArrivals = 0d;
 		
 		for(ProcessorSharedMachine machine : servers){
-			averageUtilization += machine.computeUtilization(eventTime);
+			averageUtilization += machine.computeUtilisation(eventTime);
 			totalNumberOfCompletions += machine.getNumberOfRequestsCompletionsInPreviousInterval();
 			totalNumberOfArrivals += machine.getNumberOfRequestsArrivalsInPreviousInterval();
 			machine.resetCounters();//Resetting completions and arrivals counter

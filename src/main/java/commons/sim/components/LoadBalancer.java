@@ -24,7 +24,6 @@ import commons.sim.util.MachineFactory;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
- *
  */
 public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandler{
 	
@@ -37,9 +36,12 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	private final int maxServersAllowed;
 	
 	/**
-	 * @param scheduler TODO
-	 * @param machine 
-	 * 
+	 * Default constructor.
+	 * @param scheduler Event scheduler.
+	 * @param monitor Provisioning system monitor.
+	 * @param heuristic {@link SchedulingHeuristic}
+	 * @param maxServersAllowed Max number of servers to manage in this layer.
+	 * @param machines An initial collection of {@link Machine}s.
 	 */
 	public LoadBalancer(JEEventScheduler scheduler, Monitor monitor, SchedulingHeuristic heuristic, int maxServersAllowed, MachineDescriptor... machines) {
 		super(scheduler);
@@ -141,7 +143,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 		//Gathering total utilization
 		double totalUtilization = 0d;
 		for(Machine machine : servers){
-			totalUtilization += machine.computeUtilization(eventTime);
+			totalUtilization += machine.computeUtilisation(eventTime);
 		}
 		
 		long totalRequestsArrivals = 0;
