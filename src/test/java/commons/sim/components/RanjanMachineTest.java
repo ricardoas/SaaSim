@@ -1,8 +1,11 @@
 package commons.sim.components;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
-import java.util.List;
 import java.util.Queue;
 
 import org.easymock.Capture;
@@ -25,7 +28,7 @@ import commons.sim.jeevent.JETime;
 @PrepareForTest({JEEventScheduler.class, SimulatorConfiguration.class})
 public class RanjanMachineTest {
 	
-	private static final long DEFAULT_BACKLOG_SIZE = 5;
+	private static final long DEFAULT_BACKLOG_SIZE = 2;
 	private static final long DEFAULT_MAX_NUM_OF_THREADS = 3;
 	
 	private MachineDescriptor descriptor;
@@ -166,27 +169,115 @@ public class RanjanMachineTest {
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(5000L);
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(50L);
+		firstRequest.update(50L);
+		EasyMock.expect(firstRequest.isFinished()).andReturn(true);
 		Request secondRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(5000L);
+		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(100L);
+		secondRequest.update(100L);
+		EasyMock.expect(secondRequest.isFinished()).andReturn(true);
 		Request thirdRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(thirdRequest.getTotalToProcess()).andReturn(5000L);
+		EasyMock.expect(thirdRequest.getTotalToProcess()).andReturn(100L);
+		thirdRequest.update(100L);
+		EasyMock.expect(thirdRequest.isFinished()).andReturn(true);
 		Request fourthRequest = EasyMock.createStrictMock(Request.class);
+		EasyMock.expect(fourthRequest.getTotalToProcess()).andReturn(100L);
+		fourthRequest.update(100L);
+		EasyMock.expect(fourthRequest.isFinished()).andReturn(true);
+		loadBalancer.reportRequestFinished(firstRequest);
+		loadBalancer.reportRequestFinished(secondRequest);
+		loadBalancer.reportRequestFinished(thirdRequest);
+		loadBalancer.reportRequestFinished(fourthRequest);
 		
 		PowerMock.replayAll(config, loadBalancer, firstRequest, secondRequest, thirdRequest, fourthRequest);
 		
-		Machine machine = new RanjanMachine(new JEEventScheduler(), descriptor, loadBalancer);
+		JEEventScheduler scheduler = new JEEventScheduler();
+		
+		Machine machine = new RanjanMachine(scheduler, descriptor, loadBalancer);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
 		machine.sendRequest(thirdRequest);
 		machine.sendRequest(fourthRequest);
+
 		Queue<Request> queue = machine.getProcessorQueue();
-		assertNotNull(queue);
-		assertFalse(queue.isEmpty());
 		assertEquals(firstRequest, queue.poll());
 		assertEquals(secondRequest, queue.poll());
 		assertEquals(thirdRequest, queue.poll());
 		assertNull(queue.poll());
+		
+		scheduler.start();
+		
+		assertTrue(machine.getProcessorQueue().isEmpty());
+		
+		PowerMock.verify();
+	}
+
+	@Test
+	public void testSendMoreRequestThanCanRunAndWait(){
+		SimulatorConfiguration config = mockConfiguration();
+		
+		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		Request firstRequest = EasyMock.createStrictMock(Request.class);
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(50L);
+		firstRequest.update(50L);
+		EasyMock.expect(firstRequest.isFinished()).andReturn(true);
+		
+		Request secondRequest = EasyMock.createStrictMock(Request.class);
+		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(100L);
+		secondRequest.update(100L);
+		EasyMock.expect(secondRequest.isFinished()).andReturn(true);
+		
+		Request thirdRequest = EasyMock.createStrictMock(Request.class);
+		EasyMock.expect(thirdRequest.getTotalToProcess()).andReturn(100L);
+		thirdRequest.update(100L);
+		EasyMock.expect(thirdRequest.isFinished()).andReturn(true);
+		
+		Request fourthRequest = EasyMock.createStrictMock(Request.class);
+		EasyMock.expect(fourthRequest.getTotalToProcess()).andReturn(100L);
+		fourthRequest.update(100L);
+		EasyMock.expect(fourthRequest.isFinished()).andReturn(true);
+		
+		Request fifthRequest = EasyMock.createStrictMock(Request.class);
+		EasyMock.expect(fifthRequest.getTotalToProcess()).andReturn(100L);
+		fifthRequest.update(100L);
+		EasyMock.expect(fifthRequest.isFinished()).andReturn(true);
+		
+		Request sixthRequest = EasyMock.createStrictMock(Request.class);
+
+		JEEventScheduler scheduler = new JEEventScheduler();
+		
+		Capture<JEEvent> captured = new Capture<JEEvent>();
+		EasyMock.expect(loadBalancer.getHandlerId()).andReturn(scheduler.registerHandler(loadBalancer));
+		loadBalancer.handleEvent(EasyMock.capture(captured));
+		
+		loadBalancer.reportRequestFinished(firstRequest);
+		loadBalancer.reportRequestFinished(secondRequest);
+		loadBalancer.reportRequestFinished(thirdRequest);
+		loadBalancer.reportRequestFinished(fourthRequest);
+		loadBalancer.reportRequestFinished(fifthRequest);
+
+		PowerMock.replayAll(config, loadBalancer, firstRequest, secondRequest, thirdRequest, fourthRequest, fifthRequest, sixthRequest);
+		
+		
+		Machine machine = new RanjanMachine(scheduler, descriptor, loadBalancer);
+		machine.sendRequest(firstRequest);
+		machine.sendRequest(secondRequest);
+		machine.sendRequest(thirdRequest);
+		machine.sendRequest(fourthRequest);
+		machine.sendRequest(fifthRequest);
+		machine.sendRequest(sixthRequest);
+
+		Queue<Request> queue = machine.getProcessorQueue();
+		assertEquals(firstRequest, queue.poll());
+		assertEquals(secondRequest, queue.poll());
+		assertEquals(thirdRequest, queue.poll());
+		assertNull(queue.poll());
+		
+		scheduler.start();
+		
+		assertEquals(sixthRequest, captured.getValue().getValue()[0]);
+		
+		assertTrue(machine.getProcessorQueue().isEmpty());
 		
 		PowerMock.verify();
 	}
@@ -276,182 +367,6 @@ public class RanjanMachineTest {
 		
 		PowerMock.verify(SimulatorConfiguration.class);
 		EasyMock.verify(scheduler, firstRequest, secondRequest, config);
-	}
-	
-	/**
-	 * This method verifies that a RANJAN machine contains a limit in the number of simultaneous
-	 * requests that can be processed. Since such limit is achieved, an incoming request is added
-	 * to a backlog to be processed later.
-	 * @throws Exception
-	 */
-	@Test
-	public void sendMoreRequestsThanMaxNumberOfThreads() throws Exception{
-		long localMaxNumberOfThreads = 1l;
-		
-		SimulatorConfiguration config = mockConfiguration();
-		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(localMaxNumberOfThreads);
-		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(DEFAULT_BACKLOG_SIZE);
-		
-		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(3);
-
-		Request firstRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(firstRequest.getDemand()).andReturn(600000L).once();
-
-		Request secondRequest = EasyMock.createStrictMock(Request.class);
-		
-		PowerMock.replay(SimulatorConfiguration.class);
-		EasyMock.replay(scheduler, firstRequest, secondRequest, config);
-		
-		Machine machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
-
-		machine.sendRequest(firstRequest);
-		machine.sendRequest(secondRequest);
-		
-		//Verifying queue of requests that are being processed
-		Queue<Request> queue = machine.getProcessorQueue();
-		
-		assertFalse(queue.isEmpty());
-		assertEquals(1, queue.size());
-		Request firstRequestAtQueue = queue.poll();
-		assertEquals(firstRequest, firstRequestAtQueue);
-		
-		//Verifying backlog
-		List<Request> backlog = machine.getBacklog();
-		assertFalse(backlog.isEmpty());
-		assertEquals(1, backlog.size());
-		assertEquals(secondRequest, backlog.get(0));
-		
-		PowerMock.verify(SimulatorConfiguration.class);
-		EasyMock.verify(scheduler, firstRequest, secondRequest, config);
-	}
-	
-	/**
-	 * This method verifies that a RANJAN machine contains a limit in the number of simultaneous
-	 * requests that can be processed. Since such limit is achieved, and the backlog is also full, the
-	 * request is simply thrown away.
-	 * @throws Exception
-	 */
-	@Test
-	public void sendMoreRequestsThanMaxNumberOfThreadsAndBacklog() throws Exception{
-		long localMaxNumberOfThreads = 1l;
-		long backlogSize = 0l;
-		
-		SimulatorConfiguration config = mockConfiguration();
-		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(localMaxNumberOfThreads);
-		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(backlogSize);
-		
-		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(5);
-
-		Request firstRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(firstRequest.getDemand()).andReturn(600000L).once();
-
-		Request secondRequest = EasyMock.createStrictMock(Request.class);
-		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
-		EasyMock.expect(loadBalancer.getHandlerId()).andReturn(1);
-		
-		PowerMock.replay(SimulatorConfiguration.class);
-		EasyMock.replay(scheduler, firstRequest, secondRequest, config, loadBalancer);
-		
-		Machine machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
-		machine.setLoadBalancer(loadBalancer);
-		machine.sendRequest(firstRequest);
-		machine.sendRequest(secondRequest);
-		
-		//Verifying queue of requests that are being processed
-		Queue<Request> queue = machine.getProcessorQueue();
-		
-		assertFalse(queue.isEmpty());
-		assertEquals(1, queue.size());
-		Request firstRequestAtQueue = queue.poll();
-		assertEquals(firstRequest, firstRequestAtQueue);
-		
-		//Verifying backlog
-		List<Request> backlog = machine.getBacklog();
-		assertTrue(backlog.isEmpty());
-		
-		PowerMock.verify(SimulatorConfiguration.class);
-		EasyMock.verify(scheduler, firstRequest, secondRequest, config, loadBalancer);
-	}
-	
-	/**
-	 * This method verifies that a RANJAN machine contains a limit in the number of simultaneous
-	 * requests that can be processed. As a request is finished, requests from the backlog are
-	 * collected and added to the current processing queue.
-	 * @throws Exception
-	 */
-	@Test
-	public void finishRequestAndAllowsAnotherRequestToBeProcessed() throws Exception{
-		long localMaxNumberOfThreads = 1l;
-		long backlogSize = 1l;
-		
-		SimulatorConfiguration config = mockConfiguration();
-		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(localMaxNumberOfThreads);
-		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(backlogSize);
-		
-		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(3);
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(60000L)).times(3);
-
-		Request firstRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(firstRequest.getDemand()).andReturn(60000L).once();
-		firstRequest.update(60000L);
-		EasyMock.expectLastCall();
-
-		Request secondRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(10000L).times(2);
-		EasyMock.expect(secondRequest.getDemand()).andReturn(10000L);
-		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
-		loadBalancer.reportRequestFinished(firstRequest);
-		EasyMock.expectLastCall();
-		
-		PowerMock.replay(SimulatorConfiguration.class);
-		EasyMock.replay(scheduler, firstRequest, secondRequest, config, loadBalancer);
-		
-		Machine machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), loadBalancer);
-		machine.sendRequest(firstRequest);
-		machine.sendRequest(secondRequest);
-		
-		//Verifying queue of requests that are being processed
-		Queue<Request> queue = machine.getProcessorQueue();
-		
-		assertFalse(queue.isEmpty());
-		assertEquals(1, queue.size());
-		Request firstRequestAtQueue = queue.poll();
-		assertEquals(firstRequest, firstRequestAtQueue);
-		
-		//Verifying backlog
-		List<Request> backlog = machine.getBacklog();
-		assertFalse(backlog.isEmpty());
-		assertEquals(1, backlog.size());
-		assertEquals(secondRequest, backlog.get(0));
-		
-		//Simulating that end event has arrived
-		JEEvent event = EasyMock.createStrictMock(JEEvent.class);
-		Request[] requests = {firstRequest};
-		EasyMock.expect(event.getType()).andReturn(JEEventType.REQUEST_FINISHED);
-		EasyMock.expect(event.getValue()).andReturn(requests);
-		EasyMock.replay(event);
-
-		machine.handleEvent(event);
-		
-		PowerMock.verify(SimulatorConfiguration.class);
-		EasyMock.verify(scheduler, firstRequest, secondRequest, config, loadBalancer, event);
-		
-		//Verifying queue of requests that are being processed
-		queue = machine.getProcessorQueue();
-		
-		assertFalse(queue.isEmpty());
-		assertEquals(1, queue.size());
-		firstRequestAtQueue = queue.poll();
-		assertEquals(secondRequest, firstRequestAtQueue);
-		
-		//Verifying backlog
-		backlog = machine.getBacklog();
-		assertTrue(backlog.isEmpty());
 	}
 	
 	/**

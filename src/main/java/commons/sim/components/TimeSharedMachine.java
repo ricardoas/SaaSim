@@ -24,7 +24,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	private final MachineDescriptor descriptor;
 	private final long cpuQuantumInMilis;
 	private boolean shutdownOnFinish;
-	private long lastUtilizationCalcTime;
+	private long lastUtilisationCalcTime;
 	private long totalTimeUsed;
 	protected JETime lastUpdate;
 	
@@ -48,7 +48,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		this.loadBalancer = loadBalancer;
 		this.processorQueue = new LinkedList<Request>();
 		this.cpuQuantumInMilis = DEFAULT_QUANTUM;
-		this.lastUtilizationCalcTime = 0;
+		this.lastUtilisationCalcTime = 0;
 		this.lastUpdate = scheduler.now();
 	}
 	
@@ -142,7 +142,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	}
 
 	/**
-	 * Schedule next requesto on the processor queue.
+	 * Schedule next {@link Request} on the processor queue.
 	 */
 	private void scheduleNext() {
 		Request nextRequest = processorQueue.peek();
@@ -191,15 +191,17 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 */
 	public double computeUtilisation(long timeInMillis){
 		if(processorQueue.isEmpty()){
-			double utilization = (1.0*totalTimeUsed)/(timeInMillis-lastUtilizationCalcTime);
+			double utilisation = (1.0*totalTimeUsed)/(timeInMillis-lastUtilisationCalcTime);
 			totalTimeUsed = 0;
-			return utilization;
+			lastUtilisationCalcTime = timeInMillis;
+			return utilisation;
 		}
 		
 		long totalBeingProcessedNow = timeInMillis - lastUpdate.timeMilliSeconds;
-		double utilization = (1.0* (totalTimeUsed + totalBeingProcessedNow) )/(timeInMillis-lastUtilizationCalcTime);
+		double utilisation = (1.0* (totalTimeUsed + totalBeingProcessedNow) )/(timeInMillis-lastUtilisationCalcTime);
 		totalTimeUsed = -totalBeingProcessedNow;
-		return utilization;
+		lastUtilisationCalcTime = timeInMillis;
+		return utilisation;
 	}
 
 }
