@@ -34,4 +34,21 @@ public class RoundRobinHeuristic implements SchedulingHeuristic {
 		return servers.get(lastUsed);
 	}
 
+	@Override
+	public long getRequestsArrivalCounter() {
+		return 0;
+	}
+
+	@Override
+	public long getFinishedRequestsCounter() {
+		return 0;
+	}
+
+	@Override
+	public void resetCounters() {
+	}
+
+	@Override
+	public void reportRequestFinished() {
+	}
 }

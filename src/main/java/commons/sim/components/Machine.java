@@ -42,5 +42,4 @@ public interface Machine extends JEEventHandler{
 	 * @return
 	 */
 	double computeUtilisation(long timeInMillis);
-
 }

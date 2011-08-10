@@ -20,10 +20,14 @@ import commons.sim.components.Machine;
 public class RanjanHeuristic implements SchedulingHeuristic {
 	
 	private final long SESSION_LIMIT_IN_MILLIS = 1000 * 60 * 15;
+	
 	private Map<String, Long> lastRequestTimes; 
 	private Map<Long, Machine> serversOfLastRequests;
 	
 	private int lastUsed;
+	private long requestsArrivalCounter;
+	private long finishedRequestsCounter;
+
 	
 	/**
 	 * Default constructor
@@ -32,6 +36,9 @@ public class RanjanHeuristic implements SchedulingHeuristic {
 		this.lastUsed = -1;
 		this.lastRequestTimes = new HashMap<String, Long>();
 		this.serversOfLastRequests = new HashMap<Long, Machine>();
+		
+		this.requestsArrivalCounter = 0;
+		this.finishedRequestsCounter = 0;
 	}
 
 	/**
@@ -54,6 +61,8 @@ public class RanjanHeuristic implements SchedulingHeuristic {
 	 */
 	@Override
 	public Machine getNextServer(Request request, List<Machine> servers) {
+		this.requestsArrivalCounter++;
+		
 		Machine machine = getServerOfPreviousRequestInSession(request);
 		if(machine != null){//Allocates to server already serving the session
 			return machine;
@@ -88,5 +97,26 @@ public class RanjanHeuristic implements SchedulingHeuristic {
 			return lastMachine;
 		}
 		return null;
+	}
+
+	@Override
+	public long getRequestsArrivalCounter() {
+		return this.requestsArrivalCounter;
+	}
+
+	@Override
+	public long getFinishedRequestsCounter() {
+		return this.finishedRequestsCounter;
+	}
+
+	@Override
+	public void resetCounters() {
+		this.requestsArrivalCounter = 0;
+		this.finishedRequestsCounter = 0;
+	}
+
+	@Override
+	public void reportRequestFinished() {
+		this.finishedRequestsCounter++;
 	}
 }

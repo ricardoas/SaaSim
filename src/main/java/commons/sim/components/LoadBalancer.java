@@ -3,7 +3,6 @@ package commons.sim.components;
 import static commons.sim.util.SimulatorProperties.SETUP_TIME;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -33,8 +32,6 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	private Queue<Request> requestsToBeProcessed;
 	private Monitor monitor;
 	
-	private final int maxServersAllowed;
-	
 	/**
 	 * Default constructor.
 	 * @param scheduler Event scheduler.
@@ -47,7 +44,6 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 		super(scheduler);
 		this.monitor = monitor;
 		this.heuristic = heuristic;
-		this.maxServersAllowed = maxServersAllowed;
 		this.servers = new ArrayList<Machine>();
 		for (MachineDescriptor machineDescriptor : machines) {
 			servers.add(buildMachine(machineDescriptor));
@@ -140,22 +136,17 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 
 	private RanjanStatistics collectStatistics(List<Machine> servers, long eventTime) {
 		
-		//Gathering total utilization
+		//Gathering total utilisation
 		double totalUtilization = 0d;
 		for(Machine machine : servers){
 			totalUtilization += machine.computeUtilisation(eventTime);
 		}
 		
-		long totalRequestsArrivals = 0;
-		long totalRequestsCompletions = 0;
+		long requestsArrivalCounter = this.heuristic.getRequestsArrivalCounter();
+		long finishedRequestsCounter = this.heuristic.getFinishedRequestsCounter();
+		this.heuristic.resetCounters();
 		
-		for(Machine machine : servers){
-			totalRequestsArrivals += machine.getNumberOfRequestsArrivalsInPreviousInterval();
-			totalRequestsCompletions += machine.getNumberOfRequestsCompletionsInPreviousInterval();
-			machine.resetCounters();
-		}
-		
-		return new RanjanStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, servers.size());
+		return new RanjanStatistics(totalUtilization, requestsArrivalCounter, finishedRequestsCounter, servers.size());
 	}
 
 	/**
@@ -167,6 +158,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	}
 
 	public void reportRequestFinished(Request requestFinished) {
+		heuristic.reportRequestFinished();
 		monitor.reportRequestFinished(requestFinished);
 	}
 }

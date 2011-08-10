@@ -64,4 +64,22 @@ public class ProfitDrivenHeuristic implements SchedulingHeuristic{
 		
 		return machineToSchedule;
 	}
+
+	@Override
+	public long getRequestsArrivalCounter() {
+		return 0;
+	}
+
+	@Override
+	public long getFinishedRequestsCounter() {
+		return 0;
+	}
+
+	@Override
+	public void resetCounters() {
+	}
+
+	@Override
+	public void reportRequestFinished() {
+	}
 }

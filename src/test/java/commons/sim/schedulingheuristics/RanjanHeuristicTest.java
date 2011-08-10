@@ -28,6 +28,12 @@ public class RanjanHeuristicTest {
 		heuristic = new RanjanHeuristic();
 	}
 	
+	@Test
+	public void testConstruction(){
+		assertEquals(0, this.heuristic.getRequestsArrivalCounter());
+		assertEquals(0, this.heuristic.getFinishedRequestsCounter());
+	}
+	
 	/**
 	 * This test verifies that without machines available to be selected an error is thrown.
 	 */
@@ -66,6 +72,7 @@ public class RanjanHeuristicTest {
 		Machine nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
+		assertEquals(1, heuristic.getRequestsArrivalCounter());
 		
 		EasyMock.verify(request);
 	}
@@ -103,6 +110,7 @@ public class RanjanHeuristicTest {
 		EasyMock.expect(request.getUserID()).andReturn(userID).times(2);
 		EasyMock.replay(request);
 		Machine nextServer = heuristic.getNextServer(request, servers);
+		assertEquals(1, heuristic.getRequestsArrivalCounter());
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		EasyMock.verify(request);
@@ -113,6 +121,7 @@ public class RanjanHeuristicTest {
 		EasyMock.expect(request2.getUserID()).andReturn(secondUserID).times(2);
 		EasyMock.replay(request2);
 		nextServer = heuristic.getNextServer(request2, servers);
+		assertEquals(2, heuristic.getRequestsArrivalCounter());
 		assertNotNull(nextServer);
 		assertEquals(machine2, nextServer);
 		EasyMock.verify(request2);
@@ -123,6 +132,7 @@ public class RanjanHeuristicTest {
 		EasyMock.expect(request3.getUserID()).andReturn(thirdUserID).times(2);
 		EasyMock.replay(request3);
 		nextServer = heuristic.getNextServer(request3, servers);
+		assertEquals(3, heuristic.getRequestsArrivalCounter());
 		assertNotNull(nextServer);
 		assertEquals(machine3, nextServer);
 		EasyMock.verify(request3);
@@ -133,6 +143,7 @@ public class RanjanHeuristicTest {
 		EasyMock.expect(request4.getUserID()).andReturn(fourthUserID).times(2);
 		EasyMock.replay(request4);
 		nextServer = heuristic.getNextServer(request4, servers);
+		assertEquals(4, heuristic.getRequestsArrivalCounter());
 		assertNotNull(nextServer);
 		assertEquals(machine4, nextServer);
 		EasyMock.verify(request4);
@@ -143,6 +154,7 @@ public class RanjanHeuristicTest {
 		EasyMock.expect(request5.getUserID()).andReturn(fifthUserID).times(2);
 		EasyMock.replay(request5);
 		nextServer = heuristic.getNextServer(request5, servers);
+		assertEquals(5, heuristic.getRequestsArrivalCounter());
 		assertNotNull(nextServer);
 		assertEquals(machine5, nextServer);
 		EasyMock.verify(request5);
@@ -153,6 +165,7 @@ public class RanjanHeuristicTest {
 		EasyMock.expect(request6.getUserID()).andReturn(sixthUserID).times(2);
 		EasyMock.replay(request6);
 		nextServer = heuristic.getNextServer(request6, servers);
+		assertEquals(6, heuristic.getRequestsArrivalCounter());
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		EasyMock.verify(request6);
@@ -346,6 +359,31 @@ public class RanjanHeuristicTest {
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		EasyMock.verify(request8);
+	}
+
+	@Test
+	public void testResetCounters(){
+		String userID = "u1";
+		long time = ONE_MINUTE_IN_MILLIS * 1;
+		
+		Request request = EasyMock.createNiceMock(Request.class);
+		EasyMock.expect(request.getTimeInMillis()).andReturn(time).times(2);
+		EasyMock.expect(request.getUserID()).andReturn(userID).times(2);
+		EasyMock.replay(request);
+		
+		ArrayList<Machine> servers = new ArrayList<Machine>();
+		Machine machine1 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false, 0), null);
+		servers.add(machine1);
+		
+		heuristic.getNextServer(request, servers);
+		assertEquals(1, heuristic.getRequestsArrivalCounter());
+		
+		EasyMock.verify(request);
+		
+		//Resetting counters
+		heuristic.resetCounters();
+		assertEquals(0, heuristic.getRequestsArrivalCounter());
+		assertEquals(0, heuristic.getFinishedRequestsCounter());
 	}
 }
 

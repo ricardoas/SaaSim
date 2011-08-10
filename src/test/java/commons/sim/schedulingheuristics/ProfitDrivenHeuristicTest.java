@@ -34,6 +34,12 @@ public class ProfitDrivenHeuristicTest {
 	}
 	
 	@Test
+	public void testConstruction(){
+		assertEquals(0, this.heuristic.getFinishedRequestsCounter());
+		assertEquals(0, this.heuristic.getRequestsArrivalCounter());
+	}
+	
+	@Test
 	public void testGetServerWithoutMachines(){
 		String clientID = "c1";
 		String userID = "u1";

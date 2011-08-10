@@ -18,4 +18,24 @@ public interface SchedulingHeuristic {
 	 * @return
 	 */
 	Machine getNextServer(Request request, List<Machine> servers);
+	
+	/**
+	 * @return
+	 */
+	long getRequestsArrivalCounter();
+	
+	/**
+	 * @return
+	 */
+	long getFinishedRequestsCounter();
+	
+	/**
+	 * 
+	 */
+	void resetCounters();
+
+	/**
+	 * 
+	 */
+	void reportRequestFinished();
 }

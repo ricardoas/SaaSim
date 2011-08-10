@@ -32,9 +32,6 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	
 	protected List<Request> finishedRequests;
 	
-	public int numberOfRequestsCompletionsInPreviousInterval;
-	public int numberOfRequestsArrivalsInPreviousInterval;
-	
 	/**
 	 * Default constructor
 	 * @param scheduler Event scheduler.
@@ -203,5 +200,4 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		lastUtilisationCalcTime = timeInMillis;
 		return utilisation;
 	}
-
 }
