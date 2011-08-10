@@ -1,9 +1,11 @@
 package commons.sim.components;
 
+import java.util.List;
 import java.util.Queue;
 
 import commons.cloud.Request;
 import commons.sim.jeevent.JEEventHandler;
+import commons.util.Triple;
 
 /**
  * Methods to manage a machine.
@@ -42,4 +44,10 @@ public interface Machine extends JEEventHandler{
 	 * @return
 	 */
 	double computeUtilisation(long timeInMillis);
+
+	/**
+	 * @param request
+	 * @return
+	 */
+	List<Triple<Long, Long, Long>> estimateFinishTime(Request request);
 }

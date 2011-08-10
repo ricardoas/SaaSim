@@ -28,7 +28,7 @@ public class ProfitDrivenHeuristic implements SchedulingHeuristic{
 		for(Machine machine : servers){//Evaluating if it is profitable to reuse existing machines
 			double pi = 0d;
 			double new_pi = 0d;
-			List<Triple<Long, Long, Long>> executionTimes = machine.calcExecutionTimesWithNewRequest(request, this.sla);
+			List<Triple<Long, Long, Long>> executionTimes = machine.estimateFinishTime(request);
 			boolean continueToOtherMachine = false;
 			
 			for(Triple<Long, Long, Long> pair : executionTimes){//Evaluating requests times

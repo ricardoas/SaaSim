@@ -257,7 +257,8 @@ public class ProcessorSharedMachine extends JEAbstractEventHandler implements Ma
 	 * @param sla 
 	 * @return
 	 */
-	public List<Triple<Long, Long, Long>> calcExecutionTimesWithNewRequest(Request request, double sla) {
+	@Override
+	public List<Triple<Long, Long, Long>> estimateFinishTime(Request request) {
 		int requestsToShare = this.queue.size();
 
 		List<Triple<Long, Long, Long>> executionTimes = new ArrayList<Triple<Long, Long, Long>>();
@@ -303,4 +304,5 @@ public class ProcessorSharedMachine extends JEAbstractEventHandler implements Ma
 	public MachineDescriptor getDescriptor() {
 		return null;
 	}
+
 }

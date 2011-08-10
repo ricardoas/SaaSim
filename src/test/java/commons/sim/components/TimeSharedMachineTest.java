@@ -462,4 +462,18 @@ public class TimeSharedMachineTest {
 		
 		assertFalse(machine.isBusy());//Verifying if machine is busy
 	}
+	
+	@Test
+	public void testEstimateFinishTime(){
+		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		Request request = EasyMock.createStrictMock(Request.class);
+		
+		EasyMock.replay(loadBalancer, request);
+
+		Machine machine = new TimeSharedMachine(new JEEventScheduler(), descriptor, loadBalancer);
+		
+		machine.estimateFinishTime(request);
+		
+		EasyMock.verify(loadBalancer, request);
+	}
 }

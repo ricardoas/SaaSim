@@ -1,5 +1,7 @@
 package commons.sim.components;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -10,6 +12,7 @@ import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
+import commons.util.Triple;
 
 /**
  * Time sharing machine.
@@ -200,4 +203,26 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		lastUtilisationCalcTime = timeInMillis;
 		return utilisation;
 	}
+
+	@Override
+	public List<Triple<Long, Long, Long>> estimateFinishTime(Request newRequest) {
+		List<Triple<Long, Long, Long>> executionTimes = new ArrayList<Triple<Long, Long, Long>>();
+		
+
+		for(Request request : processorQueue){
+			Triple<Long, Long, Long> triple = new Triple<Long, Long, Long>();
+			JETime estimatedFinishTime = new JETime(request.getTotalToProcess() * requestsToShare); 
+			estimatedFinishTime = estimatedFinishTime.plus(getScheduler().now());
+			triple.firstValue = estimatedFinishTime.timeMilliSeconds;
+			estimatedFinishTime = new JETime(request.getTotalToProcess() * (requestsToShare+1)); 
+			estimatedFinishTime = estimatedFinishTime.plus(getScheduler().now());
+			triple.secondValue = estimatedFinishTime.timeMilliSeconds;
+			triple.thirdValue = request.getDemand();
+
+			executionTimes.add(triple);
+		}
+
+		return executionTimes;
+	}
+	
 }
