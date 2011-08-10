@@ -6,8 +6,14 @@ import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.provisioningheuristics.RanjanStatistics;
-import commons.sim.util.MachineFactory;
 
+/**
+ * This class represents the DPS business logic according to RANJAN. Here some statistics of current
+ * available machines (i.e, utilisation) is used to verify if new machines need to be added to 
+ * an application tier, or if some machines can be removed from any application tier.
+ * @author davidcmm
+ *
+ */
 public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 
 	private double TARGET_UTILIZATION = 0.66;
@@ -30,7 +36,7 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 			Iterator<Long> iterator = this.accountingSystem.getOnDemandMachinesData().keySet().iterator();
 			while(numberOfServersToAdd < 0 && iterator.hasNext()){
 				long serverID = iterator.next();
-				this.configurable.removeServer(0, serverID, false);
+				this.configurable.removeServer(0, new MachineDescriptor(serverID, false, 0), false);
 				this.accountingSystem.reportMachineFinish(serverID, getScheduler().now().timeMilliSeconds);
 				numberOfServersToAdd++;
 			}
@@ -38,7 +44,7 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 			iterator = this.accountingSystem.getReservedMachinesData().keySet().iterator();
 			while(numberOfServersToAdd < 0 && iterator.hasNext()){
 				long serverID = iterator.next();
-				this.configurable.removeServer(0, serverID, false);
+				this.configurable.removeServer(0, new MachineDescriptor(serverID, true, 0), false);
 				this.accountingSystem.reportMachineFinish(serverID, getScheduler().now().timeMilliSeconds);
 				numberOfServersToAdd++;
 			}

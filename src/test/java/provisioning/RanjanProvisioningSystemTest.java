@@ -13,13 +13,11 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import commons.config.SimulatorConfiguration;
 import commons.sim.AccountingSystem;
 import commons.sim.SimpleSimulator;
-import commons.sim.components.ProcessorSharedMachine;
-import commons.sim.components.RanjanMachine;
+import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JETime;
 import commons.sim.provisioningheuristics.RanjanStatistics;
-import commons.sim.schedulingheuristics.RanjanHeuristic;
 
 @RunWith(PowerMockRunner.class)
 public class RanjanProvisioningSystemTest {
@@ -192,8 +190,6 @@ public class RanjanProvisioningSystemTest {
 	public void handleEventEvaluateUtilizationWithOneServerToBeAdded(){
 		int resourcesReservationLimit = 20;
 		int onDemandLimit = 20;
-		long maximumNumberOfThreads = 10l;
-		long maximumBacklogSize = 100l;
 
 		double totalUtilization = 0.0;
 		long totalRequestsArrivals = 100;
@@ -202,29 +198,15 @@ public class RanjanProvisioningSystemTest {
 		RanjanStatistics statistics = new RanjanStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
-		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(ProcessorSharedMachine.class))).andReturn(2);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(RanjanProvisioningSystem.class))).andReturn(1);
-		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(ProcessorSharedMachine.class))).andReturn(3);
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(0));
 		EasyMock.replay(scheduler);
-		
-		SimulatorConfiguration config = EasyMock.createStrictMock(SimulatorConfiguration.class);
-		PowerMock.mockStatic(SimulatorConfiguration.class);
-		EasyMock.expect(SimulatorConfiguration.getInstance()).andReturn(config).times(2);
-		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(maximumNumberOfThreads);
-		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(maximumBacklogSize);
-		EasyMock.expect(SimulatorConfiguration.getInstance()).andReturn(config).times(3);
-		EasyMock.expect(config.getApplicationHeuristics()).andReturn(new Class<?>[] {RanjanHeuristic.class});
-		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(maximumNumberOfThreads);
-		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(maximumBacklogSize);
-		PowerMock.replay(SimulatorConfiguration.class);
-		EasyMock.replay(config);
 		
 		JEEvent event = EasyMock.createStrictMock(JEEvent.class);
 		EasyMock.expect(event.getValue()).andReturn(new RanjanStatistics[]{statistics});
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
-		configurable.addServer(0, new RanjanMachine(scheduler, 0));
+		configurable.addServer(0, new MachineDescriptor(0, true, 0));
 		EasyMock.expectLastCall();
 		
 		EasyMock.replay(event, configurable);
@@ -236,7 +218,7 @@ public class RanjanProvisioningSystemTest {
 		this.heuristic.handleEventEvaluateUtilization(event);
 		
 		PowerMock.verify(SimulatorConfiguration.class);
-		EasyMock.verify(scheduler, event, configurable, config);
+		EasyMock.verify(scheduler, event, configurable);
 		
 		assertEquals(1, this.heuristic.getAccountingSystem().getReservedMachinesData().size());
 		assertEquals(0, this.heuristic.getAccountingSystem().getOnDemandMachinesData().size());
@@ -258,13 +240,6 @@ public class RanjanProvisioningSystemTest {
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(RanjanProvisioningSystem.class))).andReturn(1);
 		EasyMock.replay(scheduler);
 		
-		SimulatorConfiguration config = EasyMock.createStrictMock(SimulatorConfiguration.class);
-		PowerMock.mockStatic(SimulatorConfiguration.class);
-		EasyMock.expect(SimulatorConfiguration.getInstance()).andReturn(config);
-		EasyMock.expect(config.getApplicationHeuristics()).andReturn(new Class<?>[] {RanjanHeuristic.class});
-		PowerMock.replay(SimulatorConfiguration.class);
-		EasyMock.replay(config);
-		
 		JEEvent event = EasyMock.createStrictMock(JEEvent.class);
 		EasyMock.expect(event.getValue()).andReturn(new RanjanStatistics[]{statistics});
 		
@@ -276,14 +251,14 @@ public class RanjanProvisioningSystemTest {
 		this.heuristic.setConfigurable(configurable);
 		
 		AccountingSystem system = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		system.createMachine(1, true, 0);
-		system.createMachine(2, false, 0);
+		system.createMachine(new MachineDescriptor(1, true, 0));
+		system.createMachine(new MachineDescriptor(2, false, 0));
 		this.heuristic.setAccountingSystem(system);
 		
 		this.heuristic.handleEventEvaluateUtilization(event);
 		
 		PowerMock.verify(SimulatorConfiguration.class);
-		EasyMock.verify(scheduler, event, configurable, config);
+		EasyMock.verify(scheduler, event, configurable);
 	}
 	
 	/**
@@ -310,29 +285,29 @@ public class RanjanProvisioningSystemTest {
 		EasyMock.expect(event.getValue()).andReturn(new RanjanStatistics[]{statistics});
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
-		configurable.removeServer(0, 1, false);
+		configurable.removeServer(0, new MachineDescriptor(1, true, 0), false);
 		EasyMock.expectLastCall();
-		configurable.removeServer(0, 2, false);
+		configurable.removeServer(0, new MachineDescriptor(2, true, 0), false);
 		EasyMock.expectLastCall();
-		configurable.removeServer(0, 3, false);
+		configurable.removeServer(0, new MachineDescriptor(3, true, 0), false);
 		EasyMock.expectLastCall();
-		configurable.removeServer(0, 4, false);
+		configurable.removeServer(0, new MachineDescriptor(4, false, 0), false);
 		EasyMock.expectLastCall();
-		configurable.removeServer(0, 5, false);
+		configurable.removeServer(0, new MachineDescriptor(5, false, 0), false);
 		EasyMock.expectLastCall();
-		configurable.removeServer(0, 6, false);
+		configurable.removeServer(0, new MachineDescriptor(6, false, 0), false);
 		EasyMock.expectLastCall();
 		
 		EasyMock.replay(event, configurable);
 		
 		//Creating some machines to be removed
 		AccountingSystem accountingSystem = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		accountingSystem.createMachine(1, true, 0);
-		accountingSystem.createMachine(2, true, 0);
-		accountingSystem.createMachine(3, true, 0);
-		accountingSystem.createMachine(4, false, ONE_HOUR_IN_MILLIS);
-		accountingSystem.createMachine(5, false, ONE_HOUR_IN_MILLIS);
-		accountingSystem.createMachine(6, false, ONE_HOUR_IN_MILLIS);
+		accountingSystem.createMachine(new MachineDescriptor(1, true, 0));
+		accountingSystem.createMachine(new MachineDescriptor(2, true, 0));
+		accountingSystem.createMachine(new MachineDescriptor(3, true, 0));
+		accountingSystem.createMachine(new MachineDescriptor(4, false, ONE_HOUR_IN_MILLIS));
+		accountingSystem.createMachine(new MachineDescriptor(5, false, ONE_HOUR_IN_MILLIS));
+		accountingSystem.createMachine(new MachineDescriptor(6, false, ONE_HOUR_IN_MILLIS));
 		
 		this.heuristic = new RanjanProvisioningSystem(scheduler);
 		this.heuristic.setConfigurable(configurable);
