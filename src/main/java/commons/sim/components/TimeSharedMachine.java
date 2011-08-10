@@ -131,7 +131,6 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 			
 			tryToShutdown();
 			
-			lastUpdate = event.getScheduledTime();
 			
 			break;
 		}
@@ -147,11 +146,12 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	private void scheduleNext() {
 		Request nextRequest = processorQueue.peek();
 		long nextQuantum = Math.min(nextRequest.getTotalToProcess(), cpuQuantumInMilis);
+		lastUpdate = getScheduler().now();
 		send(new JEEvent(JEEventType.PREEMPTION, this, new JETime(nextQuantum).plus(getScheduler().now()), nextQuantum));
 	}
 	
 	public boolean isBusy() {
-		return this.processorQueue.size() != 0 && this.nextFinishEvent != null;
+		return this.processorQueue.size() != 0;
 	}	
 
 	@Override
@@ -191,7 +191,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 */
 	public double computeUtilisation(long timeInMillis){
 		if(processorQueue.isEmpty()){
-			double utilisation = (1.0*totalTimeUsed)/(timeInMillis-lastUtilisationCalcTime);
+			double utilisation = (1.0 * totalTimeUsed)/(timeInMillis - lastUtilisationCalcTime);
 			totalTimeUsed = 0;
 			lastUtilisationCalcTime = timeInMillis;
 			return utilisation;
