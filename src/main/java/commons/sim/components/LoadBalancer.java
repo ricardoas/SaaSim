@@ -26,6 +26,8 @@ import commons.sim.util.MachineFactory;
  */
 public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandler{
 	
+	private int tier;
+	
 	private final List<Machine> servers;
 	
 	private SchedulingHeuristic heuristic;
@@ -40,23 +42,25 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	 * @param maxServersAllowed Max number of servers to manage in this layer.
 	 * @param machines An initial collection of {@link Machine}s.
 	 */
-	public LoadBalancer(JEEventScheduler scheduler, Monitor monitor, SchedulingHeuristic heuristic, int maxServersAllowed, MachineDescriptor... machines) {
+	public LoadBalancer(JEEventScheduler scheduler, Monitor monitor, SchedulingHeuristic heuristic, int maxServersAllowed, int tier) {
 		super(scheduler);
 		this.monitor = monitor;
 		this.heuristic = heuristic;
+		this.tier = tier;
 		this.servers = new ArrayList<Machine>();
-		for (MachineDescriptor machineDescriptor : machines) {
-			servers.add(buildMachine(machineDescriptor));
-		}
 		this.requestsToBeProcessed = new LinkedList<Request>();
 	}
 	
 	/**
+	 * @param useStartUpDelay 
 	 * 
 	 */
-	public void addServer(MachineDescriptor descriptor){
+	public void addServer(MachineDescriptor descriptor, boolean useStartUpDelay){
 		Machine server = buildMachine(descriptor);
-		JETime serverUpTime = getScheduler().now().plus(new JETime(SimulatorConfiguration.getInstance().getLong(SETUP_TIME)));
+		JETime serverUpTime = getScheduler().now();
+		if(useStartUpDelay){
+			serverUpTime = serverUpTime.plus(new JETime(SimulatorConfiguration.getInstance().getLong(SETUP_TIME)));
+		}
 		send(new JEEvent(JEEventType.ADD_SERVER, this, serverUpTime, server));
 	}
 	
@@ -107,27 +111,29 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 				if(nextServer != null){//Reusing an existent machine
 					nextServer.sendRequest(request);
 				}else{
-					send(new JEEvent(JEEventType.REQUESTQUEUED, monitor, getScheduler().now(), request, this));
+					monitor.requestQueued(getScheduler().now().timeMilliSeconds, request, tier);
 				}
 				break;
 			case EVALUATEUTILIZATION://RANJAN Scheduler
 				Long eventTime = (Long) event.getValue()[0];
 				
 				RanjanStatistics statistics = this.collectStatistics(getServers(), eventTime);
-				send(new JEEvent(JEEventType.EVALUATEUTILIZATION, this.monitor, getScheduler().now(), statistics));
+				monitor.evaluateUtilization(getScheduler().now().timeMilliSeconds, statistics, tier);
 	
 				break;
 			case ADD_SERVER:
-				servers.add((Machine) event.getValue()[0]);
+				Machine machine = (Machine) event.getValue()[0];
+				machine.getDescriptor().setStartTimeInMillis(getScheduler().now().timeMilliSeconds);
+				servers.add(machine);
 				for (Request queuedRequest : requestsToBeProcessed) {
 					send(new JEEvent(JEEventType.NEWREQUEST, this, getScheduler().now(), queuedRequest));
 				}
 				break;
 			case MACHINE_TURNED_OFF:
-				forward(event, monitor);
+				monitor.machineTurnedOff((MachineDescriptor)event.getValue()[0]);
 				break;
 			case REQUESTQUEUED:
-				forward(event, monitor);
+				monitor.requestQueued(getScheduler().now().timeMilliSeconds, (Request)event.getValue()[0], tier);
 				break;
 			default:
 				break;
@@ -160,5 +166,16 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 	public void reportRequestFinished(Request requestFinished) {
 		heuristic.reportRequestFinished();
 		monitor.reportRequestFinished(requestFinished);
+	}
+
+	public void removeServer(boolean force) {
+		for (int i = servers.size()-1; i >= 0; i++) {
+			MachineDescriptor descriptor = servers.get(i).getDescriptor();
+			if(!descriptor.isReserved()){
+				removeServer(descriptor, force);
+				return;
+			}
+		}
+		removeServer(servers.get(servers.size()-1).getDescriptor(), force);
 	}
 }

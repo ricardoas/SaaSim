@@ -22,9 +22,10 @@ public class GEISTWorkloadParser extends AbstractWorkloadParser{
 	
 	/**
 	 * Default constructor
+	 * @param workloadPath 
 	 */
-	public GEISTWorkloadParser() {
-		super();
+	public GEISTWorkloadParser(String... workloadPath) {
+		super(workloadPath);
 	}
 
 	/**

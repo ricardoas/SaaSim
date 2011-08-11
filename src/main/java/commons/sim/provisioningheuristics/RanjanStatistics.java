@@ -7,6 +7,12 @@ public class RanjanStatistics {
 	public long numberOfRequestsCompletionsInLastInterval;
 	public long totalNumberOfServers;
 
+	/**
+	 * @param totalUtilization
+	 * @param totalRequestsArrivals
+	 * @param totalRequestsCompletions
+	 * @param totalNumberOfServers
+	 */
 	public RanjanStatistics(double totalUtilization, long totalRequestsArrivals, long totalRequestsCompletions, long totalNumberOfServers) {
 		this.totalUtilizationInLastInterval = totalUtilization;
 		this.numberOfRequestsArrivalInLastInterval = totalRequestsArrivals;

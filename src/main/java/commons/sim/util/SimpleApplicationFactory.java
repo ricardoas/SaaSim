@@ -9,7 +9,6 @@ import provisioning.Monitor;
 
 import commons.config.SimulatorConfiguration;
 import commons.sim.components.LoadBalancer;
-import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
 
@@ -24,7 +23,7 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 	 */
 	@Override
 	public List<LoadBalancer> createNewApplication(JEEventScheduler scheduler,
-			Monitor monitor, List<MachineDescriptor> setupMachines) {
+			Monitor monitor) {
 		SimulatorConfiguration config = SimulatorConfiguration.getInstance();
 		int numOfTiers = config.getInt(APPLICATION_NUM_OF_TIERS);
 		
@@ -35,7 +34,7 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 		List<LoadBalancer> loadBalancers = new ArrayList<LoadBalancer>();
 		
 		for (int i = 0; i < numOfTiers; i++) {
-			loadBalancers.add(buildLoadBalancer(scheduler, monitor, heuristicClasses[i], serversPerTier[i], maxServerPerTier[i], setupMachines));
+			loadBalancers.add(buildLoadBalancer(scheduler, monitor, heuristicClasses[i], serversPerTier[i], maxServerPerTier[i], i));
 		}
 		
 		return loadBalancers;
@@ -47,19 +46,15 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 	 * @param heuristic
 	 * @param serversPerTier 
 	 * @param maxServerPerTier 
-	 * @param setupMachines 
+	 * @param tier 
 	 * @return
 	 */
 	private LoadBalancer buildLoadBalancer(JEEventScheduler scheduler, Monitor monitor,
-			Class<?> heuristic, int serversPerTier, int maxServerPerTier, List<MachineDescriptor> setupMachines) {
+			Class<?> heuristic, int serversPerTier, int maxServerPerTier, int tier) {
 		try {
-			MachineDescriptor [] servers = new MachineDescriptor[serversPerTier];
-			for (int i = 0; i < servers.length; i++) {
-				servers[i] = setupMachines.remove(0);
-			}
 			return new LoadBalancer(scheduler, monitor, 
 					(SchedulingHeuristic) heuristic.newInstance(), 
-					maxServerPerTier, servers);
+					maxServerPerTier, tier);
 		} catch (Exception e) {
 			throw new RuntimeException("Something went wrong when loading "+ heuristic, e);
 		}

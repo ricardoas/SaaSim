@@ -8,7 +8,6 @@ import provisioning.Monitor;
 
 import commons.config.SimulatorConfiguration;
 import commons.sim.components.LoadBalancer;
-import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEEventScheduler;
 
 /**
@@ -45,8 +44,7 @@ public abstract class ApplicationFactory {
 	 * 
 	 * @param scheduler
 	 * @param monitor
-	 * @param setupMachines 
 	 * @return
 	 */
-	public abstract List<LoadBalancer> createNewApplication(JEEventScheduler scheduler, Monitor monitor, List<MachineDescriptor> setupMachines);
+	public abstract List<LoadBalancer> createNewApplication(JEEventScheduler scheduler, Monitor monitor);
 }

@@ -4,8 +4,13 @@ import java.io.IOException;
 
 import org.apache.commons.configuration.ConfigurationException;
 
+import provisioning.util.DPSFactory;
+
+import commons.cloud.UtilityResult;
 import commons.config.SimulatorConfiguration;
-import commons.sim.SimpleSimulator;
+import commons.sim.Simulator;
+import commons.sim.jeevent.JEEventScheduler;
+import commons.sim.util.SimulatorFactory;
 
 /**
  * 
@@ -22,7 +27,17 @@ public class Main {
 		
 		SimulatorConfiguration.buildInstance(args[0]);
 		
-		new SimpleSimulator().start();
+		DPS dps = DPSFactory.INSTANCE.createDPS();
+		
+		Simulator simulator = SimulatorFactory.getInstance().buildSimulator(new JEEventScheduler(), dps);
+		
+		dps.registerConfigurable(simulator);
+		
+		simulator.start();
+		
+		UtilityResult utilityResult = dps.calculateUtility();
+		System.out.println(utilityResult.getResult());
+		System.err.println(utilityResult);
 	}
 
 }

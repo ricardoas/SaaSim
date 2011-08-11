@@ -3,13 +3,12 @@ package commons.cloud;
 import java.util.HashMap;
 import java.util.Map;
 
+import commons.sim.components.MachineDescriptor;
 import commons.util.Triple;
 
 public class Provider {
 
-	public Map<Long, Triple<Long, Long, Double>> reservedResources;
-	public Map<Long, Triple<Long, Long, Double>> onDemandResources;
-	
+	public final String name;
 	public final double onDemandCpuCost;// in $/instance-hour
 	public final int onDemandLimit;// in number of instances
 	public final int reservationLimit;// in number of instances
@@ -26,7 +25,6 @@ public class Provider {
 											// to establish different costs for
 											// transference
 	public final String transferOutCosts;// Transference costs per range
-	public final String name;
 
 	public Provider(String name, double cpuCost, int onDemandLimit,
 			int reservationLimit, double reservedCpuCost, double reservationOneYearFee,
@@ -46,11 +44,10 @@ public class Provider {
 		this.transferOutLimits = transferOutLimits;
 		this.transferOutCosts = transferOutCosts;
 		
-		this.onDemandResources = new HashMap<Long, Triple<Long, Long, Double>>();
-		this.reservedResources = new HashMap<Long, Triple<Long, Long, Double>>();
 		this.verifyProperties();
 	}
 
+	@Deprecated
 	private void verifyProperties() {
 		if(this.onDemandCpuCost < 0){
 			throw new RuntimeException("Invalid provider "+this.name+": onDemandCpuCost "+this.onDemandCpuCost);
@@ -74,10 +71,11 @@ public class Provider {
 			throw new RuntimeException("Invalid provider "+this.name+": monitoringCost "+this.monitoringCost);
 		}
 	}
-
-	public void contractResource(long startTime, long endTime) {
-		// TODO
+	
+	public double calculateCost(MachineDescriptor descriptor){
+		return 0.0;
 	}
+
 
 	public double calculateCost(double consumedTransference) {
 		return this.calculateReservationCosts() + this.calculateOnDemandCosts() + this.calculateTransferenceCosts(consumedTransference);

@@ -1,6 +1,6 @@
 package commons.sim;
 
-import provisioning.DynamicallyConfigurable;
+import provisioning.DynamicConfigurable;
 
 
 /**
@@ -9,7 +9,7 @@ import provisioning.DynamicallyConfigurable;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public interface Simulator extends DynamicallyConfigurable{
+public interface Simulator extends DynamicConfigurable{
 	
 	/**
 	 * Start simulation.

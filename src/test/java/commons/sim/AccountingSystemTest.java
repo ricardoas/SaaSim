@@ -13,7 +13,6 @@ import commons.cloud.Contract;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
-import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.util.Triple;
 
@@ -48,7 +47,7 @@ public class AccountingSystemTest {
 		boolean isReserved = true;
 
 		AccountingSystem acc = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		acc.createMachine(new MachineDescriptor(machineID, isReserved, 0));
+		acc.buyMachine();
 		
 		Class cls;
 		try {
@@ -96,7 +95,7 @@ public class AccountingSystemTest {
 		boolean isReserved = false;
 
 		AccountingSystem acc = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		acc.createMachine(new MachineDescriptor(machineID, isReserved, 0));
+		acc.buyMachine();
 		
 		Class cls;
 		try {
@@ -124,7 +123,7 @@ public class AccountingSystemTest {
 			assertNull(machineUtilization.get(machineID).thirdValue);
 			
 			//Creating a second machine
-			acc.createMachine(new MachineDescriptor(machineID+1, false, 10000));
+			acc.buyMachine();
 			
 			//Checking reserved machines created
 			fld = cls.getDeclaredField("reservedMachinesIDs");
@@ -173,8 +172,8 @@ public class AccountingSystemTest {
 		boolean isReserved = false;
 
 		AccountingSystem acc = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		acc.createMachine(new MachineDescriptor(machineID, isReserved, 0));
-		acc.createMachine(new MachineDescriptor(machineID+1, !isReserved, ONE_HOUR_IN_MILLIS * 2));
+		acc.buyMachine();
+		acc.buyMachine();
 //		acc.createMachine(machineID, isReserved, 0);
 //		acc.createMachine(machineID+1, !isReserved, ONE_HOUR_IN_MILLIS * 2);
 		
@@ -223,7 +222,7 @@ public class AccountingSystemTest {
 		boolean isReserved = false;
 
 		AccountingSystem acc = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		acc.createMachine(new MachineDescriptor(machineID, isReserved, 0));
+		acc.buyMachine();
 //		acc.createMachine(machineID, isReserved, 0);
 		
 		//Finishing inexistent machine
@@ -251,9 +250,9 @@ public class AccountingSystemTest {
 		assertTrue(acc.canAddAReservedMachine());
 		
 		//Adding a number of machines below limits defined: 2 reserved machines, 1 on-demand
-		acc.createMachine(new MachineDescriptor(machineID, isReserved, 0));
-		acc.createMachine(new MachineDescriptor(machineID+1, isReserved, ONE_HOUR_IN_MILLIS));
-		acc.createMachine(new MachineDescriptor(machineID+2, !isReserved, ONE_HOUR_IN_MILLIS * 2));
+		acc.buyMachine();
+		acc.buyMachine();
+		acc.buyMachine();
 //		acc.createMachine(machineID, isReserved, 0);
 //		acc.createMachine(machineID+1, isReserved, ONE_HOUR_IN_MILLIS);
 //		acc.createMachine(machineID+2, !isReserved, ONE_HOUR_IN_MILLIS * 2);
@@ -262,8 +261,8 @@ public class AccountingSystemTest {
 		assertTrue(acc.canAddAReservedMachine());
 		
 		//Adding machines that reaches limits: 1 reserved, 1 on-demand
-		acc.createMachine(new MachineDescriptor(machineID+3, isReserved, (long)(ONE_HOUR_IN_MILLIS * 1.5)));
-		acc.createMachine(new MachineDescriptor(machineID, !isReserved, (long)(ONE_HOUR_IN_MILLIS * 2.5)));
+		acc.buyMachine();
+		acc.buyMachine();
 //		acc.createMachine(machineID+3, isReserved, ONE_HOUR_IN_MILLIS * 1.5);
 //		acc.createMachine(machineID+4, !isReserved, ONE_HOUR_IN_MILLIS * 2.5);
 		
@@ -281,16 +280,16 @@ public class AccountingSystemTest {
 		AccountingSystem acc = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
 		
 		//Adding a number of machines that reaches limits defined: 2 reserved machines, 1 on-demand
-		acc.createMachine(new MachineDescriptor(machineID, isReserved, 0));
-		acc.createMachine(new MachineDescriptor(machineID+1, isReserved, (long)(ONE_HOUR_IN_MILLIS * 0.5)));
-		acc.createMachine(new MachineDescriptor(machineID+2, isReserved, (long)(ONE_HOUR_IN_MILLIS)));
-		acc.createMachine(new MachineDescriptor(machineID+3, isReserved, (long)(ONE_HOUR_IN_MILLIS * 1.5)));
-		acc.createMachine(new MachineDescriptor(machineID+4, !isReserved, (long)(ONE_HOUR_IN_MILLIS * 2)));
-		acc.createMachine(new MachineDescriptor(machineID+5, !isReserved, (long)(ONE_HOUR_IN_MILLIS * 2.5)));
-		acc.createMachine(new MachineDescriptor(machineID+6, !isReserved, (long)(ONE_HOUR_IN_MILLIS * 3)));
-		acc.createMachine(new MachineDescriptor(machineID+7, !isReserved, (long)(ONE_HOUR_IN_MILLIS * 3)));
-		acc.createMachine(new MachineDescriptor(machineID+8, !isReserved, (long)(ONE_HOUR_IN_MILLIS * 3.5)));
-		acc.createMachine(new MachineDescriptor(machineID+9, !isReserved, (long)(ONE_HOUR_IN_MILLIS * 7)));
+		acc.buyMachine();
+		acc.buyMachine();
+		acc.buyMachine();
+		acc.buyMachine();
+		acc.buyMachine();
+		acc.buyMachine();
+		acc.buyMachine();
+		acc.buyMachine();
+		acc.buyMachine();
+		acc.buyMachine();
 //		acc.createMachine(machineID, isReserved, 0);
 //		acc.createMachine(machineID+1, isReserved, ONE_HOUR_IN_MILLIS * 0.5);
 //		acc.createMachine(machineID+2, isReserved, ONE_HOUR_IN_MILLIS);
@@ -329,8 +328,8 @@ public class AccountingSystemTest {
 		boolean isReserved = false;
 
 		AccountingSystem acc = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		acc.createMachine(new MachineDescriptor(machineID, isReserved, 0));
-		acc.createMachine(new MachineDescriptor(machineID+1, !isReserved, ONE_HOUR_IN_MILLIS * 2));
+		acc.buyMachine();
+		acc.buyMachine();
 //		acc.createMachine(machineID, isReserved, 0);
 //		acc.createMachine(machineID+1, !isReserved, ONE_HOUR_IN_MILLIS * 2);
 		
@@ -356,8 +355,8 @@ public class AccountingSystemTest {
 		boolean isReserved = false;
 
 		AccountingSystem acc = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		acc.createMachine(new MachineDescriptor(machineID, isReserved, 0));
-		acc.createMachine(new MachineDescriptor(machineID+1, !isReserved, ONE_HOUR_IN_MILLIS * 2));
+		acc.buyMachine();
+		acc.buyMachine();
 //		acc.createMachine(machineID, isReserved, 0);
 //		acc.createMachine(machineID+1, !isReserved, ONE_HOUR_IN_MILLIS * 2);
 		
@@ -377,8 +376,8 @@ public class AccountingSystemTest {
 		boolean isReserved = false;
 
 		AccountingSystem acc = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		acc.createMachine(new MachineDescriptor(machineID, isReserved, 0));
-		acc.createMachine(new MachineDescriptor(machineID+1, !isReserved, ONE_HOUR_IN_MILLIS * 2));
+		acc.buyMachine();
+		acc.buyMachine();
 //		acc.createMachine(machineID, isReserved, 0);
 //		acc.createMachine(machineID+1, !isReserved, ONE_HOUR_IN_MILLIS * 2);
 		
@@ -774,6 +773,6 @@ public class AccountingSystemTest {
 						+ 105 * provider.onDemandCpuCost + 105 * provider.monitoringCost;
 		double receipt = Math.ceil((user.consumedCpu - cpuLimit)/ONE_HOUR_IN_MILLIS) * extraCpuCost + setupCost + price; 
 		
-		assertEquals(receipt-cost, acc.calculateUtility(contract, user, provider), 0.0);
+		assertEquals(receipt-cost, acc.calculateUtility(), 0.0);
 	}
 }

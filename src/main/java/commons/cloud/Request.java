@@ -124,6 +124,13 @@ public class Request{
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "Request [reqID=" + reqID + ", demandInMillis=" + demandInMillis
+				+ ", totalProcessed=" + totalProcessed + "]";
+	}
+	
 	
 	
 }

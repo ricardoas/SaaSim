@@ -2,10 +2,12 @@ package commons.sim.util;
 
 public class ContractProperties {
 	
-	public static final String NUMBER_OF_PLANS = "plan.availableplans";
+	public static final String NUMBER_OF_PLANS = "plan.number";
 
 	// PROPERTY ARRAYS //
 	public static final String PLAN_NAME = "plan.name";
+
+	public static final String PLAN_PRIORITY = "plan.priority";
 
 	public static final String PLAN_PRICE = "plan.price";
 	

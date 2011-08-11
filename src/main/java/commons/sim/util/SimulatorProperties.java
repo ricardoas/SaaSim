@@ -23,12 +23,13 @@ public class SimulatorProperties {
 
 	public static final String SETUP_TIME = "sim.setuptime";
 	
-	public static final String PLANNING_HEURISTIC = "sim.plan.heuristic";
+	public static final String PLANNING_HEURISTIC = "planning.heuristic";
+	
+	public static final String PLANNING_PERIOD = "planning.period";
+
 	public static final String DEFAULT_PLANNING_HEURISTIC = "genetic";
 	
 	public static final String SLA = "sim.sla";
-	
-	public static final String PLANNING_PERIOD = "sim.planning.period";
 	
 	public static final String MAX_NUM_OF_THREADS_PER_SERVER = "sim.threads";
 	

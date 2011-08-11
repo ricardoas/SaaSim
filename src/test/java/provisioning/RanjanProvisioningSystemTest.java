@@ -212,7 +212,7 @@ public class RanjanProvisioningSystemTest {
 		EasyMock.replay(event, configurable);
 		
 		this.heuristic = new RanjanProvisioningSystem(scheduler);
-		this.heuristic.setConfigurable(configurable);
+		this.heuristic.registerConfigurable(configurable);
 		this.heuristic.setAccountingSystem(new AccountingSystem(resourcesReservationLimit, onDemandLimit));
 		
 		this.heuristic.handleEventEvaluateUtilization(event);
@@ -248,11 +248,11 @@ public class RanjanProvisioningSystemTest {
 		EasyMock.replay(event, configurable);
 		
 		this.heuristic = new RanjanProvisioningSystem(scheduler);
-		this.heuristic.setConfigurable(configurable);
+		this.heuristic.registerConfigurable(configurable);
 		
 		AccountingSystem system = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		system.createMachine(new MachineDescriptor(1, true, 0));
-		system.createMachine(new MachineDescriptor(2, false, 0));
+		system.buyMachine();
+		system.buyMachine();
 		this.heuristic.setAccountingSystem(system);
 		
 		this.heuristic.handleEventEvaluateUtilization(event);
@@ -302,15 +302,15 @@ public class RanjanProvisioningSystemTest {
 		
 		//Creating some machines to be removed
 		AccountingSystem accountingSystem = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		accountingSystem.createMachine(new MachineDescriptor(1, true, 0));
-		accountingSystem.createMachine(new MachineDescriptor(2, true, 0));
-		accountingSystem.createMachine(new MachineDescriptor(3, true, 0));
-		accountingSystem.createMachine(new MachineDescriptor(4, false, ONE_HOUR_IN_MILLIS));
-		accountingSystem.createMachine(new MachineDescriptor(5, false, ONE_HOUR_IN_MILLIS));
-		accountingSystem.createMachine(new MachineDescriptor(6, false, ONE_HOUR_IN_MILLIS));
+		accountingSystem.buyMachine();
+		accountingSystem.buyMachine();
+		accountingSystem.buyMachine();
+		accountingSystem.buyMachine();
+		accountingSystem.buyMachine();
+		accountingSystem.buyMachine();
 		
 		this.heuristic = new RanjanProvisioningSystem(scheduler);
-		this.heuristic.setConfigurable(configurable);
+		this.heuristic.registerConfigurable(configurable);
 		this.heuristic.setAccountingSystem(accountingSystem);
 		
 		this.heuristic.handleEventEvaluateUtilization(event);

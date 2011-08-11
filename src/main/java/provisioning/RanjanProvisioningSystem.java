@@ -1,10 +1,6 @@
 package provisioning;
 
-import java.util.Iterator;
-
-import commons.sim.components.MachineDescriptor;
-import commons.sim.jeevent.JEEvent;
-import commons.sim.jeevent.JEEventScheduler;
+import commons.cloud.Request;
 import commons.sim.provisioningheuristics.RanjanStatistics;
 
 /**
@@ -19,34 +15,20 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 	private double TARGET_UTILIZATION = 0.66;
 	public static long UTILIZATION_EVALUATION_PERIOD_IN_MILLIS = 1000 * 60 * 5;//in millis
 
-	public RanjanProvisioningSystem(JEEventScheduler scheduler) {
-		super(scheduler);
+	public RanjanProvisioningSystem() {
+		super();
 	}
 	
 	@Override
-	protected void handleEventEvaluateUtilization(JEEvent event) {
-		RanjanStatistics statistics = (RanjanStatistics) event.getValue()[0];
+	public void evaluateUtilization(long now, RanjanStatistics statistics, int tier) {
 		long numberOfServersToAdd = evaluateNumberOfServersForNextInterval(statistics);
 		if(numberOfServersToAdd > 0){
 			for(int i = 0; i < numberOfServersToAdd; i++){
-				evaluateMachinesToBeAdded();
+				evaluateMachinesToBeAdded(tier);
 			}
 		}else if(numberOfServersToAdd < 0){
-			//Removing on demand machines first
-			Iterator<Long> iterator = this.accountingSystem.getOnDemandMachinesData().keySet().iterator();
-			while(numberOfServersToAdd < 0 && iterator.hasNext()){
-				long serverID = iterator.next();
-				this.configurable.removeServer(0, new MachineDescriptor(serverID, false, 0), false);
-				this.accountingSystem.reportMachineFinish(serverID, getScheduler().now().timeMilliSeconds);
-				numberOfServersToAdd++;
-			}
-			//Removing reserved machines
-			iterator = this.accountingSystem.getReservedMachinesData().keySet().iterator();
-			while(numberOfServersToAdd < 0 && iterator.hasNext()){
-				long serverID = iterator.next();
-				this.configurable.removeServer(0, new MachineDescriptor(serverID, true, 0), false);
-				this.accountingSystem.reportMachineFinish(serverID, getScheduler().now().timeMilliSeconds);
-				numberOfServersToAdd++;
+			for (int i = 0; i < -numberOfServersToAdd; i++) {
+				configurable.removeServer(tier, false);
 			}
 		}
 	}
@@ -75,20 +57,14 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 		}
 	}
 	
-	private void evaluateMachinesToBeAdded() {
-		boolean canAddAReservedMachine = this.accountingSystem.canAddAReservedMachine();
-		boolean canAddAOnDemandMachine = this.accountingSystem.canAddAOnDemandMachine();
-		
-		if(canAddAReservedMachine){
-			MachineDescriptor descriptor = new MachineDescriptor(availableIDs++, canAddAReservedMachine, getScheduler().now().timeMilliSeconds);
-			this.configurable.addServer(0, descriptor);
-			//Registering machines for accounting
-			this.accountingSystem.createMachine(descriptor);
-		}else if(canAddAOnDemandMachine){
-			MachineDescriptor descriptor = new MachineDescriptor(availableIDs++, canAddAReservedMachine, getScheduler().now().timeMilliSeconds);
-			this.configurable.addServer(0, descriptor);
-			//Registering machines for accounting
-			this.accountingSystem.createMachine(descriptor);
+	private void evaluateMachinesToBeAdded(int tier) {
+		if(accountingSystem.canBuyMachine()){
+			configurable.addServer(tier, accountingSystem.buyMachine(), true);
 		}
+	}
+	
+	@Override
+	public void requestQueued(long timeMilliSeconds, Request request, int tier) {
+		accountingSystem.reportLostRequest(request);
 	}
 }

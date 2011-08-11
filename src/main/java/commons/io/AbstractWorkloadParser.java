@@ -6,8 +6,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import commons.cloud.Request;
-import commons.config.SimulatorConfiguration;
-import commons.sim.util.SimulatorProperties;
 
 public abstract class AbstractWorkloadParser implements WorkloadParser<Request> {
 	
@@ -15,9 +13,9 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request> 
 
 	private Request next;
 
-	public AbstractWorkloadParser() {
+	public AbstractWorkloadParser(String... workloadPath) {
 		try {
-			reader = new BufferedReader(new FileReader(SimulatorConfiguration.getInstance().getString(SimulatorProperties.WORKLOAD_PATH)));
+			reader = new BufferedReader(new FileReader(workloadPath[0]));
 			next = readNext();
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("Problem reading workload file.", e);

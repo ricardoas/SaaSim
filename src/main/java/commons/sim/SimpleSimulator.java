@@ -1,18 +1,13 @@
 package commons.sim;
 
+import static commons.io.TimeBasedWorkloadParser.DAY_IN_MILLIS;
+
 import java.io.IOException;
 import java.util.List;
 
-import provisioning.DPS;
-import provisioning.DynamicallyConfigurable;
 import provisioning.Monitor;
-import provisioning.util.DPSFactory;
 
-import commons.cloud.Provider;
 import commons.cloud.Request;
-import commons.config.SimulatorConfiguration;
-import commons.io.GEISTWorkloadParser;
-import commons.io.TimeBasedWorkloadParser;
 import commons.io.WorkloadParser;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.MachineDescriptor;
@@ -27,10 +22,12 @@ import commons.sim.util.ApplicationFactory;
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class SimpleSimulator extends JEAbstractEventHandler implements Simulator, JEEventHandler, DynamicallyConfigurable{
+public class SimpleSimulator extends JEAbstractEventHandler implements JEEventHandler, Simulator{
+	
+	private int[] daysInMonths = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	private int currentMonth = 0;
 
-	private final WorkloadParser<List<Request>> workloadParser;
-	private final Monitor monitor;
+	private WorkloadParser<List<Request>> workloadParser;
 	protected LoadBalancer loadBalancer;
 	private List<LoadBalancer> tiers;
 
@@ -40,26 +37,9 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 * @param list 
 	 * @throws IOException 
 	 */
-	public SimpleSimulator(JEEventScheduler scheduler, WorkloadParser<List<Request>> parser) throws IOException {
+	public SimpleSimulator(JEEventScheduler scheduler, Monitor monitor){
 		super(scheduler);
-		this.workloadParser = parser;
-		DPS dps = DPSFactory.INSTANCE.createDPS(scheduler);
-		Provider cloudProvider = SimulatorConfiguration.getInstance().getProviders().values().iterator().next();
-		dps.setAccountingSystem(new AccountingSystem(cloudProvider.reservationLimit, cloudProvider.onDemandLimit));
-		
-		this.monitor = dps;
-		this.monitor.setConfigurable(this);
-		this.tiers = ApplicationFactory.getInstance().createNewApplication(scheduler, getMonitor(), dps.getSetupMachines());
-	}
-	
-	/**
-	 * Constructor
-	 * @param scheduler TODO
-	 * @param list 
-	 * @throws IOException 
-	 */
-	public SimpleSimulator() throws IOException {
-		this(new JEEventScheduler(), new TimeBasedWorkloadParser(new GEISTWorkloadParser(), TimeBasedWorkloadParser.HOUR_IN_MILLIS));
+		this.tiers = ApplicationFactory.getInstance().createNewApplication(scheduler, monitor);
 	}
 	
 	/**
@@ -67,27 +47,25 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 */
 	@Override
 	public void start() {
-
 		prepareBeforeStart();
 		getScheduler().start();
 	}
 
-	protected void prepareBeforeStart() {
-		send(new JEEvent(JEEventType.READWORKLOAD, this, getScheduler().now()));
-	}
-
 	/**
-	 * @return
+	 * {@inheritDoc}
 	 */
-	public Monitor getMonitor() {
-		
-		return monitor;
-	}
-
-	public AccountingSystem getAccounting(){
-		return ((DPS)this.monitor).getAccountingSystem();
+	@Override
+	public void setWorkloadParser(WorkloadParser<List<Request>> workloadParser) {
+		this.workloadParser = workloadParser;
 	}
 	
+	
+
+	protected void prepareBeforeStart() {
+		send(new JEEvent(JEEventType.READWORKLOAD, this, getScheduler().now()));
+//		send(new JEEvent(JEEventType.CHANGE_USERS, this, getScheduler().now().plus(new JETime(DAY_IN_MILLIS * daysInMonths[currentMonth++]))));
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -123,8 +101,8 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void addServer(int tier, MachineDescriptor machineDescriptor) {
-		tiers.get(tier).addServer(machineDescriptor);
+	public void addServer(int tier, MachineDescriptor machineDescriptor, boolean useStartUpDelay) {
+		tiers.get(tier).addServer(machineDescriptor, useStartUpDelay);
 	}
 
 	/**
@@ -134,5 +112,10 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	public void removeServer(int tier, MachineDescriptor machineDescriptor,
 			boolean force) {
 		tiers.get(tier).removeServer(machineDescriptor, force);
+	}
+
+	@Override
+	public void removeServer(int tier, boolean force) {
+		tiers.get(tier).removeServer(force);
 	}
 }

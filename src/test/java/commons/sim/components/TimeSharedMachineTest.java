@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Queue;
+import java.util.Random;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -31,7 +32,7 @@ public class TimeSharedMachineTest {
 
 	@Before
 	public void setUp() throws Exception {
-		this.descriptor = new MachineDescriptor(1, false, 0);
+		this.descriptor = new MachineDescriptor(1, false);
 	}
 
 	@After
@@ -466,14 +467,19 @@ public class TimeSharedMachineTest {
 	@Test
 	public void testEstimateFinishTime(){
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
-		Request request = EasyMock.createStrictMock(Request.class);
 		
-		EasyMock.replay(loadBalancer, request);
+		EasyMock.replay(loadBalancer);
 
 		Machine machine = new TimeSharedMachine(new JEEventScheduler(), descriptor, loadBalancer);
+		long reqID = 0;
+		Random random = new Random();
+		for (int i = 0; i < 70; i++) {
+			machine.sendRequest(new Request("", "", reqID+++"", 0, 0, 0, "", "", random.nextInt(500)));
+		}
 		
+		Request request = new Request("", "", reqID+++"", 0, 0, 0, "", "", random.nextInt(500));
 		machine.estimateFinishTime(request);
 		
-		EasyMock.verify(loadBalancer, request);
+		EasyMock.verify(loadBalancer);
 	}
 }

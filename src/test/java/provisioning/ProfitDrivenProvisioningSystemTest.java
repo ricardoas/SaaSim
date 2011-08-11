@@ -34,8 +34,8 @@ public class ProfitDrivenProvisioningSystemTest {
 		EasyMock.replay(scheduler);
 		
 		AccountingSystem accounting = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		accounting.createMachine(new MachineDescriptor(1, true, 0));
-		accounting.createMachine(new MachineDescriptor(2, false, 0));
+		accounting.buyMachine();
+		accounting.buyMachine();
 		
 		ProfitDrivenProvisioningSystem dps = new ProfitDrivenProvisioningSystem(scheduler);
 		dps.setAccountingSystem(accounting);
@@ -68,8 +68,8 @@ public class ProfitDrivenProvisioningSystemTest {
 		EasyMock.replay(scheduler);
 		
 		AccountingSystem accounting = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		accounting.createMachine(new MachineDescriptor(1, true, 0));
-		accounting.createMachine(new MachineDescriptor(2, false, 0));
+		accounting.buyMachine();
+		accounting.buyMachine();
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
 		configurable.addServer(0, new MachineDescriptor(0, true, 0));
@@ -77,7 +77,7 @@ public class ProfitDrivenProvisioningSystemTest {
 		
 		ProfitDrivenProvisioningSystem dps = new ProfitDrivenProvisioningSystem(scheduler);
 		dps.setAccountingSystem(accounting);
-		dps.setConfigurable(configurable);
+		dps.registerConfigurable(configurable);
 		
 		EasyMock.replay(configurable);
 		
@@ -109,8 +109,8 @@ public class ProfitDrivenProvisioningSystemTest {
 		EasyMock.replay(scheduler);
 		
 		AccountingSystem accounting = new AccountingSystem(resourcesReservationLimit, onDemandLimit);
-		accounting.createMachine(new MachineDescriptor(1, true, 0));
-		accounting.createMachine(new MachineDescriptor(2, false, 0));
+		accounting.buyMachine();
+		accounting.buyMachine();
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
 		configurable.addServer(0, new MachineDescriptor(0, false, 0));
@@ -118,7 +118,7 @@ public class ProfitDrivenProvisioningSystemTest {
 		
 		ProfitDrivenProvisioningSystem dps = new ProfitDrivenProvisioningSystem(scheduler);
 		dps.setAccountingSystem(accounting);
-		dps.setConfigurable(configurable);
+		dps.registerConfigurable(configurable);
 		
 		EasyMock.replay(configurable);
 		

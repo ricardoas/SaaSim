@@ -1,5 +1,7 @@
 package commons.cloud;
 
+import java.util.List;
+
 /**
  * This class expresses the math utility function developed to represent the receipts and costs
  * considered when evaluating a certain infrastructure.
@@ -7,6 +9,10 @@ package commons.cloud;
  *
  */
 public class UtilityFunction {
+	
+	private List<Provider> providers;
+	
+	
 	
 	public static long HOUR_IN_MILLIS = 1000 * 60 * 60;
 

@@ -1,21 +1,98 @@
 package commons.cloud;
 
-public class User{
+public class User implements Comparable<User>{
 	
-	public String id;
-	public double consumedCpu;
-	public double consumedTransference;
-	public double consumedStorage;
+	private static int idGenerator = 0;
+	
+	private final int id;
+	private final Contract contract;
+	
+	private long consumedCpu;
+	private long consumedInTransferenceInBytes;
+	private long consumedOutTransferenceInBytes;
+	private long consumedStorageInBytes;
 
-	public User(String id) {
-		this.id = id;
+	public User(Contract contract) {
+		this.id = idGenerator++;
+		this.contract = contract;
+		reset();
+	}
+	
+	public void reset(){
+		consumedCpu = 0;
+		consumedInTransferenceInBytes = 0;
+		consumedOutTransferenceInBytes = 0;
+		consumedStorageInBytes = 0;
+	}
+	
+	public void update(long consumedCPU, long inTransferenceInBytes, long outTransferenceInBytes, long storageInBytes){
+		this.consumedCpu += consumedCPU;
+		this.consumedInTransferenceInBytes += inTransferenceInBytes;
+		this.consumedOutTransferenceInBytes += outTransferenceInBytes;
+		this.consumedStorageInBytes += storageInBytes;
+	}
+	
+	/**
+	 * @return the id
+	 */
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * @return the contract
+	 */
+	public Contract getContract() {
+		return contract;
+	}
+
+	/**
+	 * @return the consumedCpu
+	 */
+	public long getTotalConsumedCpu() {
+		return consumedCpu;
+	}
+
+	/**
+	 * @return the consumedCpu
+	 */
+	public long getConsumedCpu() {
+		return Math.min(consumedCpu, contract.getCpuLimit());
+	}
+
+	/**
+	 * @return the consumedCpu
+	 */
+	public long getExtraCpu() {
+		return Math.max(consumedCpu-contract.getCpuLimit(), 0);
+	}
+
+	/**
+	 * @return the consumedInTransferenceInBytes
+	 */
+	public long getConsumedInTransferenceInBytes() {
+		return consumedInTransferenceInBytes;
+	}
+
+	/**
+	 * @return the consumedOutTransferenceInBytes
+	 */
+	public long getConsumedOutTransferenceInBytes() {
+		return consumedOutTransferenceInBytes;
+	}
+
+	/**
+	 * @return the consumedStorageInBytes
+	 */
+	public long getConsumedStorageInBytes() {
+		return consumedStorageInBytes;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + id;
 		return result;
 	}
 
@@ -28,11 +105,21 @@ public class User{
 		if (getClass() != obj.getClass())
 			return false;
 		User other = (User) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
+		if (id != other.id)
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "User [id=" + id + 
+			 "\n      CPU used=" + consumedCpu + 
+			 " (millis)\n      data transferred=" + consumedInTransferenceInBytes	+ 
+			 " (B)\n      storage used=" + consumedStorageInBytes + " (B)]";
+	}
+
+	@Override
+	public int compareTo(User o) {
+		return this.contract.compareTo(o.contract);
 	}
 }

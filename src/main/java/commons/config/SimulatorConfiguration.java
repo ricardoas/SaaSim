@@ -25,6 +25,7 @@ import commons.sim.schedulingheuristics.RanjanHeuristic;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
 import commons.sim.util.SimpleApplicationFactory;
 import commons.sim.util.SimulatorProperties;
+import commons.sim.util.UsersProperties;
 
 
 /**
@@ -41,7 +42,7 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 	private Map<String, Provider> providers;//Map containing providers to be simulated
 	
 	//Users SaaS plans
-	public Map<String, Contract> contractsPerName;
+//	public Map<String, Contract> contractsPerName;
 	
 	public Map<User, Contract> usersContracts;
 	
@@ -398,41 +399,39 @@ public class SimulatorConfiguration	extends PropertiesConfiguration{
 	 * @return A map containing each user in the system and its signed contract
 	 * @throws IOException
 	 */
-	public Map<String, Contract> getContractsPerName() {
-		if(this.contractsPerName == null){
-			this.buildPlans();
-		}
-		
-		return this.contractsPerName;
-	}
+//	public Map<String, Contract> getContractsPerName() {
+//		if(this.contractsPerName == null){
+//			this.buildPlans();
+//		}
+//		
+//		return this.contractsPerName;
+//	}
 	
 	private void buildPlans() {
 		
-		contractsPerName = new HashMap<String, Contract>();
+		Map<String, Contract> contractsPerName = new HashMap<String, Contract>();
 		
 		int numberOfPlans = getInt(NUMBER_OF_PLANS);
 		String[] planNames = getStringArray(PLAN_NAME);
+		String[] planPriorities = getStringArray(PLAN_PRIORITY);
 		String[] prices = getStringArray(PLAN_PRICE);
 		String[] setupCosts = getStringArray(PLAN_SETUP);
 		String[] cpuLimits = getStringArray(PLAN_CPU_LIMIT);
 		String[] extraCpuCosts = getStringArray(PLAN_EXTRA_CPU_COST);
 		String[] planTransferLimits = getStringArray(PLAN_TRANSFER_LIMIT);
 		String[] planExtraTransferCost = getStringArray(PLAN_EXTRA_TRANSFER_COST);
-//		String[] users = getStringArray(PLAN_USERS);
-		String associations = getString(ASSOCIATIONS);	
 		
 		for(int i = 0; i < numberOfPlans; i++){
 			contractsPerName.put(planNames[i], 
-					new Contract(planNames[i], Double.valueOf(setupCosts[i]), Double.valueOf(prices[i]), 
-							Double.valueOf(cpuLimits[i]), Double.valueOf(extraCpuCosts[i])));
+					new Contract(planNames[i], Integer.valueOf(planPriorities[i]), Double.valueOf(setupCosts[i]), Double.valueOf(prices[i]), 
+							Long.valueOf(cpuLimits[i]), Double.valueOf(extraCpuCosts[i])));
 		}
 		
 		//Extract users associations
 		usersContracts = new HashMap<User, Contract>();
-		String[] usersAssociated = associations.split(";");
-		for(String association : usersAssociated){
-			String[] split = association.split("\\s+");
-			usersContracts.put(new User(split[0]), contractsPerName.get(split[1]));
+		String[] plans = SimulatorConfiguration.getInstance().getStringArray(UsersProperties.USER_PLAN);
+		for (int i = 0; i < plans.length; i++) {
+			usersContracts.put(new User(contractsPerName.get(plans[i])), contractsPerName.get(plans[i]));
 		}
 	}
 
