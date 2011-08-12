@@ -33,7 +33,6 @@ public class RanjanMachine extends TimeSharedMachine {
 		this.backlog = new LinkedList<Request>();
 		this.maximumNumberOfSimultaneousThreads = SimulatorConfiguration.getInstance().getMaximumNumberOfThreadsPerMachine();
 		this.backlogMaximumNumberOfRequests = SimulatorConfiguration.getInstance().getMaximumBacklogSize();
-		System.out.println("RanjanMachine.RanjanMachine() = " + maximumNumberOfSimultaneousThreads + " " + backlogMaximumNumberOfRequests);
 	}
 	
 	/**

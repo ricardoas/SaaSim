@@ -46,7 +46,6 @@ public class LoadBalancerTest {
 	public void handleEventNewRequestWithOneMachine() throws ConfigurationException{
 		Request request = EasyMock.createStrictMock(Request.class);
 		JEEvent event = EasyMock.createStrictMock(JEEvent.class);
-		MachineDescriptor descriptor = EasyMock.createStrictMock(MachineDescriptor.class);
 		Machine machine = EasyMock.createStrictMock(TimeSharedMachine.class);
 		this.schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
 		
@@ -63,13 +62,13 @@ public class LoadBalancerTest {
 		machine.sendRequest(request);
 		
 		PowerMock.replay(SimulatorConfiguration.class);
-		EasyMock.replay(event, schedulingHeuristic, descriptor, request, machine, config);
+		EasyMock.replay(event, schedulingHeuristic, request, machine, config);
 		
-		lb = new LoadBalancer(eventScheduler, null, schedulingHeuristic, Integer.MAX_VALUE, descriptor);
+		lb = new LoadBalancer(eventScheduler, null, schedulingHeuristic, Integer.MAX_VALUE, 1);
 		lb.handleEvent(event);
 		
 		PowerMock.verify(SimulatorConfiguration.class);
-		EasyMock.verify(event, schedulingHeuristic, descriptor, request, machine, config);
+		EasyMock.verify(event, schedulingHeuristic, request, machine, config);
 		
 		assertEquals(1, lb.getServers().size());
 	}
@@ -96,7 +95,7 @@ public class LoadBalancerTest {
 		EasyMock.replay(event, schedulingHeuristic, request, dps);
 		
 		//Load balancer being constructed without machines!
-		lb = new LoadBalancer(eventScheduler, dps, schedulingHeuristic, Integer.MAX_VALUE);
+		lb = new LoadBalancer(eventScheduler, dps, schedulingHeuristic, Integer.MAX_VALUE, 1);
 		lb.handleEvent(event);
 		
 		EasyMock.verify(event, schedulingHeuristic, request, dps);

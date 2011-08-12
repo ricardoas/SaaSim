@@ -149,7 +149,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		Request nextRequest = processorQueue.peek();
 		long nextQuantum = Math.min(nextRequest.getTotalToProcess(), cpuQuantumInMilis);
 		lastUpdate = getScheduler().now();
-		send(new JEEvent(JEEventType.PREEMPTION, this, new JETime(nextQuantum).plus(getScheduler().now()), nextQuantum));
+		send(new JEEvent(JEEventType.PREEMPTION, this, new JETime(nextQuantum).plus(lastUpdate), nextQuantum));
 	}
 	
 	public boolean isBusy() {

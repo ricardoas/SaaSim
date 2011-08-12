@@ -33,13 +33,12 @@ public class SimpleSimulator extends JEAbstractEventHandler implements JEEventHa
 
 	/**
 	 * Constructor
-	 * @param scheduler TODO
 	 * @param list 
 	 * @throws IOException 
 	 */
-	public SimpleSimulator(JEEventScheduler scheduler, Monitor monitor){
-		super(scheduler);
-		this.tiers = ApplicationFactory.getInstance().createNewApplication(scheduler, monitor);
+	public SimpleSimulator(Monitor monitor){
+		super(new JEEventScheduler());
+		this.tiers = ApplicationFactory.getInstance().createNewApplication(getScheduler(), monitor);
 	}
 	
 	/**

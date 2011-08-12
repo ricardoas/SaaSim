@@ -4,7 +4,6 @@ import provisioning.Monitor;
 
 import commons.sim.SimpleSimulator;
 import commons.sim.Simulator;
-import commons.sim.jeevent.JEEventScheduler;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -33,11 +32,10 @@ public class SimulatorFactory {
 	}
 
 	/**
-	 * @param scheduler 
 	 * @param monitor TODO
 	 * 
 	 */
-	public Simulator buildSimulator(JEEventScheduler scheduler, Monitor monitor){
-		return new SimpleSimulator(scheduler, monitor);
+	public Simulator buildSimulator(Monitor monitor){
+		return new SimpleSimulator(monitor);
 	}
 }

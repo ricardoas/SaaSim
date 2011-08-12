@@ -35,7 +35,7 @@ public class RanjanMachineTest {
 
 	@Before
 	public void setUp() throws Exception {
-		this.descriptor = new MachineDescriptor(1, false, 0);
+		this.descriptor = new MachineDescriptor(1, false);
 	}
 
 	@Test
@@ -290,23 +290,19 @@ public class RanjanMachineTest {
 	@Test
 	public void sendDifferentRequestsAtSameTime() throws Exception{
 		SimulatorConfiguration config = mockConfiguration();
-		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(DEFAULT_MAX_NUM_OF_THREADS);
-		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(DEFAULT_BACKLOG_SIZE);
 		
 		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(7);
+		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(3);
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(firstRequest.getDemand()).andReturn(600000L).once();
-		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(0L).once();
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(600000L).once();
 
 		Request secondRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(secondRequest.getDemand()).andReturn(300000L).once();
 
 		PowerMock.replay(SimulatorConfiguration.class);
 		EasyMock.replay(scheduler, firstRequest, secondRequest, config);
 		
-		Machine machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
+		Machine machine = new RanjanMachine(scheduler, descriptor, null);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
 		
@@ -332,26 +328,20 @@ public class RanjanMachineTest {
 	@Test
 	public void sendTwoIdenticalRequestsAtDifferentOverlappingTimes() throws Exception{
 		SimulatorConfiguration config = mockConfiguration();
-		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(DEFAULT_MAX_NUM_OF_THREADS);
-		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(DEFAULT_BACKLOG_SIZE);
 		
 		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(3);
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(100000L)).times(4);
+		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(2);
+		EasyMock.expect(scheduler.now()).andReturn(new JETime(100L));
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(firstRequest.getDemand()).andReturn(600000L).once();
-		firstRequest.update(100000L);
-		EasyMock.expectLastCall();
-		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(500000L).once();
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(600L).once();
 
 		Request secondRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(secondRequest.getDemand()).andReturn(600000L).once();
 		
 		PowerMock.replay(SimulatorConfiguration.class);
 		EasyMock.replay(scheduler, firstRequest, secondRequest, config);
 		
-		Machine machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
+		Machine machine = new RanjanMachine(scheduler, descriptor, null);
 
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
@@ -404,7 +394,7 @@ public class RanjanMachineTest {
 		PowerMock.replay(SimulatorConfiguration.class);
 		EasyMock.replay(scheduler, firstRequest, secondRequest, config, loadBalancer);
 		
-		Machine machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), loadBalancer);
+		Machine machine = new RanjanMachine(scheduler, descriptor, loadBalancer);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
 		
@@ -448,7 +438,7 @@ public class RanjanMachineTest {
 		PowerMock.replay(SimulatorConfiguration.class);
 		EasyMock.replay(request, scheduler, config);
 		
-		Machine machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, 0), null);
+		Machine machine = new RanjanMachine(scheduler, descriptor, null);
 		machine.sendRequest(request);
 		
 		//Verifying utilization

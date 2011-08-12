@@ -43,8 +43,6 @@ public class Provider {
 		this.transferInCosts = transferInCosts;
 		this.transferOutLimits = transferOutLimits;
 		this.transferOutCosts = transferOutCosts;
-		
-		this.verifyProperties();
 	}
 
 	@Deprecated
