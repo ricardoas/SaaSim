@@ -19,6 +19,9 @@ import commons.config.Configuration;
 import commons.sim.util.SimulatorProperties;
 
 
+/**
+ * FIXME don't know what to do yet.
+ */
 public class WorkloadParserTest {
 	
 	private static String W1 = "src/test/resources/workload/w1.dat";

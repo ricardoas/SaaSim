@@ -65,6 +65,8 @@ public class LoadBalancerTest {
 		EasyMock.replay(event, schedulingHeuristic, request, machine, config);
 		
 		lb = new LoadBalancer(eventScheduler, null, schedulingHeuristic, Integer.MAX_VALUE, 1);
+		MachineDescriptor descriptor = new MachineDescriptor(1, false);
+		lb.addServer(descriptor, false);
 		lb.handleEvent(event);
 		
 		PowerMock.verify(Configuration.class);
@@ -82,12 +84,12 @@ public class LoadBalancerTest {
 		Request request = EasyMock.createStrictMock(Request.class);
 		JEEvent event = EasyMock.createStrictMock(JEEvent.class);
 		DPS dps = EasyMock.createStrictMock(DPS.class);
+		dps.requestQueued(0, request, 1);
 		
 		this.schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
 		
 		EasyMock.expect(event.getType()).andReturn(JEEventType.NEWREQUEST).once();
 		EasyMock.expect(event.getValue()).andReturn(new Request [] {request}).once();
-		EasyMock.expect(dps.getHandlerId()).andReturn(1).once();
 		
 		EasyMock.expect(schedulingHeuristic.getNextServer(
 				EasyMock.isA(Request.class) , EasyMock.isA(List.class))).andReturn(null);

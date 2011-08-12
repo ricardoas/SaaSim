@@ -66,7 +66,7 @@ public class RanjanHeuristicTest {
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false, 0), null);
+		Machine machine1 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false), null);
 		servers.add(machine1);
 		
 		Machine nextServer = heuristic.getNextServer(request, servers);
@@ -93,11 +93,11 @@ public class RanjanHeuristicTest {
 		long time = ONE_MINUTE_IN_MILLIS * 1;
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false, 0), null);
-		Machine machine2 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(2, false, 0), null);
-		Machine machine3 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(3, false, 0), null);
-		Machine machine4 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(4, false, 0), null);
-		Machine machine5 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(5, false, 0), null);
+		Machine machine1 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false), null);
+		Machine machine2 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(2, false), null);
+		Machine machine3 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(3, false), null);
+		Machine machine4 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(4, false), null);
+		Machine machine5 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(5, false), null);
 		servers.add(machine1);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -180,11 +180,11 @@ public class RanjanHeuristicTest {
 		String userID = "u1";
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false, 0), null);
-		Machine machine2 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(2, false, 0), null);
-		Machine machine3 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(3, false, 0), null);
-		Machine machine4 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(4, false, 0), null);
-		Machine machine5 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(5, false, 0), null);
+		Machine machine1 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false), null);
+		Machine machine2 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(2, false), null);
+		Machine machine3 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(3, false), null);
+		Machine machine4 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(4, false), null);
+		Machine machine5 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(5, false), null);
 		servers.add(machine1);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -272,11 +272,11 @@ public class RanjanHeuristicTest {
 		String secondUserID = "u2";
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false, 0), null);
-		Machine machine2 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(2, false, 0), null);
-		Machine machine3 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(3, false, 0), null);
-		Machine machine4 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(4, false, 0), null);
-		Machine machine5 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(5, false, 0), null);
+		Machine machine1 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false), null);
+		Machine machine2 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(2, false), null);
+		Machine machine3 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(3, false), null);
+		Machine machine4 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(4, false), null);
+		Machine machine5 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(5, false), null);
 		servers.add(machine1);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -372,7 +372,7 @@ public class RanjanHeuristicTest {
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false, 0), null);
+		Machine machine1 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false), null);
 		servers.add(machine1);
 		
 		heuristic.getNextServer(request, servers);
