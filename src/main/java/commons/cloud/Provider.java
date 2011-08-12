@@ -1,12 +1,19 @@
 package commons.cloud;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import commons.sim.components.MachineDescriptor;
 import commons.util.Triple;
 
 public class Provider {
+	
+	private static int machineIDGenerator = 0;
+	private int currentOnDemandMachines;
+	private int currentReservedMachines;
+
 
 	public final String name;
 	public final double onDemandCpuCost;// in $/instance-hour
@@ -20,7 +27,9 @@ public class Provider {
 	private final double[] transferInCosts;
 	private final long[] transferOutLimits;
 	private final double[] transferOutCosts;
-
+	
+	private Map<Long, MachineDescriptor> runningMachines;
+	private List<MachineDescriptor> finishedMachines;
 
 	public Provider(String name, double cpuCost, int onDemandLimit,
 			int reservationLimit, double reservedCpuCost, double reservationOneYearFee,
@@ -39,6 +48,12 @@ public class Provider {
 		this.transferInCosts = transferInCosts;
 		this.transferOutLimits = transferOutLimits;
 		this.transferOutCosts = transferOutCosts;
+		
+		this.currentOnDemandMachines = 0;
+		this.currentReservedMachines = 0;
+		
+		this.runningMachines = new HashMap<Long, MachineDescriptor>();
+		this.finishedMachines = new ArrayList<MachineDescriptor>();
 	}
 	
 	/**
@@ -125,33 +140,12 @@ public class Provider {
 		return transferOutCosts;
 	}
 
-	@Deprecated
-	private void verifyProperties() {
-		if(this.onDemandCpuCost < 0){
-			throw new RuntimeException("Invalid provider "+this.name+": onDemandCpuCost "+this.onDemandCpuCost);
+	private double calculateCost(MachineDescriptor descriptor){
+		if(descriptor.isReserved()){
+			return (descriptor.getFinishTimeInMillis() - descriptor.getStartTimeInMillis()) * reservedCpuCost;
+		}else{
+			return (descriptor.getFinishTimeInMillis() - descriptor.getStartTimeInMillis()) * onDemandCpuCost;
 		}
-		if(this.onDemandLimit <= 0){
-			throw new RuntimeException("Invalid provider "+this.name+": onDemandLimit "+this.onDemandLimit);
-		}
-		if(this.reservationLimit <= 0){
-			throw new RuntimeException("Invalid provider "+this.name+": reservationLimit "+this.reservationLimit);
-		}
-		if(this.reservedCpuCost < 0){
-			throw new RuntimeException("Invalid provider "+this.name+": reservedCpuCost "+this.reservedCpuCost);
-		}
-		if(this.reservationOneYearFee < 0){
-			throw new RuntimeException("Invalid provider "+this.name+": reservationOneYearFee "+this.reservationOneYearFee);
-		}
-		if(this.reservationThreeYearsFee < 0){
-			throw new RuntimeException("Invalid provider "+this.name+": reservationThreeYearsFee "+this.reservationThreeYearsFee);
-		}
-		if(this.monitoringCost < 0){
-			throw new RuntimeException("Invalid provider "+this.name+": monitoringCost "+this.monitoringCost);
-		}
-	}
-	
-	public double calculateCost(MachineDescriptor descriptor){
-		return 0.0;
 	}
 
 
@@ -207,4 +201,62 @@ public class Provider {
 		}
 		return totalConsumed;
 	}
+
+	public boolean canBuyMachine(boolean reserved) {
+		return reserved ? currentReservedMachines < reservationLimit: currentOnDemandMachines < onDemandLimit;
+	}
+	
+	public MachineDescriptor buyMachine(boolean reserved) {
+		if(reserved){
+			currentReservedMachines++;
+		}else{
+			currentOnDemandMachines++;
+		}
+		return new MachineDescriptor(machineIDGenerator++, reserved);
+	}
+
+	public boolean shutdownMachine(MachineDescriptor machineDescriptor) {
+		if(runningMachines.remove(machineDescriptor.getMachineID()) == null){
+			return false;
+		}
+		finishedMachines.add(machineDescriptor);
+		if(machineDescriptor.isReserved()){
+			currentReservedMachines--;
+		}else{
+			currentOnDemandMachines--;
+		}
+		return true;
+	}
+
+	public double calculateCost() {
+		double cost = 0;
+		long inTransference = 0;
+		long outTransference = 0;
+		for (MachineDescriptor descriptor : finishedMachines) {
+			cost += calculateCost(descriptor);
+			inTransference += descriptor.getInTransference();
+			outTransference += descriptor.getOutTransference();
+		}
+		cost += calcTransferenceCost(inTransference, transferInLimits, transferInCosts);
+		cost += calcTransferenceCost(outTransference, transferOutLimits, transferOutCosts);
+		return cost;
+	}
+	
+	/**
+	 * TODO Code me!
+	 * @param totalTransfered
+	 * @param limits
+	 * @param costs
+	 * @return
+	 */
+	private double calcTransferenceCost(long totalTransfered,
+			long[] limits, double[] costs) {
+		return 0;
+	}
+
+	public void resetCostCounters(){
+		
+	}
+	
+	
 }

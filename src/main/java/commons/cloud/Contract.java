@@ -121,5 +121,11 @@ public class Contract implements Comparable<Contract>{
 	public int compareTo(Contract o) {
 		return o.priority - this.priority;
 	}
+
+	public double calculateReceipt(long consumedCpu,
+			long consumedInTransferenceInBytes,
+			long consumedOutTransferenceInBytes, long consumedStorageInBytes) {
+		return price + Math.max(0, consumedCpu-cpuLimit) * extraCpuCost;
+	}
 	
 }

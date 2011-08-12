@@ -122,4 +122,8 @@ public class User implements Comparable<User>{
 	public int compareTo(User o) {
 		return this.contract.compareTo(o.contract);
 	}
+
+	public double calculateReceipt() {
+		return this.contract.calculateReceipt(consumedCpu, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, consumedStorageInBytes);
+	}
 }

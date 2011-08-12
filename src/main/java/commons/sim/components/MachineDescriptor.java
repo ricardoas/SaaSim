@@ -1,6 +1,7 @@
 package commons.sim.components;
 
 
+
 /**
  * Machine information.
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -11,6 +12,8 @@ public class MachineDescriptor {
 	private final boolean reserved;
 	private long startTimeInMillis;
 	private long finishTimeInMillis;
+	private long inTransference;
+	private long outTransference;
 
 	/**
 	 * Default constructor.
@@ -66,5 +69,33 @@ public class MachineDescriptor {
 		if (machineID != other.machineID)
 			return false;
 		return true;
+	}
+
+	/**
+	 * @return the inTransference
+	 */
+	public long getInTransference() {
+		return inTransference;
+	}
+
+	/**
+	 * @param inTransference the inTransference to set
+	 */
+	public void setInTransference(long inTransference) {
+		this.inTransference = inTransference;
+	}
+
+	/**
+	 * @return the outTransference
+	 */
+	public long getOutTransference() {
+		return outTransference;
+	}
+
+	/**
+	 * @param outTransference the outTransference to set
+	 */
+	public void setOutTransference(long outTransference) {
+		this.outTransference = outTransference;
 	}
 }

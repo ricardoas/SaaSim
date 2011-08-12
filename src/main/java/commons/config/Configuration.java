@@ -75,10 +75,7 @@ public class Configuration	extends PropertiesConfiguration{
 	 */
 	private static Configuration instance;
 	
-	private Map<String, Provider> providers;//Map containing providers to be simulated
-	
-	//Users SaaS plans
-//	public Map<String, Contract> contractsPerName;
+	private List<Provider> providers;
 	
 	public List<User> users;
 	
@@ -346,7 +343,7 @@ public class Configuration	extends PropertiesConfiguration{
 	 * @return
 	 * @throws IOException
 	 */
-	public Map<String, Provider> getProviders() {
+	public List<Provider> getProviders() {
 		if(this.providers == null){
 			this.buildProvider();
 		}
@@ -370,7 +367,7 @@ public class Configuration	extends PropertiesConfiguration{
 		String[] transferOutLimits = getStringArray(IAAS_TRANSFER_OUT);
 		String[] transferOutCosts = getStringArray(IAAS_COST_TRANSFER_OUT);
 		
-		providers = new HashMap<String, Provider>();
+		providers = new ArrayList<Provider>();
 		for(int i = 0; i < numberOfProviders; i++){
 
 			long [] inLimits = convertToLongArray(transferInLimits[i]);
@@ -378,8 +375,7 @@ public class Configuration	extends PropertiesConfiguration{
 			long [] outLimits = convertToLongArray(transferOutLimits[i]);
 			double [] outCosts = convertToDoubleArray(transferOutCosts[i]);
 
-			providers.put(names[i], 
-					new Provider(names[i], Double.valueOf(cpuCosts[i]), Integer.valueOf(onDemandLimits[i]),
+			providers.add(new Provider(names[i], Double.valueOf(cpuCosts[i]), Integer.valueOf(onDemandLimits[i]),
 							Integer.valueOf(reservedLimits[i]), Double.valueOf(reservedCpuCosts[i]),
 							Double.valueOf(reservationOneYearFees[i]), Double.valueOf(reservationThreeYearsFees[i]),
 							Double.valueOf(monitoringCosts[i]), inLimits, inCosts, 

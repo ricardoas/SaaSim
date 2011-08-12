@@ -7,11 +7,12 @@ import commons.cloud.Request;
 import commons.cloud.UtilityResult;
 import commons.sim.AccountingSystem;
 import commons.sim.components.MachineDescriptor;
-import commons.sim.components.ProcessorSharedMachine;
-import commons.sim.jeevent.JEEvent;
-import commons.sim.jeevent.JETime;
 import commons.sim.provisioningheuristics.RanjanStatistics;
 
+/**
+ * 
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ */
 public class DynamicProvisioningSystem implements DPS{
 
 	protected long availableIDs;
@@ -24,10 +25,13 @@ public class DynamicProvisioningSystem implements DPS{
 
 	private UtilityResult utilityResult;
 
+	/**
+	 * Default constructor.
+	 */
 	public DynamicProvisioningSystem() {
 		this.availableIDs = 0;
 		this.configurables = new HashMap<Long, DynamicConfigurable>();
-		
+		this.accountingSystem = new AccountingSystem();
 	}
 	
 	@Override
@@ -35,9 +39,9 @@ public class DynamicProvisioningSystem implements DPS{
 		this.accountingSystem.setUpConfigurables(configurable);
 	}
 
-	@Deprecated
-	public void reportRequestFinished(Request requestFinished) {
-		this.accountingSystem.reportRequestFinished(requestFinished);
+	@Override
+	public void reportRequestFinished(Request request) {
+		this.accountingSystem.reportRequestFinished(request);
 	}
 	
 	@Override
