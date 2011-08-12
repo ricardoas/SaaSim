@@ -124,6 +124,13 @@ public class User implements Comparable<User>{
 	}
 
 	public double calculateReceipt() {
-		return this.contract.calculateReceipt(consumedCpu, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, consumedStorageInBytes);
+		double receipt = this.contract.calculateReceipt(consumedCpu, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, consumedStorageInBytes);
+		this.reset();
+		return receipt;
+	}
+
+
+	public double calculateUnicReceipt() {
+		return this.contract.getSetupCost();
 	}
 }

@@ -20,18 +20,17 @@ import commons.sim.util.UsersProperties;
 public class AccountingSystem {
 	
 	protected Map<String, List<String>> requestsFinishedPerUser;
+	protected Map<String, List<String>> requestsLostPerUser;
 	
 	protected double totalTransferred;
-	
 	
 	private List<User> users;
 
 	private List<Provider> providers;
 	
 	public AccountingSystem(){
-		this.totalTransferred = 0d;
-		
 		this.requestsFinishedPerUser = new HashMap<String, List<String>>();
+		this.requestsLostPerUser = new HashMap<String, List<String>>();
 		
 		this.providers = Configuration.getInstance().getProviders();
 		
@@ -47,7 +46,6 @@ public class AccountingSystem {
 		}
 		
 		requestsFinished.add(request.getRequestID());
-		this.totalTransferred += request.getSizeInBytes();
 	}
 	
 	public int getRequestsFinished(String userID){
@@ -55,10 +53,20 @@ public class AccountingSystem {
 		return (requestsFinished != null) ? requestsFinished.size() : 0;
 	}
 	
-	public double calculateUtility(){
-		return calculateReceipt() - calculateCost();
+	public double calculateUtility(long currentTimeInMillis){
+		//TODO: Add utility result!
+		return calculateReceipt() - calculateCost(currentTimeInMillis) - calculatePenalties();
 	}
 	
+	private double calculatePenalties() {
+		//TODO: Code me!
+		return 0d;
+	}
+	
+	/**
+	 * This method calculates the receipts incurred by SaaS providers periodically. (e.g, each month)  
+	 * @return
+	 */
 	private double calculateReceipt() {
 		double receipt = 0;
 		for (User user : users) {
@@ -66,13 +74,43 @@ public class AccountingSystem {
 		}
 		return receipt;
 	}
-
-	private double calculateCost() {
+	
+	/**
+	 * This method calculates the receipts incurred by SaaS providers in a unique period. (e.g, one time
+	 * during a whole year)  
+	 * @return
+	 */
+	public double calculateUniqueReceipt(){
+		double unicReceipt = 0d;
+		for(User user : users){
+			unicReceipt += user.calculateUnicReceipt();
+		}
+		return unicReceipt;
+	}
+	
+	/**
+	 * This method calculates the costs incurred by IaaS providers periodically. (e.g, each month)  
+	 * @return
+	 */
+	private double calculateCost(long currentTimeInMillis) {
 		double cost = 0.0;
 		for (Provider provider : providers) {
-			cost += provider.calculateCost();
+			cost += provider.calculateCost(currentTimeInMillis);
 		}
 		return cost;
+	}
+	
+	/**
+	 * This method calculates the costs incurred by IaaS providers in a unique period. (e.g, one time
+	 * during a whole year)  
+	 * @return
+	 */
+	public double calculateUniqueCost(){
+		double unicCost = 0d;
+		for(Provider provider : providers){
+			unicCost += provider.calculateUnicCost();
+		}
+		return unicCost;
 	}
 
 	/**
@@ -134,8 +172,14 @@ public class AccountingSystem {
 		return null;
 	}
 
-	public void reportLostRequest(Request request) {
-		// FIXME Code me!
+	public void reportRequestLost(Request request) {
+		List<String> requestsFinished = this.requestsLostPerUser.get(request.getUserID());
+		if(requestsFinished == null){
+			requestsFinished = new ArrayList<String>();
+			this.requestsLostPerUser.put(request.getUserID(), requestsFinished);
+		}
+		
+		requestsFinished.add(request.getRequestID());
 	}
 
 	public void reportMachineFinish(MachineDescriptor descriptor) {

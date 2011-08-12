@@ -65,6 +65,6 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 	
 	@Override
 	public void requestQueued(long timeMilliSeconds, Request request, int tier) {
-		accountingSystem.reportLostRequest(request);
+		accountingSystem.reportRequestLost(request);
 	}
 }

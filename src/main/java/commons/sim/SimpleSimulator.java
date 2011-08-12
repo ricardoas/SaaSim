@@ -1,5 +1,6 @@
 package commons.sim;
 
+import static commons.io.TimeBasedWorkloadParser.DAY_IN_MILLIS;
 import java.io.IOException;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements JEEventHa
 	private int currentMonth = 0;
 
 	private WorkloadParser<List<Request>> workloadParser;
-	protected LoadBalancer loadBalancer;
+	
 	private List<LoadBalancer> tiers;
 
 	/**
@@ -56,11 +57,9 @@ public class SimpleSimulator extends JEAbstractEventHandler implements JEEventHa
 		this.workloadParser = workloadParser;
 	}
 	
-	
-
 	protected void prepareBeforeStart() {
 		send(new JEEvent(JEEventType.READWORKLOAD, this, getScheduler().now()));
-//		send(new JEEvent(JEEventType.CHANGE_USERS, this, getScheduler().now().plus(new JETime(DAY_IN_MILLIS * daysInMonths[currentMonth++]))));
+		send(new JEEvent(JEEventType.CHARGE_USERS, this, getScheduler().now().plus(new JETime(DAY_IN_MILLIS * daysInMonths[currentMonth++]))));
 	}
 
 	/**
@@ -81,6 +80,9 @@ public class SimpleSimulator extends JEAbstractEventHandler implements JEEventHa
 					e.printStackTrace();
 				}
 				break;
+			case CHARGE_USERS:
+				tiers.get(0).chargeUsers();
+				send(new JEEvent(JEEventType.CHARGE_USERS, this, getScheduler().now().plus(new JETime(DAY_IN_MILLIS * daysInMonths[currentMonth++]))));
 			default:
 				break;
 		}
@@ -91,7 +93,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements JEEventHa
 	 * @return
 	 */
 	protected JEEvent parseEvent(Request request) {
-		return new JEEvent(JEEventType.NEWREQUEST, loadBalancer, new JETime(request.getTimeInMillis()), request);
+		return new JEEvent(JEEventType.NEWREQUEST, tiers.get(0), new JETime(request.getTimeInMillis()), request);
 	}
 
 	/**

@@ -14,7 +14,6 @@ public class Provider {
 	private int currentOnDemandMachines;
 	private int currentReservedMachines;
 
-
 	public final String name;
 	public final double onDemandCpuCost;// in $/instance-hour
 	public final int onDemandLimit;// in number of instances
@@ -30,6 +29,8 @@ public class Provider {
 	
 	private Map<Long, MachineDescriptor> runningMachines;
 	private List<MachineDescriptor> finishedMachines;
+	
+	private int totalNumberOfReservedMachinesUsed;
 
 	public Provider(String name, double cpuCost, int onDemandLimit,
 			int reservationLimit, double reservedCpuCost, double reservationOneYearFee,
@@ -54,6 +55,7 @@ public class Provider {
 		
 		this.runningMachines = new HashMap<Long, MachineDescriptor>();
 		this.finishedMachines = new ArrayList<MachineDescriptor>();
+		this.totalNumberOfReservedMachinesUsed = 0;
 	}
 	
 	/**
@@ -147,8 +149,115 @@ public class Provider {
 			return (descriptor.getFinishTimeInMillis() - descriptor.getStartTimeInMillis()) * onDemandCpuCost;
 		}
 	}
+	
+	private double calculateCost(MachineDescriptor descriptor, long currentTime){
+		if(descriptor.isReserved()){
+			return (currentTime - descriptor.getStartTimeInMillis()) * reservedCpuCost;
+		}else{
+			return (currentTime - descriptor.getStartTimeInMillis()) * onDemandCpuCost;
+		}
+	}
 
+	public boolean canBuyMachine(boolean reserved) {
+		return reserved ? currentReservedMachines < reservationLimit: currentOnDemandMachines < onDemandLimit;
+	}
+	
+	public MachineDescriptor buyMachine(boolean reserved) {
+		if(reserved){
+			currentReservedMachines++;
+		}else{
+			currentOnDemandMachines++;
+		}
+		return new MachineDescriptor(machineIDGenerator++, reserved);
+	}
 
+	public boolean shutdownMachine(MachineDescriptor machineDescriptor) {
+		if(runningMachines.remove(machineDescriptor.getMachineID()) == null){
+			return false;
+		}
+		finishedMachines.add(machineDescriptor);
+		if(machineDescriptor.isReserved()){
+			currentReservedMachines--;
+		}else{
+			currentOnDemandMachines--;
+		}
+		return true;
+	}
+
+	public double calculateCost(long currentTimeInMillis) {
+		double cost = 0;
+		long inTransference = 0;
+		long outTransference = 0;
+		
+		//Finished machines
+		for (MachineDescriptor descriptor : finishedMachines) {
+			cost += calculateCost(descriptor);
+			inTransference += descriptor.getInTransference();
+			outTransference += descriptor.getOutTransference();
+			if(descriptor.isReserved()){
+				this.totalNumberOfReservedMachinesUsed++;
+			}
+		}
+		cost += calcTransferenceCost(inTransference, transferInLimits, transferInCosts);
+		cost += calcTransferenceCost(outTransference, transferOutLimits, transferOutCosts);
+		
+		//Current running machines
+		long runningIn = 0;
+		long runningOut = 0;
+		
+		for(MachineDescriptor descriptor : runningMachines.values()){
+			double currentCost = calculateCost(descriptor, currentTimeInMillis);
+			double alreadyPayed = descriptor.getCostAlreadyPayed();
+			descriptor.setCostAlreadyPayed(currentCost);
+			cost += currentCost - alreadyPayed;
+			
+			long currentIn = descriptor.getInTransference();
+			long inPayed = descriptor.getInTransferencePayed();
+			descriptor.setInTransferencePayed(currentIn);
+			runningIn += currentIn - inPayed;
+			
+			long currentOut = descriptor.getOutTransference();
+			long outPayed = descriptor.getOutTransferencePayed();
+			descriptor.setOutTransferencePayed(currentOut);
+			runningOut += currentOut - outPayed;
+			
+			if(descriptor.isReserved()){
+				this.totalNumberOfReservedMachinesUsed++;
+			}
+		}
+		
+		cost += calcTransferenceCost(runningIn, transferInLimits, transferInCosts);
+		cost += calcTransferenceCost(runningOut, transferOutLimits, transferOutCosts);
+		
+		this.resetCostCounters();
+		
+		return cost;
+	}
+	
+	/**
+	 * TODO Code me!
+	 * @param totalTransfered
+	 * @param limits
+	 * @param costs
+	 * @return
+	 */
+	private double calcTransferenceCost(long totalTransfered,
+			long[] limits, double[] costs) {
+		return 0;
+	}
+
+	public void resetCostCounters(){
+		this.finishedMachines.clear();
+	}
+	
+	public double calculateUnicCost() {
+		double result = this.totalNumberOfReservedMachinesUsed * this.reservationOneYearFee;
+		this.totalNumberOfReservedMachinesUsed = 0;
+		return result;
+	}
+	
+	
+	//Deprecated!
 	public double calculateCost(double consumedTransference) {
 		return this.calculateReservationCosts() + this.calculateOnDemandCosts() + this.calculateTransferenceCosts(consumedTransference);
 	}
@@ -157,7 +266,7 @@ public class Provider {
 	private double calculateTransferenceCosts(double consumedTransference) {
 		return 0;
 	}
-
+	
 	private double calculateOnDemandCosts() {
 		double totalConsumed = this.onDemandConsumption();
 		return totalConsumed * this.onDemandCpuCost + totalConsumed * monitoringCost;
@@ -201,62 +310,4 @@ public class Provider {
 		}
 		return totalConsumed;
 	}
-
-	public boolean canBuyMachine(boolean reserved) {
-		return reserved ? currentReservedMachines < reservationLimit: currentOnDemandMachines < onDemandLimit;
-	}
-	
-	public MachineDescriptor buyMachine(boolean reserved) {
-		if(reserved){
-			currentReservedMachines++;
-		}else{
-			currentOnDemandMachines++;
-		}
-		return new MachineDescriptor(machineIDGenerator++, reserved);
-	}
-
-	public boolean shutdownMachine(MachineDescriptor machineDescriptor) {
-		if(runningMachines.remove(machineDescriptor.getMachineID()) == null){
-			return false;
-		}
-		finishedMachines.add(machineDescriptor);
-		if(machineDescriptor.isReserved()){
-			currentReservedMachines--;
-		}else{
-			currentOnDemandMachines--;
-		}
-		return true;
-	}
-
-	public double calculateCost() {
-		double cost = 0;
-		long inTransference = 0;
-		long outTransference = 0;
-		for (MachineDescriptor descriptor : finishedMachines) {
-			cost += calculateCost(descriptor);
-			inTransference += descriptor.getInTransference();
-			outTransference += descriptor.getOutTransference();
-		}
-		cost += calcTransferenceCost(inTransference, transferInLimits, transferInCosts);
-		cost += calcTransferenceCost(outTransference, transferOutLimits, transferOutCosts);
-		return cost;
-	}
-	
-	/**
-	 * TODO Code me!
-	 * @param totalTransfered
-	 * @param limits
-	 * @param costs
-	 * @return
-	 */
-	private double calcTransferenceCost(long totalTransfered,
-			long[] limits, double[] costs) {
-		return 0;
-	}
-
-	public void resetCostCounters(){
-		
-	}
-	
-	
 }

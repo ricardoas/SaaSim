@@ -42,6 +42,8 @@ public class GEISTMonthlyWorkloadParser implements WorkloadParser<List<Request>>
 	private final String[] workloadFiles;
 	private final BufferedReader [] readers;
 	public int currentMonth;
+	private Request nextRequest;
+	
 	private Map<User, List<Request>> nextRequests;
 	private Map<User, List<Request>> lastWorkloadRead;
 	
@@ -66,16 +68,19 @@ public class GEISTMonthlyWorkloadParser implements WorkloadParser<List<Request>>
 	@Override
 	public List<Request> next() throws IOException {
 		
-		this.lastWorkloadRead = new HashMap<User, List<Request>>();
+//		this.lastWorkloadRead = new HashMap<User, List<Request>>();
 		List<Request> workloadList = new ArrayList<Request>();
-		
 		int nextMonth = Integer.MAX_VALUE;
 		
 		//Verifying if any event was stored in previous read
-		if(this.nextRequests.size() != 0){
-			lastWorkloadRead.putAll(this.nextRequests);
-			this.nextRequests.clear();
+		if(nextRequest != null){
+			workloadList.add(nextRequest);
+			nextRequest = null;
 		}
+//		if(this.nextRequests.size() != 0){
+//			lastWorkloadRead.putAll(this.nextRequests);
+//			this.nextRequests.clear();
+//		}
 		
 		for(int i = 0; i < this.readers.length; i++){
 			BufferedReader reader = this.readers[i];
@@ -87,25 +92,29 @@ public class GEISTMonthlyWorkloadParser implements WorkloadParser<List<Request>>
 				//Adding new event to its corresponding user
 				int monthOfEvent = getMonthOfEvent(request.getTimeInMillis());
 				if(monthOfEvent == this.currentMonth){//An event of current iteration was found
-					User user = new User(eventData[1]);//Users are identified uniquely by their ids
-					List<Request> userWorkload = lastWorkloadRead.get(user);
-					if(userWorkload == null){
-						userWorkload = new ArrayList<Request>();
-						lastWorkloadRead.put(user, userWorkload);
-					}
-					userWorkload.add(request);
+					workloadList.add(request);
+//					User user = new User(eventData[1]);//Users are identified uniquely by their ids
+//					List<Request> userWorkload = lastWorkloadRead.get(user);
+//					if(userWorkload == null){
+//						userWorkload = new ArrayList<Request>();
+//						lastWorkloadRead.put(user, userWorkload);
+//					}
+//					userWorkload.add(request);
 				}else{
-					User user = new User(eventData[1]);//Users are identified uniquely by their ids
-					List<Request> userWorkload = this.nextRequests.get(user);
-					if(userWorkload == null){
-						userWorkload = new ArrayList<Request>();
-						this.nextRequests.put(user, userWorkload);
-					}
-					userWorkload.add(request);
-					if(monthOfEvent < nextMonth){
-						nextMonth = monthOfEvent;
-					}
-					break;//Finishing current read
+					nextRequest = request;
+					nextMonth = monthOfEvent;
+					break;
+//					User user = new User(eventData[1]);//Users are identified uniquely by their ids
+//					List<Request> userWorkload = this.nextRequests.get(user);
+//					if(userWorkload == null){
+//						userWorkload = new ArrayList<Request>();
+//						this.nextRequests.put(user, userWorkload);
+//					}
+//					userWorkload.add(request);
+//					if(monthOfEvent < nextMonth){
+//						nextMonth = monthOfEvent;
+//					}
+//					break;//Finishing current read
 				}
 			}
 		}
@@ -116,9 +125,9 @@ public class GEISTMonthlyWorkloadParser implements WorkloadParser<List<Request>>
 		}
 		
 		//Adding all read requests
-		for(List<Request> requests : this.lastWorkloadRead.values()){
-			workloadList.addAll(requests);
-		}
+//		for(List<Request> requests : this.lastWorkloadRead.values()){
+//			workloadList.addAll(requests);
+//		}
 	    return workloadList;
 	}
 	

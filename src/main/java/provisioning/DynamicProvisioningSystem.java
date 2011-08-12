@@ -73,4 +73,10 @@ public class DynamicProvisioningSystem implements DPS{
 	public UtilityResult calculateUtility() {
 		return utilityResult;
 	}
+
+	@Override
+	public double chargeUsers(long currentTimeInMillis) {
+		//TODO: Create utility result
+		return this.accountingSystem.calculateUtility(currentTimeInMillis);
+	}
 }

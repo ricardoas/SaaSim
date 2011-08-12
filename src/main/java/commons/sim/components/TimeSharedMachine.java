@@ -114,27 +114,28 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	@Override
 	public void handleEvent(JEEvent event) {
 		switch (event.getType()) {
-		case PREEMPTION:
-			Request request = processorQueue.poll();
-			
-			long processedDemand = (Long) event.getValue()[0];
-			totalTimeUsed += processedDemand;
-			request.update(processedDemand);
-			
-			if(request.isFinished()){
-				requestFinished(request);
-			}else{
-				processorQueue.add(request);
-			}
-			
-			if(!processorQueue.isEmpty()){
-				scheduleNext();
-			}
-			
-			tryToShutdown();
-			
-			
-			break;
+			case PREEMPTION:
+				Request request = processorQueue.poll();
+				
+				long processedDemand = (Long) event.getValue()[0];
+				totalTimeUsed += processedDemand;
+				request.update(processedDemand);
+				descriptor.updateTransference(request.getSizeInBytes(), request.getResponseSizeInBytes());
+				
+				if(request.isFinished()){
+					requestFinished(request);
+				}else{
+					processorQueue.add(request);
+				}
+				
+				if(!processorQueue.isEmpty()){
+					scheduleNext();
+				}
+				
+				tryToShutdown();
+				
+				
+				break;
 		}
 	}
 

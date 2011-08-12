@@ -13,6 +13,7 @@ public class Request{
 	private final long timeInMillis;
 	private final long demandInMillis;
 	private final long sizeInBytes;
+	private final long responseSizeInBytes;
 	private final int requestOption;//Indicates whether the request is a non-SSL (expired or not) or a SSL one 
 	private final String httpOperation;
 	private final String URL;
@@ -38,6 +39,7 @@ public class Request{
 		this.timeInMillis = time;
 		this.demandInMillis = demand;
 		this.sizeInBytes = size;
+		this.responseSizeInBytes = 1000000;
 		this.requestOption = requestOption;
 		this.httpOperation = httpOperation;
 		this.URL = URL;
@@ -130,7 +132,9 @@ public class Request{
 		return "Request [reqID=" + reqID + ", demandInMillis=" + demandInMillis
 				+ ", totalProcessed=" + totalProcessed + "]";
 	}
+
 	
-	
-	
+	public long getResponseSizeInBytes() {
+		return responseSizeInBytes;
+	}
 }

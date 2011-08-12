@@ -16,5 +16,6 @@ public interface Monitor{
 	void evaluateUtilization(long timeMilliSeconds, RanjanStatistics statistics, int tier);
 
 	void machineTurnedOff(MachineDescriptor machineDescriptor);
-	
+
+	double chargeUsers(long currentTimeInMillis);
 }

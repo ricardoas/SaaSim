@@ -192,4 +192,8 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 		}
 		removeServer(servers.get(servers.size()-1).getDescriptor(), force);
 	}
+
+	public void chargeUsers() {
+		this.monitor.chargeUsers(getScheduler().now().timeMilliSeconds);
+	}
 }
