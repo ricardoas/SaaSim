@@ -6,7 +6,7 @@ import java.util.List;
 
 import provisioning.Monitor;
 
-import commons.config.SimulatorConfiguration;
+import commons.config.Configuration;
 import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEEventScheduler;
 
@@ -30,7 +30,7 @@ public abstract class ApplicationFactory {
 	public static ApplicationFactory getInstance(){
 		
 		if(instance == null){
-			String className = SimulatorConfiguration.getInstance().getString(APPLICATION_FACTORY);
+			String className = Configuration.getInstance().getString(APPLICATION_FACTORY);
 			try {
 				instance = (ApplicationFactory) Class.forName(className).newInstance();
 			} catch (Exception e) {

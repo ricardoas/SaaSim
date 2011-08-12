@@ -7,7 +7,7 @@ import java.util.List;
 
 import provisioning.Monitor;
 
-import commons.config.SimulatorConfiguration;
+import commons.config.Configuration;
 import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
@@ -24,7 +24,7 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 	@Override
 	public List<LoadBalancer> createNewApplication(JEEventScheduler scheduler,
 			Monitor monitor) {
-		SimulatorConfiguration config = SimulatorConfiguration.getInstance();
+		Configuration config = Configuration.getInstance();
 		int numOfTiers = config.getInt(APPLICATION_NUM_OF_TIERS);
 		
 		Class<?>[] heuristicClasses = config.getApplicationHeuristics();

@@ -12,7 +12,7 @@ import commons.cloud.Contract;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
-import commons.config.SimulatorConfiguration;
+import commons.config.Configuration;
 import commons.sim.AccountingSystem;
 import commons.sim.SimpleSimulator;
 import commons.sim.jeevent.JEEventScheduler;
@@ -61,7 +61,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		JEEventScheduler scheduler = new JEEventScheduler();
 		
 		//Setting the number of machines that should be available at startup
-		SimulatorConfiguration.getInstance().setProperty(SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER, reservedResources+"");
+		Configuration.getInstance().setProperty(SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER, reservedResources+"");
 		try {
 			this.simulator = new SimpleSimulator(scheduler, parser);
 		} catch (IOException e) {

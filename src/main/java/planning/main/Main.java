@@ -9,7 +9,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import planning.Executor;
 import planning.Planner;
 
-import commons.config.SimulatorConfiguration;
+import commons.config.Configuration;
 
 import config.GEISTMonthlyWorkloadParser;
 
@@ -29,18 +29,18 @@ public class Main {
 		
 		try {
 			//Loading simulator configuration data
-			SimulatorConfiguration.buildInstance(args[0]);
-			SimulatorConfiguration config = SimulatorConfiguration.getInstance();
+			Configuration.buildInstance(args[0]);
+			Configuration config = Configuration.getInstance();
 			
 			//Parsing workload
 			GEISTMonthlyWorkloadParser workloadParser = new GEISTMonthlyWorkloadParser();
 			
 			//Creating planner
-			Planner planner = new Planner(config.getProviders(), config.getPlanningHeuristic(), config.getContractsPerUser(), workloadParser);
+			Planner planner = new Planner(config.getProviders(), config.getPlanningHeuristic(), config.getUsers(), workloadParser);
 			List<String> plan = planner.plan();
 			
 			//FIXME: Change workload! Performing plan execution!
-			Executor executor = new Executor(config.getProviders(), config.getContractsPerUser(), workloadParser, config.getSLA());
+			Executor executor = new Executor(config.getProviders(), config.getUsers(), workloadParser, config.getSLA());
 			executor.execute(plan);
 			
 		} catch (FileNotFoundException e) {

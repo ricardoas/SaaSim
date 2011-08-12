@@ -11,17 +11,19 @@ public class Contract implements Comparable<Contract>{
 	private final double setupCost;//in $
 	private final long cpuLimit;// in hours
 	private final double extraCpuCost;// in $/hour
-//	private final double transferenceLimit;//in GB
-//	private final double extraTransferenceCost;// in $/GB
+	private final long[] transferenceLimits;
+	private final double[] transferenceCosts;
 	
 	public Contract(String planName, int priority, double setupCost, double price,
-			long cpuLimit, double extraCpuCost) {
+			long cpuLimit, double extraCpuCost, long[] transferenceLimits, double[] transferenceCosts) {
 		this.name = planName;
 		this.priority = priority;
 		this.setupCost = setupCost;
 		this.price = price;
 		this.cpuLimit = cpuLimit;
 		this.extraCpuCost = extraCpuCost;
+		this.transferenceLimits = transferenceLimits;
+		this.transferenceCosts = transferenceCosts;
 	}
 	
 	/**
@@ -64,6 +66,20 @@ public class Contract implements Comparable<Contract>{
 	 */
 	public double getExtraCpuCost() {
 		return extraCpuCost;
+	}
+	
+	/**
+	 * @return the transferenceLimits
+	 */
+	public long[] getTransferenceLimits() {
+		return transferenceLimits;
+	}
+
+	/**
+	 * @return the transferenceCosts
+	 */
+	public double[] getTransferenceCosts() {
+		return transferenceCosts;
 	}
 
 	@Override

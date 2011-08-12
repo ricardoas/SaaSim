@@ -10,7 +10,7 @@ import java.util.Queue;
 import provisioning.Monitor;
 
 import commons.cloud.Request;
-import commons.config.SimulatorConfiguration;
+import commons.config.Configuration;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventHandler;
@@ -59,7 +59,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 		Machine server = buildMachine(descriptor);
 		JETime serverUpTime = getScheduler().now();
 		if(useStartUpDelay){
-			serverUpTime = serverUpTime.plus(new JETime(SimulatorConfiguration.getInstance().getLong(SETUP_TIME)));
+			serverUpTime = serverUpTime.plus(new JETime(Configuration.getInstance().getLong(SETUP_TIME)));
 		}
 		send(new JEEvent(JEEventType.ADD_SERVER, this, serverUpTime, server));
 	}

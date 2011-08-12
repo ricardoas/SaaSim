@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Map;
+import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationRuntimeException;
@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import commons.cloud.Contract;
 import commons.cloud.User;
-import commons.config.SimulatorConfiguration;
+import commons.config.Configuration;
 
 public class ContractInputTest {
 	
@@ -29,7 +29,7 @@ public class ContractInputTest {
 	 */
 	@Test(expected=ConfigurationRuntimeException.class)
 	public void testMandatoryPropertyWithEmptyValue() throws ConfigurationException{
-			SimulatorConfiguration.buildInstance(INVALID_FILE);
+			Configuration.buildInstance(INVALID_FILE);
 	}
 	
 	/**
@@ -38,7 +38,7 @@ public class ContractInputTest {
 	 */
 	@Test(expected=NumberFormatException.class)
 	public void testMandatoryPropertyWithNonIntegerValue() throws ConfigurationException{
-		SimulatorConfiguration.buildInstance(INVALID_FILE2);
+		Configuration.buildInstance(INVALID_FILE2);
 	}
 	
 	/**
@@ -47,7 +47,7 @@ public class ContractInputTest {
 	 */
 	@Test(expected=ConfigurationRuntimeException.class)
 	public void testArrayPropertyWithWrongSize() throws ConfigurationException{
-		SimulatorConfiguration.buildInstance(INVALID_FILE3);
+		Configuration.buildInstance(INVALID_FILE3);
 	}
 	
 	/**
@@ -56,7 +56,7 @@ public class ContractInputTest {
 	 */
 	@Test(expected=NumberFormatException.class)
 	public void testArrayPropertyWithWrongType() throws ConfigurationException{
-		SimulatorConfiguration.buildInstance(INVALID_FILE4);
+		Configuration.buildInstance(INVALID_FILE4);
 	}
 	
 	/**
@@ -65,50 +65,45 @@ public class ContractInputTest {
 	 */
 	@Test(expected=ConfigurationException.class)
 	public void testInexistentFile() throws ConfigurationException{
-		SimulatorConfiguration.buildInstance(INEXISTENT_FILE);
+		Configuration.buildInstance(INEXISTENT_FILE);
 	}
 	
 	@Test
 	public void testValidFile() throws ConfigurationException{
-		SimulatorConfiguration.buildInstance(VALID_FILE);
-		SimulatorConfiguration config = SimulatorConfiguration.getInstance();
-		Map<User, Contract> usersContracts = config.getContractsPerUser();
-		Map<String, Contract> contracts = config.getContractsPerName();
-		assertNotNull(usersContracts);
-		assertEquals(3, usersContracts.size());
-		assertEquals(2, contracts.size());
-
-		Contract c1 = usersContracts.get(new User("u1"));
+		Configuration.buildInstance(VALID_FILE);
+		Configuration config = Configuration.getInstance();
+		List<User> users = config.getUsers();
+		assertNotNull(users);
+		assertEquals(3, users.size());
+		
+		Contract c1 = users.get(0).getContract();
 		assertNotNull(c1);
-		assertEquals(10, c1.cpuLimit, 0.0);
-		assertEquals(1, c1.extraCpuCost, 0.0);
-		assertEquals("p1", c1.name);
-		assertEquals(100, c1.price, 0.0);
-		assertEquals(5.55, c1.setupCost, 0.0);
-		assertEquals(0.0, c1.extraTransferenceCost, 0.0);//FIXME: When transference be supported fix this!
-		assertEquals(0, c1.transferenceLimit, 0.0);//FIXME: When transference be supported fix this!
+		assertEquals(10, c1.getCpuLimit(), 0.0);
+		assertEquals(1, c1.getExtraCpuCost(), 0.0);
+		assertEquals("p1", c1.getName());
+		assertEquals(100, c1.getPrice(), 0.0);
+		assertEquals(5.55, c1.getSetupCost(), 0.0);
+		assertEquals(0.0, c1.getextraTransferenceCost, 0.0);//FIXME: When transference be supported fix this!
+		assertEquals(0, c1.gettransferenceLimit, 0.0);//FIXME: When transference be supported fix this!
 
-		Contract c2 = usersContracts.get(new User("u2"));
+		Contract c2 = users.get(1).getContract();
 		assertNotNull(c2);
-		assertEquals(55, c2.cpuLimit, 0.0);
-		assertEquals(2, c2.extraCpuCost, 0.0);
-		assertEquals("p2", c2.name);
-		assertEquals(250, c2.price, 0.0);
-		assertEquals(1.11, c2.setupCost, 0.0);
-		assertEquals(0, c2.extraTransferenceCost, 0.0);//FIXME: When transference be supported fix this!
-		assertEquals(0, c2.transferenceLimit, 0.0);//FIXME: When transference be supported fix this!
+		assertEquals(55, c2.getCpuLimit(), 0.0);
+		assertEquals(2, c2.getExtraCpuCost(), 0.0);
+		assertEquals("p2", c2.getName());
+		assertEquals(250, c2.getPrice(), 0.0);
+		assertEquals(1.11, c2.getSetupCost(), 0.0);
+		assertEquals(0, c2.getextraTransferenceCost, 0.0);//FIXME: When transference be supported fix this!
+		assertEquals(0, c2.gettransferenceLimit, 0.0);//FIXME: When transference be supported fix this!
 
-		Contract c3 = usersContracts.get(new User("u3"));
+		Contract c3 = users.get(2).getContract();
 		assertNotNull(c3);
-		assertEquals(10, c3.cpuLimit, 0.0);
-		assertEquals(1, c3.extraCpuCost, 0.0);
-		assertEquals("p1", c3.name);
-		assertEquals(100, c3.price, 0.0);
-		assertEquals(5.55, c3.setupCost, 0.0);
-		assertEquals(0, c3.extraTransferenceCost, 0.0);//FIXME: When transference be supported fix this!
-		assertEquals(0, c3.transferenceLimit, 0.0);//FIXME: When transference be supported fix this!
-
-		assertTrue(contracts.containsKey(c1.name));
-		assertTrue(contracts.containsKey(c2.name));
+		assertEquals(10, c3.getCpuLimit(), 0.0);
+		assertEquals(1, c3.getExtraCpuCost(), 0.0);
+		assertEquals("p1", c3.getName());
+		assertEquals(100, c3.getPrice(), 0.0);
+		assertEquals(5.55, c3.getSetupCost(), 0.0);
+		assertEquals(0, c3.getextraTransferenceCost, 0.0);//FIXME: When transference be supported fix this!
+		assertEquals(0, c3.gettransferenceLimit, 0.0);//FIXME: When transference be supported fix this!
 	}
 }

@@ -10,7 +10,7 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import commons.config.SimulatorConfiguration;
+import commons.config.Configuration;
 import commons.sim.AccountingSystem;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.MachineDescriptor;
@@ -185,7 +185,7 @@ public class RanjanProvisioningSystemTest {
 	 * This scenarios verifies that after evaluating that a machine should be added, the RANJAN provisioning
 	 * system creates a machine and adds it to simulator.
 	 */
-	@PrepareForTest(SimulatorConfiguration.class)
+	@PrepareForTest(Configuration.class)
 	@Test
 	public void handleEventEvaluateUtilizationWithOneServerToBeAdded(){
 		int resourcesReservationLimit = 20;
@@ -217,14 +217,14 @@ public class RanjanProvisioningSystemTest {
 		
 		this.heuristic.handleEventEvaluateUtilization(event);
 		
-		PowerMock.verify(SimulatorConfiguration.class);
+		PowerMock.verify(Configuration.class);
 		EasyMock.verify(scheduler, event, configurable);
 		
 		assertEquals(1, this.heuristic.getAccountingSystem().getReservedMachinesData().size());
 		assertEquals(0, this.heuristic.getAccountingSystem().getOnDemandMachinesData().size());
 	}
 	
-	@PrepareForTest(SimulatorConfiguration.class)
+	@PrepareForTest(Configuration.class)
 	@Test
 	public void handleEventEvaluateUtilizationWithOneServerToBeAddedAndLimitsReached(){
 		int resourcesReservationLimit = 1;
@@ -257,7 +257,7 @@ public class RanjanProvisioningSystemTest {
 		
 		this.heuristic.handleEventEvaluateUtilization(event);
 		
-		PowerMock.verify(SimulatorConfiguration.class);
+		PowerMock.verify(Configuration.class);
 		EasyMock.verify(scheduler, event, configurable);
 	}
 	

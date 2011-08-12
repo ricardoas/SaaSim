@@ -20,7 +20,7 @@ import commons.cloud.Contract;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
-import commons.config.SimulatorConfiguration;
+import commons.config.Configuration;
 import commons.sim.util.SimulatorProperties;
 
 import config.GEISTMonthlyWorkloadParser;
@@ -66,8 +66,8 @@ public class PlanningFitnessFunctionTest {
 		providers.put(prov.name, prov);
 		
 		try {
-			SimulatorConfiguration.buildInstance(CONFIG_FILE);
-			SimulatorConfiguration.getInstance().setProperty(SimulatorProperties.WORKLOAD_PATH, SIMPLE_WORKLOAD);
+			Configuration.buildInstance(CONFIG_FILE);
+			Configuration.getInstance().setProperty(SimulatorProperties.WORKLOAD_PATH, SIMPLE_WORKLOAD);
 			
 			GEISTMonthlyWorkloadParser parser = EasyMock.createStrictMock(GEISTMonthlyWorkloadParser.class);
 			EasyMock.expect(parser.hasNext()).andReturn(true);

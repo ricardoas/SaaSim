@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import commons.config.SimulatorConfiguration;
+import commons.config.Configuration;
 import commons.sim.AccountingSystem;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.MachineDescriptor;
@@ -23,7 +23,7 @@ public class ProfitDrivenProvisioningSystemTest {
 	 * This scenario verifies that if an event requesting a machine occurs when limits have been reached
 	 * any other machine is added to simulator
 	 */
-	@PrepareForTest(SimulatorConfiguration.class)
+	@PrepareForTest(Configuration.class)
 	@Test
 	public void evaluateAddingMachinesWithLimitsReached(){
 		int resourcesReservationLimit = 1;
@@ -56,7 +56,7 @@ public class ProfitDrivenProvisioningSystemTest {
 	 * This scenario verifies that if an event requesting a machine occurs when limits have not 
 	 * been reached another machine is added
 	 */
-	@PrepareForTest(SimulatorConfiguration.class)
+	@PrepareForTest(Configuration.class)
 	@Test
 	public void evaluateAddingMachinesWithReservedLimitNotReached(){
 		int resourcesReservationLimit = 2;
@@ -97,7 +97,7 @@ public class ProfitDrivenProvisioningSystemTest {
 	 * This scenario verifies that if an event requesting a machine occurs when limits have not 
 	 * been reached another machine is added
 	 */
-	@PrepareForTest(SimulatorConfiguration.class)
+	@PrepareForTest(Configuration.class)
 	@Test
 	public void evaluateAddingMachinesWithOnDemandLimitNotReached(){
 		int resourcesReservationLimit = 1;

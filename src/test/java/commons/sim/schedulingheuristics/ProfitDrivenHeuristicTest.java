@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import commons.cloud.Request;
-import commons.config.SimulatorConfiguration;
+import commons.config.Configuration;
 import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.components.TimeSharedMachine;
@@ -28,8 +28,8 @@ public class ProfitDrivenHeuristicTest {
 	
 	@Before
 	public void setUp() throws ConfigurationException{
-		SimulatorConfiguration.buildInstance(CONFIG_FILE);
-		SimulatorConfiguration.getInstance().setProperty(SimulatorProperties.SLA, this.sla);
+		Configuration.buildInstance(CONFIG_FILE);
+		Configuration.getInstance().setProperty(SimulatorProperties.SLA, this.sla);
 		this.heuristic = new ProfitDrivenHeuristic();
 	}
 	
@@ -143,7 +143,7 @@ public class ProfitDrivenHeuristicTest {
 	@Test
 	public void testGetServerWithBusyMachine(){
 		double sla = 1000 * 20;
-		SimulatorConfiguration.getInstance().setProperty(SimulatorProperties.SLA, sla);
+		Configuration.getInstance().setProperty(SimulatorProperties.SLA, sla);
 		this.heuristic = new ProfitDrivenHeuristic();
 		
 		String clientID = "c1";
@@ -184,7 +184,7 @@ public class ProfitDrivenHeuristicTest {
 	@Test
 	public void testGetServerWithBusyMachine2(){
 		double sla = 1000 * 20;
-		SimulatorConfiguration.getInstance().setProperty(SimulatorProperties.SLA, sla);
+		Configuration.getInstance().setProperty(SimulatorProperties.SLA, sla);
 		this.heuristic = new ProfitDrivenHeuristic();
 		
 		String clientID = "c1";
@@ -228,7 +228,7 @@ public class ProfitDrivenHeuristicTest {
 	@Test
 	public void testGetServerWithBusyMachine3(){
 		double sla = 1000 * 20;
-		SimulatorConfiguration.getInstance().setProperty(SimulatorProperties.SLA, sla);
+		Configuration.getInstance().setProperty(SimulatorProperties.SLA, sla);
 		this.heuristic = new ProfitDrivenHeuristic();
 		
 		String clientID = "c1";

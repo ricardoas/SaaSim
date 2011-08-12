@@ -16,7 +16,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import provisioning.DPS;
 
 import commons.cloud.Request;
-import commons.config.SimulatorConfiguration;
+import commons.config.Configuration;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
@@ -24,7 +24,7 @@ import commons.sim.schedulingheuristics.ProfitDrivenHeuristic;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(SimulatorConfiguration.class)
+@PrepareForTest(Configuration.class)
 public class LoadBalancerTest {
 	
 	private static final long ONE_MINUTE_IN_MILLIS = 1000 * 60l;
@@ -41,7 +41,7 @@ public class LoadBalancerTest {
 	 * Scheduling a new request with one machine artificially chosen by the heuristic
 	 * @throws ConfigurationException 
 	 */
-	@PrepareForTest(SimulatorConfiguration.class)
+	@PrepareForTest(Configuration.class)
 	@Test
 	public void handleEventNewRequestWithOneMachine() throws ConfigurationException{
 		Request request = EasyMock.createStrictMock(Request.class);
@@ -49,9 +49,9 @@ public class LoadBalancerTest {
 		Machine machine = EasyMock.createStrictMock(TimeSharedMachine.class);
 		this.schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
 		
-		SimulatorConfiguration config = EasyMock.createStrictMock(SimulatorConfiguration.class);
-		PowerMock.mockStatic(SimulatorConfiguration.class);
-		EasyMock.expect(SimulatorConfiguration.getInstance()).andReturn(config);
+		Configuration config = EasyMock.createStrictMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config);
 		EasyMock.expect(config.getApplicationHeuristics()).andReturn(new Class[] {ProfitDrivenHeuristic.class});
 		
 		EasyMock.expect(event.getType()).andReturn(JEEventType.NEWREQUEST).once();
@@ -61,13 +61,13 @@ public class LoadBalancerTest {
 				EasyMock.isA(Request.class) , EasyMock.isA(List.class))).andReturn(machine);
 		machine.sendRequest(request);
 		
-		PowerMock.replay(SimulatorConfiguration.class);
+		PowerMock.replay(Configuration.class);
 		EasyMock.replay(event, schedulingHeuristic, request, machine, config);
 		
 		lb = new LoadBalancer(eventScheduler, null, schedulingHeuristic, Integer.MAX_VALUE, 1);
 		lb.handleEvent(event);
 		
-		PowerMock.verify(SimulatorConfiguration.class);
+		PowerMock.verify(Configuration.class);
 		EasyMock.verify(event, schedulingHeuristic, request, machine, config);
 		
 		assertEquals(1, lb.getServers().size());

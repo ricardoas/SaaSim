@@ -11,7 +11,7 @@ import org.apache.commons.configuration.ConfigurationRuntimeException;
 import org.junit.Test;
 
 import commons.cloud.Provider;
-import commons.config.SimulatorConfiguration;
+import commons.config.Configuration;
 
 public class ProviderInputTest {
 	
@@ -28,7 +28,7 @@ public class ProviderInputTest {
 	 */
 	@Test(expected=ConfigurationRuntimeException.class)
 	public void testMandatoryPropertyWithEmptyValue() throws ConfigurationException{
-		SimulatorConfiguration.buildInstance(INVALID_FILE);
+		Configuration.buildInstance(INVALID_FILE);
 	}
 	
 	/**
@@ -37,7 +37,7 @@ public class ProviderInputTest {
 	 */
 	@Test(expected=NumberFormatException.class)
 	public void testMandatoryPropertyWithNonIntegerValue() throws ConfigurationException{
-		SimulatorConfiguration.buildInstance(INVALID_FILE2);
+		Configuration.buildInstance(INVALID_FILE2);
 	}
 	
 	/**
@@ -46,7 +46,7 @@ public class ProviderInputTest {
 	 */
 	@Test(expected=ConfigurationRuntimeException.class)
 	public void testArrayPropertyWithWrongSize() throws ConfigurationException{
-		SimulatorConfiguration.buildInstance(INVALID_FILE3);
+		Configuration.buildInstance(INVALID_FILE3);
 	}
 	
 	/**
@@ -55,7 +55,7 @@ public class ProviderInputTest {
 	 */
 	@Test(expected=NumberFormatException.class)
 	public void testArrayPropertyWithWrongType() throws ConfigurationException{
-		SimulatorConfiguration.buildInstance(INVALID_FILE4);
+		Configuration.buildInstance(INVALID_FILE4);
 	}
 	
 	/**
@@ -64,7 +64,7 @@ public class ProviderInputTest {
 	 */
 	@Test(expected=ConfigurationException.class)
 	public void testInexistentFile() throws ConfigurationException{
-		SimulatorConfiguration.buildInstance(INEXISTENT_FILE);
+		Configuration.buildInstance(INEXISTENT_FILE);
 	}
 	
 	/**
@@ -73,8 +73,8 @@ public class ProviderInputTest {
 	 */
 	@Test
 	public void testValidFile() throws ConfigurationException{
-		SimulatorConfiguration.buildInstance(VALID_FILE);
-		SimulatorConfiguration config = SimulatorConfiguration.getInstance();
+		Configuration.buildInstance(VALID_FILE);
+		Configuration config = Configuration.getInstance();
 		Map<String, Provider> providers = config.getProviders();
 		assertNotNull(providers);
 		assertEquals(3, providers.size());

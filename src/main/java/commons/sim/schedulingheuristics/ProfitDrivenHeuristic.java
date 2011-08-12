@@ -3,7 +3,7 @@ package commons.sim.schedulingheuristics;
 import java.util.List;
 
 import commons.cloud.Request;
-import commons.config.SimulatorConfiguration;
+import commons.config.Configuration;
 import commons.sim.components.Machine;
 import commons.sim.components.ProcessorSharedMachine;
 import commons.util.Triple;
@@ -13,7 +13,7 @@ public class ProfitDrivenHeuristic implements SchedulingHeuristic{
 	private double sla;
 	
 	public ProfitDrivenHeuristic(){
-		SimulatorConfiguration config = SimulatorConfiguration.getInstance();
+		Configuration config = Configuration.getInstance();
 		this.sla = config.getSLA();
 	}
 	

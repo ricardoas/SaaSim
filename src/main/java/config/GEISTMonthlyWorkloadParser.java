@@ -13,7 +13,7 @@ import java.util.Map;
 
 import commons.cloud.Request;
 import commons.cloud.User;
-import commons.config.SimulatorConfiguration;
+import commons.config.Configuration;
 import commons.io.WorkloadParser;
 import commons.sim.util.SimulatorProperties;
 
@@ -48,7 +48,7 @@ public class GEISTMonthlyWorkloadParser implements WorkloadParser<List<Request>>
 
 	public GEISTMonthlyWorkloadParser(){
 		this.workloadFiles = new String[1];
-		this.workloadFiles[0] = SimulatorConfiguration.getInstance().getString(SimulatorProperties.WORKLOAD_PATH);
+		this.workloadFiles[0] = Configuration.getInstance().getString(SimulatorProperties.WORKLOAD_PATH);
 		
 		this.readers = new BufferedReader[workloadFiles.length];
 		for(int i = 0; i < workloadFiles.length; i++){

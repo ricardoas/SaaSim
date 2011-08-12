@@ -7,8 +7,8 @@ plan.price=100.00
 plan.setup=5.55
 plan.cpu_lim=10
 plan.ex_cpu=1.00
-plan.transfer_lim=50
-plan.ex_transfer=0.5
+plan.transfer_lim=50|100
+plan.ex_transfer=0.5|1.5
 
 #Second plan
 plan.name=p2

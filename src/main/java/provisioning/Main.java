@@ -7,7 +7,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import provisioning.util.DPSFactory;
 
 import commons.cloud.UtilityResult;
-import commons.config.SimulatorConfiguration;
+import commons.config.Configuration;
 import commons.sim.Simulator;
 import commons.sim.util.SimulatorFactory;
 
@@ -24,7 +24,7 @@ public class Main {
 	 */
 	public static void main(String[] args) throws ConfigurationException, IOException {
 		
-		SimulatorConfiguration.buildInstance(args[0]);
+		Configuration.buildInstance(args[0]);
 		
 		DPS dps = DPSFactory.INSTANCE.createDPS();
 		

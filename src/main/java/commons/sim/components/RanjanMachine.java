@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import commons.cloud.Request;
-import commons.config.SimulatorConfiguration;
+import commons.config.Configuration;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
@@ -31,8 +31,8 @@ public class RanjanMachine extends TimeSharedMachine {
 	public RanjanMachine(JEEventScheduler scheduler, MachineDescriptor descriptor, LoadBalancer loadBalancer){
 		super(scheduler, descriptor, loadBalancer);
 		this.backlog = new LinkedList<Request>();
-		this.maximumNumberOfSimultaneousThreads = SimulatorConfiguration.getInstance().getMaximumNumberOfThreadsPerMachine();
-		this.backlogMaximumNumberOfRequests = SimulatorConfiguration.getInstance().getMaximumBacklogSize();
+		this.maximumNumberOfSimultaneousThreads = Configuration.getInstance().getMaximumNumberOfThreadsPerMachine();
+		this.backlogMaximumNumberOfRequests = Configuration.getInstance().getMaximumBacklogSize();
 	}
 	
 	/**

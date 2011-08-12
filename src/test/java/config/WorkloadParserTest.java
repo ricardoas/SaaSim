@@ -15,7 +15,7 @@ import org.junit.Test;
 
 import commons.cloud.Request;
 import commons.cloud.User;
-import commons.config.SimulatorConfiguration;
+import commons.config.Configuration;
 import commons.sim.util.SimulatorProperties;
 
 
@@ -27,8 +27,8 @@ public class WorkloadParserTest {
 	@Test
 	public void testW1(){
 		try {
-			SimulatorConfiguration.buildInstance(CONFIG_FILE);
-			SimulatorConfiguration config = SimulatorConfiguration.getInstance();
+			Configuration.buildInstance(CONFIG_FILE);
+			Configuration config = Configuration.getInstance();
 			config.setProperty(SimulatorProperties.WORKLOAD_PATH, W1);
 			
 			GEISTMonthlyWorkloadParser parser = new GEISTMonthlyWorkloadParser();

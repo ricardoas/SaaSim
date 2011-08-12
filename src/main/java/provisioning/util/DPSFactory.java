@@ -2,7 +2,7 @@ package provisioning.util;
 
 import provisioning.DPS;
 
-import commons.config.SimulatorConfiguration;
+import commons.config.Configuration;
 
 
 /**
@@ -27,7 +27,7 @@ public enum DPSFactory {
 	 * @return
 	 */
 	public DPS createDPS(Object... initargs){
-		Class<?> clazz = SimulatorConfiguration.getInstance().getDPSHeuristicClass();
+		Class<?> clazz = Configuration.getInstance().getDPSHeuristicClass();
 		
 		try {
 			return (DPS) clazz.getDeclaredConstructors()[0].newInstance(initargs);

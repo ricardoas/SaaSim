@@ -2,7 +2,7 @@ package commons.sim.util;
 
 import java.lang.reflect.Constructor;
 
-import commons.config.SimulatorConfiguration;
+import commons.config.Configuration;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
@@ -33,7 +33,7 @@ public class MachineFactory {
 	}
 	
 	private MachineFactory() {
-		Class<?>[] heuristicClasses = SimulatorConfiguration.getInstance().getApplicationHeuristics();
+		Class<?>[] heuristicClasses = Configuration.getInstance().getApplicationHeuristics();
 		boolean ranjanFactory = false;
 		for(Class<?> heuristic : heuristicClasses){
 			if(heuristic.equals(RanjanHeuristic.class)){
