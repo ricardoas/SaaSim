@@ -54,12 +54,13 @@ public class PlanningFitnessFunction extends FitnessFunction{
 
 	private void initSimulator(Integer reservedResources) {
 		//Starting simulation data to start a new simulation
-//		this.simulator = new OneTierSimulatorForPlanning(new JEEventScheduler(), null, workload, this.sla, null);//FIXME remove null (dont know how)
+//		this.simulator = new OneTierSimulatorForPlanning(new JEEventScheduler(), null, workload, this.sla, null);
 //		this.simulator.setOnDemandResourcesLimit(this.cloudProvider.onDemandLimit);
 //		this.simulator.setNumberOfReservedResources(reservedResources);
 		
 		JEEventScheduler scheduler = new JEEventScheduler();
 		
+		//FIXME!
 		//Setting the number of machines that should be available at startup
 		Configuration.getInstance().setProperty(SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER, reservedResources+"");
 		try {

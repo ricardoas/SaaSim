@@ -18,8 +18,10 @@ import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
 import commons.sim.provisioningheuristics.RanjanStatistics;
+import commons.sim.schedulingheuristics.RanjanHeuristic;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
 import commons.sim.util.MachineFactory;
+import commons.sim.util.SimulatorProperties;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -46,9 +48,19 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 		super(scheduler);
 		this.monitor = monitor;
 		this.heuristic = heuristic;
+		initHeuristicEvents();
+		
 		this.tier = tier;
 		this.servers = new ArrayList<Machine>();
 		this.requestsToBeProcessed = new LinkedList<Request>();
+	}
+
+	private void initHeuristicEvents() {
+		if(this.heuristic.getClass().equals(RanjanHeuristic.class)){
+			JETime newEventTime = new JETime(SimulatorProperties.DEFAULT_EVALUATE_UTILIZATION_PERIOD);
+			newEventTime.plus(getScheduler().now());
+			send(new JEEvent(JEEventType.EVALUATEUTILIZATION, this, newEventTime));
+		}
 	}
 	
 	/**
@@ -116,10 +128,12 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 				break;
 			case EVALUATEUTILIZATION://RANJAN Scheduler
 				Long eventTime = (Long) event.getValue()[0];
-				
 				RanjanStatistics statistics = this.collectStatistics(getServers(), eventTime);
 				monitor.evaluateUtilization(getScheduler().now().timeMilliSeconds, statistics, tier);
-	
+				
+				JETime newEventTime = new JETime(SimulatorProperties.DEFAULT_EVALUATE_UTILIZATION_PERIOD);
+				newEventTime.plus(getScheduler().now());
+				send(new JEEvent(JEEventType.EVALUATEUTILIZATION, this, newEventTime));
 				break;
 			case ADD_SERVER:
 				Machine machine = (Machine) event.getValue()[0];

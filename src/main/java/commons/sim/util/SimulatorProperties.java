@@ -34,4 +34,6 @@ public class SimulatorProperties {
 	public static final String MAX_NUM_OF_THREADS_PER_SERVER = "sim.threads";
 	
 	public static final String MAX_BACKLOG_SIZE = "sim.backlog.size";
+	
+	public static final long DEFAULT_EVALUATE_UTILIZATION_PERIOD = 1000 * 60 * 5;
 }

@@ -1,7 +1,5 @@
 package commons.sim;
 
-import static commons.io.TimeBasedWorkloadParser.DAY_IN_MILLIS;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -71,20 +69,20 @@ public class SimpleSimulator extends JEAbstractEventHandler implements JEEventHa
 	@Override
 	public void handleEvent(JEEvent event) {
 		switch (event.getType()) {
-		case READWORKLOAD:
-			try {
-				if (workloadParser.hasNext()) {
-					List<Request> list = workloadParser.next();
-					for (Request request : list) {
-						send(parseEvent(request));
+			case READWORKLOAD:
+				try {
+					if (workloadParser.hasNext()) {
+						List<Request> list = workloadParser.next();
+						for (Request request : list) {
+							send(parseEvent(request));
+						}
 					}
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			break;
-		default:
-			break;
+				break;
+			default:
+				break;
 		}
 	}
 

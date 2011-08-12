@@ -31,17 +31,17 @@ public class ProfitDrivenHeuristic implements SchedulingHeuristic{
 			List<Triple<Long, Long, Long>> executionTimes = machine.estimateFinishTime(request);
 			boolean continueToOtherMachine = false;
 			
-			for(Triple<Long, Long, Long> pair : executionTimes){//Evaluating requests times
-				double aad = Math.max(this.sla - pair.thirdValue, 0);
-				double asad = aad * (pair.thirdValue)/(pair.thirdValue);
-				double clft = pair.firstValue + asad;
+			for(Triple<Long, Long, Long> triple : executionTimes){//Evaluating requests times
+				double aad = Math.max(this.sla - triple.thirdValue, 0);
+				double asad = aad * (triple.thirdValue)/(triple.thirdValue);
+				double clft = triple.firstValue + asad;
 				
-				if(pair.secondValue > clft){//New request will delay previous requests
+				if(triple.secondValue > clft){//New request will delay previous requests
 					continueToOtherMachine = true;
 					break;
 				}
-				pi += (clft - pair.firstValue);
-				new_pi += (clft - pair.secondValue);
+				pi += (clft - triple.firstValue);
+				new_pi += (clft - triple.secondValue);
 			}
 			
 			if(continueToOtherMachine){//New request will delay previous requests, continue to next machine
