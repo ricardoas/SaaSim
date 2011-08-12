@@ -16,20 +16,13 @@ import commons.config.Configuration;
 
 public class ProviderInputTest {
 	
-	private String INVALID_FILE = "src/test/resources/providers/invalidConfig.properties";
-	private String INVALID_FILE2 = "src/test/resources/providers/invalidConfig2.properties";
-	private String INVALID_FILE3 = "src/test/resources/providers/invalidConfig3.properties";
-	private String INVALID_FILE4 = "src/test/resources/providers/invalidConfig4.properties";
-	private String INEXISTENT_FILE = "src/test/resources/providers/inexistent.properties";
-	private String VALID_FILE = "src/test/resources/providers/config.properties";
-	
 	/**
 	 * This test verifies an invalid file with transfer data missing.
 	 * @throws ConfigurationException 
 	 */
 	@Test(expected=ConfigurationRuntimeException.class)
 	public void testMandatoryPropertyWithEmptyValue() throws ConfigurationException{
-		Configuration.buildInstance(INVALID_FILE);
+		Configuration.buildInstance(PropertiesTesting.WRONG_PROVIDERS_FILE_1);
 	}
 	
 	/**
@@ -38,7 +31,7 @@ public class ProviderInputTest {
 	 */
 	@Test(expected=NumberFormatException.class)
 	public void testMandatoryPropertyWithNonIntegerValue() throws ConfigurationException{
-		Configuration.buildInstance(INVALID_FILE2);
+		Configuration.buildInstance(PropertiesTesting.WRONG_PROVIDERS_FILE_2);
 	}
 	
 	/**
@@ -47,7 +40,7 @@ public class ProviderInputTest {
 	 */
 	@Test(expected=ConfigurationRuntimeException.class)
 	public void testArrayPropertyWithWrongSize() throws ConfigurationException{
-		Configuration.buildInstance(INVALID_FILE3);
+		Configuration.buildInstance(PropertiesTesting.WRONG_PROVIDERS_FILE_3);
 	}
 	
 	/**
@@ -56,7 +49,7 @@ public class ProviderInputTest {
 	 */
 	@Test(expected=NumberFormatException.class)
 	public void testArrayPropertyWithWrongType() throws ConfigurationException{
-		Configuration.buildInstance(INVALID_FILE4);
+		Configuration.buildInstance(PropertiesTesting.WRONG_PROVIDERS_FILE_4);
 	}
 	
 	/**
