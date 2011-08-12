@@ -1,7 +1,10 @@
-users.number=1
+users.number=3
 
 user.plan=p1
 user.workload=/local/ricardo/traces/power.trc
 
-#user.plan=p2
-#user.workload=/local/ricardo/traces/power.trc
+user.plan=p2
+user.workload=/local/ricardo/traces/power.trc
+
+user.plan=p1
+user.workload=/local/ricardo/traces/power.trc

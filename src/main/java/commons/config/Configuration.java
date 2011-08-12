@@ -334,7 +334,6 @@ public class Configuration	extends PropertiesConfiguration{
 		checkSizeAndIntegerContent(IAAS_THREE_YEARS_FEE, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
 		checkSizeAndDoubleContent(IAAS_MONITORING, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
 		
-		//FIXME change the way this properties are being read.
 		checkSizeAndContent(IAAS_TRANSFER_IN, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
 		checkSizeAndContent(IAAS_COST_TRANSFER_IN, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
 		checkSizeAndContent(IAAS_TRANSFER_OUT, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
@@ -373,12 +372,18 @@ public class Configuration	extends PropertiesConfiguration{
 		
 		providers = new HashMap<String, Provider>();
 		for(int i = 0; i < numberOfProviders; i++){
+
+			long [] inLimits = convertToLongArray(transferInLimits[i]);
+			double [] inCosts = convertToDoubleArray(transferInCosts[i]);
+			long [] outLimits = convertToLongArray(transferOutLimits[i]);
+			double [] outCosts = convertToDoubleArray(transferOutCosts[i]);
+
 			providers.put(names[i], 
 					new Provider(names[i], Double.valueOf(cpuCosts[i]), Integer.valueOf(onDemandLimits[i]),
 							Integer.valueOf(reservedLimits[i]), Double.valueOf(reservedCpuCosts[i]),
 							Double.valueOf(reservationOneYearFees[i]), Double.valueOf(reservationThreeYearsFees[i]),
-							Double.valueOf(monitoringCosts[i]), transferInLimits[i], transferInCosts[i], 
-							transferOutLimits[i], transferOutCosts[i]));
+							Double.valueOf(monitoringCosts[i]), inLimits, inCosts, 
+							outLimits, outCosts));
 		}
 	}
 
@@ -397,8 +402,8 @@ public class Configuration	extends PropertiesConfiguration{
 		checkSizeAndDoubleContent(PLAN_SETUP, numberOfPlans, NUMBER_OF_PLANS);
 		checkSizeAndDoubleContent(PLAN_CPU_LIMIT, numberOfPlans, NUMBER_OF_PLANS);
 		checkSizeAndDoubleContent(PLAN_EXTRA_CPU_COST, numberOfPlans, NUMBER_OF_PLANS);
-		checkSizeAndDoubleContent(PLAN_TRANSFER_LIMIT, numberOfPlans, NUMBER_OF_PLANS);
-		checkSizeAndDoubleContent(PLAN_EXTRA_TRANSFER_COST, numberOfPlans, NUMBER_OF_PLANS);
+		checkSizeAndContent(PLAN_TRANSFER_LIMIT, numberOfPlans, NUMBER_OF_PLANS);
+		checkSizeAndContent(PLAN_EXTRA_TRANSFER_COST, numberOfPlans, NUMBER_OF_PLANS);
 	}
 
 	public String getPlanningHeuristic(){
@@ -429,20 +434,6 @@ public class Configuration	extends PropertiesConfiguration{
 		return this.users;
 	}
 	
-	/**
-	 * This method is responsible for reading contracts properties and creating the
-	 * associations between contracts and users that requested the services of each contract
-	 * @return A map containing each user in the system and its signed contract
-	 * @throws IOException
-	 */
-//	public Map<String, Contract> getContractsPerName() {
-//		if(this.contractsPerName == null){
-//			this.buildPlans();
-//		}
-//		
-//		return this.contractsPerName;
-//	}
-	
 	private void buildPlans() {
 		
 		Map<String, Contract> contractsPerName = new HashMap<String, Contract>();
@@ -458,11 +449,8 @@ public class Configuration	extends PropertiesConfiguration{
 		String[] planExtraTransferCost = getStringArray(PLAN_EXTRA_TRANSFER_COST);
 		
 		for(int i = 0; i < numberOfPlans; i++){
-			String[] transferLimits = planTransferLimits[i].split("|");
-			String[] extraTransferCost = planExtraTransferCost[i].split("|");
-			
-			long [] limits = new long[transferLimits.length];
-			double [] costs = new double[extraTransferCost.length];
+			long[] limits = convertToLongArray(planTransferLimits[i]);
+			double[] costs = convertToDoubleArray(planExtraTransferCost[i]);
 
 			contractsPerName.put(planNames[i], 
 					new Contract(planNames[i], Integer.valueOf(planPriorities[i]), Double.valueOf(setupCosts[i]), Double.valueOf(prices[i]), 
@@ -475,6 +463,24 @@ public class Configuration	extends PropertiesConfiguration{
 		for (int i = 0; i < plans.length; i++) {
 			users.add(new User(contractsPerName.get(plans[i])));
 		}
+	}
+
+	private double[] convertToDoubleArray(String pipeSeparatedString) {
+		String[] stringValues = pipeSeparatedString.split("\\|");
+		double [] doubleValues = new double[stringValues.length];
+		for (int j = 0; j < doubleValues.length; j++) {
+			doubleValues[j] = Double.valueOf(stringValues[j]);
+		}
+		return doubleValues;
+	}
+
+	private long[] convertToLongArray(String pipeSeparatedString) {
+		String[] stringValues = pipeSeparatedString.split("\\|");
+		long [] doubleValues = new long[stringValues.length];
+		for (int j = 0; j < doubleValues.length; j++) {
+			doubleValues[j] = Long.valueOf(stringValues[j]);
+		}
+		return doubleValues;
 	}
 
 	

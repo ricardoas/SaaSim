@@ -2,26 +2,19 @@ package config;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationRuntimeException;
+import org.junit.Assert;
 import org.junit.Test;
 
 import commons.cloud.Contract;
 import commons.cloud.User;
 import commons.config.Configuration;
 
-public class ContractInputTest {
-	
-	private String INVALID_FILE = "src/test/resources/contracts/invalid.properties";
-	private String INVALID_FILE2 = "src/test/resources/contracts/invalid2.properties";
-	private String INVALID_FILE3 = "src/test/resources/contracts/invalid3.properties";
-	private String INVALID_FILE4 = "src/test/resources/contracts/invalid4.properties";
-	private String INEXISTENT_FILE = "src/test/resources/contracts/inexistent.dat";
-	private String VALID_FILE = "src/test/resources/contracts/config.properties";
+public class ContractInputTest{
 	
 	/**
 	 * This test verifies that a contracts file missing user associations with SaaS plans is not valid.
@@ -29,7 +22,7 @@ public class ContractInputTest {
 	 */
 	@Test(expected=ConfigurationRuntimeException.class)
 	public void testMandatoryPropertyWithEmptyValue() throws ConfigurationException{
-			Configuration.buildInstance(INVALID_FILE);
+			Configuration.buildInstance(PropertiesTesting.WRONG_PLANS_FILE_1);
 	}
 	
 	/**
@@ -38,7 +31,7 @@ public class ContractInputTest {
 	 */
 	@Test(expected=NumberFormatException.class)
 	public void testMandatoryPropertyWithNonIntegerValue() throws ConfigurationException{
-		Configuration.buildInstance(INVALID_FILE2);
+		Configuration.buildInstance(PropertiesTesting.WRONG_PLANS_FILE_2);
 	}
 	
 	/**
@@ -47,7 +40,7 @@ public class ContractInputTest {
 	 */
 	@Test(expected=ConfigurationRuntimeException.class)
 	public void testArrayPropertyWithWrongSize() throws ConfigurationException{
-		Configuration.buildInstance(INVALID_FILE3);
+		Configuration.buildInstance(PropertiesTesting.WRONG_PLANS_FILE_3);
 	}
 	
 	/**
@@ -56,7 +49,7 @@ public class ContractInputTest {
 	 */
 	@Test(expected=NumberFormatException.class)
 	public void testArrayPropertyWithWrongType() throws ConfigurationException{
-		Configuration.buildInstance(INVALID_FILE4);
+		Configuration.buildInstance(PropertiesTesting.WRONG_PLANS_FILE_4);
 	}
 	
 	/**
@@ -65,12 +58,12 @@ public class ContractInputTest {
 	 */
 	@Test(expected=ConfigurationException.class)
 	public void testInexistentFile() throws ConfigurationException{
-		Configuration.buildInstance(INEXISTENT_FILE);
+		Configuration.buildInstance(PropertiesTesting.INEXISTENT_FILE);
 	}
 	
 	@Test
 	public void testValidFile() throws ConfigurationException{
-		Configuration.buildInstance(VALID_FILE);
+		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
 		Configuration config = Configuration.getInstance();
 		List<User> users = config.getUsers();
 		assertNotNull(users);
@@ -83,8 +76,8 @@ public class ContractInputTest {
 		assertEquals("p1", c1.getName());
 		assertEquals(100, c1.getPrice(), 0.0);
 		assertEquals(5.55, c1.getSetupCost(), 0.0);
-		assertEquals(0.0, c1.getextraTransferenceCost, 0.0);//FIXME: When transference be supported fix this!
-		assertEquals(0, c1.gettransferenceLimit, 0.0);//FIXME: When transference be supported fix this!
+		Assert.assertArrayEquals(new long[]{50, 100}, c1.getTransferenceLimits());
+		Assert.assertArrayEquals(new double[]{0.5,1.5}, c1.getTransferenceCosts(), 0.0);
 
 		Contract c2 = users.get(1).getContract();
 		assertNotNull(c2);
@@ -93,8 +86,6 @@ public class ContractInputTest {
 		assertEquals("p2", c2.getName());
 		assertEquals(250, c2.getPrice(), 0.0);
 		assertEquals(1.11, c2.getSetupCost(), 0.0);
-		assertEquals(0, c2.getextraTransferenceCost, 0.0);//FIXME: When transference be supported fix this!
-		assertEquals(0, c2.gettransferenceLimit, 0.0);//FIXME: When transference be supported fix this!
 
 		Contract c3 = users.get(2).getContract();
 		assertNotNull(c3);
@@ -103,7 +94,5 @@ public class ContractInputTest {
 		assertEquals("p1", c3.getName());
 		assertEquals(100, c3.getPrice(), 0.0);
 		assertEquals(5.55, c3.getSetupCost(), 0.0);
-		assertEquals(0, c3.getextraTransferenceCost, 0.0);//FIXME: When transference be supported fix this!
-		assertEquals(0, c3.gettransferenceLimit, 0.0);//FIXME: When transference be supported fix this!
 	}
 }

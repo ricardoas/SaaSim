@@ -16,21 +16,17 @@ public class Provider {
 	public final double reservationOneYearFee;// in $
 	public final double reservationThreeYearsFee;// in $
 	public final double monitoringCost;// in $
+	private final long[] transferInLimits;
+	private final double[] transferInCosts;
+	private final long[] transferOutLimits;
+	private final double[] transferOutCosts;
 
-	public final String transferInLimits;// This string defines the limits used
-											// to establish different costs for
-											// transference
-	public final String transferInCosts;// Transference costs per range
-	public final String transferOutLimits;// This string defines the limits used
-											// to establish different costs for
-											// transference
-	public final String transferOutCosts;// Transference costs per range
 
 	public Provider(String name, double cpuCost, int onDemandLimit,
 			int reservationLimit, double reservedCpuCost, double reservationOneYearFee,
 			double reservationThreeYearsFee, double monitoringCost,
-			String transferInLimits, String transferInCosts,
-			String transferOutLimits, String transferOutCosts) {
+			long[] transferInLimits, double[] transferInCosts,
+			long[] transferOutLimits, double[] transferOutCosts) {
 		this.name = name;
 		this.onDemandCpuCost = cpuCost;
 		this.onDemandLimit = onDemandLimit;
@@ -43,6 +39,90 @@ public class Provider {
 		this.transferInCosts = transferInCosts;
 		this.transferOutLimits = transferOutLimits;
 		this.transferOutCosts = transferOutCosts;
+	}
+	
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @return the onDemandCpuCost
+	 */
+	public double getOnDemandCpuCost() {
+		return onDemandCpuCost;
+	}
+
+	/**
+	 * @return the onDemandLimit
+	 */
+	public int getOnDemandLimit() {
+		return onDemandLimit;
+	}
+
+	/**
+	 * @return the reservationLimit
+	 */
+	public int getReservationLimit() {
+		return reservationLimit;
+	}
+
+	/**
+	 * @return the reservedCpuCost
+	 */
+	public double getReservedCpuCost() {
+		return reservedCpuCost;
+	}
+
+	/**
+	 * @return the reservationOneYearFee
+	 */
+	public double getReservationOneYearFee() {
+		return reservationOneYearFee;
+	}
+
+	/**
+	 * @return the reservationThreeYearsFee
+	 */
+	public double getReservationThreeYearsFee() {
+		return reservationThreeYearsFee;
+	}
+
+	/**
+	 * @return the monitoringCost
+	 */
+	public double getMonitoringCost() {
+		return monitoringCost;
+	}
+
+	/**
+	 * @return the transferInLimits
+	 */
+	public long[] getTransferInLimits() {
+		return transferInLimits;
+	}
+
+	/**
+	 * @return the transferInCosts
+	 */
+	public double[] getTransferInCosts() {
+		return transferInCosts;
+	}
+
+	/**
+	 * @return the transferOutLimits
+	 */
+	public long[] getTransferOutLimits() {
+		return transferOutLimits;
+	}
+
+	/**
+	 * @return the transferOutCosts
+	 */
+	public double[] getTransferOutCosts() {
+		return transferOutCosts;
 	}
 
 	@Deprecated

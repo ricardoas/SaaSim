@@ -19,7 +19,7 @@ sim.application.numberoftiers=1
 sim.application.heuristic=ROUNDROBIN
 #sim.application.heuristicclass=
 sim.application.startreplicas=1
-#sim.application.maxreplicas=
+sim.application.maxreplicas=
 
 # Time in milliseconds between machine start and application becomes up and running.
 sim.setuptime=300000

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationRuntimeException;
+import org.junit.Assert;
 import org.junit.Test;
 
 import commons.cloud.Provider;
@@ -64,7 +65,7 @@ public class ProviderInputTest {
 	 */
 	@Test(expected=ConfigurationException.class)
 	public void testInexistentFile() throws ConfigurationException{
-		Configuration.buildInstance(INEXISTENT_FILE);
+		Configuration.buildInstance(PropertiesTesting.INEXISTENT_FILE);
 	}
 	
 	/**
@@ -73,55 +74,56 @@ public class ProviderInputTest {
 	 */
 	@Test
 	public void testValidFile() throws ConfigurationException{
-		Configuration.buildInstance(VALID_FILE);
+		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
 		Configuration config = Configuration.getInstance();
 		Map<String, Provider> providers = config.getProviders();
 		assertNotNull(providers);
 		assertEquals(3, providers.size());
 
-		Provider provider = providers.get("p1");
+		Provider provider = providers.get("amazon");
 		assertNotNull(provider);
-		assertEquals("p1", provider.name);
-		assertEquals(0.5, provider.onDemandCpuCost, 0.0);
-		assertEquals(10, provider.onDemandLimit, 0.0);
-		assertEquals(0.1, provider.reservedCpuCost, 0.0);
-		assertEquals(100, provider.reservationLimit, 0.0);
-		assertEquals(1000, provider.reservationOneYearFee, 0.0);
-		assertEquals(800, provider.reservationThreeYearsFee, 0.0);
-		assertEquals(0.15, provider.monitoringCost, 0.0);
-		assertEquals("100", provider.transferInLimits);
-		assertEquals("0.10 0.09", provider.transferInCosts);
-		assertEquals("200", provider.transferOutLimits);
-		assertEquals("0.10 0.09", provider.transferOutCosts);
+		assertEquals("amazon", provider.getName());
+		assertEquals(0.5, provider.getOnDemandCpuCost(), 0.0);
+		assertEquals(20, provider.getOnDemandLimit(), 0.0);
+		assertEquals(0.3, provider.getReservedCpuCost(), 0.0);
+		assertEquals(100, provider.getReservationLimit(), 0.0);
+		assertEquals(1000, provider.getReservationOneYearFee(), 0.0);
+		assertEquals(2500, provider.getReservationThreeYearsFee(), 0.0);
+		assertEquals(0.15, provider.getMonitoringCost(), 0.0);
+		Assert.assertArrayEquals( new long[]{100}, provider.getTransferInLimits());
+		Assert.assertArrayEquals(new double[]{0.10,0.09}, provider.getTransferInCosts(), 0.0);
+		Assert.assertArrayEquals( new long[]{200}, provider.getTransferOutLimits());
+		Assert.assertArrayEquals(new double[]{0.10,0.09}, provider.getTransferOutCosts(), 0.0);
 
-		Provider provider2 = providers.get("p2");
+
+		Provider provider2 = providers.get("rackspace");
 		assertNotNull(provider2);
-		assertEquals("p2", provider2.name);
-		assertEquals(0.5, provider2.onDemandCpuCost, 0.0);
-		assertEquals(10, provider2.onDemandLimit, 0.0);
-		assertEquals(200, provider2.reservationLimit, 0.0);
-		assertEquals(0.1, provider2.reservedCpuCost, 0.0);
-		assertEquals(1000, provider2.reservationOneYearFee, 0.0);
-		assertEquals(800, provider2.reservationThreeYearsFee, 0.0);
-		assertEquals(0.15, provider2.monitoringCost, 0.0);
-		assertEquals("100", provider2.transferInLimits);
-		assertEquals("0.10 0.09", provider2.transferInCosts);
-		assertEquals("200", provider2.transferOutLimits);
-		assertEquals("0.10 0.09", provider2.transferOutCosts);
+		assertEquals("rackspace", provider2.getName());
+		assertEquals(0.5, provider2.getOnDemandCpuCost(), 0.0);
+		assertEquals(10, provider2.getOnDemandLimit(), 0.0);
+		assertEquals(200, provider2.getReservationLimit(), 0.0);
+		assertEquals(0.1, provider2.getReservedCpuCost(), 0.0);
+		assertEquals(1000, provider2.getReservationOneYearFee(), 0.0);
+		assertEquals(800, provider2.getReservationThreeYearsFee(), 0.0);
+		assertEquals(0.15, provider2.getMonitoringCost(), 0.0);
+		Assert.assertArrayEquals( new long[]{100}, provider2.getTransferInLimits());
+		Assert.assertArrayEquals(new double[]{0.10,0.09}, provider2.getTransferInCosts(), 0.0);
+		Assert.assertArrayEquals( new long[]{200}, provider2.getTransferOutLimits());
+		Assert.assertArrayEquals(new double[]{0.10,0.09}, provider2.getTransferOutCosts(), 0.0);
 
-		Provider provider3 = providers.get("p3");
+		Provider provider3 = providers.get("gogrid");
 		assertNotNull(provider3);
-		assertEquals("p3", provider3.name);
-		assertEquals(0.55, provider3.onDemandCpuCost, 0.0);
-		assertEquals(1, provider3.onDemandLimit, 0.0);
-		assertEquals(10, provider3.reservationLimit, 0.0);
-		assertEquals(0.2, provider3.reservedCpuCost, 0.0);
-		assertEquals(100, provider3.reservationOneYearFee, 0.0);
-		assertEquals(80, provider3.reservationThreeYearsFee, 0.0);
-		assertEquals(0.1, provider3.monitoringCost, 0.0);
-		assertEquals("10", provider3.transferInLimits);
-		assertEquals("0.1 0.0", provider3.transferInCosts);
-		assertEquals("20", provider3.transferOutLimits);
-		assertEquals("0.1 0.0", provider3.transferOutCosts);
+		assertEquals("gogrid", provider3.getName());
+		assertEquals(0.55, provider3.getOnDemandCpuCost(), 0.0);
+		assertEquals(1, provider3.getOnDemandLimit(), 0.0);
+		assertEquals(10, provider3.getReservationLimit(), 0.0);
+		assertEquals(0.2, provider3.getReservedCpuCost(), 0.0);
+		assertEquals(100, provider3.getReservationOneYearFee(), 0.0);
+		assertEquals(80, provider3.getReservationThreeYearsFee(), 0.0);
+		assertEquals(0.1, provider3.getMonitoringCost(), 0.0);
+		Assert.assertArrayEquals( new long[]{10}, provider3.getTransferInLimits());
+		Assert.assertArrayEquals(new double[]{0.1,0.0}, provider3.getTransferInCosts(), 0.0);
+		Assert.assertArrayEquals( new long[]{20}, provider3.getTransferOutLimits());
+		Assert.assertArrayEquals(new double[]{0.1,0.0}, provider3.getTransferOutCosts(), 0.0);
 	}
 }
