@@ -17,14 +17,14 @@ import commons.io.HistoryBasedWorkloadParser;
 
 public class Planner {
 
-	private Map<String, Provider> cloudProviders;
+	private List<Provider> cloudProviders;
 	private PlanningHeuristic planningHeuristic;
-	private Map<User, Contract> cloudUsers;
+	private List<User> cloudUsers;
 	private HistoryBasedWorkloadParser workloadParser;
 	
 	private final String OUTUPUT_FILE = "planning.dat"; 
 	
-	public Planner(Map<String, Provider> providers, String heuristic, Map<User, Contract> cloudUsers, HistoryBasedWorkloadParser workloadParser) {
+	public Planner(List<Provider> providers, String planningHeuristic, List<User> cloudUsers, HistoryBasedWorkloadParser workloadParser) {
 		this.cloudProviders = providers;
 		this.planningHeuristic = new AGHeuristic();
 		

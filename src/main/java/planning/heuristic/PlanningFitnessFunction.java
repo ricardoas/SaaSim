@@ -43,7 +43,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 	private final int maximumReservedResources;
 
 	
-	public PlanningFitnessFunction(HistoryBasedWorkloadParser parser, Map<User, Contract> cloudUsers, Map<String, Provider> cloudProvider, int maximumReservedResources){
+	public PlanningFitnessFunction(HistoryBasedWorkloadParser parser, List<User> cloudUsers, List<Provider> cloudProvider, int maximumReservedResources){
 		this.parser = parser;
 		try {
 			this.parser.next();
@@ -66,6 +66,8 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		
 		//Setting the number of machines that should be available at startup
 		Configuration.getInstance().setProperty(SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER, reservedResources+"");
+		
+		//Creating simulator structure
 		DPS dps = DPSFactory.INSTANCE.createDPS();
 		dps.getAccountingSystem().setMaximumNumberOfReservedMachinesUsed(this.maximumReservedResources);
 		this.simulator = SimulatorFactory.getInstance().buildSimulator(dps);
@@ -110,7 +112,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		
 		this.solvedProblems.put(numberOfMachinesToReserve, fitness);
 		if(fitness < 1){
-			return 1;
+			return (1/Math.abs(fitness))+1;
 		}
 		
 		return fitness;

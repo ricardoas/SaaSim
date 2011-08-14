@@ -39,9 +39,9 @@ public class AGHeuristic implements PlanningHeuristic{
 	
 	@Override
 	public void findPlan(HistoryBasedWorkloadParser workloadParser,
-			Map<String, Provider> cloudProvider, Map<User, Contract> cloudUsers) {
+			List<Provider> cloudProviders, List<User> cloudUsers) {
 		
-		initProperties(cloudProvider);
+		initProperties(cloudProviders);
 		
 		//Configuring genetic algorithm
 		Configuration config = new DefaultConfiguration();
@@ -59,7 +59,7 @@ public class AGHeuristic implements PlanningHeuristic{
 	//		config.setKeepPopulationSizeConstant(true);
 	//		config.setNaturalSelector(null);//Tournament, WeightedRoullete
 
-			PlanningFitnessFunction myFunc = createFitnessFunction(workloadParser, cloudUsers, cloudProvider);
+			PlanningFitnessFunction myFunc = createFitnessFunction(workloadParser, cloudUsers, cloudProviders);
 			config.setFitnessFunction(myFunc);
 			
 			IChromosome sampleChromosome = createSampleChromosome(config);
@@ -103,8 +103,8 @@ public class AGHeuristic implements PlanningHeuristic{
 		return false;
 	}
 
-	private void initProperties(Map<String, Provider> cloudProvider) {
-		resourcesReservationLimit = cloudProvider.values().iterator().next().reservationLimit;
+	private void initProperties(List<Provider> cloudProviders) {
+		resourcesReservationLimit = cloudProviders.iterator().next().reservationLimit;
 	}
 
 	private IChromosome createSampleChromosome(Configuration config) throws InvalidConfigurationException {
@@ -114,7 +114,7 @@ public class AGHeuristic implements PlanningHeuristic{
 		return sampleChromosome;
 	}
 
-	private PlanningFitnessFunction createFitnessFunction(HistoryBasedWorkloadParser workloadParser, Map<User, Contract> cloudUsers, Map<String, Provider> cloudProvider) {
+	private PlanningFitnessFunction createFitnessFunction(HistoryBasedWorkloadParser workloadParser, List<User> cloudUsers, List<Provider> cloudProvider) {
 		workloadParser.setReadNextPeriod(true);
 		return new PlanningFitnessFunction(workloadParser, cloudUsers, cloudProvider, this.maximumReservedResources);
 	}

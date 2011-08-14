@@ -127,7 +127,7 @@ public class Configuration	extends PropertiesConfiguration{
 		checkSizeAndContent(APPLICATION_MAX_SERVER_PER_TIER, numOfTiers, APPLICATION_NUM_OF_TIERS, Integer.MAX_VALUE+"");
 		checkSizeAndContent(APPLICATION_HEURISTIC, numOfTiers, APPLICATION_NUM_OF_TIERS, AppHeuristicValues.ROUNDROBIN.name());
 		
-		changeHeuristicNames();
+		checkSchedulingHeuristicNames();
 		checkDPSHeuristic();
 		
 		setProperty(SETUP_TIME, Math.max(getLong(SETUP_TIME, 0), 0));
@@ -214,7 +214,7 @@ public class Configuration	extends PropertiesConfiguration{
 		}
 	}
 
-	private void changeHeuristicNames() {
+	private void checkSchedulingHeuristicNames() {
 		String[] strings = getStringArray(APPLICATION_HEURISTIC);
 		String customHeuristic = getString(APPLICATION_CUSTOM_HEURISTIC);
 		for (int i = 0; i < strings.length; i++) {
@@ -387,8 +387,6 @@ public class Configuration	extends PropertiesConfiguration{
 	// ************************************* SAAS ************************************/
 
 	private void verifySaaSProperties() {
-
-		
 		checkIsInteger(NUMBER_OF_PLANS,getString(NUMBER_OF_PLANS));
 
 		int numberOfPlans = getInt(NUMBER_OF_PLANS);
