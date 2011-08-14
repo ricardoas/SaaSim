@@ -167,7 +167,7 @@ public class ProfitDrivenHeuristicTest {
 		servers.add(machine2);
 		
 		Request request = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
-		Request request2 = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
+		Request request2 = new Request(clientID, userID, reqID+1, time, size, requestOption, httpOperation, URL, demand);
 		machine1.sendRequest(request);
 		machine1.sendRequest(request2);
 		
