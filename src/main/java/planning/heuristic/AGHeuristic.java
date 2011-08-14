@@ -21,9 +21,8 @@ import org.jgap.impl.WeightedRouletteSelector;
 import commons.cloud.Contract;
 import commons.cloud.Provider;
 import commons.cloud.User;
+import commons.io.HistoryBasedWorkloadParser;
 import commons.util.SimulationData;
-
-import config.GEISTMonthlyWorkloadParser;
 
 public class AGHeuristic implements PlanningHeuristic{
 	
@@ -34,11 +33,12 @@ public class AGHeuristic implements PlanningHeuristic{
 	private int MINIMUM_NUMBER_OF_EVOLUTIONS = 200;
 	
 	private int resourcesReservationLimit = 0;
+	private int maximumReservedResources = 0;
 	
 	private List<SimulationData> bestConfigs = new ArrayList<SimulationData>();
 	
 	@Override
-	public void findPlan(GEISTMonthlyWorkloadParser workloadParser,
+	public void findPlan(HistoryBasedWorkloadParser workloadParser,
 			Map<String, Provider> cloudProvider, Map<User, Contract> cloudUsers) {
 		
 		initProperties(cloudProvider);
@@ -82,7 +82,11 @@ public class AGHeuristic implements PlanningHeuristic{
 			
 			//store best config
 			IChromosome fittestChromosome = population.getFittestChromosome();
-			this.bestConfigs.add(myFunc.getDetailedEntry((Integer) fittestChromosome.getGene(0).getAllele()));
+			SimulationData simulationData = myFunc.getDetailedEntry((Integer) fittestChromosome.getGene(0).getAllele());
+			this.bestConfigs.add(simulationData);
+			
+			//Keeping number of reserved resources to be used to configure next accounting system!
+			this.maximumReservedResources = Math.max(maximumReservedResources, simulationData.numberOfMachinesReserved);
 			
 		} catch (InvalidConfigurationException e) {
 			e.printStackTrace();
@@ -110,8 +114,9 @@ public class AGHeuristic implements PlanningHeuristic{
 		return sampleChromosome;
 	}
 
-	private PlanningFitnessFunction createFitnessFunction(GEISTMonthlyWorkloadParser workloadParser, Map<User, Contract> cloudUsers, Map<String, Provider> cloudProvider) {
-		return new PlanningFitnessFunction(workloadParser, cloudUsers, cloudProvider);
+	private PlanningFitnessFunction createFitnessFunction(HistoryBasedWorkloadParser workloadParser, Map<User, Contract> cloudUsers, Map<String, Provider> cloudProvider) {
+		workloadParser.setReadNextPeriod(true);
+		return new PlanningFitnessFunction(workloadParser, cloudUsers, cloudProvider, this.maximumReservedResources);
 	}
 
 	@Override

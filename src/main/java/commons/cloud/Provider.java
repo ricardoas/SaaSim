@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import commons.config.Configuration;
 import commons.sim.components.MachineDescriptor;
+import commons.sim.util.SimulatorProperties;
 import commons.util.Triple;
 
 public class Provider {
@@ -37,6 +39,7 @@ public class Provider {
 			double reservationThreeYearsFee, double monitoringCost,
 			long[] transferInLimits, double[] transferInCosts,
 			long[] transferOutLimits, double[] transferOutCosts) {
+		
 		this.name = name;
 		this.onDemandCpuCost = cpuCost;
 		this.onDemandLimit = onDemandLimit;
@@ -184,10 +187,11 @@ public class Provider {
 		return true;
 	}
 
-	public double calculateCost(long currentTimeInMillis) {
+	public double calculateCost(long currentTimeInMillis, int maximumNumberOfReservedResourcesUsed) {
 		double cost = 0;
 		long inTransference = 0;
 		long outTransference = 0;
+		int currentNumberOfReservedResources = 0;
 		
 		//Finished machines
 		for (MachineDescriptor descriptor : finishedMachines) {
@@ -196,6 +200,7 @@ public class Provider {
 			outTransference += descriptor.getOutTransference();
 			if(descriptor.isReserved()){
 				this.totalNumberOfReservedMachinesUsed++;
+				currentNumberOfReservedResources++;
 			}
 		}
 		cost += calcTransferenceCost(inTransference, transferInLimits, transferInCosts);
@@ -223,11 +228,18 @@ public class Provider {
 			
 			if(descriptor.isReserved()){
 				this.totalNumberOfReservedMachinesUsed++;
+				currentNumberOfReservedResources++;
 			}
 		}
 		
 		cost += calcTransferenceCost(runningIn, transferInLimits, transferInCosts);
 		cost += calcTransferenceCost(runningOut, transferOutLimits, transferOutCosts);
+		
+		if(currentNumberOfReservedResources > maximumNumberOfReservedResourcesUsed){//Charging reservation fees
+			int planningPeriod = Configuration.getInstance().getInt(SimulatorProperties.PLANNING_PERIOD);
+			double fee = (planningPeriod == 1) ? this.reservationOneYearFee : this.reservationThreeYearsFee;
+			cost += (currentNumberOfReservedResources-maximumNumberOfReservedResourcesUsed) * fee; 
+		}
 		
 		this.resetCostCounters();
 		

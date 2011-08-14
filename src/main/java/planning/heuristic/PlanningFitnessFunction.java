@@ -8,19 +8,24 @@ import java.util.Map;
 import org.jgap.FitnessFunction;
 import org.jgap.IChromosome;
 
+import provisioning.DPS;
+import provisioning.util.DPSFactory;
+
 import commons.cloud.Contract;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
 import commons.config.Configuration;
+import commons.io.HistoryBasedWorkloadParser;
+import commons.io.WorkloadParser;
 import commons.sim.AccountingSystem;
 import commons.sim.SimpleSimulator;
+import commons.sim.Simulator;
 import commons.sim.jeevent.JEEventScheduler;
+import commons.sim.util.SimulatorFactory;
 import commons.sim.util.SimulatorProperties;
 import commons.util.Dashboard;
 import commons.util.SimulationData;
-
-import config.GEISTMonthlyWorkloadParser;
 
 public class PlanningFitnessFunction extends FitnessFunction{
 	
@@ -28,46 +33,45 @@ public class PlanningFitnessFunction extends FitnessFunction{
 	 * 
 	 */
 	private static final long serialVersionUID = 7906976193829216027L;
-	private final GEISTMonthlyWorkloadParser parser;
-	private final Map<User, Contract> cloudUsers;
-	private final Provider cloudProvider;
-	
-//	private OneTierSimulatorForPlanning simulator;
-//	private UtilityFunction utilityFunction;
-//	private final Map<User, List<Request>> currentWorkload;
+	private final HistoryBasedWorkloadParser parser;
+//	private final Map<User, Contract> cloudUsers;
+//	private final Provider cloudProvider;
 	
 	private Dashboard dashboard;
 	private Map<Integer, Double> solvedProblems;
-	private SimpleSimulator simulator;
+	private Simulator simulator;
+	private final int maximumReservedResources;
 
 	
-	public PlanningFitnessFunction(GEISTMonthlyWorkloadParser parser, Map<User, Contract> cloudUsers, Map<String, Provider> cloudProvider){
+	public PlanningFitnessFunction(HistoryBasedWorkloadParser parser, Map<User, Contract> cloudUsers, Map<String, Provider> cloudProvider, int maximumReservedResources){
 		this.parser = parser;
+		try {
+			this.parser.next();
+			this.parser.setReadNextPeriod(false);
+		} catch (IOException e) {
+			throw new RuntimeException("Planning Fitness Constructor: "+e.getMessage());
+		}
+		
 		//		this.currentWorkload = currentWorkload;
-		this.cloudUsers = cloudUsers;
-		this.cloudProvider = cloudProvider.values().iterator().next();
+//		this.cloudUsers = cloudUsers;
+//		this.cloudProvider = cloudProvider.values().iterator().next();
 		//		this.utilityFunction = new UtilityFunction();
 		
+		this.maximumReservedResources = maximumReservedResources;
 		this.dashboard = new Dashboard();//Place to store detailed information
 		this.solvedProblems = new HashMap<Integer, Double>();//Used to reuse previous calculated scenarios
 	}
 
 	private void initSimulator(Integer reservedResources) {
-		//Starting simulation data to start a new simulation
-//		this.simulator = new OneTierSimulatorForPlanning(new JEEventScheduler(), null, workload, this.sla, null);
-//		this.simulator.setOnDemandResourcesLimit(this.cloudProvider.onDemandLimit);
-//		this.simulator.setNumberOfReservedResources(reservedResources);
 		
-		JEEventScheduler scheduler = new JEEventScheduler();
-		
-		//FIXME!
 		//Setting the number of machines that should be available at startup
 		Configuration.getInstance().setProperty(SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER, reservedResources+"");
-		try {
-			this.simulator = new SimpleSimulator(scheduler, parser);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		DPS dps = DPSFactory.INSTANCE.createDPS();
+		dps.getAccountingSystem().setMaximumNumberOfReservedMachinesUsed(this.maximumReservedResources);
+		this.simulator = SimulatorFactory.getInstance().buildSimulator(dps);
+		dps.registerConfigurable(simulator);
+		
+		this.simulator.setWorkloadParser(parser);//Changing parser to a history based one!
 	}
 	
 	@Override
@@ -83,6 +87,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		this.initSimulator(numberOfMachinesToReserve);
 		this.simulator.start();
 		
+		//FIXME! Retrieve UtilityResult from simulator!
 		//Updating consumption information
 		Map<User, List<Request>> currentWorkload = this.parser.getWorkloadPerUser();
 		this.updateInformation(currentWorkload);

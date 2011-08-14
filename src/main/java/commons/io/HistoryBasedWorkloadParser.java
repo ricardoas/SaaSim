@@ -15,6 +15,7 @@ public class HistoryBasedWorkloadParser extends TimeBasedWorkloadParser{
 	private static final int DEFAULT_WINDOW_SIZE = 2;
 	
 	private LinkedBlockingQueue<List<Request>> history;
+	private boolean readNexPeriod = true;
 
 	/**
 	 * @param parser
@@ -46,12 +47,20 @@ public class HistoryBasedWorkloadParser extends TimeBasedWorkloadParser{
 	 */
 	@Override
 	public List<Request> next() throws IOException {
-		List<Request> next = super.next();
-		if(!history.offer(next)){
-			history.poll();
-			history.add(next);
+		if(readNexPeriod){
+			List<Request> next = super.next();
+			if(!history.offer(next)){
+				history.poll();
+				history.add(next);
+			}
+			return next;
+		}else{
+			return this.history.peek();
 		}
-		return next;
+	}
+	
+	public void setReadNextPeriod(boolean readNextPeriod){
+		this.readNexPeriod = readNextPeriod;
 	}
 	
 

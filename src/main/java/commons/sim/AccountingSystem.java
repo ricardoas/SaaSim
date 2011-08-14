@@ -5,12 +5,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import provisioning.DynamicConfigurable;
 
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
+import commons.cloud.UtilityResult;
 import commons.config.Configuration;
 import commons.io.GEISTWorkloadParser;
 import commons.io.TimeBasedWorkloadParser;
@@ -27,6 +29,7 @@ public class AccountingSystem {
 	private List<User> users;
 
 	private List<Provider> providers;
+	private int maximumReservedResources;
 	
 	public AccountingSystem(){
 		this.requestsFinishedPerUser = new HashMap<String, List<String>>();
@@ -36,6 +39,8 @@ public class AccountingSystem {
 		
 		this.users = Configuration.getInstance().getUsers();
 		Collections.sort(users);
+		
+		this.maximumReservedResources = 0;
 	}
 	
 	public void reportRequestFinished(Request request){
@@ -53,9 +58,9 @@ public class AccountingSystem {
 		return (requestsFinished != null) ? requestsFinished.size() : 0;
 	}
 	
-	public double calculateUtility(long currentTimeInMillis){
-		//TODO: Add utility result!
-		return calculateReceipt() - calculateCost(currentTimeInMillis) - calculatePenalties();
+	public UtilityResult calculateUtility(long currentTimeInMillis){
+		UtilityResult result = new UtilityResult(calculateReceipt(), calculateCost(currentTimeInMillis), calculatePenalties());
+		return result;
 	}
 	
 	private double calculatePenalties() {
@@ -95,7 +100,7 @@ public class AccountingSystem {
 	private double calculateCost(long currentTimeInMillis) {
 		double cost = 0.0;
 		for (Provider provider : providers) {
-			cost += provider.calculateCost(currentTimeInMillis);
+			cost += provider.calculateCost(currentTimeInMillis, this.maximumReservedResources);
 		}
 		return cost;
 	}
@@ -188,5 +193,9 @@ public class AccountingSystem {
 				return;
 			}
 		}
+	}
+
+	public void setMaximumNumberOfReservedMachinesUsed(int maximumReservedResources) {
+		this.maximumReservedResources = maximumReservedResources;
 	}
 }

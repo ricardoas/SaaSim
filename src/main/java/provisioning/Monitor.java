@@ -17,5 +17,5 @@ public interface Monitor{
 
 	void machineTurnedOff(MachineDescriptor machineDescriptor);
 
-	double chargeUsers(long currentTimeInMillis);
+	void chargeUsers(long currentTimeInMillis);
 }

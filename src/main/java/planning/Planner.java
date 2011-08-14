@@ -13,19 +13,18 @@ import planning.heuristic.PlanningHeuristic;
 import commons.cloud.Contract;
 import commons.cloud.Provider;
 import commons.cloud.User;
-
-import config.GEISTMonthlyWorkloadParser;
+import commons.io.HistoryBasedWorkloadParser;
 
 public class Planner {
 
 	private Map<String, Provider> cloudProviders;
 	private PlanningHeuristic planningHeuristic;
 	private Map<User, Contract> cloudUsers;
-	private GEISTMonthlyWorkloadParser workloadParser;
+	private HistoryBasedWorkloadParser workloadParser;
 	
 	private final String OUTUPUT_FILE = "planning.dat"; 
 	
-	public Planner(Map<String, Provider> providers, String heuristic, Map<User, Contract> cloudUsers, GEISTMonthlyWorkloadParser workloadParser) {
+	public Planner(Map<String, Provider> providers, String heuristic, Map<User, Contract> cloudUsers, HistoryBasedWorkloadParser workloadParser) {
 		this.cloudProviders = providers;
 		this.planningHeuristic = new AGHeuristic();
 		
@@ -51,17 +50,17 @@ public class Planner {
 	 * of the infrastructure
 	 */
 	public List<String> plan() {
-//		try {
-//			Map<User, List<Request>> currentWorkload = this.workloadParser.next();
-//			while(!currentWorkload.isEmpty()){
+		
+		//For each month ...
+		while(this.workloadParser.hasNext()){
 			this.planningHeuristic.findPlan(this.workloadParser, cloudProviders, cloudUsers);
-//			}
-			
-			//Persisting planning
-			List<String> plan = this.planningHeuristic.getPlan();
-			persistPlanning(plan);
-			
-			return plan;
+		}
+		
+		//Persisting planning
+		List<String> plan = this.planningHeuristic.getPlan();
+		persistPlanning(plan);
+		
+		return plan;
 			
 //		} catch (IOException e) {
 //			e.printStackTrace();

@@ -10,8 +10,10 @@ import planning.Executor;
 import planning.Planner;
 
 import commons.config.Configuration;
-
-import config.GEISTMonthlyWorkloadParser;
+import commons.io.GEISTWorkloadParser;
+import commons.io.HistoryBasedWorkloadParser;
+import commons.io.TimeBasedWorkloadParser;
+import commons.sim.util.UsersProperties;
 
 /**
  * This class is responsible for obtaining input parameters, from a configuration file, such as: workload, cloud provider
@@ -33,7 +35,8 @@ public class Main {
 			Configuration config = Configuration.getInstance();
 			
 			//Parsing workload
-			GEISTMonthlyWorkloadParser workloadParser = new GEISTMonthlyWorkloadParser();
+			String[] workloads = Configuration.getInstance().getStringArray(UsersProperties.USER_WORKLOAD);
+			HistoryBasedWorkloadParser workloadParser = new HistoryBasedWorkloadParser(new GEISTWorkloadParser(workloads), TimeBasedWorkloadParser.MONTH_IN_MILLIS);
 			
 			//Creating planner
 			Planner planner = new Planner(config.getProviders(), config.getPlanningHeuristic(), config.getUsers(), workloadParser);
