@@ -2,7 +2,6 @@ package planning.heuristic;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
@@ -18,7 +17,6 @@ import org.jgap.impl.MutationOperator;
 import org.jgap.impl.StockRandomGenerator;
 import org.jgap.impl.WeightedRouletteSelector;
 
-import commons.cloud.Contract;
 import commons.cloud.Provider;
 import commons.cloud.User;
 import commons.io.HistoryBasedWorkloadParser;
@@ -30,7 +28,7 @@ public class AGHeuristic implements PlanningHeuristic{
 	private double CROSSOVER_RATE = 0.7;
 	private int MUTATION_DENOMINATOR = 1000/5;//0.5%
 	private double MINIMUM_IMPROVEMENT = 0.01;//1%
-	private int MINIMUM_NUMBER_OF_EVOLUTIONS = 200;
+	private int MINIMUM_NUMBER_OF_EVOLUTIONS = 40;
 	
 	private int resourcesReservationLimit = 0;
 	private int maximumReservedResources = 0;
@@ -68,16 +66,20 @@ public class AGHeuristic implements PlanningHeuristic{
 			Genotype population = Genotype.randomInitialGenotype(config);
 
 			//evaluating population
-			for(int i = 0; i < MINIMUM_NUMBER_OF_EVOLUTIONS; i++){
-				population.evolve();
-			}
-			IChromosome previosFittestChromosome = population.getFittestChromosome();
+			IChromosome previousFittestChromosome = null;
 			population.evolve();
 			IChromosome lastFittestChromosome = population.getFittestChromosome();
-			while(!isEvolutionComplete(previosFittestChromosome, lastFittestChromosome)){
+			int evolutionsWithoutImprovement = 0;
+			
+			while(evolutionsWithoutImprovement < MINIMUM_NUMBER_OF_EVOLUTIONS){
 				population.evolve();
-				previosFittestChromosome = lastFittestChromosome;
+				previousFittestChromosome = lastFittestChromosome;
 				lastFittestChromosome = population.getFittestChromosome();
+				if(isEvolutionComplete(lastFittestChromosome, lastFittestChromosome)){
+					evolutionsWithoutImprovement++;
+				}else{
+					evolutionsWithoutImprovement = 0;
+				}
 			}
 			
 			//store best config
@@ -93,8 +95,7 @@ public class AGHeuristic implements PlanningHeuristic{
 		}
 	}
 
-	private boolean isEvolutionComplete(IChromosome fittestChromosome,
-			IChromosome lastFittestChromosome) {
+	private boolean isEvolutionComplete(IChromosome fittestChromosome, IChromosome lastFittestChromosome) {
 		double firstFitnessValue = fittestChromosome.getFitnessValue();
 		double difference = lastFittestChromosome.getFitnessValue() - firstFitnessValue;
 		if(Math.abs(difference/firstFitnessValue) < MINIMUM_IMPROVEMENT){
