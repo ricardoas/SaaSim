@@ -13,5 +13,5 @@ public interface PlanningHeuristic {
 	
 	public double getEstimatedProfit(int period);
 	
-	public List getPlan();
+	public List getPlan(List<User> cloudUsers);
 }

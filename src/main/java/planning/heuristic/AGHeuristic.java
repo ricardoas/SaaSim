@@ -130,14 +130,25 @@ public class AGHeuristic implements PlanningHeuristic{
 	}
 
 	@Override
-	public List<String> getPlan() {
+	public List<String> getPlan(List<User> cloudUsers) {
 		List<String> planningData = new ArrayList<String>();
+		
+		double setUpReceipt = calcSetupReceipt(cloudUsers);
+		
 		for(SimulationData data : this.bestConfigs){
 			planningData.add(data.numberOfMachinesReserved + "\t" + data.totalReservedConsumedTime
 					+ "\t" + data.numberOfOnDemandMachines + "\t" + data.totalOnDemandConsumedTime +
-					"\t" + data.totalInTransferred + "\t" + data.estimatedUtility + "\t" + data.estimatedReceipt
-					+ "\t" + data.estimatedCost);
+					"\t" + data.totalInTransferred + "\t" + (data.estimatedUtility+setUpReceipt) + 
+					"\t" + data.estimatedReceipt + "\t" + data.estimatedCost);
 		}
 		return planningData;
+	}
+
+	private double calcSetupReceipt(List<User> cloudUsers) {
+		double receipt = 0;
+		for(User user : cloudUsers){
+			receipt += user.calculateUnicReceipt();
+		}
+		return receipt;
 	}
 }

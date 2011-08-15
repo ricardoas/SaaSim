@@ -55,7 +55,7 @@ public class Planner {
 		}
 		
 		//Persisting planning
-		List<String> plan = this.planningHeuristic.getPlan();
+		List<String> plan = this.planningHeuristic.getPlan(cloudUsers);
 		persistPlanning(plan);
 		
 		return plan;
