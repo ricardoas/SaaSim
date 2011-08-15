@@ -7,21 +7,50 @@ public class UtilityResult {
 		public double cost;
 		public double penalty;
 		public double utility;
+		public long totalInTransferred;
+		public long totalOutTransferred;
 	}
 
 	private String result;
 	private UtilityResultEntry entry;
 	
-	public UtilityResult(double receipt, double cost, double penalties) {
+	public UtilityResult(double receipt, double cost, double penalties, long totalInTransferred,
+			long totalOutTransferred) {
 		entry = new UtilityResultEntry();
 		entry.receipt = receipt;
 		entry.cost = cost;
 		entry.penalty = penalties;
 		entry.utility = (receipt - cost - penalties);
+		entry.totalInTransferred = totalInTransferred;
+		entry.totalOutTransferred = totalOutTransferred;
 	}
 
 	public String getResult() {
 		return result;
 	}
 
+	
+	public double getUtility() {
+		return entry.utility;
+	}
+	
+	public double getCost(){
+		return entry.cost;
+	}
+	
+	public double getPenalty(){
+		return entry.penalty;
+	}
+	
+	public double getReceipt(){
+		return entry.receipt;
+	}
+	
+	public long getTotalInTransferred(){
+		return entry.totalInTransferred;
+	}
+	
+	public long getTotalOutTransferred(){
+		return entry.totalOutTransferred;
+	}
 }

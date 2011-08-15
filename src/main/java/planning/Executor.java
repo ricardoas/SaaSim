@@ -14,34 +14,29 @@ import commons.cloud.Contract;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
-import commons.cloud.UtilityFunction;
+import commons.io.HistoryBasedWorkloadParser;
 //import commons.sim.OneTierSimulatorForPlanning;
 import commons.sim.jeevent.JEEventScheduler;
 
-import config.GEISTMonthlyWorkloadParser;
 
 //FIXME!
 public class Executor {
 
 	private static final String OUTUPUT_FILE = "executor.dat";
-	private final Provider provider;
-	private final Map<User, Contract> usersContracts;
-	private final GEISTMonthlyWorkloadParser workloadParser;
+	private final List<Provider> providers;
+	private final List<User> usersContracts;
+	private final HistoryBasedWorkloadParser parser;
 	private final double sla;
-	private UtilityFunction utilityFunction;
 
 	private List<String> executorData;
 	
 
-	public Executor(Map<String, Provider> providers,
-			Map<User, Contract> usersContracts,
-			GEISTMonthlyWorkloadParser workloadParser, double sla) {
-		this.provider = providers.values().iterator().next();
-		this.usersContracts = usersContracts;
-		this.workloadParser = workloadParser;
+	public Executor(List<Provider> providers, List<User> users, HistoryBasedWorkloadParser parser, double sla) {
+		this.providers = providers;
+		this.usersContracts = users;
+		this.parser = parser;
 		this.sla = sla;
 		
-		this.utilityFunction = new UtilityFunction();
 		this.executorData = new ArrayList<String>();
 	}
 	
@@ -52,7 +47,7 @@ public class Executor {
 		if(this.usersContracts == null || this.usersContracts.size() == 0){
 			throw new RuntimeException("Invalid users in Planner!");
 		}
-		if(this.provider == null){
+		if(this.providers == null){
 			throw new RuntimeException("Invalid cloud providers in Planner!");
 		}
 		if(this.workloadParser == null){
@@ -75,7 +70,7 @@ public class Executor {
 			
 			//Starting simulation data to start a new simulation
 //			OneTierSimulatorForPlanning simulator = new OneTierSimulatorForPlanning(new JEEventScheduler(), null, workload, this.sla);//FIXME remove null (dont know how)
-			simulator.setOnDemandResourcesLimit(this.provider.onDemandLimit);
+			simulator.setOnDemandResourcesLimit(this.providers.onDemandLimit);
 			int numberOfMachinesToReserve = parseNumberOfReservedResources(plan, periodIndex);
 			simulator.setNumberOfReservedResources(numberOfMachinesToReserve);
 			
@@ -90,12 +85,12 @@ public class Executor {
 				utility += this.utilityFunction.calculateTotalReceipt(this.usersContracts.get(user), user);
 				totalTransferred += user.consumedTransference;
 			}
-			double cost = this.utilityFunction.calculateCost(totalTransferred, this.provider);
+			double cost = this.utilityFunction.calculateCost(totalTransferred, this.providers);
 			utility -= cost;
 			
 			//Storing information
-			storeExecution(numberOfMachinesToReserve, this.provider.onDemandResources.size(), 
-					utility, cost, utility+cost, totalTransferred, this.provider.onDemandConsumption(), this.provider.reservedConsumption());
+			storeExecution(numberOfMachinesToReserve, this.providers.onDemandResources.size(), 
+					utility, cost, utility+cost, totalTransferred, this.providers.onDemandConsumption(), this.providers.reservedConsumption());
 		}
 		
 		//Persisting executor data
@@ -146,8 +141,8 @@ public class Executor {
 		}
 		
 		//Updating provider
-		this.provider.onDemandResources = simulator.getOnDemandResources();
-		this.provider.reservedResources = simulator.getReservedResources();
+		this.providers.onDemandResources = simulator.getOnDemandResources();
+		this.providers.reservedResources = simulator.getReservedResources();
 	}
 
 }

@@ -73,6 +73,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements JEEventHa
 					if (workloadParser.hasNext()) {
 						List<Request> list = workloadParser.next();
 						for (Request request : list) {
+							request.reset();
 							send(parseEvent(request));
 						}
 					}

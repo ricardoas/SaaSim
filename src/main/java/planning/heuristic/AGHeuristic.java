@@ -134,7 +134,7 @@ public class AGHeuristic implements PlanningHeuristic{
 		for(SimulationData data : this.bestConfigs){
 			planningData.add(data.numberOfMachinesReserved + "\t" + data.totalReservedConsumedTime
 					+ "\t" + data.numberOfOnDemandMachines + "\t" + data.totalOnDemandConsumedTime +
-					"\t" + data.totalTransferred + "\t" + data.estimatedUtility + "\t" + data.estimatedReceipt
+					"\t" + data.totalInTransferred + "\t" + data.estimatedUtility + "\t" + data.estimatedReceipt
 					+ "\t" + data.estimatedCost);
 		}
 		return planningData;

@@ -1,11 +1,13 @@
 package commons.cloud;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import commons.config.Configuration;
+import commons.io.TimeBasedWorkloadParser;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.util.SimulatorProperties;
 import commons.util.Triple;
@@ -145,21 +147,6 @@ public class Provider {
 		return transferOutCosts;
 	}
 
-	private double calculateCost(MachineDescriptor descriptor){
-		if(descriptor.isReserved()){
-			return (descriptor.getFinishTimeInMillis() - descriptor.getStartTimeInMillis()) * reservedCpuCost;
-		}else{
-			return (descriptor.getFinishTimeInMillis() - descriptor.getStartTimeInMillis()) * onDemandCpuCost;
-		}
-	}
-	
-	private double calculateCost(MachineDescriptor descriptor, long currentTime){
-		if(descriptor.isReserved()){
-			return (currentTime - descriptor.getStartTimeInMillis()) * reservedCpuCost;
-		}else{
-			return (currentTime - descriptor.getStartTimeInMillis()) * onDemandCpuCost;
-		}
-	}
 
 	public boolean canBuyMachine(boolean reserved) {
 		return reserved ? currentReservedMachines < reservationLimit: currentOnDemandMachines < onDemandLimit;
@@ -185,6 +172,22 @@ public class Provider {
 			currentOnDemandMachines--;
 		}
 		return true;
+	}
+	
+	private double calculateCost(MachineDescriptor descriptor){
+		if(descriptor.isReserved()){
+			return (descriptor.getFinishTimeInMillis() - descriptor.getStartTimeInMillis()) * reservedCpuCost;
+		}else{
+			return (descriptor.getFinishTimeInMillis() - descriptor.getStartTimeInMillis()) * onDemandCpuCost;
+		}
+	}
+	
+	private double calculateCost(MachineDescriptor descriptor, long currentTime){
+		if(descriptor.isReserved()){
+			return (currentTime - descriptor.getStartTimeInMillis()) * reservedCpuCost;
+		}else{
+			return (currentTime - descriptor.getStartTimeInMillis()) * onDemandCpuCost;
+		}
 	}
 
 	public double calculateCost(long currentTimeInMillis, int maximumNumberOfReservedResourcesUsed) {
@@ -269,57 +272,73 @@ public class Provider {
 	}
 	
 	
-	//Deprecated!
-	public double calculateCost(double consumedTransference) {
-		return this.calculateReservationCosts() + this.calculateOnDemandCosts() + this.calculateTransferenceCosts(consumedTransference);
-	}
-	
-	//TODO
-	private double calculateTransferenceCosts(double consumedTransference) {
-		return 0;
-	}
-	
-	private double calculateOnDemandCosts() {
-		double totalConsumed = this.onDemandConsumption();
-		return totalConsumed * this.onDemandCpuCost + totalConsumed * monitoringCost;
-	}
+//	//Deprecated!
+//	public double calculateCost(double consumedTransference) {
+//		return this.calculateReservationCosts() + this.calculateOnDemandCosts() + this.calculateTransferenceCosts(consumedTransference);
+//	}
+//	
+//	//TODO
+//	private double calculateTransferenceCosts(double consumedTransference) {
+//		return 0;
+//	}
+//	
+//	private double calculateOnDemandCosts() {
+//		double totalConsumed = this.onDemandConsumption();
+//		return totalConsumed * this.onDemandCpuCost + totalConsumed * monitoringCost;
+//	}
+//
+//	private double calculateReservationCosts() {
+//		double totalConsumed = this.reservedConsumption();
+//		return this.reservedResources.size() * this.reservationOneYearFee + 
+//		totalConsumed * this.reservedCpuCost + totalConsumed * monitoringCost;
+//	}
 
-	private double calculateReservationCosts() {
-		double totalConsumed = this.reservedConsumption();
-		return this.reservedResources.size() * this.reservationOneYearFee + 
-		totalConsumed * this.reservedCpuCost + totalConsumed * monitoringCost;
-	}
-
-	public double onDemandConsumption() {
-		double totalConsumed = 0;
-		for(Long machineID : this.onDemandResources.keySet()){
-			Triple<Long, Long, Double> triple = this.onDemandResources.get(machineID);
-			long executionTime = triple.secondValue - triple.firstValue;
+	public double[] resourcesConsumption() {
+		long onDemandConsumed = 0;
+		long reservedConsumed = 0;
+		
+		int numberOfOnDemandResources = 0;
+		int numberOfReservedResources = 0;
+		
+		for(MachineDescriptor descriptor : this.finishedMachines){
+			long executionTime = descriptor.getFinishTimeInMillis() - descriptor.getStartTimeInMillis();
 			if(executionTime < 0){
-				throw new RuntimeException("Invalid cpu usage in machine "+machineID.toString()+" : "+executionTime);
+				throw new RuntimeException("Invalid cpu usage in machine "+descriptor.getMachineID()+" : "+executionTime);
 			}
-			totalConsumed += Math.ceil(1.0 * executionTime / UtilityFunction.HOUR_IN_MILLIS);
-		}
-		return totalConsumed;
-	}
-
-	public double reservedConsumption() {
-		double totalConsumed = 0;
-		for(Long machineID : this.reservedResources.keySet()){
-			Triple<Long, Long, Double> triple = this.reservedResources.get(machineID);
-			
-			long executionTime;
-			if(triple.secondValue != null){
-				executionTime = triple.secondValue - triple.firstValue;
+			if(!descriptor.isReserved()){
+				onDemandConsumed += Math.ceil(1.0 * executionTime / TimeBasedWorkloadParser.HOUR_IN_MILLIS);
+				numberOfOnDemandResources++;
 			}else{
-				executionTime = 0;
+				reservedConsumed += Math.ceil(1.0 * executionTime / TimeBasedWorkloadParser.HOUR_IN_MILLIS);
+				numberOfReservedResources++;
 			}
-			
-			if(executionTime < 0){
-				throw new RuntimeException("Invalid cpu usage in machine "+machineID.toString()+" : "+executionTime);
-			}
-			totalConsumed += Math.ceil(1.0 * executionTime / UtilityFunction.HOUR_IN_MILLIS);
 		}
-		return totalConsumed;
+		
+		double[] result = new double[4];
+		result[0] = onDemandConsumed;
+		result[1] = numberOfOnDemandResources;
+		result[2] = reservedConsumed; 
+		result[3] = numberOfReservedResources;
+		return result;
 	}
+
+//	public double reservedConsumption() {
+//		double totalConsumed = 0;
+//		for(Long machineID : this.reservedResources.keySet()){
+//			Triple<Long, Long, Double> triple = this.reservedResources.get(machineID);
+//			
+//			long executionTime;
+//			if(triple.secondValue != null){
+//				executionTime = triple.secondValue - triple.firstValue;
+//			}else{
+//				executionTime = 0;
+//			}
+//			
+//			if(executionTime < 0){
+//				throw new RuntimeException("Invalid cpu usage in machine "+machineID.toString()+" : "+executionTime);
+//			}
+//			totalConsumed += Math.ceil(1.0 * executionTime / UtilityFunction.HOUR_IN_MILLIS);
+//		}
+//		return totalConsumed;
+//	}
 }

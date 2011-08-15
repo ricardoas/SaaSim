@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import provisioning.DynamicConfigurable;
 
@@ -23,8 +22,6 @@ public class AccountingSystem {
 	
 	protected Map<String, List<String>> requestsFinishedPerUser;
 	protected Map<String, List<String>> requestsLostPerUser;
-	
-	protected double totalTransferred;
 	
 	private List<User> users;
 
@@ -59,7 +56,11 @@ public class AccountingSystem {
 	}
 	
 	public UtilityResult calculateUtility(long currentTimeInMillis){
-		UtilityResult result = new UtilityResult(calculateReceipt(), calculateCost(currentTimeInMillis), calculatePenalties());
+		//FIXME! Compute data transferred!
+		long totaInTransferred = 0;
+		long totalOutTransferred = 0;
+		
+		UtilityResult result = new UtilityResult(calculateReceipt(), calculateCost(currentTimeInMillis), calculatePenalties(), totaInTransferred, totalOutTransferred);
 		return result;
 	}
 	
@@ -197,5 +198,17 @@ public class AccountingSystem {
 
 	public void setMaximumNumberOfReservedMachinesUsed(int maximumReservedResources) {
 		this.maximumReservedResources = maximumReservedResources;
+	}
+	
+	public double[] getResourcesData(){
+		double[] results = new double[4];
+		for (Provider provider : providers) {
+			double[] currentResult = provider.resourcesConsumption();
+			for(int i = 0; i < currentResult.length; i++){
+				results[i] += currentResult[i];
+			}
+		}
+		
+		return results;
 	}
 }

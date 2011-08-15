@@ -11,17 +11,12 @@ import org.jgap.IChromosome;
 import provisioning.DPS;
 import provisioning.util.DPSFactory;
 
-import commons.cloud.Contract;
 import commons.cloud.Provider;
-import commons.cloud.Request;
 import commons.cloud.User;
+import commons.cloud.UtilityResult;
 import commons.config.Configuration;
 import commons.io.HistoryBasedWorkloadParser;
-import commons.io.WorkloadParser;
-import commons.sim.AccountingSystem;
-import commons.sim.SimpleSimulator;
 import commons.sim.Simulator;
-import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.SimulatorFactory;
 import commons.sim.util.SimulatorProperties;
 import commons.util.Dashboard;
@@ -37,9 +32,11 @@ public class PlanningFitnessFunction extends FitnessFunction{
 //	private final Map<User, Contract> cloudUsers;
 //	private final Provider cloudProvider;
 	
-	private Dashboard dashboard;
-	private Map<Integer, Double> solvedProblems;
 	private Simulator simulator;
+	private DPS dps;
+
+	private Map<Integer, Double> solvedProblems;
+	private Dashboard dashboard;
 	private final int maximumReservedResources;
 
 	
@@ -68,7 +65,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		Configuration.getInstance().setProperty(SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER, reservedResources+"");
 		
 		//Creating simulator structure
-		DPS dps = DPSFactory.INSTANCE.createDPS();
+		dps = DPSFactory.INSTANCE.createDPS();
 		dps.getAccountingSystem().setMaximumNumberOfReservedMachinesUsed(this.maximumReservedResources);
 		this.simulator = SimulatorFactory.getInstance().buildSimulator(dps);
 		dps.registerConfigurable(simulator);
@@ -89,26 +86,13 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		this.initSimulator(numberOfMachinesToReserve);
 		this.simulator.start();
 		
-		//FIXME! Retrieve UtilityResult from simulator!
-		//Updating consumption information
-		Map<User, List<Request>> currentWorkload = this.parser.getWorkloadPerUser();
-		this.updateInformation(currentWorkload);
-		
-		//Computing total utility
-		double fitness = 0d;
-		double totalTransferred = 0d;
-		AccountingSystem accountingSystem = this.simulator.getAccounting();
-		
-		for(User user : currentWorkload.keySet()){
-			fitness += accountingSystem.calculateTotalReceipt(this.cloudUsers.get(user), user);
-			totalTransferred += user.consumedTransference;
-		}
-		double cost = accountingSystem.calculateCost(this.cloudProvider);
-		fitness -= cost;
+		UtilityResult result = this.dps.calculateUtility();
+		double[] resourcesData = this.dps.getAccountingSystem().getResourcesData();
+		double fitness = result.getUtility();
 		
 		//Storing information
-		this.dashboard.createEntry(numberOfMachinesToReserve, this.cloudProvider.onDemandResources.size(), 
-				fitness, cost, fitness+cost, totalTransferred, this.cloudProvider.onDemandConsumption(), this.cloudProvider.reservedConsumption());
+		this.dashboard.createEntry(numberOfMachinesToReserve, resourcesData[1], 
+				fitness, result.getCost(), result.getReceipt(), result.getTotalInTransferred(), result.getTotalOutTransferred(), resourcesData[0], resourcesData[2]);
 		
 		this.solvedProblems.put(numberOfMachinesToReserve, fitness);
 		if(fitness < 1){
@@ -116,25 +100,6 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		}
 		
 		return fitness;
-	}
-
-	private void updateInformation(Map<User, List<Request>> currentWorkload) {
-		//Updating users
-		for(User user : currentWorkload.keySet()){
-			List<Request> requests = currentWorkload.get(user);
-			double totalProcessed = 0;
-			double totalTransfered = 0;
-			for(Request request : requests){
-				totalProcessed += request.totalProcessed;
-				totalTransfered += request.getSizeInBytes();
-			}
-			user.consumedCpu = totalProcessed;
-			user.consumedTransference = totalTransfered;
-		}
-		
-		//Updating provider
-		this.cloudProvider.onDemandResources = this.simulator.getAccounting().getOnDemandMachinesData();
-		this.cloudProvider.reservedResources = this.simulator.getAccounting().getReservedMachinesData();
 	}
 
 	public SimulationData getDetailedEntry(Integer reservedResources) {

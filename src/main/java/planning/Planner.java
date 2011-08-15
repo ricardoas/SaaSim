@@ -5,12 +5,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import planning.heuristic.AGHeuristic;
 import planning.heuristic.PlanningHeuristic;
 
-import commons.cloud.Contract;
 import commons.cloud.Provider;
 import commons.cloud.User;
 import commons.io.HistoryBasedWorkloadParser;

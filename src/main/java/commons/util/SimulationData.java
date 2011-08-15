@@ -9,6 +9,6 @@ public class SimulationData {
 	public double estimatedUtility;
 	public double estimatedReceipt;
 	public double estimatedCost;
-	public double totalTransferred;
-	
+	public long totalInTransferred;
+	public long totalOutTransferred;
 }
