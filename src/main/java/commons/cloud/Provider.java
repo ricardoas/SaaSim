@@ -1,7 +1,6 @@
 package commons.cloud;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,11 +9,11 @@ import commons.config.Configuration;
 import commons.io.TimeBasedWorkloadParser;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.util.SimulatorProperties;
-import commons.util.Triple;
 
 public class Provider {
 	
-	private static int machineIDGenerator = 0;
+	protected static int machineIDGenerator = 0;
+	
 	private int currentOnDemandMachines;
 	private int currentReservedMachines;
 
@@ -54,6 +53,7 @@ public class Provider {
 		this.transferInCosts = transferInCosts;
 		this.transferOutLimits = transferOutLimits;
 		this.transferOutCosts = transferOutCosts;
+		this.verifyProperties();
 		
 		this.currentOnDemandMachines = 0;
 		this.currentReservedMachines = 0;
@@ -63,6 +63,21 @@ public class Provider {
 		this.totalNumberOfReservedMachinesUsed = 0;
 	}
 	
+	private void verifyProperties() {
+		if(this.onDemandCpuCost < 0 || this.reservedCpuCost < 0){
+			throw new RuntimeException(this.getClass()+": Invalid cpu/hour cost!");
+		}
+		if(this.reservationLimit <= 0 || this.onDemandLimit <= 0){
+			throw new RuntimeException(this.getClass()+": Invalid on-demand/reserved limit!");
+		}
+		if(this.reservationOneYearFee < 0 || this.reservationThreeYearsFee < 0){
+			throw new RuntimeException(this.getClass()+": Invalid reservation fees!");
+		}
+		if(this.monitoringCost < 0){
+			throw new RuntimeException(this.getClass()+": Invalid monitoring cost!");
+		}
+	}
+
 	/**
 	 * @return the name
 	 */
@@ -158,7 +173,10 @@ public class Provider {
 		}else{
 			currentOnDemandMachines++;
 		}
-		return new MachineDescriptor(machineIDGenerator++, reserved);
+		MachineDescriptor descriptor = new MachineDescriptor(machineIDGenerator++, reserved);
+		this.runningMachines.put(descriptor.getMachineID(), descriptor);
+		
+		return descriptor;
 	}
 
 	public boolean shutdownMachine(MachineDescriptor machineDescriptor) {
@@ -175,18 +193,32 @@ public class Provider {
 	}
 	
 	private double calculateCost(MachineDescriptor descriptor){
+		double executionTime = descriptor.getFinishTimeInMillis() - descriptor.getStartTimeInMillis();
+		executionTime = Math.ceil(1.0 * executionTime / TimeBasedWorkloadParser.HOUR_IN_MILLIS);
+		
+		if(executionTime < 0){
+			throw new RuntimeException(this.getClass()+": Invalid machine"+ descriptor.getMachineID() +" runtime for cost: "+executionTime);
+		}
+		
 		if(descriptor.isReserved()){
-			return (descriptor.getFinishTimeInMillis() - descriptor.getStartTimeInMillis()) * reservedCpuCost;
+			return executionTime * reservedCpuCost + executionTime * monitoringCost;
 		}else{
-			return (descriptor.getFinishTimeInMillis() - descriptor.getStartTimeInMillis()) * onDemandCpuCost;
+			return executionTime * onDemandCpuCost + executionTime * monitoringCost;
 		}
 	}
 	
 	private double calculateCost(MachineDescriptor descriptor, long currentTime){
+		double executionTime = currentTime - descriptor.getStartTimeInMillis();
+		executionTime = Math.ceil(1.0 * executionTime / TimeBasedWorkloadParser.HOUR_IN_MILLIS);
+		
+		if(executionTime < 0){
+			throw new RuntimeException(this.getClass()+": Invalid machine"+ descriptor.getMachineID() +" runtime for cost: "+executionTime);
+		}
+		
 		if(descriptor.isReserved()){
-			return (currentTime - descriptor.getStartTimeInMillis()) * reservedCpuCost;
+			return executionTime * reservedCpuCost + executionTime * monitoringCost;
 		}else{
-			return (currentTime - descriptor.getStartTimeInMillis()) * onDemandCpuCost;
+			return executionTime * onDemandCpuCost + executionTime * monitoringCost;
 		}
 	}
 
@@ -241,7 +273,7 @@ public class Provider {
 		if(currentNumberOfReservedResources > maximumNumberOfReservedResourcesUsed){//Charging reservation fees
 			int planningPeriod = Configuration.getInstance().getInt(SimulatorProperties.PLANNING_PERIOD);
 			double fee = (planningPeriod == 1) ? this.reservationOneYearFee : this.reservationThreeYearsFee;
-			cost += (currentNumberOfReservedResources-maximumNumberOfReservedResourcesUsed) * fee; 
+			cost += (currentNumberOfReservedResources - maximumNumberOfReservedResourcesUsed) * fee; 
 		}
 		
 		this.resetCostCounters();
