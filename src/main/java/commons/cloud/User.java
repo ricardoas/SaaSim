@@ -1,5 +1,7 @@
 package commons.cloud;
 
+import commons.io.TimeBasedWorkloadParser;
+
 public class User implements Comparable<User>{
 	
 	private static int idGenerator = 0;
@@ -7,7 +9,7 @@ public class User implements Comparable<User>{
 	private final int id;
 	private final Contract contract;
 	
-	private long consumedCpu;
+	private long consumedCpuInMillis;
 	private long consumedInTransferenceInBytes;
 	private long consumedOutTransferenceInBytes;
 	private long consumedStorageInBytes;
@@ -19,14 +21,14 @@ public class User implements Comparable<User>{
 	}
 	
 	public void reset(){
-		consumedCpu = 0;
+		consumedCpuInMillis = 0;
 		consumedInTransferenceInBytes = 0;
 		consumedOutTransferenceInBytes = 0;
 		consumedStorageInBytes = 0;
 	}
 	
-	public void update(long consumedCPU, long inTransferenceInBytes, long outTransferenceInBytes, long storageInBytes){
-		this.consumedCpu += consumedCPU;
+	public void update(long consumedCpuInMillis, long inTransferenceInBytes, long outTransferenceInBytes, long storageInBytes){
+		this.consumedCpuInMillis += consumedCpuInMillis;
 		this.consumedInTransferenceInBytes += inTransferenceInBytes;
 		this.consumedOutTransferenceInBytes += outTransferenceInBytes;
 		this.consumedStorageInBytes += storageInBytes;
@@ -49,14 +51,15 @@ public class User implements Comparable<User>{
 	/**
 	 * @return the consumedCpu
 	 */
-	public long getTotalConsumedCpu() {
-		return consumedCpu;
+	public long getTotalConsumedCpuInMillis() {
+		return consumedCpuInMillis;
 	}
 
 	/**
 	 * @return the consumedCpu
 	 */
 	public long getConsumedCpu() {
+		long consumedCpu = (long)Math.ceil(1.0 * consumedCpuInMillis / TimeBasedWorkloadParser.HOUR_IN_MILLIS);
 		return Math.min(consumedCpu, contract.getCpuLimit());
 	}
 
@@ -64,6 +67,7 @@ public class User implements Comparable<User>{
 	 * @return the consumedCpu
 	 */
 	public long getExtraCpu() {
+		long consumedCpu = (long)Math.ceil(1.0 * consumedCpuInMillis / TimeBasedWorkloadParser.HOUR_IN_MILLIS);
 		return Math.max(consumedCpu-contract.getCpuLimit(), 0);
 	}
 
@@ -113,7 +117,7 @@ public class User implements Comparable<User>{
 	@Override
 	public String toString() {
 		return "User [id=" + id + 
-			 "\n      CPU used=" + consumedCpu + 
+			 "\n      CPU used=" + consumedCpuInMillis + 
 			 " (millis)\n      data transferred=" + consumedInTransferenceInBytes	+ 
 			 " (B)\n      storage used=" + consumedStorageInBytes + " (B)]";
 	}
@@ -124,6 +128,8 @@ public class User implements Comparable<User>{
 	}
 
 	public double calculateReceipt() {
+		long consumedCpu = (long)Math.ceil(1.0 * consumedCpuInMillis / TimeBasedWorkloadParser.HOUR_IN_MILLIS);
+		
 		double receipt = this.contract.calculateReceipt(consumedCpu, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, consumedStorageInBytes);
 		this.reset();
 		return receipt;

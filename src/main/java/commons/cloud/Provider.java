@@ -271,7 +271,7 @@ public class Provider {
 		cost += calcTransferenceCost(runningOut, transferOutLimits, transferOutCosts);
 		
 		if(currentNumberOfReservedResources > maximumNumberOfReservedResourcesUsed){//Charging reservation fees
-			int planningPeriod = Configuration.getInstance().getInt(SimulatorProperties.PLANNING_PERIOD);
+			long planningPeriod = Configuration.getInstance().getPlanningPeriod();
 			double fee = (planningPeriod == 1) ? this.reservationOneYearFee : this.reservationThreeYearsFee;
 			cost += (currentNumberOfReservedResources - maximumNumberOfReservedResourcesUsed) * fee; 
 		}

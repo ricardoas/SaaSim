@@ -125,7 +125,7 @@ public class Contract implements Comparable<Contract>{
 	public double calculateReceipt(long consumedCpu, long consumedInTransferenceInBytes,
 			long consumedOutTransferenceInBytes, long consumedStorageInBytes) {
 		//FIXME: Add transference receipts!
-		return price + Math.max(0, consumedCpu-cpuLimit) * extraCpuCost;
+		return price + Math.max(0, consumedCpu - cpuLimit) * extraCpuCost;
 	}
 	
 }
