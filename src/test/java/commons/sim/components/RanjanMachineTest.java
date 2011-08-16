@@ -172,31 +172,34 @@ public class RanjanMachineTest {
 		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(50L);
 		firstRequest.update(50L);
 		EasyMock.expect(firstRequest.isFinished()).andReturn(true);
+		EasyMock.expect(firstRequest.getRequestSizeInBytes()).andReturn(100L);
+		EasyMock.expect(firstRequest.getResponseSizeInBytes()).andReturn(100L);
+
 		Request secondRequest = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(100L);
 		secondRequest.update(100L);
 		EasyMock.expect(secondRequest.isFinished()).andReturn(true);
+		EasyMock.expect(secondRequest.getRequestSizeInBytes()).andReturn(100L);
+		EasyMock.expect(secondRequest.getResponseSizeInBytes()).andReturn(100L);
+
 		Request thirdRequest = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(thirdRequest.getTotalToProcess()).andReturn(100L);
 		thirdRequest.update(100L);
 		EasyMock.expect(thirdRequest.isFinished()).andReturn(true);
+		EasyMock.expect(thirdRequest.getRequestSizeInBytes()).andReturn(100L);
+		EasyMock.expect(thirdRequest.getResponseSizeInBytes()).andReturn(100L);
+		
 		Request fourthRequest = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(fourthRequest.getTotalToProcess()).andReturn(100L);
 		fourthRequest.update(100L);
 		EasyMock.expect(fourthRequest.isFinished()).andReturn(true);
+		EasyMock.expect(fourthRequest.getRequestSizeInBytes()).andReturn(100L);
+		EasyMock.expect(fourthRequest.getResponseSizeInBytes()).andReturn(100L);
+
 		loadBalancer.reportRequestFinished(firstRequest);
 		loadBalancer.reportRequestFinished(secondRequest);
 		loadBalancer.reportRequestFinished(thirdRequest);
 		loadBalancer.reportRequestFinished(fourthRequest);
-		EasyMock.expect(firstRequest.getRequestSizeInBytes()).andReturn(100L);
-		EasyMock.expect(firstRequest.getResponseSizeInBytes()).andReturn(100L);
-		EasyMock.expect(secondRequest.getRequestSizeInBytes()).andReturn(100L);
-		EasyMock.expect(secondRequest.getResponseSizeInBytes()).andReturn(100L);
-		EasyMock.expect(thirdRequest.getRequestSizeInBytes()).andReturn(100L);
-		EasyMock.expect(thirdRequest.getResponseSizeInBytes()).andReturn(100L);
-		EasyMock.expect(fourthRequest.getRequestSizeInBytes()).andReturn(100L);
-		EasyMock.expect(fourthRequest.getResponseSizeInBytes()).andReturn(100L);
-
 		
 		PowerMock.replayAll(config, loadBalancer, firstRequest, secondRequest, thirdRequest, fourthRequest);
 		
@@ -230,26 +233,36 @@ public class RanjanMachineTest {
 		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(50L);
 		firstRequest.update(50L);
 		EasyMock.expect(firstRequest.isFinished()).andReturn(true);
+		EasyMock.expect(firstRequest.getRequestSizeInBytes()).andReturn(100L);
+		EasyMock.expect(firstRequest.getResponseSizeInBytes()).andReturn(100L);
 		
 		Request secondRequest = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(100L);
 		secondRequest.update(100L);
 		EasyMock.expect(secondRequest.isFinished()).andReturn(true);
+		EasyMock.expect(secondRequest.getRequestSizeInBytes()).andReturn(100L);
+		EasyMock.expect(secondRequest.getResponseSizeInBytes()).andReturn(100L);
 		
 		Request thirdRequest = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(thirdRequest.getTotalToProcess()).andReturn(100L);
 		thirdRequest.update(100L);
 		EasyMock.expect(thirdRequest.isFinished()).andReturn(true);
+		EasyMock.expect(thirdRequest.getRequestSizeInBytes()).andReturn(100L);
+		EasyMock.expect(thirdRequest.getResponseSizeInBytes()).andReturn(100L);
 		
 		Request fourthRequest = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(fourthRequest.getTotalToProcess()).andReturn(100L);
 		fourthRequest.update(100L);
 		EasyMock.expect(fourthRequest.isFinished()).andReturn(true);
+		EasyMock.expect(fourthRequest.getRequestSizeInBytes()).andReturn(100L);
+		EasyMock.expect(fourthRequest.getResponseSizeInBytes()).andReturn(100L);
 		
 		Request fifthRequest = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(fifthRequest.getTotalToProcess()).andReturn(100L);
 		fifthRequest.update(100L);
 		EasyMock.expect(fifthRequest.isFinished()).andReturn(true);
+		EasyMock.expect(fifthRequest.getRequestSizeInBytes()).andReturn(100L);
+		EasyMock.expect(fifthRequest.getResponseSizeInBytes()).andReturn(100L);
 		
 		Request sixthRequest = EasyMock.createStrictMock(Request.class);
 
@@ -379,7 +392,9 @@ public class RanjanMachineTest {
 		long localMaxNumberOfThreads = 1l;
 		long backlogSize = 1l;
 		
-		Configuration config = mockConfiguration();
+		Configuration config = EasyMock.createStrictMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(localMaxNumberOfThreads);
 		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(backlogSize);
 		
@@ -388,6 +403,7 @@ public class RanjanMachineTest {
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(60000L)).times(3);
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(60000L).times(2);
 		EasyMock.expect(firstRequest.getDemand()).andReturn(60000L).once();
 		firstRequest.update(60000L);
 		EasyMock.expectLastCall();
@@ -413,7 +429,7 @@ public class RanjanMachineTest {
 		//Simulating that end event has arrived
 		JEEvent event = EasyMock.createStrictMock(JEEvent.class);
 		Request[] requests = {firstRequest};
-		EasyMock.expect(event.getType()).andReturn(JEEventType.REQUEST_FINISHED);
+		EasyMock.expect(event.getType()).andReturn(JEEventType.PREEMPTION);
 		EasyMock.expect(event.getValue()).andReturn(requests);
 		EasyMock.replay(event);
 
@@ -435,15 +451,12 @@ public class RanjanMachineTest {
 	@Test
 	public void computeUtilizationWithThreadLimitNotReached() throws Exception{
 		Configuration config = mockConfiguration();
-		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(DEFAULT_MAX_NUM_OF_THREADS);
-		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(DEFAULT_BACKLOG_SIZE);
 		
 		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(0L)).times(7);
+		EasyMock.expect(scheduler.now()).andReturn(new JETime(0L)).times(3);
 		
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getDemand()).andReturn(600000L).once();
-		EasyMock.expect(request.getTotalToProcess()).andReturn(60000L).once();
+		EasyMock.expect(request.getTotalToProcess()).andReturn(60000L);
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(request, scheduler, config);
 		
@@ -455,7 +468,6 @@ public class RanjanMachineTest {
 		
 		//Sending another request in the same time
 		Request request2 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request2.getDemand()).andReturn(10000L).once();
 		EasyMock.replay(request2);
 		
 		machine.sendRequest(request2);
