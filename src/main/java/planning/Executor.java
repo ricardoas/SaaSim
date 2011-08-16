@@ -134,7 +134,7 @@ public class Executor {
 			double totalTransfered = 0;
 			for(Request request : requests){
 				totalProcessed += request.totalProcessed;
-				totalTransfered += request.getSizeInBytes();
+				totalTransfered += request.getRequestSizeInBytes();
 			}
 			entry.getKey().consumedCpu = totalProcessed;
 			entry.getKey().consumedTransference = totalTransfered;

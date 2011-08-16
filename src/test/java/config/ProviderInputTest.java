@@ -4,7 +4,7 @@ package config;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.Map;
+import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationRuntimeException;
@@ -69,11 +69,11 @@ public class ProviderInputTest {
 	public void testValidFile() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
 		Configuration config = Configuration.getInstance();
-		Map<String, Provider> providers = config.getProviders();
+		List<Provider> providers = config.getProviders();
 		assertNotNull(providers);
 		assertEquals(3, providers.size());
 
-		Provider provider = providers.get("amazon");
+		Provider provider = providers.get(0);
 		assertNotNull(provider);
 		assertEquals("amazon", provider.getName());
 		assertEquals(0.5, provider.getOnDemandCpuCost(), 0.0);
@@ -89,7 +89,7 @@ public class ProviderInputTest {
 		Assert.assertArrayEquals(new double[]{0.10,0.09}, provider.getTransferOutCosts(), 0.0);
 
 
-		Provider provider2 = providers.get("rackspace");
+		Provider provider2 = providers.get(1);
 		assertNotNull(provider2);
 		assertEquals("rackspace", provider2.getName());
 		assertEquals(0.5, provider2.getOnDemandCpuCost(), 0.0);
@@ -104,7 +104,7 @@ public class ProviderInputTest {
 		Assert.assertArrayEquals( new long[]{200}, provider2.getTransferOutLimits());
 		Assert.assertArrayEquals(new double[]{0.10,0.09}, provider2.getTransferOutCosts(), 0.0);
 
-		Provider provider3 = providers.get("gogrid");
+		Provider provider3 = providers.get(2);
 		assertNotNull(provider3);
 		assertEquals("gogrid", provider3.getName());
 		assertEquals(0.55, provider3.getOnDemandCpuCost(), 0.0);

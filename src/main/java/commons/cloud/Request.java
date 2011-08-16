@@ -12,7 +12,7 @@ public class Request{
 	private final String reqID;
 	private final long timeInMillis;
 	private final long demandInMillis;
-	private final long sizeInBytes;
+	private final long requestSizeInBytes;
 	private final long responseSizeInBytes;
 	private final int requestOption;//Indicates whether the request is a non-SSL (expired or not) or a SSL one 
 	private final String httpOperation;
@@ -38,7 +38,7 @@ public class Request{
 		this.reqID = reqID;
 		this.timeInMillis = time;
 		this.demandInMillis = demand;
-		this.sizeInBytes = size;
+		this.requestSizeInBytes = size;
 		this.responseSizeInBytes = 1000000;
 		this.requestOption = requestOption;
 		this.httpOperation = httpOperation;
@@ -85,10 +85,10 @@ public class Request{
 	}
 
 	/**
-	 * @return the sizeInBytes
+	 * @return the requestSizeInBytes
 	 */
-	public long getSizeInBytes() {
-		return sizeInBytes;
+	public long getRequestSizeInBytes() {
+		return requestSizeInBytes;
 	}
 
 	public String getRequestID(){

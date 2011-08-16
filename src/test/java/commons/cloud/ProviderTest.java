@@ -16,7 +16,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import commons.config.Configuration;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEEventScheduler;
-import commons.sim.util.SimulatorProperties;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Configuration.class)

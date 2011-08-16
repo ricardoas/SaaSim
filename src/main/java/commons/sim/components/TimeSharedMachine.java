@@ -120,9 +120,9 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 				long processedDemand = (Long) event.getValue()[0];
 				totalTimeUsed += processedDemand;
 				request.update(processedDemand);
-				descriptor.updateTransference(request.getSizeInBytes(), request.getResponseSizeInBytes());
 				
 				if(request.isFinished()){
+					descriptor.updateTransference(request.getRequestSizeInBytes(), request.getResponseSizeInBytes());
 					requestFinished(request);
 				}else{
 					processorQueue.add(request);

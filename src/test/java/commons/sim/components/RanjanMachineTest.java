@@ -188,6 +188,15 @@ public class RanjanMachineTest {
 		loadBalancer.reportRequestFinished(secondRequest);
 		loadBalancer.reportRequestFinished(thirdRequest);
 		loadBalancer.reportRequestFinished(fourthRequest);
+		EasyMock.expect(firstRequest.getRequestSizeInBytes()).andReturn(100L);
+		EasyMock.expect(firstRequest.getResponseSizeInBytes()).andReturn(100L);
+		EasyMock.expect(secondRequest.getRequestSizeInBytes()).andReturn(100L);
+		EasyMock.expect(secondRequest.getResponseSizeInBytes()).andReturn(100L);
+		EasyMock.expect(thirdRequest.getRequestSizeInBytes()).andReturn(100L);
+		EasyMock.expect(thirdRequest.getResponseSizeInBytes()).andReturn(100L);
+		EasyMock.expect(fourthRequest.getRequestSizeInBytes()).andReturn(100L);
+		EasyMock.expect(fourthRequest.getResponseSizeInBytes()).andReturn(100L);
+
 		
 		PowerMock.replayAll(config, loadBalancer, firstRequest, secondRequest, thirdRequest, fourthRequest);
 		

@@ -207,6 +207,8 @@ public class TimeSharedMachineTest {
 		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
 		request.update(50L);
 		EasyMock.expect(request.isFinished()).andReturn(true);
+		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(100000L);
+		EasyMock.expect(request.getResponseSizeInBytes()).andReturn(100000L);
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.reportRequestFinished(request);
@@ -246,11 +248,15 @@ public class TimeSharedMachineTest {
 		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(50L);
 		firstRequest.update(50L);
 		EasyMock.expect(firstRequest.isFinished()).andReturn(true);
+		EasyMock.expect(firstRequest.getRequestSizeInBytes()).andReturn(100000L);
+		EasyMock.expect(firstRequest.getResponseSizeInBytes()).andReturn(100000L);
 		
 		Request secondRequest = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(50L);
 		secondRequest.update(50L);
 		EasyMock.expect(secondRequest.isFinished()).andReturn(true);
+		EasyMock.expect(secondRequest.getRequestSizeInBytes()).andReturn(100000L);
+		EasyMock.expect(secondRequest.getResponseSizeInBytes()).andReturn(100000L);
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.reportRequestFinished(secondRequest);
@@ -316,6 +322,8 @@ public class TimeSharedMachineTest {
 		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
 		request.update(50L);
 		EasyMock.expect(request.isFinished()).andReturn(true);
+		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(100000L);
+		EasyMock.expect(request.getResponseSizeInBytes()).andReturn(100000L);
 		
 		loadBalancer.reportRequestFinished(request);
 		
@@ -346,6 +354,8 @@ public class TimeSharedMachineTest {
 		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
 		request.update(50L);
 		EasyMock.expect(request.isFinished()).andReturn(true);
+		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(100000L);
+		EasyMock.expect(request.getResponseSizeInBytes()).andReturn(100000L);
 		
 		loadBalancer.reportRequestFinished(request);
 		
@@ -376,6 +386,8 @@ public class TimeSharedMachineTest {
 		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
 		request.update(50L);
 		EasyMock.expect(request.isFinished()).andReturn(true);
+		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(100000L);
+		EasyMock.expect(request.getResponseSizeInBytes()).andReturn(100000L);
 		
 		loadBalancer.reportRequestFinished(request);
 		
@@ -443,6 +455,8 @@ public class TimeSharedMachineTest {
 		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
 		request.update(50L);
 		EasyMock.expect(request.isFinished()).andReturn(true);
+		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(100000L);
+		EasyMock.expect(request.getResponseSizeInBytes()).andReturn(100000L);
 		
 		loadBalancer.reportRequestFinished(request);
 		
