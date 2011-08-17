@@ -97,6 +97,9 @@ public class Configuration	extends PropertiesConfiguration{
 	 * @return
 	 */
 	public static Configuration getInstance(){
+		if(instance == null){
+			throw new ConfigurationRuntimeException();
+		}
 		return instance;
 	}
 	
