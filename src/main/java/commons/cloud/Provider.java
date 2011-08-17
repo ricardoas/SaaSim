@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
-import commons.cloud.Provider.MACHINE_TYPES;
 import commons.config.Configuration;
 import commons.io.TimeBasedWorkloadParser;
 import commons.sim.components.MachineDescriptor;
@@ -63,32 +63,20 @@ public class Provider {
 	}
 
 	private void verifyProperties() {
-		Double[] onDemandCosts = new Double[]{};
-		Double[] reservedCosts = new Double[]{};
 		
-		this.onDemandCpuCost.values().toArray(onDemandCosts);
-		this.reservedCpuCost.values().toArray(reservedCosts);
-		
-		for(int i = 0; i < onDemandCosts.length; i++){
-			if(onDemandCosts[i] < 0 || reservedCosts[i] < 0){
+		for (Entry<MachineTypeValue, MachineType> entry : types.entrySet()) {
+			MachineType type = entry.getValue();
+
+			if(type.getOnDemandCpuCost() < 0 || type.getReservedCpuCost() < 0){
 				throw new RuntimeException(this.getClass()+": Invalid cpu/hour cost!");
+			}
+			if(type.getReservationOneYearFee() < 0 || type.getReservationThreeYearsFee() < 0){
+				throw new RuntimeException(this.getClass()+": Invalid reservation fees!");
 			}
 		}
 		
 		if(this.reservationLimit <= 0 || this.onDemandLimit <= 0){
 			throw new RuntimeException(this.getClass()+": Invalid on-demand/reserved limit!");
-		}
-		
-		Double[] oneYearFees = new Double[]{};
-		Double[] threeYearsFees = new Double[]{};
-		
-		this.reservationOneYearFee.values().toArray(oneYearFees);
-		this.reservationThreeYearsFee.values().toArray(threeYearsFees);
-		
-		for(int i = 0; i < oneYearFees.length; i++){
-			if(oneYearFees[i] < 0 || threeYearsFees[i] < 0){
-				throw new RuntimeException(this.getClass()+": Invalid reservation fees!");
-			}
 		}
 		
 		if(this.monitoringCost < 0){
@@ -107,7 +95,7 @@ public class Provider {
 	 * @return the onDemandCpuCost
 	 */
 	public double getOnDemandCpuCost(MachineTypeValue type) {
-		return onDemandCpuCost.get(type);
+		return types.get(type).getOnDemandCpuCost();
 	}
 
 	/**
@@ -128,21 +116,21 @@ public class Provider {
 	 * @return the reservedCpuCost
 	 */
 	public double getReservedCpuCost(MachineTypeValue type) {
-		return reservedCpuCost.get(type);
+		return types.get(type).getReservedCpuCost();
 	}
 
 	/**
 	 * @return the reservationOneYearFee
 	 */
 	public double getReservationOneYearFee(MachineTypeValue type) {
-		return reservationOneYearFee.get(type);
+		return types.get(type).getReservationOneYearFee();
 	}
 
 	/**
 	 * @return the reservationThreeYearsFee
 	 */
 	public double getReservationThreeYearsFee(MachineTypeValue type) {
-		return reservationThreeYearsFee.get(type);
+		return types.get(type).getReservationThreeYearsFee();
 	}
 
 	/**
@@ -219,9 +207,9 @@ public class Provider {
 		}
 		
 		if(descriptor.isReserved()){
-			return executionTime * this.reservedCpuCost.get(descriptor.getType()) + executionTime * monitoringCost;
+			return executionTime * types.get(descriptor.getType()).getReservedCpuCost() + executionTime * monitoringCost;
 		}else{
-			return executionTime * this.onDemandCpuCost.get(descriptor.getType()) + executionTime * monitoringCost;
+			return executionTime * types.get(descriptor.getType()).getOnDemandCpuCost() + executionTime * monitoringCost;
 		}
 	}
 	
@@ -234,9 +222,9 @@ public class Provider {
 		}
 		
 		if(descriptor.isReserved()){
-			return executionTime * this.reservedCpuCost.get(descriptor.getType()) + executionTime * monitoringCost;
+			return executionTime * types.get(descriptor.getType()).getReservedCpuCost() + executionTime * monitoringCost;
 		}else{
-			return executionTime * this.onDemandCpuCost.get(descriptor.getType()) + executionTime * monitoringCost;
+			return executionTime * types.get(descriptor.getType()).getOnDemandCpuCost() + executionTime * monitoringCost;
 		}
 	}
 
@@ -321,28 +309,6 @@ public class Provider {
 		return result;
 	}
 	
-	
-//	//Deprecated!
-//	public double calculateCost(double consumedTransference) {
-//		return this.calculateReservationCosts() + this.calculateOnDemandCosts() + this.calculateTransferenceCosts(consumedTransference);
-//	}
-//	
-//	//TODO
-//	private double calculateTransferenceCosts(double consumedTransference) {
-//		return 0;
-//	}
-//	
-//	private double calculateOnDemandCosts() {
-//		double totalConsumed = this.onDemandConsumption();
-//		return totalConsumed * this.onDemandCpuCost + totalConsumed * monitoringCost;
-//	}
-//
-//	private double calculateReservationCosts() {
-//		double totalConsumed = this.reservedConsumption();
-//		return this.reservedResources.size() * this.reservationOneYearFee + 
-//		totalConsumed * this.reservedCpuCost + totalConsumed * monitoringCost;
-//	}
-
 	public double[] resourcesConsumption() {
 		long onDemandConsumed = 0;
 		long reservedConsumed = 0;
@@ -371,24 +337,4 @@ public class Provider {
 		result[3] = numberOfReservedResources;
 		return result;
 	}
-
-//	public double reservedConsumption() {
-//		double totalConsumed = 0;
-//		for(Long machineID : this.reservedResources.keySet()){
-//			Triple<Long, Long, Double> triple = this.reservedResources.get(machineID);
-//			
-//			long executionTime;
-//			if(triple.secondValue != null){
-//				executionTime = triple.secondValue - triple.firstValue;
-//			}else{
-//				executionTime = 0;
-//			}
-//			
-//			if(executionTime < 0){
-//				throw new RuntimeException("Invalid cpu usage in machine "+machineID.toString()+" : "+executionTime);
-//			}
-//			totalConsumed += Math.ceil(1.0 * executionTime / UtilityFunction.HOUR_IN_MILLIS);
-//		}
-//		return totalConsumed;
-//	}
 }

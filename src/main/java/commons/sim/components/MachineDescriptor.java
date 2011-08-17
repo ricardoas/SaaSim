@@ -1,6 +1,6 @@
 package commons.sim.components;
 
-import commons.cloud.Provider.MACHINE_TYPES;
+import commons.cloud.MachineTypeValue;
 
 /**
  * Machine information.
@@ -24,6 +24,7 @@ public class MachineDescriptor {
 	 * Default constructor.
 	 * @param machineID Machine unique ID.
 	 * @param reserved A {@link Boolean} value indicating if this machine has been bought on reservation market.
+	 * @param type TODO
 	 */
 	public MachineDescriptor(long machineID, boolean reserved, MachineTypeValue type) {
 		this.machineID = machineID;
