@@ -8,7 +8,6 @@ import static commons.sim.util.SimulatorProperties.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,8 +81,8 @@ public class Configuration	extends PropertiesConfiguration{
 		verifySimulatorProperties();
 		verifySaaSAppProperties();
 		verifySaaSUsersProperties();
+		verifySaaSPlansProperties();
 		verifyIaaSProperties();
-		verifySaaSProperties();
 	}
 	
 
@@ -418,18 +417,25 @@ public class Configuration	extends PropertiesConfiguration{
 	// ************************************* SAAS ************************************/
 
 
-	private void verifySaaSProperties() {
-		checkIsInteger(NUMBER_OF_PLANS,getString(NUMBER_OF_PLANS));
+	private void verifySaaSPlansProperties() {
+		Validator.checkPositive(getInt(NUMBER_OF_PLANS));
 
-		int numberOfPlans = getInt(NUMBER_OF_PLANS);
+		checkSize(PLAN_NAME, NUMBER_OF_PLANS);
+		checkSize(PLAN_PRIORITY, NUMBER_OF_PLANS);
+		checkSize(PLAN_PRICE, NUMBER_OF_PLANS);
+		checkSize(PLAN_SETUP, NUMBER_OF_PLANS);
+		checkSize(PLAN_CPU_LIMIT, NUMBER_OF_PLANS);
+		checkSize(PLAN_EXTRA_CPU_COST, NUMBER_OF_PLANS);
+		checkSize(PLAN_TRANSFER_LIMIT, NUMBER_OF_PLANS);
+		checkSize(PLAN_EXTRA_TRANSFER_COST, NUMBER_OF_PLANS);
 		
-		checkSizeAndContent(PLAN_NAME, numberOfPlans,NUMBER_OF_PLANS);
-		checkSizeAndDoubleContent(PLAN_PRICE, numberOfPlans, NUMBER_OF_PLANS);
-		checkSizeAndDoubleContent(PLAN_SETUP, numberOfPlans, NUMBER_OF_PLANS);
-		checkSizeAndDoubleContent(PLAN_CPU_LIMIT, numberOfPlans, NUMBER_OF_PLANS);
-		checkSizeAndDoubleContent(PLAN_EXTRA_CPU_COST, numberOfPlans, NUMBER_OF_PLANS);
-		checkSizeAndContent(PLAN_TRANSFER_LIMIT, numberOfPlans, NUMBER_OF_PLANS);
-		checkSizeAndContent(PLAN_EXTRA_TRANSFER_COST, numberOfPlans, NUMBER_OF_PLANS);
+		Validator.checkIsNonNegativeDoubleArray(getStringArray(PLAN_PRICE));
+		Validator.checkIsNonNegativeDoubleArray(getStringArray(PLAN_SETUP));
+		Validator.checkIsNonNegativeDoubleArray(getStringArray(PLAN_EXTRA_CPU_COST));
+		Validator.checkIsNonNegativeIntegerArray(getStringArray(PLAN_CPU_LIMIT));
+		Validator.checkIsNonNegativeIntegerArray(getStringArray(PLAN_PRIORITY));
+		Validator.checkIsNonNegativeDouble2DArray(getStringArray(PLAN_EXTRA_CPU_COST), "|");
+		Validator.checkInNonNegativeInteger2DArray(getStringArray(PLAN_CPU_LIMIT), "|");
 	}
 
 	public Class<?> getPlanningHeuristicClass(){
@@ -526,4 +532,5 @@ public class Configuration	extends PropertiesConfiguration{
 	public long getMaximumBacklogSize() {
 		return getLong(RANJAN_HEURISTIC_BACKLOG_SIZE, Long.MAX_VALUE);
 	}
+	
 }

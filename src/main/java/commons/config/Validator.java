@@ -32,4 +32,36 @@ public class Validator {
 		}
 	}
 
+	public static void checkIsNonNegativeDoubleArray(String[] values) {
+		for (String value : values) {
+			checkNonNegative(Double.valueOf(value));
+		}
+	}
+
+	private static void checkNonNegative(Double value) {
+		if (value < 0) {
+			throw new RuntimeException();
+		}
+	}
+
+	public static void checkIsNonNegativeIntegerArray(String[] values) {
+		for (String value : values) {
+			checkNonNegative(Integer.valueOf(value));
+		}
+	}
+
+	public static void checkIsNonNegativeDouble2DArray(String[] values,
+			String separator) {
+		for (String value : values) {
+			checkIsNonNegativeDoubleArray(value.split(separator));
+		}
+	}
+
+	public static void checkInNonNegativeInteger2DArray(String[] values,
+			String separator) {
+		for (String value : values) {
+			checkIsNonNegativeIntegerArray(value.split(separator));
+		}
+	}
+
 }
