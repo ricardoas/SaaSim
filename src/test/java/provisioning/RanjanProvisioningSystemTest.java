@@ -285,7 +285,7 @@ public class RanjanProvisioningSystemTest {
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
-		EasyMock.expect(config.getStringArray(SaaSUsersProperties.USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
+		EasyMock.expect(config.getStringArray(SaaSUsersProperties.SAAS_USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -332,7 +332,7 @@ public class RanjanProvisioningSystemTest {
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
-		EasyMock.expect(config.getStringArray(SaaSUsersProperties.USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
+		EasyMock.expect(config.getStringArray(SaaSUsersProperties.SAAS_USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -386,7 +386,7 @@ public class RanjanProvisioningSystemTest {
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
-		EasyMock.expect(config.getStringArray(SaaSUsersProperties.USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
+		EasyMock.expect(config.getStringArray(SaaSUsersProperties.SAAS_USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);

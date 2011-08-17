@@ -132,7 +132,7 @@ public class AccountingSystem {
 			}
 		}
 
-		String[] workloads = Configuration.getInstance().getStringArray(SaaSUsersProperties.USER_WORKLOAD);
+		String[] workloads = Configuration.getInstance().getStringArray(SaaSUsersProperties.SAAS_USER_WORKLOAD);
 
 		configurable.setWorkloadParser(new TimeBasedWorkloadParser(new GEISTWorkloadParser(workloads), TimeBasedWorkloadParser.HOUR_IN_MILLIS));
 	}

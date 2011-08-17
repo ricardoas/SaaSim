@@ -35,7 +35,7 @@ public class Main {
 			Configuration config = Configuration.getInstance();
 			
 			//Parsing workload
-			String[] workloads = Configuration.getInstance().getStringArray(SaaSUsersProperties.USER_WORKLOAD);
+			String[] workloads = Configuration.getInstance().getStringArray(SaaSUsersProperties.SAAS_USER_WORKLOAD);
 			HistoryBasedWorkloadParser workloadParser = new HistoryBasedWorkloadParser(new GEISTWorkloadParser(workloads), TimeBasedWorkloadParser.YEAR_IN_MILLIS);
 			
 			//Creating planner

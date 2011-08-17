@@ -26,4 +26,10 @@ public class Validator {
 		}
 	}
 
+	public static void checkIsNonEmptyStringArray(String[] values) {
+		for (String value : values) {
+			checkNotEmpty(value);
+		}
+	}
+
 }

@@ -1,7 +1,9 @@
 package commons.config;
 
 import static commons.sim.util.IaaSProvidersProperties.*;
+import static commons.sim.util.SaaSAppProperties.*;
 import static commons.sim.util.SaaSPlanProperties.*;
+import static commons.sim.util.SaaSUsersProperties.*;
 import static commons.sim.util.SimulatorProperties.*;
 
 import java.io.IOException;
@@ -28,8 +30,6 @@ import commons.cloud.User;
 import commons.sim.schedulingheuristics.ProfitDrivenHeuristic;
 import commons.sim.schedulingheuristics.RanjanHeuristic;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
-import commons.sim.util.SaaSAppProperties;
-import commons.sim.util.SaaSUsersProperties;
 
 
 /**
@@ -81,18 +81,19 @@ public class Configuration	extends PropertiesConfiguration{
 	private void verifyProperties(){
 		verifySimulatorProperties();
 		verifySaaSAppProperties();
+		verifySaaSUsersProperties();
 		verifyIaaSProperties();
 		verifySaaSProperties();
 	}
+	
+
+	// ************************************* SIMULATOR ************************************/
 	
 	private void verifySimulatorProperties() {
 		checkDPSHeuristic();
 		checkPlanningHeuristic();
 		Validator.checkPositive(getInt(PLANNING_PERIOD));
 	}
-
-	// ************************************* SIMULATOR ************************************/
-	
 	
 	private void checkDPSHeuristic() {
 		
@@ -146,25 +147,74 @@ public class Configuration	extends PropertiesConfiguration{
 		Validator.checkNonNegative(getInt(RANJAN_HEURISTIC_BACKLOG_SIZE));
 	}
 
-	// ************************************* SIMULATOR ************************************/
+	// ************************************* SaaS APP ************************************/
+	
 	private void verifySaaSAppProperties() {
 
-		Validator.checkNotEmpty(getString(SaaSAppProperties.APPLICATION_FACTORY));
-		Validator.checkPositive(getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS));
-		Validator.checkNonNegative(getLong(SaaSAppProperties.APPLICATION_SETUP_TIME));
+		Validator.checkNotEmpty(getString(APPLICATION_FACTORY));
+		Validator.checkPositive(getInt(APPLICATION_NUM_OF_TIERS));
+		Validator.checkNonNegative(getLong(APPLICATION_SETUP_TIME));
 		
-		checkSize(SaaSAppProperties.APPLICATION_HEURISTIC, SaaSAppProperties.APPLICATION_NUM_OF_TIERS);
-		checkSize(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER, SaaSAppProperties.APPLICATION_NUM_OF_TIERS);
+		checkSize(APPLICATION_HEURISTIC, APPLICATION_NUM_OF_TIERS);
+		checkSize(APPLICATION_INITIAL_SERVER_PER_TIER, APPLICATION_NUM_OF_TIERS);
 		
-		Validator.checkIsPositiveIntegerArray(getStringArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER));
+		Validator.checkIsPositiveIntegerArray(getStringArray(APPLICATION_INITIAL_SERVER_PER_TIER));
 
-//		checkSize(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER, SaaSAppProperties.APPLICATION_NUM_OF_TIERS);
-//		Validator.checkIsPositiveIntegerArray(getStringArray(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER));
+//		checkSize(APPLICATION_MAX_SERVER_PER_TIER, APPLICATION_NUM_OF_TIERS);
+//		Validator.checkIsPositiveIntegerArray(getStringArray(APPLICATION_MAX_SERVER_PER_TIER));
 		
 		checkSchedulingHeuristicNames();
 		
 	}
+	
+	private void checkSchedulingHeuristicNames() {
+		String[] strings = getStringArray(APPLICATION_HEURISTIC);
+		String customHeuristic = getString(APPLICATION_CUSTOM_HEURISTIC);
+		for (int i = 0; i < strings.length; i++) {
+			AppHeuristicValues value = AppHeuristicValues.valueOf(strings[i]);
+			switch (value) {
+				case ROUNDROBIN:
+					strings[i] = RoundRobinHeuristic.class.getCanonicalName();
+					break;
+				case RANJAN:
+					strings[i] = RanjanHeuristic.class.getCanonicalName();
+					break;
+				case PROFITDRIVEN:
+					strings[i] = ProfitDrivenHeuristic.class.getCanonicalName();
+					break;
+				case CUSTOM:
+					try {
+						strings[i] = Class.forName(customHeuristic).getCanonicalName();
+					} catch (ClassNotFoundException e) {
+						throw new ConfigurationRuntimeException("Problem loading " + customHeuristic, e);
+					}
+					break;
+				default:
+					throw new ConfigurationRuntimeException("Unsupported value for " + APPLICATION_HEURISTIC + ": " + strings[i]);
+			}
+		}
+		
+		setProperty(APPLICATION_HEURISTIC, strings);
+	}
 
+	// ************************************* SaaS Users ************************************/
+	
+	private void verifySaaSUsersProperties() {
+		
+		Validator.checkPositive(getInt(SAAS_NUMBER_OF_USERS));
+		
+		String workload = getString(SAAS_WORKLOAD);
+		if(workload == null || workload.isEmpty()){
+			checkSize(SAAS_USER_WORKLOAD, SAAS_NUMBER_OF_USERS);
+			Validator.checkIsNonEmptyStringArray(getStringArray(SAAS_USER_WORKLOAD));
+		}else{
+			if(getStringArray(SAAS_USER_WORKLOAD).length != 0){
+				throw new ConfigurationRuntimeException("Cannot define user specific workload when " +
+						"an unique workload has been already specified.");
+			}
+		}
+	}
+	
 	/**
 	 * @param propertyName
 	 * @param size
@@ -228,36 +278,6 @@ public class Configuration	extends PropertiesConfiguration{
 		}
 	}
 
-	private void checkSchedulingHeuristicNames() {
-		String[] strings = getStringArray(SaaSAppProperties.APPLICATION_HEURISTIC);
-		String customHeuristic = getString(SaaSAppProperties.APPLICATION_CUSTOM_HEURISTIC);
-		for (int i = 0; i < strings.length; i++) {
-			AppHeuristicValues value = AppHeuristicValues.valueOf(strings[i]);
-			switch (value) {
-				case ROUNDROBIN:
-					strings[i] = RoundRobinHeuristic.class.getCanonicalName();
-					break;
-				case RANJAN:
-					strings[i] = RanjanHeuristic.class.getCanonicalName();
-					break;
-				case PROFITDRIVEN:
-					strings[i] = ProfitDrivenHeuristic.class.getCanonicalName();
-					break;
-				case CUSTOM:
-					try {
-						strings[i] = Class.forName(customHeuristic).getCanonicalName();
-					} catch (ClassNotFoundException e) {
-						throw new ConfigurationRuntimeException("Problem loading " + customHeuristic, e);
-					}
-					break;
-				default:
-					throw new ConfigurationRuntimeException("Unsupported value for " + SaaSAppProperties.APPLICATION_HEURISTIC + ": " + strings[i]);
-			}
-		}
-		
-		setProperty(SaaSAppProperties.APPLICATION_HEURISTIC, strings);
-	}
-	
 	public int[] getIntegerArray(String propertyValue) {
 		String[] stringArray = getStringArray(propertyValue);
 		int [] values = new int[stringArray.length];
@@ -271,7 +291,7 @@ public class Configuration	extends PropertiesConfiguration{
 	 * @return
 	 */
 	public Class<?>[] getApplicationHeuristics() {
-		String[] strings = getStringArray(SaaSAppProperties.APPLICATION_HEURISTIC);
+		String[] strings = getStringArray(APPLICATION_HEURISTIC);
 		Class<?> [] heuristicClasses = new Class<?>[strings.length]; 
 		
 		for (int i = 0; i < strings.length; i++) {
@@ -422,7 +442,7 @@ public class Configuration	extends PropertiesConfiguration{
 	}
 	
 	public double getSLA(){
-		return getDouble(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME, Double.MAX_VALUE);
+		return getDouble(APPLICATION_SLA_MAX_RESPONSE_TIME, Double.MAX_VALUE);
 	}
 	
 	public long getPlanningPeriod(){
@@ -470,7 +490,7 @@ public class Configuration	extends PropertiesConfiguration{
 		
 		//Extract users associations
 		users = new ArrayList<User>();
-		String[] plans = Configuration.getInstance().getStringArray(SaaSUsersProperties.USER_PLAN);
+		String[] plans = Configuration.getInstance().getStringArray(SAAS_USER_PLAN);
 		for (int i = 0; i < plans.length; i++) {
 			users.add(new User(contractsPerName.get(plans[i])));
 		}
