@@ -1,0 +1,18 @@
+iaas.number=1
+iaas.types=small,medium,large
+iaas.relativepower=1,2,4
+
+#Provider 1
+iaas.provider.name=amazon
+iaas.provider.ondemand_cpu_cost=0.085|0.12
+iaas.provider.ondemandLimit=20
+iaas.provider.reserved_cpu_cost=0.3|0.13
+iaas.provider.reservationLimit=100
+iaas.provider.oneYearFee=1000|1500
+iaas.provider.threeYearsFee=2500|3500
+iaas.provider.types=small|large
+iaas.provider.monit=0.15
+iaas.provider.transIn=100
+iaas.provider.costsTransIn=0.10|0.09
+iaas.provider.transOut=200
+iaas.provider.costsTransOut=0.10|0.09
