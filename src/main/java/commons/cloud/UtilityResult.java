@@ -6,7 +6,6 @@ public class UtilityResult {
 		public double receipt;
 		public double cost;
 		public double penalty;
-		public double utility;
 		public long totalInTransferred;
 		public long totalOutTransferred;
 	}
@@ -20,7 +19,6 @@ public class UtilityResult {
 		entry.receipt = receipt;
 		entry.cost = cost;
 		entry.penalty = penalties;
-		entry.utility = (receipt - cost - penalties);
 		entry.totalInTransferred = totalInTransferred;
 		entry.totalOutTransferred = totalOutTransferred;
 	}
@@ -31,7 +29,7 @@ public class UtilityResult {
 
 	
 	public double getUtility() {
-		return entry.utility;
+		return (entry.receipt - entry.cost - entry.penalty);
 	}
 	
 	public double getCost(){
@@ -52,5 +50,15 @@ public class UtilityResult {
 	
 	public long getTotalOutTransferred(){
 		return entry.totalOutTransferred;
+	}
+
+	
+	public void addCost(double uniqueCost) {
+		entry.cost += uniqueCost;
+	}
+
+	
+	public void addReceipt(double uniqueReceipt) {
+		entry.receipt += uniqueReceipt;
 	}
 }

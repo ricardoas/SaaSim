@@ -37,7 +37,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 
 	private Map<Integer, Double> solvedProblems;
 	private Dashboard dashboard;
-	private final int maximumReservedResources;
+//	private final int maximumReservedResources;
 
 	
 	public PlanningFitnessFunction(HistoryBasedWorkloadParser parser, List<User> cloudUsers, List<Provider> cloudProvider, int maximumReservedResources){
@@ -49,12 +49,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 			throw new RuntimeException("Planning Fitness Constructor: "+e.getMessage());
 		}
 		
-		//		this.currentWorkload = currentWorkload;
-//		this.cloudUsers = cloudUsers;
-//		this.cloudProvider = cloudProvider.values().iterator().next();
-		//		this.utilityFunction = new UtilityFunction();
-		
-		this.maximumReservedResources = maximumReservedResources;
+//		this.maximumReservedResources = maximumReservedResources;
 		this.dashboard = new Dashboard();//Place to store detailed information
 		this.solvedProblems = new HashMap<Integer, Double>();//Used to reuse previous calculated scenarios
 	}
@@ -66,7 +61,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		
 		//Creating simulator structure
 		dps = DPSFactory.INSTANCE.createDPS();
-		dps.getAccountingSystem().setMaximumNumberOfReservedMachinesUsed(this.maximumReservedResources);
+//		dps.getAccountingSystem().setMaximumNumberOfReservedMachinesUsed(this.maximumReservedResources);
 		this.simulator = SimulatorFactory.getInstance().buildSimulator(dps);
 		dps.registerConfigurable(simulator);
 		
@@ -87,12 +82,14 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		this.simulator.start();
 		
 		UtilityResult result = this.dps.calculateUtility();
-		double[] resourcesData = this.dps.getAccountingSystem().getResourcesData();
+		result.addCost(this.dps.getAccountingSystem().calculateUniqueCost());
+		result.addReceipt(this.dps.getAccountingSystem().calculateUniqueReceipt());
+		double[] resourceConsumptionsData = this.dps.getAccountingSystem().getResourcesData();
 		double fitness = result.getUtility();
 		
 		//Storing information
-		this.dashboard.createEntry(numberOfMachinesToReserve, resourcesData[1], 
-				fitness, result.getCost(), result.getReceipt(), result.getTotalInTransferred(), result.getTotalOutTransferred(), resourcesData[0], resourcesData[2]);
+		this.dashboard.createEntry(numberOfMachinesToReserve, resourceConsumptionsData[1], 
+				fitness, result.getCost(), result.getReceipt(), result.getTotalInTransferred(), result.getTotalOutTransferred(), resourceConsumptionsData[0], resourceConsumptionsData[2]);
 		
 		this.solvedProblems.put(numberOfMachinesToReserve, fitness);
 		if(fitness < 1){

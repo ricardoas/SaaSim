@@ -20,6 +20,8 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	public static final long DAY_IN_MILLIS = 24 * HOUR_IN_MILLIS;
 
 	public static final long MONTH_IN_MILLIS = 31 * DAY_IN_MILLIS;
+
+	public static final long YEAR_IN_MILLIS = 365 * DAY_IN_MILLIS;
 	
 	private final WorkloadParser<Request> parser;
 	private final long tick;

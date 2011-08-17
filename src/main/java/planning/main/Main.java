@@ -36,7 +36,7 @@ public class Main {
 			
 			//Parsing workload
 			String[] workloads = Configuration.getInstance().getStringArray(UsersProperties.USER_WORKLOAD);
-			HistoryBasedWorkloadParser workloadParser = new HistoryBasedWorkloadParser(new GEISTWorkloadParser(workloads), TimeBasedWorkloadParser.MONTH_IN_MILLIS);
+			HistoryBasedWorkloadParser workloadParser = new HistoryBasedWorkloadParser(new GEISTWorkloadParser(workloads), TimeBasedWorkloadParser.YEAR_IN_MILLIS);
 			
 			//Creating planner
 			Planner planner = new Planner(config.getProviders(), config.getPlanningHeuristic(), config.getUsers(), workloadParser);
