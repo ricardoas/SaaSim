@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -47,9 +48,8 @@ public class ProviderTest {
 		double[] transferOutCosts = {};
 		
 		try{
-			new Provider(name, -0.09, onDemandLimit, reservationLimit, 
-					reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 			fail("Invalid provider!");
 		}catch(RuntimeException e){
 		}
@@ -69,17 +69,15 @@ public class ProviderTest {
 		double[] transferOutCosts = {};
 		
 		try{
-			new Provider(name, onDemandCpuCost, -99999, reservationLimit, 
-					reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			new Provider(name, -99999, reservationLimit, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 			fail("Invalid provider!");
 		}catch(RuntimeException e){
 		}
 		
 		try{
-			new Provider(name, onDemandCpuCost, 0, reservationLimit, 
-					reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			new Provider(name, 0, reservationLimit, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 			fail("Invalid provider!");
 		}catch(RuntimeException e){
 		}
@@ -99,17 +97,15 @@ public class ProviderTest {
 		double[] transferOutCosts = {};
 		
 		try{
-			new Provider(name, onDemandCpuCost, onDemandLimit, 0, 
-					reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			new Provider(name, onDemandLimit, 0, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 			fail("Invalid provider!");
 		}catch(RuntimeException e){
 		}
 		
 		try{
-			new Provider(name, onDemandCpuCost, onDemandLimit, -777, 
-					reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			new Provider(name, onDemandLimit, -777, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 			fail("Invalid provider!");
 		}catch(RuntimeException e){
 		}
@@ -130,17 +126,15 @@ public class ProviderTest {
 		double[] transferOutCosts = {};
 		
 		try{
-			new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
-					-reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 			fail("Invalid provider!");
 		}catch(RuntimeException e){
 		}
 		
 		try{
-			new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
-					-13.9787656, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 			fail("Invalid provider!");
 		}catch(RuntimeException e){
 		}
@@ -161,33 +155,29 @@ public class ProviderTest {
 		double[] transferOutCosts = {};
 		
 		try{
-			new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
-					reservedCpuCost, -reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 			fail("Invalid provider!");
 		}catch(RuntimeException e){
 		}
 		
 		try{
-			new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
-					reservedCpuCost, 0, reservationThreeYearsFee, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 		}catch(RuntimeException e){
 			fail("Invalid provider!");
 		}
 		
 		try{
-			new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
-					reservedCpuCost, reservationOneYearFee, -reservationThreeYearsFee, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 			fail("Invalid provider!");
 		}catch(RuntimeException e){
 		}
 		
 		try{
-			new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
-					reservedCpuCost, reservationOneYearFee, 0, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 		}catch(RuntimeException e){
 			fail("Invalid provider!");
 		}
@@ -208,17 +198,15 @@ public class ProviderTest {
 		double[] transferOutCosts = {};
 		
 		try{
-			new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
-					reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, -monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			new Provider(name, onDemandLimit, reservationLimit, -monitoringCost, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 			fail("Invalid provider!");
 		}catch(RuntimeException e){
 		}
 		
 		try{
-			new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
-					reservedCpuCost, 0, reservationThreeYearsFee, -0.0000001, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+			new Provider(name, onDemandLimit, reservationLimit, -0.0000001, 
+					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 			fail("Invalid provider!");
 		}catch(RuntimeException e){
 		}
@@ -238,9 +226,8 @@ public class ProviderTest {
 		long[] transferOutLimits = {};
 		double[] transferOutCosts = {};
 		
-		Provider provider = new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
-				reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
-				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+		Provider provider = new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
+				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 		
 		//Adding reserved resources
 		MachineDescriptor descriptor = provider.buyMachine(true);
@@ -302,9 +289,8 @@ public class ProviderTest {
 		long[] transferOutLimits = {};
 		double[] transferOutCosts = {};
 		
-		Provider provider = new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
-				reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
-				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+		Provider provider = new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
+				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 		
 		//Adding reserved resources
 		provider.buyMachine(true);
@@ -343,9 +329,8 @@ public class ProviderTest {
 		long[] transferOutLimits = {};
 		double[] transferOutCosts = {};
 		
-		Provider provider = new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
-				reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
-				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+		Provider provider = new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
+				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 		
 		//Adding reserved resources
 		MachineDescriptor descriptor = provider.buyMachine(true);
@@ -374,9 +359,8 @@ public class ProviderTest {
 		long[] transferOutLimits = {};
 		double[] transferOutCosts = {};
 		
-		Provider provider = new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
-				reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
-				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+		Provider provider = new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
+				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 		
 		//Adding on-demand resources
 		MachineDescriptor descriptor = provider.buyMachine(false);
@@ -421,9 +405,8 @@ public class ProviderTest {
 		long[] transferOutLimits = {};
 		double[] transferOutCosts = {};
 		
-		Provider provider = new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
-				reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
-				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+		Provider provider = new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
+				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 		
 		//Adding on-demand resources
 		provider.buyMachine(false);
@@ -449,9 +432,8 @@ public class ProviderTest {
 		long[] transferOutLimits = {};
 		double[] transferOutCosts = {};
 		
-		Provider provider = new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
-				reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
-				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+		Provider provider = new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
+				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 		
 		//Adding reserved resources
 		MachineDescriptor descriptor = provider.buyMachine(false);
@@ -467,9 +449,8 @@ public class ProviderTest {
 		}
 		
 		//FIXME: Double value explodes with large value!
-		provider = new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
-				reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
-				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+		provider = new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
+				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 		MachineDescriptor descriptor2 = provider.buyMachine(false);
 		descriptor2.setStartTimeInMillis(1000 * HOUR_IN_MILLIS);
 		descriptor2.setFinishTimeInMillis(400 * HOUR_IN_MILLIS);
@@ -497,9 +478,8 @@ public class ProviderTest {
 		long[] transferOutLimits = {};
 		double[] transferOutCosts = {};
 		
-		Provider provider = new Provider(name, onDemandCpuCost, onDemandLimit, reservationLimit, 
-				reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, 
-				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
+		Provider provider = new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
+				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 		
 		//Adding reserved resources
 		MachineDescriptor descriptor = provider.buyMachine(true);

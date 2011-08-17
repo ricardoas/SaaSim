@@ -1,6 +1,11 @@
 package commons.sim;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -15,6 +20,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import commons.cloud.Contract;
+import commons.cloud.MachineType;
+import commons.cloud.MachineTypeValue;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
@@ -42,7 +49,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", 0.1, onDemandLimit, reservationLimit, reservedCpuCost, reservationOneYearFee, 80, monitoringCost, new long[]{}, new double[]{},  new long[]{}, new double[]{});
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -81,7 +88,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandcpuCost, onDemandLimit, reservationLimit, reservedCpuCost, reservationOneYearFee, 80, monitoringCost, new long[]{}, new double[]{},  new long[]{}, new double[]{});
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -125,7 +132,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandCpuCost, onDemandLimit, reservationLimit, reservedCpuCost, reservationOneYearFee, 80, monitoringCost, new long[]{}, new double[]{},  new long[]{}, new double[]{});
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -167,7 +174,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandCpuCost, onDemandLimit, reservationLimit, reservedCpuCost, reservationOneYearFee, 80, monitoringCost, new long[]{}, new double[]{},  new long[]{}, new double[]{});
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -209,7 +216,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandCpuCost, onDemandLimit, reservationLimit, reservedCpuCost, reservationOneYearFee, 80, monitoringCost, new long[]{}, new double[]{},  new long[]{}, new double[]{});
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -266,7 +273,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandCpuCost, onDemandLimit, reservationLimit, reservedCpuCost, reservationOneYearFee, 80, monitoringCost, new long[]{}, new double[]{},  new long[]{}, new double[]{});
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		
@@ -306,7 +313,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandCpuCost, onDemandLimit, reservationLimit, reservedCpuCost, reservationOneYearFee, 80, monitoringCost, new long[]{}, new double[]{},  new long[]{}, new double[]{});
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		
@@ -368,7 +375,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandCpuCost, onDemandLimit, reservationLimit, reservedCpuCost, reservationOneYearFee, 80, monitoringCost, new long[]{}, new double[]{},  new long[]{}, new double[]{});
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		
@@ -431,7 +438,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandCpuCost, onDemandLimit, reservationLimit, reservedCpuCost, reservationOneYearFee, 80, monitoringCost, new long[]{}, new double[]{},  new long[]{}, new double[]{});
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		
@@ -487,7 +494,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandcpuCost, onDemandLimit, reservationLimit, reservedCpuCost, reservationOneYearFee, 80, monitoringCost, new long[]{}, new double[]{},  new long[]{}, new double[]{});
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -533,7 +540,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandcpuCost, onDemandLimit, reservationLimit, reservedCpuCost, reservationOneYearFee, 80, monitoringCost, new long[]{}, new double[]{},  new long[]{}, new double[]{});
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -579,7 +586,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandcpuCost, onDemandLimit, reservationLimit, reservedCpuCost, reservationOneYearFee, 80, monitoringCost, new long[]{}, new double[]{},  new long[]{}, new double[]{});
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -625,7 +632,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandcpuCost, onDemandLimit, reservationLimit, reservedCpuCost, reservationOneYearFee, 80, monitoringCost, new long[]{}, new double[]{},  new long[]{}, new double[]{});
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -673,7 +680,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandcpuCost, onDemandLimit, reservationLimit, reservedCpuCost, reservationOneYearFee, 80, monitoringCost, new long[]{}, new double[]{},  new long[]{}, new double[]{});
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -687,7 +694,7 @@ public class AccountingSystemTest {
 		assertEquals(0, descriptor.getFinishTimeInMillis());
 		
 		//Finishing inexistent machine
-		acc.reportMachineFinish(new MachineDescriptor(111, true));
+		acc.reportMachineFinish(new MachineDescriptor(111, true, MachineTypeValue.SMALL));
 		
 		assertEquals(0, descriptor.getFinishTimeInMillis());
 		
@@ -714,7 +721,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", 0.1, onDemandLimit, reservationLimit, 0.05, 100, 80, 0.15, new long[]{}, new double[]{},  new long[]{}, new double[]{});
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -756,7 +763,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", 0.1, onDemandLimit, reservationLimit, 0.05, 100, 80, 0.15, new long[]{}, new double[]{},  new long[]{}, new double[]{});
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -815,7 +822,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandCpuCost, onDemandLimit, reservationLimit, reservedCpuCost, reservationOneYearFee, 80, monitoringCost, new long[]{}, new double[]{},  new long[]{}, new double[]{});
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		
@@ -931,7 +938,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandCpuCost, onDemandLimit, reservationLimit, reservedCpuCost, reservationOneYearFee, 80, monitoringCost, new long[]{}, new double[]{},  new long[]{}, new double[]{});
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		
@@ -1000,7 +1007,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandCpuCost, onDemandLimit, reservationLimit, reservedCpuCost, reservationOneYearFee, 80, monitoringCost, new long[]{}, new double[]{},  new long[]{}, new double[]{});
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		

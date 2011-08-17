@@ -18,6 +18,7 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import commons.cloud.MachineTypeValue;
 import commons.cloud.Request;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
@@ -32,7 +33,7 @@ public class TimeSharedMachineTest {
 
 	@Before
 	public void setUp() throws Exception {
-		this.descriptor = new MachineDescriptor(1, false);
+		this.descriptor = new MachineDescriptor(1, false, MachineTypeValue.SMALL);
 	}
 
 	@After

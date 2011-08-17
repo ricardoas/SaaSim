@@ -11,6 +11,7 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
+import commons.cloud.MachineTypeValue;
 import commons.cloud.Request;
 import commons.config.Configuration;
 import commons.sim.components.Machine;
@@ -77,7 +78,7 @@ public class ProfitDrivenHeuristicTest {
 		EasyMock.expect(eventScheduler.now()).andReturn(new JETime(0));
 		EasyMock.replay(eventScheduler);
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false), null);
+		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false, MachineTypeValue.SMALL), null);
 		servers.add(machine1);
 		
 		Request request = new Request(clientID, userID, reqID, time, size, requestOption, httpOperation, URL, demand);
@@ -111,9 +112,9 @@ public class ProfitDrivenHeuristicTest {
 		EasyMock.expect(eventScheduler.now()).andReturn(new JETime(0));
 		EasyMock.replay(eventScheduler);
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false), null);
-		Machine machine2 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(2, false), null);
-		Machine machine3 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(3, false), null);
+		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false, MachineTypeValue.SMALL), null);
+		Machine machine2 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(2, false, MachineTypeValue.SMALL), null);
+		Machine machine3 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(3, false, MachineTypeValue.SMALL), null);
 		servers.add(machine1);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -161,8 +162,8 @@ public class ProfitDrivenHeuristicTest {
 		ArrayList<Machine> servers = new ArrayList<Machine>();
 		JEEventScheduler eventScheduler = new JEEventScheduler();
 		
-		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false), null);
-		Machine machine2 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(2, false), null);
+		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false, MachineTypeValue.SMALL), null);
+		Machine machine2 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(2, false, MachineTypeValue.SMALL), null);
 		servers.add(machine1);
 		servers.add(machine2);
 		
@@ -201,8 +202,8 @@ public class ProfitDrivenHeuristicTest {
 		
 		JEEventScheduler eventScheduler = new JEEventScheduler();
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false), null);
-		Machine machine2 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(2, false), null);
+		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false, MachineTypeValue.SMALL), null);
+		Machine machine2 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(2, false, MachineTypeValue.SMALL), null);
 		servers.add(machine1);
 		servers.add(machine2);
 		
@@ -245,8 +246,8 @@ public class ProfitDrivenHeuristicTest {
 		
 		JEEventScheduler eventScheduler = new JEEventScheduler();
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false), null);
-		Machine machine2 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(2, false), null);
+		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false, MachineTypeValue.SMALL), null);
+		Machine machine2 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(2, false, MachineTypeValue.SMALL), null);
 		servers.add(machine1);
 		servers.add(machine2);
 		
