@@ -26,7 +26,7 @@ import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JETime;
 import commons.sim.provisioningheuristics.RanjanStatistics;
-import commons.sim.util.UsersProperties;
+import commons.sim.util.SaaSUsersProperties;
 
 
 @RunWith(PowerMockRunner.class)
@@ -286,7 +286,7 @@ public class RanjanProvisioningSystemTest {
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
 		EasyMock.expect(config.getApplicationInitialServersPerTier()).andReturn(new int[]{0});
-		EasyMock.expect(config.getStringArray(UsersProperties.USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
+		EasyMock.expect(config.getStringArray(SaaSUsersProperties.USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -333,7 +333,7 @@ public class RanjanProvisioningSystemTest {
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
 		EasyMock.expect(config.getApplicationInitialServersPerTier()).andReturn(new int[]{0});
-		EasyMock.expect(config.getStringArray(UsersProperties.USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
+		EasyMock.expect(config.getStringArray(SaaSUsersProperties.USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -387,7 +387,7 @@ public class RanjanProvisioningSystemTest {
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
 		EasyMock.expect(config.getApplicationInitialServersPerTier()).andReturn(new int[]{0});
-		EasyMock.expect(config.getStringArray(UsersProperties.USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
+		EasyMock.expect(config.getStringArray(SaaSUsersProperties.USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);

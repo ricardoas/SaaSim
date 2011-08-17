@@ -1,7 +1,5 @@
 package commons.sim.components;
 
-import static commons.sim.util.SimulatorProperties.SETUP_TIME;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,6 +19,7 @@ import commons.sim.provisioningheuristics.RanjanStatistics;
 import commons.sim.schedulingheuristics.RanjanHeuristic;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
 import commons.sim.util.MachineFactory;
+import commons.sim.util.SaaSAppProperties;
 import commons.sim.util.SimulatorProperties;
 
 /**
@@ -57,7 +56,8 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 
 	private void initHeuristicEvents() {
 		if(this.heuristic.getClass().equals(RanjanHeuristic.class)){
-			JETime newEventTime = new JETime(SimulatorProperties.DEFAULT_EVALUATE_UTILIZATION_PERIOD);
+			long scheduledtime = Configuration.getInstance().getLong(SimulatorProperties.RANJAN_HEURISTIC_REPEAT_INTERVAL);
+			JETime newEventTime = new JETime(scheduledtime);
 			newEventTime.plus(getScheduler().now());
 			send(new JEEvent(JEEventType.EVALUATEUTILIZATION, this, newEventTime));
 		}
@@ -71,7 +71,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 		Machine server = buildMachine(descriptor);
 		JETime serverUpTime = getScheduler().now();
 		if(useStartUpDelay){
-			serverUpTime = serverUpTime.plus(new JETime(Configuration.getInstance().getLong(SETUP_TIME)));
+			serverUpTime = serverUpTime.plus(new JETime(Configuration.getInstance().getLong(SaaSAppProperties.SETUP_TIME)));
 		}
 		send(new JEEvent(JEEventType.ADD_SERVER, this, serverUpTime, server));
 	}
@@ -131,7 +131,9 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 				RanjanStatistics statistics = this.collectStatistics(getServers(), eventTime);
 				monitor.evaluateUtilisation(getScheduler().now().timeMilliSeconds, statistics, tier);
 				
-				JETime newEventTime = new JETime(SimulatorProperties.DEFAULT_EVALUATE_UTILIZATION_PERIOD);
+			long scheduledtime = Configuration.getInstance().getLong(SimulatorProperties.RANJAN_HEURISTIC_REPEAT_INTERVAL);
+			
+			JETime newEventTime = new JETime(scheduledtime);
 				newEventTime.plus(getScheduler().now());
 				send(new JEEvent(JEEventType.EVALUATEUTILIZATION, this, newEventTime));
 				break;

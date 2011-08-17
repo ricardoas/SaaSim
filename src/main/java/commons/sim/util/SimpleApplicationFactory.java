@@ -1,7 +1,5 @@
 package commons.sim.util;
 
-import static commons.sim.util.SimulatorProperties.APPLICATION_NUM_OF_TIERS;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +23,7 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 	public List<LoadBalancer> createNewApplication(JEEventScheduler scheduler,
 			Monitor monitor) {
 		Configuration config = Configuration.getInstance();
-		int numOfTiers = config.getInt(APPLICATION_NUM_OF_TIERS);
+		int numOfTiers = config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS);
 		
 		Class<?>[] heuristicClasses = config.getApplicationHeuristics();
 		int [] serversPerTier = config.getApplicationInitialServersPerTier();

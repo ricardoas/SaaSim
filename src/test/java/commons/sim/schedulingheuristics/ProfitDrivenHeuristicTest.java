@@ -19,7 +19,7 @@ import commons.sim.components.MachineDescriptor;
 import commons.sim.components.TimeSharedMachine;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JETime;
-import commons.sim.util.SimulatorProperties;
+import commons.sim.util.SaaSAppProperties;
 
 
 public class ProfitDrivenHeuristicTest {
@@ -31,7 +31,7 @@ public class ProfitDrivenHeuristicTest {
 	@Before
 	public void setUp() throws ConfigurationException{
 		Configuration.buildInstance(CONFIG_FILE);
-		Configuration.getInstance().setProperty(SimulatorProperties.SLA, this.sla);
+		Configuration.getInstance().setProperty(SaaSAppProperties.SLA, this.sla);
 		this.heuristic = new ProfitDrivenHeuristic();
 	}
 	
@@ -146,7 +146,7 @@ public class ProfitDrivenHeuristicTest {
 	@Test
 	public void testGetServerWithBusyMachine(){
 		double sla = 1000 * 20;
-		Configuration.getInstance().setProperty(SimulatorProperties.SLA, sla);
+		Configuration.getInstance().setProperty(SaaSAppProperties.SLA, sla);
 		this.heuristic = new ProfitDrivenHeuristic();
 		
 		String clientID = "c1";
@@ -187,7 +187,7 @@ public class ProfitDrivenHeuristicTest {
 	@Test
 	public void testGetServerWithBusyMachine2(){
 		double sla = 1000 * 20;
-		Configuration.getInstance().setProperty(SimulatorProperties.SLA, sla);
+		Configuration.getInstance().setProperty(SaaSAppProperties.SLA, sla);
 		this.heuristic = new ProfitDrivenHeuristic();
 		
 		String clientID = "c1";
@@ -231,7 +231,7 @@ public class ProfitDrivenHeuristicTest {
 	@Test
 	public void testGetServerWithBusyMachine3(){
 		double sla = 1000 * 20;
-		Configuration.getInstance().setProperty(SimulatorProperties.SLA, sla);
+		Configuration.getInstance().setProperty(SaaSAppProperties.SLA, sla);
 		this.heuristic = new ProfitDrivenHeuristic();
 		
 		String clientID = "c1";

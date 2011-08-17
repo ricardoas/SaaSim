@@ -16,7 +16,7 @@ import commons.config.Configuration;
 import commons.io.GEISTWorkloadParser;
 import commons.io.TimeBasedWorkloadParser;
 import commons.sim.components.MachineDescriptor;
-import commons.sim.util.UsersProperties;
+import commons.sim.util.SaaSUsersProperties;
 
 public class AccountingSystem {
 	
@@ -132,7 +132,7 @@ public class AccountingSystem {
 			}
 		}
 
-		String[] workloads = Configuration.getInstance().getStringArray(UsersProperties.USER_WORKLOAD);
+		String[] workloads = Configuration.getInstance().getStringArray(SaaSUsersProperties.USER_WORKLOAD);
 
 		configurable.setWorkloadParser(new TimeBasedWorkloadParser(new GEISTWorkloadParser(workloads), TimeBasedWorkloadParser.HOUR_IN_MILLIS));
 	}

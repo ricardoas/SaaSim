@@ -17,8 +17,8 @@ import commons.cloud.UtilityResult;
 import commons.config.Configuration;
 import commons.io.HistoryBasedWorkloadParser;
 import commons.sim.Simulator;
+import commons.sim.util.SaaSAppProperties;
 import commons.sim.util.SimulatorFactory;
-import commons.sim.util.SimulatorProperties;
 import commons.util.Dashboard;
 import commons.util.SimulationData;
 
@@ -57,7 +57,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 	private void initSimulator(Integer reservedResources) {
 		
 		//Setting the number of machines that should be available at startup
-		Configuration.getInstance().setProperty(SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER, reservedResources+"");
+		Configuration.getInstance().setProperty(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER, reservedResources+"");
 		
 		//Creating simulator structure
 		dps = DPSFactory.INSTANCE.createDPS();

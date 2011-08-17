@@ -13,7 +13,7 @@ import commons.config.Configuration;
 import commons.io.GEISTWorkloadParser;
 import commons.io.HistoryBasedWorkloadParser;
 import commons.io.TimeBasedWorkloadParser;
-import commons.sim.util.UsersProperties;
+import commons.sim.util.SaaSUsersProperties;
 
 /**
  * This class is responsible for obtaining input parameters, from a configuration file, such as: workload, cloud provider
@@ -35,11 +35,11 @@ public class Main {
 			Configuration config = Configuration.getInstance();
 			
 			//Parsing workload
-			String[] workloads = Configuration.getInstance().getStringArray(UsersProperties.USER_WORKLOAD);
+			String[] workloads = Configuration.getInstance().getStringArray(SaaSUsersProperties.USER_WORKLOAD);
 			HistoryBasedWorkloadParser workloadParser = new HistoryBasedWorkloadParser(new GEISTWorkloadParser(workloads), TimeBasedWorkloadParser.YEAR_IN_MILLIS);
 			
 			//Creating planner
-			Planner planner = new Planner(config.getProviders(), config.getPlanningHeuristic(), config.getUsers(), workloadParser);
+			Planner planner = new Planner(config.getProviders(), config.getUsers(), workloadParser);
 			List<String> plan = planner.plan();
 			
 			//FIXME: Change workload! Performing plan execution!

@@ -1,43 +1,8 @@
 package commons.config;
 
-import static commons.sim.util.ContractProperties.NUMBER_OF_PLANS;
-import static commons.sim.util.ContractProperties.PLAN_CPU_LIMIT;
-import static commons.sim.util.ContractProperties.PLAN_EXTRA_CPU_COST;
-import static commons.sim.util.ContractProperties.PLAN_EXTRA_TRANSFER_COST;
-import static commons.sim.util.ContractProperties.PLAN_NAME;
-import static commons.sim.util.ContractProperties.PLAN_PRICE;
-import static commons.sim.util.ContractProperties.PLAN_PRIORITY;
-import static commons.sim.util.ContractProperties.PLAN_SETUP;
-import static commons.sim.util.ContractProperties.PLAN_TRANSFER_LIMIT;
-import static commons.sim.util.ProviderProperties.IAAS_COST_TRANSFER_IN;
-import static commons.sim.util.ProviderProperties.IAAS_COST_TRANSFER_OUT;
-import static commons.sim.util.ProviderProperties.IAAS_MACHINES_TYPE;
-import static commons.sim.util.ProviderProperties.IAAS_MONITORING;
-import static commons.sim.util.ProviderProperties.IAAS_NAME;
-import static commons.sim.util.ProviderProperties.IAAS_NUMBER_OF_PROVIDERS;
-import static commons.sim.util.ProviderProperties.IAAS_ONDEMAND_CPU_COST;
-import static commons.sim.util.ProviderProperties.IAAS_ONDEMAND_LIMIT;
-import static commons.sim.util.ProviderProperties.IAAS_ONE_YEAR_FEE;
-import static commons.sim.util.ProviderProperties.IAAS_RESERVED_CPU_COST;
-import static commons.sim.util.ProviderProperties.IAAS_RESERVED_LIMIT;
-import static commons.sim.util.ProviderProperties.IAAS_THREE_YEARS_FEE;
-import static commons.sim.util.ProviderProperties.IAAS_TRANSFER_IN;
-import static commons.sim.util.ProviderProperties.IAAS_TRANSFER_OUT;
-import static commons.sim.util.SimulatorProperties.APPLICATION_CUSTOM_HEURISTIC;
-import static commons.sim.util.SimulatorProperties.APPLICATION_FACTORY;
-import static commons.sim.util.SimulatorProperties.APPLICATION_HEURISTIC;
-import static commons.sim.util.SimulatorProperties.APPLICATION_INITIAL_SERVER_PER_TIER;
-import static commons.sim.util.SimulatorProperties.APPLICATION_MAX_SERVER_PER_TIER;
-import static commons.sim.util.SimulatorProperties.APPLICATION_NUM_OF_TIERS;
-import static commons.sim.util.SimulatorProperties.DEFAULT_PLANNING_HEURISTIC;
-import static commons.sim.util.SimulatorProperties.DPS_CUSTOM_HEURISTIC;
-import static commons.sim.util.SimulatorProperties.DPS_HEURISTIC;
-import static commons.sim.util.SimulatorProperties.MAX_BACKLOG_SIZE;
-import static commons.sim.util.SimulatorProperties.MAX_NUM_OF_THREADS_PER_SERVER;
-import static commons.sim.util.SimulatorProperties.PLANNING_HEURISTIC;
-import static commons.sim.util.SimulatorProperties.PLANNING_PERIOD;
-import static commons.sim.util.SimulatorProperties.SETUP_TIME;
-import static commons.sim.util.SimulatorProperties.SLA;
+import static commons.sim.util.IaaSProvidersProperties.*;
+import static commons.sim.util.SaaSPlanProperties.*;
+import static commons.sim.util.SimulatorProperties.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,6 +15,8 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationRuntimeException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
+import planning.heuristic.AGHeuristic;
+import planning.heuristic.PlanningHeuristic;
 import provisioning.DynamicProvisioningSystem;
 import provisioning.ProfitDrivenProvisioningSystem;
 import provisioning.RanjanProvisioningSystem;
@@ -62,9 +29,9 @@ import commons.cloud.User;
 import commons.sim.schedulingheuristics.ProfitDrivenHeuristic;
 import commons.sim.schedulingheuristics.RanjanHeuristic;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
+import commons.sim.util.SaaSAppProperties;
+import commons.sim.util.SaaSUsersProperties;
 import commons.sim.util.SimpleApplicationFactory;
-import commons.sim.util.SimulatorProperties;
-import commons.sim.util.UsersProperties;
 
 
 /**
@@ -115,28 +82,88 @@ public class Configuration	extends PropertiesConfiguration{
 	
 	private void verifyProperties(){
 		verifySimulatorProperties();
+		verifySaaSAppProperties();
 		verifyIaaSProperties();
 		verifySaaSProperties();
 	}
 	
+	private void verifySimulatorProperties() {
+		checkDPSHeuristic();
+		checkPlanningHeuristic();
+		Validator.checkPositive(getInt(PLANNING_PERIOD));
+	}
+
 	// ************************************* SIMULATOR ************************************/
 	
 	
-	private void verifySimulatorProperties() {
-		setProperty(APPLICATION_FACTORY, 
-				getString(APPLICATION_FACTORY, SimpleApplicationFactory.class.getCanonicalName()));
+	private void checkDPSHeuristic() {
 		
-		int numOfTiers = Math.max(getInt(APPLICATION_NUM_OF_TIERS, 1), 1);
-		setProperty(APPLICATION_NUM_OF_TIERS, numOfTiers);
+		String heuristicName = getString(DPS_HEURISTIC);
+		Validator.checkNotEmpty(getString(DPS_HEURISTIC));
 		
-		checkSizeAndContent(APPLICATION_INITIAL_SERVER_PER_TIER, numOfTiers, APPLICATION_NUM_OF_TIERS, "1");
-		checkSizeAndContent(APPLICATION_MAX_SERVER_PER_TIER, numOfTiers, APPLICATION_NUM_OF_TIERS, Integer.MAX_VALUE+"");
-		checkSizeAndContent(APPLICATION_HEURISTIC, numOfTiers, APPLICATION_NUM_OF_TIERS, AppHeuristicValues.ROUNDROBIN.name());
+		String customHeuristicClass = getString(DPS_CUSTOM_HEURISTIC);
+		try{
+			DPSHeuristicValues value = DPSHeuristicValues.valueOf(heuristicName);
+			switch (value) {
+				case STATIC:
+					heuristicName = DynamicProvisioningSystem.class.getCanonicalName();
+					break;
+				case RANJAN:
+					heuristicName = RanjanProvisioningSystem.class.getCanonicalName();
+					checkRanjanProperties();
+					break;
+				case PROFITDRIVEN:
+					heuristicName = ProfitDrivenProvisioningSystem.class.getCanonicalName();
+					break;
+				case CUSTOM:
+					heuristicName = Class.forName(customHeuristicClass).getCanonicalName();
+					break;
+				default:
+					throw new ConfigurationRuntimeException("Unsupported value: " + value + " for DPSHeuristicValues.");
+			}
+			setProperty(DPS_HEURISTIC, heuristicName);
+		} catch (ClassNotFoundException e) {
+			throw new ConfigurationRuntimeException("Problem loading " + customHeuristicClass, e);
+		}
+	}
+
+	private void checkPlanningHeuristic() {
+		String heuristicName = getString(PLANNING_HEURISTIC);
+		Validator.checkNotEmpty(getString(PLANNING_HEURISTIC));
+		
+		PlanningHeuristicValues value = PlanningHeuristicValues.valueOf(heuristicName);
+		switch (value) {
+		case EVOLUTIONARY:
+			heuristicName = AGHeuristic.class.getCanonicalName();
+			break;
+		default:
+			throw new ConfigurationRuntimeException("Unsupported value: " + value + " for PlanningHeuristicValues.");
+		}
+		setProperty(PLANNING_HEURISTIC, heuristicName);
+	}
+
+
+	private void checkRanjanProperties() {
+		Validator.checkPositive(getInt(RANJAN_HEURISTIC_NUMBER_OF_TOKENS));
+		Validator.checkNonNegative(getInt(RANJAN_HEURISTIC_BACKLOG_SIZE));
+	}
+
+	// ************************************* SIMULATOR ************************************/
+	private void verifySaaSAppProperties() {
+		setProperty(SaaSAppProperties.APPLICATION_FACTORY, 
+				getString(SaaSAppProperties.APPLICATION_FACTORY, SimpleApplicationFactory.class.getCanonicalName()));
+		
+		Validator.checkPositive(getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS));
+		
+		int numOfTiers = getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS);
+		
+		checkSizeAndContent(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER, numOfTiers, SaaSAppProperties.APPLICATION_NUM_OF_TIERS, "1");
+		checkSizeAndContent(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER, numOfTiers, SaaSAppProperties.APPLICATION_NUM_OF_TIERS, Integer.MAX_VALUE+"");
+		checkSizeAndContent(SaaSAppProperties.APPLICATION_HEURISTIC, numOfTiers, SaaSAppProperties.APPLICATION_NUM_OF_TIERS, AppHeuristicValues.ROUNDROBIN.name());
 		
 		checkSchedulingHeuristicNames();
-		checkDPSHeuristic();
 		
-		setProperty(SETUP_TIME, Math.max(getLong(SETUP_TIME, 0), 0));
+		setProperty(SaaSAppProperties.SETUP_TIME, Math.max(getLong(SaaSAppProperties.SETUP_TIME, 0), 0));
 	}
 
 	/**
@@ -221,8 +248,8 @@ public class Configuration	extends PropertiesConfiguration{
 	}
 
 	private void checkSchedulingHeuristicNames() {
-		String[] strings = getStringArray(APPLICATION_HEURISTIC);
-		String customHeuristic = getString(APPLICATION_CUSTOM_HEURISTIC);
+		String[] strings = getStringArray(SaaSAppProperties.APPLICATION_HEURISTIC);
+		String customHeuristic = getString(SaaSAppProperties.APPLICATION_CUSTOM_HEURISTIC);
 		for (int i = 0; i < strings.length; i++) {
 			AppHeuristicValues value = AppHeuristicValues.valueOf(strings[i]);
 			switch (value) {
@@ -243,15 +270,15 @@ public class Configuration	extends PropertiesConfiguration{
 					}
 					break;
 				default:
-					throw new ConfigurationRuntimeException("Unsupported value for " + SimulatorProperties.APPLICATION_HEURISTIC + ": " + strings[i]);
+					throw new ConfigurationRuntimeException("Unsupported value for " + SaaSAppProperties.APPLICATION_HEURISTIC + ": " + strings[i]);
 			}
 		}
 		
-		setProperty(APPLICATION_HEURISTIC, strings);
+		setProperty(SaaSAppProperties.APPLICATION_HEURISTIC, strings);
 	}
 	
 	public int[] getApplicationInitialServersPerTier() {
-		String[] stringArray = getStringArray(APPLICATION_INITIAL_SERVER_PER_TIER);
+		String[] stringArray = getStringArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER);
 		int [] serversPerTier = new int[stringArray.length];
 		for (int i = 0; i < serversPerTier.length; i++) {
 			serversPerTier[i] = Integer.valueOf(stringArray[i]);
@@ -260,7 +287,7 @@ public class Configuration	extends PropertiesConfiguration{
 	}
 
 	public int[] getApplicationMaxServersPerTier() {
-		String[] stringArray = getStringArray(APPLICATION_MAX_SERVER_PER_TIER);
+		String[] stringArray = getStringArray(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER);
 		int [] serversPerTier = new int[stringArray.length];
 		for (int i = 0; i < serversPerTier.length; i++) {
 			serversPerTier[i] = Integer.valueOf(stringArray[i]);
@@ -272,7 +299,7 @@ public class Configuration	extends PropertiesConfiguration{
 	 * @return
 	 */
 	public Class<?>[] getApplicationHeuristics() {
-		String[] strings = getStringArray(APPLICATION_HEURISTIC);
+		String[] strings = getStringArray(SaaSAppProperties.APPLICATION_HEURISTIC);
 		Class<?> [] heuristicClasses = new Class<?>[strings.length]; 
 		
 		for (int i = 0; i < strings.length; i++) {
@@ -285,31 +312,6 @@ public class Configuration	extends PropertiesConfiguration{
 		return heuristicClasses;
 	}
 	
-	private void checkDPSHeuristic() {
-		String heuristicName = getString(DPS_HEURISTIC);
-		String customHeuristicClass = getString(DPS_CUSTOM_HEURISTIC);
-		try{
-			DPSHeuristicValues value = DPSHeuristicValues.valueOf(heuristicName);
-			switch (value) {
-				case STATIC:
-					heuristicName = DynamicProvisioningSystem.class.getCanonicalName();
-					break;
-				case RANJAN:
-					heuristicName = RanjanProvisioningSystem.class.getCanonicalName();
-					break;
-				case PROFITDRIVEN:
-					heuristicName = ProfitDrivenProvisioningSystem.class.getCanonicalName();
-					break;
-				case CUSTOM:
-					heuristicName = Class.forName(customHeuristicClass).getCanonicalName();
-					break;
-			}
-			setProperty(DPS_HEURISTIC, heuristicName);
-		} catch (ClassNotFoundException e) {
-			throw new ConfigurationRuntimeException("Problem loading " + customHeuristicClass, e);
-		}
-	}
-
 	public Class<?> getDPSHeuristicClass() {
 		String heuristicName = getString(DPS_HEURISTIC);
 		try {
@@ -359,6 +361,9 @@ public class Configuration	extends PropertiesConfiguration{
 	
 	private void buildProvider() {
 		int numberOfProviders = getInt(IAAS_NUMBER_OF_PROVIDERS);
+		MachineTypeValue[] allTypes = buildMachinesEnum(getStringArray(IAAS_TYPES));
+		double[] power = getDoubleArray(IAAS_POWER);
+		
 		String[] names = getStringArray(IAAS_NAME);
 		
 		String[] machinesType = getStringArray(IAAS_MACHINES_TYPE);
@@ -401,6 +406,15 @@ public class Configuration	extends PropertiesConfiguration{
 		}
 	}
 
+	private double[] getDoubleArray(String propertyName) {
+		String[] strings = getStringArray(propertyName);
+		double[] values = new double[strings.length];
+		for (int i = 0; i < strings.length; i++) {
+			values[i] = Double.valueOf(strings[i]);
+		}
+		return values;
+	}
+
 	private MachineTypeValue[] buildMachinesEnum(String[] machines) {
 		MachineTypeValue[] machineTypes = new MachineTypeValue[machines.length];
 		for(int i = 0; i < machines.length; i++){
@@ -426,12 +440,17 @@ public class Configuration	extends PropertiesConfiguration{
 		checkSizeAndContent(PLAN_EXTRA_TRANSFER_COST, numberOfPlans, NUMBER_OF_PLANS);
 	}
 
-	public String getPlanningHeuristic(){
-		return getString(PLANNING_HEURISTIC, DEFAULT_PLANNING_HEURISTIC);
+	public Class<?> getPlanningHeuristicClass(){
+		String heuristicName = getString(PLANNING_HEURISTIC);
+		try {
+			return Class.forName(heuristicName);
+		} catch (ClassNotFoundException e) {
+			throw new ConfigurationRuntimeException("Problem loading " + heuristicName, e);
+		}
 	}
 	
 	public double getSLA(){
-		return getDouble(SLA, Double.MAX_VALUE);
+		return getDouble(SaaSAppProperties.SLA, Double.MAX_VALUE);
 	}
 	
 	public long getPlanningPeriod(){
@@ -479,7 +498,7 @@ public class Configuration	extends PropertiesConfiguration{
 		
 		//Extract users associations
 		users = new ArrayList<User>();
-		String[] plans = Configuration.getInstance().getStringArray(UsersProperties.USER_PLAN);
+		String[] plans = Configuration.getInstance().getStringArray(SaaSUsersProperties.USER_PLAN);
 		for (int i = 0; i < plans.length; i++) {
 			users.add(new User(contractsPerName.get(plans[i])));
 		}
@@ -509,10 +528,10 @@ public class Configuration	extends PropertiesConfiguration{
 
 	
 	public long getMaximumNumberOfThreadsPerMachine() {
-		return getLong(MAX_NUM_OF_THREADS_PER_SERVER, Long.MAX_VALUE);
+		return getLong(RANJAN_HEURISTIC_NUMBER_OF_TOKENS, Long.MAX_VALUE);
 	}
 
 	public long getMaximumBacklogSize() {
-		return getLong(MAX_BACKLOG_SIZE, Long.MAX_VALUE);
+		return getLong(RANJAN_HEURISTIC_BACKLOG_SIZE, Long.MAX_VALUE);
 	}
 }

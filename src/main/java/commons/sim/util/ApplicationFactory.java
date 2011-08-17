@@ -1,7 +1,5 @@
 package commons.sim.util;
 
-import static commons.sim.util.SimulatorProperties.APPLICATION_FACTORY;
-
 import java.util.List;
 
 import provisioning.Monitor;
@@ -30,7 +28,7 @@ public abstract class ApplicationFactory {
 	public static ApplicationFactory getInstance(){
 		
 		if(instance == null){
-			String className = Configuration.getInstance().getString(APPLICATION_FACTORY);
+			String className = Configuration.getInstance().getString(SaaSAppProperties.APPLICATION_FACTORY);
 			try {
 				instance = (ApplicationFactory) Class.forName(className).newInstance();
 			} catch (Exception e) {

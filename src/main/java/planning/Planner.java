@@ -6,8 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 
-import planning.heuristic.AGHeuristic;
 import planning.heuristic.PlanningHeuristic;
+import planning.util.PlanningHeuristicFactory;
 
 import commons.cloud.Provider;
 import commons.cloud.User;
@@ -22,9 +22,9 @@ public class Planner {
 	
 	private final String OUTUPUT_FILE = "planning.dat"; 
 	
-	public Planner(List<Provider> providers, String planningHeuristic, List<User> cloudUsers, HistoryBasedWorkloadParser workloadParser) {
+	public Planner(List<Provider> providers, List<User> cloudUsers, HistoryBasedWorkloadParser workloadParser) {
 		this.cloudProviders = providers;
-		this.planningHeuristic = new AGHeuristic();
+		this.planningHeuristic = PlanningHeuristicFactory.INSTANCE.createHeuristic();
 		
 		this.cloudUsers = cloudUsers;
 		this.workloadParser = workloadParser;
