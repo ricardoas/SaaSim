@@ -1,7 +1,9 @@
 package config;
 
 public class PropertiesTesting {
-
+	
+	public static final String VALID_WORKLOAD = "src/test/resources/workload/w1.dat";
+	
 	public static final String VALID_FILE = "src/test/resources/config.properties";
 	public static final String INEXISTENT_FILE = "src/test/resources/config.inexistent";
 	

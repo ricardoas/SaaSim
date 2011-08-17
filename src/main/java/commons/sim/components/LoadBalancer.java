@@ -129,7 +129,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 			case EVALUATEUTILIZATION://RANJAN Scheduler
 				Long eventTime = (Long) event.getValue()[0];
 				RanjanStatistics statistics = this.collectStatistics(getServers(), eventTime);
-				monitor.evaluateUtilization(getScheduler().now().timeMilliSeconds, statistics, tier);
+				monitor.evaluateUtilisation(getScheduler().now().timeMilliSeconds, statistics, tier);
 				
 				JETime newEventTime = new JETime(SimulatorProperties.DEFAULT_EVALUATE_UTILIZATION_PERIOD);
 				newEventTime.plus(getScheduler().now());

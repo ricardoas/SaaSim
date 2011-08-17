@@ -13,7 +13,7 @@ public interface Monitor{
 	
 	void requestQueued(long timeMilliSeconds, Request request, int tier);
 
-	void evaluateUtilization(long timeMilliSeconds, RanjanStatistics statistics, int tier);
+	void evaluateUtilisation(long timeMilliSeconds, RanjanStatistics statistics, int tier);
 
 	void machineTurnedOff(MachineDescriptor machineDescriptor);
 

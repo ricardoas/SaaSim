@@ -1,8 +1,6 @@
 package config;
 
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -87,7 +85,6 @@ public class ProviderInputTest {
 		Assert.assertArrayEquals(new double[]{0.10,0.09}, provider.getTransferInCosts(), 0.0);
 		Assert.assertArrayEquals( new long[]{200}, provider.getTransferOutLimits());
 		Assert.assertArrayEquals(new double[]{0.10,0.09}, provider.getTransferOutCosts(), 0.0);
-
 
 		Provider provider2 = providers.get(1);
 		assertNotNull(provider2);

@@ -20,7 +20,7 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 	}
 	
 	@Override
-	public void evaluateUtilization(long now, RanjanStatistics statistics, int tier) {
+	public void evaluateUtilisation(long now, RanjanStatistics statistics, int tier) {
 		long numberOfServersToAdd = evaluateNumberOfServersForNextInterval(statistics);
 		if(numberOfServersToAdd > 0){
 			for(int i = 0; i < numberOfServersToAdd; i++){

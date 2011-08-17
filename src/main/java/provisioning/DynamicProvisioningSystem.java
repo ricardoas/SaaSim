@@ -36,6 +36,7 @@ public class DynamicProvisioningSystem implements DPS{
 	
 	@Override
 	public void registerConfigurable(DynamicConfigurable configurable) {
+		this.configurable = configurable;
 		this.accountingSystem.setUpConfigurables(configurable);
 	}
 
@@ -60,7 +61,7 @@ public class DynamicProvisioningSystem implements DPS{
 	}
 
 	@Override
-	public void evaluateUtilization(long now, RanjanStatistics statistics, int tier) {
+	public void evaluateUtilisation(long now, RanjanStatistics statistics, int tier) {
 		
 	}
 
