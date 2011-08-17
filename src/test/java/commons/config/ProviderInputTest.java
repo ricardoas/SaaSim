@@ -1,7 +1,6 @@
 package commons.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -11,7 +10,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import commons.cloud.Provider;
-import commons.config.Configuration;
 
 public class ProviderInputTest {
 	

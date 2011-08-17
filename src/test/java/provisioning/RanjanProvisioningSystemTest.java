@@ -1,9 +1,6 @@
 package provisioning;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
@@ -14,6 +11,7 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import commons.cloud.MachineType;
 import commons.cloud.MachineTypeValue;
 import commons.cloud.Provider;
 import commons.cloud.User;
@@ -26,6 +24,7 @@ import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JETime;
 import commons.sim.provisioningheuristics.RanjanStatistics;
+import commons.sim.util.SaaSAppProperties;
 import commons.sim.util.SaaSUsersProperties;
 
 
@@ -285,7 +284,7 @@ public class RanjanProvisioningSystemTest {
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
-		EasyMock.expect(config.getApplicationInitialServersPerTier()).andReturn(new int[]{0});
+		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
 		EasyMock.expect(config.getStringArray(SaaSUsersProperties.USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
 		
 		PowerMock.replay(Configuration.class);
@@ -332,7 +331,7 @@ public class RanjanProvisioningSystemTest {
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
-		EasyMock.expect(config.getApplicationInitialServersPerTier()).andReturn(new int[]{0});
+		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
 		EasyMock.expect(config.getStringArray(SaaSUsersProperties.USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
 		
 		PowerMock.replay(Configuration.class);
@@ -386,7 +385,7 @@ public class RanjanProvisioningSystemTest {
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
-		EasyMock.expect(config.getApplicationInitialServersPerTier()).andReturn(new int[]{0});
+		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
 		EasyMock.expect(config.getStringArray(SaaSUsersProperties.USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
 		
 		PowerMock.replay(Configuration.class);

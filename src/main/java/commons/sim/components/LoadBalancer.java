@@ -71,7 +71,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 		Machine server = buildMachine(descriptor);
 		JETime serverUpTime = getScheduler().now();
 		if(useStartUpDelay){
-			serverUpTime = serverUpTime.plus(new JETime(Configuration.getInstance().getLong(SaaSAppProperties.SETUP_TIME)));
+			serverUpTime = serverUpTime.plus(new JETime(Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SETUP_TIME)));
 		}
 		send(new JEEvent(JEEventType.ADD_SERVER, this, serverUpTime, server));
 	}

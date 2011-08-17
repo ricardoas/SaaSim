@@ -1,8 +1,6 @@
 package commons.sim.schedulingheuristics;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
@@ -31,7 +29,7 @@ public class ProfitDrivenHeuristicTest {
 	@Before
 	public void setUp() throws ConfigurationException{
 		Configuration.buildInstance(CONFIG_FILE);
-		Configuration.getInstance().setProperty(SaaSAppProperties.SLA, this.sla);
+		Configuration.getInstance().setProperty(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME, this.sla);
 		this.heuristic = new ProfitDrivenHeuristic();
 	}
 	
@@ -146,7 +144,7 @@ public class ProfitDrivenHeuristicTest {
 	@Test
 	public void testGetServerWithBusyMachine(){
 		double sla = 1000 * 20;
-		Configuration.getInstance().setProperty(SaaSAppProperties.SLA, sla);
+		Configuration.getInstance().setProperty(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME, sla);
 		this.heuristic = new ProfitDrivenHeuristic();
 		
 		String clientID = "c1";
@@ -187,7 +185,7 @@ public class ProfitDrivenHeuristicTest {
 	@Test
 	public void testGetServerWithBusyMachine2(){
 		double sla = 1000 * 20;
-		Configuration.getInstance().setProperty(SaaSAppProperties.SLA, sla);
+		Configuration.getInstance().setProperty(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME, sla);
 		this.heuristic = new ProfitDrivenHeuristic();
 		
 		String clientID = "c1";
@@ -231,7 +229,7 @@ public class ProfitDrivenHeuristicTest {
 	@Test
 	public void testGetServerWithBusyMachine3(){
 		double sla = 1000 * 20;
-		Configuration.getInstance().setProperty(SaaSAppProperties.SLA, sla);
+		Configuration.getInstance().setProperty(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME, sla);
 		this.heuristic = new ProfitDrivenHeuristic();
 		
 		String clientID = "c1";

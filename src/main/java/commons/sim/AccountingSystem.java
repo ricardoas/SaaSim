@@ -124,7 +124,7 @@ public class AccountingSystem {
 	 * @param configurable
 	 */
 	public void setUpConfigurables(DynamicConfigurable configurable) {
-		int[] initialServersPerTier = Configuration.getInstance().getApplicationInitialServersPerTier();
+		int[] initialServersPerTier = Configuration.getInstance().getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER);
 
 		for (int tier = 0; tier < initialServersPerTier.length; tier++) {
 			for (int i = 0; i < initialServersPerTier[tier]; i++) {

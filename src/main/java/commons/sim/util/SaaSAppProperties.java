@@ -14,7 +14,7 @@ public class SaaSAppProperties {
 	
 	public static final String APPLICATION_MAX_SERVER_PER_TIER = "saas.application.maxreplicas";
 
-	public static final String SLA = "sim.sla";
+	public static final String APPLICATION_SLA_MAX_RESPONSE_TIME = "saas.sla.maxrt";
 
-	public static final String SETUP_TIME = "sim.setuptime";
+	public static final String APPLICATION_SETUP_TIME = "saas.setuptime";
 }

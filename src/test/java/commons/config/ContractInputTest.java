@@ -1,7 +1,6 @@
 package commons.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -12,7 +11,6 @@ import org.junit.Test;
 
 import commons.cloud.Contract;
 import commons.cloud.User;
-import commons.config.Configuration;
 
 public class ContractInputTest{
 	

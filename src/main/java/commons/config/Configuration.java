@@ -16,7 +16,6 @@ import org.apache.commons.configuration.ConfigurationRuntimeException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import planning.heuristic.AGHeuristic;
-import planning.heuristic.PlanningHeuristic;
 import provisioning.DynamicProvisioningSystem;
 import provisioning.ProfitDrivenProvisioningSystem;
 import provisioning.RanjanProvisioningSystem;
@@ -31,7 +30,6 @@ import commons.sim.schedulingheuristics.RanjanHeuristic;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
 import commons.sim.util.SaaSAppProperties;
 import commons.sim.util.SaaSUsersProperties;
-import commons.sim.util.SimpleApplicationFactory;
 
 
 /**
@@ -150,39 +148,21 @@ public class Configuration	extends PropertiesConfiguration{
 
 	// ************************************* SIMULATOR ************************************/
 	private void verifySaaSAppProperties() {
-		setProperty(SaaSAppProperties.APPLICATION_FACTORY, 
-				getString(SaaSAppProperties.APPLICATION_FACTORY, SimpleApplicationFactory.class.getCanonicalName()));
-		
+
+		Validator.checkNotEmpty(getString(SaaSAppProperties.APPLICATION_FACTORY));
 		Validator.checkPositive(getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS));
+		Validator.checkNonNegative(getLong(SaaSAppProperties.APPLICATION_SETUP_TIME));
 		
-		int numOfTiers = getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS);
+		checkSize(SaaSAppProperties.APPLICATION_HEURISTIC, SaaSAppProperties.APPLICATION_NUM_OF_TIERS);
+		checkSize(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER, SaaSAppProperties.APPLICATION_NUM_OF_TIERS);
 		
-		checkSizeAndContent(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER, numOfTiers, SaaSAppProperties.APPLICATION_NUM_OF_TIERS, "1");
-		checkSizeAndContent(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER, numOfTiers, SaaSAppProperties.APPLICATION_NUM_OF_TIERS, Integer.MAX_VALUE+"");
-		checkSizeAndContent(SaaSAppProperties.APPLICATION_HEURISTIC, numOfTiers, SaaSAppProperties.APPLICATION_NUM_OF_TIERS, AppHeuristicValues.ROUNDROBIN.name());
+		Validator.checkIsPositiveIntegerArray(getStringArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER));
+
+//		checkSize(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER, SaaSAppProperties.APPLICATION_NUM_OF_TIERS);
+//		Validator.checkIsPositiveIntegerArray(getStringArray(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER));
 		
 		checkSchedulingHeuristicNames();
 		
-		setProperty(SaaSAppProperties.SETUP_TIME, Math.max(getLong(SaaSAppProperties.SETUP_TIME, 0), 0));
-	}
-
-	/**
-	 * @param propertyName
-	 * @param size
-	 * @param sizeProperty TODO
-	 */
-	private void checkSizeAndContent(String propertyName, int size, String sizeProperty, String defaultValue) {
-		String[] values = getStringArray(propertyName);
-		checkSize(propertyName, size, sizeProperty);
-		if(values.length == 0){
-			values = new String[size];
-			Arrays.fill(values, defaultValue);
-			setProperty(propertyName, values);
-		}else{
-			for (int i = 0; i < values.length; i++) {
-				values[i] = values[i].trim().isEmpty()? defaultValue: values[i];
-			}
-		}
 	}
 
 	/**
@@ -191,7 +171,7 @@ public class Configuration	extends PropertiesConfiguration{
 	 */
 	private void checkSizeAndContent(String propertyName, int size, String sizeProperty) {
 		String[] values = getStringArray(propertyName);
-		checkSize(propertyName, size, sizeProperty);
+		checkSize(propertyName, sizeProperty);
 		for (String value : values) {
 			checkIsNotEmpty(propertyName, value);
 		}
@@ -203,7 +183,7 @@ public class Configuration	extends PropertiesConfiguration{
 	 */
 	private void checkSizeAndIntegerContent(String propertyName, int size, String sizeProperty) {
 		String[] values = getStringArray(propertyName);
-		checkSize(propertyName, size, sizeProperty);
+		checkSize(propertyName, sizeProperty);
 		for (String value : values) {
 			checkIsInteger(propertyName, value);
 		}
@@ -215,7 +195,7 @@ public class Configuration	extends PropertiesConfiguration{
 	 */
 	private void checkSizeAndDoubleContent(String propertyName, int size, String sizeProperty) {
 		String[] values = getStringArray(propertyName);
-		checkSize(propertyName, size, sizeProperty);
+		checkSize(propertyName, sizeProperty);
 		for (String value : values) {
 			checkIsDouble(propertyName, value);
 		}
@@ -238,8 +218,9 @@ public class Configuration	extends PropertiesConfiguration{
 		Double.valueOf(value);
 	}
 
-	private void checkSize(String propertyName, int size, String sizePropertyName) {
+	private void checkSize(String propertyName, String sizePropertyName) {
 		String[] values = getStringArray(propertyName);
+		int size = getInt(sizePropertyName);
 		if (values.length != size){
 			throw new ConfigurationRuntimeException("Check number of values in " + 
 					propertyName + ". It must be equals to what is specified at " + 
@@ -277,22 +258,13 @@ public class Configuration	extends PropertiesConfiguration{
 		setProperty(SaaSAppProperties.APPLICATION_HEURISTIC, strings);
 	}
 	
-	public int[] getApplicationInitialServersPerTier() {
-		String[] stringArray = getStringArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER);
-		int [] serversPerTier = new int[stringArray.length];
-		for (int i = 0; i < serversPerTier.length; i++) {
-			serversPerTier[i] = Integer.valueOf(stringArray[i]);
+	public int[] getIntegerArray(String propertyValue) {
+		String[] stringArray = getStringArray(propertyValue);
+		int [] values = new int[stringArray.length];
+		for (int i = 0; i < values.length; i++) {
+			values[i] = Integer.valueOf(stringArray[i]);
 		}
-		return serversPerTier;
-	}
-
-	public int[] getApplicationMaxServersPerTier() {
-		String[] stringArray = getStringArray(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER);
-		int [] serversPerTier = new int[stringArray.length];
-		for (int i = 0; i < serversPerTier.length; i++) {
-			serversPerTier[i] = Integer.valueOf(stringArray[i]);
-		}
-		return serversPerTier;
+		return values;
 	}
 
 	/**
@@ -450,7 +422,7 @@ public class Configuration	extends PropertiesConfiguration{
 	}
 	
 	public double getSLA(){
-		return getDouble(SaaSAppProperties.SLA, Double.MAX_VALUE);
+		return getDouble(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME, Double.MAX_VALUE);
 	}
 	
 	public long getPlanningPeriod(){
