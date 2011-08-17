@@ -18,6 +18,8 @@ public class ProviderProperties {
 	public static final String IAAS_ONE_YEAR_FEE = "prov.oneYearFee";
 
 	public static final String IAAS_THREE_YEARS_FEE = "prov.threeYearsFee";
+	
+	public static final String IAAS_MACHINES_TYPE = "prov.types";
 
 	public static final String IAAS_MONITORING = "prov.monit";
 

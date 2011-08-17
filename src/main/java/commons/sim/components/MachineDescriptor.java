@@ -1,6 +1,6 @@
 package commons.sim.components;
 
-
+import commons.cloud.Provider.MACHINE_TYPES;
 
 /**
  * Machine information.
@@ -9,6 +9,7 @@ package commons.sim.components;
 public class MachineDescriptor {
 	
 	private final long machineID;
+	private MachineTypeValue type;
 	private final boolean reserved;
 	private long startTimeInMillis;
 	private long finishTimeInMillis;
@@ -24,11 +25,16 @@ public class MachineDescriptor {
 	 * @param machineID Machine unique ID.
 	 * @param reserved A {@link Boolean} value indicating if this machine has been bought on reservation market.
 	 */
-	public MachineDescriptor(long machineID, boolean reserved) {
+	public MachineDescriptor(long machineID, boolean reserved, MachineTypeValue type) {
 		this.machineID = machineID;
 		this.reserved = reserved;
+		this.type = type;
 	}
 
+	public MachineTypeValue getType(){
+		return this.type;
+	}
+	
 	public long getMachineID() {
 		return machineID;
 	}

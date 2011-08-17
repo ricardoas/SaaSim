@@ -134,7 +134,6 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 				
 				tryToShutdown();
 				
-				
 				break;
 		}
 	}

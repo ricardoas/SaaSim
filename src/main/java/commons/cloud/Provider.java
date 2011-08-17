@@ -5,12 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import commons.cloud.Provider.MACHINE_TYPES;
 import commons.config.Configuration;
 import commons.io.TimeBasedWorkloadParser;
 import commons.sim.components.MachineDescriptor;
-import commons.sim.util.SimulatorProperties;
 
 public class Provider {
+	
 	
 	protected static int machineIDGenerator = 0;
 	
@@ -18,12 +19,9 @@ public class Provider {
 	private int currentReservedMachines;
 
 	public final String name;
-	public final double onDemandCpuCost;// in $/instance-hour
 	public final int onDemandLimit;// in number of instances
 	public final int reservationLimit;// in number of instances
-	public final double reservedCpuCost;// in $/instance-hour
-	public final double reservationOneYearFee;// in $
-	public final double reservationThreeYearsFee;// in $
+	private final Map<MachineTypeValue, MachineType> types;
 	public final double monitoringCost;// in $
 	private final long[] transferInLimits;
 	private final double[] transferInCosts;
@@ -35,19 +33,15 @@ public class Provider {
 	
 	private int totalNumberOfReservedMachinesUsed;
 
-	public Provider(String name, double cpuCost, int onDemandLimit,
-			int reservationLimit, double reservedCpuCost, double reservationOneYearFee,
-			double reservationThreeYearsFee, double monitoringCost,
-			long[] transferInLimits, double[] transferInCosts,
-			long[] transferOutLimits, double[] transferOutCosts) {
-		
+	public Provider(String name, int onDemandLimit,
+			int reservationLimit, double monitoringCost,
+			long[] transferInLimits,
+			double[] transferInCosts,
+			long[] transferOutLimits, double[] transferOutCosts,
+			List<MachineType> types) {
 		this.name = name;
-		this.onDemandCpuCost = cpuCost;
 		this.onDemandLimit = onDemandLimit;
 		this.reservationLimit = reservationLimit;
-		this.reservedCpuCost = reservedCpuCost;
-		this.reservationOneYearFee = reservationOneYearFee;
-		this.reservationThreeYearsFee = reservationThreeYearsFee;
 		this.monitoringCost = monitoringCost;
 		this.transferInLimits = transferInLimits;
 		this.transferInCosts = transferInCosts;
@@ -61,18 +55,42 @@ public class Provider {
 		this.runningMachines = new HashMap<Long, MachineDescriptor>();
 		this.finishedMachines = new ArrayList<MachineDescriptor>();
 		this.totalNumberOfReservedMachinesUsed = 0;
-	}
-	
-	private void verifyProperties() {
-		if(this.onDemandCpuCost < 0 || this.reservedCpuCost < 0){
-			throw new RuntimeException(this.getClass()+": Invalid cpu/hour cost!");
+		
+		this.types = new HashMap<MachineTypeValue, MachineType>();
+		for (MachineType machineType : types) {
+			this.types.put(machineType.getValue(), machineType);
 		}
+	}
+
+	private void verifyProperties() {
+		Double[] onDemandCosts = new Double[]{};
+		Double[] reservedCosts = new Double[]{};
+		
+		this.onDemandCpuCost.values().toArray(onDemandCosts);
+		this.reservedCpuCost.values().toArray(reservedCosts);
+		
+		for(int i = 0; i < onDemandCosts.length; i++){
+			if(onDemandCosts[i] < 0 || reservedCosts[i] < 0){
+				throw new RuntimeException(this.getClass()+": Invalid cpu/hour cost!");
+			}
+		}
+		
 		if(this.reservationLimit <= 0 || this.onDemandLimit <= 0){
 			throw new RuntimeException(this.getClass()+": Invalid on-demand/reserved limit!");
 		}
-		if(this.reservationOneYearFee < 0 || this.reservationThreeYearsFee < 0){
-			throw new RuntimeException(this.getClass()+": Invalid reservation fees!");
+		
+		Double[] oneYearFees = new Double[]{};
+		Double[] threeYearsFees = new Double[]{};
+		
+		this.reservationOneYearFee.values().toArray(oneYearFees);
+		this.reservationThreeYearsFee.values().toArray(threeYearsFees);
+		
+		for(int i = 0; i < oneYearFees.length; i++){
+			if(oneYearFees[i] < 0 || threeYearsFees[i] < 0){
+				throw new RuntimeException(this.getClass()+": Invalid reservation fees!");
+			}
 		}
+		
 		if(this.monitoringCost < 0){
 			throw new RuntimeException(this.getClass()+": Invalid monitoring cost!");
 		}
@@ -88,8 +106,8 @@ public class Provider {
 	/**
 	 * @return the onDemandCpuCost
 	 */
-	public double getOnDemandCpuCost() {
-		return onDemandCpuCost;
+	public double getOnDemandCpuCost(MachineTypeValue type) {
+		return onDemandCpuCost.get(type);
 	}
 
 	/**
@@ -109,22 +127,22 @@ public class Provider {
 	/**
 	 * @return the reservedCpuCost
 	 */
-	public double getReservedCpuCost() {
-		return reservedCpuCost;
+	public double getReservedCpuCost(MachineTypeValue type) {
+		return reservedCpuCost.get(type);
 	}
 
 	/**
 	 * @return the reservationOneYearFee
 	 */
-	public double getReservationOneYearFee() {
-		return reservationOneYearFee;
+	public double getReservationOneYearFee(MachineTypeValue type) {
+		return reservationOneYearFee.get(type);
 	}
 
 	/**
 	 * @return the reservationThreeYearsFee
 	 */
-	public double getReservationThreeYearsFee() {
-		return reservationThreeYearsFee;
+	public double getReservationThreeYearsFee(MachineTypeValue type) {
+		return reservationThreeYearsFee.get(type);
 	}
 
 	/**
@@ -173,7 +191,7 @@ public class Provider {
 		}else{
 			currentOnDemandMachines++;
 		}
-		MachineDescriptor descriptor = new MachineDescriptor(machineIDGenerator++, reserved);
+		MachineDescriptor descriptor = new MachineDescriptor(machineIDGenerator++, reserved, MachineTypeValue.SMALL);
 		this.runningMachines.put(descriptor.getMachineID(), descriptor);
 		
 		return descriptor;
@@ -201,9 +219,9 @@ public class Provider {
 		}
 		
 		if(descriptor.isReserved()){
-			return executionTime * reservedCpuCost + executionTime * monitoringCost;
+			return executionTime * this.reservedCpuCost.get(descriptor.getType()) + executionTime * monitoringCost;
 		}else{
-			return executionTime * onDemandCpuCost + executionTime * monitoringCost;
+			return executionTime * this.onDemandCpuCost.get(descriptor.getType()) + executionTime * monitoringCost;
 		}
 	}
 	
@@ -216,9 +234,9 @@ public class Provider {
 		}
 		
 		if(descriptor.isReserved()){
-			return executionTime * reservedCpuCost + executionTime * monitoringCost;
+			return executionTime * this.reservedCpuCost.get(descriptor.getType()) + executionTime * monitoringCost;
 		}else{
-			return executionTime * onDemandCpuCost + executionTime * monitoringCost;
+			return executionTime * this.onDemandCpuCost.get(descriptor.getType()) + executionTime * monitoringCost;
 		}
 	}
 

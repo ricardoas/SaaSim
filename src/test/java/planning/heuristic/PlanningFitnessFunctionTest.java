@@ -23,9 +23,6 @@ import commons.cloud.User;
 import commons.config.Configuration;
 import commons.sim.util.SimulatorProperties;
 
-import config.GEISTMonthlyWorkloadParser;
-
-
 public class PlanningFitnessFunctionTest {
 	
 	private static final double SLA = 10d;

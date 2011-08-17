@@ -11,6 +11,7 @@ import static commons.sim.util.ContractProperties.PLAN_SETUP;
 import static commons.sim.util.ContractProperties.PLAN_TRANSFER_LIMIT;
 import static commons.sim.util.ProviderProperties.IAAS_COST_TRANSFER_IN;
 import static commons.sim.util.ProviderProperties.IAAS_COST_TRANSFER_OUT;
+import static commons.sim.util.ProviderProperties.IAAS_MACHINES_TYPE;
 import static commons.sim.util.ProviderProperties.IAAS_MONITORING;
 import static commons.sim.util.ProviderProperties.IAAS_NAME;
 import static commons.sim.util.ProviderProperties.IAAS_NUMBER_OF_PROVIDERS;
@@ -54,6 +55,8 @@ import provisioning.ProfitDrivenProvisioningSystem;
 import provisioning.RanjanProvisioningSystem;
 
 import commons.cloud.Contract;
+import commons.cloud.MachineType;
+import commons.cloud.MachineTypeValue;
 import commons.cloud.Provider;
 import commons.cloud.User;
 import commons.sim.schedulingheuristics.ProfitDrivenHeuristic;
@@ -323,12 +326,12 @@ public class Configuration	extends PropertiesConfiguration{
 		int numberOfProviders = getInt(IAAS_NUMBER_OF_PROVIDERS);
 		
 		checkSizeAndContent(IAAS_NAME, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndDoubleContent(IAAS_ONDEMAND_CPU_COST, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndContent(IAAS_ONDEMAND_CPU_COST, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
 		checkSizeAndIntegerContent(IAAS_ONDEMAND_LIMIT, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndDoubleContent(IAAS_RESERVED_CPU_COST, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndContent(IAAS_RESERVED_CPU_COST, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
 		checkSizeAndIntegerContent(IAAS_RESERVED_LIMIT, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndIntegerContent(IAAS_ONE_YEAR_FEE, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndIntegerContent(IAAS_THREE_YEARS_FEE, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndContent(IAAS_ONE_YEAR_FEE, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSizeAndContent(IAAS_THREE_YEARS_FEE, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
 		checkSizeAndDoubleContent(IAAS_MONITORING, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
 		
 		checkSizeAndContent(IAAS_TRANSFER_IN, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
@@ -355,6 +358,7 @@ public class Configuration	extends PropertiesConfiguration{
 		int numberOfProviders = getInt(IAAS_NUMBER_OF_PROVIDERS);
 		String[] names = getStringArray(IAAS_NAME);
 		
+		String[] machinesType = getStringArray(IAAS_MACHINES_TYPE);
 		String[] cpuCosts = getStringArray(IAAS_ONDEMAND_CPU_COST);
 		String[] onDemandLimits = getStringArray(IAAS_ONDEMAND_LIMIT);
 		String[] reservedCpuCosts = getStringArray(IAAS_RESERVED_CPU_COST);
@@ -369,22 +373,41 @@ public class Configuration	extends PropertiesConfiguration{
 		
 		providers = new ArrayList<Provider>();
 		for(int i = 0; i < numberOfProviders; i++){
-
+			
+			MachineTypeValue[] machines = buildMachinesEnum(convertToStringArray(machinesType[i]));
+			double[] onDemandCosts = convertToDoubleArray(cpuCosts[i]);
+			double[] reservedCosts = convertToDoubleArray(reservedCpuCosts[i]);
+			long[] oneYearFees = convertToLongArray(reservationOneYearFees[i]);
+			long[] threeYearsFee = convertToLongArray(reservationThreeYearsFees[i]);
+			
+			List<MachineType> types = new ArrayList<MachineType>();
+			for (int j = 0; j < machines.length; j++) {
+				types.add(new MachineType(machines[j], onDemandCosts[j], reservedCosts[j], oneYearFees[j], threeYearsFee[j]));
+			}
+			
+			
 			long [] inLimits = convertToLongArray(transferInLimits[i]);
 			double [] inCosts = convertToDoubleArray(transferInCosts[i]);
 			long [] outLimits = convertToLongArray(transferOutLimits[i]);
 			double [] outCosts = convertToDoubleArray(transferOutCosts[i]);
 
-			providers.add(new Provider(names[i], Double.valueOf(cpuCosts[i]), Integer.valueOf(onDemandLimits[i]),
-							Integer.valueOf(reservedLimits[i]), Double.valueOf(reservedCpuCosts[i]),
-							Double.valueOf(reservationOneYearFees[i]), Double.valueOf(reservationThreeYearsFees[i]),
+			providers.add(new Provider(names[i], Integer.valueOf(onDemandLimits[i]),
+							Integer.valueOf(reservedLimits[i]),
 							Double.valueOf(monitoringCosts[i]), inLimits, inCosts, 
-							outLimits, outCosts));
+							outLimits, outCosts, types));
 		}
 	}
 
-
+	private MachineTypeValue[] buildMachinesEnum(String[] machines) {
+		MachineTypeValue[] machineTypes = new MachineTypeValue[machines.length];
+		for(int i = 0; i < machines.length; i++){
+			machineTypes[i] = MachineTypeValue.valueOf(machines[i]);
+		}
+		return machineTypes;
+	}
+	
 	// ************************************* SAAS ************************************/
+
 
 	private void verifySaaSProperties() {
 		checkIsInteger(NUMBER_OF_PLANS,getString(NUMBER_OF_PLANS));
@@ -457,6 +480,10 @@ public class Configuration	extends PropertiesConfiguration{
 		for (int i = 0; i < plans.length; i++) {
 			users.add(new User(contractsPerName.get(plans[i])));
 		}
+	}
+	
+	private String[] convertToStringArray(String pipeSeparatedString) {
+		return pipeSeparatedString.split("\\|");
 	}
 
 	private double[] convertToDoubleArray(String pipeSeparatedString) {
