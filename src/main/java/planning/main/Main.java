@@ -1,5 +1,7 @@
 package planning.main;
 
+import static commons.sim.util.SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
@@ -43,7 +45,7 @@ public class Main {
 			List<String> plan = planner.plan();
 			
 			//FIXME: Change workload! Performing plan execution!
-			Executor executor = new Executor(config.getProviders(), config.getUsers(), workloadParser, config.getSLA());
+			Executor executor = new Executor(config.getProviders(), config.getUsers(), workloadParser, config.getDouble(APPLICATION_SLA_MAX_RESPONSE_TIME));
 			executor.execute(plan);
 			
 		} catch (FileNotFoundException e) {

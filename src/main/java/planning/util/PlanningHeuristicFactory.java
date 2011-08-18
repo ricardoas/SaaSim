@@ -1,7 +1,6 @@
 package planning.util;
 
 import planning.heuristic.PlanningHeuristic;
-import provisioning.DPS;
 
 import commons.config.Configuration;
 

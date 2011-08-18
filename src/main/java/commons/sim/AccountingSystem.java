@@ -16,6 +16,7 @@ import commons.config.Configuration;
 import commons.io.GEISTWorkloadParser;
 import commons.io.TimeBasedWorkloadParser;
 import commons.sim.components.MachineDescriptor;
+import commons.sim.util.SaaSAppProperties;
 import commons.sim.util.SaaSUsersProperties;
 
 public class AccountingSystem {

@@ -1,11 +1,12 @@
 package commons.sim.schedulingheuristics;
 
+import static commons.sim.util.SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME;
+
 import java.util.List;
 
 import commons.cloud.Request;
 import commons.config.Configuration;
 import commons.sim.components.Machine;
-import commons.sim.components.ProcessorSharedMachine;
 import commons.util.Triple;
 
 public class ProfitDrivenHeuristic implements SchedulingHeuristic{
@@ -14,7 +15,7 @@ public class ProfitDrivenHeuristic implements SchedulingHeuristic{
 	
 	public ProfitDrivenHeuristic(){
 		Configuration config = Configuration.getInstance();
-		this.sla = config.getSLA();
+		this.sla = config.getDouble(APPLICATION_SLA_MAX_RESPONSE_TIME);
 	}
 	
 	/**

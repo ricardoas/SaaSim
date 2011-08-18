@@ -37,6 +37,8 @@ import commons.sim.schedulingheuristics.RoundRobinHeuristic;
  */
 public class Configuration	extends PropertiesConfiguration{
 	
+	public static final String ARRAY_SEPARATOR = "\\|";
+
 	/**
 	 * Unique instance.
 	 */
@@ -53,7 +55,6 @@ public class Configuration	extends PropertiesConfiguration{
 	 */
 	public static void buildInstance(String propertiesFileName) throws ConfigurationException{
 		instance = new Configuration(propertiesFileName);
-		instance.verifyProperties();
 	}
 
 	/**
@@ -67,6 +68,205 @@ public class Configuration	extends PropertiesConfiguration{
 		return instance;
 	}
 	
+	public int[] getIntegerArray(String propertyName) {
+		String[] stringArray = getStringArray(propertyName);
+		int [] values = new int[stringArray.length];
+		for (int i = 0; i < values.length; i++) {
+			values[i] = Integer.valueOf(stringArray[i]);
+		}
+		return values;
+	}
+
+	public long[] getLongArray(String propertyName) {
+		return parseLongArray(getStringArray(propertyName));
+	}
+
+	public long[][] getLong2DArray(String propertyName) {
+		String[] stringArray = getStringArray(propertyName);
+		long [][] values = new long[stringArray.length][];
+		for (int i = 0; i < values.length; i++) {
+			values[i] = parseLongArray(stringArray[i].split(ARRAY_SEPARATOR));
+		}
+		return values;
+	}
+
+	public double[] getDoubleArray(String propertyName) {
+		return parseDoubleArray(getStringArray(propertyName));
+	}
+
+	public double[][] getDouble2DArray(String propertyName) {
+		String[] stringArray = getStringArray(propertyName);
+		double [][] values = new double[stringArray.length][];
+		for (int i = 0; i < values.length; i++) {
+			values[i] = parseDoubleArray(stringArray[i].split(ARRAY_SEPARATOR));
+		}
+		return values;
+	}
+
+	private double[] parseDoubleArray(String[] stringValues) {
+		double [] doubleValues = new double[stringValues.length];
+		for (int j = 0; j < doubleValues.length; j++) {
+			doubleValues[j] = Double.valueOf(stringValues[j]);
+		}
+		return doubleValues;
+	}
+
+	private long[] parseLongArray(String[] stringValues) {
+		long [] doubleValues = new long[stringValues.length];
+		for (int j = 0; j < doubleValues.length; j++) {
+			doubleValues[j] = Long.valueOf(stringValues[j]);
+		}
+		return doubleValues;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends Enum<T>> T[] getEnumArray(String propertyName, Class<T> enumClass) {
+		return parseEnum(getStringArray(propertyName), enumClass);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private <T extends Enum<T>> T[] parseEnum(String[] stringValues, Class<T> enumClass) {
+		T [] enumValues = (T[]) new Enum[stringValues.length];
+		for (int j = 0; j < enumValues.length; j++) {
+			enumValues[j] = Enum.valueOf(enumClass, stringValues[j]);
+		}
+		return enumValues;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T extends Enum<T>> T[][] getEnum2DArray(String propertyName, Class<T> enumClass) {
+		String[] machines = getStringArray(propertyName);
+		T[][] machineTypes = (T[][]) new Enum[machines.length][];
+		for(int i = 0; i < machines.length; i++){
+			machineTypes[i] = parseEnum(machines[i].split(ARRAY_SEPARATOR), enumClass);
+		}
+		return machineTypes;
+	}
+
+	/**
+	 * @return
+	 */
+	public Class<?>[] getApplicationHeuristics() {
+		String[] strings = getStringArray(APPLICATION_HEURISTIC);
+		Class<?> [] heuristicClasses = new Class<?>[strings.length]; 
+		
+		for (int i = 0; i < strings.length; i++) {
+			try {
+				heuristicClasses[i] = Class.forName(strings[i]);
+			} catch (ClassNotFoundException e) {
+				throw new ConfigurationRuntimeException("Problem loading " + strings[i], e);
+			}
+		}
+		return heuristicClasses;
+	}
+
+	public Class<?> getDPSHeuristicClass() {
+		String heuristicName = getString(DPS_HEURISTIC);
+		try {
+			return Class.forName(heuristicName);
+		} catch (ClassNotFoundException e) {
+			throw new ConfigurationRuntimeException("Problem loading " + heuristicName, e);
+		}
+	}
+
+	/**
+	 * This method is responsible for reading providers properties and creating the
+	 * cloud providers to be used in simulation.
+	 * @return
+	 * @throws IOException
+	 */
+	public List<Provider> getProviders() {
+		if(this.providers == null){
+			this.readProviders();
+		}
+		
+		return this.providers;
+	}
+
+	private void readProviders() {
+		int numberOfProviders = getInt(IAAS_NUMBER_OF_PROVIDERS);
+		MachineTypeValue[] allTypes = getEnumArray(IAAS_TYPES, MachineTypeValue.class);
+		double[] power = getDoubleArray(IAAS_POWER);
+
+		String[] names = getStringArray(IAAS_PROVIDER_NAME);
+		int[] onDemandLimits = getIntegerArray(IAAS_PROVIDER_ONDEMAND_LIMIT);
+		int[] reservedLimits = getIntegerArray(IAAS_PROVIDER_RESERVED_LIMIT);
+		double[] monitoringCosts = getDoubleArray(IAAS_PROVIDER_MONITORING);
+		long[][] transferInLimits = getLong2DArray(IAAS_PROVIDER_TRANSFER_IN);
+		double[][] transferInCosts = getDouble2DArray(IAAS_PROVIDER_COST_TRANSFER_IN);
+		long[][] transferOutLimits = getLong2DArray(IAAS_PROVIDER_TRANSFER_OUT);
+		double[][] transferOutCosts = getDouble2DArray(IAAS_PROVIDER_COST_TRANSFER_OUT);
+		
+		MachineTypeValue[][] machinesType = getEnum2DArray(IAAS_PROVIDER_TYPES, MachineTypeValue.class);
+		double[][] onDemandCpuCosts = getDouble2DArray(IAAS_PROVIDER_ONDEMAND_CPU_COST);
+		double[][] reservedCpuCosts = getDouble2DArray(IAAS_PROVIDER_RESERVED_CPU_COST);
+		double[][] reservationOneYearFees = getDouble2DArray(IAAS_PROVIDER_ONE_YEAR_FEE);
+		double[][] reservationThreeYearsFees = getDouble2DArray(IAAS_PROVIDER_THREE_YEARS_FEE);
+
+		providers = new ArrayList<Provider>();
+		
+		for(int i = 0; i < numberOfProviders; i++){
+			
+			List<MachineType> types = new ArrayList<MachineType>();
+			for (int j = 0; j < machinesType[i].length; j++) {
+				types.add(new MachineType(machinesType[i][j], onDemandCpuCosts[i][j], reservedCpuCosts[i][j], 
+						reservationOneYearFees[i][j], reservationThreeYearsFees[i][j]));
+			}
+			providers.add(new Provider(names[i], onDemandLimits[i], reservedLimits[i],
+							monitoringCosts[i], transferInLimits[i], transferInCosts[i], 
+							transferOutLimits[i], transferOutCosts[i], types));
+		}
+	}
+
+	public Class<?> getPlanningHeuristicClass(){
+		String heuristicName = getString(PLANNING_HEURISTIC);
+		try {
+			return Class.forName(heuristicName);
+		} catch (ClassNotFoundException e) {
+			throw new ConfigurationRuntimeException("Problem loading " + heuristicName, e);
+		}
+	}
+
+	/**
+	 * This method is responsible for reading contracts properties and creating the
+	 * associations between contracts and users that requested the services of each contract
+	 * @return A map containing each contract name and its characterization
+	 * @throws IOException
+	 */
+	public List<User> getUsers() {
+		if(this.users == null){
+			this.readUsers();
+		}
+		
+		return this.users;
+	}
+
+	private void readUsers() {
+		
+		int numberOfPlans = getInt(NUMBER_OF_PLANS);
+		String[] planNames = getStringArray(PLAN_NAME);
+		int[] planPriorities = getIntegerArray(PLAN_PRIORITY);
+		double[] prices = getDoubleArray(PLAN_PRICE);
+		double[] setupCosts = getDoubleArray(PLAN_SETUP);
+		long[] cpuLimits = getLongArray(PLAN_CPU_LIMIT);
+		double[] extraCpuCosts = getDoubleArray(PLAN_EXTRA_CPU_COST);
+		long[][] planTransferLimits = getLong2DArray(PLAN_TRANSFER_LIMIT);
+		double[][] planExtraTransferCost = getDouble2DArray(PLAN_EXTRA_TRANSFER_COST);
+		
+		Map<String, Contract> contractsPerName = new HashMap<String, Contract>();
+		for(int i = 0; i < numberOfPlans; i++){
+			contractsPerName.put(planNames[i], 
+					new Contract(planNames[i], planPriorities[i], setupCosts[i], prices[i], 
+							cpuLimits[i], extraCpuCosts[i], planTransferLimits[i], planExtraTransferCost[i]));
+		}
+		
+		String[] plans = getStringArray(SAAS_USER_PLAN);
+		users = new ArrayList<User>();
+		for (int i = 0; i < plans.length; i++) {
+			users.add(new User(contractsPerName.get(plans[i])));
+		}
+	}
+
 	/**
 	 * Private constructor.
 	 * 
@@ -75,26 +275,27 @@ public class Configuration	extends PropertiesConfiguration{
 	 */
 	private Configuration(String propertiesFileName) throws ConfigurationException {
 		super(propertiesFileName);
+		verifyProperties();
 	}
 	
-	private void verifyProperties(){
+	private void verifyProperties() throws ConfigurationException{
 		verifySimulatorProperties();
 		verifySaaSAppProperties();
 		verifySaaSUsersProperties();
 		verifySaaSPlansProperties();
-		verifyIaaSProperties();
+		verifyIaaSProvidersProperties();
 	}
 	
 
 	// ************************************* SIMULATOR ************************************/
 	
-	private void verifySimulatorProperties() {
+	private void verifySimulatorProperties() throws ConfigurationException {
 		checkDPSHeuristic();
 		checkPlanningHeuristic();
 		Validator.checkPositive(getInt(PLANNING_PERIOD));
 	}
 	
-	private void checkDPSHeuristic() {
+	private void checkDPSHeuristic() throws ConfigurationException {
 		
 		String heuristicName = getString(DPS_HEURISTIC);
 		Validator.checkNotEmpty(getString(DPS_HEURISTIC));
@@ -117,15 +318,15 @@ public class Configuration	extends PropertiesConfiguration{
 					heuristicName = Class.forName(customHeuristicClass).getCanonicalName();
 					break;
 				default:
-					throw new ConfigurationRuntimeException("Unsupported value: " + value + " for DPSHeuristicValues.");
+					throw new ConfigurationException("Unsupported value: " + value + " for DPSHeuristicValues.");
 			}
 			setProperty(DPS_HEURISTIC, heuristicName);
 		} catch (ClassNotFoundException e) {
-			throw new ConfigurationRuntimeException("Problem loading " + customHeuristicClass, e);
+			throw new ConfigurationException("Problem loading " + customHeuristicClass, e);
 		}
 	}
 
-	private void checkPlanningHeuristic() {
+	private void checkPlanningHeuristic() throws ConfigurationException {
 		String heuristicName = getString(PLANNING_HEURISTIC);
 		Validator.checkNotEmpty(getString(PLANNING_HEURISTIC));
 		
@@ -135,7 +336,7 @@ public class Configuration	extends PropertiesConfiguration{
 			heuristicName = AGHeuristic.class.getCanonicalName();
 			break;
 		default:
-			throw new ConfigurationRuntimeException("Unsupported value: " + value + " for PlanningHeuristicValues.");
+			throw new ConfigurationException("Unsupported value: " + value + " for PlanningHeuristicValues.");
 		}
 		setProperty(PLANNING_HEURISTIC, heuristicName);
 	}
@@ -157,7 +358,7 @@ public class Configuration	extends PropertiesConfiguration{
 		checkSize(APPLICATION_HEURISTIC, APPLICATION_NUM_OF_TIERS);
 		checkSize(APPLICATION_INITIAL_SERVER_PER_TIER, APPLICATION_NUM_OF_TIERS);
 		
-		Validator.checkIsPositiveIntegerArray(getStringArray(APPLICATION_INITIAL_SERVER_PER_TIER));
+		Validator.checkIsPositiveArray(getStringArray(APPLICATION_INITIAL_SERVER_PER_TIER));
 
 //		checkSize(APPLICATION_MAX_SERVER_PER_TIER, APPLICATION_NUM_OF_TIERS);
 //		Validator.checkIsPositiveIntegerArray(getStringArray(APPLICATION_MAX_SERVER_PER_TIER));
@@ -198,7 +399,7 @@ public class Configuration	extends PropertiesConfiguration{
 
 	// ************************************* SaaS Users ************************************/
 	
-	private void verifySaaSUsersProperties() {
+	private void verifySaaSUsersProperties() throws ConfigurationException {
 		
 		Validator.checkPositive(getInt(SAAS_NUMBER_OF_USERS));
 		
@@ -208,65 +409,12 @@ public class Configuration	extends PropertiesConfiguration{
 			Validator.checkIsNonEmptyStringArray(getStringArray(SAAS_USER_WORKLOAD));
 		}else{
 			if(getStringArray(SAAS_USER_WORKLOAD).length != 0){
-				throw new ConfigurationRuntimeException("Cannot define user specific workload when " +
+				throw new ConfigurationException("Cannot define user specific workload when " +
 						"an unique workload has been already specified.");
 			}
 		}
 	}
 	
-	/**
-	 * @param propertyName
-	 * @param size
-	 */
-	private void checkSizeAndContent(String propertyName, int size, String sizeProperty) {
-		String[] values = getStringArray(propertyName);
-		checkSize(propertyName, sizeProperty);
-		for (String value : values) {
-			checkIsNotEmpty(propertyName, value);
-		}
-	}
-
-	/**
-	 * @param propertyName
-	 * @param size
-	 */
-	private void checkSizeAndIntegerContent(String propertyName, int size, String sizeProperty) {
-		String[] values = getStringArray(propertyName);
-		checkSize(propertyName, sizeProperty);
-		for (String value : values) {
-			checkIsInteger(propertyName, value);
-		}
-	}
-
-	/**
-	 * @param propertyName
-	 * @param size
-	 */
-	private void checkSizeAndDoubleContent(String propertyName, int size, String sizeProperty) {
-		String[] values = getStringArray(propertyName);
-		checkSize(propertyName, sizeProperty);
-		for (String value : values) {
-			checkIsDouble(propertyName, value);
-		}
-	}
-
-	private void checkIsNotEmpty(String propertyName, String value) {
-		if(value.trim().isEmpty()){
-			throw new ConfigurationRuntimeException("Mandatory property " + 
-					propertyName + " has no value associated with it.");
-		}
-	}
-
-	private void checkIsInteger(String propertyName, String value) {
-		checkIsNotEmpty(propertyName, value);
-		Integer.valueOf(value);
-	}
-
-	private void checkIsDouble(String propertyName, String value) {
-		checkIsNotEmpty(propertyName, value);
-		Double.valueOf(value);
-	}
-
 	private void checkSize(String propertyName, String sizePropertyName) {
 		String[] values = getStringArray(propertyName);
 		int size = getInt(sizePropertyName);
@@ -277,142 +425,50 @@ public class Configuration	extends PropertiesConfiguration{
 		}
 	}
 
-	public int[] getIntegerArray(String propertyValue) {
-		String[] stringArray = getStringArray(propertyValue);
-		int [] values = new int[stringArray.length];
-		for (int i = 0; i < values.length; i++) {
-			values[i] = Integer.valueOf(stringArray[i]);
-		}
-		return values;
-	}
-
-	/**
-	 * @return
-	 */
-	public Class<?>[] getApplicationHeuristics() {
-		String[] strings = getStringArray(APPLICATION_HEURISTIC);
-		Class<?> [] heuristicClasses = new Class<?>[strings.length]; 
-		
-		for (int i = 0; i < strings.length; i++) {
-			try {
-				heuristicClasses[i] = Class.forName(strings[i]);
-			} catch (ClassNotFoundException e) {
-				throw new ConfigurationRuntimeException("Problem loading " + strings[i], e);
-			}
-		}
-		return heuristicClasses;
-	}
-	
-	public Class<?> getDPSHeuristicClass() {
-		String heuristicName = getString(DPS_HEURISTIC);
-		try {
-			return Class.forName(heuristicName);
-		} catch (ClassNotFoundException e) {
-			throw new ConfigurationRuntimeException("Problem loading " + heuristicName, e);
-		}
-	}
 	
 	
-	// ************************************* PROVIDERS ************************************/
 	
-	private void verifyIaaSProperties() {
+	// ******************************** IAAS PROVIDERS ************************************/
+	
+	private void verifyIaaSProvidersProperties() throws ConfigurationException {
 		
-		checkIsInteger(IAAS_NUMBER_OF_PROVIDERS,getString(IAAS_NUMBER_OF_PROVIDERS));
+		Validator.checkPositive(getInt(IAAS_NUMBER_OF_PROVIDERS));
 		
-		int numberOfProviders = getInt(IAAS_NUMBER_OF_PROVIDERS);
+		Validator.checkIsEnumArray(getStringArray(IAAS_TYPES), MachineTypeValue.class);
+		Validator.checkIsPositiveDoubleArray(getStringArray(IAAS_POWER));
 		
-		checkSizeAndContent(IAAS_NAME, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndContent(IAAS_ONDEMAND_CPU_COST, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndIntegerContent(IAAS_ONDEMAND_LIMIT, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndContent(IAAS_RESERVED_CPU_COST, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndIntegerContent(IAAS_RESERVED_LIMIT, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndContent(IAAS_ONE_YEAR_FEE, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndContent(IAAS_THREE_YEARS_FEE, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndDoubleContent(IAAS_MONITORING, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		if(getStringArray(IAAS_TYPES).length != getStringArray(IAAS_POWER).length){
+			throw new ConfigurationException(IAAS_TYPES + " must have the same size of " + IAAS_POWER);
+		}
 		
-		checkSizeAndContent(IAAS_TRANSFER_IN, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndContent(IAAS_COST_TRANSFER_IN, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndContent(IAAS_TRANSFER_OUT, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
-		checkSizeAndContent(IAAS_COST_TRANSFER_OUT, numberOfProviders, IAAS_NUMBER_OF_PROVIDERS);
+		checkSize(IAAS_PROVIDER_NAME, IAAS_NUMBER_OF_PROVIDERS);
+		checkSize(IAAS_PROVIDER_ONDEMAND_CPU_COST, IAAS_NUMBER_OF_PROVIDERS);
+		checkSize(IAAS_PROVIDER_RESERVED_CPU_COST, IAAS_NUMBER_OF_PROVIDERS);
+		checkSize(IAAS_PROVIDER_ONE_YEAR_FEE, IAAS_NUMBER_OF_PROVIDERS);
+		checkSize(IAAS_PROVIDER_THREE_YEARS_FEE, IAAS_NUMBER_OF_PROVIDERS);
+		checkSize(IAAS_PROVIDER_TRANSFER_IN, IAAS_NUMBER_OF_PROVIDERS);
+		checkSize(IAAS_PROVIDER_COST_TRANSFER_IN, IAAS_NUMBER_OF_PROVIDERS);
+		checkSize(IAAS_PROVIDER_TRANSFER_OUT, IAAS_NUMBER_OF_PROVIDERS);
+		checkSize(IAAS_PROVIDER_COST_TRANSFER_OUT, IAAS_NUMBER_OF_PROVIDERS);
+		checkSize(IAAS_PROVIDER_ONDEMAND_LIMIT, IAAS_NUMBER_OF_PROVIDERS);
+		checkSize(IAAS_PROVIDER_RESERVED_LIMIT, IAAS_NUMBER_OF_PROVIDERS);
+		checkSize(IAAS_PROVIDER_MONITORING, IAAS_NUMBER_OF_PROVIDERS);
+		
+		Validator.checkIsNonEmptyStringArray(getStringArray(IAAS_PROVIDER_NAME));
+		Validator.checkIsNonNegativeDouble2DArray(getStringArray(IAAS_PROVIDER_ONDEMAND_CPU_COST), ARRAY_SEPARATOR);
+		Validator.checkIsNonNegativeDouble2DArray(getStringArray(IAAS_PROVIDER_RESERVED_CPU_COST), ARRAY_SEPARATOR);
+		Validator.checkIsNonNegativeDouble2DArray(getStringArray(IAAS_PROVIDER_ONE_YEAR_FEE), ARRAY_SEPARATOR);
+		Validator.checkIsNonNegativeDouble2DArray(getStringArray(IAAS_PROVIDER_THREE_YEARS_FEE), ARRAY_SEPARATOR);
+		Validator.checkIsNonNegative2DArray(getStringArray(IAAS_PROVIDER_TRANSFER_IN), ARRAY_SEPARATOR);
+		Validator.checkIsNonNegativeDouble2DArray(getStringArray(IAAS_PROVIDER_COST_TRANSFER_IN), ARRAY_SEPARATOR);
+		Validator.checkIsNonNegative2DArray(getStringArray(IAAS_PROVIDER_TRANSFER_OUT), ARRAY_SEPARATOR);
+		Validator.checkIsNonNegativeDouble2DArray(getStringArray(IAAS_PROVIDER_COST_TRANSFER_OUT), ARRAY_SEPARATOR);
+		Validator.checkIsNonNegativeArray(getStringArray(IAAS_PROVIDER_ONDEMAND_LIMIT));
+		Validator.checkIsNonNegativeArray(getStringArray(IAAS_PROVIDER_RESERVED_LIMIT));
+		Validator.checkIsNonNegativeDoubleArray(getStringArray(IAAS_PROVIDER_MONITORING));
 	}
 	
-	/**
-	 * This method is responsible for reading providers properties and creating the
-	 * cloud providers to be used in simulation.
-	 * @return
-	 * @throws IOException
-	 */
-	public List<Provider> getProviders() {
-		if(this.providers == null){
-			this.buildProvider();
-		}
-		
-		return this.providers;
-	}
 	
-	private void buildProvider() {
-		int numberOfProviders = getInt(IAAS_NUMBER_OF_PROVIDERS);
-		MachineTypeValue[] allTypes = buildMachinesEnum(getStringArray(IAAS_TYPES));
-		double[] power = getDoubleArray(IAAS_POWER);
-		
-		String[] names = getStringArray(IAAS_NAME);
-		
-		String[] machinesType = getStringArray(IAAS_MACHINES_TYPE);
-		String[] cpuCosts = getStringArray(IAAS_ONDEMAND_CPU_COST);
-		String[] onDemandLimits = getStringArray(IAAS_ONDEMAND_LIMIT);
-		String[] reservedCpuCosts = getStringArray(IAAS_RESERVED_CPU_COST);
-		String[] reservedLimits = getStringArray(IAAS_RESERVED_LIMIT);
-		String[] reservationOneYearFees = getStringArray(IAAS_ONE_YEAR_FEE);
-		String[] reservationThreeYearsFees = getStringArray(IAAS_THREE_YEARS_FEE);
-		String[] monitoringCosts = getStringArray(IAAS_MONITORING);
-		String[] transferInLimits = getStringArray(IAAS_TRANSFER_IN);
-		String[] transferInCosts = getStringArray(IAAS_COST_TRANSFER_IN);
-		String[] transferOutLimits = getStringArray(IAAS_TRANSFER_OUT);
-		String[] transferOutCosts = getStringArray(IAAS_COST_TRANSFER_OUT);
-		
-		providers = new ArrayList<Provider>();
-		for(int i = 0; i < numberOfProviders; i++){
-			
-			MachineTypeValue[] machines = buildMachinesEnum(convertToStringArray(machinesType[i]));
-			double[] onDemandCosts = convertToDoubleArray(cpuCosts[i]);
-			double[] reservedCosts = convertToDoubleArray(reservedCpuCosts[i]);
-			long[] oneYearFees = convertToLongArray(reservationOneYearFees[i]);
-			long[] threeYearsFee = convertToLongArray(reservationThreeYearsFees[i]);
-			
-			List<MachineType> types = new ArrayList<MachineType>();
-			for (int j = 0; j < machines.length; j++) {
-				types.add(new MachineType(machines[j], onDemandCosts[j], reservedCosts[j], oneYearFees[j], threeYearsFee[j]));
-			}
-			
-			
-			long [] inLimits = convertToLongArray(transferInLimits[i]);
-			double [] inCosts = convertToDoubleArray(transferInCosts[i]);
-			long [] outLimits = convertToLongArray(transferOutLimits[i]);
-			double [] outCosts = convertToDoubleArray(transferOutCosts[i]);
-
-			providers.add(new Provider(names[i], Integer.valueOf(onDemandLimits[i]),
-							Integer.valueOf(reservedLimits[i]),
-							Double.valueOf(monitoringCosts[i]), inLimits, inCosts, 
-							outLimits, outCosts, types));
-		}
-	}
-
-	private double[] getDoubleArray(String propertyName) {
-		String[] strings = getStringArray(propertyName);
-		double[] values = new double[strings.length];
-		for (int i = 0; i < strings.length; i++) {
-			values[i] = Double.valueOf(strings[i]);
-		}
-		return values;
-	}
-
-	private MachineTypeValue[] buildMachinesEnum(String[] machines) {
-		MachineTypeValue[] machineTypes = new MachineTypeValue[machines.length];
-		for(int i = 0; i < machines.length; i++){
-			machineTypes[i] = MachineTypeValue.valueOf(machines[i]);
-		}
-		return machineTypes;
-	}
 	
 	// ************************************* SAAS ************************************/
 
@@ -432,99 +488,12 @@ public class Configuration	extends PropertiesConfiguration{
 		Validator.checkIsNonNegativeDoubleArray(getStringArray(PLAN_PRICE));
 		Validator.checkIsNonNegativeDoubleArray(getStringArray(PLAN_SETUP));
 		Validator.checkIsNonNegativeDoubleArray(getStringArray(PLAN_EXTRA_CPU_COST));
-		Validator.checkIsNonNegativeIntegerArray(getStringArray(PLAN_CPU_LIMIT));
-		Validator.checkIsNonNegativeIntegerArray(getStringArray(PLAN_PRIORITY));
-		Validator.checkIsNonNegativeDouble2DArray(getStringArray(PLAN_EXTRA_CPU_COST), "|");
-		Validator.checkInNonNegativeInteger2DArray(getStringArray(PLAN_CPU_LIMIT), "|");
+		Validator.checkIsNonNegativeArray(getStringArray(PLAN_CPU_LIMIT));
+		Validator.checkIsNonNegativeArray(getStringArray(PLAN_PRIORITY));
+		Validator.checkIsNonNegativeDouble2DArray(getStringArray(PLAN_EXTRA_CPU_COST), ARRAY_SEPARATOR);
+		Validator.checkIsNonNegative2DArray(getStringArray(PLAN_CPU_LIMIT), ARRAY_SEPARATOR);
 	}
 
-	public Class<?> getPlanningHeuristicClass(){
-		String heuristicName = getString(PLANNING_HEURISTIC);
-		try {
-			return Class.forName(heuristicName);
-		} catch (ClassNotFoundException e) {
-			throw new ConfigurationRuntimeException("Problem loading " + heuristicName, e);
-		}
-	}
-	
-	public double getSLA(){
-		return getDouble(APPLICATION_SLA_MAX_RESPONSE_TIME, Double.MAX_VALUE);
-	}
-	
-	public long getPlanningPeriod(){
-		return getLong(PLANNING_PERIOD);
-	}
-	
-	
-	
-	/**
-	 * This method is responsible for reading contracts properties and creating the
-	 * associations between contracts and users that requested the services of each contract
-	 * @return A map containing each contract name and its characterization
-	 * @throws IOException
-	 */
-	public List<User> getUsers() {
-		if(this.users == null){
-			this.buildPlans();
-		}
-		
-		return this.users;
-	}
-	
-	private void buildPlans() {
-		
-		Map<String, Contract> contractsPerName = new HashMap<String, Contract>();
-		
-		int numberOfPlans = getInt(NUMBER_OF_PLANS);
-		String[] planNames = getStringArray(PLAN_NAME);
-		String[] planPriorities = getStringArray(PLAN_PRIORITY);
-		String[] prices = getStringArray(PLAN_PRICE);
-		String[] setupCosts = getStringArray(PLAN_SETUP);
-		String[] cpuLimits = getStringArray(PLAN_CPU_LIMIT);
-		String[] extraCpuCosts = getStringArray(PLAN_EXTRA_CPU_COST);
-		String[] planTransferLimits = getStringArray(PLAN_TRANSFER_LIMIT);
-		String[] planExtraTransferCost = getStringArray(PLAN_EXTRA_TRANSFER_COST);
-		
-		for(int i = 0; i < numberOfPlans; i++){
-			long[] limits = convertToLongArray(planTransferLimits[i]);
-			double[] costs = convertToDoubleArray(planExtraTransferCost[i]);
-
-			contractsPerName.put(planNames[i], 
-					new Contract(planNames[i], Integer.valueOf(planPriorities[i]), Double.valueOf(setupCosts[i]), Double.valueOf(prices[i]), 
-							Long.valueOf(cpuLimits[i]), Double.valueOf(extraCpuCosts[i]), limits, costs));
-		}
-		
-		//Extract users associations
-		users = new ArrayList<User>();
-		String[] plans = Configuration.getInstance().getStringArray(SAAS_USER_PLAN);
-		for (int i = 0; i < plans.length; i++) {
-			users.add(new User(contractsPerName.get(plans[i])));
-		}
-	}
-	
-	private String[] convertToStringArray(String pipeSeparatedString) {
-		return pipeSeparatedString.split("\\|");
-	}
-
-	private double[] convertToDoubleArray(String pipeSeparatedString) {
-		String[] stringValues = pipeSeparatedString.split("\\|");
-		double [] doubleValues = new double[stringValues.length];
-		for (int j = 0; j < doubleValues.length; j++) {
-			doubleValues[j] = Double.valueOf(stringValues[j]);
-		}
-		return doubleValues;
-	}
-
-	private long[] convertToLongArray(String pipeSeparatedString) {
-		String[] stringValues = pipeSeparatedString.split("\\|");
-		long [] doubleValues = new long[stringValues.length];
-		for (int j = 0; j < doubleValues.length; j++) {
-			doubleValues[j] = Long.valueOf(stringValues[j]);
-		}
-		return doubleValues;
-	}
-
-	
 	public long getMaximumNumberOfThreadsPerMachine() {
 		return getLong(RANJAN_HEURISTIC_NUMBER_OF_TOKENS, Long.MAX_VALUE);
 	}

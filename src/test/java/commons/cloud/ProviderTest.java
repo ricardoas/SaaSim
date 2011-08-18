@@ -1,6 +1,8 @@
 package commons.cloud;
 
-import static org.junit.Assert.*;
+import static commons.sim.util.SimulatorProperties.PLANNING_PERIOD;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -263,7 +265,7 @@ public class ProviderTest {
 		PowerMock.mockStatic(Configuration.class);
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config);
-		EasyMock.expect(config.getPlanningPeriod()).andReturn(1l);
+		EasyMock.expect(config.getLong(PLANNING_PERIOD)).andReturn(1l);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -303,7 +305,7 @@ public class ProviderTest {
 		PowerMock.mockStatic(Configuration.class);
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config);
-		EasyMock.expect(config.getPlanningPeriod()).andReturn(1l);
+		EasyMock.expect(config.getLong(PLANNING_PERIOD)).andReturn(1l);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -541,7 +543,7 @@ public class ProviderTest {
 		PowerMock.mockStatic(Configuration.class);
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config);
-		EasyMock.expect(config.getPlanningPeriod()).andReturn(1l);
+		EasyMock.expect(config.getLong(PLANNING_PERIOD)).andReturn(1l);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);

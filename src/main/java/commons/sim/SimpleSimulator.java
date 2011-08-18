@@ -1,6 +1,7 @@
 package commons.sim;
 
 import static commons.io.TimeBasedWorkloadParser.DAY_IN_MILLIS;
+
 import java.io.IOException;
 import java.util.List;
 

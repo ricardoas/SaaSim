@@ -1,5 +1,6 @@
 package commons.config;
 
+
 public class Validator {
 
 	public static void checkNonNegative(long value) {
@@ -20,7 +21,7 @@ public class Validator {
 		}
 	}
 
-	public static void checkIsPositiveIntegerArray(String[] values) {
+	public static void checkIsPositiveArray(String[] values) {
 		for (String value : values) {
 			checkPositive(Integer.valueOf(value));
 		}
@@ -38,13 +39,13 @@ public class Validator {
 		}
 	}
 
-	private static void checkNonNegative(Double value) {
+	public static void checkNonNegative(Double value) {
 		if (value < 0) {
 			throw new RuntimeException();
 		}
 	}
 
-	public static void checkIsNonNegativeIntegerArray(String[] values) {
+	public static void checkIsNonNegativeArray(String[] values) {
 		for (String value : values) {
 			checkNonNegative(Integer.valueOf(value));
 		}
@@ -57,10 +58,29 @@ public class Validator {
 		}
 	}
 
-	public static void checkInNonNegativeInteger2DArray(String[] values,
+	public static void checkIsNonNegative2DArray(String[] values,
 			String separator) {
 		for (String value : values) {
-			checkIsNonNegativeIntegerArray(value.split(separator));
+			checkIsNonNegativeArray(value.split(separator));
+		}
+	}
+
+	public static void checkIsPositiveDoubleArray(String[] values) {
+		for (String value : values) {
+			checkPositive(Double.valueOf(value));
+		}
+	}
+
+	public static void checkPositive(Double value) {
+		if (value <= 0) {
+			throw new RuntimeException();
+		}
+	}
+
+	public static <T extends Enum<T>> void checkIsEnumArray(String[] values,
+			Class<T> enumClass) {
+		for (String value : values) {
+			Enum.valueOf(enumClass, value);
 		}
 	}
 

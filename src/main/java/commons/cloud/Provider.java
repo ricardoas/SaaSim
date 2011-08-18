@@ -1,5 +1,7 @@
 package commons.cloud;
 
+import static commons.sim.util.SimulatorProperties.PLANNING_PERIOD;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -277,7 +279,7 @@ public class Provider {
 		cost += calcTransferenceCost(runningOut, transferOutLimits, transferOutCosts);
 		
 		if(currentNumberOfReservedResources > maximumNumberOfReservedResourcesUsed){//Charging reservation fees
-			long planningPeriod = Configuration.getInstance().getPlanningPeriod();
+			long planningPeriod = Configuration.getInstance().getLong(PLANNING_PERIOD);
 			double fee = (planningPeriod == 1) ? this.reservationOneYearFee : this.reservationThreeYearsFee;
 			cost += (currentNumberOfReservedResources - maximumNumberOfReservedResourcesUsed) * fee; 
 		}

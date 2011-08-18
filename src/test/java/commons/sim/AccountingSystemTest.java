@@ -1,5 +1,6 @@
 package commons.sim;
 
+import static commons.sim.util.SimulatorProperties.PLANNING_PERIOD;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Field;
@@ -131,7 +132,7 @@ public class AccountingSystemTest {
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
-		EasyMock.expect(config.getPlanningPeriod()).andReturn(1l);
+		EasyMock.expect(config.getLong(PLANNING_PERIOD)).andReturn(1l);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -173,7 +174,7 @@ public class AccountingSystemTest {
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
-		EasyMock.expect(config.getPlanningPeriod()).andReturn(1l);
+		EasyMock.expect(config.getLong(PLANNING_PERIOD)).andReturn(1l);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -215,7 +216,7 @@ public class AccountingSystemTest {
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
-		EasyMock.expect(config.getPlanningPeriod()).andReturn(1l);
+		EasyMock.expect(config.getLong(PLANNING_PERIOD)).andReturn(1l);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -321,7 +322,7 @@ public class AccountingSystemTest {
 		users.add(new User(contract));
 		EasyMock.expect(config.getUsers()).andReturn(users);
 		
-		EasyMock.expect(config.getPlanningPeriod()).andReturn(1l);
+		EasyMock.expect(config.getLong(PLANNING_PERIOD)).andReturn(1l);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -446,7 +447,7 @@ public class AccountingSystemTest {
 		users.add(new User(contract));
 		EasyMock.expect(config.getUsers()).andReturn(users);
 		
-		EasyMock.expect(config.getPlanningPeriod()).andReturn(1l);
+		EasyMock.expect(config.getLong(PLANNING_PERIOD)).andReturn(1l);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -493,7 +494,7 @@ public class AccountingSystemTest {
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
-		EasyMock.expect(config.getPlanningPeriod()).andReturn(1l);
+		EasyMock.expect(config.getLong(PLANNING_PERIOD)).andReturn(1l);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -539,7 +540,7 @@ public class AccountingSystemTest {
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
-		EasyMock.expect(config.getPlanningPeriod()).andReturn(1l);
+		EasyMock.expect(config.getLong(PLANNING_PERIOD)).andReturn(1l);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -585,7 +586,7 @@ public class AccountingSystemTest {
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
-		EasyMock.expect(config.getPlanningPeriod()).andReturn(1l);
+		EasyMock.expect(config.getLong(PLANNING_PERIOD)).andReturn(1l);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -631,7 +632,7 @@ public class AccountingSystemTest {
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
-		EasyMock.expect(config.getPlanningPeriod()).andReturn(1l);
+		EasyMock.expect(config.getLong(PLANNING_PERIOD)).andReturn(1l);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -679,7 +680,7 @@ public class AccountingSystemTest {
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
-		EasyMock.expect(config.getPlanningPeriod()).andReturn(1l);
+		EasyMock.expect(config.getLong(PLANNING_PERIOD)).andReturn(1l);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);

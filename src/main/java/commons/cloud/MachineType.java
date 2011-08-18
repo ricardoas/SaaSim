@@ -10,8 +10,8 @@ public class MachineType {
 	private final MachineTypeValue value;
 	private final double onDemandCpuCost;
 	private final double reservedCpuCost;
-	private final long reservationOneYearFee;
-	private final long reservationThreeYearsFee;
+	private final double reservationOneYearFee;
+	private final double reservationThreeYearsFee;
 	
 	/**
 	 * Default constructor.
@@ -22,8 +22,8 @@ public class MachineType {
 	 * @param reservationThreeYearsFee
 	 */
 	public MachineType(MachineTypeValue value, double onDemandCpuCost,
-			double reservedCpuCost, long reservationOneYearFee,
-			long reservationThreeYearsFee) {
+			double reservedCpuCost, double reservationOneYearFee,
+			double reservationThreeYearsFee) {
 		this.value = value;
 		this.onDemandCpuCost = onDemandCpuCost;
 		this.reservedCpuCost = reservedCpuCost;
@@ -43,11 +43,11 @@ public class MachineType {
 		return reservedCpuCost;
 	}
 
-	public long getReservationOneYearFee() {
+	public double getReservationOneYearFee() {
 		return reservationOneYearFee;
 	}
 
-	public long getReservationThreeYearsFee() {
+	public double getReservationThreeYearsFee() {
 		return reservationThreeYearsFee;
 	}
 }
