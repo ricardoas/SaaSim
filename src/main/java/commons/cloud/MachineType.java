@@ -43,6 +43,7 @@ public class MachineType {
 		this.reservation = reservation;
 		
 		this.runningMachines = new ArrayList<MachineDescriptor>();
+		this.finishedMachines = new ArrayList<MachineDescriptor>();
 	}
 
 	public MachineTypeValue getType() {
@@ -77,7 +78,12 @@ public class MachineType {
 	}
 
 	public MachineDescriptor buyMachine() {
-		return canBuy()?new MachineDescriptor(IDGenerator.GENERATOR.next(), true, getType()): null;
+		if(canBuy()){
+			MachineDescriptor descriptor = new MachineDescriptor(IDGenerator.GENERATOR.next(), true, getType());
+			runningMachines.add(descriptor);
+			return descriptor;
+		}
+		return null;
 	}
 
 	public boolean canBuy() {
