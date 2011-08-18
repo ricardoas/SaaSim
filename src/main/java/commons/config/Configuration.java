@@ -25,8 +25,8 @@ import provisioning.ProfitDrivenProvisioningSystem;
 import provisioning.RanjanProvisioningSystem;
 
 import commons.cloud.Contract;
+import commons.cloud.TypeProvider;
 import commons.cloud.MachineType;
-import commons.cloud.MachineTypeValue;
 import commons.cloud.Provider;
 import commons.cloud.User;
 import commons.sim.schedulingheuristics.ProfitDrivenHeuristic;
@@ -51,7 +51,7 @@ public class Configuration	extends PropertiesConfiguration{
 	
 	public List<User> users;
 
-	private HashMap<MachineTypeValue, Double> relativePower;
+	private HashMap<MachineType, Double> relativePower;
 	
 	/**
 	 * Builds the single instance of this configuration.
@@ -267,8 +267,8 @@ public class Configuration	extends PropertiesConfiguration{
 	private void readProviders() {
 		int numberOfProviders = getInt(IAAS_NUMBER_OF_PROVIDERS);
 		
-		relativePower = new HashMap<MachineTypeValue, Double>();
-		MachineTypeValue[] allTypes = getEnumArray(IAAS_TYPES, MachineTypeValue.class);
+		relativePower = new HashMap<MachineType, Double>();
+		MachineType[] allTypes = getEnumArray(IAAS_TYPES, MachineType.class);
 		double[] power = getDoubleArray(IAAS_POWER);
 		for (int i = 0; i < allTypes.length; i++) {
 			relativePower.put(allTypes[i], power[i]);
@@ -283,24 +283,24 @@ public class Configuration	extends PropertiesConfiguration{
 		long[][] transferOutLimits = getLong2DArray(IAAS_PROVIDER_TRANSFER_OUT);
 		double[][] transferOutCosts = getDouble2DArray(IAAS_PROVIDER_COST_TRANSFER_OUT);
 		
-		MachineTypeValue[][] machinesType = getEnum2DArray(IAAS_PROVIDER_TYPES, MachineTypeValue.class);
+		MachineType[][] machinesType = getEnum2DArray(IAAS_PROVIDER_TYPES, MachineType.class);
 		double[][] onDemandCpuCosts = getDouble2DArray(IAAS_PROVIDER_ONDEMAND_CPU_COST);
 		double[][] reservedCpuCosts = getDouble2DArray(IAAS_PROVIDER_RESERVED_CPU_COST);
 		double[][] reservationOneYearFees = getDouble2DArray(IAAS_PROVIDER_ONE_YEAR_FEE);
 		double[][] reservationThreeYearsFees = getDouble2DArray(IAAS_PROVIDER_THREE_YEARS_FEE);
 	
 		List<String> providersWithPlan = Arrays.asList(getStringArray(IAAS_PLAN_PROVIDER_NAME));
-		MachineTypeValue[][] machines = getEnum2DArray(IAAS_PLAN_PROVIDER_TYPES, MachineTypeValue.class);
+		MachineType[][] machines = getEnum2DArray(IAAS_PLAN_PROVIDER_TYPES, MachineType.class);
 		long[][] reservations = getLong2DArray(IAAS_PLAN_PROVIDER_RESERVATION);
 		
 		providers = new ArrayList<Provider>();
 		
 		for(int i = 0; i < numberOfProviders; i++){
 			
-			List<MachineType> types = new ArrayList<MachineType>();
+			List<TypeProvider> types = new ArrayList<TypeProvider>();
 			
 			int providerIndex = providersWithPlan.indexOf(names[i]);
-			List<MachineTypeValue> typeList = null;
+			List<MachineType> typeList = null;
 			
 			if(providerIndex == -1){
 				typeList = Arrays.asList(machines[providerIndex]);
@@ -312,7 +312,7 @@ public class Configuration	extends PropertiesConfiguration{
 					int index = typeList.indexOf(machinesType[i][j]);
 					reservation = (index == -1)? 0: reservations[i][index];
 				}
-				types.add(new MachineType(machinesType[i][j], onDemandCpuCosts[i][j], reservedCpuCosts[i][j], 
+				types.add(new TypeProvider(machinesType[i][j], onDemandCpuCosts[i][j], reservedCpuCosts[i][j], 
 						reservationOneYearFees[i][j], reservationThreeYearsFees[i][j], reservation));
 			}
 			providers.add(new Provider(names[i], onDemandLimits[i], reservedLimits[i],
@@ -470,7 +470,7 @@ public class Configuration	extends PropertiesConfiguration{
 		
 		Validator.checkPositive(IAAS_NUMBER_OF_PROVIDERS, getInt(IAAS_NUMBER_OF_PROVIDERS));
 		
-		Validator.checkIsEnumArray(IAAS_TYPES, getStringArray(IAAS_TYPES), MachineTypeValue.class);
+		Validator.checkIsEnumArray(IAAS_TYPES, getStringArray(IAAS_TYPES), MachineType.class);
 		Validator.checkIsPositiveDoubleArray(IAAS_POWER, getStringArray(IAAS_POWER));
 		
 		if(getStringArray(IAAS_TYPES).length != getStringArray(IAAS_POWER).length){

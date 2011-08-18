@@ -15,22 +15,22 @@ public class MachineTypeValueTest {
 
 	@Test
 	public void testValueOfWithExistentValue() {
-		assertEquals(MachineTypeValue.SMALL, MachineTypeValue.valueOf(MachineTypeValue.SMALL.name()));
+		assertEquals(MachineType.SMALL, MachineType.valueOf(MachineType.SMALL.name()));
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testValueOfWithInexistentValue() {
-		MachineTypeValue.valueOf("unknown");
+		MachineType.valueOf("unknown");
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testValueOfWithEmptyValue() {
-		MachineTypeValue.valueOf("");
+		MachineType.valueOf("");
 	}
 
 	@Test(expected=NullPointerException.class)
 	public void testValueOfWithNullValue() {
-		MachineTypeValue.valueOf(null);
+		MachineType.valueOf(null);
 	}
 
 }

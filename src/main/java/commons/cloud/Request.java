@@ -7,45 +7,42 @@ package commons.cloud;
  */
 public class Request{
 	
-	private final String clientID;
-	private final String userID;
+	private final String saasClient;
 	private final String reqID;
-	private final long timeInMillis;
-	private final long demandInMillis;
+	private final String userID;
+	private final long arrivalTime;
+	private final long[] cpuDemandInMillis;
 	private final long requestSizeInBytes;
 	private final long responseSizeInBytes;
-	private final int requestOption;//Indicates whether the request is a non-SSL (expired or not) or a SSL one 
-	private final String httpOperation;
-	private final String URL;
 	
 	public long totalProcessed;
+	private MachineType value;
 	
 	/**
-	 * @param clientID
-	 * @param userID
 	 * @param reqID
-	 * @param time
-	 * @param size
-	 * @param requestOption
-	 * @param httpOperation
-	 * @param URL
-	 * @param demand
+	 * @param saasClient
+	 * @param userID
+	 * @param arrivalTime
+	 * @param requestSizeInBytes
+	 * @param responseSizeInBytes
+	 * @param cpuDemandInMillis
 	 */
-	public Request(String clientID, String userID, String reqID, long time,
-			long size, int requestOption, String httpOperation, String URL, long demand) {
-		this.clientID = clientID;
-		this.userID = userID;
+	public Request(String reqID, String saasClient, String userID, long arrivalTime,
+			long requestSizeInBytes, long responseSizeInBytes, long[] cpuDemandInMillis) {
+		this.saasClient = saasClient;
 		this.reqID = reqID;
-		this.timeInMillis = time;
-		this.demandInMillis = demand;
-		this.requestSizeInBytes = size;
-		this.responseSizeInBytes = 1000000;
-		this.requestOption = requestOption;
-		this.httpOperation = httpOperation;
-		this.URL = URL;
+		this.userID = userID;
+		this.arrivalTime = arrivalTime;
+		this.requestSizeInBytes = requestSizeInBytes;
+		this.responseSizeInBytes = responseSizeInBytes;
+		this.cpuDemandInMillis = cpuDemandInMillis;
 		this.totalProcessed = 0;
 	}
 	
+	public void assignTo(MachineType value){
+		this.value = value;
+	}
+
 	/**
 	 * Updates processed demand value.<p> 
 	 * This method assumes processedDemand &leq; demandInMillis - totalProcessed
@@ -53,46 +50,21 @@ public class Request{
 	 */
 	public void update(long processedDemand){
 		if(processedDemand < 0){
-			throw new RuntimeException("Invalid process amount: "+processedDemand+" in request "+this.reqID+" "+this.clientID);
+			throw new RuntimeException("Invalid process amount: "+processedDemand+" in request "+this.reqID+" of "+this.saasClient);
 		}
 		this.totalProcessed += processedDemand;
 	}
 	
 	public boolean isFinished(){
-		return this.totalProcessed >= this.demandInMillis;//FIXME >= ??? shouldnt it be == ?
+		return getTotalToProcess() == 0;//FIXME >= ??? shouldnt it be == ?
 	}
 
 	public long getTotalToProcess() {
-		return this.demandInMillis - this.totalProcessed;
+		return getDemand() - this.totalProcessed;
 	}
-
-	public long getDemand() {
-		return demandInMillis;
-	}
-
-	/**
-	 * @return the timeInMillis
-	 */
-	public long getTimeInMillis() {
-		return timeInMillis;
-	}
-
-	/**
-	 * @return the userID
-	 */
-	public String getUserID() {
-		return userID;
-	}
-
-	/**
-	 * @return the requestSizeInBytes
-	 */
-	public long getRequestSizeInBytes() {
-		return requestSizeInBytes;
-	}
-
-	public String getRequestID(){
-		return this.reqID;
+	
+	private long getDemand(){
+		return cpuDemandInMillis[value.ordinal()];
 	}
 
 	/**
@@ -129,12 +101,7 @@ public class Request{
 
 	@Override
 	public String toString() {
-		return "Request [reqID=" + reqID + ", demandInMillis=" + demandInMillis
+		return "Request [reqID=" + reqID + ", demandInMillis=" + cpuDemandInMillis
 				+ ", totalProcessed=" + totalProcessed + "]";
-	}
-
-	
-	public long getResponseSizeInBytes() {
-		return responseSizeInBytes;
 	}
 }

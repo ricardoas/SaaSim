@@ -15,7 +15,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import provisioning.DPS;
 
-import commons.cloud.MachineTypeValue;
+import commons.cloud.MachineType;
 import commons.cloud.Request;
 import commons.config.Configuration;
 import commons.sim.jeevent.JEEvent;
@@ -46,7 +46,7 @@ public class LoadBalancerTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void handleEventNewRequestWithOneMachine() throws ConfigurationException{
-		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineTypeValue.SMALL);
+		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL);
 		
 		Request request = EasyMock.createStrictMock(Request.class);
 		JEEvent newRequestEvent = EasyMock.createStrictMock(JEEvent.class);

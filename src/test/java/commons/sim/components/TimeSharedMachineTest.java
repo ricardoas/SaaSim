@@ -15,7 +15,7 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import commons.cloud.MachineTypeValue;
+import commons.cloud.MachineType;
 import commons.cloud.Request;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
@@ -30,7 +30,7 @@ public class TimeSharedMachineTest {
 
 	@Before
 	public void setUp() throws Exception {
-		this.descriptor = new MachineDescriptor(1, false, MachineTypeValue.SMALL);
+		this.descriptor = new MachineDescriptor(1, false, MachineType.SMALL);
 	}
 
 	@After
@@ -486,10 +486,10 @@ public class TimeSharedMachineTest {
 		long reqID = 0;
 		Random random = new Random();
 		for (int i = 0; i < 70; i++) {
-			machine.sendRequest(new Request("", "", reqID+++"", 0, 0, 0, "", "", random.nextInt(500)));
+			machine.sendRequest(new Request("", reqID+++"", "", 0, 0, "", random.nextInt(500)));
 		}
 		
-		Request request = new Request("", "", reqID+++"", 0, 0, 0, "", "", random.nextInt(500));
+		Request request = new Request("", reqID+++"", "", 0, 0, "", random.nextInt(500));
 		machine.estimateFinishTime(request);
 		
 		EasyMock.verify(loadBalancer);

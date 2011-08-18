@@ -16,8 +16,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import commons.cloud.Contract;
+import commons.cloud.TypeProvider;
 import commons.cloud.MachineType;
-import commons.cloud.MachineTypeValue;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
@@ -45,7 +45,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -54,13 +54,13 @@ public class AccountingSystemTest {
 		EasyMock.replay(config);
 		
 		AccountingSystem acc = new AccountingSystem();
-		assertTrue(provider.canBuyMachine(true, MachineTypeValue.SMALL));
-		assertTrue(provider.canBuyMachine(false, MachineTypeValue.SMALL));
+		assertTrue(provider.canBuyMachine(true, MachineType.SMALL));
+		assertTrue(provider.canBuyMachine(false, MachineType.SMALL));
 		
 		MachineDescriptor descriptor = acc.buyMachine();
 		
-		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
-		assertTrue(provider.canBuyMachine(false, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(true, MachineType.SMALL));
+		assertTrue(provider.canBuyMachine(false, MachineType.SMALL));
 		
 		assertTrue(descriptor.isReserved());
 		assertEquals(0, descriptor.getStartTimeInMillis());
@@ -84,7 +84,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -93,8 +93,8 @@ public class AccountingSystemTest {
 		EasyMock.replay(config);
 		
 		AccountingSystem acc = new AccountingSystem();
-		assertTrue(provider.canBuyMachine(true, MachineTypeValue.SMALL));
-		assertTrue(provider.canBuyMachine(false, MachineTypeValue.SMALL));
+		assertTrue(provider.canBuyMachine(true, MachineType.SMALL));
+		assertTrue(provider.canBuyMachine(false, MachineType.SMALL));
 		
 		MachineDescriptor descriptor = acc.buyMachine();
 		MachineDescriptor descriptor2 = acc.buyMachine();
@@ -103,8 +103,8 @@ public class AccountingSystemTest {
 		assertEquals(0, descriptor.getStartTimeInMillis());
 		assertFalse(descriptor2.isReserved());
 		assertEquals(0, descriptor2.getStartTimeInMillis());
-		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
-		assertFalse(provider.canBuyMachine(false, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(true, MachineType.SMALL));
+		assertFalse(provider.canBuyMachine(false, MachineType.SMALL));
 		
 		PowerMock.verify(Configuration.class);
 		EasyMock.verify(config);
@@ -128,7 +128,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -170,7 +170,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -212,7 +212,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -269,7 +269,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		
@@ -309,7 +309,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		
@@ -371,7 +371,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		
@@ -434,7 +434,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		
@@ -490,7 +490,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -503,15 +503,15 @@ public class AccountingSystemTest {
 		
 		MachineDescriptor descriptor = acc.buyMachine();
 		MachineDescriptor descriptor2 = acc.buyMachine();
-		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
-		assertFalse(provider.canBuyMachine(false, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(true, MachineType.SMALL));
+		assertFalse(provider.canBuyMachine(false, MachineType.SMALL));
 		
 		//Finishing machine
 		descriptor.setFinishTimeInMillis(10 * ONE_HOUR_IN_MILLIS);
 		acc.reportMachineFinish(descriptor);
 		
-		assertTrue(provider.canBuyMachine(true, MachineTypeValue.SMALL));
-		assertFalse(provider.canBuyMachine(false, MachineTypeValue.SMALL));
+		assertTrue(provider.canBuyMachine(true, MachineType.SMALL));
+		assertFalse(provider.canBuyMachine(false, MachineType.SMALL));
 		
 		double reservedCost = reservationOneYearFee + 10 * reservedCpuCost + 10 * monitoringCost;
 		double onDemandCost = 10 * onDemandcpuCost + 10 * monitoringCost;
@@ -536,7 +536,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -549,15 +549,15 @@ public class AccountingSystemTest {
 		
 		MachineDescriptor descriptor = acc.buyMachine();
 		MachineDescriptor descriptor2 = acc.buyMachine();
-		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
-		assertFalse(provider.canBuyMachine(false, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(true, MachineType.SMALL));
+		assertFalse(provider.canBuyMachine(false, MachineType.SMALL));
 		
 		//Finishing machine
 		descriptor2.setFinishTimeInMillis(10 * ONE_HOUR_IN_MILLIS);
 		acc.reportMachineFinish(descriptor2);
 		
-		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
-		assertTrue(provider.canBuyMachine(false, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(true, MachineType.SMALL));
+		assertTrue(provider.canBuyMachine(false, MachineType.SMALL));
 		
 		double reservedCost = reservationOneYearFee + 11 * reservedCpuCost + 11 * monitoringCost;
 		double onDemandCost = 10 * onDemandcpuCost + 10 * monitoringCost;
@@ -582,7 +582,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -595,15 +595,15 @@ public class AccountingSystemTest {
 		
 		MachineDescriptor descriptor = acc.buyMachine();
 		MachineDescriptor descriptor2 = acc.buyMachine();
-		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
-		assertFalse(provider.canBuyMachine(false, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(true, MachineType.SMALL));
+		assertFalse(provider.canBuyMachine(false, MachineType.SMALL));
 		
 		//Finishing machine
 		descriptor.setFinishTimeInMillis(10 * ONE_HOUR_IN_MILLIS);
 		acc.reportMachineFinish(descriptor);
 		
-		assertTrue(provider.canBuyMachine(true, MachineTypeValue.SMALL));
-		assertFalse(provider.canBuyMachine(false, MachineTypeValue.SMALL));
+		assertTrue(provider.canBuyMachine(true, MachineType.SMALL));
+		assertFalse(provider.canBuyMachine(false, MachineType.SMALL));
 		
 		double reservedCost = reservationOneYearFee + 10 * reservedCpuCost + 10 * monitoringCost;
 		double onDemandCost = 20 * onDemandcpuCost + 20 * monitoringCost;
@@ -628,7 +628,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -641,8 +641,8 @@ public class AccountingSystemTest {
 		
 		MachineDescriptor descriptor = acc.buyMachine();
 		MachineDescriptor descriptor2 = acc.buyMachine();
-		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
-		assertFalse(provider.canBuyMachine(false, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(true, MachineType.SMALL));
+		assertFalse(provider.canBuyMachine(false, MachineType.SMALL));
 		
 		//Finishing machine
 		descriptor.setFinishTimeInMillis(10 * ONE_HOUR_IN_MILLIS);
@@ -650,8 +650,8 @@ public class AccountingSystemTest {
 		descriptor2.setFinishTimeInMillis(999 * ONE_HOUR_IN_MILLIS);
 		acc.reportMachineFinish(descriptor2);
 		
-		assertTrue(provider.canBuyMachine(true, MachineTypeValue.SMALL));
-		assertTrue(provider.canBuyMachine(false, MachineTypeValue.SMALL));
+		assertTrue(provider.canBuyMachine(true, MachineType.SMALL));
+		assertTrue(provider.canBuyMachine(false, MachineType.SMALL));
 		
 		double reservedCost = reservationOneYearFee + 10 * reservedCpuCost + 10 * monitoringCost;
 		double onDemandCost = 999 * onDemandcpuCost + 999 * monitoringCost;
@@ -676,7 +676,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -690,7 +690,7 @@ public class AccountingSystemTest {
 		assertEquals(0, descriptor.getFinishTimeInMillis());
 		
 		//Finishing inexistent machine
-		acc.reportMachineFinish(new MachineDescriptor(111, true, MachineTypeValue.SMALL));
+		acc.reportMachineFinish(new MachineDescriptor(111, true, MachineType.SMALL));
 		
 		assertEquals(0, descriptor.getFinishTimeInMillis());
 		
@@ -717,7 +717,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -726,23 +726,23 @@ public class AccountingSystemTest {
 		EasyMock.replay(config);
 		
 		AccountingSystem acc = new AccountingSystem();
-		assertTrue(provider.canBuyMachine(true, MachineTypeValue.SMALL));
-		assertTrue(provider.canBuyMachine(false, MachineTypeValue.SMALL));
+		assertTrue(provider.canBuyMachine(true, MachineType.SMALL));
+		assertTrue(provider.canBuyMachine(false, MachineType.SMALL));
 		
 		//Adding a number of machines below limits defined: 3 reserved machines
 		acc.buyMachine();
 		acc.buyMachine();
 		acc.buyMachine();
 		
-		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
-		assertTrue(provider.canBuyMachine(false, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(true, MachineType.SMALL));
+		assertTrue(provider.canBuyMachine(false, MachineType.SMALL));
 		
 		//Adding machines that reaches limits: 2 on-demand
 		acc.buyMachine();
 		acc.buyMachine();
 		
-		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
-		assertFalse(provider.canBuyMachine(false, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(true, MachineType.SMALL));
+		assertFalse(provider.canBuyMachine(false, MachineType.SMALL));
 		
 		PowerMock.verify(Configuration.class);
 		EasyMock.verify(config);
@@ -759,7 +759,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -782,22 +782,22 @@ public class AccountingSystemTest {
 		acc.buyMachine();
 		
 		//Verifying that no more machines can be added
-		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
-		assertFalse(provider.canBuyMachine(false, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(true, MachineType.SMALL));
+		assertFalse(provider.canBuyMachine(false, MachineType.SMALL));
 		
 		//Finishing some reserved machines
 		acc.reportMachineFinish(descriptor);
 		acc.reportMachineFinish(descriptor2);
 		
-		assertTrue(provider.canBuyMachine(true, MachineTypeValue.SMALL));
-		assertFalse(provider.canBuyMachine(false, MachineTypeValue.SMALL));
+		assertTrue(provider.canBuyMachine(true, MachineType.SMALL));
+		assertFalse(provider.canBuyMachine(false, MachineType.SMALL));
 		
 		//Finishing some on-demand machines
 		acc.reportMachineFinish(descriptor3);
 		acc.reportMachineFinish(descriptor4);
 		
-		assertTrue(provider.canBuyMachine(true, MachineTypeValue.SMALL));
-		assertTrue(provider.canBuyMachine(false, MachineTypeValue.SMALL));
+		assertTrue(provider.canBuyMachine(true, MachineType.SMALL));
+		assertTrue(provider.canBuyMachine(false, MachineType.SMALL));
 		
 		PowerMock.verify(Configuration.class);
 		EasyMock.verify(config);
@@ -818,7 +818,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		
@@ -934,7 +934,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		
@@ -1003,7 +1003,7 @@ public class AccountingSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		List<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("p1", onDemandLimit, reservationLimit, monitoringCost, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		

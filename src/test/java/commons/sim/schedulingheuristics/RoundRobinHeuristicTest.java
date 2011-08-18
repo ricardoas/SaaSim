@@ -10,7 +10,7 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
-import commons.cloud.MachineTypeValue;
+import commons.cloud.MachineType;
 import commons.cloud.Request;
 import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
@@ -46,7 +46,7 @@ public class RoundRobinHeuristicTest {
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false, MachineTypeValue.SMALL), null);
+		Machine machine = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false, MachineType.SMALL), null);
 		servers.add(machine);
 		
 		//Retrieving for the first time
@@ -76,9 +76,9 @@ public class RoundRobinHeuristicTest {
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false, MachineTypeValue.SMALL), null);
-		Machine machine2 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(2, false, MachineTypeValue.SMALL), null);
-		Machine machine3 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(3, false, MachineTypeValue.SMALL), null);
+		Machine machine = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false, MachineType.SMALL), null);
+		Machine machine2 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(2, false, MachineType.SMALL), null);
+		Machine machine3 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(3, false, MachineType.SMALL), null);
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);

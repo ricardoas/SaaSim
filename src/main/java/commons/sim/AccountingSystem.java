@@ -140,7 +140,7 @@ public class AccountingSystem {
 	
 	public boolean canBuyMachine(){
 		for (Provider provider : providers) {
-			if(provider.canBuyMachine(true, MachineTypeValue.SMALL) || provider.canBuyMachine(false, MachineTypeValue.SMALL)){
+			if(provider.canBuyMachine(true, MachineType.SMALL) || provider.canBuyMachine(false, MachineType.SMALL)){
 				return true;
 			}
 		}
@@ -163,8 +163,8 @@ public class AccountingSystem {
 
 	private MachineDescriptor requestOnDemandMachine() {
 		for (Provider provider : providers) {
-			if(provider.canBuyMachine(false, MachineTypeValue.SMALL)){
-				return provider.buyMachine(false, MachineTypeValue.SMALL);
+			if(provider.canBuyMachine(false, MachineType.SMALL)){
+				return provider.buyMachine(false, MachineType.SMALL);
 			}
 		}
 		return null;
@@ -172,8 +172,8 @@ public class AccountingSystem {
 
 	private MachineDescriptor requestReservedMachine() {
 		for (Provider provider : providers) {
-			if(provider.canBuyMachine(true, MachineTypeValue.SMALL)){
-				return provider.buyMachine(true, MachineTypeValue.SMALL);
+			if(provider.canBuyMachine(true, MachineType.SMALL)){
+				return provider.buyMachine(true, MachineType.SMALL);
 			}
 		}
 		return null;

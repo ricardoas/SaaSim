@@ -11,8 +11,8 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import commons.cloud.TypeProvider;
 import commons.cloud.MachineType;
-import commons.cloud.MachineTypeValue;
 import commons.cloud.Provider;
 import commons.cloud.User;
 import commons.config.Configuration;
@@ -269,7 +269,7 @@ public class RanjanProvisioningSystemTest {
 		EasyMock.replay(scheduler);
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
-		configurable.addServer(0, new MachineDescriptor(0, true, MachineTypeValue.SMALL), true);
+		configurable.addServer(0, new MachineDescriptor(0, true, MachineType.SMALL), true);
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		
 		EasyMock.replay(configurable);
@@ -280,7 +280,7 @@ public class RanjanProvisioningSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(4);
 		
 		ArrayList<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -297,8 +297,8 @@ public class RanjanProvisioningSystemTest {
 		PowerMock.verify(Configuration.class);
 		EasyMock.verify(config, configurable);
 		
-		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
-		assertTrue(provider.canBuyMachine(false, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(true, MachineType.SMALL));
+		assertTrue(provider.canBuyMachine(false, MachineType.SMALL));
 	}
 	
 	@Test
@@ -325,7 +325,7 @@ public class RanjanProvisioningSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
 		
 		ArrayList<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
@@ -379,7 +379,7 @@ public class RanjanProvisioningSystemTest {
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
 		
 		ArrayList<Provider> providers = new ArrayList<Provider>();
-		Provider provider = new Provider("1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<MachineType>());
+		Provider provider = new Provider("1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers.add(provider);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());

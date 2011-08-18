@@ -23,7 +23,7 @@ public class Provider {
 	private final String name;
 	private final int onDemandLimit;
 	private final int reservationLimit;
-	private final Map<MachineTypeValue, MachineType> types;
+	private final Map<MachineType, TypeProvider> types;
 	private final double monitoringCost;
 	private final long[] transferInLimits;
 	private final double[] transferInCosts;
@@ -38,7 +38,7 @@ public class Provider {
 			long[] transferInLimits,
 			double[] transferInCosts,
 			long[] transferOutLimits, double[] transferOutCosts,
-			List<MachineType> types) {
+			List<TypeProvider> types) {
 		this.name = name;
 		this.onDemandLimit = onDemandLimit;
 		this.reservationLimit = reservationLimit;
@@ -51,8 +51,8 @@ public class Provider {
 		this.onDemandRunningMachines = new ArrayList<MachineDescriptor>();
 		this.onDemandFinishedMachines = new ArrayList<MachineDescriptor>();
 		
-		this.types = new HashMap<MachineTypeValue, MachineType>();
-		for (MachineType machineType : types) {
+		this.types = new HashMap<MachineType, TypeProvider>();
+		for (TypeProvider machineType : types) {
 			this.types.put(machineType.getType(), machineType);
 		}
 	}
@@ -67,7 +67,7 @@ public class Provider {
 	/**
 	 * @return the onDemandCpuCost
 	 */
-	public double getOnDemandCpuCost(MachineTypeValue type) {
+	public double getOnDemandCpuCost(MachineType type) {
 		return types.get(type).getOnDemandCpuCost();
 	}
 
@@ -88,21 +88,21 @@ public class Provider {
 	/**
 	 * @return the reservedCpuCost
 	 */
-	public double getReservedCpuCost(MachineTypeValue type) {
+	public double getReservedCpuCost(MachineType type) {
 		return types.get(type).getReservedCpuCost();
 	}
 
 	/**
 	 * @return the reservationOneYearFee
 	 */
-	public double getReservationOneYearFee(MachineTypeValue type) {
+	public double getReservationOneYearFee(MachineType type) {
 		return types.get(type).getReservationOneYearFee();
 	}
 
 	/**
 	 * @return the reservationThreeYearsFee
 	 */
-	public double getReservationThreeYearsFee(MachineTypeValue type) {
+	public double getReservationThreeYearsFee(MachineType type) {
 		return types.get(type).getReservationThreeYearsFee();
 	}
 
@@ -142,7 +142,7 @@ public class Provider {
 	}
 
 
-	public boolean canBuyMachine(boolean reserved, MachineTypeValue type) {
+	public boolean canBuyMachine(boolean reserved, MachineType type) {
 		if(!reserved){
 			return onDemandRunningMachines.size() < getOnDemandLimit();
 		}
@@ -152,10 +152,10 @@ public class Provider {
 	/**
 	 * Buy a new machine in this {@link Provider}.
 	 * @param isReserved <code>true</code> if such machine is a previously reserved one. 
-	 * @param instanceType See {@link MachineTypeValue}
+	 * @param instanceType See {@link MachineType}
 	 * @return A new {@link MachineDescriptor} if succeeded in creation, or <code>null</code> otherwise.
 	 */
-	public MachineDescriptor buyMachine(boolean isReserved, MachineTypeValue instanceType) {
+	public MachineDescriptor buyMachine(boolean isReserved, MachineType instanceType) {
 		if(!isReserved){
 			MachineDescriptor descriptor = new MachineDescriptor(IDGenerator.GENERATOR.next(), isReserved, instanceType);
 			this.onDemandRunningMachines.add(descriptor);
