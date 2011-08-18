@@ -88,6 +88,13 @@ public class Validator {
 		}
 	}
 
+	public static void checkIsNonEmptyString2DArray(String propertyName, String[] values,
+			String separator) throws ConfigurationException {
+		for (String value : values) {
+			checkIsNonEmptyStringArray(propertyName, value.split(separator));
+		}
+	}
+
 	public static void checkIsPositiveDoubleArray(String propertyName, String[] values) throws ConfigurationException {
 		for (String value : values) {
 			try{

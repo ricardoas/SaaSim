@@ -10,31 +10,29 @@ import java.util.Map.Entry;
 
 import commons.config.Configuration;
 import commons.io.TimeBasedWorkloadParser;
+import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 
+/**
+ * IaaS {@link Machine} provider.
+ * 
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ */
 public class Provider {
 	
-	
-	protected static int machineIDGenerator = 0;
-	
-	private int currentOnDemandMachines;
-	private int currentReservedMachines;
-
-	public final String name;
-	public final int onDemandLimit;// in number of instances
-	public final int reservationLimit;// in number of instances
+	private final String name;
+	private final int onDemandLimit;
+	private final int reservationLimit;
 	private final Map<MachineTypeValue, MachineType> types;
-	public final double monitoringCost;// in $
+	private final double monitoringCost;
 	private final long[] transferInLimits;
 	private final double[] transferInCosts;
 	private final long[] transferOutLimits;
 	private final double[] transferOutCosts;
 	
-	private Map<Long, MachineDescriptor> runningMachines;
-	private List<MachineDescriptor> finishedMachines;
+	private List<MachineDescriptor> onDemandRunningMachines;
+	private List<MachineDescriptor> onDemandFinishedMachines;
 	
-	private int totalNumberOfReservedMachinesUsed;
-
 	public Provider(String name, int onDemandLimit,
 			int reservationLimit, double monitoringCost,
 			long[] transferInLimits,
@@ -49,40 +47,13 @@ public class Provider {
 		this.transferInCosts = transferInCosts;
 		this.transferOutLimits = transferOutLimits;
 		this.transferOutCosts = transferOutCosts;
-		this.verifyProperties();
 		
-		this.currentOnDemandMachines = 0;
-		this.currentReservedMachines = 0;
-		
-		this.runningMachines = new HashMap<Long, MachineDescriptor>();
-		this.finishedMachines = new ArrayList<MachineDescriptor>();
-		this.totalNumberOfReservedMachinesUsed = 0;
+		this.onDemandRunningMachines = new ArrayList<MachineDescriptor>();
+		this.onDemandFinishedMachines = new ArrayList<MachineDescriptor>();
 		
 		this.types = new HashMap<MachineTypeValue, MachineType>();
 		for (MachineType machineType : types) {
-			this.types.put(machineType.getValue(), machineType);
-		}
-	}
-
-	private void verifyProperties() {
-		
-		for (Entry<MachineTypeValue, MachineType> entry : types.entrySet()) {
-			MachineType type = entry.getValue();
-
-			if(type.getOnDemandCpuCost() < 0 || type.getReservedCpuCost() < 0){
-				throw new RuntimeException(this.getClass()+": Invalid cpu/hour cost!");
-			}
-			if(type.getReservationOneYearFee() < 0 || type.getReservationThreeYearsFee() < 0){
-				throw new RuntimeException(this.getClass()+": Invalid reservation fees!");
-			}
-		}
-		
-		if(this.reservationLimit <= 0 || this.onDemandLimit <= 0){
-			throw new RuntimeException(this.getClass()+": Invalid on-demand/reserved limit!");
-		}
-		
-		if(this.monitoringCost < 0){
-			throw new RuntimeException(this.getClass()+": Invalid monitoring cost!");
+			this.types.put(machineType.getType(), machineType);
 		}
 	}
 
@@ -171,33 +142,39 @@ public class Provider {
 	}
 
 
-	public boolean canBuyMachine(boolean reserved) {
-		return reserved ? currentReservedMachines < reservationLimit: currentOnDemandMachines < onDemandLimit;
+	public boolean canBuyMachine(boolean reserved, MachineTypeValue type) {
+		if(!reserved){
+			return onDemandRunningMachines.size() < getOnDemandLimit();
+		}
+		return types.containsKey(type)?types.get(type).canBuy():false;
 	}
 	
-	public MachineDescriptor buyMachine(boolean reserved) {
-		if(reserved){
-			currentReservedMachines++;
-		}else{
-			currentOnDemandMachines++;
+	/**
+	 * Buy a new machine in this {@link Provider}.
+	 * @param isReserved <code>true</code> if such machine is a previously reserved one. 
+	 * @param instanceType See {@link MachineTypeValue}
+	 * @return A new {@link MachineDescriptor} if succeeded in creation, or <code>null</code> otherwise.
+	 */
+	public MachineDescriptor buyMachine(boolean isReserved, MachineTypeValue instanceType) {
+		if(!isReserved){
+			MachineDescriptor descriptor = new MachineDescriptor(IDGenerator.GENERATOR.next(), isReserved, instanceType);
+			this.onDemandRunningMachines.add(descriptor);
+			return descriptor;
 		}
-		MachineDescriptor descriptor = new MachineDescriptor(machineIDGenerator++, reserved, MachineTypeValue.SMALL);
-		this.runningMachines.put(descriptor.getMachineID(), descriptor);
-		
-		return descriptor;
+		if(!types.containsKey(instanceType)){
+			throw new RuntimeException("Attempt to buy a machine of type " + instanceType + " at provider: " + getName());
+		}
+		return types.get(instanceType).buyMachine();
 	}
 
 	public boolean shutdownMachine(MachineDescriptor machineDescriptor) {
-		if(runningMachines.remove(machineDescriptor.getMachineID()) == null){
-			return false;
-		}
-		finishedMachines.add(machineDescriptor);
 		if(machineDescriptor.isReserved()){
-			currentReservedMachines--;
-		}else{
-			currentOnDemandMachines--;
+			if(!types.containsKey(machineDescriptor.getType())){
+				return false;
+			}
+			return types.get(machineDescriptor.getType()).shutdownMachine(machineDescriptor);
 		}
-		return true;
+		return onDemandRunningMachines.remove(machineDescriptor.getMachineID());
 	}
 	
 	private double calculateCost(MachineDescriptor descriptor){
@@ -209,9 +186,9 @@ public class Provider {
 		}
 		
 		if(descriptor.isReserved()){
-			return executionTime * types.get(descriptor.getType()).getReservedCpuCost() + executionTime * monitoringCost;
+			return executionTime * types.get(descriptor.getType()).getReservedCpuCost() + executionTime * getMonitoringCost();
 		}else{
-			return executionTime * types.get(descriptor.getType()).getOnDemandCpuCost() + executionTime * monitoringCost;
+			return executionTime * types.get(descriptor.getType()).getOnDemandCpuCost() + executionTime * getMonitoringCost();
 		}
 	}
 	
@@ -224,9 +201,9 @@ public class Provider {
 		}
 		
 		if(descriptor.isReserved()){
-			return executionTime * types.get(descriptor.getType()).getReservedCpuCost() + executionTime * monitoringCost;
+			return executionTime * types.get(descriptor.getType()).getReservedCpuCost() + executionTime * getMonitoringCost();
 		}else{
-			return executionTime * types.get(descriptor.getType()).getOnDemandCpuCost() + executionTime * monitoringCost;
+			return executionTime * types.get(descriptor.getType()).getOnDemandCpuCost() + executionTime * getMonitoringCost();
 		}
 	}
 
@@ -237,7 +214,7 @@ public class Provider {
 		int currentNumberOfReservedResources = 0;
 		
 		//Finished machines
-		for (MachineDescriptor descriptor : finishedMachines) {
+		for (MachineDescriptor descriptor : onDemandFinishedMachines) {
 			cost += calculateCost(descriptor);
 			inTransference += descriptor.getInTransference();
 			outTransference += descriptor.getOutTransference();
@@ -253,7 +230,7 @@ public class Provider {
 		long runningIn = 0;
 		long runningOut = 0;
 		
-		for(MachineDescriptor descriptor : runningMachines.values()){
+		for(MachineDescriptor descriptor : onDemandRunningMachines.values()){
 			double currentCost = calculateCost(descriptor, currentTimeInMillis);
 			double alreadyPayed = descriptor.getCostAlreadyPayed();
 			descriptor.setCostAlreadyPayed(currentCost);
@@ -302,7 +279,7 @@ public class Provider {
 	}
 
 	public void resetCostCounters(){
-		this.finishedMachines.clear();
+		this.onDemandFinishedMachines.clear();
 	}
 	
 	public double calculateUnicCost() {
@@ -318,7 +295,7 @@ public class Provider {
 		int numberOfOnDemandResources = 0;
 		int numberOfReservedResources = 0;
 		
-		for(MachineDescriptor descriptor : this.finishedMachines){
+		for(MachineDescriptor descriptor : this.onDemandFinishedMachines){
 			long executionTime = descriptor.getFinishTimeInMillis() - descriptor.getStartTimeInMillis();
 			if(executionTime < 0){
 				throw new RuntimeException("Invalid cpu usage in machine "+descriptor.getMachineID()+" : "+executionTime);

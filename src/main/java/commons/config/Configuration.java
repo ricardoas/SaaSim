@@ -1,6 +1,7 @@
 package commons.config;
 
 import static commons.sim.util.IaaSProvidersProperties.*;
+import static commons.sim.util.IaaSPlanProperties.*;
 import static commons.sim.util.SaaSAppProperties.*;
 import static commons.sim.util.SaaSPlanProperties.*;
 import static commons.sim.util.SaaSUsersProperties.*;
@@ -8,7 +9,9 @@ import static commons.sim.util.SimulatorProperties.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +50,8 @@ public class Configuration	extends PropertiesConfiguration{
 	private List<Provider> providers;
 	
 	public List<User> users;
+
+	private HashMap<MachineTypeValue, Double> relativePower;
 	
 	/**
 	 * Builds the single instance of this configuration.
@@ -119,11 +124,19 @@ public class Configuration	extends PropertiesConfiguration{
 		return doubleValues;
 	}
 
-	@SuppressWarnings("unchecked")
 	public <T extends Enum<T>> T[] getEnumArray(String propertyName, Class<T> enumClass) {
 		return parseEnum(getStringArray(propertyName), enumClass);
 	}
 	
+	public String[][] getString2DArray(String propertyName) {
+		String[] stringArray = getStringArray(propertyName);
+		String[][] values = new String[stringArray.length][];
+		for (int i = 0; i < values.length; i++) {
+			values[i] = stringArray[i].split(ARRAY_SEPARATOR);
+		}
+		return values;
+	}
+
 	@SuppressWarnings("unchecked")
 	private <T extends Enum<T>> T[] parseEnum(String[] stringValues, Class<T> enumClass) {
 		T [] enumValues = (T[]) new Enum[stringValues.length];
@@ -176,46 +189,7 @@ public class Configuration	extends PropertiesConfiguration{
 	 * @throws IOException
 	 */
 	public List<Provider> getProviders() {
-		if(this.providers == null){
-			this.readProviders();
-		}
-		
 		return this.providers;
-	}
-
-	private void readProviders() {
-		int numberOfProviders = getInt(IAAS_NUMBER_OF_PROVIDERS);
-		MachineTypeValue[] allTypes = getEnumArray(IAAS_TYPES, MachineTypeValue.class);
-		double[] power = getDoubleArray(IAAS_POWER);
-
-		String[] names = getStringArray(IAAS_PROVIDER_NAME);
-		int[] onDemandLimits = getIntegerArray(IAAS_PROVIDER_ONDEMAND_LIMIT);
-		int[] reservedLimits = getIntegerArray(IAAS_PROVIDER_RESERVED_LIMIT);
-		double[] monitoringCosts = getDoubleArray(IAAS_PROVIDER_MONITORING);
-		long[][] transferInLimits = getLong2DArray(IAAS_PROVIDER_TRANSFER_IN);
-		double[][] transferInCosts = getDouble2DArray(IAAS_PROVIDER_COST_TRANSFER_IN);
-		long[][] transferOutLimits = getLong2DArray(IAAS_PROVIDER_TRANSFER_OUT);
-		double[][] transferOutCosts = getDouble2DArray(IAAS_PROVIDER_COST_TRANSFER_OUT);
-		
-		MachineTypeValue[][] machinesType = getEnum2DArray(IAAS_PROVIDER_TYPES, MachineTypeValue.class);
-		double[][] onDemandCpuCosts = getDouble2DArray(IAAS_PROVIDER_ONDEMAND_CPU_COST);
-		double[][] reservedCpuCosts = getDouble2DArray(IAAS_PROVIDER_RESERVED_CPU_COST);
-		double[][] reservationOneYearFees = getDouble2DArray(IAAS_PROVIDER_ONE_YEAR_FEE);
-		double[][] reservationThreeYearsFees = getDouble2DArray(IAAS_PROVIDER_THREE_YEARS_FEE);
-
-		providers = new ArrayList<Provider>();
-		
-		for(int i = 0; i < numberOfProviders; i++){
-			
-			List<MachineType> types = new ArrayList<MachineType>();
-			for (int j = 0; j < machinesType[i].length; j++) {
-				types.add(new MachineType(machinesType[i][j], onDemandCpuCosts[i][j], reservedCpuCosts[i][j], 
-						reservationOneYearFees[i][j], reservationThreeYearsFees[i][j]));
-			}
-			providers.add(new Provider(names[i], onDemandLimits[i], reservedLimits[i],
-							monitoringCosts[i], transferInLimits[i], transferInCosts[i], 
-							transferOutLimits[i], transferOutCosts[i], types));
-		}
 	}
 
 	public Class<?> getPlanningHeuristicClass(){
@@ -234,12 +208,35 @@ public class Configuration	extends PropertiesConfiguration{
 	 * @throws IOException
 	 */
 	public List<User> getUsers() {
-		if(this.users == null){
-			this.readUsers();
-		}
-		
 		return this.users;
 	}
+
+	/**
+	 * Private constructor.
+	 * 
+	 * @param propertiesFileName
+	 * @throws ConfigurationException
+	 */
+	private Configuration(String propertiesFileName) throws ConfigurationException {
+		super(propertiesFileName);
+		verifyProperties();
+		parseProperties();
+	}
+	
+	private void verifyProperties() throws ConfigurationException{
+		verifySimulatorProperties();
+		verifySaaSAppProperties();
+		verifySaaSUsersProperties();
+		verifySaaSPlansProperties();
+		verifyIaaSProvidersProperties();
+		verifyIaaSPlanProperties();
+	}
+	
+	private void parseProperties() {
+		readUsers();
+		readProviders();
+	}
+	
 
 	private void readUsers() {
 		
@@ -267,25 +264,64 @@ public class Configuration	extends PropertiesConfiguration{
 		}
 	}
 
-	/**
-	 * Private constructor.
-	 * 
-	 * @param propertiesFileName
-	 * @throws ConfigurationException
-	 */
-	private Configuration(String propertiesFileName) throws ConfigurationException {
-		super(propertiesFileName);
-		verifyProperties();
-	}
+	private void readProviders() {
+		int numberOfProviders = getInt(IAAS_NUMBER_OF_PROVIDERS);
+		
+		relativePower = new HashMap<MachineTypeValue, Double>();
+		MachineTypeValue[] allTypes = getEnumArray(IAAS_TYPES, MachineTypeValue.class);
+		double[] power = getDoubleArray(IAAS_POWER);
+		for (int i = 0; i < allTypes.length; i++) {
+			relativePower.put(allTypes[i], power[i]);
+		}
 	
-	private void verifyProperties() throws ConfigurationException{
-		verifySimulatorProperties();
-		verifySaaSAppProperties();
-		verifySaaSUsersProperties();
-		verifySaaSPlansProperties();
-		verifyIaaSProvidersProperties();
-	}
+		String[] names = getStringArray(IAAS_PROVIDER_NAME);
+		int[] onDemandLimits = getIntegerArray(IAAS_PROVIDER_ONDEMAND_LIMIT);
+		int[] reservedLimits = getIntegerArray(IAAS_PROVIDER_RESERVED_LIMIT);
+		double[] monitoringCosts = getDoubleArray(IAAS_PROVIDER_MONITORING);
+		long[][] transferInLimits = getLong2DArray(IAAS_PROVIDER_TRANSFER_IN);
+		double[][] transferInCosts = getDouble2DArray(IAAS_PROVIDER_COST_TRANSFER_IN);
+		long[][] transferOutLimits = getLong2DArray(IAAS_PROVIDER_TRANSFER_OUT);
+		double[][] transferOutCosts = getDouble2DArray(IAAS_PROVIDER_COST_TRANSFER_OUT);
+		
+		MachineTypeValue[][] machinesType = getEnum2DArray(IAAS_PROVIDER_TYPES, MachineTypeValue.class);
+		double[][] onDemandCpuCosts = getDouble2DArray(IAAS_PROVIDER_ONDEMAND_CPU_COST);
+		double[][] reservedCpuCosts = getDouble2DArray(IAAS_PROVIDER_RESERVED_CPU_COST);
+		double[][] reservationOneYearFees = getDouble2DArray(IAAS_PROVIDER_ONE_YEAR_FEE);
+		double[][] reservationThreeYearsFees = getDouble2DArray(IAAS_PROVIDER_THREE_YEARS_FEE);
 	
+		List<String> providersWithPlan = Arrays.asList(getStringArray(IAAS_PLAN_PROVIDER_NAME));
+		MachineTypeValue[][] machines = getEnum2DArray(IAAS_PLAN_PROVIDER_TYPES, MachineTypeValue.class);
+		long[][] reservations = getLong2DArray(IAAS_PLAN_PROVIDER_RESERVATION);
+		
+		providers = new ArrayList<Provider>();
+		
+		for(int i = 0; i < numberOfProviders; i++){
+			
+			List<MachineType> types = new ArrayList<MachineType>();
+			
+			int providerIndex = providersWithPlan.indexOf(names[i]);
+			List<MachineTypeValue> typeList = null;
+			
+			if(providerIndex == -1){
+				typeList = Arrays.asList(machines[providerIndex]);
+			}
+			
+			for (int j = 0; j < machinesType[i].length; j++) {
+				long reservation = 0;
+				if(providerIndex == -1){
+					int index = typeList.indexOf(machinesType[i][j]);
+					reservation = (index == -1)? 0: reservations[i][index];
+				}
+				types.add(new MachineType(machinesType[i][j], onDemandCpuCosts[i][j], reservedCpuCosts[i][j], 
+						reservationOneYearFees[i][j], reservationThreeYearsFees[i][j], reservation));
+			}
+			providers.add(new Provider(names[i], onDemandLimits[i], reservedLimits[i],
+							monitoringCosts[i], transferInLimits[i], transferInCosts[i], 
+							transferOutLimits[i], transferOutCosts[i], types));
+		}
+		
+		
+	}
 
 	// ************************************* SIMULATOR ************************************/
 	
@@ -493,13 +529,37 @@ public class Configuration	extends PropertiesConfiguration{
 		Validator.checkIsNonNegativeDouble2DArray(PLAN_EXTRA_CPU_COST, getStringArray(PLAN_EXTRA_CPU_COST), ARRAY_SEPARATOR);
 		Validator.checkIsNonNegative2DArray(PLAN_CPU_LIMIT, getStringArray(PLAN_CPU_LIMIT), ARRAY_SEPARATOR);
 	}
-
-	public long getMaximumNumberOfThreadsPerMachine() {
-		return getLong(RANJAN_HEURISTIC_NUMBER_OF_TOKENS, Long.MAX_VALUE);
-	}
-
-	public long getMaximumBacklogSize() {
-		return getLong(RANJAN_HEURISTIC_BACKLOG_SIZE, Long.MAX_VALUE);
-	}
 	
+	// ******************************** IAAS PLAN ************************************/
+	
+	private void verifyIaaSPlanProperties() throws ConfigurationException {
+		String[] providersWithPlan = getStringArray(IAAS_PLAN_PROVIDER_NAME);
+		String[][] machines = getString2DArray(IAAS_PLAN_PROVIDER_TYPES);
+		long[][] reservation = getLong2DArray(IAAS_PLAN_PROVIDER_RESERVATION);
+		
+		if(providersWithPlan.length != machines.length){
+			throw new ConfigurationException("Number of values in " + IAAS_PLAN_PROVIDER_NAME + " must be the same of " + IAAS_PLAN_PROVIDER_TYPES);
+		}
+		
+		if(providersWithPlan.length != reservation.length){
+			throw new ConfigurationException("Number of values in " + IAAS_PLAN_PROVIDER_NAME + " must be the same of " + IAAS_PLAN_PROVIDER_RESERVATION);
+		}
+		
+		for (int i = 0; i < machines.length; i++) {
+			if(machines[i].length != reservation[i].length){
+				throw new ConfigurationException("Number of values in " + IAAS_PLAN_PROVIDER_TYPES + " must be the same of " + IAAS_PLAN_PROVIDER_RESERVATION);
+			}
+		}
+		
+		Validator.checkIsNonEmptyStringArray(IAAS_PLAN_PROVIDER_NAME, providersWithPlan);
+		Validator.checkIsNonEmptyString2DArray(IAAS_PLAN_PROVIDER_TYPES, providersWithPlan, ARRAY_SEPARATOR);
+		
+		HashSet<String> set = new HashSet<String>(Arrays.asList(getStringArray(IAAS_PROVIDER_NAME)));
+		for (String provider : providersWithPlan) {
+			if(!set.contains(provider)){
+				throw new ConfigurationException("Provider " + provider + " need to be defined at providers configuration file.");
+			}
+		}
+		
+	}
 }

@@ -1,5 +1,8 @@
 package commons.sim.components;
 
+import static commons.sim.util.SimulatorProperties.*;
+import static commons.sim.util.SimulatorProperties.RANJAN_HEURISTIC_BACKLOG_SIZE;
+
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -31,8 +34,8 @@ public class RanjanMachine extends TimeSharedMachine {
 	public RanjanMachine(JEEventScheduler scheduler, MachineDescriptor descriptor, LoadBalancer loadBalancer){
 		super(scheduler, descriptor, loadBalancer);
 		this.backlog = new LinkedList<Request>();
-		this.maximumNumberOfSimultaneousThreads = Configuration.getInstance().getMaximumNumberOfThreadsPerMachine();
-		this.backlogMaximumNumberOfRequests = Configuration.getInstance().getMaximumBacklogSize();
+		this.maximumNumberOfSimultaneousThreads = Configuration.getInstance().getLong(RANJAN_HEURISTIC_NUMBER_OF_TOKENS);
+		this.backlogMaximumNumberOfRequests = Configuration.getInstance().getLong(RANJAN_HEURISTIC_BACKLOG_SIZE);
 	}
 	
 	/**

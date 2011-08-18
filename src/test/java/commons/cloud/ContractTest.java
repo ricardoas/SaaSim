@@ -4,10 +4,15 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import commons.config.Configuration;
+
 /**
  * This class contains tests for the Contract entity between a SaaS user and a SaaS provider.
+ * As {@link Contract} does not contains validation (assumed to be done by the {@link Configuration}
+ * during loading), creation is not tested. 
+ * 
  * @author davidcmm
- *
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public class ContractTest {
 	

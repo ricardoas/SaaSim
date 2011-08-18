@@ -54,13 +54,13 @@ public class AccountingSystemTest {
 		EasyMock.replay(config);
 		
 		AccountingSystem acc = new AccountingSystem();
-		assertTrue(provider.canBuyMachine(true));
-		assertTrue(provider.canBuyMachine(false));
+		assertTrue(provider.canBuyMachine(true, MachineTypeValue.SMALL));
+		assertTrue(provider.canBuyMachine(false, MachineTypeValue.SMALL));
 		
 		MachineDescriptor descriptor = acc.buyMachine();
 		
-		assertFalse(provider.canBuyMachine(true));
-		assertTrue(provider.canBuyMachine(false));
+		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
+		assertTrue(provider.canBuyMachine(false, MachineTypeValue.SMALL));
 		
 		assertTrue(descriptor.isReserved());
 		assertEquals(0, descriptor.getStartTimeInMillis());
@@ -93,8 +93,8 @@ public class AccountingSystemTest {
 		EasyMock.replay(config);
 		
 		AccountingSystem acc = new AccountingSystem();
-		assertTrue(provider.canBuyMachine(true));
-		assertTrue(provider.canBuyMachine(false));
+		assertTrue(provider.canBuyMachine(true, MachineTypeValue.SMALL));
+		assertTrue(provider.canBuyMachine(false, MachineTypeValue.SMALL));
 		
 		MachineDescriptor descriptor = acc.buyMachine();
 		MachineDescriptor descriptor2 = acc.buyMachine();
@@ -103,8 +103,8 @@ public class AccountingSystemTest {
 		assertEquals(0, descriptor.getStartTimeInMillis());
 		assertFalse(descriptor2.isReserved());
 		assertEquals(0, descriptor2.getStartTimeInMillis());
-		assertFalse(provider.canBuyMachine(true));
-		assertFalse(provider.canBuyMachine(false));
+		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(false, MachineTypeValue.SMALL));
 		
 		PowerMock.verify(Configuration.class);
 		EasyMock.verify(config);
@@ -503,15 +503,15 @@ public class AccountingSystemTest {
 		
 		MachineDescriptor descriptor = acc.buyMachine();
 		MachineDescriptor descriptor2 = acc.buyMachine();
-		assertFalse(provider.canBuyMachine(true));
-		assertFalse(provider.canBuyMachine(false));
+		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(false, MachineTypeValue.SMALL));
 		
 		//Finishing machine
 		descriptor.setFinishTimeInMillis(10 * ONE_HOUR_IN_MILLIS);
 		acc.reportMachineFinish(descriptor);
 		
-		assertTrue(provider.canBuyMachine(true));
-		assertFalse(provider.canBuyMachine(false));
+		assertTrue(provider.canBuyMachine(true, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(false, MachineTypeValue.SMALL));
 		
 		double reservedCost = reservationOneYearFee + 10 * reservedCpuCost + 10 * monitoringCost;
 		double onDemandCost = 10 * onDemandcpuCost + 10 * monitoringCost;
@@ -549,15 +549,15 @@ public class AccountingSystemTest {
 		
 		MachineDescriptor descriptor = acc.buyMachine();
 		MachineDescriptor descriptor2 = acc.buyMachine();
-		assertFalse(provider.canBuyMachine(true));
-		assertFalse(provider.canBuyMachine(false));
+		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(false, MachineTypeValue.SMALL));
 		
 		//Finishing machine
 		descriptor2.setFinishTimeInMillis(10 * ONE_HOUR_IN_MILLIS);
 		acc.reportMachineFinish(descriptor2);
 		
-		assertFalse(provider.canBuyMachine(true));
-		assertTrue(provider.canBuyMachine(false));
+		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
+		assertTrue(provider.canBuyMachine(false, MachineTypeValue.SMALL));
 		
 		double reservedCost = reservationOneYearFee + 11 * reservedCpuCost + 11 * monitoringCost;
 		double onDemandCost = 10 * onDemandcpuCost + 10 * monitoringCost;
@@ -595,15 +595,15 @@ public class AccountingSystemTest {
 		
 		MachineDescriptor descriptor = acc.buyMachine();
 		MachineDescriptor descriptor2 = acc.buyMachine();
-		assertFalse(provider.canBuyMachine(true));
-		assertFalse(provider.canBuyMachine(false));
+		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(false, MachineTypeValue.SMALL));
 		
 		//Finishing machine
 		descriptor.setFinishTimeInMillis(10 * ONE_HOUR_IN_MILLIS);
 		acc.reportMachineFinish(descriptor);
 		
-		assertTrue(provider.canBuyMachine(true));
-		assertFalse(provider.canBuyMachine(false));
+		assertTrue(provider.canBuyMachine(true, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(false, MachineTypeValue.SMALL));
 		
 		double reservedCost = reservationOneYearFee + 10 * reservedCpuCost + 10 * monitoringCost;
 		double onDemandCost = 20 * onDemandcpuCost + 20 * monitoringCost;
@@ -641,8 +641,8 @@ public class AccountingSystemTest {
 		
 		MachineDescriptor descriptor = acc.buyMachine();
 		MachineDescriptor descriptor2 = acc.buyMachine();
-		assertFalse(provider.canBuyMachine(true));
-		assertFalse(provider.canBuyMachine(false));
+		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(false, MachineTypeValue.SMALL));
 		
 		//Finishing machine
 		descriptor.setFinishTimeInMillis(10 * ONE_HOUR_IN_MILLIS);
@@ -650,8 +650,8 @@ public class AccountingSystemTest {
 		descriptor2.setFinishTimeInMillis(999 * ONE_HOUR_IN_MILLIS);
 		acc.reportMachineFinish(descriptor2);
 		
-		assertTrue(provider.canBuyMachine(true));
-		assertTrue(provider.canBuyMachine(false));
+		assertTrue(provider.canBuyMachine(true, MachineTypeValue.SMALL));
+		assertTrue(provider.canBuyMachine(false, MachineTypeValue.SMALL));
 		
 		double reservedCost = reservationOneYearFee + 10 * reservedCpuCost + 10 * monitoringCost;
 		double onDemandCost = 999 * onDemandcpuCost + 999 * monitoringCost;
@@ -726,23 +726,23 @@ public class AccountingSystemTest {
 		EasyMock.replay(config);
 		
 		AccountingSystem acc = new AccountingSystem();
-		assertTrue(provider.canBuyMachine(true));
-		assertTrue(provider.canBuyMachine(false));
+		assertTrue(provider.canBuyMachine(true, MachineTypeValue.SMALL));
+		assertTrue(provider.canBuyMachine(false, MachineTypeValue.SMALL));
 		
 		//Adding a number of machines below limits defined: 3 reserved machines
 		acc.buyMachine();
 		acc.buyMachine();
 		acc.buyMachine();
 		
-		assertFalse(provider.canBuyMachine(true));
-		assertTrue(provider.canBuyMachine(false));
+		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
+		assertTrue(provider.canBuyMachine(false, MachineTypeValue.SMALL));
 		
 		//Adding machines that reaches limits: 2 on-demand
 		acc.buyMachine();
 		acc.buyMachine();
 		
-		assertFalse(provider.canBuyMachine(true));
-		assertFalse(provider.canBuyMachine(false));
+		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(false, MachineTypeValue.SMALL));
 		
 		PowerMock.verify(Configuration.class);
 		EasyMock.verify(config);
@@ -782,22 +782,22 @@ public class AccountingSystemTest {
 		acc.buyMachine();
 		
 		//Verifying that no more machines can be added
-		assertFalse(provider.canBuyMachine(true));
-		assertFalse(provider.canBuyMachine(false));
+		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(false, MachineTypeValue.SMALL));
 		
 		//Finishing some reserved machines
 		acc.reportMachineFinish(descriptor);
 		acc.reportMachineFinish(descriptor2);
 		
-		assertTrue(provider.canBuyMachine(true));
-		assertFalse(provider.canBuyMachine(false));
+		assertTrue(provider.canBuyMachine(true, MachineTypeValue.SMALL));
+		assertFalse(provider.canBuyMachine(false, MachineTypeValue.SMALL));
 		
 		//Finishing some on-demand machines
 		acc.reportMachineFinish(descriptor3);
 		acc.reportMachineFinish(descriptor4);
 		
-		assertTrue(provider.canBuyMachine(true));
-		assertTrue(provider.canBuyMachine(false));
+		assertTrue(provider.canBuyMachine(true, MachineTypeValue.SMALL));
+		assertTrue(provider.canBuyMachine(false, MachineTypeValue.SMALL));
 		
 		PowerMock.verify(Configuration.class);
 		EasyMock.verify(config);

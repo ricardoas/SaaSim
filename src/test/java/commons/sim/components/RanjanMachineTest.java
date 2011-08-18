@@ -1,5 +1,7 @@
 package commons.sim.components;
 
+import static commons.sim.util.SimulatorProperties.*;
+import static commons.sim.util.SimulatorProperties.RANJAN_HEURISTIC_BACKLOG_SIZE;
 import static org.junit.Assert.*;
 
 import java.util.Queue;
@@ -57,8 +59,8 @@ public class RanjanMachineTest {
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
-		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(DEFAULT_MAX_NUM_OF_THREADS);
-		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(DEFAULT_BACKLOG_SIZE);
+		EasyMock.expect(config.getLong(RANJAN_HEURISTIC_NUMBER_OF_TOKENS)).andReturn(DEFAULT_MAX_NUM_OF_THREADS);
+		EasyMock.expect(config.getLong(RANJAN_HEURISTIC_BACKLOG_SIZE)).andReturn(DEFAULT_BACKLOG_SIZE);
 		return config;
 	}
 	
@@ -392,8 +394,8 @@ public class RanjanMachineTest {
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
-		EasyMock.expect(config.getMaximumNumberOfThreadsPerMachine()).andReturn(localMaxNumberOfThreads);
-		EasyMock.expect(config.getMaximumBacklogSize()).andReturn(backlogSize);
+		EasyMock.expect(config.getLong(RANJAN_HEURISTIC_NUMBER_OF_TOKENS)).andReturn(localMaxNumberOfThreads);
+		EasyMock.expect(config.getLong(RANJAN_HEURISTIC_BACKLOG_SIZE)).andReturn(backlogSize);
 		
 		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(3);

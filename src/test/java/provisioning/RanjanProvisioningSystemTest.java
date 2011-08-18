@@ -297,8 +297,8 @@ public class RanjanProvisioningSystemTest {
 		PowerMock.verify(Configuration.class);
 		EasyMock.verify(config, configurable);
 		
-		assertFalse(provider.canBuyMachine(true));
-		assertTrue(provider.canBuyMachine(false));
+		assertFalse(provider.canBuyMachine(true, MachineTypeValue.SMALL));
+		assertTrue(provider.canBuyMachine(false, MachineTypeValue.SMALL));
 	}
 	
 	@Test

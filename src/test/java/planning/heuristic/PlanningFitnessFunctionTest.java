@@ -60,7 +60,7 @@ public class PlanningFitnessFunctionTest {
 		String transferOutCosts = "";
 		Provider prov = new Provider("prov1", cpuCost, onDemandLimit, reservationLimit, reservedCpuCost, reservationOneYearFee, reservationThreeYearsFee, monitoringCost, transferInLimits, transferInCosts, transferOutLimits, transferOutCosts);
 		Map<String, Provider> providers = new HashMap<String, Provider>();
-		providers.put(prov.name, prov);
+		providers.put(prov.getName(), prov);
 		
 		try {
 			Configuration.buildInstance(CONFIG_FILE);

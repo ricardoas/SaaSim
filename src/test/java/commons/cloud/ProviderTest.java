@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
@@ -35,6 +36,7 @@ public class ProviderTest {
 		field.set(null, 0);
 	}
 
+	@Ignore("Moving to Cnofiguration test.")
 	@Test
 	public void providerWithInvalidCpuCost(){
 		int onDemandLimit = 20;
@@ -56,6 +58,7 @@ public class ProviderTest {
 		}
 	}
 	
+	@Ignore("Moving to Cnofiguration test.")
 	@Test
 	public void providerWithInvalidCpuLimit(){
 		double onDemandCpuCost = 0.1;
@@ -84,6 +87,7 @@ public class ProviderTest {
 		}
 	}
 	
+	@Ignore("Moving to Cnofiguration test.")
 	@Test
 	public void providerWithInvalidReservedCpuLimit(){
 		double onDemandCpuCost = 0.1;
@@ -112,6 +116,7 @@ public class ProviderTest {
 		}
 	}
 	
+	@Ignore("Moving to Cnofiguration test.")
 	@Test
 	public void providerWithInvalidReservedCpuCost(){
 		double onDemandCpuCost = 0.1;
@@ -141,6 +146,7 @@ public class ProviderTest {
 		}
 	}
 	
+	@Ignore("Moving to Cnofiguration test.")
 	@Test
 	public void providerWithInvalidReservationFee(){
 		double onDemandCpuCost = 0.1;
@@ -184,6 +190,7 @@ public class ProviderTest {
 		}
 	}
 	
+	@Ignore("Moving to Cnofiguration test.")
 	@Test
 	public void providerWithInvalidMonitoringCost(){
 		double onDemandCpuCost = 0.1;
@@ -231,32 +238,32 @@ public class ProviderTest {
 				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 		
 		//Adding reserved resources
-		MachineDescriptor descriptor = provider.buyMachine(true);
+		MachineDescriptor descriptor = provider.buyMachine(true, MachineTypeValue.SMALL);
 		descriptor.setStartTimeInMillis(1 * HOUR_IN_MILLIS);
 		descriptor.setFinishTimeInMillis(5 * HOUR_IN_MILLIS);
 		provider.shutdownMachine(descriptor);
 		
-		MachineDescriptor descriptor2 = provider.buyMachine(true);
+		MachineDescriptor descriptor2 = provider.buyMachine(true, MachineTypeValue.SMALL);
 		descriptor2.setStartTimeInMillis(0);
 		descriptor2.setFinishTimeInMillis(5 * HOUR_IN_MILLIS);
 		provider.shutdownMachine(descriptor2);
 		
-		MachineDescriptor descriptor3 = provider.buyMachine(true);
+		MachineDescriptor descriptor3 = provider.buyMachine(true, MachineTypeValue.SMALL);
 		descriptor3.setStartTimeInMillis(3 * HOUR_IN_MILLIS);
 		descriptor3.setFinishTimeInMillis(18 * HOUR_IN_MILLIS);
 		provider.shutdownMachine(descriptor3);
 		
-		MachineDescriptor descriptor4 = provider.buyMachine(true);
+		MachineDescriptor descriptor4 = provider.buyMachine(true, MachineTypeValue.SMALL);
 		descriptor4.setStartTimeInMillis(0);
 		descriptor4.setFinishTimeInMillis(15 * HOUR_IN_MILLIS);
 		provider.shutdownMachine(descriptor4);
 		
-		MachineDescriptor descriptor5 = provider.buyMachine(true);
+		MachineDescriptor descriptor5 = provider.buyMachine(true, MachineTypeValue.SMALL);
 		descriptor5.setStartTimeInMillis(5 * HOUR_IN_MILLIS);
 		descriptor5.setFinishTimeInMillis((long)(17.5d * HOUR_IN_MILLIS));
 		provider.shutdownMachine(descriptor5);
 		
-		MachineDescriptor descriptor6 = provider.buyMachine(true);
+		MachineDescriptor descriptor6 = provider.buyMachine(true, MachineTypeValue.SMALL);
 		descriptor6.setStartTimeInMillis((long)(0.5d * HOUR_IN_MILLIS));
 		descriptor6.setFinishTimeInMillis((long)(15.73d * HOUR_IN_MILLIS));
 		provider.shutdownMachine(descriptor6);
@@ -294,12 +301,12 @@ public class ProviderTest {
 				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 		
 		//Adding reserved resources
-		provider.buyMachine(true);
-		provider.buyMachine(true);
-		provider.buyMachine(true);
-		provider.buyMachine(true);
-		provider.buyMachine(true);
-		provider.buyMachine(true);
+		provider.buyMachine(true, MachineTypeValue.SMALL);
+		provider.buyMachine(true, MachineTypeValue.SMALL);
+		provider.buyMachine(true, MachineTypeValue.SMALL);
+		provider.buyMachine(true, MachineTypeValue.SMALL);
+		provider.buyMachine(true, MachineTypeValue.SMALL);
+		provider.buyMachine(true, MachineTypeValue.SMALL);
 		
 		//Mocks
 		PowerMock.mockStatic(Configuration.class);
@@ -334,7 +341,7 @@ public class ProviderTest {
 				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 		
 		//Adding reserved resources
-		MachineDescriptor descriptor = provider.buyMachine(true);
+		MachineDescriptor descriptor = provider.buyMachine(true, MachineTypeValue.SMALL);
 		descriptor.setStartTimeInMillis(0);
 		descriptor.setFinishTimeInMillis((long)(-5d * HOUR_IN_MILLIS));
 		provider.shutdownMachine(descriptor);
@@ -364,27 +371,27 @@ public class ProviderTest {
 				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 		
 		//Adding on-demand resources
-		MachineDescriptor descriptor = provider.buyMachine(false);
+		MachineDescriptor descriptor = provider.buyMachine(false, MachineTypeValue.SMALL);
 		descriptor.setStartTimeInMillis(0);
 		descriptor.setFinishTimeInMillis(2 * HOUR_IN_MILLIS);
 		provider.shutdownMachine(descriptor);
 		
-		MachineDescriptor descriptor2 = provider.buyMachine(false);
+		MachineDescriptor descriptor2 = provider.buyMachine(false, MachineTypeValue.SMALL);
 		descriptor2.setStartTimeInMillis(1 * HOUR_IN_MILLIS);
 		descriptor2.setFinishTimeInMillis(2 * HOUR_IN_MILLIS);
 		provider.shutdownMachine(descriptor2);
 		
-		MachineDescriptor descriptor3 = provider.buyMachine(false);
+		MachineDescriptor descriptor3 = provider.buyMachine(false, MachineTypeValue.SMALL);
 		descriptor3.setStartTimeInMillis(0);
 		descriptor3.setFinishTimeInMillis(15 * HOUR_IN_MILLIS);
 		provider.shutdownMachine(descriptor3);
 		
-		MachineDescriptor descriptor4 = provider.buyMachine(false);
+		MachineDescriptor descriptor4 = provider.buyMachine(false, MachineTypeValue.SMALL);
 		descriptor4.setStartTimeInMillis(1 * HOUR_IN_MILLIS);
 		descriptor4.setFinishTimeInMillis((long)(2.2d * HOUR_IN_MILLIS));
 		provider.shutdownMachine(descriptor4);
 		
-		MachineDescriptor descriptor5= provider.buyMachine(false);
+		MachineDescriptor descriptor5= provider.buyMachine(false, MachineTypeValue.SMALL);
 		descriptor5.setStartTimeInMillis(2 * HOUR_IN_MILLIS);
 		descriptor5.setFinishTimeInMillis((long)(7.14d * HOUR_IN_MILLIS));
 		provider.shutdownMachine(descriptor5);
@@ -410,11 +417,11 @@ public class ProviderTest {
 				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 		
 		//Adding on-demand resources
-		provider.buyMachine(false);
-		provider.buyMachine(false);
-		provider.buyMachine(false);
-		provider.buyMachine(false);
-		provider.buyMachine(false);
+		provider.buyMachine(false, MachineTypeValue.SMALL);
+		provider.buyMachine(false, MachineTypeValue.SMALL);
+		provider.buyMachine(false, MachineTypeValue.SMALL);
+		provider.buyMachine(false, MachineTypeValue.SMALL);
+		provider.buyMachine(false, MachineTypeValue.SMALL);
 		
 		assertEquals( 100 * onDemandCpuCost + 100 * monitoringCost, provider.calculateCost(20 * HOUR_IN_MILLIS, 0), 0.0001d);
 	}
@@ -437,7 +444,7 @@ public class ProviderTest {
 				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 		
 		//Adding reserved resources
-		MachineDescriptor descriptor = provider.buyMachine(false);
+		MachineDescriptor descriptor = provider.buyMachine(false, MachineTypeValue.SMALL);
 		descriptor.setStartTimeInMillis(0);
 		descriptor.setFinishTimeInMillis((long)(-6d * HOUR_IN_MILLIS));
 		provider.shutdownMachine(descriptor);
@@ -452,7 +459,7 @@ public class ProviderTest {
 		//FIXME: Double value explodes with large value!
 		provider = new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
 				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
-		MachineDescriptor descriptor2 = provider.buyMachine(false);
+		MachineDescriptor descriptor2 = provider.buyMachine(false, MachineTypeValue.SMALL);
 		descriptor2.setStartTimeInMillis(1000 * HOUR_IN_MILLIS);
 		descriptor2.setFinishTimeInMillis(400 * HOUR_IN_MILLIS);
 		provider.shutdownMachine(descriptor2);
@@ -483,58 +490,58 @@ public class ProviderTest {
 				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<MachineType>());
 		
 		//Adding reserved resources
-		MachineDescriptor descriptor = provider.buyMachine(true);
+		MachineDescriptor descriptor = provider.buyMachine(true, MachineTypeValue.SMALL);
 		descriptor.setStartTimeInMillis(0);
 		descriptor.setFinishTimeInMillis(10 * HOUR_IN_MILLIS);
 		provider.shutdownMachine(descriptor);
 		
-		MachineDescriptor descriptor2 = provider.buyMachine(true);
+		MachineDescriptor descriptor2 = provider.buyMachine(true, MachineTypeValue.SMALL);
 		descriptor2.setStartTimeInMillis(10 * HOUR_IN_MILLIS);
 		descriptor2.setFinishTimeInMillis(30 * HOUR_IN_MILLIS);
 		provider.shutdownMachine(descriptor2);
 		
-		MachineDescriptor descriptor3 = provider.buyMachine(true);
+		MachineDescriptor descriptor3 = provider.buyMachine(true, MachineTypeValue.SMALL);
 		descriptor3.setStartTimeInMillis(1 * HOUR_IN_MILLIS);
 		descriptor3.setFinishTimeInMillis(16 * HOUR_IN_MILLIS);
 		provider.shutdownMachine(descriptor3);
 		
-		MachineDescriptor descriptor4 = provider.buyMachine(true);
+		MachineDescriptor descriptor4 = provider.buyMachine(true, MachineTypeValue.SMALL);
 		descriptor4.setStartTimeInMillis(50 * HOUR_IN_MILLIS);
 		descriptor4.setFinishTimeInMillis(65 * HOUR_IN_MILLIS);
 		provider.shutdownMachine(descriptor4);
 		
-		MachineDescriptor descriptor5 = provider.buyMachine(true);
+		MachineDescriptor descriptor5 = provider.buyMachine(true, MachineTypeValue.SMALL);
 		descriptor5.setStartTimeInMillis(0);
 		descriptor5.setFinishTimeInMillis(15 * HOUR_IN_MILLIS);
 		provider.shutdownMachine(descriptor5);
 		
-		MachineDescriptor descriptor6 = provider.buyMachine(true);
+		MachineDescriptor descriptor6 = provider.buyMachine(true, MachineTypeValue.SMALL);
 		descriptor6.setStartTimeInMillis((long)(11.5d * HOUR_IN_MILLIS));
 		descriptor6.setFinishTimeInMillis(24 * HOUR_IN_MILLIS);
 		provider.shutdownMachine(descriptor6);
 		
-		MachineDescriptor descriptor7 = provider.buyMachine(true);
+		MachineDescriptor descriptor7 = provider.buyMachine(true, MachineTypeValue.SMALL);
 		descriptor7.setStartTimeInMillis(0);
 		descriptor7.setFinishTimeInMillis((long)(15.23d * HOUR_IN_MILLIS));
 		provider.shutdownMachine(descriptor7);
 		
 		//On-demand resources
-		MachineDescriptor descriptor8 = provider.buyMachine(false);
+		MachineDescriptor descriptor8 = provider.buyMachine(false, MachineTypeValue.SMALL);
 		descriptor8.setStartTimeInMillis(18 * HOUR_IN_MILLIS);
 		descriptor8.setFinishTimeInMillis(36 * HOUR_IN_MILLIS);
 		provider.shutdownMachine(descriptor8);
 		
-		MachineDescriptor descriptor9 = provider.buyMachine(false);
+		MachineDescriptor descriptor9 = provider.buyMachine(false, MachineTypeValue.SMALL);
 		descriptor9.setStartTimeInMillis(0);
 		descriptor9.setFinishTimeInMillis((long)(78.5d * HOUR_IN_MILLIS));
 		provider.shutdownMachine(descriptor9);
 		
-		MachineDescriptor descriptor10 = provider.buyMachine(false);
+		MachineDescriptor descriptor10 = provider.buyMachine(false, MachineTypeValue.SMALL);
 		descriptor10.setStartTimeInMillis((long)(2.4d * HOUR_IN_MILLIS));
 		descriptor10.setFinishTimeInMillis((long)(3.6d * HOUR_IN_MILLIS));
 		provider.shutdownMachine(descriptor10);
 		
-		MachineDescriptor descriptor11 = provider.buyMachine(false);
+		MachineDescriptor descriptor11 = provider.buyMachine(false, MachineTypeValue.SMALL);
 		descriptor11.setStartTimeInMillis(0);
 		descriptor11.setFinishTimeInMillis((long)(5.14d * HOUR_IN_MILLIS));
 		provider.shutdownMachine(descriptor11);

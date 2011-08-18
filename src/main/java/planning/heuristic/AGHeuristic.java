@@ -105,7 +105,7 @@ public class AGHeuristic implements PlanningHeuristic{
 	}
 
 	private void initProperties(List<Provider> cloudProviders) {
-		resourcesReservationLimit = cloudProviders.iterator().next().reservationLimit;
+		resourcesReservationLimit = cloudProviders.iterator().next().getReservationLimit();
 	}
 
 	private IChromosome createSampleChromosome(Configuration config) throws InvalidConfigurationException {
