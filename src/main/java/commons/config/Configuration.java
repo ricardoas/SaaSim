@@ -292,13 +292,13 @@ public class Configuration	extends PropertiesConfiguration{
 	private void verifySimulatorProperties() throws ConfigurationException {
 		checkDPSHeuristic();
 		checkPlanningHeuristic();
-		Validator.checkPositive(getInt(PLANNING_PERIOD));
+		Validator.checkPositive(PLANNING_PERIOD, getInt(PLANNING_PERIOD));
 	}
 	
 	private void checkDPSHeuristic() throws ConfigurationException {
 		
 		String heuristicName = getString(DPS_HEURISTIC);
-		Validator.checkNotEmpty(getString(DPS_HEURISTIC));
+		Validator.checkNotEmpty(DPS_HEURISTIC, getString(DPS_HEURISTIC));
 		
 		String customHeuristicClass = getString(DPS_CUSTOM_HEURISTIC);
 		try{
@@ -328,7 +328,7 @@ public class Configuration	extends PropertiesConfiguration{
 
 	private void checkPlanningHeuristic() throws ConfigurationException {
 		String heuristicName = getString(PLANNING_HEURISTIC);
-		Validator.checkNotEmpty(getString(PLANNING_HEURISTIC));
+		Validator.checkNotEmpty(PLANNING_HEURISTIC, getString(PLANNING_HEURISTIC));
 		
 		PlanningHeuristicValues value = PlanningHeuristicValues.valueOf(heuristicName);
 		switch (value) {
@@ -342,23 +342,23 @@ public class Configuration	extends PropertiesConfiguration{
 	}
 
 
-	private void checkRanjanProperties() {
-		Validator.checkPositive(getInt(RANJAN_HEURISTIC_NUMBER_OF_TOKENS));
-		Validator.checkNonNegative(getInt(RANJAN_HEURISTIC_BACKLOG_SIZE));
+	private void checkRanjanProperties() throws ConfigurationException {
+		Validator.checkPositive(RANJAN_HEURISTIC_NUMBER_OF_TOKENS, getInt(RANJAN_HEURISTIC_NUMBER_OF_TOKENS));
+		Validator.checkNonNegative(RANJAN_HEURISTIC_BACKLOG_SIZE, getInt(RANJAN_HEURISTIC_BACKLOG_SIZE));
 	}
 
 	// ************************************* SaaS APP ************************************/
 	
-	private void verifySaaSAppProperties() {
+	private void verifySaaSAppProperties() throws ConfigurationException {
 
-		Validator.checkNotEmpty(getString(APPLICATION_FACTORY));
-		Validator.checkPositive(getInt(APPLICATION_NUM_OF_TIERS));
-		Validator.checkNonNegative(getLong(APPLICATION_SETUP_TIME));
+		Validator.checkNotEmpty(APPLICATION_FACTORY, getString(APPLICATION_FACTORY));
+		Validator.checkPositive(APPLICATION_NUM_OF_TIERS, getInt(APPLICATION_NUM_OF_TIERS));
+		Validator.checkNonNegative(APPLICATION_SETUP_TIME, getLong(APPLICATION_SETUP_TIME));
 		
 		checkSize(APPLICATION_HEURISTIC, APPLICATION_NUM_OF_TIERS);
 		checkSize(APPLICATION_INITIAL_SERVER_PER_TIER, APPLICATION_NUM_OF_TIERS);
 		
-		Validator.checkIsPositiveArray(getStringArray(APPLICATION_INITIAL_SERVER_PER_TIER));
+		Validator.checkIsPositiveArray(APPLICATION_INITIAL_SERVER_PER_TIER, getStringArray(APPLICATION_INITIAL_SERVER_PER_TIER));
 
 //		checkSize(APPLICATION_MAX_SERVER_PER_TIER, APPLICATION_NUM_OF_TIERS);
 //		Validator.checkIsPositiveIntegerArray(getStringArray(APPLICATION_MAX_SERVER_PER_TIER));
@@ -401,12 +401,12 @@ public class Configuration	extends PropertiesConfiguration{
 	
 	private void verifySaaSUsersProperties() throws ConfigurationException {
 		
-		Validator.checkPositive(getInt(SAAS_NUMBER_OF_USERS));
+		Validator.checkPositive(SAAS_NUMBER_OF_USERS, getInt(SAAS_NUMBER_OF_USERS));
 		
 		String workload = getString(SAAS_WORKLOAD);
 		if(workload == null || workload.isEmpty()){
 			checkSize(SAAS_USER_WORKLOAD, SAAS_NUMBER_OF_USERS);
-			Validator.checkIsNonEmptyStringArray(getStringArray(SAAS_USER_WORKLOAD));
+			Validator.checkIsNonEmptyStringArray(SAAS_USER_WORKLOAD, getStringArray(SAAS_USER_WORKLOAD));
 		}else{
 			if(getStringArray(SAAS_USER_WORKLOAD).length != 0){
 				throw new ConfigurationException("Cannot define user specific workload when " +
@@ -432,10 +432,10 @@ public class Configuration	extends PropertiesConfiguration{
 	
 	private void verifyIaaSProvidersProperties() throws ConfigurationException {
 		
-		Validator.checkPositive(getInt(IAAS_NUMBER_OF_PROVIDERS));
+		Validator.checkPositive(IAAS_NUMBER_OF_PROVIDERS, getInt(IAAS_NUMBER_OF_PROVIDERS));
 		
-		Validator.checkIsEnumArray(getStringArray(IAAS_TYPES), MachineTypeValue.class);
-		Validator.checkIsPositiveDoubleArray(getStringArray(IAAS_POWER));
+		Validator.checkIsEnumArray(IAAS_TYPES, getStringArray(IAAS_TYPES), MachineTypeValue.class);
+		Validator.checkIsPositiveDoubleArray(IAAS_POWER, getStringArray(IAAS_POWER));
 		
 		if(getStringArray(IAAS_TYPES).length != getStringArray(IAAS_POWER).length){
 			throw new ConfigurationException(IAAS_TYPES + " must have the same size of " + IAAS_POWER);
@@ -454,18 +454,18 @@ public class Configuration	extends PropertiesConfiguration{
 		checkSize(IAAS_PROVIDER_RESERVED_LIMIT, IAAS_NUMBER_OF_PROVIDERS);
 		checkSize(IAAS_PROVIDER_MONITORING, IAAS_NUMBER_OF_PROVIDERS);
 		
-		Validator.checkIsNonEmptyStringArray(getStringArray(IAAS_PROVIDER_NAME));
-		Validator.checkIsNonNegativeDouble2DArray(getStringArray(IAAS_PROVIDER_ONDEMAND_CPU_COST), ARRAY_SEPARATOR);
-		Validator.checkIsNonNegativeDouble2DArray(getStringArray(IAAS_PROVIDER_RESERVED_CPU_COST), ARRAY_SEPARATOR);
-		Validator.checkIsNonNegativeDouble2DArray(getStringArray(IAAS_PROVIDER_ONE_YEAR_FEE), ARRAY_SEPARATOR);
-		Validator.checkIsNonNegativeDouble2DArray(getStringArray(IAAS_PROVIDER_THREE_YEARS_FEE), ARRAY_SEPARATOR);
-		Validator.checkIsNonNegative2DArray(getStringArray(IAAS_PROVIDER_TRANSFER_IN), ARRAY_SEPARATOR);
-		Validator.checkIsNonNegativeDouble2DArray(getStringArray(IAAS_PROVIDER_COST_TRANSFER_IN), ARRAY_SEPARATOR);
-		Validator.checkIsNonNegative2DArray(getStringArray(IAAS_PROVIDER_TRANSFER_OUT), ARRAY_SEPARATOR);
-		Validator.checkIsNonNegativeDouble2DArray(getStringArray(IAAS_PROVIDER_COST_TRANSFER_OUT), ARRAY_SEPARATOR);
-		Validator.checkIsNonNegativeArray(getStringArray(IAAS_PROVIDER_ONDEMAND_LIMIT));
-		Validator.checkIsNonNegativeArray(getStringArray(IAAS_PROVIDER_RESERVED_LIMIT));
-		Validator.checkIsNonNegativeDoubleArray(getStringArray(IAAS_PROVIDER_MONITORING));
+		Validator.checkIsNonEmptyStringArray(IAAS_PROVIDER_NAME, getStringArray(IAAS_PROVIDER_NAME));
+		Validator.checkIsNonNegativeDouble2DArray(IAAS_PROVIDER_ONDEMAND_CPU_COST, getStringArray(IAAS_PROVIDER_ONDEMAND_CPU_COST), ARRAY_SEPARATOR);
+		Validator.checkIsNonNegativeDouble2DArray(IAAS_PROVIDER_RESERVED_CPU_COST, getStringArray(IAAS_PROVIDER_RESERVED_CPU_COST), ARRAY_SEPARATOR);
+		Validator.checkIsNonNegativeDouble2DArray(IAAS_PROVIDER_ONE_YEAR_FEE, getStringArray(IAAS_PROVIDER_ONE_YEAR_FEE), ARRAY_SEPARATOR);
+		Validator.checkIsNonNegativeDouble2DArray(IAAS_PROVIDER_THREE_YEARS_FEE, getStringArray(IAAS_PROVIDER_THREE_YEARS_FEE), ARRAY_SEPARATOR);
+		Validator.checkIsNonNegative2DArray(IAAS_PROVIDER_TRANSFER_IN, getStringArray(IAAS_PROVIDER_TRANSFER_IN), ARRAY_SEPARATOR);
+		Validator.checkIsNonNegativeDouble2DArray(IAAS_PROVIDER_COST_TRANSFER_IN, getStringArray(IAAS_PROVIDER_COST_TRANSFER_IN), ARRAY_SEPARATOR);
+		Validator.checkIsNonNegative2DArray(IAAS_PROVIDER_TRANSFER_OUT, getStringArray(IAAS_PROVIDER_TRANSFER_OUT), ARRAY_SEPARATOR);
+		Validator.checkIsNonNegativeDouble2DArray(IAAS_PROVIDER_COST_TRANSFER_OUT, getStringArray(IAAS_PROVIDER_COST_TRANSFER_OUT), ARRAY_SEPARATOR);
+		Validator.checkIsNonNegativeArray(IAAS_PROVIDER_ONDEMAND_LIMIT, getStringArray(IAAS_PROVIDER_ONDEMAND_LIMIT));
+		Validator.checkIsNonNegativeArray(IAAS_PROVIDER_RESERVED_LIMIT, getStringArray(IAAS_PROVIDER_RESERVED_LIMIT));
+		Validator.checkIsNonNegativeDoubleArray(IAAS_PROVIDER_MONITORING, getStringArray(IAAS_PROVIDER_MONITORING));
 	}
 	
 	
@@ -473,8 +473,8 @@ public class Configuration	extends PropertiesConfiguration{
 	// ************************************* SAAS ************************************/
 
 
-	private void verifySaaSPlansProperties() {
-		Validator.checkPositive(getInt(NUMBER_OF_PLANS));
+	private void verifySaaSPlansProperties() throws ConfigurationException {
+		Validator.checkPositive(NUMBER_OF_PLANS, getInt(NUMBER_OF_PLANS));
 
 		checkSize(PLAN_NAME, NUMBER_OF_PLANS);
 		checkSize(PLAN_PRIORITY, NUMBER_OF_PLANS);
@@ -485,13 +485,13 @@ public class Configuration	extends PropertiesConfiguration{
 		checkSize(PLAN_TRANSFER_LIMIT, NUMBER_OF_PLANS);
 		checkSize(PLAN_EXTRA_TRANSFER_COST, NUMBER_OF_PLANS);
 		
-		Validator.checkIsNonNegativeDoubleArray(getStringArray(PLAN_PRICE));
-		Validator.checkIsNonNegativeDoubleArray(getStringArray(PLAN_SETUP));
-		Validator.checkIsNonNegativeDoubleArray(getStringArray(PLAN_EXTRA_CPU_COST));
-		Validator.checkIsNonNegativeArray(getStringArray(PLAN_CPU_LIMIT));
-		Validator.checkIsNonNegativeArray(getStringArray(PLAN_PRIORITY));
-		Validator.checkIsNonNegativeDouble2DArray(getStringArray(PLAN_EXTRA_CPU_COST), ARRAY_SEPARATOR);
-		Validator.checkIsNonNegative2DArray(getStringArray(PLAN_CPU_LIMIT), ARRAY_SEPARATOR);
+		Validator.checkIsNonNegativeDoubleArray(PLAN_PRICE, getStringArray(PLAN_PRICE));
+		Validator.checkIsNonNegativeDoubleArray(PLAN_SETUP, getStringArray(PLAN_SETUP));
+		Validator.checkIsNonNegativeDoubleArray(PLAN_EXTRA_CPU_COST, getStringArray(PLAN_EXTRA_CPU_COST));
+		Validator.checkIsNonNegativeArray(PLAN_CPU_LIMIT, getStringArray(PLAN_CPU_LIMIT));
+		Validator.checkIsNonNegativeArray(PLAN_PRIORITY, getStringArray(PLAN_PRIORITY));
+		Validator.checkIsNonNegativeDouble2DArray(PLAN_EXTRA_CPU_COST, getStringArray(PLAN_EXTRA_CPU_COST), ARRAY_SEPARATOR);
+		Validator.checkIsNonNegative2DArray(PLAN_CPU_LIMIT, getStringArray(PLAN_CPU_LIMIT), ARRAY_SEPARATOR);
 	}
 
 	public long getMaximumNumberOfThreadsPerMachine() {

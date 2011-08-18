@@ -1,86 +1,117 @@
 package commons.config;
 
+import org.apache.commons.configuration.ConfigurationException;
 
+
+/**
+ * Validation rules.
+ * 
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ */
 public class Validator {
 
-	public static void checkNonNegative(long value) {
+	public static void checkNonNegative(String propertyName, long value) throws ConfigurationException {
 		if (value < 0) {
-			throw new RuntimeException();
+			throw new ConfigurationException(propertyName + " must be a non negative integer.");
 		}
 	}
 
-	public static void checkNotEmpty(String value) {
+	public static void checkNotEmpty(String propertyName, String value) throws ConfigurationException {
 		if (value == null || value.isEmpty()) {
-			throw new RuntimeException();
+			throw new ConfigurationException(propertyName + " can't be empty.");
 		}
 	}
 
-	public static void checkPositive(long value) {
+	public static void checkPositive(String propertyName, long value) throws ConfigurationException {
 		if (value <= 0) {
-			throw new RuntimeException();
+			throw new ConfigurationException(propertyName + " must be a positive integer.");
 		}
 	}
 
-	public static void checkIsPositiveArray(String[] values) {
+	public static void checkIsPositiveArray(String propertyName, String[] values) throws ConfigurationException {
 		for (String value : values) {
-			checkPositive(Integer.valueOf(value));
+			try{
+				checkPositive(propertyName, Long.valueOf(value));
+			}catch (ConfigurationException e) {
+				throw new ConfigurationException(propertyName + " must be an array of positive integers. " + value + " value is invalid.", e);
+			}
 		}
 	}
 
-	public static void checkIsNonEmptyStringArray(String[] values) {
+	public static void checkIsNonEmptyStringArray(String propertyName, String[] values) throws ConfigurationException {
 		for (String value : values) {
-			checkNotEmpty(value);
+			try{
+				checkNotEmpty(propertyName, value);
+			}catch (ConfigurationException e) {
+				throw new ConfigurationException(propertyName + " must be an array of non empty values. " + value + " value is invalid.", e);
+			}
 		}
 	}
 
-	public static void checkIsNonNegativeDoubleArray(String[] values) {
+	public static void checkIsNonNegativeDoubleArray(String propertyName, String[] values) throws ConfigurationException {
 		for (String value : values) {
-			checkNonNegative(Double.valueOf(value));
+			try{
+				checkNonNegative(propertyName, Double.valueOf(value));
+			}catch (ConfigurationException e) {
+				throw new ConfigurationException(propertyName + " must be an array of non negative floating-point numbers. " + value + " value is invalid.", e);
+			}
 		}
 	}
 
-	public static void checkNonNegative(Double value) {
+	public static void checkNonNegative(String propertyName, Double value) throws ConfigurationException {
 		if (value < 0) {
-			throw new RuntimeException();
+			throw new ConfigurationException(propertyName + " must be a non negative floating-point number.");
 		}
 	}
 
-	public static void checkIsNonNegativeArray(String[] values) {
+	public static void checkIsNonNegativeArray(String propertyName, String[] values) throws ConfigurationException {
 		for (String value : values) {
-			checkNonNegative(Integer.valueOf(value));
+			try{
+				checkNonNegative(propertyName, Integer.valueOf(value));
+			}catch (ConfigurationException e) {
+				throw new ConfigurationException(propertyName + " must be an array of non negative integers. " + value + " value is invalid.", e);
+			}
 		}
 	}
 
-	public static void checkIsNonNegativeDouble2DArray(String[] values,
-			String separator) {
+	public static void checkIsNonNegativeDouble2DArray(String propertyName, String[] values,
+			String separator) throws ConfigurationException {
 		for (String value : values) {
-			checkIsNonNegativeDoubleArray(value.split(separator));
+			checkIsNonNegativeDoubleArray(propertyName, value.split(separator));
 		}
 	}
 
-	public static void checkIsNonNegative2DArray(String[] values,
-			String separator) {
+	public static void checkIsNonNegative2DArray(String propertyName, String[] values,
+			String separator) throws ConfigurationException {
 		for (String value : values) {
-			checkIsNonNegativeArray(value.split(separator));
+			checkIsNonNegativeArray(propertyName, value.split(separator));
 		}
 	}
 
-	public static void checkIsPositiveDoubleArray(String[] values) {
+	public static void checkIsPositiveDoubleArray(String propertyName, String[] values) throws ConfigurationException {
 		for (String value : values) {
-			checkPositive(Double.valueOf(value));
+			try{
+				checkPositive(propertyName, Double.valueOf(value));
+			}catch (ConfigurationException e) {
+				throw new ConfigurationException(propertyName + " must be an array of positive floating-point numbers. " + value + " value is invalid.", e);
+			}
 		}
 	}
 
-	public static void checkPositive(Double value) {
+	public static void checkPositive(String propertyName, Double value) throws ConfigurationException {
 		if (value <= 0) {
-			throw new RuntimeException();
+			throw new ConfigurationException(propertyName + " must be a positive floating-point number.");
 		}
 	}
 
-	public static <T extends Enum<T>> void checkIsEnumArray(String[] values,
-			Class<T> enumClass) {
+	public static <T extends Enum<T>> void checkIsEnumArray(String propertyName, String[] values,
+			Class<T> enumClass) throws ConfigurationException {
 		for (String value : values) {
-			Enum.valueOf(enumClass, value);
+			try{
+				Enum.valueOf(enumClass, value);
+			}catch(Exception e){
+				throw new ConfigurationException(propertyName + " must be a valid member of enum " + enumClass.getCanonicalName() + ". " + value + " value is invalid.", e);
+			}
 		}
 	}
 
