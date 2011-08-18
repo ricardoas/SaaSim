@@ -157,9 +157,12 @@ public class Provider {
 	 */
 	public MachineDescriptor buyMachine(boolean isReserved, MachineType instanceType) {
 		if(!isReserved){
-			MachineDescriptor descriptor = new MachineDescriptor(IDGenerator.GENERATOR.next(), isReserved, instanceType);
-			this.onDemandRunningMachines.add(descriptor);
-			return descriptor;
+			if(canBuyMachine(false, instanceType)){
+				MachineDescriptor descriptor = new MachineDescriptor(IDGenerator.GENERATOR.next(), isReserved, instanceType);
+				this.onDemandRunningMachines.add(descriptor);
+				return descriptor;
+			}
+			return null;
 		}
 		if(!types.containsKey(instanceType)){
 			throw new RuntimeException("Attempt to buy a machine of type " + instanceType + " at provider: " + getName());
@@ -174,7 +177,10 @@ public class Provider {
 			}
 			return types.get(machineDescriptor.getType()).shutdownMachine(machineDescriptor);
 		}
-		return onDemandRunningMachines.remove(machineDescriptor.getMachineID());
+		if(onDemandRunningMachines.remove(machineDescriptor)){
+			return onDemandFinishedMachines.add(machineDescriptor);
+		}
+		return false;
 	}
 	
 	private double calculateCost(MachineDescriptor descriptor){

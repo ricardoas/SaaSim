@@ -24,6 +24,9 @@ public class ContractTest {
 	private long [] transferenceLimits = {10, 100};
 	private double [] transferenceCosts = {0.5, 0,3};
 
+	/**
+	 * Test method for {@link Contract#compareTo(Contract)}
+	 */
 	@Test
 	public void testCompareTo(){
 		Contract c1 = new Contract(planName, 1, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts);
@@ -41,18 +44,27 @@ public class ContractTest {
 		assertEquals(0, c2B.compareTo(c2B));
 	}
 	
+	/**
+	 * Test method for {@link Contract#calculateReceipt(long, long, long, long)}
+	 */
 	@Test
 	public void testCalculateReceiptWithoutConsumption(){
 		Contract c1 = new Contract(planName, 1, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts);
 		assertEquals(price, c1.calculateReceipt(0, 0, 0, 0), 0.0);
 	}
 	
+	/**
+	 * Test method for {@link Contract#calculateReceipt(long, long, long, long)}
+	 */
 	@Test
 	public void testCalculateReceiptWithConsumptionLowerThanCPULimit(){
 		Contract c1 = new Contract(planName, 1, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts);
 		assertEquals(price, c1.calculateReceipt(10, 0, 0, 0), 0.0);
 	}
 	
+	/**
+	 * Test method for {@link Contract#calculateReceipt(long, long, long, long)}
+	 */
 	@Test
 	public void testCalculateReceiptWithConsumptionHigherThanCPULimit(){
 		Contract c1 = new Contract(planName, 1, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts);

@@ -1,564 +1,240 @@
+/**
+ * 
+ */
 package commons.cloud;
 
-import static commons.sim.util.SimulatorProperties.PLANNING_PERIOD;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.easymock.PowerMock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-import commons.config.Configuration;
 import commons.sim.components.MachineDescriptor;
-import commons.sim.jeevent.JEEventScheduler;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Configuration.class)
+/**
+ * test class for {@link Provider} 
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ *
+ */
 public class ProviderTest {
-	
-	private String name = "prov";
-	private static final long HOUR_IN_MILLIS = 1000 * 60 * 60;
-	private JEEventScheduler scheduler;
-	
-	@Before
-	public void setUp() throws ClassNotFoundException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
-		scheduler = new JEEventScheduler();
-		Class c = Class.forName("commons.cloud.Provider");
-		Field field = c.getDeclaredField("machineIDGenerator");
-		field.set(null, 0);
+
+	/**
+	 * Test method for {@link commons.cloud.Provider#canBuyMachine(boolean, commons.cloud.MachineType)}.
+	 */
+	@Test
+	public void testCanBuyOnDemandMachineWithAvailableMachines() {
+		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
+		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
+		EasyMock.replay(typeProvider);
+		
+		Provider provider = new Provider("amazon", 3, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		assertTrue(provider.canBuyMachine(false, null));
+		
+		EasyMock.verify(typeProvider);
 	}
 
-	@Ignore("Moving to Cnofiguration test.")
+	/**
+	 * Test method for {@link commons.cloud.Provider#canBuyMachine(boolean, commons.cloud.MachineType)}.
+	 */
 	@Test
-	public void providerWithInvalidCpuCost(){
-		int onDemandLimit = 20;
-		int reservationLimit = 20;
-		double reservedCpuCost = 0.01;
-		double reservationOneYearFee = 100;
-		double reservationThreeYearsFee = 70;
-		double monitoringCost = 0.2;
-		long[] transferInLimits = {};
-		double[] transferInCosts = {};
-		long[] transferOutLimits = {};
-		double[] transferOutCosts = {};
+	public void testCanBuyOnDemandMachineWithoutAvailableMachines() {
+		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
+		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
+		EasyMock.replay(typeProvider);
 		
-		try{
-			new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
-			fail("Invalid provider!");
-		}catch(RuntimeException e){
-		}
+		Provider provider = new Provider("amazon", 0, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		assertFalse(provider.canBuyMachine(false, MachineType.LARGE));
+		
+		EasyMock.verify(typeProvider);
 	}
-	
-	@Ignore("Moving to Cnofiguration test.")
+
+	/**
+	 * Test method for {@link commons.cloud.Provider#canBuyMachine(boolean, commons.cloud.MachineType)}.
+	 */
 	@Test
-	public void providerWithInvalidCpuLimit(){
-		double onDemandCpuCost = 0.1;
-		int reservationLimit = 20;
-		double reservedCpuCost = 0.01;
-		double reservationOneYearFee = 100;
-		double reservationThreeYearsFee = 70;
-		double monitoringCost = 0.2;
-		long[] transferInLimits = {};
-		double[] transferInCosts = {};
-		long[] transferOutLimits = {};
-		double[] transferOutCosts = {};
+	public void testCanBuyReservedMachineNotProvided() {
+		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
+		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
+		EasyMock.replay(typeProvider);
 		
-		try{
-			new Provider(name, -99999, reservationLimit, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
-			fail("Invalid provider!");
-		}catch(RuntimeException e){
-		}
+		Provider provider = new Provider("amazon", 0, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		assertFalse(provider.canBuyMachine(true, MachineType.SMALL));
 		
-		try{
-			new Provider(name, 0, reservationLimit, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
-			fail("Invalid provider!");
-		}catch(RuntimeException e){
-		}
+		EasyMock.verify(typeProvider);
 	}
-	
-	@Ignore("Moving to Cnofiguration test.")
+
+	/**
+	 * Test method for {@link commons.cloud.Provider#canBuyMachine(boolean, commons.cloud.MachineType)}.
+	 */
 	@Test
-	public void providerWithInvalidReservedCpuLimit(){
-		double onDemandCpuCost = 0.1;
-		int onDemandLimit = 20;
-		double reservedCpuCost = 0.01;
-		double reservationOneYearFee = 100;
-		double reservationThreeYearsFee = 70;
-		double monitoringCost = 0.2;
-		long[] transferInLimits = {};
-		double[] transferInCosts = {};
-		long[] transferOutLimits = {};
-		double[] transferOutCosts = {};
+	public void testCanBuyReservedMachineProvidedButUnavailable() {
+		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
+		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
+		EasyMock.expect(typeProvider.canBuy()).andReturn(false);
+		EasyMock.replay(typeProvider);
 		
-		try{
-			new Provider(name, onDemandLimit, 0, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
-			fail("Invalid provider!");
-		}catch(RuntimeException e){
-		}
+		Provider provider = new Provider("amazon", 0, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		assertFalse(provider.canBuyMachine(true, MachineType.LARGE));
 		
-		try{
-			new Provider(name, onDemandLimit, -777, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
-			fail("Invalid provider!");
-		}catch(RuntimeException e){
-		}
+		EasyMock.verify(typeProvider);
 	}
-	
-	@Ignore("Moving to Cnofiguration test.")
+
+	/**
+	 * Test method for {@link commons.cloud.Provider#buyMachine(boolean, commons.cloud.MachineType)}.
+	 */
 	@Test
-	public void providerWithInvalidReservedCpuCost(){
-		double onDemandCpuCost = 0.1;
-		int onDemandLimit = 20;
-		int reservationLimit = 20;
-		double reservedCpuCost = 0.01;
-		double reservationOneYearFee = 100;
-		double reservationThreeYearsFee = 70;
-		double monitoringCost = 0.2;
-		long[] transferInLimits = {};
-		double[] transferInCosts = {};
-		long[] transferOutLimits = {};
-		double[] transferOutCosts = {};
+	public void testBuyMachineOnDemandMachineUntilNoMachineIsAvailable() {
+		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
+		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
+		EasyMock.replay(typeProvider);
 		
-		try{
-			new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
-			fail("Invalid provider!");
-		}catch(RuntimeException e){
-		}
-		
-		try{
-			new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
-			fail("Invalid provider!");
-		}catch(RuntimeException e){
-		}
-	}
-	
-	@Ignore("Moving to Cnofiguration test.")
-	@Test
-	public void providerWithInvalidReservationFee(){
-		double onDemandCpuCost = 0.1;
-		int onDemandLimit = 20;
-		int reservationLimit = 20;
-		double reservedCpuCost = 0.01;
-		double reservationOneYearFee = 100;
-		double reservationThreeYearsFee = 70;
-		double monitoringCost = 0.2;
-		long[] transferInLimits = {};
-		double[] transferInCosts = {};
-		long[] transferOutLimits = {};
-		double[] transferOutCosts = {};
-		
-		try{
-			new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
-			fail("Invalid provider!");
-		}catch(RuntimeException e){
-		}
-		
-		try{
-			new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
-		}catch(RuntimeException e){
-			fail("Invalid provider!");
-		}
-		
-		try{
-			new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
-			fail("Invalid provider!");
-		}catch(RuntimeException e){
-		}
-		
-		try{
-			new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
-		}catch(RuntimeException e){
-			fail("Invalid provider!");
-		}
-	}
-	
-	@Ignore("Moving to Cnofiguration test.")
-	@Test
-	public void providerWithInvalidMonitoringCost(){
-		double onDemandCpuCost = 0.1;
-		int onDemandLimit = 20;
-		int reservationLimit = 20;
-		double reservedCpuCost = 0.01;
-		double reservationOneYearFee = 100;
-		double reservationThreeYearsFee = 70;
-		double monitoringCost = 0.2;
-		long[] transferInLimits = {};
-		double[] transferInCosts = {};
-		long[] transferOutLimits = {};
-		double[] transferOutCosts = {};
-		
-		try{
-			new Provider(name, onDemandLimit, reservationLimit, -monitoringCost, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
-			fail("Invalid provider!");
-		}catch(RuntimeException e){
-		}
-		
-		try{
-			new Provider(name, onDemandLimit, reservationLimit, -0.0000001, 
-					transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
-			fail("Invalid provider!");
-		}catch(RuntimeException e){
-		}
-	}
-	
-	@Test
-	public void calculateCostForReservedResourcesAlreadyFinished(){
-		double onDemandCpuCost = 0.1;
-		int onDemandLimit = 20;
-		int reservationLimit = 20;
-		double reservedCpuCost = 0.01;
-		double reservationOneYearFee = 100;
-		double reservationThreeYearsFee = 70;
-		double monitoringCost = 0.2;
-		long[] transferInLimits = {};
-		double[] transferInCosts = {};
-		long[] transferOutLimits = {};
-		double[] transferOutCosts = {};
-		
-		Provider provider = new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
-				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
-		
-		//Adding reserved resources
-		MachineDescriptor descriptor = provider.buyMachine(true, MachineType.SMALL);
-		descriptor.setStartTimeInMillis(1 * HOUR_IN_MILLIS);
-		descriptor.setFinishTimeInMillis(5 * HOUR_IN_MILLIS);
-		provider.shutdownMachine(descriptor);
-		
-		MachineDescriptor descriptor2 = provider.buyMachine(true, MachineType.SMALL);
-		descriptor2.setStartTimeInMillis(0);
-		descriptor2.setFinishTimeInMillis(5 * HOUR_IN_MILLIS);
-		provider.shutdownMachine(descriptor2);
-		
-		MachineDescriptor descriptor3 = provider.buyMachine(true, MachineType.SMALL);
-		descriptor3.setStartTimeInMillis(3 * HOUR_IN_MILLIS);
-		descriptor3.setFinishTimeInMillis(18 * HOUR_IN_MILLIS);
-		provider.shutdownMachine(descriptor3);
-		
-		MachineDescriptor descriptor4 = provider.buyMachine(true, MachineType.SMALL);
-		descriptor4.setStartTimeInMillis(0);
-		descriptor4.setFinishTimeInMillis(15 * HOUR_IN_MILLIS);
-		provider.shutdownMachine(descriptor4);
-		
-		MachineDescriptor descriptor5 = provider.buyMachine(true, MachineType.SMALL);
-		descriptor5.setStartTimeInMillis(5 * HOUR_IN_MILLIS);
-		descriptor5.setFinishTimeInMillis((long)(17.5d * HOUR_IN_MILLIS));
-		provider.shutdownMachine(descriptor5);
-		
-		MachineDescriptor descriptor6 = provider.buyMachine(true, MachineType.SMALL);
-		descriptor6.setStartTimeInMillis((long)(0.5d * HOUR_IN_MILLIS));
-		descriptor6.setFinishTimeInMillis((long)(15.73d * HOUR_IN_MILLIS));
-		provider.shutdownMachine(descriptor6);
-		
-		//Mocks
-		PowerMock.mockStatic(Configuration.class);
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config);
-		EasyMock.expect(config.getLong(PLANNING_PERIOD)).andReturn(1l);
-		
-		PowerMock.replay(Configuration.class);
-		EasyMock.replay(config);
-		
-		assertEquals(6 * reservationOneYearFee + 68 * reservedCpuCost + 68 * monitoringCost, provider.calculateCost(20 * HOUR_IN_MILLIS, 0), 0.0d);
-		
-		PowerMock.verify(Configuration.class);
-		EasyMock.verify(config);
-	}
-	
-	@Test
-	public void calculateCostForReservedResourcesNotFinished(){
-		double onDemandCpuCost = 0.1;
-		int onDemandLimit = 20;
-		int reservationLimit = 20;
-		double reservedCpuCost = 0.01;
-		double reservationOneYearFee = 100;
-		double reservationThreeYearsFee = 70;
-		double monitoringCost = 0.2;
-		long[] transferInLimits = {};
-		double[] transferInCosts = {};
-		long[] transferOutLimits = {};
-		double[] transferOutCosts = {};
-		
-		Provider provider = new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
-				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
-		
-		//Adding reserved resources
-		provider.buyMachine(true, MachineType.SMALL);
-		provider.buyMachine(true, MachineType.SMALL);
-		provider.buyMachine(true, MachineType.SMALL);
-		provider.buyMachine(true, MachineType.SMALL);
-		provider.buyMachine(true, MachineType.SMALL);
-		provider.buyMachine(true, MachineType.SMALL);
-		
-		//Mocks
-		PowerMock.mockStatic(Configuration.class);
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config);
-		EasyMock.expect(config.getLong(PLANNING_PERIOD)).andReturn(1l);
-		
-		PowerMock.replay(Configuration.class);
-		EasyMock.replay(config);
-		
-		assertEquals(6 * reservationOneYearFee + 120 * reservedCpuCost + 120 * monitoringCost, provider.calculateCost(20 * HOUR_IN_MILLIS, 0), 0.0d);
-		
-		PowerMock.verify(Configuration.class);
-		EasyMock.verify(config);
-	}
-	
-	@Test
-	public void calculateCostForReservedResourcesWithInvalidDuration(){
-		double onDemandCpuCost = 0.1;
-		int onDemandLimit = 20;
-		int reservationLimit = 20;
-		double reservedCpuCost = 0.01;
-		double reservationOneYearFee = 100;
-		double reservationThreeYearsFee = 70;
-		double monitoringCost = 0.2;
-		long[] transferInLimits = {};
-		double[] transferInCosts = {};
-		long[] transferOutLimits = {};
-		double[] transferOutCosts = {};
-		
-		Provider provider = new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
-				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
-		
-		//Adding reserved resources
-		MachineDescriptor descriptor = provider.buyMachine(true, MachineType.SMALL);
-		descriptor.setStartTimeInMillis(0);
-		descriptor.setFinishTimeInMillis((long)(-5d * HOUR_IN_MILLIS));
-		provider.shutdownMachine(descriptor);
-		
-		try{
-			provider.calculateCost(1 * HOUR_IN_MILLIS, 0);
-			fail("Invalid resource consumption!");
-		}catch(RuntimeException e){
-		}
-	}
-	
-	@Test
-	public void calculateCostOnDemandResourcesAlreadyFinished(){
-		double onDemandCpuCost = 0.85;
-		int onDemandLimit = 20;
-		int reservationLimit = 20;
-		double reservedCpuCost = 0.35;
-		double reservationOneYearFee = 99.123;
-		double reservationThreeYearsFee = 70;
-		double monitoringCost = 0.15;
-		long[] transferInLimits = {};
-		double[] transferInCosts = {};
-		long[] transferOutLimits = {};
-		double[] transferOutCosts = {};
-		
-		Provider provider = new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
-				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
-		
-		//Adding on-demand resources
+		Provider provider = new Provider("amazon", 1, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		assertTrue(provider.canBuyMachine(false, MachineType.SMALL));
 		MachineDescriptor descriptor = provider.buyMachine(false, MachineType.SMALL);
-		descriptor.setStartTimeInMillis(0);
-		descriptor.setFinishTimeInMillis(2 * HOUR_IN_MILLIS);
-		provider.shutdownMachine(descriptor);
+		assertNotNull(descriptor);
+		assertFalse(descriptor.isReserved());
+		assertEquals(MachineType.SMALL, descriptor.getType());
 		
-		MachineDescriptor descriptor2 = provider.buyMachine(false, MachineType.SMALL);
-		descriptor2.setStartTimeInMillis(1 * HOUR_IN_MILLIS);
-		descriptor2.setFinishTimeInMillis(2 * HOUR_IN_MILLIS);
-		provider.shutdownMachine(descriptor2);
-		
-		MachineDescriptor descriptor3 = provider.buyMachine(false, MachineType.SMALL);
-		descriptor3.setStartTimeInMillis(0);
-		descriptor3.setFinishTimeInMillis(15 * HOUR_IN_MILLIS);
-		provider.shutdownMachine(descriptor3);
-		
-		MachineDescriptor descriptor4 = provider.buyMachine(false, MachineType.SMALL);
-		descriptor4.setStartTimeInMillis(1 * HOUR_IN_MILLIS);
-		descriptor4.setFinishTimeInMillis((long)(2.2d * HOUR_IN_MILLIS));
-		provider.shutdownMachine(descriptor4);
-		
-		MachineDescriptor descriptor5= provider.buyMachine(false, MachineType.SMALL);
-		descriptor5.setStartTimeInMillis(2 * HOUR_IN_MILLIS);
-		descriptor5.setFinishTimeInMillis((long)(7.14d * HOUR_IN_MILLIS));
-		provider.shutdownMachine(descriptor5);
-		
-		assertEquals( 26 * onDemandCpuCost + 26 * monitoringCost, provider.calculateCost(20 * HOUR_IN_MILLIS, 0), 0.0001d);
+		assertFalse(provider.canBuyMachine(false, MachineType.SMALL));
+		assertNull(provider.buyMachine(false, MachineType.SMALL));
+
+		EasyMock.verify(typeProvider);
 	}
-	
+
+	/**
+	 * Test method for {@link commons.cloud.Provider#buyMachine(boolean, commons.cloud.MachineType)}.
+	 */
 	@Test
-	public void calculateCostOnDemandResourcesNotFinished(){
-		double onDemandCpuCost = 0.85;
-		int onDemandLimit = 20;
-		int reservationLimit = 20;
-		double reservedCpuCost = 0.35;
-		double reservationOneYearFee = 99.123;
-		double reservationThreeYearsFee = 70;
-		double monitoringCost = 0.15;
-		long[] transferInLimits = {};
-		double[] transferInCosts = {};
-		long[] transferOutLimits = {};
-		double[] transferOutCosts = {};
+	public void testBuyReservedMachineProvidedAndAvailableUntilIsOver() {
+		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
+		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
+		EasyMock.expect(typeProvider.canBuy()).andReturn(true);
+		EasyMock.expect(typeProvider.buyMachine()).andReturn(new MachineDescriptor(1, true, MachineType.LARGE));
+		EasyMock.expect(typeProvider.canBuy()).andReturn(false);
+		EasyMock.expect(typeProvider.buyMachine()).andReturn(null);
+		EasyMock.replay(typeProvider);
 		
-		Provider provider = new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
-				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
+		Provider provider = new Provider("amazon", 0, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		assertTrue(provider.canBuyMachine(true, MachineType.LARGE));
+		MachineDescriptor descriptor = provider.buyMachine(true, MachineType.LARGE);
+		assertNotNull(descriptor);
+		assertTrue(descriptor.isReserved());
+		assertEquals(MachineType.LARGE, descriptor.getType());
 		
-		//Adding on-demand resources
-		provider.buyMachine(false, MachineType.SMALL);
-		provider.buyMachine(false, MachineType.SMALL);
-		provider.buyMachine(false, MachineType.SMALL);
-		provider.buyMachine(false, MachineType.SMALL);
-		provider.buyMachine(false, MachineType.SMALL);
+		assertFalse(provider.canBuyMachine(true, MachineType.LARGE));
+		assertNull(provider.buyMachine(true, MachineType.LARGE));
 		
-		assertEquals( 100 * onDemandCpuCost + 100 * monitoringCost, provider.calculateCost(20 * HOUR_IN_MILLIS, 0), 0.0001d);
+		EasyMock.verify(typeProvider);
 	}
-	
+
+	/**
+	 * Test method for {@link commons.cloud.Provider#shutdownMachine(commons.sim.components.MachineDescriptor)}.
+	 */
 	@Test
-	public void calculateCostOnDemandResourcesWithInvalidDuration(){
-		double onDemandCpuCost = 0.85;
-		int onDemandLimit = 20;
-		int reservationLimit = 20;
-		double reservedCpuCost = 0.35;
-		double reservationOneYearFee = 99.123;
-		double reservationThreeYearsFee = 70;
-		double monitoringCost = 0.15;
-		long[] transferInLimits = {};
-		double[] transferInCosts = {};
-		long[] transferOutLimits = {};
-		double[] transferOutCosts = {};
+	public void testShutdownInexistentOnDemandMachine() {
+		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
+		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
+		EasyMock.replay(typeProvider);
 		
-		Provider provider = new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
-				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
+		Provider provider = new Provider("amazon", 3, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		assertFalse(provider.shutdownMachine(new MachineDescriptor(1, false, MachineType.LARGE)));
 		
-		//Adding reserved resources
+		EasyMock.verify(typeProvider);
+	}
+
+	/**
+	 * Test method for {@link commons.cloud.Provider#shutdownMachine(commons.sim.components.MachineDescriptor)}.
+	 */
+	@Test
+	public void testShutdownInexistentReservedMachine() {
+		MachineDescriptor descriptor = new MachineDescriptor(1, true, MachineType.LARGE);
+		
+		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
+		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
+		EasyMock.expect(typeProvider.shutdownMachine(descriptor)).andReturn(false);
+		EasyMock.replay(typeProvider);
+		
+		Provider provider = new Provider("amazon", 3, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		assertFalse(provider.shutdownMachine(descriptor));
+		
+		EasyMock.verify(typeProvider);
+	}
+
+	/**
+	 * Test method for {@link commons.cloud.Provider#shutdownMachine(commons.sim.components.MachineDescriptor)}.
+	 */
+	@Test
+	public void testShutdownOnDemandMachine() {
+		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
+		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
+		EasyMock.replay(typeProvider);
+		
+		Provider provider = new Provider("amazon", 1, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
 		MachineDescriptor descriptor = provider.buyMachine(false, MachineType.SMALL);
-		descriptor.setStartTimeInMillis(0);
-		descriptor.setFinishTimeInMillis((long)(-6d * HOUR_IN_MILLIS));
-		provider.shutdownMachine(descriptor);
+		assertNotNull(descriptor);
+		assertFalse(provider.canBuyMachine(false, MachineType.SMALL));
+		assertTrue(provider.shutdownMachine(descriptor));
+		assertTrue(provider.canBuyMachine(false, MachineType.SMALL));
 		
-		try{
-			provider.calculateCost(1 * HOUR_IN_MILLIS, 0);
-			fail("Invalid resource consumption!");
-		}catch(RuntimeException e){
-			System.err.println(e.getMessage());
-		}
-		
-		//FIXME: Double value explodes with large value!
-		provider = new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
-				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
-		MachineDescriptor descriptor2 = provider.buyMachine(false, MachineType.SMALL);
-		descriptor2.setStartTimeInMillis(1000 * HOUR_IN_MILLIS);
-		descriptor2.setFinishTimeInMillis(400 * HOUR_IN_MILLIS);
-		provider.shutdownMachine(descriptor2);
-		
-		try{
-			provider.calculateCost(500 * HOUR_IN_MILLIS, 0);
-			fail("Invalid resource consumption!");
-		}catch(RuntimeException e){
-			System.err.println(e.getMessage());
-		}
+		EasyMock.verify(typeProvider);
 	}
-	
+
+	/**
+	 * Test method for {@link commons.cloud.Provider#shutdownMachine(commons.sim.components.MachineDescriptor)}.
+	 */
 	@Test
-	public void calculateCostForReservedAndOnDemandResources(){
-		double onDemandCpuCost = 0.12;
-		int onDemandLimit = 30;
-		int reservationLimit = 20;
-		double reservedCpuCost = 0.085;
-		double reservationOneYearFee = 227.50;
-		double reservationThreeYearsFee = 70;
-		double monitoringCost = 0.15;
-		long[] transferInLimits = {};
-		double[] transferInCosts = {};
-		long[] transferOutLimits = {};
-		double[] transferOutCosts = {};
+	public void testShutdownReservedMachine() {
+		MachineDescriptor descriptorToSell = new MachineDescriptor(1, true, MachineType.LARGE);
 		
-		Provider provider = new Provider(name, onDemandLimit, reservationLimit, monitoringCost, 
-				transferInLimits, transferInCosts, transferOutLimits, transferOutCosts, new ArrayList<TypeProvider>());
+		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
+		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
+		EasyMock.expect(typeProvider.buyMachine()).andReturn(descriptorToSell);
+		EasyMock.expect(typeProvider.canBuy()).andReturn(false);
+		EasyMock.expect(typeProvider.shutdownMachine(descriptorToSell)).andReturn(true);
+		EasyMock.expect(typeProvider.canBuy()).andReturn(true);
+		EasyMock.replay(typeProvider);
 		
-		//Adding reserved resources
-		MachineDescriptor descriptor = provider.buyMachine(true, MachineType.SMALL);
-		descriptor.setStartTimeInMillis(0);
-		descriptor.setFinishTimeInMillis(10 * HOUR_IN_MILLIS);
-		provider.shutdownMachine(descriptor);
+		Provider provider = new Provider("amazon", 1, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		MachineDescriptor descriptor = provider.buyMachine(true, MachineType.LARGE);
+		assertNotNull(descriptor);
+		assertFalse(provider.canBuyMachine(true, MachineType.LARGE));
+		assertTrue(provider.shutdownMachine(descriptor));
+		assertTrue(provider.canBuyMachine(true, MachineType.LARGE));
 		
-		MachineDescriptor descriptor2 = provider.buyMachine(true, MachineType.SMALL);
-		descriptor2.setStartTimeInMillis(10 * HOUR_IN_MILLIS);
-		descriptor2.setFinishTimeInMillis(30 * HOUR_IN_MILLIS);
-		provider.shutdownMachine(descriptor2);
-		
-		MachineDescriptor descriptor3 = provider.buyMachine(true, MachineType.SMALL);
-		descriptor3.setStartTimeInMillis(1 * HOUR_IN_MILLIS);
-		descriptor3.setFinishTimeInMillis(16 * HOUR_IN_MILLIS);
-		provider.shutdownMachine(descriptor3);
-		
-		MachineDescriptor descriptor4 = provider.buyMachine(true, MachineType.SMALL);
-		descriptor4.setStartTimeInMillis(50 * HOUR_IN_MILLIS);
-		descriptor4.setFinishTimeInMillis(65 * HOUR_IN_MILLIS);
-		provider.shutdownMachine(descriptor4);
-		
-		MachineDescriptor descriptor5 = provider.buyMachine(true, MachineType.SMALL);
-		descriptor5.setStartTimeInMillis(0);
-		descriptor5.setFinishTimeInMillis(15 * HOUR_IN_MILLIS);
-		provider.shutdownMachine(descriptor5);
-		
-		MachineDescriptor descriptor6 = provider.buyMachine(true, MachineType.SMALL);
-		descriptor6.setStartTimeInMillis((long)(11.5d * HOUR_IN_MILLIS));
-		descriptor6.setFinishTimeInMillis(24 * HOUR_IN_MILLIS);
-		provider.shutdownMachine(descriptor6);
-		
-		MachineDescriptor descriptor7 = provider.buyMachine(true, MachineType.SMALL);
-		descriptor7.setStartTimeInMillis(0);
-		descriptor7.setFinishTimeInMillis((long)(15.23d * HOUR_IN_MILLIS));
-		provider.shutdownMachine(descriptor7);
-		
-		//On-demand resources
-		MachineDescriptor descriptor8 = provider.buyMachine(false, MachineType.SMALL);
-		descriptor8.setStartTimeInMillis(18 * HOUR_IN_MILLIS);
-		descriptor8.setFinishTimeInMillis(36 * HOUR_IN_MILLIS);
-		provider.shutdownMachine(descriptor8);
-		
-		MachineDescriptor descriptor9 = provider.buyMachine(false, MachineType.SMALL);
-		descriptor9.setStartTimeInMillis(0);
-		descriptor9.setFinishTimeInMillis((long)(78.5d * HOUR_IN_MILLIS));
-		provider.shutdownMachine(descriptor9);
-		
-		MachineDescriptor descriptor10 = provider.buyMachine(false, MachineType.SMALL);
-		descriptor10.setStartTimeInMillis((long)(2.4d * HOUR_IN_MILLIS));
-		descriptor10.setFinishTimeInMillis((long)(3.6d * HOUR_IN_MILLIS));
-		provider.shutdownMachine(descriptor10);
-		
-		MachineDescriptor descriptor11 = provider.buyMachine(false, MachineType.SMALL);
-		descriptor11.setStartTimeInMillis(0);
-		descriptor11.setFinishTimeInMillis((long)(5.14d * HOUR_IN_MILLIS));
-		provider.shutdownMachine(descriptor11);
-		
-		//Mocks
-		PowerMock.mockStatic(Configuration.class);
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config);
-		EasyMock.expect(config.getLong(PLANNING_PERIOD)).andReturn(1l);
-		
-		PowerMock.replay(Configuration.class);
-		EasyMock.replay(config);
-		
-		assertEquals( 7 * reservationOneYearFee + 104 * reservedCpuCost + 104 * monitoringCost +
-				105 * onDemandCpuCost + 105 * monitoringCost, provider.calculateCost(80 * HOUR_IN_MILLIS, 0), 0.00001d);
-		
-		PowerMock.verify(Configuration.class);
-		EasyMock.verify(config);
+		EasyMock.verify(typeProvider);
 	}
+
+	/**
+	 * Test method for {@link commons.cloud.Provider#calculateCost(long, int)}.
+	 */
+	@Test
+	public void testCalculateCost() {
+		fail("Not yet implemented");
+	}
+
+	/**
+	 * Test method for {@link commons.cloud.Provider#resetCostCounters()}.
+	 */
+	@Test
+	public void testResetCostCounters() {
+		fail("Not yet implemented");
+	}
+
+	/**
+	 * Test method for {@link commons.cloud.Provider#calculateUnicCost()}.
+	 */
+	@Test
+	public void testCalculateUnicCost() {
+		fail("Not yet implemented");
+	}
+
+	/**
+	 * Test method for {@link commons.cloud.Provider#resourcesConsumption()}.
+	 */
+	@Test
+	public void testResourcesConsumption() {
+		fail("Not yet implemented");
+	}
+
 }
