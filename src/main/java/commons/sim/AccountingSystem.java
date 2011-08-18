@@ -77,7 +77,7 @@ public class AccountingSystem {
 	private double calculateReceipt() {
 		double receipt = 0;
 		for (User user : users) {
-			receipt += user.calculateReceipt();
+			receipt += user.calculatePartialReceipt();
 		}
 		return receipt;
 	}
@@ -90,7 +90,7 @@ public class AccountingSystem {
 	public double calculateUniqueReceipt(){
 		double unicReceipt = 0d;
 		for(User user : users){
-			unicReceipt += user.calculateUnicReceipt();
+			unicReceipt += user.calculateOneTimeFees();
 		}
 		return unicReceipt;
 	}

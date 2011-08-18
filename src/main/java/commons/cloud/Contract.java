@@ -9,20 +9,20 @@ public class Contract implements Comparable<Contract>{
 	private final int priority;
 	private final double price;//in $
 	private final double setupCost;//in $
-	private final long cpuLimit;// in hours
+	private final long cpuLimitInMillis;// in hours
 	private final double extraCpuCost;// in $/hour
-	private final long[] transferenceLimits;
+	private final long[] transferenceLimitsInBytes;
 	private final double[] transferenceCosts;
 	
 	public Contract(String planName, int priority, double setupCost, double price,
-			long cpuLimit, double extraCpuCost, long[] transferenceLimits, double[] transferenceCosts) {
+			long cpuLimitInMillis, double extraCpuCost, long[] transferenceLimitsInBytes, double[] transferenceCosts) {
 		this.name = planName;
 		this.priority = priority;
 		this.setupCost = setupCost;
 		this.price = price;
-		this.cpuLimit = cpuLimit;
+		this.cpuLimitInMillis = cpuLimitInMillis;
 		this.extraCpuCost = extraCpuCost;
-		this.transferenceLimits = transferenceLimits;
+		this.transferenceLimitsInBytes = transferenceLimitsInBytes;
 		this.transferenceCosts = transferenceCosts;
 	}
 	
@@ -58,7 +58,7 @@ public class Contract implements Comparable<Contract>{
 	 * @return the cpuLimit
 	 */
 	public long getCpuLimit() {
-		return cpuLimit;
+		return cpuLimitInMillis;
 	}
 
 	/**
@@ -72,7 +72,7 @@ public class Contract implements Comparable<Contract>{
 	 * @return the transferenceLimits
 	 */
 	public long[] getTransferenceLimits() {
-		return transferenceLimits;
+		return transferenceLimitsInBytes;
 	}
 
 	/**
@@ -110,7 +110,7 @@ public class Contract implements Comparable<Contract>{
 	@Override
 	public String toString() {
 		return "Contract [name=" + name + ", price=" + price + ", setupCost="
-				+ setupCost + ", cpuLimit=" + cpuLimit + ", extraCpuCost="
+				+ setupCost + ", cpuLimit=" + cpuLimitInMillis + ", extraCpuCost="
 				+ extraCpuCost + "]";
 	}
 
@@ -124,8 +124,11 @@ public class Contract implements Comparable<Contract>{
 
 	public double calculateReceipt(long consumedCpu, long consumedInTransferenceInBytes,
 			long consumedOutTransferenceInBytes, long consumedStorageInBytes) {
-		//FIXME: Add transference receipts!
-		return price + Math.max(0, consumedCpu - cpuLimit) * extraCpuCost;
+		return price + Math.max(0, consumedCpu - cpuLimitInMillis) * extraCpuCost;
+	}
+	
+	public double calculateOneTimeFees() {
+		return setupCost;
 	}
 	
 }

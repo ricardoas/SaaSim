@@ -147,7 +147,7 @@ public class AGHeuristic implements PlanningHeuristic{
 	private double calcSetupReceipt(List<User> cloudUsers) {
 		double receipt = 0;
 		for(User user : cloudUsers){
-			receipt += user.calculateUnicReceipt();
+			receipt += user.calculateOneTimeFees();
 		}
 		return receipt;
 	}

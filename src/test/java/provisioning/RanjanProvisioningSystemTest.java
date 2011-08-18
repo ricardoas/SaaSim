@@ -32,7 +32,6 @@ import commons.sim.util.SaaSUsersProperties;
 @PrepareForTest(Configuration.class)
 public class RanjanProvisioningSystemTest {
 	
-	private static final long ONE_HOUR_IN_MILLIS = 1000 * 60 * 60;
 	private RanjanProvisioningSystem heuristic;
 
 	@Test

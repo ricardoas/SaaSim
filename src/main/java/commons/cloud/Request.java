@@ -1,5 +1,7 @@
 package commons.cloud;
 
+import java.util.Arrays;
+
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -39,26 +41,91 @@ public class Request{
 		this.totalProcessed = 0;
 	}
 	
+	/**
+	 * @return the saasClient
+	 */
+	public String getSaasClient() {
+		return saasClient;
+	}
+
+	/**
+	 * @return the reqID
+	 */
+	public String getReqID() {
+		return reqID;
+	}
+
+	/**
+	 * @return the userID
+	 */
+	public String getUserID() {
+		return userID;
+	}
+
+	/**
+	 * @return the arrivalTime
+	 */
+	public long getArrivalTime() {
+		return arrivalTime;
+	}
+
+	/**
+	 * @return the cpuDemandInMillis
+	 */
+	public long[] getCpuDemandInMillis() {
+		return cpuDemandInMillis;
+	}
+
+	/**
+	 * @return the requestSizeInBytes
+	 */
+	public long getRequestSizeInBytes() {
+		return requestSizeInBytes;
+	}
+
+	/**
+	 * @return the responseSizeInBytes
+	 */
+	public long getResponseSizeInBytes() {
+		return responseSizeInBytes;
+	}
+
+	/**
+	 * @return the value
+	 */
+	public MachineType getValue() {
+		return value;
+	}
+
+	/**
+	 * @param value
+	 */
 	public void assignTo(MachineType value){
 		this.value = value;
 	}
 
 	/**
-	 * Updates processed demand value.<p> 
-	 * This method assumes processedDemand &leq; demandInMillis - totalProcessed
+	 * Updates processed demand value.
+	 *  
 	 * @param processedDemand
 	 */
 	public void update(long processedDemand){
 		if(processedDemand < 0){
 			throw new RuntimeException("Invalid process amount: "+processedDemand+" in request "+this.reqID+" of "+this.saasClient);
 		}
-		this.totalProcessed += processedDemand;
+		this.totalProcessed += Math.min(processedDemand, getTotalToProcess());
 	}
 	
+	/**
+	 * @return
+	 */
 	public boolean isFinished(){
-		return getTotalToProcess() == 0;//FIXME >= ??? shouldnt it be == ?
+		return getTotalToProcess() == 0;
 	}
 
+	/**
+	 * @return
+	 */
 	public long getTotalToProcess() {
 		return getDemand() - this.totalProcessed;
 	}
@@ -72,8 +139,12 @@ public class Request{
 	 */
 	public void reset() {
 		this.totalProcessed = 0;
+		this.value = null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -82,6 +153,9 @@ public class Request{
 		return result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -99,9 +173,20 @@ public class Request{
 		return true;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	
 	@Override
 	public String toString() {
-		return "Request [reqID=" + reqID + ", demandInMillis=" + cpuDemandInMillis
-				+ ", totalProcessed=" + totalProcessed + "]";
+		return "Request [saasClient=" + saasClient + ", reqID=" + reqID
+				+ ", userID=" + userID + ", arrivalTime=" + arrivalTime
+				+ ", cpuDemandInMillis=" + Arrays.toString(cpuDemandInMillis)
+				+ ", requestSizeInBytes=" + requestSizeInBytes
+				+ ", responseSizeInBytes=" + responseSizeInBytes
+				+ ", totalProcessed=" + totalProcessed + ", assignedTo=" + value==null?"Nobody":value
+				+ "]";
 	}
+	
+	
 }

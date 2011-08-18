@@ -1,7 +1,12 @@
 package commons.cloud;
 
-import commons.io.TimeBasedWorkloadParser;
 
+/**
+ * Class representing a SaaS user. For a user that generates request using an application see
+ * {@link Request#getUserID()}.
+ * 
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ */
 public class User implements Comparable<User>{
 	
 	private static int idGenerator = 0;
@@ -12,26 +17,17 @@ public class User implements Comparable<User>{
 	private long consumedCpuInMillis;
 	private long consumedInTransferenceInBytes;
 	private long consumedOutTransferenceInBytes;
-	private long consumedStorageInBytes;
+	private final long consumedStorageInBytes;
 
-	public User(Contract contract) {
+	/**
+	 * Default constructor.
+	 * @param contract
+	 */
+	public User(Contract contract, long consumedStorageInBytes) {
 		this.id = idGenerator++;
 		this.contract = contract;
+		this.consumedStorageInBytes = consumedStorageInBytes;
 		reset();
-	}
-	
-	public void reset(){
-		consumedCpuInMillis = 0;
-		consumedInTransferenceInBytes = 0;
-		consumedOutTransferenceInBytes = 0;
-		consumedStorageInBytes = 0;
-	}
-	
-	public void update(long consumedCpuInMillis, long inTransferenceInBytes, long outTransferenceInBytes, long storageInBytes){
-		this.consumedCpuInMillis += consumedCpuInMillis;
-		this.consumedInTransferenceInBytes += inTransferenceInBytes;
-		this.consumedOutTransferenceInBytes += outTransferenceInBytes;
-		this.consumedStorageInBytes += storageInBytes;
 	}
 	
 	/**
@@ -56,22 +52,6 @@ public class User implements Comparable<User>{
 	}
 
 	/**
-	 * @return the consumedCpu
-	 */
-	public long getConsumedCpu() {
-		long consumedCpu = (long)Math.ceil(1.0 * consumedCpuInMillis / TimeBasedWorkloadParser.HOUR_IN_MILLIS);
-		return Math.min(consumedCpu, contract.getCpuLimit());
-	}
-
-	/**
-	 * @return the consumedCpu
-	 */
-	public long getExtraCpu() {
-		long consumedCpu = (long)Math.ceil(1.0 * consumedCpuInMillis / TimeBasedWorkloadParser.HOUR_IN_MILLIS);
-		return Math.max(consumedCpu-contract.getCpuLimit(), 0);
-	}
-
-	/**
 	 * @return the consumedInTransferenceInBytes
 	 */
 	public long getConsumedInTransferenceInBytes() {
@@ -90,6 +70,29 @@ public class User implements Comparable<User>{
 	 */
 	public long getConsumedStorageInBytes() {
 		return consumedStorageInBytes;
+	}
+
+	private void reset(){
+		consumedCpuInMillis = 0;
+		consumedInTransferenceInBytes = 0;
+		consumedOutTransferenceInBytes = 0;
+	}
+	
+	public void update(long consumedCpuInMillis, long inTransferenceInBytes, long outTransferenceInBytes){
+		this.consumedCpuInMillis += consumedCpuInMillis;
+		this.consumedInTransferenceInBytes += inTransferenceInBytes;
+		this.consumedOutTransferenceInBytes += outTransferenceInBytes;
+	}
+	
+	public double calculatePartialReceipt() {
+		double receipt = this.contract.calculateReceipt(consumedCpuInMillis, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, consumedStorageInBytes);
+		this.reset();
+		return receipt;
+	}
+
+
+	public double calculateOneTimeFees() {
+		return this.contract.calculateOneTimeFees();
 	}
 
 	@Override
@@ -114,29 +117,22 @@ public class User implements Comparable<User>{
 		return true;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
-		return "User [id=" + id + 
-			 "\n      CPU used=" + consumedCpuInMillis + 
-			 " (millis)\n      data transferred=" + consumedInTransferenceInBytes	+ 
-			 " (B)\n      storage used=" + consumedStorageInBytes + " (B)]";
+		return "User [id=" + id + ", contract=" + contract.getName()
+				+ ", consumedCpuInMillis=" + consumedCpuInMillis
+				+ ", consumedInTransferenceInBytes="
+				+ consumedInTransferenceInBytes
+				+ ", consumedOutTransferenceInBytes="
+				+ consumedOutTransferenceInBytes + ", consumedStorageInBytes="
+				+ consumedStorageInBytes + "]";
 	}
 
 	@Override
 	public int compareTo(User o) {
 		return this.contract.compareTo(o.contract);
-	}
-
-	public double calculateReceipt() {
-		long consumedCpu = (long)Math.ceil(1.0 * consumedCpuInMillis / TimeBasedWorkloadParser.HOUR_IN_MILLIS);
-		
-		double receipt = this.contract.calculateReceipt(consumedCpu, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, consumedStorageInBytes);
-		this.reset();
-		return receipt;
-	}
-
-
-	public double calculateUnicReceipt() {
-		return this.contract.getSetupCost();
 	}
 }

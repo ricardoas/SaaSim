@@ -254,7 +254,7 @@ public class AccountingSystemTest {
 		Contract contract = new Contract("p1", 0, setupCost, price, cpuLimit, extraCpuCost, new long[]{}, new double[]{});
 		
 		User user = new User(contract);
-		user.update((long)(11.5 * ONE_HOUR_IN_MILLIS), 0, 0, 0);//Partial hour is billed as a full hour
+		user.update((long)(11.5 * ONE_HOUR_IN_MILLIS), 0, 0);//Partial hour is billed as a full hour
 		
 		int reservationLimit = 4;
 		int onDemandLimit = 2;
@@ -317,7 +317,7 @@ public class AccountingSystemTest {
 		ArrayList<User> users = new ArrayList<User>();
 		Contract contract = new Contract("p1", 0, 0, price, cpuLimitInHours, extraCpuCost, new long[]{}, new double[]{});
 		User user = new User(contract);
-		user.update(11 * ONE_HOUR_IN_MILLIS, 0, 0, 0);//This user exceeds the limit!
+		user.update(11 * ONE_HOUR_IN_MILLIS, 0, 0);//This user exceeds the limit!
 		users.add(user);
 		users.add(new User(contract));
 		EasyMock.expect(config.getUsers()).andReturn(users);
@@ -379,7 +379,7 @@ public class AccountingSystemTest {
 		ArrayList<User> users = new ArrayList<User>();
 		Contract contract = new Contract("p1", 0, 0, price, cpuLimitInHours, extraCpuCost, new long[]{}, new double[]{});
 		User user = new User(contract);
-		user.update(11 * ONE_HOUR_IN_MILLIS, 0, 0, 0);//This user exceeds the limit!
+		user.update(11 * ONE_HOUR_IN_MILLIS, 0, 0);//This user exceeds the limit!
 		users.add(user);
 		users.add(new User(contract));
 		EasyMock.expect(config.getUsers()).andReturn(users);
@@ -442,7 +442,7 @@ public class AccountingSystemTest {
 		ArrayList<User> users = new ArrayList<User>();
 		Contract contract = new Contract("p1", 0, 0, price, cpuLimitInHours, extraCpuCost, new long[]{}, new double[]{});
 		User user = new User(contract);
-		user.update(11 * ONE_HOUR_IN_MILLIS, 0, 0, 0);//This user exceeds the limit!
+		user.update(11 * ONE_HOUR_IN_MILLIS, 0, 0);//This user exceeds the limit!
 		users.add(user);
 		users.add(new User(contract));
 		EasyMock.expect(config.getUsers()).andReturn(users);

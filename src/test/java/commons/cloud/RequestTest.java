@@ -6,9 +6,7 @@ package commons.cloud;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -44,7 +42,31 @@ public class RequestTest {
 	 */
 	@Test
 	public void testUpdate() {
+		request.assignTo(MachineType.SMALL);
+		assertEquals(SMALL_DEMAND, request.getTotalToProcess());
 		request.update(100);
+		assertEquals(SMALL_DEMAND-100, request.getTotalToProcess());
+	}
+
+	/**
+	 * Test method for {@link commons.cloud.Request#update(long)}.
+	 */
+	@Test
+	public void testUpdateWithMoreThanRequiredToFinish() {
+		request.assignTo(MachineType.SMALL);
+		assertEquals(SMALL_DEMAND, request.getTotalToProcess());
+		request.update(SMALL_DEMAND + 100);
+		assertEquals(0, request.getTotalToProcess());
+	}
+
+	/**
+	 * Test method for {@link commons.cloud.Request#update(long)}.
+	 */
+	@Test(expected=RuntimeException.class)
+	public void testUpdateWithNegativeDemand() {
+		request.assignTo(MachineType.SMALL);
+		assertEquals(SMALL_DEMAND, request.getTotalToProcess());
+		request.update(-100);
 	}
 
 	/**
@@ -56,6 +78,20 @@ public class RequestTest {
 	}
 
 	/**
+	 * Test method for {@link commons.cloud.Request#isFinished()}.
+	 */
+	@Test
+	public void testIsFinishedWithAssignment() {
+		request.assignTo(MachineType.XLARGE);
+		assertFalse(request.isFinished());
+		while(!request.isFinished()){
+			request.update(100);
+		}
+		assertTrue(request.isFinished());
+		assertEquals(0, request.getTotalToProcess());
+	}
+
+	/**
 	 * Test method for {@link commons.cloud.Request#getTotalToProcess()}.
 	 */
 	@Test(expected=NullPointerException.class)
@@ -64,19 +100,16 @@ public class RequestTest {
 	}
 
 	/**
-	 * Test method for {@link commons.cloud.Request#getDemand()}.
-	 */
-	@Test
-	public void testGetDemand() {
-		fail("Not yet implemented");
-	}
-
-	/**
 	 * Test method for {@link commons.cloud.Request#reset()}.
 	 */
-	@Test
+	@Test(expected=NullPointerException.class)
 	public void testReset() {
-		fail("Not yet implemented");
+		request.assignTo(MachineType.XLARGE);
+		assertEquals(XLARGE_DEMAND, request.getTotalToProcess());
+		request.update(100);
+		assertEquals(XLARGE_DEMAND-100, request.getTotalToProcess());
+		request.reset();
+		request.getTotalToProcess();
 	}
 
 }
