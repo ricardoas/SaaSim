@@ -1,6 +1,5 @@
 package commons.cloud;
 
-import commons.cloud.UtilityResult.UtilityResultEntry;
 
 
 /**
@@ -93,8 +92,8 @@ public class User implements Comparable<User>{
 	}
 
 
-	public double calculateOneTimeFees() {
-		return this.contract.calculateOneTimeFees();
+	public void calculateOneTimeFees(UtilityResult result) {
+		result.addUserUniqueFee(getId(), this.contract.calculateOneTimeFees());
 	}
 
 	@Override

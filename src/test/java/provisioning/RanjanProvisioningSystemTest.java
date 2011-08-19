@@ -11,9 +11,9 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import commons.cloud.TypeProvider;
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
+import commons.cloud.TypeProvider;
 import commons.cloud.User;
 import commons.config.Configuration;
 import commons.config.PropertiesTesting;

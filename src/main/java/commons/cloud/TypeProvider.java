@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import commons.cloud.UtilityResult.UtilityResultEntry;
 import commons.sim.components.MachineDescriptor;
 
 
@@ -162,6 +161,13 @@ public class TypeProvider {
 			transferences[1] += descriptor.getOutTransference();
 		}
 		return transferences;
+	}
+
+	/**
+	 * @return
+	 */
+	public double calculateUniqueCost() {
+		return reservation * reservationOneYearFee;
 	}
 	
 }

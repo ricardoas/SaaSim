@@ -20,5 +20,9 @@ public class SaaSPlanProperties {
 	public static final String PLAN_TRANSFER_LIMIT = "saas.plan.transfer_lim";
 	
 	public static final String PLAN_EXTRA_TRANSFER_COST = "saas.plan.ex_transfer";
+	
+	public static final String PLAN_STORAGE_LIMIT = "saas.plan.storage_lim";
+	
+	public static final String PLAN_EXTRA_STORAGE_COST = "saas.plan.ex_storage";
 }
 

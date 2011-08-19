@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import commons.cloud.UtilityResult.UtilityResultEntry;
 import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
+import commons.util.CostCalculus;
 
 /**
  * IaaS {@link Machine} provider.
@@ -15,7 +15,6 @@ import commons.sim.components.MachineDescriptor;
  */
 public class Provider {
 	
-	private static final long GB_IN_BYTES = 1024 * 1024 * 1024;
 	
 	private final String name;
 	private final int onDemandLimit;
@@ -185,45 +184,17 @@ public class Provider {
 			typeProvider.calculateMachinesCost(entry, currentTimeInMillis, monitoringCost);
 		}
 		
-		double inCost = calcTransferenceCost(transferences[0], transferInLimits, transferInCosts);
-		double outCost = calcTransferenceCost(transferences[1], transferOutLimits, transferOutCosts);
+		double inCost = CostCalculus.calcTransferenceCost(transferences[0], transferInLimits, transferInCosts);
+		double outCost = CostCalculus.calcTransferenceCost(transferences[1], transferOutLimits, transferOutCosts);
 		
 		entry.addTransferenceToCost(transferences[0], inCost, transferences[1], outCost);
 	}
 	
-	/**
-	 * TODO Code me!
-	 * @param totalTransfered
-	 * @param limits
-	 * @param costs
-	 * @return
-	 */
-	private static double calcTransferenceCost(long totalTransfered,
-			long[] limits, double[] costs) {
-		double transferenceLeft = (1.0*totalTransfered)/GB_IN_BYTES;
-		int currentIndex = 0;
-		double total = 0;
-		while(transferenceLeft != 0 && currentIndex != limits.length){
-			if(transferenceLeft <= limits[currentIndex]){
-				total += transferenceLeft * costs[currentIndex];
-				transferenceLeft = 0;
-			}else{
-				total += limits[currentIndex] * costs[currentIndex];
-				transferenceLeft -= limits[currentIndex]; 
-			}
-			currentIndex++;
-		}
-		
-		if(transferenceLeft != 0){
-			total += limits[currentIndex] * costs[currentIndex];
-			transferenceLeft = 0; 
-		}
-		return total;
-	}
 
-	public double calculateUniqueCost() {
-		double result = 0;//this.totalNumberOfReservedMachinesUsed * this.reservationOneYearFee;
-//		this.totalNumberOfReservedMachinesUsed = 0;
-		return result;
+	public void calculateUniqueCost(UtilityResult result) {
+		for (TypeProvider typeProvider : types.values()) {
+			double cost = typeProvider.calculateUniqueCost();
+			result.addProviderUniqueCost(getName(), typeProvider.getType(), cost);
+		}
 	}
 }

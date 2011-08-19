@@ -1,7 +1,7 @@
 package commons.config;
 
-import static commons.sim.util.IaaSProvidersProperties.*;
 import static commons.sim.util.IaaSPlanProperties.*;
+import static commons.sim.util.IaaSProvidersProperties.*;
 import static commons.sim.util.SaaSAppProperties.*;
 import static commons.sim.util.SaaSPlanProperties.*;
 import static commons.sim.util.SaaSUsersProperties.*;
@@ -25,9 +25,9 @@ import provisioning.ProfitDrivenProvisioningSystem;
 import provisioning.RanjanProvisioningSystem;
 
 import commons.cloud.Contract;
-import commons.cloud.TypeProvider;
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
+import commons.cloud.TypeProvider;
 import commons.cloud.User;
 import commons.sim.schedulingheuristics.ProfitDrivenHeuristic;
 import commons.sim.schedulingheuristics.RanjanHeuristic;
@@ -249,12 +249,15 @@ public class Configuration	extends PropertiesConfiguration{
 		double[] extraCpuCosts = getDoubleArray(PLAN_EXTRA_CPU_COST);
 		long[][] planTransferLimits = getLong2DArray(PLAN_TRANSFER_LIMIT);
 		double[][] planExtraTransferCost = getDouble2DArray(PLAN_EXTRA_TRANSFER_COST);
+		long[] planStorageLimits = getLongArray(PLAN_STORAGE_LIMIT);
+		double[] planExtraStorageCosts = getDoubleArray(PLAN_EXTRA_STORAGE_COST);
 		
 		Map<String, Contract> contractsPerName = new HashMap<String, Contract>();
 		for(int i = 0; i < numberOfPlans; i++){
 			contractsPerName.put(planNames[i], 
 					new Contract(planNames[i], planPriorities[i], setupCosts[i], prices[i], 
-							cpuLimits[i], extraCpuCosts[i], planTransferLimits[i], planExtraTransferCost[i]));
+							cpuLimits[i], extraCpuCosts[i], planTransferLimits[i], planExtraTransferCost[i],
+							planStorageLimits[i], planExtraStorageCosts[i]));
 		}
 		
 		String[] plans = getStringArray(SAAS_USER_PLAN);

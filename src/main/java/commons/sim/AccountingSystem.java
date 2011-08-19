@@ -13,7 +13,7 @@ import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
 import commons.cloud.UtilityResult;
-import commons.cloud.UtilityResult.UtilityResultEntry;
+import commons.cloud.UtilityResultEntry;
 import commons.config.Configuration;
 import commons.io.GEISTWorkloadParser;
 import commons.io.TimeBasedWorkloadParser;
@@ -84,30 +84,18 @@ public class AccountingSystem {
 	}
 
 	/**
-	 * This method calculates the receipts incurred by SaaS providers in a unique period. (e.g, one time
-	 * during a whole year)  
-	 * @return
-	 */
-	public double calculateUniqueReceipt(){
-		double unicReceipt = 0d;
-		for(User user : users){
-			unicReceipt += user.calculateOneTimeFees();
-		}
-		return unicReceipt;
-	}
-	
-	/**
 	 * This method calculates the costs incurred by IaaS providers in a unique period. (e.g, one time
 	 * during a whole year)  
 	 * @param result TODO
 	 * @return
 	 */
-	public double calculateUniqueUtility(UtilityResult result){
-		double uniqueCost = 0d;
+	public void calculateUniqueUtility(UtilityResult result){
 		for(Provider provider : providers){
-			uniqueCost += provider.calculateUniqueCost();
+			provider.calculateUniqueCost(result);
 		}
-		return uniqueCost;
+		for(User user : users){
+			user.calculateOneTimeFees(result);
+		}
 	}
 
 	/**

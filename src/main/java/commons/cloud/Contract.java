@@ -1,12 +1,16 @@
 package commons.cloud;
 
-import commons.cloud.UtilityResult.UtilityResultEntry;
+import commons.util.CostCalculus;
+
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public class Contract implements Comparable<Contract>{
 	
+	private static final long HOUR_IN_MILLIS = 3600000;
+	private static final long MB_IN_BYTES = 1024 * 1024;
+
 	private final String name;
 	private final int priority;
 	private final double price;//in $
@@ -15,9 +19,12 @@ public class Contract implements Comparable<Contract>{
 	private final double extraCpuCost;// in $/hour
 	private final long[] transferenceLimitsInBytes;
 	private final double[] transferenceCosts;
+	private final long storageLimitInMB;
+	private final double storageCostPerMB;
 	
 	public Contract(String planName, int priority, double setupCost, double price,
-			long cpuLimitInMillis, double extraCpuCost, long[] transferenceLimitsInBytes, double[] transferenceCosts) {
+			long cpuLimitInMillis, double extraCpuCost, long[] transferenceLimitsInBytes, double[] transferenceCosts,
+			long storageLimitInMB, double storageCostPerMB) {
 		this.name = planName;
 		this.priority = priority;
 		this.setupCost = setupCost;
@@ -26,6 +33,8 @@ public class Contract implements Comparable<Contract>{
 		this.extraCpuCost = extraCpuCost;
 		this.transferenceLimitsInBytes = transferenceLimitsInBytes;
 		this.transferenceCosts = transferenceCosts;
+		this.storageLimitInMB = storageLimitInMB;
+		this.storageCostPerMB = storageCostPerMB;
 	}
 	
 	/**
@@ -133,9 +142,15 @@ public class Contract implements Comparable<Contract>{
 	 */
 	public void calculateReceipt(UtilityResultEntry entry, long consumedCpu, long consumedInTransferenceInBytes,
 			long consumedOutTransferenceInBytes, long consumedStorageInBytes) {
-		double result = price + Math.max(0, consumedCpu - cpuLimitInMillis) * extraCpuCost;
-		//FIXME use transference
-		entry.addToReceipt(getName(), result);
+		long extraConsumedCPU = Math.max(0, consumedCpu - cpuLimitInMillis);
+		double costOfCPU = price + extraConsumedCPU/HOUR_IN_MILLIS * extraCpuCost;
+		
+		long consumedTransference = consumedInTransferenceInBytes + consumedOutTransferenceInBytes;
+		double transferenceCost = CostCalculus.calcTransferenceCost(consumedTransference , transferenceLimitsInBytes, transferenceCosts);
+		
+		double storageCost = Math.max(0, (1.0*consumedStorageInBytes)/MB_IN_BYTES - storageLimitInMB) * storageCostPerMB;
+		
+		entry.addToReceipt(getName(), extraConsumedCPU, costOfCPU, consumedTransference, transferenceCost, storageCost);
 	}
 	
 	public double calculateOneTimeFees() {

@@ -1,7 +1,6 @@
 package commons.sim.components;
 
 import static commons.sim.util.SimulatorProperties.*;
-import static commons.sim.util.SimulatorProperties.RANJAN_HEURISTIC_BACKLOG_SIZE;
 
 import java.util.LinkedList;
 import java.util.Queue;

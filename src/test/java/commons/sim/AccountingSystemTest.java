@@ -16,10 +16,10 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import commons.cloud.Contract;
-import commons.cloud.TypeProvider;
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.Request;
+import commons.cloud.TypeProvider;
 import commons.cloud.User;
 import commons.cloud.UtilityResult;
 import commons.config.Configuration;

@@ -23,15 +23,35 @@ public class ContractTest {
 	private double extraCpuCost = 0.5;
 	private long [] transferenceLimits = {10, 100};
 	private double [] transferenceCosts = {0.5, 0,3};
+	private long storageLimits = 5;
+	private double storageCosts = 5.12;
 
+//	@Test
+//	public void testCalculateReceiptWithUsage() {
+//		Contract contract = EasyMock.createStrictMock(Contract.class);
+//		EasyMock.expect(contract.calculateReceipt(0, 0, 0, STORAGE_IN_BYTES)).andReturn(PRICE);
+//		EasyMock.expect(contract.calculateReceipt(100000, 100000, 100000, STORAGE_IN_BYTES)).andReturn(PRICE_WITH_USAGE);
+//		EasyMock.expect(contract.calculateReceipt(200000, 200000, 200000, STORAGE_IN_BYTES)).andReturn(PRICE_WITH_USAGE + PRICE_WITH_USAGE);
+//		EasyMock.replay(contract);
+//		
+//		User user = new User(contract, STORAGE_IN_BYTES);
+//		assertEquals(PRICE, user.calculatePartialReceipt(), 0.0);
+//		user.update(100000, 100000, 100000);
+//		assertEquals(PRICE_WITH_USAGE, user.calculatePartialReceipt(), 0.0);
+//		user.update(100000, 100000, 100000);
+//		user.update(100000, 100000, 100000);
+//		assertEquals(PRICE_WITH_USAGE + PRICE_WITH_USAGE, user.calculatePartialReceipt(), 0.0);
+//	
+//		EasyMock.verify(contract);
+//	}
 	/**
 	 * Test method for {@link Contract#compareTo(Contract)}
 	 */
 	@Test
 	public void testCompareTo(){
-		Contract c1 = new Contract(planName, 1, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts);
-		Contract c2A = new Contract(planName, 2, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts);
-		Contract c2B = new Contract(planName, 2, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts);
+		Contract c1 = new Contract(planName, 1, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
+		Contract c2A = new Contract(planName, 2, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
+		Contract c2B = new Contract(planName, 2, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
 		
 		assertEquals(0, c1.compareTo(c1));
 		assertEquals(1, c1.compareTo(c2A));
@@ -49,8 +69,11 @@ public class ContractTest {
 	 */
 	@Test
 	public void testCalculateReceiptWithoutConsumption(){
-		Contract c1 = new Contract(planName, 1, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts);
-		assertEquals(price, c1.calculateReceipt(0, 0, 0, 0), 0.0);
+		Contract c1 = new Contract(planName, 1, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
+		UtilityResultEntry entry = new UtilityResultEntry(0);
+		entry.addUser(1);
+		c1.calculateReceipt(entry, 0, 0, 0, 0);
+		assertEquals(price, entry.getReceipt(), 0.0);
 	}
 	
 	/**
@@ -58,8 +81,11 @@ public class ContractTest {
 	 */
 	@Test
 	public void testCalculateReceiptWithConsumptionLowerThanCPULimit(){
-		Contract c1 = new Contract(planName, 1, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts);
-		assertEquals(price, c1.calculateReceipt(10, 0, 0, 0), 0.0);
+		Contract c1 = new Contract(planName, 1, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
+		UtilityResultEntry entry = new UtilityResultEntry(0);
+		entry.addUser(1);
+		c1.calculateReceipt(entry, 10, 0, 0, 0);
+		assertEquals(price, entry.getReceipt(), 0.0);
 	}
 	
 	/**
@@ -67,8 +93,11 @@ public class ContractTest {
 	 */
 	@Test
 	public void testCalculateReceiptWithConsumptionHigherThanCPULimit(){
-		Contract c1 = new Contract(planName, 1, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts);
+		Contract c1 = new Contract(planName, 1, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
 		int consumedCpu = 9999;
-		assertEquals(price + (consumedCpu-cpuLimit)*extraCpuCost, c1.calculateReceipt(consumedCpu, 0, 0, 0), 0.0);
+		UtilityResultEntry entry = new UtilityResultEntry(0);
+		entry.addUser(1);
+		c1.calculateReceipt(entry, consumedCpu, 0, 0, 0);
+		assertEquals(price + (consumedCpu-cpuLimit)*extraCpuCost, entry.getReceipt(), 0.0);
 	}
 }

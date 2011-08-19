@@ -3,7 +3,7 @@
  */
 package commons.cloud;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -23,35 +23,15 @@ public class UserTest {
 	 * Test method for {@link commons.cloud.User#calculatePartialReceipt()}.
 	 */
 	@Test
-	public void testCalculateReceiptWithNothingUsed() {
+	public void testCalculateReceipt() {
+		UtilityResultEntry entry = new UtilityResultEntry(0);
+		
 		Contract contract = EasyMock.createStrictMock(Contract.class);
-		EasyMock.expect(contract.calculateReceipt(0, 0, 0, STORAGE_IN_BYTES)).andReturn(PRICE);
+		contract.calculateReceipt(entry, 0, 0, 0, STORAGE_IN_BYTES);
 		EasyMock.replay(contract);
 		
 		User user = new User(contract, STORAGE_IN_BYTES);
-		assertEquals(PRICE, user.calculatePartialReceipt(), 0.0);
-	
-		EasyMock.verify(contract);
-	}
-
-	/**
-	 * Test method for {@link commons.cloud.User#calculatePartialReceipt()}.
-	 */
-	@Test
-	public void testCalculateReceiptWithUsage() {
-		Contract contract = EasyMock.createStrictMock(Contract.class);
-		EasyMock.expect(contract.calculateReceipt(0, 0, 0, STORAGE_IN_BYTES)).andReturn(PRICE);
-		EasyMock.expect(contract.calculateReceipt(100000, 100000, 100000, STORAGE_IN_BYTES)).andReturn(PRICE_WITH_USAGE);
-		EasyMock.expect(contract.calculateReceipt(200000, 200000, 200000, STORAGE_IN_BYTES)).andReturn(PRICE_WITH_USAGE + PRICE_WITH_USAGE);
-		EasyMock.replay(contract);
-		
-		User user = new User(contract, STORAGE_IN_BYTES);
-		assertEquals(PRICE, user.calculatePartialReceipt(), 0.0);
-		user.update(100000, 100000, 100000);
-		assertEquals(PRICE_WITH_USAGE, user.calculatePartialReceipt(), 0.0);
-		user.update(100000, 100000, 100000);
-		user.update(100000, 100000, 100000);
-		assertEquals(PRICE_WITH_USAGE + PRICE_WITH_USAGE, user.calculatePartialReceipt(), 0.0);
+		user.calculatePartialReceipt(entry);
 	
 		EasyMock.verify(contract);
 	}
