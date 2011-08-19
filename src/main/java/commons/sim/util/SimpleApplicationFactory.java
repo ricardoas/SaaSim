@@ -47,7 +47,7 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 	 * @param tier 
 	 * @return
 	 */
-	private LoadBalancer buildLoadBalancer(JEEventScheduler scheduler, Monitor monitor,
+	private static LoadBalancer buildLoadBalancer(JEEventScheduler scheduler, Monitor monitor,
 			Class<?> heuristic, int serversPerTier, int maxServerPerTier, int tier) {
 		try {
 			return new LoadBalancer(scheduler, monitor, 

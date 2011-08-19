@@ -1,7 +1,5 @@
 package provisioning;
 
-import java.io.IOException;
-
 import org.apache.commons.configuration.ConfigurationException;
 
 import provisioning.util.DPSFactory;
@@ -20,15 +18,14 @@ public class Main {
 	/**
 	 * @param args
 	 * @throws ConfigurationException 
-	 * @throws IOException 
 	 */
-	public static void main(String[] args) throws ConfigurationException, IOException {
+	public static void main(String[] args) throws ConfigurationException {
 		
 		Configuration.buildInstance(args[0]);
 		
 		DPS dps = DPSFactory.INSTANCE.createDPS();
 		
-		Simulator simulator = SimulatorFactory.getInstance().buildSimulator(dps);
+		Simulator simulator = SimulatorFactory.buildSimulator(dps);
 		
 		dps.registerConfigurable(simulator);
 		

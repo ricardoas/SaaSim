@@ -29,12 +29,8 @@ public class TimeSharedMachineTest {
 	private MachineDescriptor descriptor;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		this.descriptor = new MachineDescriptor(1, false, MachineType.SMALL);
-	}
-
-	@After
-	public void tearDown() throws Exception {
 	}
 
 	@Test
@@ -84,7 +80,7 @@ public class TimeSharedMachineTest {
 	}
 
 	@Test
-	public void testSendSmallRequestWithEmptyMachine() throws Exception{
+	public void testSendSmallRequestWithEmptyMachine(){
 		JEEventScheduler scheduler = new JEEventScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);

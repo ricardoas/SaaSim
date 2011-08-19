@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Random;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,7 +20,7 @@ public class JETimeTest {
 	private int secondTime;
 
 	@Before
-	public void setUpBeforeClass() throws Exception {
+	public void setUpBeforeClass() {
 		this.random = new Random();
 		firstTime = random.nextInt(UPPERBOUND);
 		secondTime = random.nextInt(UPPERBOUND);
@@ -30,10 +29,6 @@ public class JETimeTest {
 			firstTime = secondTime;
 			secondTime = tmp;
 		}
-	}
-
-	@After
-	public void tearDown() throws Exception {
 	}
 
 	@Test

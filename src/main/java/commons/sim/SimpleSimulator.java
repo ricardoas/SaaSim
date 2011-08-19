@@ -13,7 +13,6 @@ import commons.sim.components.LoadBalancer;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
-import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
@@ -22,7 +21,7 @@ import commons.sim.util.ApplicationFactory;
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class SimpleSimulator extends JEAbstractEventHandler implements JEEventHandler, Simulator{
+public class SimpleSimulator extends JEAbstractEventHandler implements Simulator{
 	
 	private int[] daysInMonths = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 	private int currentMonth = 0;
@@ -69,24 +68,25 @@ public class SimpleSimulator extends JEAbstractEventHandler implements JEEventHa
 	@Override
 	public void handleEvent(JEEvent event) {
 		switch (event.getType()) {
-			case READWORKLOAD:
-				try {
-					if (workloadParser.hasNext()) {
-						List<Request> list = workloadParser.next();
-						for (Request request : list) {
-							request.reset();
-							send(parseEvent(request));
-						}
+		case READWORKLOAD:
+			try {
+				if (workloadParser.hasNext()) {
+					List<Request> list = workloadParser.next();
+					for (Request request : list) {
+						request.reset();
+						send(parseEvent(request));
 					}
-				} catch (IOException e) {
-					e.printStackTrace();
 				}
-				break;
-			case CHARGE_USERS:
-				tiers.get(0).chargeUsers();
-				send(new JEEvent(JEEventType.CHARGE_USERS, this, getScheduler().now().plus(new JETime(DAY_IN_MILLIS * daysInMonths[currentMonth++]))));
-			default:
-				break;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			break;
+		case CHARGE_USERS:
+			tiers.get(0).chargeUsers();
+			send(new JEEvent(JEEventType.CHARGE_USERS, this, getScheduler().now().plus(new JETime(DAY_IN_MILLIS * daysInMonths[currentMonth++]))));
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -95,7 +95,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements JEEventHa
 	 * @return
 	 */
 	protected JEEvent parseEvent(Request request) {
-		return new JEEvent(JEEventType.NEWREQUEST, tiers.get(0), new JETime(request.getTimeInMillis()), request);
+		return new JEEvent(JEEventType.NEWREQUEST, tiers.get(0), new JETime(request.getArrivalTimeInMillis()), request);
 	}
 
 	/**

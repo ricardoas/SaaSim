@@ -115,7 +115,7 @@ public class AccountingSystem {
 	public double calculateUniqueCost(){
 		double unicCost = 0d;
 		for(Provider provider : providers){
-			unicCost += provider.calculateUnicCost();
+			unicCost += provider.calculateUniqueCost();
 		}
 		return unicCost;
 	}

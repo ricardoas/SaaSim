@@ -45,7 +45,7 @@ public class ConfigurationTest {
 	}
 	
 	@Test(expected=ConfigurationRuntimeException.class)
-	public void testGetInstanceWithoutBuild() throws ConfigurationException {
+	public void testGetInstanceWithoutBuild() {
 		Configuration.getInstance();
 	}
 	

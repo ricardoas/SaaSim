@@ -8,6 +8,10 @@ public class UtilityResult {
 		public double penalty;
 		public long totalInTransferred;
 		public long totalOutTransferred;
+		
+		public void addToCost(double cost) {
+			this.cost += cost;
+		}
 	}
 
 	private String result;

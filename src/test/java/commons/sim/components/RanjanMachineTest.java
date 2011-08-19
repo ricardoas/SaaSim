@@ -33,7 +33,7 @@ public class RanjanMachineTest {
 	private MachineDescriptor descriptor;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		this.descriptor = new MachineDescriptor(1, false, MachineType.SMALL);
 	}
 
@@ -105,7 +105,7 @@ public class RanjanMachineTest {
 	}
 	
 	@Test
-	public void testSendSmallRequestWithEmptyMachine() throws Exception{
+	public void testSendSmallRequestWithEmptyMachine(){
 
 		Configuration config = mockConfiguration();
 		

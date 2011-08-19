@@ -115,7 +115,8 @@ public class JETime implements Comparable<JETime> {
     /**
      * {@inheritDoc}
      */
-    public int compareTo(JETime o) {
+    @Override
+	public int compareTo(JETime o) {
     	if(o.equals(INFINITY)){
     		return -1;
     	}

@@ -12,7 +12,7 @@ public class Request{
 	private final String saasClient;
 	private final String reqID;
 	private final String userID;
-	private final long arrivalTime;
+	private final long arrivalTimeInMillis;
 	private final long[] cpuDemandInMillis;
 	private final long requestSizeInBytes;
 	private final long responseSizeInBytes;
@@ -24,17 +24,17 @@ public class Request{
 	 * @param reqID
 	 * @param saasClient
 	 * @param userID
-	 * @param arrivalTime
+	 * @param arrivalTimeInMillis
 	 * @param requestSizeInBytes
 	 * @param responseSizeInBytes
 	 * @param cpuDemandInMillis
 	 */
-	public Request(String reqID, String saasClient, String userID, long arrivalTime,
+	public Request(String reqID, String saasClient, String userID, long arrivalTimeInMillis,
 			long requestSizeInBytes, long responseSizeInBytes, long[] cpuDemandInMillis) {
 		this.saasClient = saasClient;
 		this.reqID = reqID;
 		this.userID = userID;
-		this.arrivalTime = arrivalTime;
+		this.arrivalTimeInMillis = arrivalTimeInMillis;
 		this.requestSizeInBytes = requestSizeInBytes;
 		this.responseSizeInBytes = responseSizeInBytes;
 		this.cpuDemandInMillis = cpuDemandInMillis;
@@ -63,10 +63,10 @@ public class Request{
 	}
 
 	/**
-	 * @return the arrivalTime
+	 * @return the arrivalTimeInMillis
 	 */
-	public long getArrivalTime() {
-		return arrivalTime;
+	public long getArrivalTimeInMillis() {
+		return arrivalTimeInMillis;
 	}
 
 	/**
@@ -180,7 +180,7 @@ public class Request{
 	@Override
 	public String toString() {
 		return "Request [saasClient=" + saasClient + ", reqID=" + reqID
-				+ ", userID=" + userID + ", arrivalTime=" + arrivalTime
+				+ ", userID=" + userID + ", arrivalTime=" + arrivalTimeInMillis
 				+ ", cpuDemandInMillis=" + Arrays.toString(cpuDemandInMillis)
 				+ ", requestSizeInBytes=" + requestSizeInBytes
 				+ ", responseSizeInBytes=" + responseSizeInBytes

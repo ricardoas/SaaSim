@@ -11,31 +11,9 @@ import commons.sim.Simulator;
 public class SimulatorFactory {
 	
 	/**
-	 * Unique instance
-	 */
-	private static SimulatorFactory instance;
-	
-	/**
-	 * Builds and gets the single instance of thsi factory.
-	 * @return
-	 */
-	public static SimulatorFactory getInstance(){
-		
-		if(instance == null){
-			instance = new SimulatorFactory();
-		}
-		return instance;
-	}
-	
-	private SimulatorFactory() {
-		
-	}
-
-	/**
 	 * @param monitor TODO
-	 * 
 	 */
-	public Simulator buildSimulator(Monitor monitor){
+	public static Simulator buildSimulator(Monitor monitor){
 		return new SimpleSimulator(monitor);
 	}
 }

@@ -16,10 +16,6 @@ public class MachineDescriptor {
 	private long inTransference;
 	private long outTransference;
 	
-	private double costPayed;
-	private long inTransferencePayed;
-	private long outTransferencePayed;
-
 	/**
 	 * Default constructor.
 	 * @param machineID Machine unique ID.
@@ -108,31 +104,6 @@ public class MachineDescriptor {
 	 */
 	public void setOutTransference(long outTransference) {
 		this.outTransference = outTransference;
-	}
-
-	
-	public void setCostAlreadyPayed(double costPayed) {
-		this.costPayed = costPayed;
-	}
-	
-	public double getCostAlreadyPayed(){
-		return this.costPayed;
-	}
-	
-	public void setInTransferencePayed(long value){
-		inTransferencePayed = value;
-	}
-	
-	public long getInTransferencePayed(){
-		return inTransferencePayed;
-	}
-	
-	public void setOutTransferencePayed(long value){
-		outTransferencePayed = value;
-	}
-	
-	public long getOutTransferencePayed(){
-		return outTransferencePayed;
 	}
 
 	public void updateTransference(long sizeInBytes, long responseSizeInBytes) {

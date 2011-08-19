@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.print.attribute.standard.Finishings;
+
+import commons.cloud.UtilityResult.UtilityResultEntry;
 import commons.config.Configuration;
 import commons.io.TimeBasedWorkloadParser;
 import commons.sim.components.Machine;
@@ -30,8 +33,8 @@ public class Provider {
 	private final long[] transferOutLimits;
 	private final double[] transferOutCosts;
 	
-	private List<MachineDescriptor> onDemandRunningMachines;
-	private List<MachineDescriptor> onDemandFinishedMachines;
+	private double previousDebt;
+	private int onDemandRunningMachines;
 	
 	public Provider(String name, int onDemandLimit,
 			int reservationLimit, double monitoringCost,
@@ -48,13 +51,12 @@ public class Provider {
 		this.transferOutLimits = transferOutLimits;
 		this.transferOutCosts = transferOutCosts;
 		
-		this.onDemandRunningMachines = new ArrayList<MachineDescriptor>();
-		this.onDemandFinishedMachines = new ArrayList<MachineDescriptor>();
-		
 		this.types = new HashMap<MachineType, TypeProvider>();
 		for (TypeProvider machineType : types) {
 			this.types.put(machineType.getType(), machineType);
 		}
+		this.onDemandRunningMachines = 0;
+		this.previousDebt = 0;
 	}
 
 	/**
@@ -144,7 +146,7 @@ public class Provider {
 
 	public boolean canBuyMachine(boolean reserved, MachineType type) {
 		if(!reserved){
-			return onDemandRunningMachines.size() < getOnDemandLimit();
+			return onDemandRunningMachines < getOnDemandLimit();
 		}
 		return types.containsKey(type)?types.get(type).canBuy():false;
 	}
@@ -156,120 +158,47 @@ public class Provider {
 	 * @return A new {@link MachineDescriptor} if succeeded in creation, or <code>null</code> otherwise.
 	 */
 	public MachineDescriptor buyMachine(boolean isReserved, MachineType instanceType) {
-		if(!isReserved){
-			if(canBuyMachine(false, instanceType)){
-				MachineDescriptor descriptor = new MachineDescriptor(IDGenerator.GENERATOR.next(), isReserved, instanceType);
-				this.onDemandRunningMachines.add(descriptor);
-				return descriptor;
-			}
-			return null;
-		}
 		if(!types.containsKey(instanceType)){
 			throw new RuntimeException("Attempt to buy a machine of type " + instanceType + " at provider: " + getName());
 		}
-		return types.get(instanceType).buyMachine();
+		if(!isReserved){
+			this.onDemandRunningMachines++;
+		}
+		return types.get(instanceType).buyMachine(isReserved);
 	}
 
 	public boolean shutdownMachine(MachineDescriptor machineDescriptor) {
-		if(machineDescriptor.isReserved()){
-			if(!types.containsKey(machineDescriptor.getType())){
-				return false;
-			}
-			return types.get(machineDescriptor.getType()).shutdownMachine(machineDescriptor);
+		if(!types.containsKey(machineDescriptor.getType())){
+			return false;
 		}
-		if(onDemandRunningMachines.remove(machineDescriptor)){
-			return onDemandFinishedMachines.add(machineDescriptor);
+		boolean removed = types.get(machineDescriptor.getType()).shutdownMachine(machineDescriptor);
+		if(!machineDescriptor.isReserved()){
+			onDemandRunningMachines--;
 		}
-		return false;
+		return removed;
 	}
 	
-	private double calculateCost(MachineDescriptor descriptor){
-		double executionTime = descriptor.getFinishTimeInMillis() - descriptor.getStartTimeInMillis();
-		executionTime = Math.ceil(1.0 * executionTime / TimeBasedWorkloadParser.HOUR_IN_MILLIS);
-		
-		if(executionTime < 0){
-			throw new RuntimeException(this.getClass()+": Invalid machine"+ descriptor.getMachineID() +" runtime for cost: "+executionTime);
-		}
-		
-		if(descriptor.isReserved()){
-			return executionTime * types.get(descriptor.getType()).getReservedCpuCost() + executionTime * getMonitoringCost();
-		}else{
-			return executionTime * types.get(descriptor.getType()).getOnDemandCpuCost() + executionTime * getMonitoringCost();
-		}
-	}
-	
-	private double calculateCost(MachineDescriptor descriptor, long currentTime){
-		double executionTime = currentTime - descriptor.getStartTimeInMillis();
-		executionTime = Math.ceil(1.0 * executionTime / TimeBasedWorkloadParser.HOUR_IN_MILLIS);
-		
-		if(executionTime < 0){
-			throw new RuntimeException(this.getClass()+": Invalid machine"+ descriptor.getMachineID() +" runtime for cost: "+executionTime);
-		}
-		
-		if(descriptor.isReserved()){
-			return executionTime * types.get(descriptor.getType()).getReservedCpuCost() + executionTime * getMonitoringCost();
-		}else{
-			return executionTime * types.get(descriptor.getType()).getOnDemandCpuCost() + executionTime * getMonitoringCost();
-		}
-	}
 
-	public double calculateCost(long currentTimeInMillis, int maximumNumberOfReservedResourcesUsed) {
-		double cost = 0;
-		long inTransference = 0;
-		long outTransference = 0;
-		int currentNumberOfReservedResources = 0;
+	public void calculateCost(UtilityResultEntry entry) {
 		
-		//Finished machines
-		for (MachineDescriptor descriptor : onDemandFinishedMachines) {
-			cost += calculateCost(descriptor);
-			inTransference += descriptor.getInTransference();
-			outTransference += descriptor.getOutTransference();
-			if(descriptor.isReserved()){
-				this.totalNumberOfReservedMachinesUsed++;
-				currentNumberOfReservedResources++;
-			}
-		}
-		cost += calcTransferenceCost(inTransference, transferInLimits, transferInCosts);
-		cost += calcTransferenceCost(outTransference, transferOutLimits, transferOutCosts);
+		entry.addToCost(previousDebt);
 		
-		//Current running machines
-		long runningIn = 0;
-		long runningOut = 0;
-		
-		for(MachineDescriptor descriptor : onDemandRunningMachines.values()){
-			double currentCost = calculateCost(descriptor, currentTimeInMillis);
-			double alreadyPayed = descriptor.getCostAlreadyPayed();
-			descriptor.setCostAlreadyPayed(currentCost);
-			cost += currentCost - alreadyPayed;
-			
-			long currentIn = descriptor.getInTransference();
-			long inPayed = descriptor.getInTransferencePayed();
-			descriptor.setInTransferencePayed(currentIn);
-			runningIn += currentIn - inPayed;
-			
-			long currentOut = descriptor.getOutTransference();
-			long outPayed = descriptor.getOutTransferencePayed();
-			descriptor.setOutTransferencePayed(currentOut);
-			runningOut += currentOut - outPayed;
-			
-			if(descriptor.isReserved()){
-				this.totalNumberOfReservedMachinesUsed++;
-				currentNumberOfReservedResources++;
+		double nextTurnDebt = 0;
+		long [] transferences = new long[4];
+				
+		for (TypeProvider typeProvider : types.values()) {
+			typeProvider.calculateFinishedMachinesCost(entry);
+			nextTurnDebt += typeProvider.calculateRunningMachinesCost(entry);
+			long [] typeTransferences = typeProvider.getTotalTransferences();
+			for (int i = 0; i < typeTransferences.length; i++) {
+				transferences[i] += typeTransferences[i];
 			}
 		}
 		
-		cost += calcTransferenceCost(runningIn, transferInLimits, transferInCosts);
-		cost += calcTransferenceCost(runningOut, transferOutLimits, transferOutCosts);
+		entry.addToCost(calcTransferenceCost(transferences[0]+transferences[2], transferInLimits, transferInCosts));
+		entry.addToCost(calcTransferenceCost(transferences[1]+transferences[3], transferOutLimits, transferOutCosts));
 		
-		if(currentNumberOfReservedResources > maximumNumberOfReservedResourcesUsed){//Charging reservation fees
-			long planningPeriod = Configuration.getInstance().getLong(PLANNING_PERIOD);
-			double fee = (planningPeriod == 1) ? this.reservationOneYearFee : this.reservationThreeYearsFee;
-			cost += (currentNumberOfReservedResources - maximumNumberOfReservedResourcesUsed) * fee; 
-		}
-		
-		this.resetCostCounters();
-		
-		return cost;
+		previousDebt = nextTurnDebt;
 	}
 	
 	/**
@@ -281,14 +210,11 @@ public class Provider {
 	 */
 	private double calcTransferenceCost(long totalTransfered,
 			long[] limits, double[] costs) {
-		return 0;
+		double total = 0;
+		return total;
 	}
 
-	public void resetCostCounters(){
-		this.onDemandFinishedMachines.clear();
-	}
-	
-	public double calculateUnicCost() {
+	public double calculateUniqueCost() {
 		double result = this.totalNumberOfReservedMachinesUsed * this.reservationOneYearFee;
 		this.totalNumberOfReservedMachinesUsed = 0;
 		return result;

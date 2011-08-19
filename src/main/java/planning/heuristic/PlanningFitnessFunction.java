@@ -61,8 +61,8 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		
 		//Creating simulator structure
 		dps = DPSFactory.INSTANCE.createDPS();
-//		dps.getAccountingSystem().setMaximumNumberOfReservedMachinesUsed(this.maximumReservedResources);
-		this.simulator = SimulatorFactory.getInstance().buildSimulator(dps);
+		//		dps.getAccountingSystem().setMaximumNumberOfReservedMachinesUsed(this.maximumReservedResources);
+		this.simulator = SimulatorFactory.buildSimulator(dps);
 		dps.registerConfigurable(simulator);
 		
 		this.simulator.setWorkloadParser(parser);//Changing parser to a history based one!

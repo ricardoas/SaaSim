@@ -37,7 +37,7 @@ public class TypeProviderTest {
 	/**
 	 * Test method for {@link commons.cloud.TypeProvider#shutdownMachine(commons.sim.components.MachineDescriptor)}.
 	 */
-	@Test
+	@Test(expected=NullPointerException.class)
 	public void testShutdownNullMachine() {
 		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 0);
 		type.shutdownMachine(null);
@@ -58,29 +58,29 @@ public class TypeProviderTest {
 	@Test
 	public void testShutdownExistentMachine() {
 		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 1);
-		MachineDescriptor descriptor = type.buyMachine();
+		MachineDescriptor descriptor = type.buyMachine(true);
 		assertTrue(type.shutdownMachine(descriptor));
 	}
 
 	/**
-	 * Test method for {@link commons.cloud.TypeProvider#buyMachine()}.
+	 * Test method for {@link commons.cloud.TypeProvider#buyMachine(boolean)}.
 	 */
 	@Test
 	public void testBuyMachineWithNoLimit() {
 		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 0);
-		assertNull(type.buyMachine());
+		assertNull(type.buyMachine(true));
 	}
 
 	/**
-	 * Test method for {@link commons.cloud.TypeProvider#buyMachine()}.
+	 * Test method for {@link commons.cloud.TypeProvider#buyMachine(boolean)}.
 	 */
 	@Test
 	public void testBuyMachineWithLimit() {
 		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 3);
-		assertNotNull(type.buyMachine());
-		assertNotNull(type.buyMachine());
-		assertNotNull(type.buyMachine());
-		assertNull(type.buyMachine());
+		assertNotNull(type.buyMachine(true));
+		assertNotNull(type.buyMachine(true));
+		assertNotNull(type.buyMachine(true));
+		assertNull(type.buyMachine(true));
 	}
 
 	/**
@@ -108,8 +108,8 @@ public class TypeProviderTest {
 	public void testCanBuyWithLimitChanging() {
 		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 2);
 		assertTrue(type.canBuy());
-		type.buyMachine();
-		type.buyMachine();
+		type.buyMachine(true);
+		type.buyMachine(true);
 		assertFalse(type.canBuy());
 	}
 

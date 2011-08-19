@@ -48,13 +48,12 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 		long numberOfServersToAdd = (newNumberOfServers - statistics.totalNumberOfServers);
 		if(numberOfServersToAdd != 0){
 			return numberOfServersToAdd;
-		}else{
-			if(statistics.numberOfRequestsArrivalInLastInterval > 0 && 
-					statistics.totalNumberOfServers == 0){
-				return 1l;
-			}
-			return numberOfServersToAdd;
 		}
+		if(statistics.numberOfRequestsArrivalInLastInterval > 0 && 
+				statistics.totalNumberOfServers == 0){
+			return 1l;
+		}
+		return numberOfServersToAdd;
 	}
 	
 	private void evaluateMachinesToBeAdded(int tier) {

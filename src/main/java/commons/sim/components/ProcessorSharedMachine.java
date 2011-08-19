@@ -215,18 +215,17 @@ public class ProcessorSharedMachine extends JEAbstractEventHandler implements Ma
 	 * @param currentTime
 	 * @return
 	 */
+	@Override
 	public double computeUtilisation(long currentTime){
 		if(this.queue.size() != 0){//Requests need to be processed, so resource is full
 			return 1.0;
-		}else{//Requests were processed previously, and no pending requests exist
-			if(currentTime >= RanjanProvisioningSystem.UTILIZATION_EVALUATION_PERIOD_IN_MILLIS){
-				double difference = this.lastUpdate.timeMilliSeconds - (currentTime - RanjanProvisioningSystem.UTILIZATION_EVALUATION_PERIOD_IN_MILLIS);
-				if(difference <= 0){
-					return 0.0;
-				}else{
-					return difference/RanjanProvisioningSystem.UTILIZATION_EVALUATION_PERIOD_IN_MILLIS;
-				}
+		}
+		if(currentTime >= RanjanProvisioningSystem.UTILIZATION_EVALUATION_PERIOD_IN_MILLIS){
+			double difference = this.lastUpdate.timeMilliSeconds - (currentTime - RanjanProvisioningSystem.UTILIZATION_EVALUATION_PERIOD_IN_MILLIS);
+			if(difference <= 0){
+				return 0.0;
 			}
+			return difference/RanjanProvisioningSystem.UTILIZATION_EVALUATION_PERIOD_IN_MILLIS;
 		}
 		return 0.0;
 	}

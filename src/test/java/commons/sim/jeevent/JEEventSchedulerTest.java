@@ -13,12 +13,12 @@ public class JEEventSchedulerTest {
 	private JEEventScheduler scheduler;
 
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		scheduler = new JEEventScheduler();
 	}
 
 	@After
-	public void tearDown() throws Exception {
+	public void tearDown() {
 		scheduler = null;
 	}
 
