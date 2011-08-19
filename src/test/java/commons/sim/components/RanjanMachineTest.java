@@ -403,13 +403,13 @@ public class RanjanMachineTest {
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(60000L).times(2);
-		EasyMock.expect(firstRequest.getDemand()).andReturn(60000L).once();
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(60000L).once();
 		firstRequest.update(60000L);
 		EasyMock.expectLastCall();
 
 		Request secondRequest = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(10000L).times(2);
-		EasyMock.expect(secondRequest.getDemand()).andReturn(10000L);
+		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(10000L);
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.reportRequestFinished(firstRequest);

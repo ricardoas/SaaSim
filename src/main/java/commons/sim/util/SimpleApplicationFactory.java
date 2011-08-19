@@ -26,13 +26,12 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 		int numOfTiers = config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS);
 		
 		Class<?>[] heuristicClasses = config.getApplicationHeuristics();
-		int [] serversPerTier = config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER);
 		int [] maxServerPerTier = config.getIntegerArray(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER);
 		
 		List<LoadBalancer> loadBalancers = new ArrayList<LoadBalancer>();
 		
 		for (int i = 0; i < numOfTiers; i++) {
-			loadBalancers.add(buildLoadBalancer(scheduler, monitor, heuristicClasses[i], serversPerTier[i], maxServerPerTier[i], i));
+			loadBalancers.add(buildLoadBalancer(scheduler, monitor, heuristicClasses[i], maxServerPerTier[i], i));
 		}
 		
 		return loadBalancers;
@@ -42,13 +41,12 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 	 * @param scheduler
 	 * @param monitor
 	 * @param heuristic
-	 * @param serversPerTier 
 	 * @param maxServerPerTier 
 	 * @param tier 
 	 * @return
 	 */
 	private static LoadBalancer buildLoadBalancer(JEEventScheduler scheduler, Monitor monitor,
-			Class<?> heuristic, int serversPerTier, int maxServerPerTier, int tier) {
+			Class<?> heuristic, int maxServerPerTier, int tier) {
 		try {
 			return new LoadBalancer(scheduler, monitor, 
 					(SchedulingHeuristic) heuristic.newInstance(), 

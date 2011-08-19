@@ -9,24 +9,14 @@ import commons.config.Configuration;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public enum DPSFactory {
-	
-	/**
-	 * Single instance.
-	 */
-	INSTANCE;
-	
-	/**
-	 * Private constructor
-	 */
-	private DPSFactory() {}
+public class DPSFactory {
 	
 	/**
 	 * 
 	 * @param initargs 
 	 * @return
 	 */
-	public DPS createDPS(Object... initargs){
+	public static DPS createDPS(Object... initargs){
 		Class<?> clazz = Configuration.getInstance().getDPSHeuristicClass();
 		
 		try {

@@ -23,7 +23,7 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request> 
 	}
 
 	@Override
-	public Request next() throws IOException {
+	public Request next() {
 		Request toReturn = next;
 		next = readNext();
 		return toReturn;

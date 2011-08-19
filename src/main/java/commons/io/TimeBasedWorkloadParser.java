@@ -46,11 +46,11 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	public List<Request> next() throws IOException {
 		List<Request> requests = new ArrayList<Request>();
 		Request r = leftOver != null? leftOver: parser.next();
-		long time = leftOver != null? Math.min(leftOver.getTimeInMillis()/tick, currentTick): currentTick;
+		long time = leftOver != null? Math.min(leftOver.getArrivalTimeInMillis()/tick, currentTick): currentTick;
 		while(hasNext() && time == currentTick){
 			requests.add(r);
 			r = parser.next();
-			time = r.getTimeInMillis()/tick;
+			time = r.getArrivalTimeInMillis()/tick;
 		}
 		currentTick++;
 		if(r != null){

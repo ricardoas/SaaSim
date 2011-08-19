@@ -1,18 +1,10 @@
 package commons.cloud;
 
-import static commons.sim.util.SimulatorProperties.PLANNING_PERIOD;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.print.attribute.standard.Finishings;
 
 import commons.cloud.UtilityResult.UtilityResultEntry;
-import commons.config.Configuration;
-import commons.io.TimeBasedWorkloadParser;
 import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 
@@ -22,6 +14,8 @@ import commons.sim.components.MachineDescriptor;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public class Provider {
+	
+	private static final long GB_IN_BYTES = 1024 * 1024 * 1024;
 	
 	private final String name;
 	private final int onDemandLimit;
@@ -33,7 +27,6 @@ public class Provider {
 	private final long[] transferOutLimits;
 	private final double[] transferOutCosts;
 	
-	private double previousDebt;
 	private int onDemandRunningMachines;
 	
 	public Provider(String name, int onDemandLimit,
@@ -56,7 +49,6 @@ public class Provider {
 			this.types.put(machineType.getType(), machineType);
 		}
 		this.onDemandRunningMachines = 0;
-		this.previousDebt = 0;
 	}
 
 	/**
@@ -179,26 +171,24 @@ public class Provider {
 	}
 	
 
-	public void calculateCost(UtilityResultEntry entry) {
+	public void calculateCost(UtilityResultEntry entry, long currentTimeInMillis) {
 		
-		entry.addToCost(previousDebt);
+		entry.addProvider(getName());
 		
-		double nextTurnDebt = 0;
-		long [] transferences = new long[4];
+		
+		long [] transferences = new long[2];
 				
 		for (TypeProvider typeProvider : types.values()) {
-			typeProvider.calculateFinishedMachinesCost(entry);
-			nextTurnDebt += typeProvider.calculateRunningMachinesCost(entry);
 			long [] typeTransferences = typeProvider.getTotalTransferences();
-			for (int i = 0; i < typeTransferences.length; i++) {
-				transferences[i] += typeTransferences[i];
-			}
+			transferences[0] += typeTransferences[0];
+			transferences[1] += typeTransferences[1];
+			typeProvider.calculateMachinesCost(entry, currentTimeInMillis, monitoringCost);
 		}
 		
-		entry.addToCost(calcTransferenceCost(transferences[0]+transferences[2], transferInLimits, transferInCosts));
-		entry.addToCost(calcTransferenceCost(transferences[1]+transferences[3], transferOutLimits, transferOutCosts));
+		double inCost = calcTransferenceCost(transferences[0], transferInLimits, transferInCosts);
+		double outCost = calcTransferenceCost(transferences[1], transferOutLimits, transferOutCosts);
 		
-		previousDebt = nextTurnDebt;
+		entry.addTransferenceToCost(transferences[0], inCost, transferences[1], outCost);
 	}
 	
 	/**
@@ -208,44 +198,32 @@ public class Provider {
 	 * @param costs
 	 * @return
 	 */
-	private double calcTransferenceCost(long totalTransfered,
+	private static double calcTransferenceCost(long totalTransfered,
 			long[] limits, double[] costs) {
+		double transferenceLeft = (1.0*totalTransfered)/GB_IN_BYTES;
+		int currentIndex = 0;
 		double total = 0;
+		while(transferenceLeft != 0 && currentIndex != limits.length){
+			if(transferenceLeft <= limits[currentIndex]){
+				total += transferenceLeft * costs[currentIndex];
+				transferenceLeft = 0;
+			}else{
+				total += limits[currentIndex] * costs[currentIndex];
+				transferenceLeft -= limits[currentIndex]; 
+			}
+			currentIndex++;
+		}
+		
+		if(transferenceLeft != 0){
+			total += limits[currentIndex] * costs[currentIndex];
+			transferenceLeft = 0; 
+		}
 		return total;
 	}
 
 	public double calculateUniqueCost() {
-		double result = this.totalNumberOfReservedMachinesUsed * this.reservationOneYearFee;
-		this.totalNumberOfReservedMachinesUsed = 0;
-		return result;
-	}
-	
-	public double[] resourcesConsumption() {
-		long onDemandConsumed = 0;
-		long reservedConsumed = 0;
-		
-		int numberOfOnDemandResources = 0;
-		int numberOfReservedResources = 0;
-		
-		for(MachineDescriptor descriptor : this.onDemandFinishedMachines){
-			long executionTime = descriptor.getFinishTimeInMillis() - descriptor.getStartTimeInMillis();
-			if(executionTime < 0){
-				throw new RuntimeException("Invalid cpu usage in machine "+descriptor.getMachineID()+" : "+executionTime);
-			}
-			if(!descriptor.isReserved()){
-				onDemandConsumed += Math.ceil(1.0 * executionTime / TimeBasedWorkloadParser.HOUR_IN_MILLIS);
-				numberOfOnDemandResources++;
-			}else{
-				reservedConsumed += Math.ceil(1.0 * executionTime / TimeBasedWorkloadParser.HOUR_IN_MILLIS);
-				numberOfReservedResources++;
-			}
-		}
-		
-		double[] result = new double[4];
-		result[0] = onDemandConsumed;
-		result[1] = numberOfOnDemandResources;
-		result[2] = reservedConsumed; 
-		result[3] = numberOfReservedResources;
+		double result = 0;//this.totalNumberOfReservedMachinesUsed * this.reservationOneYearFee;
+//		this.totalNumberOfReservedMachinesUsed = 0;
 		return result;
 	}
 }

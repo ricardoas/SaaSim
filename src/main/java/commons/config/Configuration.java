@@ -108,7 +108,7 @@ public class Configuration	extends PropertiesConfiguration{
 		return values;
 	}
 
-	private double[] parseDoubleArray(String[] stringValues) {
+	private static double[] parseDoubleArray(String[] stringValues) {
 		double [] doubleValues = new double[stringValues.length];
 		for (int j = 0; j < doubleValues.length; j++) {
 			doubleValues[j] = Double.valueOf(stringValues[j]);
@@ -116,7 +116,7 @@ public class Configuration	extends PropertiesConfiguration{
 		return doubleValues;
 	}
 
-	private long[] parseLongArray(String[] stringValues) {
+	private static long[] parseLongArray(String[] stringValues) {
 		long [] doubleValues = new long[stringValues.length];
 		for (int j = 0; j < doubleValues.length; j++) {
 			doubleValues[j] = Long.valueOf(stringValues[j]);
@@ -138,7 +138,7 @@ public class Configuration	extends PropertiesConfiguration{
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T extends Enum<T>> T[] parseEnum(String[] stringValues, Class<T> enumClass) {
+	private static <T extends Enum<T>> T[] parseEnum(String[] stringValues, Class<T> enumClass) {
 		T [] enumValues = (T[]) new Enum[stringValues.length];
 		for (int j = 0; j < enumValues.length; j++) {
 			enumValues[j] = Enum.valueOf(enumClass, stringValues[j]);
@@ -258,9 +258,11 @@ public class Configuration	extends PropertiesConfiguration{
 		}
 		
 		String[] plans = getStringArray(SAAS_USER_PLAN);
+		long[] storage = getLongArray(SAAS_USER_STORAGE);
+		
 		users = new ArrayList<User>();
 		for (int i = 0; i < plans.length; i++) {
-			users.add(new User(contractsPerName.get(plans[i])));
+			users.add(new User(contractsPerName.get(plans[i]), storage[i]));
 		}
 	}
 
@@ -308,7 +310,7 @@ public class Configuration	extends PropertiesConfiguration{
 			
 			for (int j = 0; j < machinesType[i].length; j++) {
 				long reservation = 0;
-				if(providerIndex == -1){
+				if(typeList != null){
 					int index = typeList.indexOf(machinesType[i][j]);
 					reservation = (index == -1)? 0: reservations[i][index];
 				}
@@ -437,7 +439,10 @@ public class Configuration	extends PropertiesConfiguration{
 	
 	private void verifySaaSUsersProperties() throws ConfigurationException {
 		
+		checkSize(SAAS_USER_STORAGE, SAAS_NUMBER_OF_USERS);
+		
 		Validator.checkPositive(SAAS_NUMBER_OF_USERS, getInt(SAAS_NUMBER_OF_USERS));
+		Validator.checkIsNonNegativeArray(SAAS_USER_STORAGE, getStringArray(SAAS_USER_STORAGE));
 		
 		String workload = getString(SAAS_WORKLOAD);
 		if(workload == null || workload.isEmpty()){

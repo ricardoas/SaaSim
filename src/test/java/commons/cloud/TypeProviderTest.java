@@ -47,7 +47,16 @@ public class TypeProviderTest {
 	 * Test method for {@link commons.cloud.TypeProvider#shutdownMachine(commons.sim.components.MachineDescriptor)}.
 	 */
 	@Test
-	public void testShutdownInexistentMachine() {
+	public void testShutdownInexistentReservedMachine() {
+		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 0);
+		assertFalse(type.shutdownMachine(new MachineDescriptor(1, true, MachineType.SMALL)));
+	}
+
+	/**
+	 * Test method for {@link commons.cloud.TypeProvider#shutdownMachine(commons.sim.components.MachineDescriptor)}.
+	 */
+	@Test
+	public void testShutdownInexistentOnDemandMachine() {
 		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 0);
 		assertFalse(type.shutdownMachine(new MachineDescriptor(1, false, MachineType.SMALL)));
 	}
@@ -56,9 +65,19 @@ public class TypeProviderTest {
 	 * Test method for {@link commons.cloud.TypeProvider#shutdownMachine(commons.sim.components.MachineDescriptor)}.
 	 */
 	@Test
-	public void testShutdownExistentMachine() {
+	public void testShutdownExistentReservedMachine() {
 		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 1);
 		MachineDescriptor descriptor = type.buyMachine(true);
+		assertTrue(type.shutdownMachine(descriptor));
+	}
+
+	/**
+	 * Test method for {@link commons.cloud.TypeProvider#shutdownMachine(commons.sim.components.MachineDescriptor)}.
+	 */
+	@Test
+	public void testShutdownExistentOnDemandMachine() {
+		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 1);
+		MachineDescriptor descriptor = type.buyMachine(false);
 		assertTrue(type.shutdownMachine(descriptor));
 	}
 
@@ -66,7 +85,19 @@ public class TypeProviderTest {
 	 * Test method for {@link commons.cloud.TypeProvider#buyMachine(boolean)}.
 	 */
 	@Test
-	public void testBuyMachineWithNoLimit() {
+	public void testBuyOnDemandMachine() {
+		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 0);
+		MachineDescriptor descriptor = type.buyMachine(false);
+		assertNotNull(descriptor);
+		assertFalse(descriptor.isReserved());
+		assertEquals(MachineType.SMALL, descriptor.getType());
+	}
+
+	/**
+	 * Test method for {@link commons.cloud.TypeProvider#buyMachine(boolean)}.
+	 */
+	@Test
+	public void testBuyReservedMachineWithNoLimit() {
 		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 0);
 		assertNull(type.buyMachine(true));
 	}
@@ -75,7 +106,7 @@ public class TypeProviderTest {
 	 * Test method for {@link commons.cloud.TypeProvider#buyMachine(boolean)}.
 	 */
 	@Test
-	public void testBuyMachineWithLimit() {
+	public void testBuyReservedMachineWithLimit() {
 		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 3);
 		assertNotNull(type.buyMachine(true));
 		assertNotNull(type.buyMachine(true));

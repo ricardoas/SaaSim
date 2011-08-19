@@ -56,6 +56,23 @@ public class MachineDescriptor {
 		this.finishTimeInMillis = finishTimeInMillis;
 	}
 
+	/**
+	 * @return the inTransference
+	 */
+	public long getInTransference() {
+		return inTransference;
+	}
+
+	/**
+	 * @return the outTransference
+	 */
+	public long getOutTransference() {
+		return outTransference;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -64,6 +81,9 @@ public class MachineDescriptor {
 		return result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -79,35 +99,28 @@ public class MachineDescriptor {
 	}
 
 	/**
-	 * @return the inTransference
+	 * @param inTransferenceInBytes
+	 * @param outTransferenceInBytes
 	 */
-	public long getInTransference() {
-		return inTransference;
+	public void updateTransference(long inTransferenceInBytes, long outTransferenceInBytes) {
+		this.inTransference += inTransferenceInBytes;
+		this.outTransference += outTransferenceInBytes;
+	}
+	
+	/**
+	 * @param now
+	 */
+	public void reset(long now){
+		setStartTimeInMillis(now);
+		this.inTransference = 0;
+		this.outTransference = 0;
 	}
 
 	/**
-	 * @param inTransference the inTransference to set
+	 * @return 
+	 * 
 	 */
-	public void setInTransference(long inTransference) {
-		this.inTransference = inTransference;
-	}
-
-	/**
-	 * @return the outTransference
-	 */
-	public long getOutTransference() {
-		return outTransference;
-	}
-
-	/**
-	 * @param outTransference the outTransference to set
-	 */
-	public void setOutTransference(long outTransference) {
-		this.outTransference = outTransference;
-	}
-
-	public void updateTransference(long sizeInBytes, long responseSizeInBytes) {
-		this.inTransference += sizeInBytes;
-		this.outTransference += responseSizeInBytes;
+	public long getUpTimeInMillis() {
+		return finishTimeInMillis - startTimeInMillis;
 	}
 }

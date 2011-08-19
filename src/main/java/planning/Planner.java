@@ -24,7 +24,7 @@ public class Planner {
 	
 	public Planner(List<Provider> providers, List<User> cloudUsers, HistoryBasedWorkloadParser workloadParser) {
 		this.cloudProviders = providers;
-		this.planningHeuristic = PlanningHeuristicFactory.INSTANCE.createHeuristic();
+		this.planningHeuristic = PlanningHeuristicFactory.createHeuristic();
 		
 		this.cloudUsers = cloudUsers;
 		this.workloadParser = workloadParser;

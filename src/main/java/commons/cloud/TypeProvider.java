@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.print.attribute.standard.Finishings;
-
 import commons.cloud.UtilityResult.UtilityResultEntry;
-import commons.io.TimeBasedWorkloadParser;
 import commons.sim.components.MachineDescriptor;
 
 
@@ -17,6 +14,8 @@ import commons.sim.components.MachineDescriptor;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public class TypeProvider {
+	
+	private static final long HOUR_IN_MILLIS = 3600000;
 	
 	private final MachineType type;
 	private final double onDemandCpuCost;
@@ -96,9 +95,15 @@ public class TypeProvider {
 	}
 
 	public MachineDescriptor buyMachine(boolean isReserved) {
-		if(canBuy()){
-			MachineDescriptor descriptor = new MachineDescriptor(IDGenerator.GENERATOR.next(), true, getType());
-			reservedRunningMachines.add(descriptor);
+		if(isReserved){
+			if(canBuy()){
+				MachineDescriptor descriptor = new MachineDescriptor(IDGenerator.GENERATOR.next(), isReserved, getType());
+				reservedRunningMachines.add(descriptor);
+				return descriptor;
+			}
+		}else{
+			MachineDescriptor descriptor = new MachineDescriptor(IDGenerator.GENERATOR.next(), isReserved, getType());
+			onDemandRunningMachines.add(descriptor);
 			return descriptor;
 		}
 		return null;
@@ -108,38 +113,37 @@ public class TypeProvider {
 		return reservedRunningMachines.size() < reservation;
 	}
 
-	public double calculateFinishedMachinesCost(UtilityResultEntry entry) {
-		long total = 0;
+	public void calculateMachinesCost(UtilityResultEntry entry, long currentTimeInMillis, double monitoringCostPerHour) {
+		long onDemandUpTimeInFullHours = 0;
+		long reservedUpTimeInFullHours = 0;
+		
 		for (MachineDescriptor descriptor : onDemandFinishedMachines) {
-			total += descriptor.getInTransference();
+			onDemandUpTimeInFullHours += (long) Math.ceil(1.0*descriptor.getUpTimeInMillis()/HOUR_IN_MILLIS);
 		}
 		for (MachineDescriptor descriptor : reservedFinishedMachines) {
-			total += descriptor.getInTransference();
+			reservedUpTimeInFullHours += (long) Math.ceil(1.0*descriptor.getUpTimeInMillis()/HOUR_IN_MILLIS);
 		}
-		return total;
+		for (MachineDescriptor descriptor : onDemandRunningMachines) {
+			onDemandUpTimeInFullHours += (long) Math.ceil(1.0*descriptor.getUpTimeInMillis()/HOUR_IN_MILLIS);
+			descriptor.reset(currentTimeInMillis);
+		}
+		for (MachineDescriptor descriptor : reservedRunningMachines) {
+			reservedUpTimeInFullHours += (long) Math.ceil(1.0*descriptor.getUpTimeInMillis()/HOUR_IN_MILLIS);
+			descriptor.reset(currentTimeInMillis);
+		}
+		
+		double onDemandCost = onDemandUpTimeInFullHours * onDemandCpuCost;
+		double reservedCost = reservedUpTimeInFullHours * reservedCpuCost;
+		double monitoringCost = (onDemandUpTimeInFullHours + reservedUpTimeInFullHours) * monitoringCostPerHour;
+		
+		entry.addUsageToCost(type, onDemandUpTimeInFullHours, onDemandCost, reservedUpTimeInFullHours, reservedCost, monitoringCost);
+		
+		onDemandFinishedMachines.clear();
+		reservedFinishedMachines.clear();
 	}
 
-	public double calculateRunningMachinesCost(UtilityResultEntry entry) {
-		return 0;
-	}
-	
-	private double calculateCost(MachineDescriptor descriptor){
-		double executionTime = descriptor.getFinishTimeInMillis() - descriptor.getStartTimeInMillis();
-		executionTime = Math.ceil(1.0 * executionTime / TimeBasedWorkloadParser.HOUR_IN_MILLIS);
-		
-		if(executionTime < 0){
-			throw new RuntimeException(this.getClass()+": Invalid machine"+ descriptor.getMachineID() +" runtime for cost: "+executionTime);
-		}
-		
-		if(descriptor.isReserved()){
-			return executionTime * types.get(descriptor.getType()).getReservedCpuCost() + executionTime * getMonitoringCost();
-		}else{
-			return executionTime * types.get(descriptor.getType()).getOnDemandCpuCost() + executionTime * getMonitoringCost();
-		}
-	}
-	
 	public long[] getTotalTransferences() {
-		long [] transferences = new long[4];
+		long [] transferences = new long[2];
 		Arrays.fill(transferences, 0);
 		for (MachineDescriptor descriptor : onDemandFinishedMachines) {
 			transferences[0] += descriptor.getInTransference();
@@ -150,12 +154,12 @@ public class TypeProvider {
 			transferences[1] += descriptor.getOutTransference();
 		}
 		for (MachineDescriptor descriptor : onDemandRunningMachines) {
-			transferences[2] += descriptor.getInTransference();
-			transferences[3] += descriptor.getOutTransference();
+			transferences[0] += descriptor.getInTransference();
+			transferences[1] += descriptor.getOutTransference();
 		}
 		for (MachineDescriptor descriptor : reservedRunningMachines) {
-			transferences[2] += descriptor.getInTransference();
-			transferences[3] += descriptor.getOutTransference();
+			transferences[0] += descriptor.getInTransference();
+			transferences[1] += descriptor.getOutTransference();
 		}
 		return transferences;
 	}

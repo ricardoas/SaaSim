@@ -10,11 +10,9 @@ import commons.cloud.Request;
  * 	<li>User ID</li>
  * 	<li>Request ID</li>
  * 	<li>Time</li>
- * 	<li>Size of requested file</li>
- * 	<li>Request Option</li>
- * 	<li>HTTP operation which originated the request</li>
- * 	<li>URL: FQDN of requested file</li>
- * 	<li>Demand: </li>
+ * 	<li>Request size in Bytes</li>
+ * 	<li>Response size in Bytes (Size of requested file)</li>
+ * 	<li> Array of demand in millis </li>
  * </ul>
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
@@ -34,9 +32,14 @@ public class GEISTWorkloadParser extends AbstractWorkloadParser{
 	@Override
 	protected Request parseRequest(String line) {
 		String[] eventData = line.split("( +|\t+)+");
-		//FIXME: User ID should refer to file being read!
-		return new Request(eventData[0], eventData[2], eventData[1], Long
+		
+		long [] demand = new long[eventData.length - 6];
+		for (int i = 6; i < eventData.length; i++) {
+			demand[i-6] = Long.valueOf(eventData[i]);
+		}
+		
+		return new Request(eventData[2], eventData[0], eventData[1], Long
 				.valueOf(eventData[3]), Long.valueOf(eventData[4]),
-				eventData[7], Long.valueOf(eventData[8]));
+				Long.valueOf(eventData[5]), demand);
 	}
 }

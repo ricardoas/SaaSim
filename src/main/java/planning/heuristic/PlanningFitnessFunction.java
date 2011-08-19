@@ -60,7 +60,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		Configuration.getInstance().setProperty(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER, reservedResources+"");
 		
 		//Creating simulator structure
-		dps = DPSFactory.INSTANCE.createDPS();
+		dps = DPSFactory.createDPS();
 		//		dps.getAccountingSystem().setMaximumNumberOfReservedMachinesUsed(this.maximumReservedResources);
 		this.simulator = SimulatorFactory.buildSimulator(dps);
 		dps.registerConfigurable(simulator);
@@ -82,8 +82,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		this.simulator.start();
 		
 		UtilityResult result = this.dps.calculateUtility();
-		result.addCost(this.dps.getAccountingSystem().calculateUniqueCost());
-		result.addReceipt(this.dps.getAccountingSystem().calculateUniqueReceipt());
+		this.dps.getAccountingSystem().calculateUniqueUtility(result));
 		double[] resourceConsumptionsData = this.dps.getAccountingSystem().getResourcesData();
 		double fitness = result.getUtility();
 		

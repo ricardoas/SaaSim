@@ -66,26 +66,25 @@ public class RanjanHeuristic implements SchedulingHeuristic {
 		Machine machine = getServerOfPreviousRequestInSession(request);
 		if(machine != null){//Allocates to server already serving the session
 			return machine;
-		}else{
-			lastUsed = (lastUsed + 1) % servers.size();
-			machine = servers.get(lastUsed);
-			
-			//Updating times
-			String userID = request.getUserID();
-			long timeInMillis = request.getTimeInMillis();
-			
-			Long lastRequestTime = this.lastRequestTimes.get(userID);
-			this.lastRequestTimes.put(userID, timeInMillis);
-			this.serversOfLastRequests.remove(lastRequestTime);
-			this.serversOfLastRequests.put(timeInMillis, machine);
-			
-			return machine;
 		}
+		lastUsed = (lastUsed + 1) % servers.size();
+		machine = servers.get(lastUsed);
+		
+		//Updating times
+		String userID = request.getUserID();
+		long timeInMillis = request.getArrivalTimeInMillis();
+		
+		Long lastRequestTime = this.lastRequestTimes.get(userID);
+		this.lastRequestTimes.put(userID, timeInMillis);
+		this.serversOfLastRequests.remove(lastRequestTime);
+		this.serversOfLastRequests.put(timeInMillis, machine);
+		
+		return machine;
 		
 	}
 	
 	private Machine getServerOfPreviousRequestInSession(Request request) {
-		long timeInMillis = request.getTimeInMillis();
+		long timeInMillis = request.getArrivalTimeInMillis();
 		String userID = request.getUserID();
 
 		Long lastRequestTime = this.lastRequestTimes.get(userID);

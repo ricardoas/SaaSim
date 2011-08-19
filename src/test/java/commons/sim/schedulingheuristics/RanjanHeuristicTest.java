@@ -44,7 +44,7 @@ public class RanjanHeuristicTest {
 		long time = ONE_MINUTE_IN_MILLIS * 10;
 		
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getTimeInMillis()).andReturn(time).once();
+		EasyMock.expect(request.getArrivalTimeInMillis()).andReturn(time).once();
 		EasyMock.expect(request.getUserID()).andReturn(userID).once();
 		EasyMock.replay(request);
 		
@@ -62,7 +62,7 @@ public class RanjanHeuristicTest {
 		long time = ONE_MINUTE_IN_MILLIS * 1;
 		
 		Request request = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request.getTimeInMillis()).andReturn(time).times(2);
+		EasyMock.expect(request.getArrivalTimeInMillis()).andReturn(time).times(2);
 		EasyMock.expect(request.getUserID()).andReturn(userID).times(2);
 		EasyMock.replay(request);
 		
@@ -107,7 +107,7 @@ public class RanjanHeuristicTest {
 		
 		//First request
 		Request request = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request.getTimeInMillis()).andReturn(time).times(2);
+		EasyMock.expect(request.getArrivalTimeInMillis()).andReturn(time).times(2);
 		EasyMock.expect(request.getUserID()).andReturn(userID).times(2);
 		EasyMock.replay(request);
 		Machine nextServer = heuristic.getNextServer(request, servers);
@@ -118,7 +118,7 @@ public class RanjanHeuristicTest {
 		
 		//Second request
 		Request request2 = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request2.getTimeInMillis()).andReturn(time).times(2);
+		EasyMock.expect(request2.getArrivalTimeInMillis()).andReturn(time).times(2);
 		EasyMock.expect(request2.getUserID()).andReturn(secondUserID).times(2);
 		EasyMock.replay(request2);
 		nextServer = heuristic.getNextServer(request2, servers);
@@ -129,7 +129,7 @@ public class RanjanHeuristicTest {
 		
 		//Third request
 		Request request3 = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request3.getTimeInMillis()).andReturn(time).times(2);
+		EasyMock.expect(request3.getArrivalTimeInMillis()).andReturn(time).times(2);
 		EasyMock.expect(request3.getUserID()).andReturn(thirdUserID).times(2);
 		EasyMock.replay(request3);
 		nextServer = heuristic.getNextServer(request3, servers);
@@ -140,7 +140,7 @@ public class RanjanHeuristicTest {
 		
 		//Fourth request
 		Request request4 = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request4.getTimeInMillis()).andReturn(time).times(2);
+		EasyMock.expect(request4.getArrivalTimeInMillis()).andReturn(time).times(2);
 		EasyMock.expect(request4.getUserID()).andReturn(fourthUserID).times(2);
 		EasyMock.replay(request4);
 		nextServer = heuristic.getNextServer(request4, servers);
@@ -151,7 +151,7 @@ public class RanjanHeuristicTest {
 		
 		//Fifth request
 		Request request5 = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request5.getTimeInMillis()).andReturn(time).times(2);
+		EasyMock.expect(request5.getArrivalTimeInMillis()).andReturn(time).times(2);
 		EasyMock.expect(request5.getUserID()).andReturn(fifthUserID).times(2);
 		EasyMock.replay(request5);
 		nextServer = heuristic.getNextServer(request5, servers);
@@ -162,7 +162,7 @@ public class RanjanHeuristicTest {
 		
 		//Restarting again
 		Request request6 = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request6.getTimeInMillis()).andReturn(time).times(2);
+		EasyMock.expect(request6.getArrivalTimeInMillis()).andReturn(time).times(2);
 		EasyMock.expect(request6.getUserID()).andReturn(sixthUserID).times(2);
 		EasyMock.replay(request6);
 		nextServer = heuristic.getNextServer(request6, servers);
@@ -194,7 +194,7 @@ public class RanjanHeuristicTest {
 		
 		//First request
 		Request request = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request.getTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 1).times(2);
+		EasyMock.expect(request.getArrivalTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 1).times(2);
 		EasyMock.expect(request.getUserID()).andReturn(userID).times(2);
 		EasyMock.replay(request);
 		Machine nextServer = heuristic.getNextServer(request, servers);
@@ -204,7 +204,7 @@ public class RanjanHeuristicTest {
 		
 		//Second request
 		Request request2 = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request2.getTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 3);
+		EasyMock.expect(request2.getArrivalTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 3);
 		EasyMock.expect(request2.getUserID()).andReturn(userID);
 		EasyMock.replay(request2);
 		nextServer = heuristic.getNextServer(request2, servers);
@@ -214,7 +214,7 @@ public class RanjanHeuristicTest {
 		
 		//Third request
 		Request request3 = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request3.getTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 8);
+		EasyMock.expect(request3.getArrivalTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 8);
 		EasyMock.expect(request3.getUserID()).andReturn(userID);
 		EasyMock.replay(request3);
 		nextServer = heuristic.getNextServer(request3, servers);
@@ -224,7 +224,7 @@ public class RanjanHeuristicTest {
 		
 		//Fourth request
 		Request request4 = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request4.getTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 17);
+		EasyMock.expect(request4.getArrivalTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 17);
 		EasyMock.expect(request4.getUserID()).andReturn(userID);
 		EasyMock.replay(request4);
 		nextServer = heuristic.getNextServer(request4, servers);
@@ -234,7 +234,7 @@ public class RanjanHeuristicTest {
 		
 		//Fifth request
 		Request request5 = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request5.getTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 30);
+		EasyMock.expect(request5.getArrivalTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 30);
 		EasyMock.expect(request5.getUserID()).andReturn(userID);
 		EasyMock.replay(request5);
 		nextServer = heuristic.getNextServer(request5, servers);
@@ -244,7 +244,7 @@ public class RanjanHeuristicTest {
 		
 		//Sixth request
 		Request request6 = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request6.getTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 45);
+		EasyMock.expect(request6.getArrivalTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 45);
 		EasyMock.expect(request6.getUserID()).andReturn(userID);
 		EasyMock.replay(request6);
 		nextServer = heuristic.getNextServer(request6, servers);
@@ -254,7 +254,7 @@ public class RanjanHeuristicTest {
 		
 		//Request arriving after session limit
 		Request request7 = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request7.getTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 61).times(2);
+		EasyMock.expect(request7.getArrivalTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 61).times(2);
 		EasyMock.expect(request7.getUserID()).andReturn(userID).times(2);
 		EasyMock.replay(request7);
 		nextServer = heuristic.getNextServer(request7, servers);
@@ -286,7 +286,7 @@ public class RanjanHeuristicTest {
 		
 		//First request
 		Request request = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request.getTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 1).times(2);
+		EasyMock.expect(request.getArrivalTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 1).times(2);
 		EasyMock.expect(request.getUserID()).andReturn(userID).times(2);
 		EasyMock.replay(request);
 		Machine nextServer = heuristic.getNextServer(request, servers);
@@ -296,7 +296,7 @@ public class RanjanHeuristicTest {
 		
 		//Second request
 		Request request2 = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request2.getTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 2).times(2);
+		EasyMock.expect(request2.getArrivalTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 2).times(2);
 		EasyMock.expect(request2.getUserID()).andReturn(secondUserID).times(2);
 		EasyMock.replay(request2);
 		nextServer = heuristic.getNextServer(request2, servers);
@@ -306,7 +306,7 @@ public class RanjanHeuristicTest {
 		
 		//Third request
 		Request request3 = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request3.getTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 5);
+		EasyMock.expect(request3.getArrivalTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 5);
 		EasyMock.expect(request3.getUserID()).andReturn(userID);
 		EasyMock.replay(request3);
 		nextServer = heuristic.getNextServer(request3, servers);
@@ -316,7 +316,7 @@ public class RanjanHeuristicTest {
 		
 		//Fourth request
 		Request request4 = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request4.getTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 10);
+		EasyMock.expect(request4.getArrivalTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 10);
 		EasyMock.expect(request4.getUserID()).andReturn(secondUserID);
 		EasyMock.replay(request4);
 		nextServer = heuristic.getNextServer(request4, servers);
@@ -326,7 +326,7 @@ public class RanjanHeuristicTest {
 		
 		//Requests after session limit
 		Request request5 = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request5.getTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 21).times(2);
+		EasyMock.expect(request5.getArrivalTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 21).times(2);
 		EasyMock.expect(request5.getUserID()).andReturn(userID).times(2);
 		EasyMock.replay(request5);
 		nextServer = heuristic.getNextServer(request5, servers);
@@ -335,7 +335,7 @@ public class RanjanHeuristicTest {
 		EasyMock.verify(request5);
 		
 		Request request6 = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request6.getTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 26).times(2);
+		EasyMock.expect(request6.getArrivalTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 26).times(2);
 		EasyMock.expect(request6.getUserID()).andReturn(secondUserID).times(2);
 		EasyMock.replay(request6);
 		nextServer = heuristic.getNextServer(request6, servers);
@@ -344,7 +344,7 @@ public class RanjanHeuristicTest {
 		EasyMock.verify(request6);
 		
 		Request request7 = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request7.getTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 37).times(2);
+		EasyMock.expect(request7.getArrivalTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 37).times(2);
 		EasyMock.expect(request7.getUserID()).andReturn(userID).times(2);
 		EasyMock.replay(request7);
 		nextServer = heuristic.getNextServer(request7, servers);
@@ -353,7 +353,7 @@ public class RanjanHeuristicTest {
 		EasyMock.verify(request7);
 		
 		Request request8 = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request8.getTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 42).times(2);
+		EasyMock.expect(request8.getArrivalTimeInMillis()).andReturn(ONE_MINUTE_IN_MILLIS * 42).times(2);
 		EasyMock.expect(request8.getUserID()).andReturn(secondUserID).times(2);
 		EasyMock.replay(request8);
 		nextServer = heuristic.getNextServer(request8, servers);
@@ -368,7 +368,7 @@ public class RanjanHeuristicTest {
 		long time = ONE_MINUTE_IN_MILLIS * 1;
 		
 		Request request = EasyMock.createNiceMock(Request.class);
-		EasyMock.expect(request.getTimeInMillis()).andReturn(time).times(2);
+		EasyMock.expect(request.getArrivalTimeInMillis()).andReturn(time).times(2);
 		EasyMock.expect(request.getUserID()).andReturn(userID).times(2);
 		EasyMock.replay(request);
 		

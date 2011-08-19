@@ -29,6 +29,8 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	private WorkloadParser<List<Request>> workloadParser;
 	
 	private List<LoadBalancer> tiers;
+	
+	private final Monitor monitor;
 
 	/**
 	 * Constructor
@@ -37,6 +39,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 */
 	public SimpleSimulator(Monitor monitor){
 		super(new JEEventScheduler());
+		this.monitor = monitor;
 		this.tiers = ApplicationFactory.getInstance().createNewApplication(getScheduler(), monitor);
 	}
 	
@@ -82,7 +85,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 			}
 			break;
 		case CHARGE_USERS:
-			tiers.get(0).chargeUsers();
+			this.monitor.chargeUsers(getScheduler().now().timeMilliSeconds);
 			send(new JEEvent(JEEventType.CHARGE_USERS, this, getScheduler().now().plus(new JETime(DAY_IN_MILLIS * daysInMonths[currentMonth++]))));
 			break;
 		default:

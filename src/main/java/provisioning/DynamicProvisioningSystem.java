@@ -32,6 +32,7 @@ public class DynamicProvisioningSystem implements DPS{
 		this.availableIDs = 0;
 		this.configurables = new HashMap<Long, DynamicConfigurable>();
 		this.accountingSystem = new AccountingSystem();
+		this.utilityResult = new UtilityResult();
 	}
 	
 	@Override
@@ -72,11 +73,12 @@ public class DynamicProvisioningSystem implements DPS{
 
 	@Override
 	public UtilityResult calculateUtility() {
+		this.accountingSystem.calculateUniqueUtility(utilityResult);
 		return utilityResult;
 	}
 
 	@Override
 	public void chargeUsers(long currentTimeInMillis) {
-		this.utilityResult = this.accountingSystem.calculateUtility(currentTimeInMillis);
+		this.utilityResult.addEntry(this.accountingSystem.calculateUtility(currentTimeInMillis));
 	}
 }

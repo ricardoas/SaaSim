@@ -70,6 +70,7 @@ public class ProcessorSharedMachine extends JEAbstractEventHandler implements Ma
 	/**
 	 * @param request
 	 */
+	@Override
 	public void sendRequest(Request request) {
 
 		updateFinishedDemand();
@@ -122,7 +123,7 @@ public class ProcessorSharedMachine extends JEAbstractEventHandler implements Ma
 	 * @return
 	 */
 	protected JETime calcEstimatedFinishTime(Request request, int queueSize) {
-		return new JETime(request.getDemand() * queueSize).plus(getScheduler().now());
+		return new JETime(request.getTotalToProcess() * queueSize).plus(getScheduler().now());
 	}
 
 	/**
@@ -190,6 +191,7 @@ public class ProcessorSharedMachine extends JEAbstractEventHandler implements Ma
 		return true;
 	}
 
+	@Override
 	public String toString(){
 		return "Mac "+this.machineID;
 	}
@@ -270,7 +272,7 @@ public class ProcessorSharedMachine extends JEAbstractEventHandler implements Ma
 			estimatedFinishTime = new JETime(currentRequest.getTotalToProcess() * (requestsToShare+1)); 
 			estimatedFinishTime = estimatedFinishTime.plus(getScheduler().now());
 			triple.secondValue = estimatedFinishTime.timeMilliSeconds;
-			triple.thirdValue = currentRequest.getDemand();
+			triple.thirdValue = currentRequest.getTotalToProcess();
 
 			executionTimes.add(triple);
 		}
@@ -282,6 +284,7 @@ public class ProcessorSharedMachine extends JEAbstractEventHandler implements Ma
 		return totalProcessed;
 	}
 
+	@Override
 	public void shutdownOnFinish() {
 		this.shutdownOnFinish = true;
 	}
@@ -290,6 +293,7 @@ public class ProcessorSharedMachine extends JEAbstractEventHandler implements Ma
 		this.loadBalancer = loadBalancer;
 	}
 
+	@Override
 	public LoadBalancer getLoadBalancer() {
 		return loadBalancer;
 	}

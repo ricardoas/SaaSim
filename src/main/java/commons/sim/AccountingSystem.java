@@ -8,10 +8,12 @@ import java.util.Map;
 
 import provisioning.DynamicConfigurable;
 
+import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
 import commons.cloud.UtilityResult;
+import commons.cloud.UtilityResult.UtilityResultEntry;
 import commons.config.Configuration;
 import commons.io.GEISTWorkloadParser;
 import commons.io.TimeBasedWorkloadParser;
@@ -25,9 +27,7 @@ public class AccountingSystem {
 	protected Map<String, List<String>> requestsLostPerUser;
 	
 	private List<User> users;
-
 	private List<Provider> providers;
-	private int maximumReservedResources;
 	
 	public AccountingSystem(){
 		this.requestsFinishedPerUser = new HashMap<String, List<String>>();
@@ -37,8 +37,6 @@ public class AccountingSystem {
 		
 		this.users = Configuration.getInstance().getUsers();
 		Collections.sort(users);
-		
-		this.maximumReservedResources = 0;
 	}
 	
 	public void reportRequestFinished(Request request){
@@ -48,7 +46,7 @@ public class AccountingSystem {
 			this.requestsFinishedPerUser.put(request.getUserID(), requestsFinished);
 		}
 		
-		requestsFinished.add(request.getRequestID());
+		requestsFinished.add(request.getReqID());
 	}
 	
 	public int getRequestsFinished(String userID){
@@ -56,32 +54,35 @@ public class AccountingSystem {
 		return (requestsFinished != null) ? requestsFinished.size() : 0;
 	}
 	
-	public UtilityResult calculateUtility(long currentTimeInMillis){
-		//FIXME! Compute data transferred!
-		long totaInTransferred = 0;
-		long totalOutTransferred = 0;
-		
-		UtilityResult result = new UtilityResult(calculateReceipt(), calculateCost(currentTimeInMillis), calculatePenalties(), totaInTransferred, totalOutTransferred);
-		return result;
-	}
-	
-	private double calculatePenalties() {
-		//TODO: Code me!
-		return 0d;
+	public UtilityResultEntry calculateUtility(long currentTimeInMillis){
+		UtilityResultEntry entry = new UtilityResultEntry(currentTimeInMillis);
+		calculateReceipt(entry);
+		calculateCost(entry, currentTimeInMillis);
+		return entry;
 	}
 	
 	/**
 	 * This method calculates the receipts incurred by SaaS providers periodically. (e.g, each month)  
+	 * @param entry 
 	 * @return
 	 */
-	private double calculateReceipt() {
-		double receipt = 0;
+	private void calculateReceipt(UtilityResultEntry entry) {
 		for (User user : users) {
-			receipt += user.calculatePartialReceipt();
+			user.calculatePartialReceipt(entry);
 		}
-		return receipt;
 	}
 	
+	/**
+	 * This method calculates the costs incurred by IaaS providers periodically. (e.g, each month)  
+	 * @param currentTimeInMillis 
+	 * @return
+	 */
+	private void calculateCost(UtilityResultEntry entry, long currentTimeInMillis) {
+		for (Provider provider : providers) {
+			provider.calculateCost(entry, currentTimeInMillis);
+		}
+	}
+
 	/**
 	 * This method calculates the receipts incurred by SaaS providers in a unique period. (e.g, one time
 	 * during a whole year)  
@@ -96,28 +97,17 @@ public class AccountingSystem {
 	}
 	
 	/**
-	 * This method calculates the costs incurred by IaaS providers periodically. (e.g, each month)  
-	 * @return
-	 */
-	private double calculateCost(long currentTimeInMillis) {
-		double cost = 0.0;
-		for (Provider provider : providers) {
-			cost += provider.calculateCost(currentTimeInMillis, this.maximumReservedResources);
-		}
-		return cost;
-	}
-	
-	/**
 	 * This method calculates the costs incurred by IaaS providers in a unique period. (e.g, one time
 	 * during a whole year)  
+	 * @param result TODO
 	 * @return
 	 */
-	public double calculateUniqueCost(){
-		double unicCost = 0d;
+	public double calculateUniqueUtility(UtilityResult result){
+		double uniqueCost = 0d;
 		for(Provider provider : providers){
-			unicCost += provider.calculateUniqueCost();
+			uniqueCost += provider.calculateUniqueCost();
 		}
-		return unicCost;
+		return uniqueCost;
 	}
 
 	/**
@@ -186,7 +176,7 @@ public class AccountingSystem {
 			this.requestsLostPerUser.put(request.getUserID(), requestsFinished);
 		}
 		
-		requestsFinished.add(request.getRequestID());
+		requestsFinished.add(request.getReqID());
 	}
 
 	public void reportMachineFinish(MachineDescriptor descriptor) {
@@ -195,21 +185,5 @@ public class AccountingSystem {
 				return;
 			}
 		}
-	}
-
-	public void setMaximumNumberOfReservedMachinesUsed(int maximumReservedResources) {
-		this.maximumReservedResources = maximumReservedResources;
-	}
-	
-	public double[] getResourcesData(){
-		double[] results = new double[4];
-		for (Provider provider : providers) {
-			double[] currentResult = provider.resourcesConsumption();
-			for(int i = 0; i < currentResult.length; i++){
-				results[i] += currentResult[i];
-			}
-		}
-		
-		return results;
 	}
 }

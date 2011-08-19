@@ -11,7 +11,6 @@ import commons.cloud.Request;
 import commons.config.Configuration;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
-import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
@@ -25,7 +24,7 @@ import commons.sim.util.SimulatorProperties;
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandler{
+public class LoadBalancer extends JEAbstractEventHandler{
 	
 	private int tier;
 	
@@ -92,9 +91,7 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 					send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this, getScheduler().now(), server));
 				}
 				servers.remove(server);
-				if(server != null){
-					server.shutdownOnFinish();
-				}
+				server.shutdownOnFinish();
 			}
 			break;// not a concurrent modification because of "break" statement.
 		}
@@ -195,7 +192,4 @@ public class LoadBalancer extends JEAbstractEventHandler implements JEEventHandl
 		removeServer(servers.get(servers.size()-1).getDescriptor(), force);
 	}
 
-	public void chargeUsers() {
-		this.monitor.chargeUsers(getScheduler().now().timeMilliSeconds);
-	}
 }

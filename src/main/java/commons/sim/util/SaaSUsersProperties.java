@@ -10,4 +10,6 @@ public class SaaSUsersProperties {
 
 	public static final String SAAS_USER_WORKLOAD = "saas.user.workload";
 
+	public static final String SAAS_USER_STORAGE = "saas.user.storage";
+
 }

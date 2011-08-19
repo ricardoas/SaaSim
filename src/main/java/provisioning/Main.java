@@ -23,7 +23,7 @@ public class Main {
 		
 		Configuration.buildInstance(args[0]);
 		
-		DPS dps = DPSFactory.INSTANCE.createDPS();
+		DPS dps = DPSFactory.createDPS();
 		
 		Simulator simulator = SimulatorFactory.buildSimulator(dps);
 		
@@ -32,7 +32,7 @@ public class Main {
 		simulator.start();
 		
 		UtilityResult utilityResult = dps.calculateUtility();
-		System.out.println(utilityResult.getResult());
+		System.out.println(utilityResult.getUtility());
 		System.err.println(utilityResult);
 	}
 

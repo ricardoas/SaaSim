@@ -62,7 +62,7 @@ public class ProcessorSharedMachineTest {
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(0L)).times(3);
 		
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getDemand()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
+		EasyMock.expect(request.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
 		EasyMock.replay(request, scheduler);
 		
 		long machineID = 1l;
@@ -87,11 +87,11 @@ public class ProcessorSharedMachineTest {
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(7);
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(firstRequest.getDemand()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
 		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 10).times(2);
 
 		Request secondRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(secondRequest.getDemand()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
+		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
 		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
 
 		EasyMock.replay(scheduler, firstRequest, secondRequest);
@@ -126,11 +126,11 @@ public class ProcessorSharedMachineTest {
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(7);
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(firstRequest.getDemand()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
 		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(0L).once();
 
 		Request secondRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(secondRequest.getDemand()).andReturn(ONE_MINUTE_IN_MILLIS * 5).once();
+		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 5).once();
 
 		EasyMock.replay(scheduler, firstRequest, secondRequest);
 		
@@ -164,13 +164,13 @@ public class ProcessorSharedMachineTest {
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(100000L)).times(4);
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(firstRequest.getDemand()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
 		firstRequest.update(100000L);
 		EasyMock.expectLastCall();
 		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(500000L).once();
 
 		Request secondRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(secondRequest.getDemand()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
+		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
 
 		EasyMock.replay(scheduler, firstRequest, secondRequest);
 		
@@ -207,7 +207,7 @@ public class ProcessorSharedMachineTest {
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(150000L)).times(4);
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(firstRequest.getDemand()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
 		firstRequest.update(50000L);
 		EasyMock.expectLastCall();
 		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(550000L).once();
@@ -216,12 +216,12 @@ public class ProcessorSharedMachineTest {
 		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(500000L).once();
 
 		Request secondRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(secondRequest.getDemand()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
+		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
 		secondRequest.update(50000L);
 		EasyMock.expectLastCall();
 
 		Request thirdRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(thirdRequest.getDemand()).andReturn(ONE_MINUTE_IN_MILLIS * 2).once();
+		EasyMock.expect(thirdRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 2).once();
 		
 		EasyMock.replay(scheduler, firstRequest, secondRequest, thirdRequest);
 		
@@ -259,7 +259,7 @@ public class ProcessorSharedMachineTest {
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(ONE_MINUTE_IN_MILLIS * 10));
 		
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getDemand()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
+		EasyMock.expect(request.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
 		request.update(ONE_MINUTE_IN_MILLIS * 10);
 		EasyMock.expectLastCall();
 
@@ -301,14 +301,14 @@ public class ProcessorSharedMachineTest {
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(ONE_MINUTE_IN_MILLIS * 4)).times(3);
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(firstRequest.getDemand()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
 		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
 		firstRequest.update(ONE_MINUTE_IN_MILLIS * 2);
 		EasyMock.expectLastCall();
 		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 8).times(3);
 
 		Request secondRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(secondRequest.getDemand()).andReturn(ONE_MINUTE_IN_MILLIS * 2).once();
+		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 2).once();
 		secondRequest.update(ONE_MINUTE_IN_MILLIS * 2);
 		EasyMock.expectLastCall();
 		
@@ -405,7 +405,7 @@ public class ProcessorSharedMachineTest {
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(0L)).times(3);
 		
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getDemand()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
+		EasyMock.expect(request.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
 		EasyMock.replay(request, scheduler);
 		
 		//After requests arriving, machine becomes busy
@@ -430,7 +430,7 @@ public class ProcessorSharedMachineTest {
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(ONE_MINUTE_IN_MILLIS * 10));
 		
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getDemand()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
+		EasyMock.expect(request.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
 		request.update(ONE_MINUTE_IN_MILLIS * 10);
 		EasyMock.expectLastCall();
 
@@ -472,14 +472,14 @@ public class ProcessorSharedMachineTest {
 		EasyMock.expect(scheduler.now()).andReturn(new JETime(ONE_MINUTE_IN_MILLIS * 4)).times(3);
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(firstRequest.getDemand()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
 		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
 		firstRequest.update(ONE_MINUTE_IN_MILLIS * 2);
 		EasyMock.expectLastCall();
 		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 8).times(3);
 
 		Request secondRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(secondRequest.getDemand()).andReturn(ONE_MINUTE_IN_MILLIS * 2).once();
+		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 2).once();
 		secondRequest.update(ONE_MINUTE_IN_MILLIS * 2);
 		EasyMock.expectLastCall();
 		
@@ -519,13 +519,13 @@ public class ProcessorSharedMachineTest {
 //		EasyMock.expect(scheduler.now()).andReturn(new JETime(100000L)).times(4);
 //
 //		Request firstRequest = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(firstRequest.getDemand()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
+//		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 10).once();
 //		firstRequest.update(100000L);
 //		EasyMock.expectLastCall();
 //		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(500000L).once();
 //
 //		Request secondRequest = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(secondRequest.getDemand()).andReturn(ONE_MINUTE_IN_MILLIS * 5).once();
+//		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(ONE_MINUTE_IN_MILLIS * 5).once();
 //
 //		EasyMock.replay(scheduler, firstRequest, secondRequest);
 //

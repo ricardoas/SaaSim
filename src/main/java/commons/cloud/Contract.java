@@ -1,5 +1,7 @@
 package commons.cloud;
 
+import commons.cloud.UtilityResult.UtilityResultEntry;
+
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
@@ -122,9 +124,18 @@ public class Contract implements Comparable<Contract>{
 		return o.priority - this.priority;
 	}
 
-	public double calculateReceipt(long consumedCpu, long consumedInTransferenceInBytes,
+	/**
+	 * @param entry
+	 * @param consumedCpu
+	 * @param consumedInTransferenceInBytes
+	 * @param consumedOutTransferenceInBytes
+	 * @param consumedStorageInBytes
+	 */
+	public void calculateReceipt(UtilityResultEntry entry, long consumedCpu, long consumedInTransferenceInBytes,
 			long consumedOutTransferenceInBytes, long consumedStorageInBytes) {
-		return price + Math.max(0, consumedCpu - cpuLimitInMillis) * extraCpuCost;
+		double result = price + Math.max(0, consumedCpu - cpuLimitInMillis) * extraCpuCost;
+		//FIXME use transference
+		entry.addToReceipt(getName(), result);
 	}
 	
 	public double calculateOneTimeFees() {

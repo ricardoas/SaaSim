@@ -1,5 +1,7 @@
 package commons.cloud;
 
+import commons.cloud.UtilityResult.UtilityResultEntry;
+
 
 /**
  * Class representing a SaaS user. For a user that generates request using an application see
@@ -84,10 +86,10 @@ public class User implements Comparable<User>{
 		this.consumedOutTransferenceInBytes += outTransferenceInBytes;
 	}
 	
-	public double calculatePartialReceipt() {
-		double receipt = this.contract.calculateReceipt(consumedCpuInMillis, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, consumedStorageInBytes);
+	public void calculatePartialReceipt(UtilityResultEntry entry) {
+		entry.addUser(getId());
+		this.contract.calculateReceipt(entry, consumedCpuInMillis, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, consumedStorageInBytes);
 		this.reset();
-		return receipt;
 	}
 
 

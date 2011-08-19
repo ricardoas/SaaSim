@@ -182,6 +182,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		return true;
 	}
 
+	@Override
 	public String toString(){
 		return getClass().getName() + " " + descriptor;
 	}
@@ -191,6 +192,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 * @param timeInMillis
 	 * @return
 	 */
+	@Override
 	public double computeUtilisation(long timeInMillis){
 		if(processorQueue.isEmpty()){
 			double utilisation = (1.0 * totalTimeUsed)/(timeInMillis - lastUtilisationCalcTime);

@@ -4,24 +4,14 @@ import planning.heuristic.PlanningHeuristic;
 
 import commons.config.Configuration;
 
-public enum PlanningHeuristicFactory {
-	
-	/**
-	 * Single instance.
-	 */
-	INSTANCE;
-	
-	/**
-	 * Private constructor
-	 */
-	private PlanningHeuristicFactory() {}
+public class PlanningHeuristicFactory {
 	
 	/**
 	 * 
 	 * @param initargs 
 	 * @return
 	 */
-	public PlanningHeuristic createHeuristic(){
+	public static PlanningHeuristic createHeuristic(){
 		Class<?> clazz = Configuration.getInstance().getPlanningHeuristicClass();
 		
 		try {

@@ -49,8 +49,8 @@ public class ProfitDrivenHeuristic implements SchedulingHeuristic{
 				continue;
 			}
 			
-			double aad = this.sla - request.getDemand();
-			double asad = aad * (request.getDemand())/(request.getDemand());
+			double aad = this.sla - request.getTotalToProcess();
+			double asad = aad * (request.getTotalToProcess())/(request.getTotalToProcess());
 			double clft = asad;//Simplification
 			new_pi += (clft);
 			
