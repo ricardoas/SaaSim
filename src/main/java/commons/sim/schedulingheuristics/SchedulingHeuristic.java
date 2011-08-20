@@ -38,4 +38,6 @@ public interface SchedulingHeuristic {
 	 * 
 	 */
 	void reportRequestFinished();
+
+	void finishServer(Machine server, int index, List<Machine> servers);
 }

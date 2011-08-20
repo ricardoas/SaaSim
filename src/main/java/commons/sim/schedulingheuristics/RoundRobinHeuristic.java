@@ -51,4 +51,13 @@ public class RoundRobinHeuristic implements SchedulingHeuristic {
 	@Override
 	public void reportRequestFinished() {
 	}
+
+	@Override
+	public void finishServer(Machine server, int index, List<Machine> servers){
+		if(lastUsed == index){
+			lastUsed = (lastUsed + 1) % servers.size();
+		}else if(lastUsed > index){
+			lastUsed = Math.max(lastUsed - 1, 0);
+		}
+	}
 }

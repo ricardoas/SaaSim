@@ -327,6 +327,10 @@ public class Configuration	extends PropertiesConfiguration{
 		
 		
 	}
+	
+	public double getRelativePower(MachineType type){
+		return this.relativePower.get(type);
+	}
 
 	// ************************************* SIMULATOR ************************************/
 	

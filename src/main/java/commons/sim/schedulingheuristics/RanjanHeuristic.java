@@ -118,4 +118,8 @@ public class RanjanHeuristic implements SchedulingHeuristic {
 	public void reportRequestFinished() {
 		this.finishedRequestsCounter++;
 	}
+
+	@Override
+	public void finishServer(Machine server, int index, List<Machine> servers) {
+	}
 }

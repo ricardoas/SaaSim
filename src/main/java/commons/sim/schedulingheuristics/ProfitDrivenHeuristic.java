@@ -83,4 +83,8 @@ public class ProfitDrivenHeuristic implements SchedulingHeuristic{
 	@Override
 	public void reportRequestFinished() {
 	}
+
+	@Override
+	public void finishServer(Machine server, int index, List<Machine> servers) {
+	}
 }

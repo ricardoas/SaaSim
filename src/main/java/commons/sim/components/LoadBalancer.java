@@ -84,7 +84,8 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	 * 
 	 */
 	public void removeServer(MachineDescriptor descriptor, boolean force){
-		for (Machine server : servers) {
+		for (int i = 0; i < servers.size(); i++) {
+			Machine server = servers.get(i);
 			if(server.getDescriptor().equals(descriptor)){
 				if(force){
 					migrateRequests(server);
@@ -92,6 +93,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 				}
 				servers.remove(server);
 				server.shutdownOnFinish();
+				heuristic.finishServer(server, i, servers);
 			}
 			break;// not a concurrent modification because of "break" statement.
 		}
