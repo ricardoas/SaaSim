@@ -70,34 +70,39 @@ public class ConfigurationTest {
 		assertNotNull(Configuration.getInstance());
 	}
 	
-	@Test(expected=ConfigurationRuntimeException.class)
-	public void testMandatoryPropertyWithEmptyValue() throws ConfigurationException{
-			Configuration.buildInstance(PropertiesTesting.WRONG_PLANS_FILE_1);
+	@Test(expected=ConfigurationException.class)
+	public void testSaaSUsersWrongFile1() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_USERS_FILE_1);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testSaaSUsersWrongFile2() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_USERS_FILE_2);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testSaaSUsersWrongFile3() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_USERS_FILE_3);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testSaaSUsersWrongFile4() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_USERS_FILE_4);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testSaaSUsersWrongFile5() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_USERS_FILE_5);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testSaaSUsersWrongFile6() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_USERS_FILE_6);
 	}
 	
 	@Test(expected=NumberFormatException.class)
-	public void testMandatoryIntegerPropertyWithNonIntegerValue() throws ConfigurationException{
-		Configuration.buildInstance(PropertiesTesting.WRONG_PLANS_FILE_2);
-	}
-	
-	@Test(expected=NumberFormatException.class)
-	public void testMandatoryLongPropertyWithNonLongValue() throws ConfigurationException{
-		Configuration.buildInstance(PropertiesTesting.WRONG_PLANS_FILE_2);
-	}
-	
-	@Test(expected=NumberFormatException.class)
-	public void testMandatoryDoublePropertyWithNonDoubleValue() throws ConfigurationException{
-		Configuration.buildInstance(PropertiesTesting.WRONG_PLANS_FILE_2);
-	}
-	
-	@Test(expected=ConfigurationRuntimeException.class)
-	public void testArrayPropertyWithWrongSize() throws ConfigurationException{
-		Configuration.buildInstance(PropertiesTesting.WRONG_PLANS_FILE_3);
-	}
-	
-	@Test(expected=NumberFormatException.class)
-	public void testArrayPropertyWithWrongType() throws ConfigurationException{
-		Configuration.buildInstance(PropertiesTesting.WRONG_PLANS_FILE_4);
+	public void testSaaSUsersWrongFile7() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_USERS_FILE_7);
 	}
 	
 	@Test
@@ -108,7 +113,7 @@ public class ConfigurationTest {
 		config.getDPSHeuristicClass();
 		config.getPlanningHeuristicClass();
 		config.getProviders();
-		config.getRelativePower(null);
+//		config.getRelativePower(null);
 		config.getUsers();
 	}
 

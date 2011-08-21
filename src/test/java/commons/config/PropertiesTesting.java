@@ -24,6 +24,12 @@ public class PropertiesTesting {
 	public static final String WRONG_PROVIDERS_FILE_3 = "src/test/resources/providers/config3.properties";
 	public static final String WRONG_PROVIDERS_FILE_4 = "src/test/resources/providers/config4.properties";
 	
-	
+	public static final String WRONG_USERS_FILE_1 = "src/test/resources/users/config1.properties";
+	public static final String WRONG_USERS_FILE_2 = "src/test/resources/users/config2.properties";
+	public static final String WRONG_USERS_FILE_3 = "src/test/resources/users/config3.properties";
+	public static final String WRONG_USERS_FILE_4 = "src/test/resources/users/config4.properties";
+	public static final String WRONG_USERS_FILE_5 = "src/test/resources/users/config5.properties";
+	public static final String WRONG_USERS_FILE_6 = "src/test/resources/users/config6.properties";
+	public static final String WRONG_USERS_FILE_7 = "src/test/resources/users/config7.properties";
 
 }

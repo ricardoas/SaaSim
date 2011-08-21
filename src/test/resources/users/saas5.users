@@ -1,0 +1,10 @@
+saas.number=2
+#saas.workload=/local/ricardo/traces/power.trc
+
+saas.user.plan=p1
+saas.user.storage=5120000
+saas.user.workload=/local/ricardo/traces/power.trc
+
+saas.user.plan=p2
+saas.user.storage=10240000
+saas.user.workload=

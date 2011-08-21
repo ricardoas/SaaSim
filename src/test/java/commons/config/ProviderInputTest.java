@@ -1,15 +1,8 @@
 package commons.config;
 
-import static org.junit.Assert.*;
-
-import java.util.List;
-
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationRuntimeException;
-import org.junit.Assert;
 import org.junit.Test;
-
-import commons.cloud.Provider;
 
 public class ProviderInputTest {
 	
@@ -47,15 +40,6 @@ public class ProviderInputTest {
 	@Test(expected=NumberFormatException.class)
 	public void testArrayPropertyWithWrongType() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.WRONG_PROVIDERS_FILE_4);
-	}
-	
-	/**
-	 * This test verifies the error thrown when an inexistent file is read.
-	 * @throws ConfigurationException 
-	 */
-	@Test(expected=ConfigurationException.class)
-	public void testInexistentFile() throws ConfigurationException{
-		Configuration.buildInstance(PropertiesTesting.INEXISTENT_CONFIG_FILE);
 	}
 	
 }

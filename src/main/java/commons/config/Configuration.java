@@ -233,13 +233,13 @@ public class Configuration	extends PropertiesConfiguration{
 		verifyIaaSPlanProperties();
 	}
 	
-	private void parseProperties() {
+	private void parseProperties() throws ConfigurationException {
 		readUsers();
 		readProviders();
 	}
 	
 
-	private void readUsers() {
+	private void readUsers() throws ConfigurationException {
 		
 		int numberOfPlans = getInt(NUMBER_OF_PLANS);
 		String[] planNames = getStringArray(PLAN_NAME);
@@ -266,6 +266,10 @@ public class Configuration	extends PropertiesConfiguration{
 		
 		users = new ArrayList<User>();
 		for (int i = 0; i < plans.length; i++) {
+			if(!contractsPerName.containsKey(plans[i])){
+				throw new ConfigurationException("Cannot find configuration for plan " + plans[i] + ". Check contracts file.");
+			}
+			
 			users.add(new User(contractsPerName.get(plans[i]), storage[i]));
 		}
 	}
@@ -413,7 +417,7 @@ public class Configuration	extends PropertiesConfiguration{
 		
 	}
 	
-	private void checkSchedulingHeuristicNames() {
+	private void checkSchedulingHeuristicNames() throws ConfigurationException {
 		String[] strings = getStringArray(APPLICATION_HEURISTIC);
 		String customHeuristic = getString(APPLICATION_CUSTOM_HEURISTIC);
 		for (int i = 0; i < strings.length; i++) {
@@ -432,11 +436,11 @@ public class Configuration	extends PropertiesConfiguration{
 					try {
 						strings[i] = Class.forName(customHeuristic).getCanonicalName();
 					} catch (ClassNotFoundException e) {
-						throw new ConfigurationRuntimeException("Problem loading " + customHeuristic, e);
+						throw new ConfigurationException("Problem loading " + customHeuristic, e);
 					}
 					break;
 				default:
-					throw new ConfigurationRuntimeException("Unsupported value for " + APPLICATION_HEURISTIC + ": " + strings[i]);
+					throw new ConfigurationException("Unsupported value for " + APPLICATION_HEURISTIC + ": " + strings[i]);
 			}
 		}
 		
@@ -464,11 +468,11 @@ public class Configuration	extends PropertiesConfiguration{
 		}
 	}
 	
-	private void checkSize(String propertyName, String sizePropertyName) {
+	private void checkSize(String propertyName, String sizePropertyName) throws ConfigurationException {
 		String[] values = getStringArray(propertyName);
 		int size = getInt(sizePropertyName);
 		if (values.length != size){
-			throw new ConfigurationRuntimeException("Check number of values in " + 
+			throw new ConfigurationException("Check number of values in " + 
 					propertyName + ". It must be equals to what is specified at " + 
 					sizePropertyName);
 		}
