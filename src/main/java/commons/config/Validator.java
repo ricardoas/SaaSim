@@ -115,7 +115,7 @@ public class Validator {
 			Class<T> enumClass) throws ConfigurationException {
 		for (String value : values) {
 			try{
-				Enum.valueOf(enumClass, value);
+				Enum.valueOf(enumClass, value.trim().toUpperCase());
 			}catch(Exception e){
 				throw new ConfigurationException(propertyName + " must be a valid member of enum " + enumClass.getCanonicalName() + ". " + value + " value is invalid.", e);
 			}

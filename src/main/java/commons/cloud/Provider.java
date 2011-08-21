@@ -3,6 +3,7 @@ package commons.cloud;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
@@ -196,5 +197,11 @@ public class Provider {
 			double cost = typeProvider.calculateUniqueCost();
 			result.addProviderUniqueCost(getName(), typeProvider.getType(), cost);
 		}
+	}
+
+	public MachineType[] getAvailableTypes() {
+		Set<MachineType> set = types.keySet();
+		MachineType[] result = new MachineType[set.size()];
+		return set.toArray(result);
 	}
 }

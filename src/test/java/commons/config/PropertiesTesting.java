@@ -9,7 +9,8 @@ public class PropertiesTesting {
 	public static final String INEXISTENT_PLANS_FILE = "src/test/resources/inexistent1.properties";
 	public static final String INEXISTENT_APP_FILE = "src/test/resources/inexistent2.properties";
 	public static final String INEXISTENT_USERS_FILE = "src/test/resources/inexistent3.properties";
-	public static final String INEXISTENT_IAAS_FILE = "src/test/resources/inexistent4.properties";
+	public static final String INEXISTENT_IAAS_PROVIDERS_FILE = "src/test/resources/inexistent4.properties";
+	public static final String INEXISTENT_IAAS_PLAN_FILE = "src/test/resources/inexistent4.properties";
 	
 	public static final String MANDATORY_PROPERTY_WITH_EMPTY_VALUE = "";
 	

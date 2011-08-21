@@ -8,6 +8,7 @@ import static commons.sim.util.SaaSUsersProperties.*;
 import static commons.sim.util.SimulatorProperties.*;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -49,7 +50,7 @@ public class Configuration	extends PropertiesConfiguration{
 	
 	private List<Provider> providers;
 	
-	public List<User> users;
+	private List<User> users;
 
 	private HashMap<MachineType, Double> relativePower;
 	
@@ -139,17 +140,17 @@ public class Configuration	extends PropertiesConfiguration{
 
 	@SuppressWarnings("unchecked")
 	private static <T extends Enum<T>> T[] parseEnum(String[] stringValues, Class<T> enumClass) {
-		T [] enumValues = (T[]) new Enum[stringValues.length];
+		T [] enumValues = (T[]) Array.newInstance(enumClass, stringValues.length);
 		for (int j = 0; j < enumValues.length; j++) {
-			enumValues[j] = Enum.valueOf(enumClass, stringValues[j]);
+			enumValues[j] = Enum.valueOf(enumClass, stringValues[j].trim().toUpperCase());
 		}
 		return enumValues;
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	public <T extends Enum<T>> T[][] getEnum2DArray(String propertyName, Class<T> enumClass) {
 		String[] machines = getStringArray(propertyName);
-		T[][] machineTypes = (T[][]) new Enum[machines.length][];
+		T[][] machineTypes = (T[][]) Array.newInstance(enumClass, machines.length, machines.length);
 		for(int i = 0; i < machines.length; i++){
 			machineTypes[i] = parseEnum(machines[i].split(ARRAY_SEPARATOR), enumClass);
 		}

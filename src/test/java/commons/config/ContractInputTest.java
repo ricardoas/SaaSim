@@ -59,38 +59,4 @@ public class ContractInputTest{
 		Configuration.buildInstance(PropertiesTesting.INEXISTENT_CONFIG_FILE);
 	}
 	
-	@Test
-	public void testValidFile() throws ConfigurationException{
-		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
-		Configuration config = Configuration.getInstance();
-		List<User> users = config.getUsers();
-		assertNotNull(users);
-		assertEquals(3, users.size());
-		
-		Contract c1 = users.get(0).getContract();
-		assertNotNull(c1);
-		assertEquals(10, c1.getCpuLimit(), 0.0);
-		assertEquals(1, c1.getExtraCpuCost(), 0.0);
-		assertEquals("p1", c1.getName());
-		assertEquals(100, c1.getPrice(), 0.0);
-		assertEquals(5.55, c1.getSetupCost(), 0.0);
-		Assert.assertArrayEquals(new long[]{50, 100}, c1.getTransferenceLimits());
-		Assert.assertArrayEquals(new double[]{0.5,1.5}, c1.getTransferenceCosts(), 0.0);
-
-		Contract c2 = users.get(1).getContract();
-		assertNotNull(c2);
-		assertEquals(55, c2.getCpuLimit(), 0.0);
-		assertEquals(2, c2.getExtraCpuCost(), 0.0);
-		assertEquals("p2", c2.getName());
-		assertEquals(250, c2.getPrice(), 0.0);
-		assertEquals(1.11, c2.getSetupCost(), 0.0);
-
-		Contract c3 = users.get(2).getContract();
-		assertNotNull(c3);
-		assertEquals(10, c3.getCpuLimit(), 0.0);
-		assertEquals(1, c3.getExtraCpuCost(), 0.0);
-		assertEquals("p1", c3.getName());
-		assertEquals(100, c3.getPrice(), 0.0);
-		assertEquals(5.55, c3.getSetupCost(), 0.0);
-	}
 }

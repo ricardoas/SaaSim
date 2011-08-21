@@ -66,9 +66,9 @@ public class Contract implements Comparable<Contract>{
 	}
 
 	/**
-	 * @return the cpuLimit
+	 * @return the cpuLimitInMillis
 	 */
-	public long getCpuLimit() {
+	public long getCpuLimitInMillis() {
 		return cpuLimitInMillis;
 	}
 
@@ -82,7 +82,7 @@ public class Contract implements Comparable<Contract>{
 	/**
 	 * @return the transferenceLimits
 	 */
-	public long[] getTransferenceLimits() {
+	public long[] getTransferenceLimitsInBytes() {
 		return transferenceLimitsInBytes;
 	}
 
@@ -91,6 +91,14 @@ public class Contract implements Comparable<Contract>{
 	 */
 	public double[] getTransferenceCosts() {
 		return transferenceCosts;
+	}
+	
+	public long getStorageLimitInMB() {
+		return storageLimitInMB;
+	}
+
+	public double getStorageCostPerMB() {
+		return storageCostPerMB;
 	}
 
 	@Override

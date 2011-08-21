@@ -1,5 +1,5 @@
-saas.number=1
-#saas.workload=
+saas.number=2
+saas.workload=
 
 saas.user.plan=p1
 saas.user.storage=5120000

@@ -6,6 +6,6 @@ package commons.cloud;
  */
 public enum MachineType {
 
-	SMALL, LARGE, XLARGE
+	SMALL, LARGE, XLARGE, MEDIUM
 
 };
