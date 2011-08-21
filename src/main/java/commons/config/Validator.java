@@ -2,6 +2,8 @@ package commons.config;
 
 import org.apache.commons.configuration.ConfigurationException;
 
+import commons.cloud.MachineType;
+
 
 /**
  * Validation rules.
@@ -10,9 +12,14 @@ import org.apache.commons.configuration.ConfigurationException;
  */
 public class Validator {
 
-	public static void checkNonNegative(String propertyName, long value) throws ConfigurationException {
-		if (value < 0) {
-			throw new ConfigurationException(propertyName + " must be a non negative integer.");
+	public static void checkNonNegative(String propertyName, String value) throws ConfigurationException {
+		try{
+			Long valueOf = Long.valueOf(value);
+			if (valueOf < 0) {
+				throw new ConfigurationException(propertyName + " must be a non negative integer.");
+			}
+		}catch(NumberFormatException e){
+			throw new ConfigurationException(propertyName + " must be a non negative integer.", e);
 		}
 	}
 
@@ -22,16 +29,21 @@ public class Validator {
 		}
 	}
 
-	public static void checkPositive(String propertyName, long value) throws ConfigurationException {
-		if (value <= 0) {
-			throw new ConfigurationException(propertyName + " must be a positive integer.");
+	public static void checkPositive(String propertyName, String value) throws ConfigurationException {
+		try{
+			Long valueOf = Long.valueOf(value);
+			if (valueOf <= 0) {
+				throw new ConfigurationException(propertyName + " must be a positive integer.");
+			}
+		}catch(NumberFormatException e){
+			throw new ConfigurationException(propertyName + " must be a positive integer.", e);
 		}
 	}
 
 	public static void checkIsPositiveArray(String propertyName, String[] values) throws ConfigurationException {
 		for (String value : values) {
 			try{
-				checkPositive(propertyName, Long.valueOf(value));
+				checkPositive(propertyName, value);
 			}catch (ConfigurationException e) {
 				throw new ConfigurationException(propertyName + " must be an array of positive integers. " + value + " value is invalid.", e);
 			}
@@ -51,23 +63,28 @@ public class Validator {
 	public static void checkIsNonNegativeDoubleArray(String propertyName, String[] values) throws ConfigurationException {
 		for (String value : values) {
 			try{
-				checkNonNegative(propertyName, Double.valueOf(value));
+				checkNonNegativeDouble(propertyName, value);
 			}catch (ConfigurationException e) {
 				throw new ConfigurationException(propertyName + " must be an array of non negative floating-point numbers. " + value + " value is invalid.", e);
 			}
 		}
 	}
 
-	public static void checkNonNegative(String propertyName, Double value) throws ConfigurationException {
-		if (value < 0) {
-			throw new ConfigurationException(propertyName + " must be a non negative floating-point number.");
+	public static void checkNonNegativeDouble(String propertyName, String value) throws ConfigurationException {
+		try{
+			Double valueOf = Double.valueOf(value);
+			if (valueOf < 0) {
+				throw new ConfigurationException(propertyName + " must be a non negative floating-point number.");
+			}
+		}catch(NumberFormatException e){
+			throw new ConfigurationException(propertyName + " must be a non negative floating-point number.", e);
 		}
 	}
 
 	public static void checkIsNonNegativeArray(String propertyName, String[] values) throws ConfigurationException {
 		for (String value : values) {
 			try{
-				checkNonNegative(propertyName, Integer.valueOf(value));
+				checkNonNegative(propertyName, value);
 			}catch (ConfigurationException e) {
 				throw new ConfigurationException(propertyName + " must be an array of non negative integers. " + value + " value is invalid.", e);
 			}
@@ -98,16 +115,21 @@ public class Validator {
 	public static void checkIsPositiveDoubleArray(String propertyName, String[] values) throws ConfigurationException {
 		for (String value : values) {
 			try{
-				checkPositive(propertyName, Double.valueOf(value));
+				checkPositiveDouble(propertyName, value);
 			}catch (ConfigurationException e) {
 				throw new ConfigurationException(propertyName + " must be an array of positive floating-point numbers. " + value + " value is invalid.", e);
 			}
 		}
 	}
 
-	public static void checkPositive(String propertyName, Double value) throws ConfigurationException {
-		if (value <= 0) {
-			throw new ConfigurationException(propertyName + " must be a positive floating-point number.");
+	public static void checkPositiveDouble(String propertyName, String value) throws ConfigurationException {
+		try{
+			Double valueOf = Double.valueOf(value);
+			if (valueOf <= 0) {
+				throw new ConfigurationException(propertyName + " must be a positive floating-point number.");
+			}
+		}catch(NumberFormatException e){
+			throw new ConfigurationException(propertyName + " must be a positive floating-point number.", e);
 		}
 	}
 
@@ -116,9 +138,17 @@ public class Validator {
 		for (String value : values) {
 			try{
 				Enum.valueOf(enumClass, value.trim().toUpperCase());
-			}catch(Exception e){
+			}catch(RuntimeException e){
 				throw new ConfigurationException(propertyName + " must be a valid member of enum " + enumClass.getCanonicalName() + ". " + value + " value is invalid.", e);
 			}
+		}
+	}
+
+	public static void checkIsEnum2DArray(String propertyName,
+			String[] values, Class<MachineType> enumClass,
+			String separator) throws ConfigurationException {
+		for (String value : values) {
+			checkIsEnumArray(propertyName, value.split(separator), enumClass);
 		}
 	}
 

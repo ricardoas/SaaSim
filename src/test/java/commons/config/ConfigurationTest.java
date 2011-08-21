@@ -100,9 +100,79 @@ public class ConfigurationTest {
 		Configuration.buildInstance(PropertiesTesting.WRONG_USERS_FILE_6);
 	}
 	
-	@Test(expected=NumberFormatException.class)
+	@Test(expected=ConfigurationException.class)
 	public void testSaaSUsersWrongFile7() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.WRONG_USERS_FILE_7);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testSaaSPlansWrongFile1() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_PLANS_FILE_1);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testSaaSPlansWrongFile2() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_PLANS_FILE_2);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testSaaSPlansWrongFile3() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_PLANS_FILE_3);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testSaaSPlansWrongFile4() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_PLANS_FILE_4);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testSaaSPlansWrongFile5() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_PLANS_FILE_5);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testIaaSProvidersWrongFile1() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_PROVIDERS_FILE_1);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testIaaSProvidersWrongFile2() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_PROVIDERS_FILE_2);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testIaaSProvidersWrongFile3() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_PROVIDERS_FILE_3);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testIaaSProvidersWrongFile4() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_PROVIDERS_FILE_4);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testIaaSProvidersWrongFile5() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_PROVIDERS_FILE_5);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testIaaSProvidersWrongFile6() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_PROVIDERS_FILE_6);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testIaaSProvidersWrongFile7() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_PROVIDERS_FILE_7);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testIaaSProvidersWrongFile8() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_PROVIDERS_FILE_8);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testIaaSProvidersWrongFile9() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_PROVIDERS_FILE_9);
 	}
 	
 	@Test

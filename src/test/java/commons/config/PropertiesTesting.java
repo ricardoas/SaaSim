@@ -18,11 +18,18 @@ public class PropertiesTesting {
 	public static final String WRONG_PLANS_FILE_2 = "src/test/resources/contracts/config2.properties";
 	public static final String WRONG_PLANS_FILE_3 = "src/test/resources/contracts/config3.properties";
 	public static final String WRONG_PLANS_FILE_4 = "src/test/resources/contracts/config4.properties";
+	public static final String WRONG_PLANS_FILE_5 = "src/test/resources/contracts/config5.properties";
 	
 	public static final String WRONG_PROVIDERS_FILE_1 = "src/test/resources/providers/config1.properties";
 	public static final String WRONG_PROVIDERS_FILE_2 = "src/test/resources/providers/config2.properties";
 	public static final String WRONG_PROVIDERS_FILE_3 = "src/test/resources/providers/config3.properties";
 	public static final String WRONG_PROVIDERS_FILE_4 = "src/test/resources/providers/config4.properties";
+	public static final String WRONG_PROVIDERS_FILE_5 = "src/test/resources/providers/config5.properties";
+	public static final String WRONG_PROVIDERS_FILE_6 = "src/test/resources/providers/config6.properties";
+	public static final String WRONG_PROVIDERS_FILE_7 = "src/test/resources/providers/config7.properties";
+	public static final String WRONG_PROVIDERS_FILE_8 = "src/test/resources/providers/config8.properties";
+	public static final String WRONG_PROVIDERS_FILE_9 = "src/test/resources/providers/config9.properties";
+	
 	
 	public static final String WRONG_USERS_FILE_1 = "src/test/resources/users/config1.properties";
 	public static final String WRONG_USERS_FILE_2 = "src/test/resources/users/config2.properties";
