@@ -15,8 +15,6 @@ import org.junit.Test;
 public class UserTest {
 	
 	private static final int STORAGE_IN_BYTES = 1024000;
-	private static final double PRICE = 100.0;
-	private static final double PRICE_WITH_USAGE = 150.0;
 	private static final double SETUP = 1000.0;
 
 	/**
@@ -46,7 +44,7 @@ public class UserTest {
 		EasyMock.replay(contract);
 		
 		User user = new User(contract, STORAGE_IN_BYTES);
-		assertEquals(SETUP, user.calculateOneTimeFees(), 0.0);
+		user.calculateOneTimeFees(new UtilityResult());
 	
 		EasyMock.verify(contract);
 	}

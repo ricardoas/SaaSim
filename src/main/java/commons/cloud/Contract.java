@@ -143,7 +143,7 @@ public class Contract implements Comparable<Contract>{
 	public void calculateReceipt(UtilityResultEntry entry, long consumedCpu, long consumedInTransferenceInBytes,
 			long consumedOutTransferenceInBytes, long consumedStorageInBytes) {
 		long extraConsumedCPU = Math.max(0, consumedCpu - cpuLimitInMillis);
-		double costOfCPU = price + extraConsumedCPU/HOUR_IN_MILLIS * extraCpuCost;
+		double costOfCPU = price + (1.0*extraConsumedCPU)/HOUR_IN_MILLIS * extraCpuCost;
 		
 		long consumedTransference = consumedInTransferenceInBytes + consumedOutTransferenceInBytes;
 		double transferenceCost = CostCalculus.calcTransferenceCost(consumedTransference , transferenceLimitsInBytes, transferenceCosts);

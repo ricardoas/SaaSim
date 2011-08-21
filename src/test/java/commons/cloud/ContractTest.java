@@ -16,11 +16,13 @@ import commons.config.Configuration;
  */
 public class ContractTest {
 	
+	private static final long HOUR_IN_MILLIS = 3600000;
+
 	private String planName = "p1";
 	private double setupCost = 55;
 	private double price = 200;
-	private long cpuLimit = 10;
-	private double extraCpuCost = 0.5;
+	private long cpuLimit = 500 * HOUR_IN_MILLIS;
+	private double extraCpuCost = 5;
 	private long [] transferenceLimits = {10, 100};
 	private double [] transferenceCosts = {0.5, 0,3};
 	private long storageLimits = 5;
@@ -94,10 +96,10 @@ public class ContractTest {
 	@Test
 	public void testCalculateReceiptWithConsumptionHigherThanCPULimit(){
 		Contract c1 = new Contract(planName, 1, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
-		int consumedCpu = 9999;
+		long consumedCpu = 600 * HOUR_IN_MILLIS;
 		UtilityResultEntry entry = new UtilityResultEntry(0);
 		entry.addUser(1);
 		c1.calculateReceipt(entry, consumedCpu, 0, 0, 0);
-		assertEquals(price + (consumedCpu-cpuLimit)*extraCpuCost, entry.getReceipt(), 0.0);
+		assertEquals(price + 100*extraCpuCost, entry.getReceipt(), 0.0);
 	}
 }
