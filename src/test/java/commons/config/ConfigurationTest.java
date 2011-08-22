@@ -182,9 +182,9 @@ public class ConfigurationTest {
 		config.getApplicationHeuristics();
 		config.getDPSHeuristicClass();
 		config.getPlanningHeuristicClass();
-		config.getProviders();
-//		config.getRelativePower(null);
-		config.getUsers();
+//		config.getProviders();
+		config.getRelativePower(null);
+//		config.getUsers();
 	}
 
 	@Test
@@ -197,29 +197,29 @@ public class ConfigurationTest {
 		
 		Contract c1 = users.get(0).getContract();
 		assertNotNull(c1);
-		assertEquals("p1", c1.getName());
-		assertEquals(0, c1.getPriority());
-		assertEquals(100, c1.getPrice(), 0.0);
-		assertEquals(5.55, c1.getSetupCost(), 0.0);
+		assertEquals("bronze", c1.getName());
+		assertEquals(4, c1.getPriority());
+		assertEquals(24.95, c1.getPrice(), 0.0);
+		assertEquals(0.0, c1.getSetupCost(), 0.0);
 		assertEquals(10, c1.getCpuLimitInMillis(), 0.0);
 		assertEquals(1, c1.getExtraCpuCost(), 0.0);
-		Assert.assertArrayEquals(new long[]{50, 100}, c1.getTransferenceLimitsInBytes());
-		Assert.assertArrayEquals(new double[]{0,0.5,1.5}, c1.getTransferenceCosts(), 0.0);
-		assertEquals(5120, c1.getStorageLimitInMB(), 0.0);
-		assertEquals(0.005, c1.getStorageCostPerMB(), 0.0);
+		Assert.assertArrayEquals(new long[]{2048}, c1.getTransferenceLimitsInBytes());
+		Assert.assertArrayEquals(new double[]{0,0.005}, c1.getTransferenceCosts(), 0.0);
+		assertEquals(200, c1.getStorageLimitInMB(), 0.0);
+		assertEquals(0.1, c1.getStorageCostPerMB(), 0.0);
 
 		Contract c2 = users.get(1).getContract();
 		assertNotNull(c2);
-		assertEquals("p2", c2.getName());
-		assertEquals(1, c2.getPriority());
-		assertEquals(250, c2.getPrice(), 0.0);
-		assertEquals(1.11, c2.getSetupCost(), 0.0);
-		assertEquals(55, c2.getCpuLimitInMillis(), 0.0);
-		assertEquals(2, c2.getExtraCpuCost(), 0.0);
-		Assert.assertArrayEquals(new long[]{100}, c2.getTransferenceLimitsInBytes());
-		Assert.assertArrayEquals(new double[]{0,3.3}, c2.getTransferenceCosts(), 0.0);
-		assertEquals(5120, c2.getStorageLimitInMB(), 0.0);
-		assertEquals(0.005, c2.getStorageCostPerMB(), 0.0);
+		assertEquals("silver", c2.getName());
+		assertEquals(3, c2.getPriority());
+		assertEquals(39.95, c2.getPrice(), 0.0);
+		assertEquals(0, c2.getSetupCost(), 0.0);
+		assertEquals(10, c2.getCpuLimitInMillis(), 0.0);
+		assertEquals(1, c2.getExtraCpuCost(), 0.0);
+		Assert.assertArrayEquals(new long[]{4096}, c2.getTransferenceLimitsInBytes());
+		Assert.assertArrayEquals(new double[]{0,0.005}, c2.getTransferenceCosts(), 0.0);
+		assertEquals(300, c2.getStorageLimitInMB(), 0.0);
+		assertEquals(0.1, c2.getStorageCostPerMB(), 0.0);
 	}
 	
 	/**

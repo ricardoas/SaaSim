@@ -166,4 +166,12 @@ public class ContractTest {
 		
 		EasyMock.verify(entry);
 	}
+	
+	/**
+	 * Test method for {@link Contract#calculateOneTimeFees()}
+	 */
+	@Test
+	public void testCalculateOneTimeFees(){
+		assertEquals(0.0, c1.calculateOneTimeFees(), 0.0);
+	}
 }

@@ -5,6 +5,7 @@ package commons.cloud;
 
 import static org.junit.Assert.*;
 
+import org.easymock.EasyMock;
 import org.junit.Test;
 
 import commons.sim.components.MachineDescriptor;
@@ -15,6 +16,13 @@ import commons.sim.components.MachineDescriptor;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public class TypeProviderTest {
+
+	private static final long HOUR_IN_MILLIS = 3600000;
+
+	private double onDemandCost = 0.085;
+	private double reservationCost = 0.3;
+	private double oneYearFee = 227.5;
+	private double threeYearsFee = 350;
 
 	/**
 	 * Test method for {@link commons.cloud.TypeProvider#getType()}.
@@ -142,6 +150,30 @@ public class TypeProviderTest {
 		type.buyMachine(true);
 		type.buyMachine(true);
 		assertFalse(type.canBuy());
+	}
+	
+	@Test
+	public void testCalculateUniqueCostWithNoReservation(){
+		TypeProvider type = new TypeProvider(MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 0);
+		assertEquals(0.0, type.calculateUniqueCost(), 0.0);
+	}
+	
+	@Test
+	public void testCalculateUniqueCostWithReservation(){
+		TypeProvider type = new TypeProvider(MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 3);
+		assertEquals(227.5 * 3, type.calculateUniqueCost(), 0.0);
+	}
+	
+	@Test
+	public void testCalculateUniqueCostWithNoMachineUsed(){
+		TypeProvider type = new TypeProvider(MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
+		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
+		entry.addUsageToCost(MachineType.SMALL, 0, 0, 0, 0, 0);
+		EasyMock.replay(entry);
+		
+		type.calculateMachinesCost(entry, 0, 1.5);
+		
+		EasyMock.verify(entry);
 	}
 
 }
