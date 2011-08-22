@@ -185,8 +185,8 @@ public class Provider {
 			typeProvider.calculateMachinesCost(entry, currentTimeInMillis, monitoringCost);
 		}
 		
-		double inCost = CostCalculus.calcTransferenceCost(transferences[0], transferInLimits, transferInCosts);
-		double outCost = CostCalculus.calcTransferenceCost(transferences[1], transferOutLimits, transferOutCosts);
+		double inCost = CostCalculus.calcTransferenceCost(transferences[0], transferInLimits, transferInCosts, CostCalculus.GB_IN_BYTES);
+		double outCost = CostCalculus.calcTransferenceCost(transferences[1], transferOutLimits, transferOutCosts, CostCalculus.GB_IN_BYTES);
 		
 		entry.addTransferenceToCost(transferences[0], inCost, transferences[1], outCost);
 	}

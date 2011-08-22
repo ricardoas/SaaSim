@@ -9,32 +9,33 @@ package commons.util;
  */
 public class CostCalculus {
 
-	private static final long GB_IN_BYTES = 1024 * 1024 * 1024;
+	public static final long GB_IN_BYTES = 1024 * 1024 * 1024;
+	public static final long MB_IN_BYTES = 1024 * 1024;
 
 	/**
-	 * @param totalTransfered
-	 * @param limits
-	 * @param costs
+	 * @param totalTransferedInBytes
+	 * @param limitsInConvertedUnit
+	 * @param costsInConvertedUnit
 	 * @return
 	 */
-	public static double calcTransferenceCost(long totalTransfered,
-			long[] limits, double[] costs) {
-		double transferenceLeft = (1.0*totalTransfered)/GB_IN_BYTES;
+	public static double calcTransferenceCost(long totalTransferedInBytes,
+			long[] limitsInConvertedUnit, double[] costsInConvertedUnit, long conversion) {
+		double transferenceLeft = (1.0*totalTransferedInBytes)/conversion;
 		int currentIndex = 0;
 		double total = 0;
-		while(transferenceLeft != 0 && currentIndex != limits.length){
-			if(transferenceLeft <= limits[currentIndex]){
-				total += transferenceLeft * costs[currentIndex];
+		while(transferenceLeft != 0 && currentIndex != limitsInConvertedUnit.length){
+			if(transferenceLeft <= limitsInConvertedUnit[currentIndex]){
+				total += transferenceLeft * costsInConvertedUnit[currentIndex];
 				transferenceLeft = 0;
 			}else{
-				total += limits[currentIndex] * costs[currentIndex];
-				transferenceLeft -= limits[currentIndex]; 
+				total += limitsInConvertedUnit[currentIndex] * costsInConvertedUnit[currentIndex];
+				transferenceLeft -= limitsInConvertedUnit[currentIndex]; 
 			}
 			currentIndex++;
 		}
 		
 		if(transferenceLeft != 0){
-			total += limits[currentIndex] * costs[currentIndex];
+			total += transferenceLeft * costsInConvertedUnit[currentIndex];
 			transferenceLeft = 0; 
 		}
 		return total;

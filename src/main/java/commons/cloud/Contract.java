@@ -154,7 +154,7 @@ public class Contract implements Comparable<Contract>{
 		double costOfCPU = price + (1.0*extraConsumedCPU)/HOUR_IN_MILLIS * extraCpuCost;
 		
 		long consumedTransference = consumedInTransferenceInBytes + consumedOutTransferenceInBytes;
-		double transferenceCost = CostCalculus.calcTransferenceCost(consumedTransference , transferenceLimitsInBytes, transferenceCosts);
+		double transferenceCost = CostCalculus.calcTransferenceCost(consumedTransference , transferenceLimitsInBytes, transferenceCosts, CostCalculus.MB_IN_BYTES);
 		
 		double storageCost = Math.max(0, (1.0*consumedStorageInBytes)/MB_IN_BYTES - storageLimitInMB) * storageCostPerMB;
 		
