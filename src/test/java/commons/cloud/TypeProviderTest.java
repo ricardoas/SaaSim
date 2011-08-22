@@ -23,6 +23,7 @@ public class TypeProviderTest {
 	private double reservationCost = 0.3;
 	private double oneYearFee = 227.5;
 	private double threeYearsFee = 350;
+	private double monitoringCost = 1.5;
 
 	/**
 	 * Test method for {@link commons.cloud.TypeProvider#getType()}.
@@ -171,9 +172,72 @@ public class TypeProviderTest {
 		entry.addUsageToCost(MachineType.SMALL, 0, 0, 0, 0, 0);
 		EasyMock.replay(entry);
 		
-		type.calculateMachinesCost(entry, 0, 1.5);
+		type.calculateMachinesCost(entry, 0, monitoringCost);
+		
+		EasyMock.verify(entry);
+	}
+	
+	@Test
+	public void testCalculateUniqueCostWithOndemandRunningMachineUsed(){
+		TypeProvider type = new TypeProvider(MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
+		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
+		entry.addUsageToCost(MachineType.SMALL, 1, 1 * onDemandCost, 0, 0, 1 * monitoringCost);
+		EasyMock.replay(entry);
+		
+		MachineDescriptor descriptor = type.buyMachine(false);
+		descriptor.setStartTimeInMillis(0);
+		
+		type.calculateMachinesCost(entry, HOUR_IN_MILLIS/2, monitoringCost);
+		
+		EasyMock.verify(entry);
+	}
+	
+	@Test
+	public void testCalculateUniqueCostWithOndemandFinishedMachineUsed(){
+		TypeProvider type = new TypeProvider(MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
+		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
+		entry.addUsageToCost(MachineType.SMALL, 1, 1 * onDemandCost, 0, 0, 1 * monitoringCost);
+		EasyMock.replay(entry);
+		
+		MachineDescriptor descriptor = type.buyMachine(false);
+		descriptor.setStartTimeInMillis(0);
+		descriptor.setFinishTimeInMillis(HOUR_IN_MILLIS/2);
+		type.shutdownMachine(descriptor);
+		
+		type.calculateMachinesCost(entry, HOUR_IN_MILLIS, monitoringCost);
+		
+		EasyMock.verify(entry);
+	}
+	
+	@Test
+	public void testCalculateUniqueCostWithReservedRunningMachineUsed(){
+		TypeProvider type = new TypeProvider(MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
+		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
+		entry.addUsageToCost(MachineType.SMALL, 0, 0, 1, 1 * reservationCost, 1 * monitoringCost);
+		EasyMock.replay(entry);
+		
+		MachineDescriptor descriptor = type.buyMachine(true);
+		descriptor.setStartTimeInMillis(0);
+		
+		type.calculateMachinesCost(entry, HOUR_IN_MILLIS/2, monitoringCost);
 		
 		EasyMock.verify(entry);
 	}
 
+	@Test
+	public void testCalculateUniqueCostWithReservedFinishedMachineUsed(){
+		TypeProvider type = new TypeProvider(MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
+		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
+		entry.addUsageToCost(MachineType.SMALL, 0, 0, 1, 1 * reservationCost, 1 * monitoringCost);
+		EasyMock.replay(entry);
+		
+		MachineDescriptor descriptor = type.buyMachine(true);
+		descriptor.setStartTimeInMillis(0);
+		descriptor.setFinishTimeInMillis(HOUR_IN_MILLIS/2);
+		type.shutdownMachine(descriptor);
+		
+		type.calculateMachinesCost(entry, HOUR_IN_MILLIS, monitoringCost);
+		
+		EasyMock.verify(entry);
+	}
 }

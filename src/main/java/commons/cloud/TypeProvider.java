@@ -123,11 +123,11 @@ public class TypeProvider {
 			reservedUpTimeInFullHours += (long) Math.ceil(1.0*descriptor.getUpTimeInMillis()/HOUR_IN_MILLIS);
 		}
 		for (MachineDescriptor descriptor : onDemandRunningMachines) {
-			onDemandUpTimeInFullHours += (long) Math.ceil(1.0*descriptor.getUpTimeInMillis()/HOUR_IN_MILLIS);
+			onDemandUpTimeInFullHours += (long) Math.ceil(1.0*(currentTimeInMillis - descriptor.getUpTimeInMillis())/HOUR_IN_MILLIS);
 			descriptor.reset(currentTimeInMillis);
 		}
 		for (MachineDescriptor descriptor : reservedRunningMachines) {
-			reservedUpTimeInFullHours += (long) Math.ceil(1.0*descriptor.getUpTimeInMillis()/HOUR_IN_MILLIS);
+			reservedUpTimeInFullHours += (long) Math.ceil(1.0*(currentTimeInMillis - descriptor.getUpTimeInMillis())/HOUR_IN_MILLIS);
 			descriptor.reset(currentTimeInMillis);
 		}
 		
