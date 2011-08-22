@@ -7,9 +7,13 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.EasyMock;
+import org.junit.Before;
 import org.junit.Test;
 
+import commons.config.Configuration;
+import commons.config.PropertiesTesting;
 import commons.sim.components.MachineDescriptor;
 
 /**
@@ -18,6 +22,14 @@ import commons.sim.components.MachineDescriptor;
  *
  */
 public class ProviderTest {
+	
+	private Provider amazon;
+	
+	@Before
+	public void setUp() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
+		amazon = Configuration.getInstance().getProviders().get(0);
+	}
 
 	/**
 	 * Test method for {@link commons.cloud.Provider#canBuyMachine(boolean, commons.cloud.MachineType)}.
@@ -214,7 +226,7 @@ public class ProviderTest {
 	}
 
 	/**
-	 * Test method for {@link commons.cloud.Provider#calculateCost(long, int)}.
+	 * Test method for {@link commons.cloud.Provider#calculateCost(UtilityResultEntry, long)}.
 	 */
 	@Test
 	public void testCalculateCost() {
@@ -222,27 +234,10 @@ public class ProviderTest {
 	}
 
 	/**
-	 * Test method for {@link commons.cloud.Provider#resetCostCounters()}.
-	 */
-	@Test
-	public void testResetCostCounters() {
-		fail("Not yet implemented");
-	}
-
-	/**
-	 * Test method for {@link commons.cloud.Provider#calculateUniqueCost()}.
+	 * Test method for {@link commons.cloud.Provider#calculateUniqueCost(UtilityResult)}.
 	 */
 	@Test
 	public void testCalculateUnicCost() {
 		fail("Not yet implemented");
 	}
-
-	/**
-	 * Test method for {@link commons.cloud.Provider#resourcesConsumption()}.
-	 */
-	@Test
-	public void testResourcesConsumption() {
-		fail("Not yet implemented");
-	}
-
 }
