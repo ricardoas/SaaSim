@@ -138,7 +138,7 @@ public class Provider {
 
 	public boolean canBuyMachine(boolean reserved, MachineType type) {
 		if(!reserved){
-			return onDemandRunningMachines < getOnDemandLimit();
+			return types.containsKey(type) && onDemandRunningMachines < getOnDemandLimit();
 		}
 		return types.containsKey(type)?types.get(type).canBuy():false;
 	}
@@ -159,12 +159,17 @@ public class Provider {
 		return types.get(instanceType).buyMachine(isReserved);
 	}
 
+	/**
+	 * TODO test removed false of an on demand machine.
+	 * @param machineDescriptor
+	 * @return
+	 */
 	public boolean shutdownMachine(MachineDescriptor machineDescriptor) {
 		if(!types.containsKey(machineDescriptor.getType())){
 			return false;
 		}
 		boolean removed = types.get(machineDescriptor.getType()).shutdownMachine(machineDescriptor);
-		if(!machineDescriptor.isReserved()){
+		if(removed && !machineDescriptor.isReserved()){
 			onDemandRunningMachines--;
 		}
 		return removed;

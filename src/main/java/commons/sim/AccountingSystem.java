@@ -1,7 +1,6 @@
 package commons.sim;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,37 +22,40 @@ import commons.sim.util.SaaSUsersProperties;
 
 public class AccountingSystem {
 	
-	protected Map<String, List<String>> requestsFinishedPerUser;
 	protected Map<String, List<String>> requestsLostPerUser;
 	
-	private List<User> users;
+	private Map<Integer, User> users;
 	private List<Provider> providers;
 	
 	public AccountingSystem(){
-		this.requestsFinishedPerUser = new HashMap<String, List<String>>();
 		this.requestsLostPerUser = new HashMap<String, List<String>>();
 		
 		this.providers = Configuration.getInstance().getProviders();
 		
-		this.users = Configuration.getInstance().getUsers();
-		Collections.sort(users);
-	}
-	
-	public void reportRequestFinished(Request request){
-		List<String> requestsFinished = this.requestsFinishedPerUser.get(request.getUserID());
-		if(requestsFinished == null){
-			requestsFinished = new ArrayList<String>();
-			this.requestsFinishedPerUser.put(request.getUserID(), requestsFinished);
+		users = new HashMap<Integer, User>();
+		List<User> listOfUsers = Configuration.getInstance().getUsers();
+		for (User user : listOfUsers) {
+			users.put(user.getId(), user);
 		}
-		
-		requestsFinished.add(request.getReqID());
 	}
 	
-	public int getRequestsFinished(String userID){
-		List<String> requestsFinished = this.requestsFinishedPerUser.get(userID);
-		return (requestsFinished != null) ? requestsFinished.size() : 0;
+	public void reportFinishedRequest(Request request){
+		if(!users.containsKey(request.getUserID())){
+			throw new RuntimeException("Unregistered user with ID " + request.getUserID() + ". Check configuration files.");
+		}
+		users.get(request.getUserID()).reportFinishedRequest(request);
 	}
 	
+	/**
+	 * @param request
+	 */
+	public void reportLostRequest(Request request) {
+		if(!users.containsKey(request.getUserID())){
+			throw new RuntimeException("Unregistered user with ID " + request.getUserID() + ". Check configuration files.");
+		}
+		users.get(request.getUserID()).reportLostRequest(request);
+	}
+
 	public UtilityResultEntry calculateUtility(long currentTimeInMillis){
 		UtilityResultEntry entry = new UtilityResultEntry(currentTimeInMillis);
 		calculateReceipt(entry);
@@ -67,7 +69,7 @@ public class AccountingSystem {
 	 * @return
 	 */
 	private void calculateReceipt(UtilityResultEntry entry) {
-		for (User user : users) {
+		for (User user : users.values()) {
 			user.calculatePartialReceipt(entry);
 		}
 	}
@@ -93,7 +95,7 @@ public class AccountingSystem {
 		for(Provider provider : providers){
 			provider.calculateUniqueCost(result);
 		}
-		for(User user : users){
+		for(User user : users.values()){
 			user.calculateOneTimeFees(result);
 		}
 	}
@@ -116,13 +118,14 @@ public class AccountingSystem {
 		configurable.setWorkloadParser(new TimeBasedWorkloadParser(new GEISTWorkloadParser(workloads), TimeBasedWorkloadParser.HOUR_IN_MILLIS));
 	}
 	
-	public boolean canBuyMachine(){
+	public List<Provider> canBuyMachine(MachineType type, boolean isReserved){
+		ArrayList<Provider> available = new ArrayList<Provider>();
 		for (Provider provider : providers) {
-			if(provider.canBuyMachine(true, MachineType.SMALL) || provider.canBuyMachine(false, MachineType.SMALL)){
-				return true;
+			if(provider.canBuyMachine(isReserved, type)){
+				available.add(provider);
 			}
 		}
-		return false;
+		return available;
 	}
 	
 	public MachineDescriptor buyMachine() {
@@ -157,21 +160,12 @@ public class AccountingSystem {
 		return null;
 	}
 
-	public void reportRequestLost(Request request) {
-		List<String> requestsFinished = this.requestsLostPerUser.get(request.getUserID());
-		if(requestsFinished == null){
-			requestsFinished = new ArrayList<String>();
-			this.requestsLostPerUser.put(request.getUserID(), requestsFinished);
-		}
-		
-		requestsFinished.add(request.getReqID());
-	}
-
 	public void reportMachineFinish(MachineDescriptor descriptor) {
 		for (Provider provider : providers) {
 			if(provider.shutdownMachine(descriptor)){
 				return;
 			}
 		}
+		throw new RuntimeException("No provider is responsible for machine " + descriptor);
 	}
 }

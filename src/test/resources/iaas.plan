@@ -5,7 +5,7 @@ iaas.plan.reservation=19|7
 
 # provider 2 
 iaas.plan.name=rackspace
-iaas.plan.types=small|medium
+iaas.plan.types=small|large
 iaas.plan.reservation=0|2
 
 # provider 3 

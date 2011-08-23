@@ -1,6 +1,6 @@
 iaas.number=3
-iaas.types=small,medium,large,xlarge
-iaas.relativepower=1,4,2,4
+iaas.types=small,medium,large,xlarge,highcpu
+iaas.relativepower=1,4,2,4,8
 
 #Provider 1
 iaas.provider.name=rackspace

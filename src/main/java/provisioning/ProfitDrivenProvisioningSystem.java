@@ -13,7 +13,7 @@ public class ProfitDrivenProvisioningSystem extends DynamicProvisioningSystem{
 		if(accountingSystem.canBuyMachine()){
 			configurable.addServer(tier, accountingSystem.buyMachine(), true);
 		}else{
-			accountingSystem.reportRequestLost(request);
+			accountingSystem.reportLostRequest(request);
 		}
 	}
 }

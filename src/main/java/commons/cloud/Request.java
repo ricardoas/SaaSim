@@ -17,7 +17,7 @@ public class Request{
 	private final long requestSizeInBytes;
 	private final long responseSizeInBytes;
 	
-	public long totalProcessed;
+	private long totalProcessed;
 	private MachineType value;
 	
 	/**
@@ -171,6 +171,13 @@ public class Request{
 		} else if (!reqID.equals(other.reqID))
 			return false;
 		return true;
+	}
+	
+	/**
+	 * @return the totalProcessed
+	 */
+	public long getTotalProcessed() {
+		return totalProcessed;
 	}
 
 	/**

@@ -315,7 +315,7 @@ public class Configuration	extends PropertiesConfiguration{
 			int providerIndex = providersWithPlan.indexOf(names[i]);
 			List<MachineType> typeList = null;
 			
-			if(providerIndex == -1){
+			if(providerIndex != -1){
 				typeList = Arrays.asList(machines[providerIndex]);
 			}
 			
@@ -339,8 +339,11 @@ public class Configuration	extends PropertiesConfiguration{
 				long reservation = 0;
 				if(typeList != null){
 					int index = typeList.indexOf(machinesType[i][j]);
-					reservation = (index == -1)? 0: reservations[i][index];
+					reservation = (index == -1)? 0: reservations[providerIndex][index];
 				}
+				System.out.println(names[i]);
+				System.out.println(machinesType[i][j]);
+				System.out.println(reservation);
 				types.add(new TypeProvider(machinesType[i][j], onDemandCpuCosts[i][j], reservedCpuCosts[i][j], 
 						reservationOneYearFees[i][j], reservationThreeYearsFees[i][j], reservation));
 			}

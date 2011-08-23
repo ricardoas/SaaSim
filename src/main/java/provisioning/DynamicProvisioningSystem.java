@@ -43,7 +43,7 @@ public class DynamicProvisioningSystem implements DPS{
 
 	@Override
 	public void reportRequestFinished(Request request) {
-		this.accountingSystem.reportRequestFinished(request);
+		this.accountingSystem.reportFinishedRequest(request);
 	}
 	
 	@Override

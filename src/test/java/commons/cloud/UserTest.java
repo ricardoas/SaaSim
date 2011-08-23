@@ -76,5 +76,72 @@ public class UserTest {
 		
 		EasyMock.verify(gold, silver);
 	}
+	
+	/**
+	 * Test method for {@link User#reportFinishedRequest(Request)} 
+	 */
+	@Test
+	public void testReportFinishedRequest(){
+		long totalProcessed = 250;
+		long requestSize = 1024 * 100;
+		long responseSize = 1024 * 1024 * 5;
+		
+		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
+		entry.addUser(EasyMock.anyInt());
+		
+		Contract gold = EasyMock.createStrictMock(Contract.class);
+		gold.calculateReceipt(entry, 2*totalProcessed, 2*requestSize, 2*responseSize, STORAGE_IN_BYTES);
+		
+		Request request = EasyMock.createStrictMock(Request.class);;
+		EasyMock.expect(request.getTotalProcessed()).andReturn(totalProcessed);
+		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(requestSize);
+		EasyMock.expect(request.getResponseSizeInBytes()).andReturn(responseSize);
+		
+		EasyMock.expect(request.getTotalProcessed()).andReturn(totalProcessed);
+		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(requestSize);
+		EasyMock.expect(request.getResponseSizeInBytes()).andReturn(responseSize);
+		
+		
+		EasyMock.replay(gold, request, entry);
+		
+		User user = new User(gold , STORAGE_IN_BYTES);
+		user.reportFinishedRequest(request);
+		user.reportFinishedRequest(request);
+		user.calculatePartialReceipt(entry);
+		
+		EasyMock.verify(gold, request, entry);
+	}
+
+	/**
+	 * Test method for {@link User#reportLostRequest(Request)} 
+	 */
+	@Test
+	public void testReportLostRequest(){
+		long totalProcessed = 250;
+		long requestSize = 1024 * 100;
+		
+		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
+		entry.addUser(EasyMock.anyInt());
+		
+		Contract gold = EasyMock.createStrictMock(Contract.class);
+		gold.calculateReceipt(entry, 2*totalProcessed, 2*requestSize, 0, STORAGE_IN_BYTES);
+		
+		Request request = EasyMock.createStrictMock(Request.class);;
+		EasyMock.expect(request.getTotalProcessed()).andReturn(totalProcessed);
+		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(requestSize);
+		
+		EasyMock.expect(request.getTotalProcessed()).andReturn(totalProcessed);
+		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(requestSize);
+		
+		
+		EasyMock.replay(gold, request, entry);
+		
+		User user = new User(gold , STORAGE_IN_BYTES);
+		user.reportLostRequest(request);
+		user.reportLostRequest(request);
+		user.calculatePartialReceipt(entry);
+		
+		EasyMock.verify(gold, request, entry);
+	}
 
 }
