@@ -341,9 +341,6 @@ public class Configuration	extends PropertiesConfiguration{
 					int index = typeList.indexOf(machinesType[i][j]);
 					reservation = (index == -1)? 0: reservations[providerIndex][index];
 				}
-				System.out.println(names[i]);
-				System.out.println(machinesType[i][j]);
-				System.out.println(reservation);
 				types.add(new TypeProvider(machinesType[i][j], onDemandCpuCosts[i][j], reservedCpuCosts[i][j], 
 						reservationOneYearFees[i][j], reservationThreeYearsFees[i][j], reservation));
 			}

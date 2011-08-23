@@ -145,7 +145,7 @@ public class OldAccountingSystemTest {
 		double reservedCost = reservationOneYearFee + reservedCpuCost + monitoringCost;
 		double onDemandCost = onDemandCpuCost + monitoringCost;
 		
-		UtilityResult result = acc.calculateUtility(ONE_HOUR_IN_MILLIS);
+		UtilityResult result = acc.accountPartialUtility(ONE_HOUR_IN_MILLIS);
 		assertEquals(reservedCost + onDemandCost, result.getCost(), 0.0);
 		assertEquals(0, result.getReceipt(), 0.0);
 		assertEquals(0, result.getPenalty(), 0.0);
@@ -187,7 +187,7 @@ public class OldAccountingSystemTest {
 		double reservedCost = reservationOneYearFee + 3 * reservedCpuCost + 3 * monitoringCost;
 		double onDemandCost = 3 * onDemandCpuCost + 3 * monitoringCost;
 		
-		UtilityResult result = acc.calculateUtility(3 * ONE_HOUR_IN_MILLIS);
+		UtilityResult result = acc.accountPartialUtility(3 * ONE_HOUR_IN_MILLIS);
 		assertEquals(reservedCost + onDemandCost, result.getCost(), 0.00001);
 		assertEquals(0, result.getReceipt(), 0.0);
 		assertEquals(0, result.getPenalty(), 0.0);
@@ -235,7 +235,7 @@ public class OldAccountingSystemTest {
 		double reservedCost = reservationOneYearFee + 11 * reservedCpuCost + 11 * monitoringCost;
 		double onDemandCost = 8 * onDemandCpuCost + 8 * monitoringCost;
 		
-		UtilityResult result = acc.calculateUtility(20 * ONE_HOUR_IN_MILLIS);
+		UtilityResult result = acc.accountPartialUtility(20 * ONE_HOUR_IN_MILLIS);
 		assertEquals(reservedCost + onDemandCost, result.getCost(), 0.00001);
 		assertEquals(0, result.getReceipt(), 0.0);
 		assertEquals(0, result.getPenalty(), 0.0);
@@ -283,7 +283,7 @@ public class OldAccountingSystemTest {
 		
 		AccountingSystem acc = new AccountingSystem();
 		
-		UtilityResult result = acc.calculateUtility(12 * ONE_HOUR_IN_MILLIS);
+		UtilityResult result = acc.accountPartialUtility(12 * ONE_HOUR_IN_MILLIS);
 		assertEquals(200 + 0.9, result.getReceipt(), 0.0);
 		
 		PowerMock.verify(Configuration.class);
@@ -342,7 +342,7 @@ public class OldAccountingSystemTest {
 		double onDemandCost = 8 * onDemandCpuCost + 8 * monitoringCost;
 		double receipt = 2 * (contract.getPrice()) + contract.getExtraCpuCost(); 
 		
-		UtilityResult result = acc.calculateUtility(20 * ONE_HOUR_IN_MILLIS);
+		UtilityResult result = acc.accountPartialUtility(20 * ONE_HOUR_IN_MILLIS);
 		assertEquals(reservedCost + onDemandCost, result.getCost(), 0.00001);
 		assertEquals(receipt, result.getReceipt(), 0.0);
 		assertEquals(0, result.getPenalty(), 0.0);
@@ -405,7 +405,7 @@ public class OldAccountingSystemTest {
 		//Setting that 1 reserved machine was already charged!
 		acc.setMaximumNumberOfReservedMachinesUsed(1);
 		
-		UtilityResult result = acc.calculateUtility(20 * ONE_HOUR_IN_MILLIS);
+		UtilityResult result = acc.accountPartialUtility(20 * ONE_HOUR_IN_MILLIS);
 		assertEquals(reservedCost + onDemandCost, result.getCost(), 0.00001);
 		assertEquals(receipt, result.getReceipt(), 0.0);
 		assertEquals(0, result.getPenalty(), 0.0);
@@ -465,7 +465,7 @@ public class OldAccountingSystemTest {
 		//Utility calculus depends on descriptor finish time!
 		double receipt = 2 * (contract.getPrice()) + contract.getExtraCpuCost(); 
 		
-		UtilityResult result = acc.calculateUtility(20 * ONE_HOUR_IN_MILLIS);
+		UtilityResult result = acc.accountPartialUtility(20 * ONE_HOUR_IN_MILLIS);
 		assertEquals(0, result.getCost(), 0.00001);
 		assertEquals(receipt, result.getReceipt(), 0.0);
 		assertEquals(0, result.getPenalty(), 0.0);

@@ -26,9 +26,12 @@ public class AccountingSystem {
 	
 	private Map<Integer, User> users;
 	private List<Provider> providers;
+
+	private UtilityResult utilityResult;
 	
 	public AccountingSystem(){
 		this.requestsLostPerUser = new HashMap<String, List<String>>();
+		this.utilityResult = new UtilityResult();
 		
 		this.providers = Configuration.getInstance().getProviders();
 		
@@ -56,11 +59,11 @@ public class AccountingSystem {
 		users.get(request.getUserID()).reportLostRequest(request);
 	}
 
-	public UtilityResultEntry calculateUtility(long currentTimeInMillis){
+	public void accountPartialUtility(long currentTimeInMillis){
 		UtilityResultEntry entry = new UtilityResultEntry(currentTimeInMillis);
 		calculateReceipt(entry);
 		calculateCost(entry, currentTimeInMillis);
-		return entry;
+		this.utilityResult.addEntry(entry);
 	}
 	
 	/**
@@ -88,16 +91,16 @@ public class AccountingSystem {
 	/**
 	 * This method calculates the costs incurred by IaaS providers in a unique period. (e.g, one time
 	 * during a whole year)  
-	 * @param result TODO
 	 * @return
 	 */
-	public void calculateUniqueUtility(UtilityResult result){
+	public UtilityResult calculateUtility(){
 		for(Provider provider : providers){
-			provider.calculateUniqueCost(result);
+			provider.calculateUniqueCost(utilityResult);
 		}
 		for(User user : users.values()){
-			user.calculateOneTimeFees(result);
+			user.calculateOneTimeFees(utilityResult);
 		}
+		return utilityResult;
 	}
 
 	/**

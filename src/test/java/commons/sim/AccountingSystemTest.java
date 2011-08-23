@@ -164,7 +164,7 @@ public class AccountingSystemTest {
 		List<Provider> providers = accounting.canBuyMachine(MachineType.LARGE, true);
 		assertNotNull(providers);
 		assertFalse(providers.isEmpty());
-		assertEquals(1, providers.size());
+		assertEquals(2, providers.size());
 	}
 
 	/**
@@ -176,7 +176,7 @@ public class AccountingSystemTest {
 	}
 
 	/**
-	 * Test method for {@link commons.sim.AccountingSystem#calculateUtility(long)}.
+	 * Test method for {@link commons.sim.AccountingSystem#accountPartialUtility(long)}.
 	 */
 	@Test
 	public void testCalculateUtility() {
@@ -184,7 +184,7 @@ public class AccountingSystemTest {
 	}
 
 	/**
-	 * Test method for {@link commons.sim.AccountingSystem#calculateUniqueUtility(commons.cloud.UtilityResult)}.
+	 * Test method for {@link commons.sim.AccountingSystem#calculateUtility()}.
 	 */
 	@Test
 	public void testCalculateUniqueUtility() {

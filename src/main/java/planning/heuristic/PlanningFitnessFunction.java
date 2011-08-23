@@ -82,7 +82,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		this.simulator.start();
 		
 		UtilityResult result = this.dps.calculateUtility();
-		this.dps.getAccountingSystem().calculateUniqueUtility(result));
+		this.dps.getAccountingSystem().calculateUniqueUtility());
 		double[] resourceConsumptionsData = this.dps.getAccountingSystem().getResourcesData();
 		double fitness = result.getUtility();
 		
