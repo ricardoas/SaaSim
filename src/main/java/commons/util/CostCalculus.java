@@ -20,24 +20,22 @@ public class CostCalculus {
 	 */
 	public static double calcTransferenceCost(long totalTransferedInBytes,
 			long[] limitsInConvertedUnit, double[] costsInConvertedUnit, long conversion) {
-		double transferenceLeft = (1.0*totalTransferedInBytes)/conversion;
-		int currentIndex = 0;
-		double total = 0;
-		while(transferenceLeft != 0 && currentIndex != limitsInConvertedUnit.length){
-			if(transferenceLeft <= limitsInConvertedUnit[currentIndex]){
-				total += transferenceLeft * costsInConvertedUnit[currentIndex];
-				transferenceLeft = 0;
+		
+		double transference = (1.0*totalTransferedInBytes)/conversion;
+		double total = Math.min(transference, limitsInConvertedUnit[0]) * costsInConvertedUnit[0];
+		
+		for (int i = 1; i < limitsInConvertedUnit.length; i++) {
+			if(transference >= limitsInConvertedUnit[i]){
+				total += (limitsInConvertedUnit[i]-limitsInConvertedUnit[i-1]) * costsInConvertedUnit[i];
 			}else{
-				total += limitsInConvertedUnit[currentIndex] * costsInConvertedUnit[currentIndex];
-				transferenceLeft -= limitsInConvertedUnit[currentIndex]; 
+				total += Math.max(0, (transference-limitsInConvertedUnit[i-1])) * costsInConvertedUnit[i];
 			}
-			currentIndex++;
 		}
 		
-		if(transferenceLeft != 0){
-			total += transferenceLeft * costsInConvertedUnit[currentIndex];
-			transferenceLeft = 0; 
+		if(transference > limitsInConvertedUnit[limitsInConvertedUnit.length-1]){
+			total += (transference - limitsInConvertedUnit[limitsInConvertedUnit.length-1]) * costsInConvertedUnit[costsInConvertedUnit.length-1];
 		}
+		
 		return total;
 	}
 
