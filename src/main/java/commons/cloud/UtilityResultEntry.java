@@ -323,7 +323,7 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	}
 
 	/**
-	 * @param users2
+	 * @param map
 	 * @return
 	 */
 	private static <K,V> String format(Map<K, V> map) {
@@ -334,6 +334,4 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 		}
 		return sb.toString().substring(0, sb.length()-1);
 	}
-	
-	
 }

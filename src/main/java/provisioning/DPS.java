@@ -12,10 +12,6 @@ import commons.sim.AccountingSystem;
  */
 public interface DPS extends Monitor{
 	
-	void setAccountingSystem(AccountingSystem system);
-	
-	AccountingSystem getAccountingSystem();
-	
 	void registerConfigurable(DynamicConfigurable configurable);
 	
 	UtilityResult calculateUtility();
