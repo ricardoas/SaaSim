@@ -43,7 +43,7 @@ public class ProviderTest {
 		EasyMock.replay(typeProvider);
 		
 		Provider provider = new Provider("amazon", 3, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
-		assertTrue(provider.canBuyMachine(false, null));
+		assertTrue(provider.canBuyMachine(false, MachineType.LARGE));
 		
 		EasyMock.verify(typeProvider);
 	}
