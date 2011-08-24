@@ -1,7 +1,6 @@
 package commons.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -176,6 +175,31 @@ public class ConfigurationTest {
 	}
 	
 	@Test
+	public void testEmptyIaaSPlanFile() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.EMPTY_IAAS_PLANS_FILE);
+		Configuration config = Configuration.getInstance();
+		
+		List<Provider> providers = config.getProviders();
+		assertEquals(3, providers.size());
+		for(Provider provider : providers){
+			assertFalse(provider.canBuyMachine(true, MachineType.SMALL));
+			assertFalse(provider.canBuyMachine(true, MachineType.MEDIUM));
+			assertFalse(provider.canBuyMachine(true, MachineType.LARGE));
+			assertFalse(provider.canBuyMachine(true, MachineType.XLARGE));
+		}
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testInvalidIaaSPlanFile() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.INVALID_IAAS_PLANS_FILE);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testInvalidIaaSPlanFile2() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.INVALID_IAAS_PLANS_FILE_2);
+	}
+	
+	@Test
 	public void testValidFile() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
 		Configuration config = Configuration.getInstance();
@@ -183,7 +207,10 @@ public class ConfigurationTest {
 		config.getDPSHeuristicClass();
 		config.getPlanningHeuristicClass();
 //		config.getProviders();
-		config.getRelativePower(null);
+		assertEquals(1, config.getRelativePower(MachineType.SMALL), 0.0);
+		assertEquals(4, config.getRelativePower(MachineType.MEDIUM), 0.0);
+		assertEquals(2, config.getRelativePower(MachineType.LARGE), 0.0);
+		assertEquals(4, config.getRelativePower(MachineType.XLARGE), 0.0);
 //		config.getUsers();
 	}
 

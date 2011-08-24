@@ -30,6 +30,9 @@ public class PropertiesTesting {
 	public static final String WRONG_PROVIDERS_FILE_8 = "src/test/resources/providers/config8.properties";
 	public static final String WRONG_PROVIDERS_FILE_9 = "src/test/resources/providers/config9.properties";
 	
+	public static final String EMPTY_IAAS_PLANS_FILE = "src/test/resources/providers/config10.properties";
+	public static final String INVALID_IAAS_PLANS_FILE = "src/test/resources/providers/config11.properties";
+	public static final String INVALID_IAAS_PLANS_FILE_2 = "src/test/resources/providers/config12.properties";
 	
 	public static final String WRONG_USERS_FILE_1 = "src/test/resources/users/config1.properties";
 	public static final String WRONG_USERS_FILE_2 = "src/test/resources/users/config2.properties";
@@ -40,3 +43,4 @@ public class PropertiesTesting {
 	public static final String WRONG_USERS_FILE_7 = "src/test/resources/users/config7.properties";
 
 }
+

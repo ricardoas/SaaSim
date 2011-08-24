@@ -32,6 +32,36 @@ public class ProviderTest {
 		amazon = Configuration.getInstance().getProviders().get(1);
 		assert amazon.getName().equals("amazon"): "Check providers order in iaas.providers file.";
 	}
+	
+	/**
+	 * Test method for {@link commons.cloud.Provider#canBuyMachine(boolean, commons.cloud.MachineType)}.
+	 */
+	@Test
+	public void testCanBuyOnDemandMachineWithoutAType() {
+		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
+		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
+		EasyMock.replay(typeProvider);
+		
+		Provider provider = new Provider("amazon", 3, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		assertFalse(provider.canBuyMachine(false, MachineType.SMALL));
+		
+		EasyMock.verify(typeProvider);
+	}
+	
+	/**
+	 * Test method for {@link commons.cloud.Provider#canBuyMachine(boolean, commons.cloud.MachineType)}.
+	 */
+	@Test
+	public void testCanBuyOnDemandMachineWithNullType() {
+		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
+		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
+		EasyMock.replay(typeProvider);
+		
+		Provider provider = new Provider("amazon", 3, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		assertFalse(provider.canBuyMachine(false, null));
+		
+		EasyMock.verify(typeProvider);
+	}
 
 	/**
 	 * Test method for {@link commons.cloud.Provider#canBuyMachine(boolean, commons.cloud.MachineType)}.
@@ -72,8 +102,23 @@ public class ProviderTest {
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
 		EasyMock.replay(typeProvider);
 		
-		Provider provider = new Provider("amazon", 0, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		Provider provider = new Provider("amazon", 0, 1, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
 		assertFalse(provider.canBuyMachine(true, MachineType.SMALL));
+		
+		EasyMock.verify(typeProvider);
+	}
+	
+	/**
+	 * Test method for {@link commons.cloud.Provider#canBuyMachine(boolean, commons.cloud.MachineType)}.
+	 */
+	@Test
+	public void testCanBuyReservedMachineWithNullType() {
+		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
+		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
+		EasyMock.replay(typeProvider);
+		
+		Provider provider = new Provider("amazon", 0, 1, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		assertFalse(provider.canBuyMachine(true, null));
 		
 		EasyMock.verify(typeProvider);
 	}
@@ -149,15 +194,21 @@ public class ProviderTest {
 	 */
 	@Test
 	public void testShutdownInexistentOnDemandMachine() {
-		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.LARGE);
+		MachineDescriptor descriptor = new MachineDescriptor(111, false, MachineType.LARGE);
+		MachineDescriptor existentDescriptor = new MachineDescriptor(1, false, MachineType.LARGE);
 
 		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
+		EasyMock.expect(typeProvider.buyMachine(false)).andReturn(existentDescriptor);
 		EasyMock.expect(typeProvider.shutdownMachine(descriptor)).andReturn(false);
 		EasyMock.replay(typeProvider);
 		
-		Provider provider = new Provider("amazon", 3, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		Provider provider = new Provider("amazon", 1, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		provider.buyMachine(false, MachineType.LARGE);//Buying an on-demand machine
+		
+		assertFalse(provider.canBuyMachine(false, MachineType.LARGE));
 		assertFalse(provider.shutdownMachine(descriptor));
+		assertFalse(provider.canBuyMachine(false, MachineType.LARGE));
 		
 		EasyMock.verify(typeProvider);
 	}
@@ -325,7 +376,7 @@ public class ProviderTest {
 	 * Test method for {@link commons.cloud.Provider#calculateUniqueCost(UtilityResult)}.
 	 */
 	@Test
-	public void testCalculateUnicCostWithNoConsumption() {
+	public void testCalculateUniqueCostWithNoConsumption() {
 		UtilityResult result = EasyMock.createStrictMock(UtilityResult.class);
 		result.addProviderUniqueCost("amazon", MachineType.SMALL, 0);
 		
