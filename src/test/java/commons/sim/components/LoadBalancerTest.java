@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,12 +25,14 @@ import commons.sim.jeevent.JEEventType;
 import commons.sim.jeevent.JETime;
 import commons.sim.schedulingheuristics.ProfitDrivenHeuristic;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
+import commons.sim.util.MachineFactory;
+import commons.sim.util.SaaSAppProperties;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(Configuration.class)
+@PrepareForTest({Configuration.class, MachineFactory.class})
+
 public class LoadBalancerTest {
 	
-	private static final long ONE_MINUTE_IN_MILLIS = 1000 * 60l;
 	private LoadBalancer lb;
 	private JEEventScheduler eventScheduler;
 	private SchedulingHeuristic schedulingHeuristic;
@@ -39,13 +42,52 @@ public class LoadBalancerTest {
 		this.eventScheduler = new JEEventScheduler();
 	}
 	
+	@Test
+	public void testAddServer(){
+		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL);
+		
+		Configuration config = EasyMock.createStrictMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SETUP_TIME)).andReturn(1000l);
+		EasyMock.expect(config.getApplicationHeuristics()).andReturn(new Class[]{ProfitDrivenHeuristic.class});
+		
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(LoadBalancer.class))).andReturn(1);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(TimeSharedMachine.class))).andReturn(2);
+		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(2);
+		Capture<JEEvent> captured = new Capture<JEEvent>();
+		scheduler.queueEvent(EasyMock.capture(captured));
+		
+		this.schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
+		PowerMock.replay(Configuration.class);
+		EasyMock.replay(config, scheduler, this.schedulingHeuristic);
+		
+		lb = new LoadBalancer(scheduler, null, schedulingHeuristic, Integer.MAX_VALUE, 0);
+
+		MachineFactory factory = EasyMock.createStrictMock(MachineFactory.class);
+		PowerMock.mockStatic(MachineFactory.class);
+		EasyMock.expect(MachineFactory.getInstance()).andReturn(factory);
+		EasyMock.expect(factory.createMachine(scheduler, descriptor, lb)).andReturn(new TimeSharedMachine(scheduler, descriptor, lb));
+		PowerMock.replay(MachineFactory.class);
+		EasyMock.replay(factory);
+		
+		lb.addServer(descriptor, true);
+		
+		JEEvent event = captured.getValue();
+		assertEquals(JEEventType.ADD_SERVER, event.getType());
+		assertEquals(1000l, event.getScheduledTime().timeMilliSeconds);
+		
+		PowerMock.verifyAll();
+	}
+	
 	/**
 	 * Scheduling a new request with one machine artificially chosen by the heuristic
 	 * @throws ConfigurationException 
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
-	public void handleEventNewRequestWithOneMachine() throws ConfigurationException{
+	public void testHandleEventNewRequestWithOneMachine() throws ConfigurationException{
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL);
 		
 		Request request = EasyMock.createStrictMock(Request.class);
@@ -65,7 +107,6 @@ public class LoadBalancerTest {
 		EasyMock.expect(schedulingHeuristic.getNextServer(
 				EasyMock.isA(Request.class) , EasyMock.isA(List.class))).andReturn(machine);
 		machine.sendRequest(request);
-		
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(newRequestEvent, schedulingHeuristic, request, machine, config);
@@ -87,7 +128,7 @@ public class LoadBalancerTest {
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
-	public void handleEventNewRequestWithNoAvailableMachine(){
+	public void testHandleEventNewRequestWithNoAvailableMachine(){
 		Request request = EasyMock.createStrictMock(Request.class);
 		JEEvent event = EasyMock.createStrictMock(JEEvent.class);
 		DPS dps = EasyMock.createStrictMock(DPS.class);
