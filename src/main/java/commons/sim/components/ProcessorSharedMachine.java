@@ -19,6 +19,7 @@ import commons.util.Triple;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
+@Deprecated
 public class ProcessorSharedMachine extends JEAbstractEventHandler implements Machine{
 
 	protected final long machineID;
