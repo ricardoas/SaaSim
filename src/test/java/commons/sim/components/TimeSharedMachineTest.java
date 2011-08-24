@@ -55,7 +55,6 @@ public class TimeSharedMachineTest {
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(request.getTotalToProcess()).andReturn(5000L);
 		
-		
 		TimeSharedMachine machine = PowerMock.createStrictPartialMock(TimeSharedMachine.class, new String[]{"handleEvent"}, scheduler, descriptor, loadBalancer);
 		Capture<JEEvent> captured = new Capture<JEEvent>();
 		machine.handleEvent(EasyMock.capture(captured));
@@ -186,6 +185,10 @@ public class TimeSharedMachineTest {
 		EasyMock.verify(loadBalancer, request, machine);
 	}
 	
+	/**
+	 * In this scenario events the scheduler deals with some preemption events until the request
+	 * is fully processed. After the request is fully processed, the machine is turned off.
+	 */
 	@Test
 	public void testHandlePreemptionOfLastRequestOnQueueWithShutdown(){
 		JEEventScheduler scheduler = new JEEventScheduler();
@@ -209,10 +212,9 @@ public class TimeSharedMachineTest {
 		Capture<JEEvent> captured = new Capture<JEEvent>();
 		loadBalancer.handleEvent(EasyMock.capture(captured));
 		EasyMock.expectLastCall();
-
 		
 		EasyMock.replay(loadBalancer, request);
-		
+
 		Machine machine = new TimeSharedMachine(scheduler, descriptor, loadBalancer);
 		machine.sendRequest(request);
 		machine.shutdownOnFinish();
@@ -235,21 +237,39 @@ public class TimeSharedMachineTest {
 		JEEventScheduler scheduler = new JEEventScheduler();
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(150L);
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(500L);
 		firstRequest.update(100L);
 		EasyMock.expect(firstRequest.isFinished()).andReturn(false);
-		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(50L);
-		firstRequest.update(50L);
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(400L);
+		firstRequest.update(100L);
+		EasyMock.expect(firstRequest.isFinished()).andReturn(false);
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(300L);
+		firstRequest.update(100L);
+		EasyMock.expect(firstRequest.isFinished()).andReturn(false);
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(200L);
+		firstRequest.update(100L);
+		EasyMock.expect(firstRequest.isFinished()).andReturn(false);
+		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(100L);
+		firstRequest.update(100L);
 		EasyMock.expect(firstRequest.isFinished()).andReturn(true);
-		EasyMock.expect(firstRequest.getRequestSizeInBytes()).andReturn(100000L);
-		EasyMock.expect(firstRequest.getResponseSizeInBytes()).andReturn(100000L);
+		EasyMock.expect(firstRequest.getRequestSizeInBytes()).andReturn(100l);
+		EasyMock.expect(firstRequest.getResponseSizeInBytes()).andReturn(10000l);
 		
 		Request secondRequest = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(50L);
-		secondRequest.update(50L);
+		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(400L);
+		secondRequest.update(100L);
+		EasyMock.expect(secondRequest.isFinished()).andReturn(false);
+		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(300L);
+		secondRequest.update(100L);
+		EasyMock.expect(secondRequest.isFinished()).andReturn(false);
+		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(200L);
+		secondRequest.update(100L);
+		EasyMock.expect(secondRequest.isFinished()).andReturn(false);
+		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(100L);
+		secondRequest.update(100L);
 		EasyMock.expect(secondRequest.isFinished()).andReturn(true);
-		EasyMock.expect(secondRequest.getRequestSizeInBytes()).andReturn(100000L);
-		EasyMock.expect(secondRequest.getResponseSizeInBytes()).andReturn(100000L);
+		EasyMock.expect(secondRequest.getRequestSizeInBytes()).andReturn(100l);
+		EasyMock.expect(secondRequest.getResponseSizeInBytes()).andReturn(10000l);
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.reportRequestFinished(secondRequest);
@@ -283,6 +303,10 @@ public class TimeSharedMachineTest {
 		EasyMock.verify(loadBalancer);
 	}
 
+	/**
+	 * As the request finish event has not happened, the time that is an attribute of computeUtilisation
+	 * is used as the computing time
+	 */
 	@Test
 	public void testComputeUtilisationOfMachineWithRunningRequest(){
 		
@@ -299,7 +323,7 @@ public class TimeSharedMachineTest {
 		machine.sendRequest(request);
 		
 		assertEquals(Double.NaN, machine.computeUtilisation(scheduler.now().timeMilliSeconds), 0.0001);
-		assertEquals(1, machine.computeUtilisation(scheduler.now().timeMilliSeconds + 75), 0.0001);
+		assertEquals(1, machine.computeUtilisation(scheduler.now().timeMilliSeconds + 50), 0.0001);
 		
 		EasyMock.verify(loadBalancer, request);
 	}
@@ -369,7 +393,7 @@ public class TimeSharedMachineTest {
 	}
 
 	@Test
-	public void testComputeUtilisationOfMachineWithAfterRequestFinishes(){
+	public void testComputeUtilisationOfMachineWithRequestFinishes2(){
 		
 		JEEventScheduler scheduler = new JEEventScheduler();
 		
@@ -471,22 +495,23 @@ public class TimeSharedMachineTest {
 		assertFalse(machine.isBusy());//Verifying if machine is busy
 	}
 	
-	@Test
-	public void testEstimateFinishTime(){
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
-		
-		EasyMock.replay(loadBalancer);
-
-		Machine machine = new TimeSharedMachine(new JEEventScheduler(), descriptor, loadBalancer);
-		long reqID = 0;
-		Random random = new Random();
-		for (int i = 0; i < 70; i++) {
-			machine.sendRequest(new Request("", reqID+++"", "", 0, 0, "", random.nextInt(500)));
-		}
-		
-		Request request = new Request("", reqID+++"", "", 0, 0, "", random.nextInt(500));
-		machine.estimateFinishTime(request);
-		
-		EasyMock.verify(loadBalancer);
-	}
+//	@Test
+//	public void testEstimateFinishTime(){
+//		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+//		
+//		EasyMock.replay(loadBalancer);
+//
+//		Machine machine = new TimeSharedMachine(new JEEventScheduler(), descriptor, loadBalancer);
+//		long reqID = 0;
+//		Random random = new Random();
+//		for (int i = 0; i < 70; i++) {
+//			machine.sendRequest(new Request("", reqID+++"", "", 0, 0, "", random.nextInt(500)));
+//		}
+//		
+//		Request request = new Request("", reqID+++"", "", 0, 0, "", random.nextInt(500));
+//		machine.estimateFinishTime(request);
+//		
+//		EasyMock.verify(loadBalancer);
+//	}
 }
+
