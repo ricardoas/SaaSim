@@ -5,7 +5,7 @@ import commons.cloud.UtilityResult;
 import commons.sim.AccountingSystem;
 
 /**
- * Dynamic Provisioning System
+ * Dynamic Provisioning System interface. A DPS is a {@link Monitor} object too.
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *

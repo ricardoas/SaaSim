@@ -57,13 +57,13 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 	}
 	
 	private void evaluateMachinesToBeAdded(int tier) {
-		if(accountingSystem.canBuyMachine()){
+		if(canBuyMachine()){
 			configurable.addServer(tier, accountingSystem.buyMachine(), true);
 		}
 	}
 	
 	@Override
 	public void requestQueued(long timeMilliSeconds, Request request, int tier) {
-		accountingSystem.reportLostRequest(request);
+		reportLostRequest(request);
 	}
 }

@@ -1,7 +1,5 @@
 package commons.cloud;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -219,8 +217,6 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 					+ "," + monitoringCost
 					+ "," + format(types);
 		}
-		
-		
 	}
 
 	private final long time;
@@ -237,18 +233,18 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	 * @param providers2 
 	 * @param users 
 	 */
-	public UtilityResultEntry(long time, Collection<User> users, List<Provider> providers) {
+	public UtilityResultEntry(long time, Map<Integer, User> users, Map<String, Provider> providers) {
 		this.time = time;
 		this.receipt = 0;
 		this.cost = 0;
 		this.penalty = 0;
 		this.users = new TreeMap<Integer, UserEntry>();
-		for (User user : users) {
-			this.users.put(user.getId(), new UserEntry(user.getId()));
+		for (Entry<Integer, User> entry : users.entrySet()) {
+			this.users.put(entry.getKey(), new UserEntry(entry.getKey()));
 		}
 		this.providers = new TreeMap<String, ProviderEntry>();
-		for (Provider provider : providers) {
-			this.providers.put(provider.getName(), new ProviderEntry(provider.getName(), provider.getAvailableTypes()));
+		for (Entry<String, Provider> entry : providers.entrySet()) {
+			this.providers.put(entry.getKey(), new ProviderEntry(entry.getKey(), entry.getValue().getAvailableTypes()));
 		}
 	}
 	

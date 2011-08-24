@@ -37,7 +37,7 @@ public class ProfitDrivenProvisioningSystemTest {
 		accounting.buyMachine();
 		accounting.buyMachine();
 		
-		ProfitDrivenProvisioningSystem dps = new ProfitDrivenProvisioningSystem(scheduler);
+		DynamicProvisioningSystem dps = new ProfitDrivenProvisioningSystem(scheduler);
 		dps.setAccountingSystem(accounting);
 		
 		//Event to add machine
@@ -75,7 +75,7 @@ public class ProfitDrivenProvisioningSystemTest {
 		configurable.addServer(0, new MachineDescriptor(0, true, 0));
 		EasyMock.expectLastCall();
 		
-		ProfitDrivenProvisioningSystem dps = new ProfitDrivenProvisioningSystem(scheduler);
+		DynamicProvisioningSystem dps = new ProfitDrivenProvisioningSystem(scheduler);
 		dps.setAccountingSystem(accounting);
 		dps.registerConfigurable(configurable);
 		
@@ -116,7 +116,7 @@ public class ProfitDrivenProvisioningSystemTest {
 		configurable.addServer(0, new MachineDescriptor(0, false, 0));
 		EasyMock.expectLastCall();
 		
-		ProfitDrivenProvisioningSystem dps = new ProfitDrivenProvisioningSystem(scheduler);
+		DynamicProvisioningSystem dps = new ProfitDrivenProvisioningSystem(scheduler);
 		dps.setAccountingSystem(accounting);
 		dps.registerConfigurable(configurable);
 		
