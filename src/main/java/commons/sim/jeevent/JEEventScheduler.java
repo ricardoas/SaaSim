@@ -66,7 +66,9 @@ public class JEEventScheduler {
     public int registerHandler(JEEventHandler handler) {
     	
 		int id;
-		while((id = random.nextInt()) <= 0 || handlerMap.containsKey(id)){}
+		while((id = random.nextInt()) <= 0 || handlerMap.containsKey(id)){
+			// Loop until there's an available ID
+		}
 		handlerMap.put(id, handler);
 		return id;
     }

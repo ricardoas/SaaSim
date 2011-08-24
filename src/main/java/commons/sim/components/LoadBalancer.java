@@ -94,8 +94,8 @@ public class LoadBalancer extends JEAbstractEventHandler{
 				servers.remove(server);
 				server.shutdownOnFinish();
 				heuristic.finishServer(server, i, servers);
+				break;// not a concurrent modification because of "break" statement.
 			}
-			break;// not a concurrent modification because of "break" statement.
 		}
 	}
 

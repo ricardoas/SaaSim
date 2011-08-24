@@ -244,4 +244,13 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	public double getPenalty() {
 		return penalty;
 	}
+
+	@Override
+	public String toString() {
+		return "UtilityResultEntry [time=" + time + ", receipt=" + receipt
+				+ ", cost=" + cost + ", penalty=" + penalty + ", users="
+				+ users + ", providers=" + providers + "]";
+	}
+	
+	
 }
