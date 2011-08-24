@@ -1,9 +1,9 @@
 package commons.cloud;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 /**
@@ -11,6 +11,10 @@ import java.util.TreeMap;
  */
 public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	
+	/**
+	 * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+	 *
+	 */
 	private static class UserEntry{
 
 		private final int userID;
@@ -48,9 +52,27 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 			this.storageCost = storageCost;
 			this.totalReceipt = total;
 		}
+
+		/**
+		 * {@inheritDoc}
+		 */
 		
+		@Override
+		public String toString() {
+			return userID 
+					+ "," + contractName 
+					+ "," + totalReceipt
+					+ "," + consumedCPU 
+					+ "," + cpuCost
+					+ "," + consumedTransference
+					+ "," + transferenceCost
+					+ "," + storageCost;
+		}
 	}
 	
+	/**
+	 * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+	 */
 	private static class TypeEntry{
 		
 		private final MachineType type;
@@ -61,7 +83,7 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 
 		/**
 		 * Default constructor.
-		 * @param type2
+		 * @param type
 		 * @param onDemandCPUHours
 		 * @param onDemandCost
 		 * @param reservedCPUHours
@@ -72,10 +94,10 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 		}
 
 		/**
-		 * @param onDemandCPUHours2
-		 * @param onDemandCost2
-		 * @param reservedCPUHours2
-		 * @param reservedCost2
+		 * @param onDemandCPUHours
+		 * @param onDemandCost
+		 * @param reservedCPUHours
+		 * @param reservedCost
 		 */
 		public void update(long onDemandCPUHours, double onDemandCost,
 				long reservedCPUHours, double reservedCost) {
@@ -84,8 +106,26 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 			this.reservedCPUHours = reservedCPUHours;
 			this.reservedCost = reservedCost;
 		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return type 
+					+ "," + onDemandCPUHours 
+					+ "," + onDemandCost
+					+ "," + reservedCPUHours
+					+ "," + reservedCost;
+		}
+		
+		
 	}
 	
+	/**
+	 * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+	 *
+	 */
 	private static class ProviderEntry{
 		
 		private final String name;
@@ -159,6 +199,27 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 			this.types.get(type).update(onDemandCPUHours, onDemandCost,
 				reservedCPUHours, reservedCost);
 		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		
+		@Override
+		public String toString() {
+			return name 
+					+ "," + cost
+					+ "," + inCost 
+					+ "," + outCost
+					+ "," + onDemandCost 
+					+ "," + reservedCost 
+					+ "," + inTransference
+					+ "," + outTransference
+					+ "," + onDemandCPUHours
+					+ "," + reservedCPUHours 
+					+ "," + monitoringCost
+					+ "," + format(types);
+		}
+		
 		
 	}
 
@@ -168,7 +229,6 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	private double penalty;
 	
 	private Map<Integer, UserEntry> users;
-	
 	private Map<String, ProviderEntry> providers;
 	
 	/**
@@ -262,9 +322,21 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 
 	@Override
 	public String toString() {
-		return "UtilityResultEntry [time=" + time + ", receipt=" + receipt
-				+ ", cost=" + cost + ", penalty=" + penalty + ", users="
-				+ users + ", providers=" + providers + "]";
+		return time + "," + getUtility() + "," + receipt	+ "," + cost + "," + penalty + ","
+				+ format(users) + "," + format(providers);
+	}
+
+	/**
+	 * @param users2
+	 * @return
+	 */
+	private static <K,V> String format(Map<K, V> map) {
+		StringBuilder sb = new StringBuilder();
+		for (Entry<K, V> entry : map.entrySet()) {
+			sb.append(entry.getValue());
+			sb.append(',');
+		}
+		return sb.toString().substring(0, sb.length()-1);
 	}
 	
 	

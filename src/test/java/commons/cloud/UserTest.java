@@ -5,7 +5,6 @@ package commons.cloud;
 
 import static org.junit.Assert.assertEquals;
 
-import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
