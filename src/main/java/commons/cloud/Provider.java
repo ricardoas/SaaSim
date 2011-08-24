@@ -178,22 +178,19 @@ public class Provider {
 
 	public void calculateCost(UtilityResultEntry entry, long currentTimeInMillis) {
 		
-		entry.addProvider(getName());
-		
-		
 		long [] transferences = new long[2];
 				
 		for (TypeProvider typeProvider : types.values()) {
 			long [] typeTransferences = typeProvider.getTotalTransferences();
 			transferences[0] += typeTransferences[0];
 			transferences[1] += typeTransferences[1];
-			typeProvider.calculateMachinesCost(entry, currentTimeInMillis, monitoringCost);
+			typeProvider.calculateMachinesCost(entry, getName(), currentTimeInMillis, monitoringCost);
 		}
 		
 		double inCost = CostCalculus.calcTransferenceCost(transferences[0], transferInLimits, transferInCosts, CostCalculus.GB_IN_BYTES);
 		double outCost = CostCalculus.calcTransferenceCost(transferences[1], transferOutLimits, transferOutCosts, CostCalculus.GB_IN_BYTES);
 		
-		entry.addTransferenceToCost(transferences[0], inCost, transferences[1], outCost);
+		entry.addTransferenceToCost(getName(), transferences[0], inCost, transferences[1], outCost);
 	}
 	
 

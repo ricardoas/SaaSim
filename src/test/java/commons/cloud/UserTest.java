@@ -5,6 +5,7 @@ package commons.cloud;
 
 import static org.junit.Assert.assertEquals;
 
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
@@ -22,16 +23,18 @@ public class UserTest {
 	 */
 	@Test
 	public void testCalculateReceipt() {
-		UtilityResultEntry entry = new UtilityResultEntry(0);
+		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
 		
 		Contract contract = EasyMock.createStrictMock(Contract.class);
-		contract.calculateReceipt(entry, 0, 0, 0, STORAGE_IN_BYTES);
-		EasyMock.replay(contract);
 		
 		User user = new User(contract, STORAGE_IN_BYTES);
+		
+		contract.calculateReceipt(entry, user.getId(), 0, 0, 0, STORAGE_IN_BYTES);
+		EasyMock.replay(contract, entry);
+		
 		user.calculatePartialReceipt(entry);
 	
-		EasyMock.verify(contract);
+		EasyMock.verify(contract, entry);
 	}
 
 	/**
@@ -87,10 +90,12 @@ public class UserTest {
 		long responseSize = 1024 * 1024 * 5;
 		
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addUser(EasyMock.anyInt());
 		
 		Contract gold = EasyMock.createStrictMock(Contract.class);
-		gold.calculateReceipt(entry, 2*totalProcessed, 2*requestSize, 2*responseSize, STORAGE_IN_BYTES);
+		
+		User user = new User(gold , STORAGE_IN_BYTES);
+		
+		gold.calculateReceipt(entry, user.getId(), 2*totalProcessed, 2*requestSize, 2*responseSize, STORAGE_IN_BYTES);
 		
 		Request request = EasyMock.createStrictMock(Request.class);;
 		EasyMock.expect(request.getTotalProcessed()).andReturn(totalProcessed);
@@ -104,7 +109,6 @@ public class UserTest {
 		
 		EasyMock.replay(gold, request, entry);
 		
-		User user = new User(gold , STORAGE_IN_BYTES);
 		user.reportFinishedRequest(request);
 		user.reportFinishedRequest(request);
 		user.calculatePartialReceipt(entry);
@@ -121,10 +125,12 @@ public class UserTest {
 		long requestSize = 1024 * 100;
 		
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addUser(EasyMock.anyInt());
 		
 		Contract gold = EasyMock.createStrictMock(Contract.class);
-		gold.calculateReceipt(entry, 2*totalProcessed, 2*requestSize, 0, STORAGE_IN_BYTES);
+		
+		User user = new User(gold , STORAGE_IN_BYTES);
+		
+		gold.calculateReceipt(entry, user.getId(), 2*totalProcessed, 2*requestSize, 0, STORAGE_IN_BYTES);
 		
 		Request request = EasyMock.createStrictMock(Request.class);;
 		EasyMock.expect(request.getTotalProcessed()).andReturn(totalProcessed);
@@ -136,7 +142,6 @@ public class UserTest {
 		
 		EasyMock.replay(gold, request, entry);
 		
-		User user = new User(gold , STORAGE_IN_BYTES);
 		user.reportLostRequest(request);
 		user.reportLostRequest(request);
 		user.calculatePartialReceipt(entry);

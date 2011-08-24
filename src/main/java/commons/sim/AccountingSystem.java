@@ -60,7 +60,7 @@ public class AccountingSystem {
 	}
 
 	public void accountPartialUtility(long currentTimeInMillis){
-		UtilityResultEntry entry = new UtilityResultEntry(currentTimeInMillis);
+		UtilityResultEntry entry = new UtilityResultEntry(currentTimeInMillis, users.values(), providers);
 		calculateReceipt(entry);
 		calculateCost(entry, currentTimeInMillis);
 		this.utilityResult.addEntry(entry);

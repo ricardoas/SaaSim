@@ -94,8 +94,7 @@ public class User implements Comparable<User>{
 	}
 	
 	public void calculatePartialReceipt(UtilityResultEntry entry) {
-		entry.addUser(getId());
-		this.contract.calculateReceipt(entry, consumedCpuInMillis, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, consumedStorageInBytes);
+		this.contract.calculateReceipt(entry, getId(), consumedCpuInMillis, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, consumedStorageInBytes);
 		this.reset();
 	}
 

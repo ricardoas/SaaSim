@@ -112,7 +112,7 @@ public class TypeProvider {
 		return reservedRunningMachines.size() < reservation;
 	}
 
-	public void calculateMachinesCost(UtilityResultEntry entry, long currentTimeInMillis, double monitoringCostPerHour) {
+	public void calculateMachinesCost(UtilityResultEntry entry, String provider, long currentTimeInMillis, double monitoringCostPerHour) {
 		long onDemandUpTimeInFullHours = 0;
 		long reservedUpTimeInFullHours = 0;
 		
@@ -135,7 +135,7 @@ public class TypeProvider {
 		double reservedCost = reservedUpTimeInFullHours * reservedCpuCost;
 		double monitoringCost = (onDemandUpTimeInFullHours + reservedUpTimeInFullHours) * monitoringCostPerHour;
 		
-		entry.addUsageToCost(type, onDemandUpTimeInFullHours, onDemandCost, reservedUpTimeInFullHours, reservedCost, monitoringCost);
+		entry.addUsageToCost(provider, type, onDemandUpTimeInFullHours, onDemandCost, reservedUpTimeInFullHours, reservedCost, monitoringCost);
 		
 		onDemandFinishedMachines.clear();
 		reservedFinishedMachines.clear();

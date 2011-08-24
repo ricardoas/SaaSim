@@ -1,7 +1,10 @@
 package commons.cloud;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -10,6 +13,7 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	
 	private static class UserEntry{
 
+		private final int userID;
 		private String contractName;
 		private double totalReceipt;
 		private long consumedCPU;
@@ -17,6 +21,14 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 		private long consumedTransference;
 		private double transferenceCost;
 		private double storageCost;
+
+		/**
+		 * Default constructor.
+		 * @param userID
+		 */
+		public UserEntry(int userID) {
+			this.userID = userID;
+		}
 
 		/**
 		 * @param contractName
@@ -42,10 +54,10 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	private static class TypeEntry{
 		
 		private final MachineType type;
-		private final long onDemandCPUHours;
-		private final double onDemandCost;
-		private final long reservedCPUHours;
-		private final double reservedCost;
+		private long onDemandCPUHours;
+		private double onDemandCost;
+		private long reservedCPUHours;
+		private double reservedCost;
 
 		/**
 		 * Default constructor.
@@ -55,9 +67,18 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 		 * @param reservedCPUHours
 		 * @param reservedCost
 		 */
-		public TypeEntry(MachineType type, long onDemandCPUHours,
-				double onDemandCost, long reservedCPUHours, double reservedCost) {
+		public TypeEntry(MachineType type) {
 			this.type = type;
+		}
+
+		/**
+		 * @param onDemandCPUHours2
+		 * @param onDemandCost2
+		 * @param reservedCPUHours2
+		 * @param reservedCost2
+		 */
+		public void update(long onDemandCPUHours, double onDemandCost,
+				long reservedCPUHours, double reservedCost) {
 			this.onDemandCPUHours = onDemandCPUHours;
 			this.onDemandCost = onDemandCost;
 			this.reservedCPUHours = reservedCPUHours;
@@ -84,8 +105,9 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 		
 		/**
 		 * Default constructor.
+		 * @param machineTypes 
 		 */
-		public ProviderEntry(String name) {
+		public ProviderEntry(String name, MachineType[] machineTypes) {
 			this.name = name;
 			this.cost = 0;
 			this.inCost = 0;
@@ -97,7 +119,10 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 			this.onDemandCPUHours = 0;
 			this.reservedCPUHours = 0;
 			this.monitoringCost = 0;
-			this.types = new HashMap<MachineType, TypeEntry>();
+			this.types = new TreeMap<MachineType, TypeEntry>();
+			for (MachineType machineType : machineTypes) {
+				this.types.put(machineType, new TypeEntry(machineType));
+			}
 		}
 
  		/**
@@ -131,8 +156,8 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 			this.reservedCost += reservedCost;
 			this.monitoringCost += monitoringCost;
 			this.cost += (onDemandCost + reservedCost);
-			this.types.put(type, new TypeEntry(type, onDemandCPUHours, onDemandCost,
-				reservedCPUHours, reservedCost));
+			this.types.get(type).update(onDemandCPUHours, onDemandCost,
+				reservedCPUHours, reservedCost);
 		}
 		
 	}
@@ -142,23 +167,29 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	private double cost;
 	private double penalty;
 	
-	private int currentUser;
 	private Map<Integer, UserEntry> users;
 	
-	private String currentProvider;
 	private Map<String, ProviderEntry> providers;
 	
 	/**
 	 * Default constructor
 	 * @param time 
+	 * @param providers2 
+	 * @param users 
 	 */
-	public UtilityResultEntry(long time) {
+	public UtilityResultEntry(long time, Collection<User> users, List<Provider> providers) {
 		this.time = time;
 		this.receipt = 0;
 		this.cost = 0;
 		this.penalty = 0;
-		this.users = new HashMap<Integer, UserEntry>();
-		this.providers = new HashMap<String, ProviderEntry>();
+		this.users = new TreeMap<Integer, UserEntry>();
+		for (User user : users) {
+			this.users.put(user.getId(), new UserEntry(user.getId()));
+		}
+		this.providers = new TreeMap<String, ProviderEntry>();
+		for (Provider provider : providers) {
+			this.providers.put(provider.getName(), new ProviderEntry(provider.getName(), provider.getAvailableTypes()));
+		}
 	}
 	
 	/**
@@ -171,14 +202,6 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	}
 
 	/**
-	 * @param userID
-	 */
-	public void addUser(int userID) {
-		currentUser = userID;
-		users.put(userID, new UserEntry());
-	}
-
-	/**
 	 * @param contractName
 	 * @param total
 	 * @param transferenceCost 
@@ -186,27 +209,19 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	 * @param storageCost 
 	 * @param costOfCPU 
 	 */
-	public void addToReceipt(String contractName, long consumedCPU, double cpuCost, long consumedTransference, double transferenceCost, double storageCost) {
+	public void addToReceipt(int userID, String contractName, long consumedCPU, double cpuCost, long consumedTransference, double transferenceCost, double storageCost) {
 		double total = cpuCost + transferenceCost + storageCost;
-		users.get(currentUser).add(contractName, consumedCPU, cpuCost, consumedTransference, transferenceCost, storageCost, total);
+		users.get(userID).add(contractName, consumedCPU, cpuCost, consumedTransference, transferenceCost, storageCost, total);
 		receipt += total;
 	}
 
-	/**
-	 * @param providerName
-	 */
-	public void addProvider(String providerName) {
-		currentProvider = providerName;
-		providers.put(providerName, new ProviderEntry(providerName));
-	}
-
-	public void addTransferenceToCost(long inTransference, double inCost, long outTransference, double outCost) {
-		providers.get(currentProvider).addTransference(inTransference, inCost, outTransference, outCost);
+	public void addTransferenceToCost(String provider, long inTransference, double inCost, long outTransference, double outCost) {
+		providers.get(provider).addTransference(inTransference, inCost, outTransference, outCost);
 		this.cost += (inCost + outCost);
 	}
 	
-	public void addUsageToCost(MachineType type, long onDemandCPUHours, double onDemandCost, long reservedCPUHours, double reservedCost, double monitoringCost) {
-		providers.get(currentProvider).addUsage(type, onDemandCPUHours, onDemandCost, reservedCPUHours, reservedCost, monitoringCost);
+	public void addUsageToCost(String provider, MachineType type, long onDemandCPUHours, double onDemandCost, long reservedCPUHours, double reservedCost, double monitoringCost) {
+		providers.get(provider).addUsage(type, onDemandCPUHours, onDemandCost, reservedCPUHours, reservedCost, monitoringCost);
 		this.cost += (onDemandCost + reservedCost);
 	}
 

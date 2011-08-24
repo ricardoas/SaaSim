@@ -284,13 +284,12 @@ public class ProviderTest {
 	@Test
 	public void testCalculateCostWithNoTransference() {
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addProvider("amazon");
-		entry.addTransferenceToCost(0, 0, 0, 0);
+		entry.addTransferenceToCost("amazon", 0, 0, 0, 0);
 
 		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.SMALL);
 		EasyMock.expect(typeProvider.getTotalTransferences()).andReturn(new long[]{0, 0});
-		typeProvider.calculateMachinesCost(entry, 0, 3.0);
+		typeProvider.calculateMachinesCost(entry, "amazon", 0, 3.0);
 		EasyMock.replay(entry, typeProvider);
 		
 		Provider provider = new Provider("amazon", 1, 0, 3.0, new long[]{0}, new double[]{0,0}, new long[]{1,10240,51200,153600}, new double[]{0,0.12,0.09,0.07,0.05}, Arrays.asList(typeProvider) );
@@ -305,13 +304,12 @@ public class ProviderTest {
 	@Test
 	public void testCalculateCostWithInTransferenceAndNoOutTransference() {
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addProvider("amazon");
-		entry.addTransferenceToCost(5 * CostCalculus.GB_IN_BYTES, 0, 0, 0);
+		entry.addTransferenceToCost("amazon", 5 * CostCalculus.GB_IN_BYTES, 0, 0, 0);
 
 		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.SMALL);
 		EasyMock.expect(typeProvider.getTotalTransferences()).andReturn(new long[]{5 * CostCalculus.GB_IN_BYTES, 0});
-		typeProvider.calculateMachinesCost(entry, 0, 3.0);
+		typeProvider.calculateMachinesCost(entry, "amazon", 0, 3.0);
 		EasyMock.replay(entry, typeProvider);
 		
 		Provider provider = new Provider("amazon", 1, 0, 3.0, new long[]{0}, new double[]{0,0}, new long[]{1,10240,51200,153600}, new double[]{0,0.12,0.09,0.07,0.05}, Arrays.asList(typeProvider) );
@@ -326,13 +324,12 @@ public class ProviderTest {
 	@Test
 	public void testCalculateCostWithOutTransferenceBelowMinimum() {
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addProvider("amazon");
-		entry.addTransferenceToCost(0, 0, CostCalculus.GB_IN_BYTES/2, 0);
+		entry.addTransferenceToCost("amazon", 0, 0, CostCalculus.GB_IN_BYTES/2, 0);
 
 		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.SMALL);
 		EasyMock.expect(typeProvider.getTotalTransferences()).andReturn(new long[]{0, CostCalculus.GB_IN_BYTES/2});
-		typeProvider.calculateMachinesCost(entry, 0, 3.0);
+		typeProvider.calculateMachinesCost(entry, "amazon", 0, 3.0);
 		EasyMock.replay(entry, typeProvider);
 		
 		Provider provider = new Provider("amazon", 1, 0, 3.0, new long[]{0}, new double[]{0,0}, new long[]{1,10240,51200,153600}, new double[]{0,0.12,0.09,0.07,0.05}, Arrays.asList(typeProvider) );
@@ -350,7 +347,6 @@ public class ProviderTest {
 		double[] transferOutCosts = new double[]{0,0.12,0.09,0.07,0.05};
 		
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addProvider("amazon");
 		long outTransference = 154000;
 		double expectedCost = transferOutLimits[0] * transferOutCosts[0] + 
 								(transferOutLimits[1]-transferOutLimits[0]) * transferOutCosts[1] +
@@ -358,12 +354,12 @@ public class ProviderTest {
 								(transferOutLimits[3]-transferOutLimits[2]) * transferOutCosts[3] +
 								(outTransference - transferOutLimits[3]) * transferOutCosts[4];
 		
-		entry.addTransferenceToCost(0, 0, outTransference * CostCalculus.GB_IN_BYTES, expectedCost);
+		entry.addTransferenceToCost("amazon", 0, 0, outTransference * CostCalculus.GB_IN_BYTES, expectedCost);
 
 		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.SMALL);
 		EasyMock.expect(typeProvider.getTotalTransferences()).andReturn(new long[]{0, outTransference * CostCalculus.GB_IN_BYTES});
-		typeProvider.calculateMachinesCost(entry, 0, 3.0);
+		typeProvider.calculateMachinesCost(entry, "amazon", 0, 3.0);
 		EasyMock.replay(entry, typeProvider);
 		
 		Provider provider = new Provider("amazon", 1, 0, 3.0, new long[]{0}, new double[]{0,0}, transferOutLimits, transferOutCosts, Arrays.asList(typeProvider) );
