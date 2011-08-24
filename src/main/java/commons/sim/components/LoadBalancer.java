@@ -76,7 +76,6 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	}
 	
 	private Machine buildMachine(MachineDescriptor machineDescriptor) {
-
 		return MachineFactory.getInstance().createMachine(getScheduler(), machineDescriptor, this);
 	}
 	
@@ -167,6 +166,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		long finishedRequestsCounter = this.heuristic.getFinishedRequestsCounter();
 		this.heuristic.resetCounters();
 		
+		//TODO: Adapt to multiple instance types
 		return new RanjanStatistics(totalUtilisation, requestsArrivalCounter, finishedRequestsCounter, servers.size());
 	}
 
