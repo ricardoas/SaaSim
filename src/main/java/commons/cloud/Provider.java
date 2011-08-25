@@ -153,10 +153,11 @@ public class Provider {
 		if(!types.containsKey(instanceType)){
 			throw new RuntimeException("Attempt to buy a machine of type " + instanceType + " at provider: " + getName());
 		}
-		if(!isReserved){
+		MachineDescriptor descriptor = types.get(instanceType).buyMachine(isReserved);
+		if(!isReserved && descriptor != null){
 			this.onDemandRunningMachines++;
 		}
-		return types.get(instanceType).buyMachine(isReserved);
+		return descriptor;
 	}
 
 	/**
@@ -193,8 +194,8 @@ public class Provider {
 		entry.addTransferenceToCost(getName(), transferences[0], inCost, transferences[1], outCost);
 	}
 	
-
 	public void calculateUniqueCost(UtilityResult result) {
+
 		for (TypeProvider typeProvider : types.values()) {
 			double cost = typeProvider.calculateUniqueCost();
 			result.addProviderUniqueCost(getName(), typeProvider.getType(), cost);
@@ -203,7 +204,6 @@ public class Provider {
 
 	public MachineType[] getAvailableTypes() {
 		Set<MachineType> set = types.keySet();
-		MachineType[] result = new MachineType[set.size()];
-		return set.toArray(result);
+		return set.toArray(new MachineType[set.size()]);
 	}
 }

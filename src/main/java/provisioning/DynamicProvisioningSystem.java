@@ -1,10 +1,13 @@
 package provisioning;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
@@ -121,4 +124,19 @@ public class DynamicProvisioningSystem implements DPS{
 		}
 		users.get(request.getUserID()).reportLostRequest(request);
 	}
+	
+	protected List<Provider> canBuyMachine(MachineType type, boolean isReserved){
+		List<Provider> available = new ArrayList<Provider>();
+		for (Entry<String, Provider> entry : providers.entrySet()) {
+			if(entry.getValue().canBuyMachine(isReserved, type)){
+				available.add(entry.getValue());
+			}
+		}
+		return available;
+	}
+
+	protected MachineDescriptor buyMachine(Provider provider, MachineType instanceType, boolean isReserved){
+		return provider.buyMachine(isReserved, instanceType);
+	}
+
 }

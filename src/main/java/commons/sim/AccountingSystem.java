@@ -21,6 +21,11 @@ public class AccountingSystem {
 		this.utilityResult = new UtilityResult();
 	}
 	
+	/**
+	 * @param currentTimeInMillis
+	 * @param users
+	 * @param providers
+	 */
 	public void accountPartialUtility(long currentTimeInMillis, Map<Integer, User> users, Map<String, Provider> providers){
 		UtilityResultEntry entry = new UtilityResultEntry(currentTimeInMillis, users, providers);
 		for (User user : users.values()) {

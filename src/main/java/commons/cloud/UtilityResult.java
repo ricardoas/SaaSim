@@ -1,6 +1,7 @@
 package commons.cloud;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -8,7 +9,7 @@ import java.util.TreeSet;
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class UtilityResult {
+public class UtilityResult{
 	
 	private SortedSet<UtilityResultEntry> entries;
 	private Map<Integer, Double> usersUniqueFee;
@@ -80,5 +81,9 @@ public class UtilityResult {
 		}
 		providersUniqueFee.get(name).put(type, cost);
 		uniqueCost += cost;
+	}
+
+	public Iterator<UtilityResultEntry> iterator() {
+		return entries.iterator();
 	}
 }
