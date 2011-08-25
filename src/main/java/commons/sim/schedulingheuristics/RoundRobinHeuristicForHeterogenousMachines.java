@@ -24,7 +24,7 @@ public class RoundRobinHeuristicForHeterogenousMachines implements SchedulingHeu
 	 * Default constructor
 	 */
 	public RoundRobinHeuristicForHeterogenousMachines() {
-		this.lastUsed = -1;
+		this.lastUsed = 0;
 		this.allocationsPerServer = new ArrayList<Integer>();
 	}
 

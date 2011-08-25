@@ -24,16 +24,12 @@ public class RoundRobinHeuristicTest {
 		this.heuristic = new RoundRobinHeuristic();
 	}
 	
-	@Test
+	@Test(expected=ArithmeticException.class)
 	public void testWithoutMachines(){
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.replay(request);
 		
-		try{
-			this.heuristic.getNextServer(request, new ArrayList<Machine>());
-			fail("Error allocating request to empty set of machines!");
-		}catch(ArithmeticException e){
-		}
+		this.heuristic.getNextServer(request, new ArrayList<Machine>());
 		
 		EasyMock.verify(request);
 	}
@@ -99,6 +95,10 @@ public class RoundRobinHeuristicTest {
 		nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
+		
+		nextServer = this.heuristic.getNextServer(request, servers);
+		assertNotNull(nextServer);
+		assertEquals(nextServer, machine2);
 		
 		EasyMock.verify(request);
 	}
