@@ -50,7 +50,7 @@ public class TimeSharedMachineTest {
 	}
 	
 	@Test
-	public void testSendBigRequestWithEmptyMachine() throws Exception{
+	public void testSendBigRequestWithEmptyMachine(){
 		JEEventScheduler scheduler = new JEEventScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);

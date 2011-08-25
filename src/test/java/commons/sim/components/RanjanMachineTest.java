@@ -54,7 +54,7 @@ public class RanjanMachineTest {
 		PowerMock.verifyAll();
 	}
 
-	private Configuration mockConfiguration() {
+	private static Configuration mockConfiguration() {
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);

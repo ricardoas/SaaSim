@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -118,6 +117,7 @@ public class LoadBalancerTest {
 		PowerMock.verifyAll();
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testRemoveServer(){
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL);
@@ -169,11 +169,10 @@ public class LoadBalancerTest {
 	
 	/**
 	 * Scheduling a new request with one machine artificially chosen by the heuristic
-	 * @throws ConfigurationException 
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testHandleEventNewRequestWithOneMachine() throws ConfigurationException{
+	public void testHandleEventNewRequestWithOneMachine(){
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL);
 		
 		Request request = EasyMock.createStrictMock(Request.class);

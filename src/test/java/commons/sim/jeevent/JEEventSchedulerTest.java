@@ -39,7 +39,7 @@ public class JEEventSchedulerTest {
 		final JEAbstractEventHandler handler = EasyMock.createStrictMock(JEAbstractEventHandler.class);
 		EasyMock.expect(handler.getHandlerId()).andAnswer(new IAnswer<Integer>() {
 			@Override
-			public Integer answer() throws Throwable {
+			public Integer answer() {
 				return scheduler.registerHandler(handler);
 			}
 		}).once();
@@ -59,7 +59,7 @@ public class JEEventSchedulerTest {
 		final JEAbstractEventHandler handler = EasyMock.createStrictMock(JEAbstractEventHandler.class);
 		EasyMock.expect(handler.getHandlerId()).andAnswer(new IAnswer<Integer>() {
 			@Override
-			public Integer answer() throws Throwable {
+			public Integer answer() {
 				return scheduler.registerHandler(handler);
 			}
 		}).once();
