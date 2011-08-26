@@ -157,17 +157,17 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	private RanjanStatistics collectStatistics(List<Machine> servers, long eventTime) {
 		
 		//Gathering total utilisation
-		double totalUtilisation = 0d;
+		double averageUtilisation = 0d;
 		for(Machine machine : servers){
-			totalUtilisation += machine.computeUtilisation(eventTime);
+			averageUtilisation += machine.computeUtilisation(eventTime);
 		}
+		averageUtilisation /= servers.size();
 		
 		long requestsArrivalCounter = this.heuristic.getRequestsArrivalCounter();
 		long finishedRequestsCounter = this.heuristic.getFinishedRequestsCounter();
 		this.heuristic.resetCounters();
 		
-		//TODO: Adapt to multiple instance types
-		return new RanjanStatistics(totalUtilisation, requestsArrivalCounter, finishedRequestsCounter, servers.size());
+		return new RanjanStatistics(averageUtilisation, requestsArrivalCounter, finishedRequestsCounter, servers.size());
 	}
 
 	/**

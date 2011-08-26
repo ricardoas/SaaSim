@@ -1,8 +1,3 @@
-/**
- * This heuristic is quite similar to a Round-Robin one. The difference consists 
- * in the fact that it tries to arrange requests of a same session in the same
- * servers.
- */
 package commons.sim.schedulingheuristics;
 
 import java.util.HashMap;
@@ -14,6 +9,10 @@ import commons.sim.components.Machine;
 
 /**
  * Simple {@link SchedulingHeuristic} to choose servers in a Round Robin fashion.
+ * 
+ * This heuristic is quite similar to a Round-Robin one. The difference consists 
+ * in the fact that it tries to arrange requests of a same session in the same
+ * servers.
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
