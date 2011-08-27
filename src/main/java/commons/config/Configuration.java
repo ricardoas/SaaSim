@@ -24,6 +24,7 @@ import planning.heuristic.AGHeuristic;
 import provisioning.DynamicProvisioningSystem;
 import provisioning.ProfitDrivenProvisioningSystem;
 import provisioning.RanjanProvisioningSystem;
+import provisioning.RanjanProvisioningSystemForHeterogeneousMachines;
 
 import commons.cloud.Contract;
 import commons.cloud.MachineType;
@@ -388,6 +389,10 @@ public class Configuration	extends PropertiesConfiguration{
 					break;
 				case RANJAN:
 					heuristicName = RanjanProvisioningSystem.class.getCanonicalName();
+					checkRanjanProperties();
+					break;
+				case RANJANHET:
+					heuristicName = RanjanProvisioningSystemForHeterogeneousMachines.class.getCanonicalName();
 					checkRanjanProperties();
 					break;
 				case PROFITDRIVEN:

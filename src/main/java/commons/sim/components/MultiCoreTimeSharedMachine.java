@@ -7,8 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import commons.cloud.MachineType;
 import commons.cloud.Request;
-import commons.sim.jeevent.JEAbstractEventHandler;
+import commons.config.Configuration;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
@@ -19,22 +20,10 @@ import commons.util.Triple;
  * Time sharing machine.
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class TimeSharedMachine extends JEAbstractEventHandler implements Machine{
+public class MultiCoreTimeSharedMachine extends TimeSharedMachine{
 	
-	private static final long DEFAULT_QUANTUM = 100;
-
-	protected final LoadBalancer loadBalancer;
-	protected final Queue<Request> processorQueue;
-	protected final MachineDescriptor descriptor;
-	protected final long cpuQuantumInMilis;
-	protected boolean shutdownOnFinish;
-	protected long lastUtilisationCalcTime;
-	protected long totalTimeUsed;
-	protected JETime lastUpdate;
-	
-	protected JEEvent nextFinishEvent;
-	
-	protected List<Request> finishedRequests;
+	protected List<Request> currentExecuting;
+	private int NUMBER_OF_CORES = 1;
 	
 	/**
 	 * Default constructor
@@ -42,42 +31,14 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 * @param descriptor Machine descriptor.
 	 * @param loadBalancer {@link LoadBalancer} responsible for this machine.
 	 */
-	public TimeSharedMachine(JEEventScheduler scheduler, MachineDescriptor descriptor, 
+	public MultiCoreTimeSharedMachine(JEEventScheduler scheduler, MachineDescriptor descriptor, 
 			LoadBalancer loadBalancer) {
-		super(scheduler);
-		this.descriptor = descriptor;
-		this.loadBalancer = loadBalancer;
-		this.processorQueue = new LinkedList<Request>();
-		this.cpuQuantumInMilis = DEFAULT_QUANTUM;
-		this.lastUtilisationCalcTime = 0;
-		this.lastUpdate = scheduler.now();
+		super(scheduler, descriptor, loadBalancer);
+		
+		this.NUMBER_OF_CORES = (int) Math.floor(Configuration.getInstance().getRelativePower(descriptor.getType()));
+		this.currentExecuting = new ArrayList<Request>(this.NUMBER_OF_CORES); 
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
-	
-	@Override
-	public LoadBalancer getLoadBalancer() {
-		return loadBalancer;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Queue<Request> getProcessorQueue() {
-		return new LinkedList<Request>(processorQueue);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public MachineDescriptor getDescriptor() {
-		return descriptor;
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */
@@ -86,25 +47,16 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		this.processorQueue.add(request);
 		request.assignTo(descriptor.getType());
 		
-		if(processorQueue.size() == 1){
+		if(!this.processorQueue.isEmpty() && this.currentExecuting.size() < this.NUMBER_OF_CORES){
 			scheduleNext();
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void shutdownOnFinish() {
-		this.shutdownOnFinish = true;
-		tryToShutdown();
 	}
 
 	/**
 	 * 
 	 */
 	private void tryToShutdown() {
-		if(processorQueue.isEmpty() && shutdownOnFinish){
+		if(processorQueue.isEmpty() && currentExecuting.isEmpty() && shutdownOnFinish){
 			descriptor.setFinishTimeInMillis(getScheduler().now().timeMilliSeconds);
 			send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, getScheduler().now(), descriptor));
 		}
@@ -117,7 +69,8 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	public void handleEvent(JEEvent event) {
 		switch (event.getType()) {
 			case PREEMPTION:
-				Request request = processorQueue.poll();
+				Request request = (Request) event.getValue()[1];
+				currentExecuting.remove(request);
 				
 				long processedDemand = (Long) event.getValue()[0];
 				totalTimeUsed += processedDemand;
@@ -130,7 +83,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 					processorQueue.add(request);
 				}
 				
-				if(!processorQueue.isEmpty()){
+				if(!processorQueue.isEmpty() && currentExecuting.size() < this.NUMBER_OF_CORES){
 					scheduleNext();
 				}
 				
@@ -140,55 +93,23 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		}
 	}
 
-	protected void requestFinished(Request request) {
-		getLoadBalancer().reportRequestFinished(request);
-	}
-
 	/**
 	 * Schedule next {@link Request} on the processor queue.
 	 */
+	@Override
 	protected void scheduleNext() {
-		Request nextRequest = processorQueue.peek();
+		Request nextRequest = processorQueue.poll();
+		currentExecuting.add(nextRequest);
 		long nextQuantum = Math.min(nextRequest.getTotalToProcess(), cpuQuantumInMilis);
 		lastUpdate = getScheduler().now();
-		send(new JEEvent(JEEventType.PREEMPTION, this, new JETime(nextQuantum).plus(lastUpdate), nextQuantum));
+		send(new JEEvent(JEEventType.PREEMPTION, this, new JETime(nextQuantum).plus(lastUpdate), nextQuantum, nextRequest));
 	}
 	
+	@Override
 	public boolean isBusy() {
-		return this.processorQueue.size() != 0;
+		return this.processorQueue.size() != 0 || this.currentExecuting.size() != 0;
 	}	
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result
-				+ ((descriptor == null) ? 0 : descriptor.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		TimeSharedMachine other = (TimeSharedMachine) obj;
-		if (descriptor == null) {
-			if (other.descriptor != null)
-				return false;
-		} else if (!descriptor.equals(other.descriptor))
-			return false;
-		return true;
-	}
-
-	@Override
-	public String toString(){
-		return getClass().getName() + " " + descriptor;
-	}
-	
 	/**
 	 * This method estimates CPU utilisation of current machine
 	 * @param timeInMillis
@@ -196,19 +117,24 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 */
 	@Override
 	public double computeUtilisation(long timeInMillis){
-		if(processorQueue.isEmpty()){
-			double utilisation = (1.0 * totalTimeUsed)/(timeInMillis - lastUtilisationCalcTime);
+		if(processorQueue.isEmpty() && currentExecuting.isEmpty()){
+			double utilisation = (1.0 * totalTimeUsed)/((timeInMillis - lastUtilisationCalcTime)*this.NUMBER_OF_CORES);
 			totalTimeUsed = 0;
 			lastUtilisationCalcTime = timeInMillis;
 			return utilisation;
 		}
 		
-		long totalBeingProcessedNow = timeInMillis - lastUpdate.timeMilliSeconds;
-		double utilisation = (1.0* (totalTimeUsed + totalBeingProcessedNow) )/(timeInMillis-lastUtilisationCalcTime);
+		long totalBeingProcessedNow = (timeInMillis - lastUpdate.timeMilliSeconds)*this.currentExecuting.size();
+		double utilisation = (1.0* (totalTimeUsed + totalBeingProcessedNow) )/((timeInMillis - lastUtilisationCalcTime)*this.NUMBER_OF_CORES);
 		totalTimeUsed = -totalBeingProcessedNow;
 		lastUtilisationCalcTime = timeInMillis;
 		return utilisation;
 	}
+	
+	public Queue<Request> getExecutingQueue() {
+		return new LinkedList<Request>(currentExecuting);
+	}
+
 	
 	private class Info{
 
@@ -254,8 +180,8 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 			return true;
 		}
 
-		private TimeSharedMachine getOuterType() {
-			return TimeSharedMachine.this;
+		private MultiCoreTimeSharedMachine getOuterType() {
+			return MultiCoreTimeSharedMachine.this;
 		}
 
 		@Override
@@ -266,7 +192,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 
 	@Override
 	public List<Triple<Long, Long, Long>> estimateFinishTime(Request newRequest) {
-		
+		//FIXME
 		List<Triple<Long, Long, Long>> executionTimes = new ArrayList<Triple<Long, Long, Long>>();
 		Map<Request, Info> times = new HashMap<Request, Info>();
 		Queue<Request> queue = getProcessorQueue();

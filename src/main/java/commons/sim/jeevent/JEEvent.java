@@ -81,7 +81,13 @@ public class JEEvent implements Comparable<JEEvent>{
 	@Override
 	public int compareTo(JEEvent o) {
 		int result = getScheduledTime().compareTo(o.getScheduledTime());
-		return result != 0? result: type.compareTo(o.getType());
+		if(result != 0){
+			return result;
+		}else if(type.compareTo(o.getType()) != 0){
+			return type.compareTo(o.getType());
+		}else{
+			return eventId - o.eventId;
+		}
 	}
 	
 	/**

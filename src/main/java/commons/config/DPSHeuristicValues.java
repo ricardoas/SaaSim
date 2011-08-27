@@ -1,5 +1,5 @@
 package commons.config;
 
 public enum DPSHeuristicValues {
-	STATIC, RANJAN, PROFITDRIVEN, CUSTOM
+	STATIC, RANJAN, RANJANHET, PROFITDRIVEN, CUSTOM, 
 }

@@ -20,7 +20,7 @@ import commons.sim.jeevent.JEEventType;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public class RanjanMachine extends TimeSharedMachine {
+public class MultiCoreRanjanMachine extends MultiCoreTimeSharedMachine {
 	
 	private Queue<Request> backlog;
 	
@@ -30,7 +30,7 @@ public class RanjanMachine extends TimeSharedMachine {
 	/**
 	 * @see commons.sim.components.ProcessorSharedMachine
 	 */
-	public RanjanMachine(JEEventScheduler scheduler, MachineDescriptor descriptor, LoadBalancer loadBalancer){
+	public MultiCoreRanjanMachine(JEEventScheduler scheduler, MachineDescriptor descriptor, LoadBalancer loadBalancer){
 		super(scheduler, descriptor, loadBalancer);
 		this.backlog = new LinkedList<Request>();
 		this.maximumNumberOfSimultaneousThreads = Configuration.getInstance().getLong(RANJAN_HEURISTIC_NUMBER_OF_TOKENS);
@@ -51,8 +51,8 @@ public class RanjanMachine extends TimeSharedMachine {
 		}
 	}
 
-	protected boolean hasTokenLeft() {
-		return processorQueue.size() < maximumNumberOfSimultaneousThreads;
+	private boolean hasTokenLeft() {
+		return processorQueue.size() + currentExecuting.size() < maximumNumberOfSimultaneousThreads;
 	}
 	
 	private boolean canWaitForToken() {
