@@ -19,8 +19,10 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import commons.cloud.Contract;
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
+import commons.cloud.Request;
 import commons.cloud.User;
 import commons.cloud.UtilityResult;
 import commons.cloud.UtilityResultEntry;
@@ -238,6 +240,66 @@ public class DynamicProvisioningSystemTest {
 		DynamicProvisioningSystem dps = new DynamicProvisioningSystem();
 		dps.chargeUsers(0);
 
+		PowerMock.verifyAll();
+	}
+	
+	@Test
+	@PrepareForTest(Configuration.class)
+	public void testReportLostRequest(){
+		Request request = EasyMock.createStrictMock(Request.class);
+		EasyMock.expect(request.getUserID()).andReturn("0");
+		
+		Contract contract = EasyMock.createStrictMock(Contract.class);
+
+		//Configuration mock
+		Configuration config = EasyMock.createStrictMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
+		EasyMock.expect(config.getProviders()).andReturn(new ArrayList<Provider>());
+		
+		User user = EasyMock.createStrictMock(User.class);
+		EasyMock.expect(user.getId()).andReturn(0);
+		user.reportLostRequest(request);
+		ArrayList<User> users = new ArrayList<User>();
+		users.add(user);
+		EasyMock.expect(config.getUsers()).andReturn(users);
+		
+		PowerMock.replayAll(request, contract, config, user);
+		
+		//Creating dps
+		DynamicProvisioningSystem dps = new DynamicProvisioningSystem();
+		dps.reportLostRequest(request);
+		
+		PowerMock.verifyAll();
+	}
+	
+	@Test
+	@PrepareForTest(Configuration.class)
+	public void testReportFinishedRequest(){
+		Request request = EasyMock.createStrictMock(Request.class);
+		EasyMock.expect(request.getUserID()).andReturn("0");
+		
+		Contract contract = EasyMock.createStrictMock(Contract.class);
+
+		//Configuration mock
+		Configuration config = EasyMock.createStrictMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
+		EasyMock.expect(config.getProviders()).andReturn(new ArrayList<Provider>());
+		
+		User user = EasyMock.createStrictMock(User.class);
+		EasyMock.expect(user.getId()).andReturn(0);
+		user.reportFinishedRequest(request);
+		ArrayList<User> users = new ArrayList<User>();
+		users.add(user);
+		EasyMock.expect(config.getUsers()).andReturn(users);
+		
+		PowerMock.replayAll(request, contract, config, user);
+		
+		//Creating dps
+		DynamicProvisioningSystem dps = new DynamicProvisioningSystem();
+		dps.reportRequestFinished(request);
+		
 		PowerMock.verifyAll();
 	}
 }

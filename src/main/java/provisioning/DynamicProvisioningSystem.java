@@ -99,10 +99,11 @@ public class DynamicProvisioningSystem implements DPS{
 
 	@Override
 	public void reportRequestFinished(Request request) {
-		if(!users.containsKey(request.getUserID())){
+		Integer userID = Integer.valueOf(request.getUserID());
+		if( !users.containsKey(userID) ){
 			throw new RuntimeException("Unregistered user with ID " + request.getUserID() + ". Check configuration files.");
 		}
-		users.get(request.getUserID()).reportFinishedRequest(request);
+		users.get(userID).reportFinishedRequest(request);
 	}
 	
 	@Override
@@ -139,10 +140,11 @@ public class DynamicProvisioningSystem implements DPS{
 	 * @param request
 	 */
 	protected void reportLostRequest(Request request) {
-		if(!users.containsKey(request.getUserID())){
+		Integer userID = Integer.valueOf(request.getUserID());
+		if( !users.containsKey(userID) ){
 			throw new RuntimeException("Unregistered user with ID " + request.getUserID() + ". Check configuration files.");
 		}
-		users.get(request.getUserID()).reportLostRequest(request);
+		users.get(userID).reportLostRequest(request);
 	}
 	
 	protected List<Provider> canBuyMachine(MachineType type, boolean isReserved){
