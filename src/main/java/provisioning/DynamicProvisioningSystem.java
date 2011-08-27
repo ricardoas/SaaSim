@@ -2,6 +2,7 @@ package provisioning;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -19,7 +20,6 @@ import commons.sim.AccountingSystem;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.provisioningheuristics.RanjanStatistics;
 import commons.sim.util.SaaSAppProperties;
-import commons.sim.util.SaaSUsersProperties;
 
 /**
  * 
@@ -35,9 +35,11 @@ public class DynamicProvisioningSystem implements DPS{
 	
 	protected final Map<Long, DynamicConfigurable> configurables;
 
-	private Map<Integer, User> users;
+	protected Map<Integer, User> users;
 	
-	private Map<String, Provider> providers;
+	protected Map<String, Provider> providers;
+	
+	protected MachineType[] setupTypes = {MachineType.HIGHCPU, MachineType.MEDIUM, MachineType.XLARGE, MachineType.LARGE};
 	
 	/**
 	 * Default constructor.
@@ -65,16 +67,34 @@ public class DynamicProvisioningSystem implements DPS{
 	public void registerConfigurable(DynamicConfigurable configurable) {
 		this.configurable = configurable;
 		int[] initialServersPerTier = Configuration.getInstance().getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER);
+		
+		//Looking for reserved instances!
+		addServersToTiers(configurable, initialServersPerTier);
 
+		String[] workloads = Configuration.getInstance().getWorkloads();
+		configurable.setWorkloadParser(new TimeBasedWorkloadParser(new GEISTWorkloadParser(workloads), TimeBasedWorkloadParser.HOUR_IN_MILLIS));
+	}
+
+	private void addServersToTiers(DynamicConfigurable configurable, int[] initialServersPerTier) {
 		for (int tier = 0; tier < initialServersPerTier.length; tier++) {
-			for (int i = 0; i < initialServersPerTier[tier]; i++) {
-				//configurable.addServer(tier, buyMachine(), false);
+			int serversAdded = 0;
+			for(MachineType machineType : this.setupTypes){
+				Iterator<Provider> iterator = this.providers.values().iterator();
+				while(iterator.hasNext()){
+					Provider provider = iterator.next();
+					while(provider.canBuyMachine(true, machineType) && serversAdded < initialServersPerTier[tier]){
+						configurable.addServer(tier, provider.buyMachine(true, machineType), false);
+						serversAdded++;
+					}
+					if(serversAdded == initialServersPerTier[tier]){
+						break;
+					}
+				}
+				if(serversAdded == initialServersPerTier[tier]){
+					break;
+				}
 			}
 		}
-
-		String[] workloads = Configuration.getInstance().getStringArray(SaaSUsersProperties.SAAS_USER_WORKLOAD);
-
-		configurable.setWorkloadParser(new TimeBasedWorkloadParser(new GEISTWorkloadParser(workloads), TimeBasedWorkloadParser.HOUR_IN_MILLIS));
 	}
 
 	@Override
@@ -138,5 +158,4 @@ public class DynamicProvisioningSystem implements DPS{
 	protected MachineDescriptor buyMachine(Provider provider, MachineType instanceType, boolean isReserved){
 		return provider.buyMachine(isReserved, instanceType);
 	}
-
 }

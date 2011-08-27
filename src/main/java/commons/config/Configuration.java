@@ -33,6 +33,7 @@ import commons.cloud.User;
 import commons.sim.schedulingheuristics.ProfitDrivenHeuristic;
 import commons.sim.schedulingheuristics.RanjanHeuristic;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
+import commons.sim.util.SaaSUsersProperties;
 
 
 /**
@@ -610,5 +611,14 @@ public class Configuration	extends PropertiesConfiguration{
 			}
 		}
 		
+	}
+
+	public String[] getWorkloads() {
+		String[] stringArray = this.getStringArray(SaaSUsersProperties.SAAS_USER_WORKLOAD);
+		if(stringArray == null || stringArray.length == 0){
+			String workload = getString(SAAS_WORKLOAD);
+			stringArray = new String[]{workload};
+		}
+		return stringArray;
 	}
 }

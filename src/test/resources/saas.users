@@ -1,5 +1,5 @@
 saas.number=2
-saas.workload=/local/ricardo/traces/power.trc
+saas.workload=src/test/resources/power.trc
 
 saas.user.plan=bronze
 saas.user.storage=5120000

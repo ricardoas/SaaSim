@@ -34,7 +34,7 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 	}
 
 	public long evaluateNumberOfServersForNextInterval(RanjanStatistics statistics) {
-		double averageUtilization = statistics.totalUtilizationInLastInterval / statistics.totalNumberOfServers;
+		double averageUtilization = statistics.averageUtilisation / statistics.totalNumberOfServers;
 		double d;
 		if(statistics.numberOfRequestsCompletionsInLastInterval == 0){
 			d = averageUtilization;
