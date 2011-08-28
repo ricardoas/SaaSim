@@ -103,7 +103,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	/**
 	 * 
 	 */
-	private void tryToShutdown() {
+	protected void tryToShutdown() {
 		if(processorQueue.isEmpty() && shutdownOnFinish){
 			descriptor.setFinishTimeInMillis(getScheduler().now().timeMilliSeconds);
 			send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, getScheduler().now(), descriptor));

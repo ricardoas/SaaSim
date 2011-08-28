@@ -62,14 +62,27 @@ public class MultiCoreRanjanMachine extends MultiCoreTimeSharedMachine {
 	@Override
 	protected void requestFinished(Request request) {
 		if(!backlog.isEmpty()){
-			processorQueue.add(backlog.poll());
+			Request newRequestToAdd = backlog.poll();
+			newRequestToAdd.assignTo(this.descriptor.getType());
+			processorQueue.add(newRequestToAdd);
 		}
 		super.requestFinished(request);
 	}
 	
 	@Override
 	public double computeUtilisation(long currentTime){
-		//FIXME Should add processing time!
-		return ((double)processorQueue.size()) / this.maximumNumberOfSimultaneousThreads;
+		//TODO: Review this!
+		if(processorQueue.isEmpty() && currentExecuting.isEmpty()){
+			double utilisation = (1.0 * totalTimeUsed)/((currentTime - lastUtilisationCalcTime) * this.maximumNumberOfSimultaneousThreads);
+			totalTimeUsed = 0;
+			lastUtilisationCalcTime = currentTime;
+			return utilisation;
+		}
+		
+		long totalBeingProcessedNow = (currentTime - lastUpdate.timeMilliSeconds) * (this.currentExecuting.size());
+		double utilisation = (1.0* (totalTimeUsed + totalBeingProcessedNow) )/((currentTime - lastUtilisationCalcTime) * this.maximumNumberOfSimultaneousThreads);
+		totalTimeUsed = -totalBeingProcessedNow;
+		lastUtilisationCalcTime = currentTime;
+		return utilisation;
 	}
 }

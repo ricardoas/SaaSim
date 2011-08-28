@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import commons.cloud.MachineType;
 import commons.cloud.Request;
 import commons.config.Configuration;
 import commons.sim.jeevent.JEEvent;
@@ -55,7 +54,8 @@ public class MultiCoreTimeSharedMachine extends TimeSharedMachine{
 	/**
 	 * 
 	 */
-	private void tryToShutdown() {
+	@Override
+	protected void tryToShutdown() {
 		if(processorQueue.isEmpty() && currentExecuting.isEmpty() && shutdownOnFinish){
 			descriptor.setFinishTimeInMillis(getScheduler().now().timeMilliSeconds);
 			send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, getScheduler().now(), descriptor));
@@ -117,15 +117,16 @@ public class MultiCoreTimeSharedMachine extends TimeSharedMachine{
 	 */
 	@Override
 	public double computeUtilisation(long timeInMillis){
+		//TODO: Review this!
 		if(processorQueue.isEmpty() && currentExecuting.isEmpty()){
-			double utilisation = (1.0 * totalTimeUsed)/((timeInMillis - lastUtilisationCalcTime)*this.NUMBER_OF_CORES);
+			double utilisation = (1.0 * totalTimeUsed)/((timeInMillis - lastUtilisationCalcTime) * this.NUMBER_OF_CORES);
 			totalTimeUsed = 0;
 			lastUtilisationCalcTime = timeInMillis;
 			return utilisation;
 		}
 		
-		long totalBeingProcessedNow = (timeInMillis - lastUpdate.timeMilliSeconds)*this.currentExecuting.size();
-		double utilisation = (1.0* (totalTimeUsed + totalBeingProcessedNow) )/((timeInMillis - lastUtilisationCalcTime)*this.NUMBER_OF_CORES);
+		long totalBeingProcessedNow = (timeInMillis - lastUpdate.timeMilliSeconds) * (this.currentExecuting.size());
+		double utilisation = (1.0* (totalTimeUsed + totalBeingProcessedNow) )/((timeInMillis - lastUtilisationCalcTime) * this.NUMBER_OF_CORES);
 		totalTimeUsed = -totalBeingProcessedNow;
 		lastUtilisationCalcTime = timeInMillis;
 		return utilisation;
