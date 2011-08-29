@@ -59,7 +59,6 @@ public class DynamicProvisioningSystem implements DPS{
 		for (User user : listOfUsers) {
 			this.users.put(user.getId(), user);
 		}
-		
 		this.accountingSystem = new AccountingSystem();
 	}
 	
@@ -72,7 +71,7 @@ public class DynamicProvisioningSystem implements DPS{
 		addServersToTiers(configurable, initialServersPerTier);
 
 		String[] workloads = Configuration.getInstance().getWorkloads();
-		configurable.setWorkloadParser(new TimeBasedWorkloadParser(new GEISTWorkloadParser(workloads), TimeBasedWorkloadParser.HOUR_IN_MILLIS));
+		configurable.setWorkloadParser(new TimeBasedWorkloadParser(new GEISTWorkloadParser(workloads), TimeBasedWorkloadParser.DAY_IN_MILLIS));
 	}
 	
 	private void addServersToTiers(DynamicConfigurable configurable, int[] initialServersPerTier) {
@@ -101,11 +100,11 @@ public class DynamicProvisioningSystem implements DPS{
 
 	@Override
 	public void reportRequestFinished(Request request) {
-		Integer userID = Integer.valueOf(request.getUserID());
-		if( !users.containsKey(userID) ){
-			throw new RuntimeException("Unregistered user with ID " + request.getUserID() + ". Check configuration files.");
+		Integer SaaSClientID = Integer.valueOf(request.getSaasClient());
+		if( !users.containsKey(SaaSClientID) ){
+			throw new RuntimeException("Unregistered user with ID " + request.getSaasClient() + ". Check configuration files.");
 		}
-		users.get(userID).reportFinishedRequest(request);
+		users.get(SaaSClientID).reportFinishedRequest(request);
 	}
 	
 	@Override
@@ -142,11 +141,11 @@ public class DynamicProvisioningSystem implements DPS{
 	 * @param request
 	 */
 	protected void reportLostRequest(Request request) {
-		Integer userID = Integer.valueOf(request.getUserID());
-		if( !users.containsKey(userID) ){
-			throw new RuntimeException("Unregistered user with ID " + request.getUserID() + ". Check configuration files.");
+		Integer SaaSClientID = Integer.valueOf(request.getSaasClient());
+		if( !users.containsKey(SaaSClientID) ){
+			throw new RuntimeException("Unregistered user with ID " + request.getSaasClient() + ". Check configuration files.");
 		}
-		users.get(userID).reportLostRequest(request);
+		users.get(SaaSClientID).reportLostRequest(request);
 	}
 	
 	protected List<Provider> canBuyMachine(MachineType type, boolean isReserved){
@@ -161,5 +160,10 @@ public class DynamicProvisioningSystem implements DPS{
 
 	protected MachineDescriptor buyMachine(Provider provider, MachineType instanceType, boolean isReserved){
 		return provider.buyMachine(isReserved, instanceType);
+	}
+
+	@Override
+	public long getSimulationEndTime() {
+		return this.configurable.getSimulationEndTime();
 	}
 }

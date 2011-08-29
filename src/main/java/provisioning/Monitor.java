@@ -18,4 +18,6 @@ public interface Monitor{
 	void machineTurnedOff(MachineDescriptor machineDescriptor);
 
 	void chargeUsers(long currentTimeInMillis);
+
+	long getSimulationEndTime();
 }
