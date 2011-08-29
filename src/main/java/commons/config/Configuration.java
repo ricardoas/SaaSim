@@ -34,6 +34,7 @@ import commons.cloud.User;
 import commons.sim.schedulingheuristics.ProfitDrivenHeuristic;
 import commons.sim.schedulingheuristics.RanjanHeuristic;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
+import commons.sim.schedulingheuristics.RoundRobinHeuristicForHeterogenousMachines;
 import commons.sim.util.SaaSUsersProperties;
 
 
@@ -391,7 +392,7 @@ public class Configuration	extends PropertiesConfiguration{
 					heuristicName = RanjanProvisioningSystem.class.getCanonicalName();
 					checkRanjanProperties();
 					break;
-				case RANJANHET:
+				case RANJAN_HET:
 					heuristicName = RanjanProvisioningSystemForHeterogeneousMachines.class.getCanonicalName();
 					checkRanjanProperties();
 					break;
@@ -414,13 +415,13 @@ public class Configuration	extends PropertiesConfiguration{
 		String heuristicName = getString(PLANNING_HEURISTIC);
 		Validator.checkNotEmpty(PLANNING_HEURISTIC, getString(PLANNING_HEURISTIC));
 		
-		PlanningHeuristicValues value = PlanningHeuristicValues.valueOf(heuristicName);
+		PlanningHeuristicValues value = PlanningHeuristicValues.valueOf(heuristicName.toUpperCase());
 		switch (value) {
-		case EVOLUTIONARY:
-			heuristicName = AGHeuristic.class.getCanonicalName();
-			break;
-		default:
-			throw new ConfigurationException("Unsupported value: " + value + " for PlanningHeuristicValues.");
+			case EVOLUTIONARY:
+				heuristicName = AGHeuristic.class.getCanonicalName();
+				break;
+			default:
+				throw new ConfigurationException("Unsupported value: " + value + " for PlanningHeuristicValues.");
 		}
 		setProperty(PLANNING_HEURISTIC, heuristicName);
 	}
@@ -460,6 +461,8 @@ public class Configuration	extends PropertiesConfiguration{
 				case ROUNDROBIN:
 					strings[i] = RoundRobinHeuristic.class.getCanonicalName();
 					break;
+				case ROUNDROBIN_HET:
+					strings[i] = RoundRobinHeuristicForHeterogenousMachines.class.getCanonicalName();
 				case RANJAN:
 					strings[i] = RanjanHeuristic.class.getCanonicalName();
 					break;
