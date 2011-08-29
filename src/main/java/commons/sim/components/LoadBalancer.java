@@ -57,8 +57,8 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		if(this.heuristic.getClass().equals(RanjanHeuristic.class)){
 			long scheduledtime = Configuration.getInstance().getLong(SimulatorProperties.RANJAN_HEURISTIC_REPEAT_INTERVAL);
 			JETime newEventTime = new JETime(scheduledtime);
-			newEventTime.plus(getScheduler().now());
-			send(new JEEvent(JEEventType.EVALUATEUTILIZATION, this, newEventTime));
+			newEventTime = newEventTime.plus(getScheduler().now());
+			send(new JEEvent(JEEventType.EVALUATEUTILIZATION, this, newEventTime, newEventTime.timeMilliSeconds));
 		}
 	}
 	
@@ -132,8 +132,10 @@ public class LoadBalancer extends JEAbstractEventHandler{
 				long scheduledtime = Configuration.getInstance().getLong(SimulatorProperties.RANJAN_HEURISTIC_REPEAT_INTERVAL);
 				
 				JETime newEventTime = new JETime(scheduledtime);
-				newEventTime.plus(getScheduler().now());
-				send(new JEEvent(JEEventType.EVALUATEUTILIZATION, this, newEventTime));
+				newEventTime = newEventTime.plus(getScheduler().now());
+				if(newEventTime.timeMilliSeconds < this.monitor.getSimulationEndTime()){
+					send(new JEEvent(JEEventType.EVALUATEUTILIZATION, this, newEventTime, newEventTime.timeMilliSeconds));
+				}
 				break;
 			case ADD_SERVER:
 				Machine machine = (Machine) event.getValue()[0];
