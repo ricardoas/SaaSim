@@ -18,7 +18,7 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 		private final int userID;
 		private String contractName;
 		private double totalReceipt;
-		private long consumedCPU;
+		private long extraConsumedCPU;
 		private double cpuCost;
 		private long consumedTransference;
 		private double transferenceCost;
@@ -41,9 +41,9 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 		 * @param cpuCost 
 		 * @param result
 		 */
-		public void add(String contractName, long consumedCPU, double cpuCost, long consumedTransference, double transferenceCost, double storageCost, double total) {
+		public void add(String contractName, long extraConsumedCPU, double cpuCost, long consumedTransference, double transferenceCost, double storageCost, double total) {
 			this.contractName = contractName;
-			this.consumedCPU = consumedCPU;
+			this.extraConsumedCPU = extraConsumedCPU;
 			this.cpuCost = cpuCost;
 			this.consumedTransference = consumedTransference;
 			this.transferenceCost = transferenceCost;
@@ -60,7 +60,7 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 			return userID 
 					+ "," + contractName 
 					+ "," + totalReceipt
-					+ "," + consumedCPU 
+					+ "," + extraConsumedCPU 
 					+ "," + cpuCost
 					+ "," + consumedTransference
 					+ "," + transferenceCost
@@ -298,9 +298,9 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	 * @param storageCost 
 	 * @param costOfCPU 
 	 */
-	public void addToReceipt(int userID, String contractName, long consumedCPU, double cpuCost, long consumedTransference, double transferenceCost, double storageCost) {
+	public void addToReceipt(int userID, String contractName, long extraConsumedCPU, double cpuCost, long consumedTransference, double transferenceCost, double storageCost) {
 		double total = cpuCost + transferenceCost + storageCost;
-		users.get(userID).add(contractName, consumedCPU, cpuCost, consumedTransference, transferenceCost, storageCost, total);
+		users.get(userID).add(contractName, extraConsumedCPU, cpuCost, consumedTransference, transferenceCost, storageCost, total);
 		receipt += total;
 	}
 
