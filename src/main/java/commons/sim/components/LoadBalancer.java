@@ -167,7 +167,6 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		long finishedRequestsCounter = this.heuristic.getFinishedRequestsCounter();
 		this.heuristic.resetCounters();
 		
-		//TODO: Adapt to multiple instance types
 		return new RanjanStatistics(averageUtilisation, requestsArrivalCounter, finishedRequestsCounter, servers.size());
 	}
 
