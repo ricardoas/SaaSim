@@ -9,7 +9,7 @@ import commons.cloud.MachineType;
 public class MachineDescriptor {
 	
 	private final long machineID;
-	private MachineType type;
+	private final MachineType type;
 	private final boolean reserved;
 	private long startTimeInMillis;
 	private long finishTimeInMillis;
@@ -69,7 +69,7 @@ public class MachineDescriptor {
 	public long getOutTransference() {
 		return outTransference;
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -78,6 +78,8 @@ public class MachineDescriptor {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (int) (machineID ^ (machineID >>> 32));
+		result = prime * result + (reserved ? 1231 : 1237);
+		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		return result;
 	}
 
@@ -94,6 +96,10 @@ public class MachineDescriptor {
 			return false;
 		MachineDescriptor other = (MachineDescriptor) obj;
 		if (machineID != other.machineID)
+			return false;
+		if (reserved != other.reserved)
+			return false;
+		if (type != other.type)
 			return false;
 		return true;
 	}
