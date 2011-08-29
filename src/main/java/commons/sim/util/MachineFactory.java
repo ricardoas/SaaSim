@@ -6,6 +6,8 @@ import commons.config.Configuration;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
+import commons.sim.components.MultiCoreRanjanMachine;
+import commons.sim.components.MultiCoreTimeSharedMachine;
 import commons.sim.components.RanjanMachine;
 import commons.sim.components.TimeSharedMachine;
 import commons.sim.jeevent.JEEventScheduler;
@@ -43,9 +45,9 @@ public class MachineFactory {
 		}
 		
 		if(ranjanFactory){//Constructing a machine factory for RANJAN heuristic
-			machineClass = RanjanMachine.class.getConstructors()[0];
+			machineClass = MultiCoreRanjanMachine.class.getConstructors()[0];
 		}else{
-			machineClass = TimeSharedMachine.class.getConstructors()[0];
+			machineClass = MultiCoreTimeSharedMachine.class.getConstructors()[0];
 		}
 
 	}

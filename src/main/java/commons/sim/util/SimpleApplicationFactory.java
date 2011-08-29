@@ -27,7 +27,7 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 		
 		Class<?>[] heuristicClasses = config.getApplicationHeuristics();
 		int [] maxServerPerTier = config.getIntegerArray(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER);
-		
+
 		List<LoadBalancer> loadBalancers = new ArrayList<LoadBalancer>();
 		
 		for (int i = 0; i < numOfTiers; i++) {
