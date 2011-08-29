@@ -31,6 +31,8 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	private List<LoadBalancer> tiers;
 	
 	private final Monitor monitor;
+	
+	private long simulationEndTime = 0;
 
 	/**
 	 * Constructor
@@ -71,25 +73,32 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	@Override
 	public void handleEvent(JEEvent event) {
 		switch (event.getType()) {
-		case READWORKLOAD:
-			try {
-				if (workloadParser.hasNext()) {
-					List<Request> list = workloadParser.next();
-					for (Request request : list) {
-						request.reset();
-						send(parseEvent(request));
+			case READWORKLOAD:
+				try {
+					if(workloadParser.hasNext()) {
+						List<Request> list = workloadParser.next();
+						for (Request request : list) {
+							request.reset();
+							send(parseEvent(request));
+							if(request.getArrivalTimeInMillis() > simulationEndTime){
+								simulationEndTime = request.getArrivalTimeInMillis();
+							}
+						}
+						
 					}
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			break;
-		case CHARGE_USERS:
-			this.monitor.chargeUsers(getScheduler().now().timeMilliSeconds);
-			send(new JEEvent(JEEventType.CHARGE_USERS, this, getScheduler().now().plus(new JETime(DAY_IN_MILLIS * daysInMonths[currentMonth++]))));
-			break;
-		default:
-			break;
+				break;
+			case CHARGE_USERS:
+				this.monitor.chargeUsers(getScheduler().now().timeMilliSeconds);
+				JETime newEventTime = getScheduler().now().plus(new JETime(DAY_IN_MILLIS * daysInMonths[currentMonth++]));
+				if(currentMonth < daysInMonths.length && newEventTime.timeMilliSeconds < simulationEndTime){
+					send(new JEEvent(JEEventType.CHARGE_USERS, this, newEventTime));
+				}
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -121,5 +130,10 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	@Override
 	public void removeServer(int tier, boolean force) {
 		tiers.get(tier).removeServer(force);
+	}
+
+	@Override
+	public long getSimulationEndTime() {
+		return simulationEndTime;
 	}
 }
