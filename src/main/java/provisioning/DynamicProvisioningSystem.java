@@ -1,6 +1,8 @@
 package provisioning;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -39,8 +41,6 @@ public class DynamicProvisioningSystem implements DPS{
 	
 	protected Map<String, Provider> providers;
 	
-	protected MachineType[] setupTypes = {MachineType.HIGHCPU, MachineType.MEDIUM, MachineType.XLARGE, MachineType.LARGE};
-	
 	/**
 	 * Default constructor.
 	 */
@@ -74,11 +74,13 @@ public class DynamicProvisioningSystem implements DPS{
 		String[] workloads = Configuration.getInstance().getWorkloads();
 		configurable.setWorkloadParser(new TimeBasedWorkloadParser(new GEISTWorkloadParser(workloads), TimeBasedWorkloadParser.HOUR_IN_MILLIS));
 	}
-
+	
 	private void addServersToTiers(DynamicConfigurable configurable, int[] initialServersPerTier) {
+		List<MachineType> typeList = Arrays.asList(MachineType.values());
+		Collections.reverse(typeList);
 		for (int tier = 0; tier < initialServersPerTier.length; tier++) {
 			int serversAdded = 0;
-			for(MachineType machineType : this.setupTypes){
+			for(MachineType machineType : typeList){
 				Iterator<Provider> iterator = this.providers.values().iterator();
 				while(iterator.hasNext()){
 					Provider provider = iterator.next();

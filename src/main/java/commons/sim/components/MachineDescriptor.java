@@ -129,4 +129,13 @@ public class MachineDescriptor {
 	public long getUpTimeInMillis() {
 		return finishTimeInMillis - startTimeInMillis;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return "MachineDescriptor [machineID=" + machineID + ", type=" + type
+				+ ", reserved=" + reserved + "]";
+	}
 }

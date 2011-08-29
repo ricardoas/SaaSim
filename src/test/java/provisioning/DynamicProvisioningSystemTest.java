@@ -111,13 +111,10 @@ public class DynamicProvisioningSystemTest {
 
 	/**
 	 * Test method for {@link provisioning.DynamicProvisioningSystem#registerConfigurable(provisioning.DynamicConfigurable)}.
-	 * @throws Exception 
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
-	@PrepareForTest(DynamicProvisioningSystem.class)
-	public void testRegisterConfigurableWithMultipleServers() throws Exception {
-		GEISTWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(GEISTWorkloadParser.class, "src/test/resources/power.trc");
-		
+	public void testRegisterConfigurableWithMultipleServers() {
 		Configuration.getInstance().setProperty(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER, "7");
 		
 		DynamicConfigurable configurable = EasyMock.createStrictMock(DynamicConfigurable.class);
@@ -128,14 +125,14 @@ public class DynamicProvisioningSystemTest {
 		configurable.addServer(0, new MachineDescriptor(4, true, MachineType.LARGE), false);
 		configurable.addServer(0, new MachineDescriptor(5, true, MachineType.LARGE), false);
 		configurable.addServer(0, new MachineDescriptor(6, true, MachineType.LARGE), false);
-		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
+		configurable.setWorkloadParser(EasyMock.anyObject(WorkloadParser.class));
 		
-		PowerMock.replayAll(configurable, parser);
+		EasyMock.replay(configurable);
 		
 		DynamicProvisioningSystem dps = new DynamicProvisioningSystem();
 		dps.registerConfigurable(configurable);
 		
-		PowerMock.verifyAll();
+		EasyMock.verify(configurable);
 	}
 	
 	/**
