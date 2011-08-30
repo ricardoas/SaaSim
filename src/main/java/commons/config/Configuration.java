@@ -463,6 +463,7 @@ public class Configuration	extends PropertiesConfiguration{
 					break;
 				case ROUNDROBIN_HET:
 					strings[i] = RoundRobinHeuristicForHeterogenousMachines.class.getCanonicalName();
+					break;
 				case RANJAN:
 					strings[i] = RanjanHeuristic.class.getCanonicalName();
 					break;
