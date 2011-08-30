@@ -59,7 +59,13 @@ public class MonitorTest {
 	 */
 	@Test
 	public void testRequestQueued() {
-		fail("Not yet implemented");
+		Request request = EasyMock.createStrictMock(Request.class);
+		EasyMock.expect(request.getSaasClient()).andReturn("client A");
+		EasyMock.replay(request);
+		
+		monitor.requestQueued(0, request, 0);
+		
+		EasyMock.verify(request);
 	}
 
 	/**

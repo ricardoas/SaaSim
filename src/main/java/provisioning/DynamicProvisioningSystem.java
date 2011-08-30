@@ -36,7 +36,7 @@ public class DynamicProvisioningSystem implements DPS{
 	
 	protected final Map<Long, DynamicConfigurable> configurables;
 
-	protected Map<Integer, User> users;
+	protected Map<String, User> users;
 	
 	protected Map<String, Provider> providers;
 	
@@ -53,7 +53,7 @@ public class DynamicProvisioningSystem implements DPS{
 			this.providers.put(provider.getName(), provider);
 		}
 		
-		this.users = new HashMap<Integer, User>();
+		this.users = new HashMap<String, User>();
 		List<User> listOfUsers = Configuration.getInstance().getUsers();
 		for (User user : listOfUsers) {
 			this.users.put(user.getId(), user);
@@ -135,11 +135,10 @@ public class DynamicProvisioningSystem implements DPS{
 	 * @param request
 	 */
 	protected void reportLostRequest(Request request) {
-		Integer SaaSClientID = Integer.valueOf(request.getSaasClient());
-		if( !users.containsKey(SaaSClientID) ){
+		if( !users.containsKey(request.getSaasClient()) ){
 			throw new RuntimeException("Unregistered user with ID " + request.getSaasClient() + ". Check configuration files.");
 		}
-		users.get(SaaSClientID).reportLostRequest(request);
+		users.get(request.getSaasClient()).reportLostRequest(request);
 	}
 	
 	protected List<Provider> canBuyMachine(MachineType type, boolean isReserved){

@@ -1,6 +1,9 @@
 package provisioning;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
@@ -69,7 +72,9 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 		int serversAdded = 0;
 		Configuration config = Configuration.getInstance();
 		
-		for(MachineType machineType: this.setupTypes){//Retrieving any reserved machine left
+		List<MachineType> typeList = Arrays.asList(MachineType.values());
+		Collections.reverse(typeList);
+		for(MachineType machineType: typeList){//TODO test which order is the best
 			Iterator<Provider> iterator = this.providers.values().iterator();
 			while(iterator.hasNext()){
 				Provider provider = iterator.next();
@@ -93,9 +98,9 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 				Iterator<Provider> iterator = this.providers.values().iterator();
 				while(iterator.hasNext()){
 					Provider provider = iterator.next();
-					while(provider.canBuyMachine(true, machineType) && 
+					while(provider.canBuyMachine(false, machineType) && 
 							serversAdded + config.getRelativePower(machineType) <= numberOfServersToAdd){
-						configurable.addServer(tier, provider.buyMachine(true, machineType), true);
+						configurable.addServer(tier, provider.buyMachine(false, machineType), true);
 						serversAdded += config.getRelativePower(machineType);
 					}
 					if(serversAdded == numberOfServersToAdd){

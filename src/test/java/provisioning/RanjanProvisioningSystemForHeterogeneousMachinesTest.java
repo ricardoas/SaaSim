@@ -353,7 +353,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
 		EasyMock.expect(config.getWorkloads()).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(12);
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(10);
 		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d).times(10);
 		
 		PowerMock.replay(Configuration.class);
