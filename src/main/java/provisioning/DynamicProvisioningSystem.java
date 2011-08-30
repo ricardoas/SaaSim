@@ -109,7 +109,7 @@ public class DynamicProvisioningSystem implements DPS{
 	
 	@Override
 	public void requestQueued(long timeMilliSeconds, Request request, int tier) {
-		
+		reportLostRequest(request);
 	}
 
 	@Override
