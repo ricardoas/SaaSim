@@ -507,7 +507,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 	@Test
 	public void testReportQueuedRequest(){
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getUserID()).andReturn("0");
+		EasyMock.expect(request.getSaasClient()).andReturn("0");
 		
 		Contract contract = EasyMock.createStrictMock(Contract.class);
 
@@ -536,7 +536,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 	@Test
 	public void testReportFinishedRequest(){
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getUserID()).andReturn("0");
+		EasyMock.expect(request.getSaasClient()).andReturn("0");
 		
 		Contract contract = EasyMock.createStrictMock(Contract.class);
 

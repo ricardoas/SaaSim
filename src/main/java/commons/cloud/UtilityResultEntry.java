@@ -311,7 +311,7 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	
 	public void addUsageToCost(String provider, MachineType type, long onDemandCPUHours, double onDemandCost, long reservedCPUHours, double reservedCost, double monitoringCost) {
 		providers.get(provider).addUsage(type, onDemandCPUHours, onDemandCost, reservedCPUHours, reservedCost, monitoringCost);
-		this.cost += (onDemandCost + reservedCost);
+		this.cost += (onDemandCost + reservedCost + monitoringCost);
 	}
 
 	/**

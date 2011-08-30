@@ -46,7 +46,7 @@ public class MonitorTest {
 	@Test(expected=RuntimeException.class)
 	public void testReportRequestFinished() {
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getUserID()).andReturn("100").times(2);
+		EasyMock.expect(request.getSaasClient()).andReturn("100").times(2);
 		EasyMock.replay(request);
 		
 		monitor.reportRequestFinished(request);

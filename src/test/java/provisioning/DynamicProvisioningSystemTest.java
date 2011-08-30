@@ -244,7 +244,7 @@ public class DynamicProvisioningSystemTest {
 	@PrepareForTest(Configuration.class)
 	public void testReportLostRequest(){
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getUserID()).andReturn("0");
+		EasyMock.expect(request.getSaasClient()).andReturn("0");
 		
 		Contract contract = EasyMock.createStrictMock(Contract.class);
 
@@ -274,7 +274,7 @@ public class DynamicProvisioningSystemTest {
 	@PrepareForTest(Configuration.class)
 	public void testReportFinishedRequest(){
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getUserID()).andReturn("0");
+		EasyMock.expect(request.getSaasClient()).andReturn("0");
 		
 		Contract contract = EasyMock.createStrictMock(Contract.class);
 
