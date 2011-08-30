@@ -193,7 +193,7 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 			this.reservedCPUHours += reservedCPUHours;
 			this.reservedCost += reservedCost;
 			this.monitoringCost += monitoringCost;
-			this.cost += (onDemandCost + reservedCost);
+			this.cost += (onDemandCost + reservedCost + monitoringCost);
 			this.types.get(type).update(onDemandCPUHours, onDemandCost,
 				reservedCPUHours, reservedCost);
 		}
