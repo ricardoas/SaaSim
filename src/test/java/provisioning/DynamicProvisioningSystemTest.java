@@ -28,7 +28,6 @@ import commons.cloud.UtilityResult;
 import commons.cloud.UtilityResultEntry;
 import commons.config.Configuration;
 import commons.config.PropertiesTesting;
-import commons.io.GEISTWorkloadParser;
 import commons.io.WorkloadParser;
 import commons.sim.AccountingSystem;
 import commons.sim.components.MachineDescriptor;
@@ -137,24 +136,21 @@ public class DynamicProvisioningSystemTest {
 	
 	/**
 	 * Test method for {@link provisioning.DynamicProvisioningSystem#registerConfigurable(provisioning.DynamicConfigurable)}.
-	 * @throws Exception 
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
-	@PrepareForTest(DynamicProvisioningSystem.class)
-	public void testRegisterConfigurableWithAnyServers() throws Exception {
-		GEISTWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(GEISTWorkloadParser.class, "src/test/resources/power.trc");
-		
+	public void testRegisterConfigurableWithAnyServers() {
 		Configuration.getInstance().setProperty(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER, "0");
 		
 		DynamicConfigurable configurable = EasyMock.createStrictMock(DynamicConfigurable.class);
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		
-		PowerMock.replayAll(configurable, parser);
+		EasyMock.replay(configurable);
 		
 		DynamicProvisioningSystem dps = new DynamicProvisioningSystem();
 		dps.registerConfigurable(configurable);
 		
-		PowerMock.verifyAll();
+		EasyMock.verify();
 	}
 	
 	/**

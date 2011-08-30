@@ -69,11 +69,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 		int serversAdded = 0;
 		Configuration config = Configuration.getInstance();
 		
-		MachineType[] machineTypes = MachineType.values();
-		
-		for(int i = machineTypes.length - 1; i >= 0; i--){//Retrieving any reserved machine left
-			MachineType machineType = machineTypes[i];
-			
+		for(MachineType machineType: this.setupTypes){//Retrieving any reserved machine left
 			Iterator<Provider> iterator = this.providers.values().iterator();
 			while(iterator.hasNext()){
 				Provider provider = iterator.next();

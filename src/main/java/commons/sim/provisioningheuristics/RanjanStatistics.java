@@ -58,4 +58,17 @@ public class RanjanStatistics {
 			return false;
 		return true;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return "RanjanStatistics [averageUtilisation=" + averageUtilisation
+				+ ", numberOfRequestsArrivalInLastInterval="
+				+ numberOfRequestsArrivalInLastInterval
+				+ ", numberOfRequestsCompletionsInLastInterval="
+				+ numberOfRequestsCompletionsInLastInterval
+				+ ", totalNumberOfServers=" + totalNumberOfServers + "]";
+	}
 }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -67,32 +66,27 @@ public class DynamicProvisioningSystem implements DPS{
 		this.configurable = configurable;
 		int[] initialServersPerTier = Configuration.getInstance().getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER);
 		
+		List<MachineType> typeList = Arrays.asList(MachineType.values());
+		Collections.reverse(typeList);
 		//Looking for reserved instances!
-		addServersToTiers(configurable, initialServersPerTier);
+		for (int tier = 0; tier < initialServersPerTier.length; tier++) {
+			addServersToTier(configurable, tier, initialServersPerTier[tier], typeList);
+		}
 
 		String[] workloads = Configuration.getInstance().getWorkloads();
 		configurable.setWorkloadParser(new TimeBasedWorkloadParser(new GEISTWorkloadParser(workloads), TimeBasedWorkloadParser.DAY_IN_MILLIS));
 	}
 	
-	private void addServersToTiers(DynamicConfigurable configurable, int[] initialServersPerTier) {
-		List<MachineType> typeList = Arrays.asList(MachineType.values());
-		Collections.reverse(typeList);
-		for (int tier = 0; tier < initialServersPerTier.length; tier++) {
-			int serversAdded = 0;
-			for(MachineType machineType : typeList){
-				Iterator<Provider> iterator = this.providers.values().iterator();
-				while(iterator.hasNext()){
-					Provider provider = iterator.next();
-					while(provider.canBuyMachine(true, machineType) && serversAdded < initialServersPerTier[tier]){
-						configurable.addServer(tier, provider.buyMachine(true, machineType), false);
-						serversAdded++;
-					}
-					if(serversAdded == initialServersPerTier[tier]){
-						break;
-					}
+	private void addServersToTier(DynamicConfigurable configurable, int tier, int numberOfInitialServers, List<MachineType> typeList) {
+		int serversAdded = 0;
+		for(MachineType machineType : typeList){
+			for (Provider provider : this.providers.values()) {
+				while(provider.canBuyMachine(true, machineType) && serversAdded < numberOfInitialServers){
+					configurable.addServer(tier, provider.buyMachine(true, machineType), false);
+					serversAdded++;
 				}
-				if(serversAdded == initialServersPerTier[tier]){
-					break;
+				if(serversAdded == numberOfInitialServers){
+					return;
 				}
 			}
 		}

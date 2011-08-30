@@ -185,6 +185,8 @@ public class LoadBalancerTest {
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config);
 		EasyMock.expect(config.getApplicationHeuristics()).andReturn(new Class[] {ProfitDrivenHeuristic.class});
+		EasyMock.expect(Configuration.getInstance()).andReturn(config);
+		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1.0);
 		
 		EasyMock.expect(newRequestEvent.getType()).andReturn(JEEventType.NEWREQUEST).once();
 		EasyMock.expect(newRequestEvent.getValue()).andReturn(new Request [] {request}).once();
@@ -274,7 +276,8 @@ public class LoadBalancerTest {
 		EasyMock.replay(this.schedulingHeuristic);
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
-		monitor.evaluateUtilisation(0, new RanjanStatistics(utilisation1+utilisation2, totalArrivals, totalCompletions, 2), 0);
+		monitor.evaluateUtilisation(0, new RanjanStatistics((utilisation1+utilisation2)/2, totalArrivals, totalCompletions, 2), 0);
+		EasyMock.expect(monitor.getSimulationEndTime()).andReturn(eventScheduler.now().timeMilliSeconds);
 		EasyMock.replay(monitor);
 		
 		lb = new LoadBalancer(eventScheduler, monitor, schedulingHeuristic, Integer.MAX_VALUE, 0);
@@ -325,6 +328,7 @@ public class LoadBalancerTest {
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		monitor.evaluateUtilisation(0, new RanjanStatistics(0, totalArrivals, totalCompletions, 0), 0);
+		EasyMock.expect(monitor.getSimulationEndTime()).andReturn(eventScheduler.now().timeMilliSeconds);
 		EasyMock.replay(monitor);
 		
 		lb = new LoadBalancer(eventScheduler, monitor, schedulingHeuristic, Integer.MAX_VALUE, 0);

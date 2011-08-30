@@ -49,6 +49,8 @@ public class MachineFactory {
 		}else{
 			machineClass = MultiCoreTimeSharedMachine.class.getConstructors()[0];
 		}
+		System.out.println("MachineFactory.MachineFactory()");
+		System.out.println(machineClass);
 
 	}
 	

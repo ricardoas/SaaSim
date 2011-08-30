@@ -163,7 +163,10 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		for(Machine machine : servers){
 			averageUtilisation += machine.computeUtilisation(eventTime);
 		}
-		averageUtilisation /= servers.size();
+		
+		if(!servers.isEmpty()){
+			averageUtilisation /= servers.size();
+		}
 		
 		long requestsArrivalCounter = this.heuristic.getRequestsArrivalCounter();
 		long finishedRequestsCounter = this.heuristic.getFinishedRequestsCounter();

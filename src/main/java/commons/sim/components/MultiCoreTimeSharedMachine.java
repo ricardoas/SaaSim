@@ -33,7 +33,6 @@ public class MultiCoreTimeSharedMachine extends TimeSharedMachine{
 	public MultiCoreTimeSharedMachine(JEEventScheduler scheduler, MachineDescriptor descriptor, 
 			LoadBalancer loadBalancer) {
 		super(scheduler, descriptor, loadBalancer);
-		
 		this.NUMBER_OF_CORES = (int) Math.floor(Configuration.getInstance().getRelativePower(descriptor.getType()));
 		this.currentExecuting = new ArrayList<Request>(this.NUMBER_OF_CORES); 
 	}

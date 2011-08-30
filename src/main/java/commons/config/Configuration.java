@@ -383,7 +383,7 @@ public class Configuration	extends PropertiesConfiguration{
 		
 		String customHeuristicClass = getString(DPS_CUSTOM_HEURISTIC);
 		try{
-			DPSHeuristicValues value = DPSHeuristicValues.valueOf(heuristicName);
+			DPSHeuristicValues value = DPSHeuristicValues.valueOf(heuristicName.toUpperCase());
 			switch (value) {
 				case STATIC:
 					heuristicName = DynamicProvisioningSystem.class.getCanonicalName();
