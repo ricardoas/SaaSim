@@ -715,12 +715,136 @@ public class MultiCoreRanjanMachineTest {
 	}
 	
 	/**
-	 * One request arrives (below the number of simultaneous threads) and stays
-	 * processing.
+	 * As the request finish event has not happened, the time that is an attribute of computeUtilisation
+	 * is used as the computing time
 	 */
 	@Test
 	public void testComputeUtilisationOfMachineWithRunningRequestAndOneCore(){
 		
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(MultiCoreTimeSharedMachine.class))).andReturn(1);
+		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(2);
+		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
+		EasyMock.expect(scheduler.now()).andReturn(new JETime(100l)).times(2);
+		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
+		
+		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		
+		Request request = EasyMock.createStrictMock(Request.class);
+		request.assignTo(MachineType.SMALL);
+		EasyMock.expect(request.getTotalToProcess()).andReturn(150L);
+		request.update(100);
+		EasyMock.expect(request.isFinished()).andReturn(false);
+		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
+		
+		Configuration config = mockConfiguration(1, DEFAULT_MAX_NUM_OF_THREADS, DEFAULT_BACKLOG_SIZE);
+		PowerMock.replayAll(request, loadBalancer, config, scheduler);
+		
+		MultiCoreRanjanMachine machine = new MultiCoreRanjanMachine(scheduler, descriptor, loadBalancer);
+		machine.sendRequest(request);
+		
+		assertEquals(Double.NaN, machine.computeUtilisation(0), 0.0001);
+		assertEquals(1, machine.computeUtilisation(50), 0.0001);
+		
+		//Simulating a preemption event
+		machine.handleEvent(new JEEvent(JEEventType.PREEMPTION, machine, new JETime(100), 100l, request));
+		
+		assertEquals(1, machine.computeUtilisation(100), 0.0001);
+		assertEquals(1, machine.computeUtilisation(150), 0.0001);
+		
+		PowerMock.verifyAll();
+	}
+	
+	@Test
+	public void testComputeUtilisationOfMachineWithRunningRequestAndOneCore2(){
+		
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(MultiCoreTimeSharedMachine.class))).andReturn(1);
+		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(2);
+		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
+		EasyMock.expect(scheduler.now()).andReturn(new JETime(100l)).times(2);
+		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
+		EasyMock.expect(scheduler.now()).andReturn(new JETime(150l));
+		
+		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		loadBalancer.reportRequestFinished(EasyMock.isA(Request.class));
+		
+		Request request = EasyMock.createStrictMock(Request.class);
+		request.assignTo(MachineType.SMALL);
+		EasyMock.expect(request.getTotalToProcess()).andReturn(150L);
+		request.update(100);
+		EasyMock.expect(request.isFinished()).andReturn(false);
+		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
+		request.update(50);
+		EasyMock.expect(request.isFinished()).andReturn(true);
+		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(0l);
+		EasyMock.expect(request.getResponseSizeInBytes()).andReturn(0l);
+		
+		Configuration config = mockConfiguration(1, DEFAULT_MAX_NUM_OF_THREADS, DEFAULT_BACKLOG_SIZE);
+		PowerMock.replayAll(request, loadBalancer, config, scheduler);
+		
+		MultiCoreRanjanMachine machine = new MultiCoreRanjanMachine(scheduler, descriptor, loadBalancer);
+		machine.sendRequest(request);
+		
+		//Simulating a preemption event
+		machine.handleEvent(new JEEvent(JEEventType.PREEMPTION, machine, new JETime(100), 100l, request));
+		
+		//As a compute utilisation is performed, the next compute utilisation will start from this time!
+		assertEquals(1, machine.computeUtilisation(100), 0.0001);
+		
+		machine.handleEvent(new JEEvent(JEEventType.PREEMPTION, machine, new JETime(150), 50l, request));
+		assertEquals(0.25, machine.computeUtilisation(300), 0.0001);
+		
+		PowerMock.verifyAll();
+	}
+
+	/**
+	 * As the request finish event has not happened, the time that is an attribute of computeUtilisation
+	 * is used as the computing time
+	 */
+	@Test
+	public void testComputeUtilisationOfMachineWithRunningRequestAndDualCore(){
+		
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(MultiCoreTimeSharedMachine.class))).andReturn(1);
+		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(2);
+		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
+		EasyMock.expect(scheduler.now()).andReturn(new JETime(100l)).times(2);
+		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
+		
+		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		Request request = EasyMock.createStrictMock(Request.class);
+		request.assignTo(MachineType.SMALL);
+		EasyMock.expect(request.getTotalToProcess()).andReturn(150L);
+		request.update(100);
+		EasyMock.expect(request.isFinished()).andReturn(false);
+		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
+		
+		Configuration config = mockConfiguration(2, DEFAULT_MAX_NUM_OF_THREADS, DEFAULT_BACKLOG_SIZE);
+		PowerMock.replayAll(request, loadBalancer, config, scheduler);
+		
+		MultiCoreRanjanMachine machine = new MultiCoreRanjanMachine(scheduler, descriptor, loadBalancer);
+		machine.sendRequest(request);
+		
+		assertEquals(Double.NaN, machine.computeUtilisation(0), 0.0001);
+		assertEquals(0.5, machine.computeUtilisation(50), 0.0001);
+		
+		//Simulating a preemption event
+		machine.handleEvent(new JEEvent(JEEventType.PREEMPTION, machine, new JETime(100), 100l, request));
+		
+		assertEquals(0.5, machine.computeUtilisation(100), 0.0001);
+		assertEquals(0.5, machine.computeUtilisation(150), 0.0001);
+		
+		PowerMock.verifyAll();
+	}
+
+	/**
+	 * As the request finish event has not happened, the time that is an attribute of computeUtilisation
+	 * is used as the computing time
+	 */
+	@Test
+	public void testComputeUtilisationOfMachineWithRunningRequestAndQuadCore(){
+		
 		JEEventScheduler scheduler = new JEEventScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
@@ -728,181 +852,208 @@ public class MultiCoreRanjanMachineTest {
 		request.assignTo(MachineType.SMALL);
 		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
 		
-		Configuration config = mockConfiguration(1, DEFAULT_MAX_NUM_OF_THREADS, DEFAULT_BACKLOG_SIZE);
+		Configuration config = mockConfiguration(4, DEFAULT_MAX_NUM_OF_THREADS, DEFAULT_BACKLOG_SIZE);
 		PowerMock.replayAll(request, loadBalancer, config);
 		
 		MultiCoreRanjanMachine machine = new MultiCoreRanjanMachine(scheduler, descriptor, loadBalancer);
 		machine.sendRequest(request);
 		
 		assertEquals(Double.NaN, machine.computeUtilisation(scheduler.now().timeMilliSeconds), 0.0001);
-		assertEquals(1.0/DEFAULT_MAX_NUM_OF_THREADS, machine.computeUtilisation(scheduler.now().timeMilliSeconds + 50), 0.0001);
+		assertEquals(0.25, machine.computeUtilisation(scheduler.now().timeMilliSeconds + 50), 0.0001);
 		
 		PowerMock.verifyAll();
 	}
-	
-	/**
-	 * One request arrives (below the number of simultaneous threads) and stays
-	 * processing.
-	 */
+
 	@Test
-	public void testComputeUtilisationOfMachineWithRunningRequestAndMultiCore(){
+	public void testComputeUtilisationOfMachineAsRequestFinishesAndOneCore(){
 		
 		JEEventScheduler scheduler = new JEEventScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		
 		Request request = EasyMock.createStrictMock(Request.class);
 		request.assignTo(MachineType.SMALL);
 		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
+		request.update(50L);
+		EasyMock.expect(request.isFinished()).andReturn(true);
+		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(100000L);
+		EasyMock.expect(request.getResponseSizeInBytes()).andReturn(100000L);
 		
-		Configuration config = mockConfiguration(3, DEFAULT_MAX_NUM_OF_THREADS, DEFAULT_BACKLOG_SIZE);
+		loadBalancer.reportRequestFinished(request);
+		
+		Configuration config = mockConfiguration(1, DEFAULT_MAX_NUM_OF_THREADS, DEFAULT_BACKLOG_SIZE);
 		PowerMock.replayAll(request, loadBalancer, config);
 		
 		MultiCoreRanjanMachine machine = new MultiCoreRanjanMachine(scheduler, descriptor, loadBalancer);
 		machine.sendRequest(request);
 		
-		assertEquals(Double.NaN, machine.computeUtilisation(scheduler.now().timeMilliSeconds), 0.0001);
-		assertEquals(1.0/DEFAULT_MAX_NUM_OF_THREADS, machine.computeUtilisation(scheduler.now().timeMilliSeconds + 50), 0.0001);
+		scheduler.start();
+		
+		assertEquals(1, machine.computeUtilisation(50), 0.0001);
+		//After computing utilization, counters are reseted for next period ...
+		assertEquals(0.0, machine.computeUtilisation(99), 0.0001);
 		
 		PowerMock.verifyAll();
 	}
 	
-	/**
-	 * This method verifies that the utilization computed at each machine depends on the maximum number
-	 * of threads that can be executed in a machine and the time consumed by the running request. In
-	 * this test, the maximum number of threads and the current number of threads executing are equal.
-	 * @throws Exception
-	 */
 	@Test
-	public void testComputeUtilisationWithThreadLimitReachedAndOneCore() throws Exception{
-		long localMaxNumberOfThreads = 1l;
-		long backlogSize = 1l;
+	public void testComputeUtilisationOfMachineAsRequestFinishesAndQuadCore(){
 		
-		Configuration config = mockConfiguration(1, localMaxNumberOfThreads, backlogSize);
-		
-		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(3);
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(100)).times(2);
-
-		Request firstRequest = EasyMock.createStrictMock(Request.class);
-		firstRequest.assignTo(MachineType.SMALL);
-		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(60000L);
-		firstRequest.update(100L);
-		EasyMock.expect(firstRequest.isFinished()).andReturn(false);
-		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(59900L);
-
-		Request secondRequest = EasyMock.createStrictMock(Request.class);
+		JEEventScheduler scheduler = new JEEventScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
-		
-		PowerMock.replayAll(scheduler, firstRequest, secondRequest, config, loadBalancer);
-		
-		MultiCoreRanjanMachine machine = new MultiCoreRanjanMachine(scheduler, descriptor, loadBalancer);
-		machine.sendRequest(firstRequest);
-		machine.sendRequest(secondRequest);
-		
-		//Verifying utilization with one request in the queue, requests in backlog
-		assertEquals(1.0 / localMaxNumberOfThreads, machine.computeUtilisation(10l), 0.0);
-		
-		//Simulating that end event has arrived
-		JEEvent event = EasyMock.createStrictMock(JEEvent.class);
-		EasyMock.expect(event.getType()).andReturn(JEEventType.PREEMPTION);
-		EasyMock.expect(event.getValue()).andReturn(new Object[]{100l, firstRequest}).times(2);
-		EasyMock.replay(event);
-		
-		//Preemption event
-		machine.handleEvent(event);
-		
-		PowerMock.verifyAll();
-		
-		//Verifying queue of requests that are being processed
-		assertEquals(1.0 / localMaxNumberOfThreads, machine.computeUtilisation(0l), 0.0);
-	}
-	
-	/**
-	 * This method verifies that the utilization computed at each machine depends on the maximum number
-	 * of threads that can be executed in a machine and the time consumed by the running request. In
-	 * this test, the maximum number of threads and the current number of threads executing are equal.
-	 * @throws Exception
-	 */
-	@Test
-	public void testComputeUtilisationWithThreadLimitReachedAndMultiCore() throws Exception{
-		long localMaxNumberOfThreads = 1l;
-		long backlogSize = 1l;
-		
-		Configuration config = mockConfiguration(2, localMaxNumberOfThreads, backlogSize);
-		
-		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(3);
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(100)).times(2);
-
-		Request firstRequest = EasyMock.createStrictMock(Request.class);
-		firstRequest.assignTo(MachineType.SMALL);
-		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(60000L);
-		firstRequest.update(100L);
-		EasyMock.expect(firstRequest.isFinished()).andReturn(false);
-		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(59900L);
-
-		Request secondRequest = EasyMock.createStrictMock(Request.class);
-		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
-		
-		PowerMock.replayAll(scheduler, firstRequest, secondRequest, config, loadBalancer);
-		
-		MultiCoreRanjanMachine machine = new MultiCoreRanjanMachine(scheduler, descriptor, loadBalancer);
-		machine.sendRequest(firstRequest);
-		machine.sendRequest(secondRequest);
-		
-		//Verifying utilization with one request in the queue, requests in backlog
-		assertEquals(1.0 / localMaxNumberOfThreads, machine.computeUtilisation(10l), 0.0);
-		
-		//Simulating that end event has arrived
-		JEEvent event = EasyMock.createStrictMock(JEEvent.class);
-		EasyMock.expect(event.getType()).andReturn(JEEventType.PREEMPTION);
-		EasyMock.expect(event.getValue()).andReturn(new Object[]{100l, firstRequest}).times(2);
-		EasyMock.replay(event);
-
-		machine.handleEvent(event);
-		
-		PowerMock.verifyAll();
-		
-		//Verifying queue of requests that are being processed
-		assertEquals(1.0 / localMaxNumberOfThreads, machine.computeUtilisation(0l), 0.0);
-	}
-	
-	/**
-	 * This method verifies that the utilisation computed at each machine depends on the maximum number
-	 * of threads that can be executed in a machine and current processing time. In
-	 * this test, the maximum number of threads and the current number of threads executing are different.
-	 * @throws Exception
-	 */
-	@Test
-	public void testComputeUtilisationWithThreadLimitNotReachedAndOneCore() throws Exception{
-		//FIXME
-		Configuration config = mockConfiguration(1, DEFAULT_MAX_NUM_OF_THREADS, DEFAULT_BACKLOG_SIZE);
-		
-		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(0L)).times(3);
 		
 		Request request = EasyMock.createStrictMock(Request.class);
 		request.assignTo(MachineType.SMALL);
-		EasyMock.expect(request.getTotalToProcess()).andReturn(60000L);
-		PowerMock.replayAll(request, scheduler, config);
+		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
+		request.update(50L);
+		EasyMock.expect(request.isFinished()).andReturn(true);
+		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(100000L);
+		EasyMock.expect(request.getResponseSizeInBytes()).andReturn(100000L);
 		
-		MultiCoreRanjanMachine machine = new MultiCoreRanjanMachine(scheduler, descriptor, null);
+		loadBalancer.reportRequestFinished(request);
+		
+		Configuration config = mockConfiguration(4, DEFAULT_MAX_NUM_OF_THREADS, DEFAULT_BACKLOG_SIZE);
+		PowerMock.replayAll(request, loadBalancer, config);
+		
+		MultiCoreRanjanMachine machine = new MultiCoreRanjanMachine(scheduler, descriptor, loadBalancer);
+		machine.sendRequest(request);
+
+		scheduler.start();
+		
+		assertEquals(0.25, machine.computeUtilisation(50), 0.0001);
+		//After computing utilization, counters are reseted for next period ...
+		assertEquals(0.0, machine.computeUtilisation(299), 0.0001);
+		
+		PowerMock.verifyAll();
+	}
+
+	@Test
+	public void testComputeUtilisationOfMachineAfterRequestFinishesAndOneCore(){
+		
+		JEEventScheduler scheduler = new JEEventScheduler();
+		
+		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		
+		Request request = EasyMock.createStrictMock(Request.class);
+		request.assignTo(MachineType.SMALL);
+		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
+		request.update(50L);
+		EasyMock.expect(request.isFinished()).andReturn(true);
+		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(100000L);
+		EasyMock.expect(request.getResponseSizeInBytes()).andReturn(100000L);
+		
+		loadBalancer.reportRequestFinished(request);
+		
+		Configuration config = mockConfiguration(1, DEFAULT_MAX_NUM_OF_THREADS, DEFAULT_BACKLOG_SIZE);
+		PowerMock.replayAll(request, loadBalancer, config);
+		
+		MultiCoreRanjanMachine machine = new MultiCoreRanjanMachine(scheduler, descriptor, loadBalancer);
 		machine.sendRequest(request);
 		
-		//Verifying utilisation
-		assertEquals(1.0 / DEFAULT_MAX_NUM_OF_THREADS, machine.computeUtilisation(10l), 0.0);
+		scheduler.start();
 		
-		//Sending another request in the same time
-		Request request2 = EasyMock.createStrictMock(Request.class);
-		request2.assignTo(MachineType.SMALL);
-		EasyMock.replay(request2);
+		//Computing utilisation
+		assertEquals(0.5, machine.computeUtilisation(100), 0.0001);
+		//After computing utilization, counters are reseted for next period ...
+		assertEquals(0.0, machine.computeUtilisation(150), 0.0001);
 		
-		machine.sendRequest(request2);
+		PowerMock.verifyAll();
+	}
+	
+	@Test
+	public void testComputeUtilisationOfMachineAfterRequestFinishesAndQuadCore(){
 		
-		//Verifying utilisation
-		assertEquals(2.0 / DEFAULT_MAX_NUM_OF_THREADS, machine.computeUtilisation(100l), 0.0);
+		JEEventScheduler scheduler = new JEEventScheduler();
+		
+		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		
+		Request request = EasyMock.createStrictMock(Request.class);
+		request.assignTo(MachineType.SMALL);
+		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
+		request.update(50L);
+		EasyMock.expect(request.isFinished()).andReturn(true);
+		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(100000L);
+		EasyMock.expect(request.getResponseSizeInBytes()).andReturn(100000L);
+		
+		loadBalancer.reportRequestFinished(request);
+		
+		Configuration config = mockConfiguration(4, DEFAULT_MAX_NUM_OF_THREADS, DEFAULT_BACKLOG_SIZE);
+		PowerMock.replayAll(request, loadBalancer, config);
+		
+		MultiCoreRanjanMachine machine = new MultiCoreRanjanMachine(scheduler, descriptor, loadBalancer);
+		machine.sendRequest(request);
+		
+		scheduler.start();
+		
+		//Computing utilisation
+		assertEquals(0.125, machine.computeUtilisation(100), 0.0001);
+		//After computing utilization, counters are reseted for next period ...
+		assertEquals(0.0, machine.computeUtilisation(150), 0.0001);
+		
+		PowerMock.verifyAll();
+	}
+
+	@Test
+	public void testComputeUtilisationOfMachineAfterRequestFinishesAndOneCore2(){
+		
+		JEEventScheduler scheduler = new JEEventScheduler();
+		
+		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		
+		Request request = EasyMock.createStrictMock(Request.class);
+		request.assignTo(MachineType.SMALL);
+		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
+		request.update(50L);
+		EasyMock.expect(request.isFinished()).andReturn(true);
+		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(100000L);
+		EasyMock.expect(request.getResponseSizeInBytes()).andReturn(100000L);
+		
+		loadBalancer.reportRequestFinished(request);
+		
+		Configuration config = mockConfiguration(1, DEFAULT_MAX_NUM_OF_THREADS, DEFAULT_BACKLOG_SIZE);
+		PowerMock.replayAll(request, loadBalancer, config);
+		
+		MultiCoreRanjanMachine machine = new MultiCoreRanjanMachine(scheduler, descriptor, loadBalancer);
+		machine.sendRequest(request);
+		
+		scheduler.start();
+		
+		assertEquals(1.0/3, machine.computeUtilisation(150), 0.0001);
+		//After computing utilization, counters are reseted for next period ...
+		assertEquals(0.0, machine.computeUtilisation(160), 0.0001);
+		
+		PowerMock.verifyAll();
+	}
+	
+	@Test
+	public void testComputeUtilisationOfMachineAfterRequestFinishesAndDualCore2(){
+		
+		JEEventScheduler scheduler = new JEEventScheduler();
+		
+		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		
+		Request request = EasyMock.createStrictMock(Request.class);
+		request.assignTo(MachineType.SMALL);
+		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
+		request.update(50L);
+		EasyMock.expect(request.isFinished()).andReturn(true);
+		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(100000L);
+		EasyMock.expect(request.getResponseSizeInBytes()).andReturn(100000L);
+		
+		loadBalancer.reportRequestFinished(request);
+		
+		Configuration config = mockConfiguration(2, DEFAULT_MAX_NUM_OF_THREADS, DEFAULT_BACKLOG_SIZE);
+		PowerMock.replayAll(request, loadBalancer, config);
+		
+		MultiCoreRanjanMachine machine = new MultiCoreRanjanMachine(scheduler, descriptor, loadBalancer);
+		machine.sendRequest(request);
+		
+		scheduler.start();
+		
+		assertEquals(1.0/6, machine.computeUtilisation(150), 0.0001);
+		//After computing utilization, counters are reseted for next period ...
+		assertEquals(0.0, machine.computeUtilisation(151), 0.0001);
 		
 		PowerMock.verifyAll();
 	}
