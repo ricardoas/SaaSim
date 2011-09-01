@@ -5,10 +5,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import planning.heuristic.PlanningHeuristic;
 import planning.util.PlanningHeuristicFactory;
 
+import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.User;
 import commons.io.HistoryBasedWorkloadParser;
@@ -47,17 +49,13 @@ public class Planner {
 	 * Given the heuristic and the scenario data, this method is responsible for requesting the planning
 	 * of the infrastructure
 	 */
-	public List<String> plan() {
+	public Map<MachineType, Integer> plan() {
 		
-		//For each month ...
-		while(this.workloadParser.hasNext()){
-			this.planningHeuristic.findPlan(this.workloadParser, cloudProviders, cloudUsers);
-		}
+		//Asking for a plan
+		this.planningHeuristic.findPlan(this.workloadParser, cloudProviders, cloudUsers);
 		
 		//Persisting planning
-		List<String> plan = this.planningHeuristic.getPlan(cloudUsers);
-		persistPlanning(plan);
-		
+		Map<MachineType, Integer> plan = this.planningHeuristic.getPlan(cloudUsers);
 		return plan;
 			
 //		} catch (IOException e) {

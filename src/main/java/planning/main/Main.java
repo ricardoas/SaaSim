@@ -4,13 +4,14 @@ import static commons.sim.util.SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TI
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.configuration.ConfigurationException;
 
 import planning.Executor;
 import planning.Planner;
 
+import commons.cloud.MachineType;
 import commons.config.Configuration;
 import commons.io.GEISTWorkloadParser;
 import commons.io.HistoryBasedWorkloadParser;
@@ -42,7 +43,7 @@ public class Main {
 			
 			//Creating planner
 			Planner planner = new Planner(config.getProviders(), config.getUsers(), workloadParser);
-			List<String> plan = planner.plan();
+			Map<MachineType, Integer> plan = planner.plan();
 			
 			//FIXME: Change workload! Performing plan execution!
 			Executor executor = new Executor(config.getProviders(), config.getUsers(), workloadParser, config.getDouble(APPLICATION_SLA_MAX_RESPONSE_TIME));

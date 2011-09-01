@@ -15,4 +15,6 @@ public class SimulatorProperties {
 	public static final String PLANNING_HEURISTIC = "planning.heuristic";
 	
 	public static final String PLANNING_PERIOD = "planning.period";
+	
+	public static final String PLANNING_TYPE = "planning.type";
 }

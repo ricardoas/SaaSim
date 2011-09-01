@@ -21,6 +21,7 @@ import org.apache.commons.configuration.ConfigurationRuntimeException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import planning.heuristic.AGHeuristic;
+import planning.heuristic.OverProvisionHeuristic;
 import provisioning.DynamicProvisioningSystem;
 import provisioning.ProfitDrivenProvisioningSystem;
 import provisioning.RanjanProvisioningSystem;
@@ -420,12 +421,20 @@ public class Configuration	extends PropertiesConfiguration{
 			case EVOLUTIONARY:
 				heuristicName = AGHeuristic.class.getCanonicalName();
 				break;
+			case OVERPROVISIONING:
+				heuristicName = OverProvisionHeuristic.class.getCanonicalName();
+				checkPlanningType();
+				break;
 			default:
 				throw new ConfigurationException("Unsupported value: " + value + " for PlanningHeuristicValues.");
 		}
 		setProperty(PLANNING_HEURISTIC, heuristicName);
 	}
 
+
+	private void checkPlanningType() throws ConfigurationException {
+		Validator.checkNotEmpty(PLANNING_TYPE, getString(PLANNING_TYPE));
+	}
 
 	private void checkRanjanProperties() throws ConfigurationException {
 		Validator.checkPositive(RANJAN_HEURISTIC_NUMBER_OF_TOKENS, getString(RANJAN_HEURISTIC_NUMBER_OF_TOKENS));

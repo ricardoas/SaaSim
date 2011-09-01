@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
@@ -46,13 +47,10 @@ public class Executor {
 		if(this.providers == null){
 			throw new RuntimeException("Invalid cloud providers in Planner!");
 		}
-		if(this.workloadParser == null){
-			throw new RuntimeException("Invalid workload parser in Planner!");
-		}
 	}
 
 
-	public void execute(List<String> plan) throws IOException {
+	public void execute(Map<MachineType, Integer> plan) throws IOException {
 		Map<User, List<Request>> currentWorkload = this.workloadParser.next();
 		int periodIndex = 0;
 		
