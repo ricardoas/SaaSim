@@ -22,6 +22,7 @@ import commons.util.Triple;
 public class TimeSharedMachine extends JEAbstractEventHandler implements Machine{
 	
 	private static final long DEFAULT_QUANTUM = 100;
+	protected int NUMBER_OF_CORES = 1;
 
 	protected final LoadBalancer loadBalancer;
 	protected final Queue<Request> processorQueue;
@@ -29,6 +30,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	protected final long cpuQuantumInMilis;
 	protected boolean shutdownOnFinish;
 	protected long lastUtilisationCalcTime;
+	protected long totalTimeUsedInLastPeriod;
 	protected long totalTimeUsed;
 	protected JETime lastUpdate;
 	
@@ -50,6 +52,8 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		this.processorQueue = new LinkedList<Request>();
 		this.cpuQuantumInMilis = DEFAULT_QUANTUM;
 		this.lastUtilisationCalcTime = 0;
+		this.totalTimeUsed = 0;
+		this.totalTimeUsedInLastPeriod = 0;
 		this.lastUpdate = scheduler.now();
 	}
 	
@@ -76,6 +80,16 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	@Override
 	public MachineDescriptor getDescriptor() {
 		return descriptor;
+	}
+	
+	@Override
+	public long getTotalTimeUsed(){
+		return this.totalTimeUsed;
+	}
+	
+	@Override
+	public int getNumberOfCores() {
+		return this.NUMBER_OF_CORES;
 	}
 
 	/**
@@ -120,8 +134,12 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 				Request request = processorQueue.poll();
 				
 				long processedDemand = (Long) event.getValue()[0];
+				totalTimeUsedInLastPeriod += processedDemand;
 				totalTimeUsed += processedDemand;
+				
 				request.update(processedDemand);
+				
+				lastUpdate = getScheduler().now();
 				
 				if(request.isFinished()){
 					descriptor.updateTransference(request.getRequestSizeInBytes(), request.getResponseSizeInBytes());
@@ -197,15 +215,15 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	@Override
 	public double computeUtilisation(long timeInMillis){
 		if(processorQueue.isEmpty()){
-			double utilisation = (1.0 * totalTimeUsed)/(timeInMillis - lastUtilisationCalcTime);
-			totalTimeUsed = 0;
+			double utilisation = (1.0 * totalTimeUsedInLastPeriod)/(timeInMillis - lastUtilisationCalcTime);
+			totalTimeUsedInLastPeriod = 0;
 			lastUtilisationCalcTime = timeInMillis;
 			return utilisation;
 		}
 		
 		long totalBeingProcessedNow = timeInMillis - lastUpdate.timeMilliSeconds;
-		double utilisation = (1.0* (totalTimeUsed + totalBeingProcessedNow) )/(timeInMillis-lastUtilisationCalcTime);
-		totalTimeUsed = -totalBeingProcessedNow;
+		double utilisation = (1.0* (totalTimeUsedInLastPeriod + totalBeingProcessedNow) )/(timeInMillis-lastUtilisationCalcTime);
+		totalTimeUsedInLastPeriod = -totalBeingProcessedNow;
 		lastUtilisationCalcTime = timeInMillis;
 		return utilisation;
 	}

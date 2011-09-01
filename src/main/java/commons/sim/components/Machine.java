@@ -44,6 +44,16 @@ public interface Machine extends JEEventHandler{
 	 * @return
 	 */
 	double computeUtilisation(long timeInMillis);
+	
+	/**
+	 * @return
+	 */
+	long getTotalTimeUsed();
+	
+	/**
+	 * @return
+	 */
+	int getNumberOfCores();
 
 	/**
 	 * @param request

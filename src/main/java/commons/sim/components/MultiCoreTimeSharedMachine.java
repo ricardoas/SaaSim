@@ -22,7 +22,6 @@ import commons.util.Triple;
 public class MultiCoreTimeSharedMachine extends TimeSharedMachine{
 	
 	protected List<Request> currentExecuting;
-	private int NUMBER_OF_CORES = 1;
 	
 	/**
 	 * Default constructor
@@ -72,6 +71,7 @@ public class MultiCoreTimeSharedMachine extends TimeSharedMachine{
 				currentExecuting.remove(request);
 				
 				long processedDemand = (Long) event.getValue()[0];
+				totalTimeUsedInLastPeriod += processedDemand;
 				totalTimeUsed += processedDemand;
 				
 				lastUpdate = getScheduler().now();
@@ -120,18 +120,17 @@ public class MultiCoreTimeSharedMachine extends TimeSharedMachine{
 	@Override
 	public double computeUtilisation(long timeInMillis){
 		if(processorQueue.isEmpty() && currentExecuting.isEmpty()){
-			double utilisation = (1.0 * totalTimeUsed)/((timeInMillis - lastUtilisationCalcTime) * this.NUMBER_OF_CORES);
-			totalTimeUsed = 0;
+			double utilisation = (1.0 * totalTimeUsedInLastPeriod)/((timeInMillis - lastUtilisationCalcTime) * this.NUMBER_OF_CORES);
+			totalTimeUsedInLastPeriod = 0;
 			lastUtilisationCalcTime = timeInMillis;
 			return utilisation;
 		}
 		
-		//FIXME: Suponha que aconteca um preemption e a request continue executando, a diferenca nao eh mais essa certo?
 		long totalBeingProcessedNow = (timeInMillis - lastUpdate.timeMilliSeconds);
 		totalBeingProcessedNow *= this.currentExecuting.size();
 		
-		double utilisation = (1.0* (totalTimeUsed + totalBeingProcessedNow) )/((timeInMillis - lastUtilisationCalcTime) * this.NUMBER_OF_CORES);
-		totalTimeUsed = -totalBeingProcessedNow;
+		double utilisation = (1.0* (totalTimeUsedInLastPeriod + totalBeingProcessedNow) )/((timeInMillis - lastUtilisationCalcTime) * this.NUMBER_OF_CORES);
+		totalTimeUsedInLastPeriod = -totalBeingProcessedNow;
 		lastUtilisationCalcTime = timeInMillis;
 		return utilisation;
 	}

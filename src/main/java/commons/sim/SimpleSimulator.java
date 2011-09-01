@@ -136,4 +136,8 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	public long getSimulationEndTime() {
 		return simulationEndTime;
 	}
+	
+	public List<LoadBalancer> getTiers(){
+		return this.tiers;
+	}
 }

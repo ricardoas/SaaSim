@@ -67,9 +67,9 @@ public class RanjanMachine extends TimeSharedMachine {
 		super.requestFinished(request);
 	}
 	
-	@Override
-	public double computeUtilisation(long currentTime){
-		//FIXME Should add processing time!
-		return ((double)processorQueue.size()) / this.maximumNumberOfSimultaneousThreads;
-	}
+//	@Override
+//	public double computeUtilisation(long currentTime){
+//		//FIXME Should add processing time!
+//		return ((double)processorQueue.size()) / this.maximumNumberOfSimultaneousThreads;
+//	}
 }
