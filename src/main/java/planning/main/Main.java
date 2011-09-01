@@ -45,7 +45,7 @@ public class Main {
 			Planner planner = new Planner(config.getProviders(), config.getUsers(), workloadParser);
 			Map<MachineType, Integer> plan = planner.plan();
 			
-			//FIXME: Change workload! Performing plan execution!
+			//FIXME: Change workload! Performing plan execution! or Create an output iaas.plan file!
 			Executor executor = new Executor(config.getProviders(), config.getUsers(), workloadParser, config.getDouble(APPLICATION_SLA_MAX_RESPONSE_TIME));
 			executor.execute(plan);
 			

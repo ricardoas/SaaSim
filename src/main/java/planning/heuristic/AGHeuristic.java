@@ -1,154 +1,56 @@
 package planning.heuristic;
 
-import java.util.ArrayList;
+import static commons.sim.util.IaaSPlanProperties.*;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.jgap.Chromosome;
-import org.jgap.Configuration;
-import org.jgap.Gene;
-import org.jgap.Genotype;
-import org.jgap.IChromosome;
-import org.jgap.InvalidConfigurationException;
-import org.jgap.impl.ChromosomePool;
-import org.jgap.impl.CrossoverOperator;
-import org.jgap.impl.DefaultConfiguration;
-import org.jgap.impl.IntegerGene;
-import org.jgap.impl.MutationOperator;
-import org.jgap.impl.StockRandomGenerator;
-import org.jgap.impl.WeightedRouletteSelector;
+import provisioning.DPS;
+import provisioning.util.DPSFactory;
 
+import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.User;
+import commons.cloud.UtilityResult;
+import commons.config.Configuration;
 import commons.io.HistoryBasedWorkloadParser;
-import commons.util.SimulationData;
+import commons.sim.Simulator;
+import commons.sim.util.SimulatorFactory;
 
 public class AGHeuristic implements PlanningHeuristic{
 	
-	private int POPULATION_SIZE = 1000;
-	private double CROSSOVER_RATE = 0.7;
-	private int MUTATION_DENOMINATOR = 1000/5;//0.5%
-	private double MINIMUM_IMPROVEMENT = 0.01;//1%
-	private int MINIMUM_NUMBER_OF_EVOLUTIONS = 40;
-	
-	private int resourcesReservationLimit = 0;
-	private int maximumReservedResources = 0;
-	
-	private List<SimulationData> bestConfigs = new ArrayList<SimulationData>();
-	
+	private UtilityResult utilityResult;
+
 	@Override
 	public void findPlan(HistoryBasedWorkloadParser workloadParser,
 			List<Provider> cloudProviders, List<User> cloudUsers) {
+		//TODO: Read data from output file of JGAP, and simulate it in order to obtain detailed information
+//		Configuration.buildInstance(args[0]);
+		Configuration config = Configuration.getInstance();
+		config.setProperty(IAAS_PLAN_PROVIDER_NAME, new String[]{});
+		config.setProperty(IAAS_PLAN_PROVIDER_TYPES, new String[]{});
+		config.setProperty(IAAS_PLAN_PROVIDER_RESERVATION, new long[]{});
 		
-		initProperties(cloudProviders);
+		DPS dps = DPSFactory.createDPS();
 		
-		//Configuring genetic algorithm
-		Configuration config = new DefaultConfiguration();
-		try {
-			config.setPopulationSize(POPULATION_SIZE);
-			config.setPreservFittestIndividual(true);
-			config.setRandomGenerator(new StockRandomGenerator());
-			config.setChromosomePool(new ChromosomePool());
-			
-			config.addGeneticOperator(new CrossoverOperator(config, CROSSOVER_RATE));
-			config.addGeneticOperator(new MutationOperator(config, MUTATION_DENOMINATOR));
-			config.removeNaturalSelectors(true);
-			config.removeNaturalSelectors(false);
-			config.addNaturalSelector(new WeightedRouletteSelector(), true);
-	//		config.setKeepPopulationSizeConstant(true);
-	//		config.setNaturalSelector(null);//Tournament, WeightedRoullete
-
-			PlanningFitnessFunction myFunc = createFitnessFunction(workloadParser, cloudUsers, cloudProviders);
-			config.setFitnessFunction(myFunc);
-			
-			IChromosome sampleChromosome = createSampleChromosome(config);
-			config.setSampleChromosome(sampleChromosome);
-			
-			Genotype population = Genotype.randomInitialGenotype(config);
-
-			//evaluating population
-			IChromosome previousFittestChromosome = null;
-			population.evolve();
-			IChromosome lastFittestChromosome = population.getFittestChromosome();
-			int evolutionsWithoutImprovement = 0;
-			
-			while(evolutionsWithoutImprovement < MINIMUM_NUMBER_OF_EVOLUTIONS){
-				population.evolve();
-				previousFittestChromosome = lastFittestChromosome;
-				lastFittestChromosome = population.getFittestChromosome();
-				if(isEvolutionComplete(lastFittestChromosome, lastFittestChromosome)){
-					evolutionsWithoutImprovement++;
-				}else{
-					evolutionsWithoutImprovement = 0;
-				}
-			}
-			
-			//store best config
-			IChromosome fittestChromosome = population.getFittestChromosome();
-			SimulationData simulationData = myFunc.getDetailedEntry((Integer) fittestChromosome.getGene(0).getAllele());
-			this.bestConfigs.add(simulationData);
-			
-			//Keeping number of reserved resources to be used to configure next accounting system!
-			this.maximumReservedResources = Math.max(maximumReservedResources, simulationData.numberOfMachinesReserved);
-			
-		} catch (InvalidConfigurationException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private boolean isEvolutionComplete(IChromosome fittestChromosome, IChromosome lastFittestChromosome) {
-		double firstFitnessValue = fittestChromosome.getFitnessValue();
-		double difference = lastFittestChromosome.getFitnessValue() - firstFitnessValue;
-		if(Math.abs(difference/firstFitnessValue) < MINIMUM_IMPROVEMENT){
-			return true;
-		}
-		return false;
-	}
-
-	private void initProperties(List<Provider> cloudProviders) {
-		resourcesReservationLimit = cloudProviders.iterator().next().getReservationLimit();
-	}
-
-	private IChromosome createSampleChromosome(Configuration config) throws InvalidConfigurationException {
-		Gene[] genes = new IntegerGene[1];
-		genes[0] = new IntegerGene(config, 0, resourcesReservationLimit);
-		IChromosome sampleChromosome = new Chromosome(config, genes);
-		return sampleChromosome;
-	}
-
-	private PlanningFitnessFunction createFitnessFunction(HistoryBasedWorkloadParser workloadParser, List<User> cloudUsers, List<Provider> cloudProvider) {
-		workloadParser.setReadNextPeriod(true);
-		return new PlanningFitnessFunction(workloadParser, cloudUsers, cloudProvider, this.maximumReservedResources);
+		Simulator simulator = SimulatorFactory.buildSimulator(dps);
+		dps.registerConfigurable(simulator);
+		
+		simulator.start();
+		
+		utilityResult = dps.calculateUtility();
 	}
 
 	@Override
 	public double getEstimatedProfit(int period) {
-		if(period > 0 && period < this.bestConfigs.size()){
-			return this.bestConfigs.get(period).estimatedUtility;
-		}
-		
-		return Double.POSITIVE_INFINITY;
+		return utilityResult.getUtility();
 	}
 
 	@Override
-	public List<String> getPlan(List<User> cloudUsers) {
-		List<String> planningData = new ArrayList<String>();
-		
-		double setUpReceipt = calcSetupReceipt(cloudUsers);
-		
-		for(SimulationData data : this.bestConfigs){
-			planningData.add(data.numberOfMachinesReserved + "\t" + data.totalReservedConsumedTime
-					+ "\t" + data.numberOfOnDemandMachines + "\t" + data.totalOnDemandConsumedTime +
-					"\t" + data.totalInTransferred + "\t" + (data.estimatedUtility+setUpReceipt) + 
-					"\t" + data.estimatedReceipt + "\t" + data.estimatedCost);
-		}
-		return planningData;
-	}
-
-	private double calcSetupReceipt(List<User> cloudUsers) {
-		double receipt = 0;
-		for(User user : cloudUsers){
-			receipt += user.calculateOneTimeFees();
-		}
-		return receipt;
+	public Map<MachineType, Integer> getPlan(List<User> cloudUsers) {
+		Map<MachineType, Integer> plan = new HashMap<MachineType, Integer>();
+		//TODO read from files obtained from JGAP!
+		return plan;
 	}
 }
