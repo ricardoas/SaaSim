@@ -47,7 +47,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 			List<Machine> servers = lb.getServers();
 			for(Machine server : servers){
 				double utilisation = (1.0 * server.getTotalTimeUsed())/(server.getDescriptor().getUpTimeInMillis() * server.getNumberOfCores());
-				if(utilisation > UTILISATION_THRESHOLD){
+				if(utilisation >= UTILISATION_THRESHOLD){
 					Integer numberOfServers = this.plan.get(server.getDescriptor().getType());
 					if(numberOfServers == null ){
 						numberOfServers = 0;
