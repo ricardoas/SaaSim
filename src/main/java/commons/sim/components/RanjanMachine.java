@@ -45,6 +45,7 @@ public class RanjanMachine extends TimeSharedMachine {
 		if(hasTokenLeft()){
 			super.sendRequest(request);
 		}else if(canWaitForToken()){
+			request.assignTo(this.descriptor.getType());
 			this.backlog.add(request);
 		}else{
 			send(new JEEvent(JEEventType.REQUESTQUEUED, getLoadBalancer(), getScheduler().now(), request));
@@ -66,10 +67,4 @@ public class RanjanMachine extends TimeSharedMachine {
 		}
 		super.requestFinished(request);
 	}
-	
-//	@Override
-//	public double computeUtilisation(long currentTime){
-//		//FIXME Should add processing time!
-//		return ((double)processorQueue.size()) / this.maximumNumberOfSimultaneousThreads;
-//	}
 }

@@ -52,6 +52,7 @@ public class TimeSharedMachineTest {
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		Request request = EasyMock.createStrictMock(Request.class);
+		request.assignTo(MachineType.SMALL);
 		EasyMock.expect(request.getTotalToProcess()).andReturn(5000L);
 		
 		TimeSharedMachine machine = PowerMock.createStrictPartialMock(TimeSharedMachine.class, new String[]{"handleEvent"}, scheduler, descriptor, loadBalancer);
@@ -82,8 +83,8 @@ public class TimeSharedMachineTest {
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		Request request = EasyMock.createStrictMock(Request.class);
+		request.assignTo(MachineType.SMALL);
 		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
-		
 		
 		TimeSharedMachine machine = PowerMock.createStrictPartialMock(TimeSharedMachine.class, new String[]{"handleEvent"}, scheduler, descriptor, loadBalancer);
 		Capture<JEEvent> captured = new Capture<JEEvent>();
@@ -111,9 +112,10 @@ public class TimeSharedMachineTest {
 	public void testSendTwoRequestWithEmptyMachine(){
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
+		firstRequest.assignTo(MachineType.SMALL);
 		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(5000L);
 		Request secondRequest = EasyMock.createStrictMock(Request.class);
-		
+		secondRequest.assignTo(MachineType.SMALL);
 		EasyMock.replay(loadBalancer, firstRequest, secondRequest);
 		
 		Machine machine = new TimeSharedMachine(new JEEventScheduler(), descriptor, loadBalancer);
@@ -158,8 +160,8 @@ public class TimeSharedMachineTest {
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		Request request = EasyMock.createStrictMock(Request.class);
+		request.assignTo(MachineType.SMALL);
 		EasyMock.expect(request.getTotalToProcess()).andReturn(5000L);
-		
 		
 		TimeSharedMachine machine = PowerMock.createStrictPartialMock(TimeSharedMachine.class, new String[]{"handleEvent"}, scheduler, descriptor, loadBalancer);
 		Capture<JEEvent> captured = new Capture<JEEvent>();
@@ -193,6 +195,7 @@ public class TimeSharedMachineTest {
 		JEEventScheduler scheduler = new JEEventScheduler();
 
 		Request request = EasyMock.createStrictMock(Request.class);
+		request.assignTo(MachineType.SMALL);
 		EasyMock.expect(request.getTotalToProcess()).andReturn(250L);
 		request.update(100L);
 		EasyMock.expect(request.isFinished()).andReturn(false);
@@ -236,6 +239,7 @@ public class TimeSharedMachineTest {
 		JEEventScheduler scheduler = new JEEventScheduler();
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
+		firstRequest.assignTo(MachineType.SMALL);
 		EasyMock.expect(firstRequest.getTotalToProcess()).andReturn(500L);
 		firstRequest.update(100L);
 		EasyMock.expect(firstRequest.isFinished()).andReturn(false);
@@ -255,6 +259,7 @@ public class TimeSharedMachineTest {
 		EasyMock.expect(firstRequest.getResponseSizeInBytes()).andReturn(10000l);
 		
 		Request secondRequest = EasyMock.createStrictMock(Request.class);
+		secondRequest.assignTo(MachineType.SMALL);
 		EasyMock.expect(secondRequest.getTotalToProcess()).andReturn(400L);
 		secondRequest.update(100L);
 		EasyMock.expect(secondRequest.isFinished()).andReturn(false);
@@ -313,6 +318,7 @@ public class TimeSharedMachineTest {
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		Request request = EasyMock.createStrictMock(Request.class);
+		request.assignTo(MachineType.SMALL);
 		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
 		
 		TimeSharedMachine machine = new TimeSharedMachine(scheduler, descriptor, loadBalancer);
@@ -335,6 +341,7 @@ public class TimeSharedMachineTest {
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
 		Request request = EasyMock.createStrictMock(Request.class);
+		request.assignTo(MachineType.SMALL);
 		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
 		request.update(50L);
 		EasyMock.expect(request.isFinished()).andReturn(true);
@@ -367,6 +374,7 @@ public class TimeSharedMachineTest {
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
 		Request request = EasyMock.createStrictMock(Request.class);
+		request.assignTo(MachineType.SMALL);
 		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
 		request.update(50L);
 		EasyMock.expect(request.isFinished()).andReturn(true);
@@ -399,6 +407,7 @@ public class TimeSharedMachineTest {
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
 		Request request = EasyMock.createStrictMock(Request.class);
+		request.assignTo(MachineType.SMALL);
 		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
 		request.update(50L);
 		EasyMock.expect(request.isFinished()).andReturn(true);
@@ -430,6 +439,7 @@ public class TimeSharedMachineTest {
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
 		Request request = EasyMock.createStrictMock(Request.class);
+		request.assignTo(MachineType.SMALL);
 		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
 		
 		EasyMock.replay(loadBalancer, request);
@@ -468,6 +478,7 @@ public class TimeSharedMachineTest {
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
 		Request request = EasyMock.createStrictMock(Request.class);
+		request.assignTo(MachineType.SMALL);
 		EasyMock.expect(request.getTotalToProcess()).andReturn(50L);
 		request.update(50L);
 		EasyMock.expect(request.isFinished()).andReturn(true);

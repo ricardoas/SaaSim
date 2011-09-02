@@ -84,11 +84,6 @@ public class MultiCoreTimeSharedMachineTest {
 		assertNotNull(queue);
 		assertTrue(queue.isEmpty());
 		
-		queue = machine.getExecutingQueue();
-		assertNotNull(queue);
-		assertEquals(1, queue.size());
-		assertTrue(queue.contains(request));
-		
 		scheduler.start();
 		
 		JEEvent event = captured.getValue();
@@ -139,12 +134,6 @@ public class MultiCoreTimeSharedMachineTest {
 		assertEquals(1, queue.size());
 		assertTrue(queue.contains(request3));
 		
-		queue = machine.getExecutingQueue();
-		assertNotNull(queue);
-		assertEquals(2, queue.size());
-		assertTrue(queue.contains(request));
-		assertTrue(queue.contains(request2));
-		
 		scheduler.start();
 		
 		JEEvent event = captured.getValue();
@@ -188,11 +177,6 @@ public class MultiCoreTimeSharedMachineTest {
 		Queue<Request> queue = machine.getProcessorQueue();
 		assertNotNull(queue);
 		assertTrue(queue.isEmpty());
-		
-		queue = machine.getExecutingQueue();
-		assertNotNull(queue);
-		assertEquals(1, queue.size());
-		assertTrue(queue.contains(request));
 		
 		scheduler.start();
 		
@@ -238,13 +222,6 @@ public class MultiCoreTimeSharedMachineTest {
 		Queue<Request> queue = machine.getProcessorQueue();
 		assertNotNull(queue);
 		assertTrue(queue.isEmpty());
-		
-		queue = machine.getExecutingQueue();
-		assertNotNull(queue);
-		assertEquals(3, queue.size());
-		assertTrue(queue.contains(request));
-		assertTrue(queue.contains(request2));
-		assertTrue(queue.contains(request3));
 		
 		scheduler.start();
 		
@@ -310,7 +287,7 @@ public class MultiCoreTimeSharedMachineTest {
 		EasyMock.expect(request.getTotalToProcess()).andReturn(5000L);
 		
 		Configuration config = mockConfiguration(1);
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(4d);
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(1d);
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
 		
@@ -325,10 +302,6 @@ public class MultiCoreTimeSharedMachineTest {
 		Queue<Request> queue = machine.getProcessorQueue();
 		assertNotNull(queue);
 		assertTrue(queue.isEmpty());
-		
-		queue = machine.getExecutingQueue();
-		assertNotNull(queue);
-		assertFalse(queue.isEmpty());
 		
 		//Shutting down machine
 		machine.shutdownOnFinish();

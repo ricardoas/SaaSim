@@ -95,11 +95,6 @@ public class MultiCoreRanjanMachineTest {
 		assertNotNull(queue);
 		assertTrue(queue.isEmpty());
 		
-		queue = machine.getExecutingQueue();
-		assertNotNull(queue);
-		assertEquals(1, queue.size());
-		assertTrue(queue.contains(request));
-		
 		scheduler.start();
 		
 		JEEvent event = captured.getValue();
@@ -148,12 +143,6 @@ public class MultiCoreRanjanMachineTest {
 		assertEquals(1, queue.size());
 		assertTrue(queue.contains(request3));
 		
-		queue = machine.getExecutingQueue();
-		assertNotNull(queue);
-		assertEquals(2, queue.size());
-		assertTrue(queue.contains(request));
-		assertTrue(queue.contains(request2));
-		
 		scheduler.start();
 		
 		JEEvent event = captured.getValue();
@@ -197,10 +186,6 @@ public class MultiCoreRanjanMachineTest {
 		Queue<Request> queue = machine.getProcessorQueue();
 		assertNotNull(queue);
 		assertTrue(queue.isEmpty());
-		
-		queue = machine.getExecutingQueue();
-		assertNotNull(queue);
-		assertEquals(1, queue.size());
 		
 		scheduler.start();
 		
@@ -246,13 +231,6 @@ public class MultiCoreRanjanMachineTest {
 		Queue<Request> queue = machine.getProcessorQueue();
 		assertNotNull(queue);
 		assertTrue(queue.isEmpty());
-		
-		queue = machine.getExecutingQueue();
-		assertNotNull(queue);
-		assertEquals(3, queue.size());
-		assertTrue(queue.contains(request));
-		assertTrue(queue.contains(request2));
-		assertTrue(queue.contains(request3));
 		
 		scheduler.start();
 		
@@ -409,16 +387,10 @@ public class MultiCoreRanjanMachineTest {
 		assertEquals(thirdRequest, queue.poll());
 		assertNull(queue.poll());
 		
-		queue = machine.getExecutingQueue();
-		assertEquals(1, queue.size());
-		assertEquals(firstRequest, queue.poll());
-		assertNull(queue.poll());
-		
 		scheduler.start();
 		
 		assertTrue(machine.getProcessorQueue().isEmpty());
-		assertTrue(machine.getExecutingQueue().isEmpty());
-		
+
 		PowerMock.verify();
 	}
 	
@@ -485,17 +457,9 @@ public class MultiCoreRanjanMachineTest {
 		Queue<Request> queue = machine.getProcessorQueue();
 		assertEquals(0, queue.size());
 		
-		queue = machine.getExecutingQueue();
-		assertEquals(3, queue.size());
-		assertEquals(firstRequest, queue.poll());
-		assertEquals(secondRequest, queue.poll());
-		assertEquals(thirdRequest, queue.poll());
-		assertNull(queue.poll());
-		
 		scheduler.start();
 		
 		assertTrue(machine.getProcessorQueue().isEmpty());
-		assertTrue(machine.getExecutingQueue().isEmpty());
 		
 		PowerMock.verify();
 	}
@@ -579,11 +543,6 @@ public class MultiCoreRanjanMachineTest {
 		assertEquals(2, queue.size());
 		assertEquals(secondRequest, queue.poll());
 		assertEquals(thirdRequest, queue.poll());
-		assertNull(queue.poll());
-		
-		queue = machine.getExecutingQueue();
-		assertEquals(1, queue.size());
-		assertEquals(firstRequest, queue.poll());
 		assertNull(queue.poll());
 		
 		scheduler.start();
@@ -674,14 +633,7 @@ public class MultiCoreRanjanMachineTest {
 		machine.sendRequest(sixthRequest);
 
 		Queue<Request> queue = machine.getProcessorQueue();
-		assertEquals(0, queue.size());
-		
-		queue = machine.getExecutingQueue();
-		assertEquals(3, queue.size());
-		assertEquals(firstRequest, queue.poll());
-		assertEquals(secondRequest, queue.poll());
-		assertEquals(thirdRequest, queue.poll());
-		assertNull(queue.poll());
+		assertTrue(queue.isEmpty());
 		
 		scheduler.start();
 		
@@ -1124,10 +1076,6 @@ public class MultiCoreRanjanMachineTest {
 		
 		machine.sendRequest(request);
 		assertTrue(machine.isBusy());//Verifying if machine is busy
-		
-		Queue<Request> queue = machine.getExecutingQueue();
-		assertNotNull(queue);
-		assertEquals(1, queue.size());
 		
 		scheduler.start();
 		

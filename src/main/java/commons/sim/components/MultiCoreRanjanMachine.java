@@ -52,7 +52,7 @@ public class MultiCoreRanjanMachine extends MultiCoreTimeSharedMachine {
 	}
 
 	private boolean hasTokenLeft() {
-		return processorQueue.size() + currentExecuting.size() < maximumNumberOfSimultaneousThreads;
+		return processorQueue.size() + (this.NUMBER_OF_CORES - this.semaphore.availablePermits()) < maximumNumberOfSimultaneousThreads;
 	}
 	
 	private boolean canWaitForToken() {
