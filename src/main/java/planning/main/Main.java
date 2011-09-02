@@ -1,17 +1,19 @@
 package planning.main;
 
-import static commons.sim.util.SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME;
-
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.configuration.ConfigurationException;
 
-import planning.Executor;
 import planning.Planner;
 
 import commons.cloud.MachineType;
+import commons.cloud.Provider;
 import commons.config.Configuration;
 import commons.io.GEISTWorkloadParser;
 import commons.io.HistoryBasedWorkloadParser;
@@ -26,7 +28,9 @@ import commons.sim.util.SaaSUsersProperties;
  */
 public class Main {
 	
-	public static void main(String[] args) {
+	private static final String OUTPUT_FILE = "output.plan";
+
+	public static void main(String[] args) throws IOException {
 		if(args.length != 1){
 			System.err.println("Configuration file is missing!");
 			System.exit(1);
@@ -44,10 +48,11 @@ public class Main {
 			//Creating planner
 			Planner planner = new Planner(config.getProviders(), config.getUsers(), workloadParser);
 			Map<MachineType, Integer> plan = planner.plan();
+			createPlanFile(plan, config.getProviders());
 			
 			//FIXME: Change workload! Performing plan execution! or Create an output iaas.plan file!
-			Executor executor = new Executor(config.getProviders(), config.getUsers(), workloadParser, config.getDouble(APPLICATION_SLA_MAX_RESPONSE_TIME));
-			executor.execute(plan);
+//			Executor executor = new Executor(config.getProviders(), config.getUsers(), workloadParser, config.getDouble(APPLICATION_SLA_MAX_RESPONSE_TIME));
+//			executor.execute(plan);
 			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -59,6 +64,33 @@ public class Main {
 			e.printStackTrace();
 			System.exit(1);
 		}
+	}
+
+	private static void createPlanFile(Map<MachineType, Integer> plan, List<Provider> providers) throws IOException {
+		FileWriter writer = new FileWriter(new File(OUTPUT_FILE));
+		
+		String providerName = providers.get(0).getName();
+		writer.write("iaas.plan.name="+providerName+"\n");
+		StringBuilder machinesTypes = new StringBuilder();
+		StringBuilder machinesAmount = new StringBuilder();
+		
+		Iterator<MachineType> iterator = plan.keySet().iterator();
+		while(iterator.hasNext()){
+			MachineType type = iterator.next();	
+			machinesTypes.append(type.toString().toLowerCase());
+			
+			Integer amount = plan.get(type);
+			machinesAmount.append(amount);
+			
+			if(iterator.hasNext()){
+				machinesTypes.append("|");
+				machinesAmount.append("|");
+			}
+		}
+		writer.write("iaas.plan.types="+machinesTypes.toString()+"\n");
+		writer.write("iaas.plan.reservation="+machinesAmount.toString());
+		
+		writer.close();
 	}
 
 }
