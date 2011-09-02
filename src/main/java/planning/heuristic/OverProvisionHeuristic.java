@@ -20,7 +20,9 @@ import commons.sim.util.SimulatorProperties;
 
 public class OverProvisionHeuristic implements PlanningHeuristic{
 
+	public static final double FACTOR = 0.2;//Utilisation factor according to Above the Clouds: ...
 	private int maximumNumberOfServers;
+	
 	
 	public OverProvisionHeuristic(){
 		this.maximumNumberOfServers = 0;
@@ -60,7 +62,7 @@ public class OverProvisionHeuristic implements PlanningHeuristic{
 	public Map<MachineType, Integer> getPlan(List<User> cloudUsers) {
 		Map<MachineType, Integer> plan = new HashMap<MachineType, Integer>();
 		MachineType machineType = MachineType.valueOf(Configuration.getInstance().getString(SimulatorProperties.PLANNING_TYPE).toUpperCase());
-		plan.put(machineType, maximumNumberOfServers);
+		plan.put(machineType, (int)Math.ceil(maximumNumberOfServers * FACTOR));
 		return plan;
 	}
 }

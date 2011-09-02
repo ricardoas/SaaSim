@@ -118,7 +118,7 @@ public class OverProvisionHeuristicTest {
 		assertNotNull(plan);
 		assertEquals(1, plan.size());
 		int value = plan.get(MachineType.SMALL);
-		assertEquals(5, value);
+		assertEquals(5 * OverProvisionHeuristic.FACTOR, value, 0.0001);
 		
 		PowerMock.verifyAll();
 	}
@@ -184,7 +184,7 @@ public class OverProvisionHeuristicTest {
 		assertNotNull(plan);
 		assertEquals(1, plan.size());
 		int value = plan.get(MachineType.SMALL);
-		assertEquals(4, value);
+		assertEquals(Math.ceil(4 * OverProvisionHeuristic.FACTOR), value, 0.0001);
 		
 		PowerMock.verifyAll();
 	}
@@ -250,7 +250,7 @@ public class OverProvisionHeuristicTest {
 		assertNotNull(plan);
 		assertEquals(1, plan.size());
 		int value = plan.get(MachineType.SMALL);
-		assertEquals(2, value);
+		assertEquals(Math.ceil(2 * OverProvisionHeuristic.FACTOR), value, 0.00001);
 		
 		PowerMock.verifyAll();
 	}
@@ -313,7 +313,7 @@ public class OverProvisionHeuristicTest {
 		assertNotNull(plan);
 		assertEquals(1, plan.size());
 		int value = plan.get(MachineType.SMALL);
-		assertEquals(4, value);
+		assertEquals(Math.ceil(4 * OverProvisionHeuristic.FACTOR), value, 0.0001);
 		
 		PowerMock.verifyAll();
 	}
@@ -376,7 +376,7 @@ public class OverProvisionHeuristicTest {
 		assertNotNull(plan);
 		assertEquals(1, plan.size());
 		int value = plan.get(MachineType.SMALL);
-		assertEquals(4, value);
+		assertEquals(Math.ceil(4 * OverProvisionHeuristic.FACTOR), value, 0.00001);
 		
 		PowerMock.verifyAll();
 	}
@@ -439,7 +439,7 @@ public class OverProvisionHeuristicTest {
 		assertNotNull(plan);
 		assertEquals(1, plan.size());
 		int value = plan.get(MachineType.SMALL);
-		assertEquals(3, value);
+		assertEquals(Math.ceil(3 * OverProvisionHeuristic.FACTOR), value, 0.000001);
 		
 		PowerMock.verifyAll();
 	}
