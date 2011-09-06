@@ -199,7 +199,7 @@ public class DynamicProvisioningSystemTest {
 		List<Provider> providers = Configuration.getInstance().getProviders();
 		List<User> users = Configuration.getInstance().getUsers();
 
-		Map<Integer, User> usersMap = new TreeMap<Integer, User>();
+		Map<String, User> usersMap = new TreeMap<String, User>();
 		for (User user : users) {
 			usersMap.put(user.getId(), user);
 		}
@@ -210,7 +210,7 @@ public class DynamicProvisioningSystemTest {
 		}
 		
 		UtilityResultEntry entry = PowerMock.createStrictMockAndExpectNew(UtilityResultEntry.class, 0L, usersMap, providersMap);
-		entry.addToReceipt(EasyMock.anyInt(), EasyMock.anyObject(String.class), EasyMock.anyLong(), 
+		entry.addToReceipt(EasyMock.anyObject(String.class), EasyMock.anyObject(String.class), EasyMock.anyLong(), 
 				EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyDouble());
 		PowerMock.expectLastCall().times(2);
 		//AMAZON
@@ -251,7 +251,7 @@ public class DynamicProvisioningSystemTest {
 		EasyMock.expect(config.getProviders()).andReturn(new ArrayList<Provider>());
 		
 		User user = EasyMock.createStrictMock(User.class);
-		EasyMock.expect(user.getId()).andReturn(0);
+		EasyMock.expect(user.getId()).andReturn("0");
 		user.reportLostRequest(request);
 		ArrayList<User> users = new ArrayList<User>();
 		users.add(user);
@@ -281,7 +281,7 @@ public class DynamicProvisioningSystemTest {
 		EasyMock.expect(config.getProviders()).andReturn(new ArrayList<Provider>());
 		
 		User user = EasyMock.createStrictMock(User.class);
-		EasyMock.expect(user.getId()).andReturn(0);
+		EasyMock.expect(user.getId()).andReturn("0");
 		user.reportFinishedRequest(request);
 		ArrayList<User> users = new ArrayList<User>();
 		users.add(user);

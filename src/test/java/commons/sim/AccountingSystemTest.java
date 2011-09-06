@@ -43,7 +43,7 @@ public class AccountingSystemTest {
 	 */
 	@Test
 	public void testAccountPartialUtilityWithoutUsersAndProviders() {
-		Map<Integer, User> users = new TreeMap<Integer, User>();
+		Map<String, User> users = new TreeMap<String, User>();
 		Map<String, Provider> providers = new TreeMap<String, Provider>();
 		
 		AccountingSystem acc = new AccountingSystem();
@@ -65,7 +65,7 @@ public class AccountingSystemTest {
 		List<Provider> providers = Configuration.getInstance().getProviders();
 		List<User> users = Configuration.getInstance().getUsers();
 
-		Map<Integer, User> usersMap = new TreeMap<Integer, User>();
+		Map<String, User> usersMap = new TreeMap<String, User>();
 		for (User user : users) {
 			usersMap.put(user.getId(), user);
 		}
@@ -76,7 +76,7 @@ public class AccountingSystemTest {
 		}
 		
 		UtilityResultEntry entry = PowerMock.createStrictMockAndExpectNew(UtilityResultEntry.class, 0L, usersMap, providersMap);
-		entry.addToReceipt(EasyMock.anyInt(), EasyMock.anyObject(String.class), EasyMock.anyLong(), 
+		entry.addToReceipt(EasyMock.anyObject(String.class), EasyMock.anyObject(String.class), EasyMock.anyLong(), 
 				EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyDouble());
 		PowerMock.expectLastCall().times(2);
 		//AMAZON
@@ -107,7 +107,7 @@ public class AccountingSystemTest {
 	 */
 	@Test
 	public void testCalculateUtilityWithoutUsersAndProviders() {
-		Map<Integer, User> users = new TreeMap<Integer, User>();
+		Map<String, User> users = new TreeMap<String, User>();
 		Map<String, Provider> providers = new TreeMap<String, Provider>();
 		
 		AccountingSystem acc = new AccountingSystem();
@@ -127,7 +127,7 @@ public class AccountingSystemTest {
 		List<Provider> providers = Configuration.getInstance().getProviders();
 		List<User> users = Configuration.getInstance().getUsers();
 
-		Map<Integer, User> usersMap = new TreeMap<Integer, User>();
+		Map<String, User> usersMap = new TreeMap<String, User>();
 		for (User user : users) {
 			usersMap.put(user.getId(), user);
 		}
@@ -140,7 +140,7 @@ public class AccountingSystemTest {
 		UtilityResult result = PowerMock.createStrictMockAndExpectNew(UtilityResult.class);
 		result.addProviderUniqueCost(EasyMock.anyObject(String.class), EasyMock.anyObject(MachineType.class), EasyMock.anyDouble());
 		PowerMock.expectLastCall().times(7);
-		result.addUserUniqueFee(EasyMock.anyInt(), EasyMock.anyDouble());
+		result.addUserUniqueFee(EasyMock.anyObject(String.class), EasyMock.anyDouble());
 		PowerMock.expectLastCall().times(2);
 		
 		PowerMock.replayAll();

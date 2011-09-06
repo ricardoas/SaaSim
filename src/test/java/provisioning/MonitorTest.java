@@ -108,7 +108,7 @@ public class MonitorTest {
 		provider.calculateCost(EasyMock.isA(UtilityResultEntry.class), EasyMock.anyLong());
 		
 		User user = EasyMock.createStrictMock(User.class);
-		EasyMock.expect(user.getId()).andReturn(1);
+		EasyMock.expect(user.getId()).andReturn("1");
 		user.calculatePartialReceipt(EasyMock.isA(UtilityResultEntry.class));
 		
 		Configuration config = EasyMock.createStrictMock(Configuration.class);

@@ -117,7 +117,7 @@ public class ProfitDrivenHeuristicTest {
 		servers.add(machine2);
 		servers.add(machine3);
 		
-		Request request = new Request(clientID, reqID, userID, time, size, URL, demand);
+		Request request = new Request(reqID, clientID, userID, time, size, URL, demand);
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);

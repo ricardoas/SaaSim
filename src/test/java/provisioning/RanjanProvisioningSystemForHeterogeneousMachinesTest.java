@@ -518,7 +518,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(config.getProviders()).andReturn(new ArrayList<Provider>());
 		
 		User user = EasyMock.createStrictMock(User.class);
-		EasyMock.expect(user.getId()).andReturn(0);
+		EasyMock.expect(user.getId()).andReturn("0");
 		user.reportLostRequest(request);
 		ArrayList<User> users = new ArrayList<User>();
 		users.add(user);
@@ -547,7 +547,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(config.getProviders()).andReturn(new ArrayList<Provider>());
 		
 		User user = EasyMock.createStrictMock(User.class);
-		EasyMock.expect(user.getId()).andReturn(0);
+		EasyMock.expect(user.getId()).andReturn("0");
 		user.reportFinishedRequest(request);
 		ArrayList<User> users = new ArrayList<User>();
 		users.add(user);
