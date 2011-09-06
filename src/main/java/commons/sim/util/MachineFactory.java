@@ -8,8 +8,6 @@ import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.components.MultiCoreRanjanMachine;
 import commons.sim.components.MultiCoreTimeSharedMachine;
-import commons.sim.components.RanjanMachine;
-import commons.sim.components.TimeSharedMachine;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.schedulingheuristics.RanjanHeuristic;
 

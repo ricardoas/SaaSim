@@ -15,7 +15,7 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	 */
 	private static class UserEntry{
 
-		private final int userID;
+		private final String userID;
 		private String contractName;
 		private double totalReceipt;
 		private long extraConsumedCPU;
@@ -28,7 +28,7 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 		 * Default constructor.
 		 * @param userID
 		 */
-		public UserEntry(int userID) {
+		public UserEntry(String userID) {
 			this.userID = userID;
 		}
 
@@ -224,7 +224,7 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	private double cost;
 	private double penalty;
 	
-	private Map<Integer, UserEntry> users;
+	private Map<String, UserEntry> users;
 	private Map<String, ProviderEntry> providers;
 	
 	/**
@@ -233,13 +233,13 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	 * @param providers2 
 	 * @param users 
 	 */
-	public UtilityResultEntry(long time, Map<Integer, User> users, Map<String, Provider> providers) {
+	public UtilityResultEntry(long time, Map<String, User> users, Map<String, Provider> providers) {
 		this.time = time;
 		this.receipt = 0;
 		this.cost = 0;
 		this.penalty = 0;
-		this.users = new TreeMap<Integer, UserEntry>();
-		for (Entry<Integer, User> entry : users.entrySet()) {
+		this.users = new TreeMap<String, UserEntry>();
+		for (Entry<String, User> entry : users.entrySet()) {
 			this.users.put(entry.getKey(), new UserEntry(entry.getKey()));
 		}
 		this.providers = new TreeMap<String, ProviderEntry>();
@@ -298,7 +298,7 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	 * @param storageCost 
 	 * @param costOfCPU 
 	 */
-	public void addToReceipt(int userID, String contractName, long extraConsumedCPU, double cpuCost, long consumedTransference, double transferenceCost, double storageCost) {
+	public void addToReceipt(String userID, String contractName, long extraConsumedCPU, double cpuCost, long consumedTransference, double transferenceCost, double storageCost) {
 		double total = cpuCost + transferenceCost + storageCost;
 		users.get(userID).add(contractName, extraConsumedCPU, cpuCost, consumedTransference, transferenceCost, storageCost, total);
 		receipt += total;

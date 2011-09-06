@@ -57,9 +57,9 @@ public class UtilityResultTest {
 		User user2 = EasyMock.createStrictMock(User.class);
 		EasyMock.replay(user1, user2);
 		
-		HashMap<Integer, User> users = new HashMap<Integer, User>();
-		users.put(1, user1);
-		users.put(2, user2);
+		HashMap<String, User> users = new HashMap<String, User>();
+		users.put("user1", user1);
+		users.put("user2", user2);
 		
 		Provider provider = EasyMock.createStrictMock(Provider.class);
 		EasyMock.expect(provider.getAvailableTypes()).andReturn(MachineType.values());
@@ -77,7 +77,7 @@ public class UtilityResultTest {
 		entry.addTransferenceToCost("amazon", 10000, inCost, 2000, outCost);
 		
 		//Adding to receipt
-		entry.addToReceipt(1, "c1", 100, cpuCost, 2500, transferenceCost, storageCost);
+		entry.addToReceipt("user1", "c1", 100, cpuCost, 2500, transferenceCost, storageCost);
 		
 		return entry;
 	}
@@ -89,8 +89,8 @@ public class UtilityResultTest {
 		int firstUserFee = 1000;
 		int secondUserFee = 2000;
 	
-		result.addUserUniqueFee(1, firstUserFee);
-		result.addUserUniqueFee(2, secondUserFee);
+		result.addUserUniqueFee("user1", firstUserFee);
+		result.addUserUniqueFee("user2", secondUserFee);
 		
 		assertEquals(firstUserFee + secondUserFee, result.getUtility(), 0.00001);
 	}
@@ -130,7 +130,7 @@ public class UtilityResultTest {
 		
 		//Adding user unique fee
 		int firstUserFee = 977;
-		result.addUserUniqueFee(1, firstUserFee);
+		result.addUserUniqueFee("user1", firstUserFee);
 		
 		//Adding provider unique cost
 		double rackspaceCost = 3333.0;

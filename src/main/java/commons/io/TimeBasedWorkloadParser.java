@@ -11,32 +11,22 @@ import commons.cloud.Request;
  */
 public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	
-	public static final long SECOND_IN_MILLIS = 1000;
-	
-	public static final long MINUTE_IN_MILLIS = 60 * SECOND_IN_MILLIS;
-	
-	public static final long HOUR_IN_MILLIS = 60 * MINUTE_IN_MILLIS;
-	
-	public static final long DAY_IN_MILLIS = 24 * HOUR_IN_MILLIS;
-
-	public static final long MONTH_IN_MILLIS = 31 * DAY_IN_MILLIS;
-
-	public static final long YEAR_IN_MILLIS = 365 * DAY_IN_MILLIS;
-	
-	private final WorkloadParser<Request> parser;
-	private final long tick;
+	private final TickSize tick;
 	private long currentTick;
 
-	private Request leftOver;
+	private List<Request> leftOver;
+
+	private WorkloadParser<Request>[] parsers;
 	
 	/**
-	 * @param parser
 	 * @param tick
+	 * @param parser
 	 */
-	public TimeBasedWorkloadParser(WorkloadParser<Request> parser, long tick) {
-		this.parser = parser;
+	public TimeBasedWorkloadParser(TickSize tick, WorkloadParser<Request>... parser) {
+		this.parsers = parser;
 		this.tick = tick;
 		this.currentTick = 0;
+		this.leftOver = new ArrayList<Request>();
 	}
 
 	/**
@@ -44,18 +34,30 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	 */
 	@Override
 	public List<Request> next() throws IOException {
-		List<Request> requests = new ArrayList<Request>();
-		Request r = leftOver != null? leftOver: parser.next();
-		long time = leftOver != null? Math.min(leftOver.getArrivalTimeInMillis()/tick, currentTick): currentTick;
-		while(hasNext() && time == currentTick){
-			requests.add(r);
-			r = parser.next();
-			time = r.getArrivalTimeInMillis()/tick;
+		List<Request> requests = new ArrayList<Request>(leftOver);
+		
+		long time = (currentTick + 1) * tick.getTickInMillis();
+		
+		for (Request request : requests) {
+			if(request.getArrivalTimeInMillis() >= time){
+				leftOver.add(request);
+			}
 		}
-		currentTick++;
-		if(r != null){
-			leftOver = r;
+		requests.removeAll(leftOver);
+		
+		for (WorkloadParser<Request> parser : parsers) {
+			while(parser.hasNext()){
+				Request request = parser.next();
+				if(request.getArrivalTimeInMillis() < time){
+					requests.add(request);
+				}else{
+					leftOver.add(request);
+					break;
+				}
+			}
 		}
+		
+		this.currentTick++;
 		return requests;
 	}
 
@@ -64,7 +66,12 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	 */
 	@Override
 	public boolean hasNext() {
-		return parser.hasNext();
+		for (WorkloadParser<Request> parser: parsers) {
+			if(parser.hasNext()){
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

@@ -21,7 +21,7 @@ public class HistoryBasedWorkloadParser extends TimeBasedWorkloadParser{
 	 * @param parser
 	 * @param tick
 	 */
-	public HistoryBasedWorkloadParser(WorkloadParser<Request> parser, long tick) {
+	public HistoryBasedWorkloadParser(WorkloadParser<Request> parser, TickSize tick) {
 		this(parser, tick, DEFAULT_WINDOW_SIZE);
 	}
 	
@@ -30,8 +30,9 @@ public class HistoryBasedWorkloadParser extends TimeBasedWorkloadParser{
 	 * @param tick
 	 * @param windowSize
 	 */
-	public HistoryBasedWorkloadParser(WorkloadParser<Request> parser, long tick, int windowSize) {
-		super(parser, tick);
+	@SuppressWarnings("unchecked")
+	public HistoryBasedWorkloadParser(WorkloadParser<Request> parser, TickSize tick, int windowSize) {
+		super(tick, parser);
 		this.history = new LinkedBlockingQueue<List<Request>>(windowSize);
 	}
 	

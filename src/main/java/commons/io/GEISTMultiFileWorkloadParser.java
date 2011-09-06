@@ -6,7 +6,6 @@ import commons.cloud.Request;
  * GEIST parser. A GEIST workload file contains one request per line.
  * Each line contains nine tab separated columns ordered as follow:<br>
  * <ul>
- * 	<li><b>Client ID</b>: </li>
  * 	<li>User ID</li>
  * 	<li>Request ID</li>
  * 	<li>Time</li>
@@ -16,14 +15,17 @@ import commons.cloud.Request;
  * </ul>
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class GEISTWorkloadParser extends AbstractWorkloadParser{
+public class GEISTMultiFileWorkloadParser extends AbstractWorkloadParser{
 	
+	private final String userID;
+
 	/**
 	 * Default constructor
 	 * @param workloadPath 
 	 */
-	public GEISTWorkloadParser(String... workloadPath) {
+	public GEISTMultiFileWorkloadParser(String workloadPath, String userID) {
 		super(workloadPath);
+		this.userID = userID;
 	}
 
 	/**
@@ -33,13 +35,13 @@ public class GEISTWorkloadParser extends AbstractWorkloadParser{
 	protected Request parseRequest(String line) {
 		String[] eventData = line.split("( +|\t+)+");
 		
-		long [] demand = new long[eventData.length - 6];
-		for (int i = 6; i < eventData.length; i++) {
-			demand[i-6] = Long.valueOf(eventData[i]);
+		long [] demand = new long[eventData.length - 5];
+		for (int i = 5; i < eventData.length; i++) {
+			demand[i-5] = Long.valueOf(eventData[i]);
 		}
 		
-		return new Request(eventData[2], eventData[0], eventData[1], Long
-				.valueOf(eventData[3]), Long.valueOf(eventData[4]),
-				Long.valueOf(eventData[5]), demand);
+		return new Request(eventData[1], userID, eventData[0], Long
+				.valueOf(eventData[2]), Long.valueOf(eventData[3]),
+				Long.valueOf(eventData[4]), demand);
 	}
 }

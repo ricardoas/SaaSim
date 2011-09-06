@@ -17,4 +17,8 @@ public class SimulatorProperties {
 	public static final String PLANNING_PERIOD = "planning.period";
 	
 	public static final String PLANNING_TYPE = "planning.type";
+	
+	public static final String PARSER_IDIOM = "dps.workload.parser";
+	
+	public static final String PARSER_PAGE_SIZE = "dps.workload.pagesize";
 }

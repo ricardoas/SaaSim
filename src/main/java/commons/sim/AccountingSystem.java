@@ -26,7 +26,7 @@ public class AccountingSystem {
 	 * @param users
 	 * @param providers
 	 */
-	public void accountPartialUtility(long currentTimeInMillis, Map<Integer, User> users, Map<String, Provider> providers){
+	public void accountPartialUtility(long currentTimeInMillis, Map<String, User> users, Map<String, Provider> providers){
 		UtilityResultEntry entry = new UtilityResultEntry(currentTimeInMillis, users, providers);
 		for (User user : users.values()) {
 			user.calculatePartialReceipt(entry);
@@ -42,7 +42,7 @@ public class AccountingSystem {
 	 * during a whole year)  
 	 * @return
 	 */
-	public UtilityResult calculateUtility(Map<Integer, User> users, Map<String, Provider> providers){
+	public UtilityResult calculateUtility(Map<String, User> users, Map<String, Provider> providers){
 		for(Provider provider : providers.values()){
 			provider.calculateUniqueCost(utilityResult);
 		}

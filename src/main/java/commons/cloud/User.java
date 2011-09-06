@@ -13,9 +13,7 @@ import java.util.List;
  */
 public class User implements Comparable<User>{
 	
-	private static int idGenerator = 0;
-	
-	private final int id;
+	private final String id;
 	private final Contract contract;
 	
 	private long consumedCpuInMillis;
@@ -30,8 +28,8 @@ public class User implements Comparable<User>{
 	 * Default constructor.
 	 * @param contract
 	 */
-	public User(Contract contract, long consumedStorageInBytes) {
-		this.id = idGenerator++;
+	public User(String userID, Contract contract, long consumedStorageInBytes) {
+		this.id = userID;
 		this.contract = contract;
 		this.consumedStorageInBytes = consumedStorageInBytes;
 		reset();
@@ -40,7 +38,7 @@ public class User implements Comparable<User>{
 	/**
 	 * @return the id
 	 */
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
@@ -102,15 +100,21 @@ public class User implements Comparable<User>{
 	public void calculateOneTimeFees(UtilityResult result) {
 		result.addUserUniqueFee(getId(), this.contract.calculateOneTimeFees());
 	}
-
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + id;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -120,7 +124,10 @@ public class User implements Comparable<User>{
 		if (getClass() != obj.getClass())
 			return false;
 		User other = (User) obj;
-		if (id != other.id)
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
 			return false;
 		return true;
 	}

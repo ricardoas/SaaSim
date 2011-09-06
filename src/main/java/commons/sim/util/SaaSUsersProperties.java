@@ -8,6 +8,8 @@ public class SaaSUsersProperties {
 
 	public static final String SAAS_USER_PLAN = "saas.user.plan";
 
+	public static final String SAAS_USER_ID = "saas.user.id";
+
 	public static final String SAAS_USER_WORKLOAD = "saas.user.workload";
 
 	public static final String SAAS_USER_STORAGE = "saas.user.storage";

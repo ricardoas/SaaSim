@@ -15,10 +15,7 @@ import planning.Planner;
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.config.Configuration;
-import commons.io.GEISTWorkloadParser;
 import commons.io.HistoryBasedWorkloadParser;
-import commons.io.TimeBasedWorkloadParser;
-import commons.sim.util.SaaSUsersProperties;
 
 /**
  * This class is responsible for obtaining input parameters, from a configuration file, such as: workload, cloud provider
@@ -30,7 +27,7 @@ public class Main {
 	
 	private static final String OUTPUT_FILE = "output.plan";
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 		if(args.length != 1){
 			System.err.println("Configuration file is missing!");
 			System.exit(1);
@@ -42,8 +39,8 @@ public class Main {
 			Configuration config = Configuration.getInstance();
 			
 			//Parsing workload
-			String[] workloads = Configuration.getInstance().getStringArray(SaaSUsersProperties.SAAS_USER_WORKLOAD);
-			HistoryBasedWorkloadParser workloadParser = new HistoryBasedWorkloadParser(new GEISTWorkloadParser(workloads), TimeBasedWorkloadParser.YEAR_IN_MILLIS);
+			String[] workloads = Configuration.getInstance().getWorkloads();
+			HistoryBasedWorkloadParser workloadParser = null;//new HistoryBasedWorkloadParser(new GEISTSingleFileWorkloadParser(workloads[0]), TimeBasedWorkloadParser.YEAR_IN_MILLIS);
 			
 			//Creating planner
 			Planner planner = new Planner(config.getProviders(), config.getUsers(), workloadParser);

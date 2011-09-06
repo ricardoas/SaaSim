@@ -13,9 +13,9 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request> 
 
 	private Request next;
 
-	public AbstractWorkloadParser(String... workloadPath) {
+	public AbstractWorkloadParser(String workloadPath) {
 		try {
-			reader = new BufferedReader(new FileReader(workloadPath[0]));
+			reader = new BufferedReader(new FileReader(workloadPath));
 			next = readNext();
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("Problem reading workload file.", e);
@@ -41,10 +41,7 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request> 
 		String line;
 		try {
 			line = reader.readLine();
-			if(line == null){
-				return null;
-			}
-			return parseRequest(line);
+			return line == null? null: parseRequest(line);
 		} catch (IOException e) {
 			throw new RuntimeException("Problem reading workload file.", e);
 		}

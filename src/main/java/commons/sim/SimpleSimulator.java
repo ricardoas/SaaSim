@@ -1,13 +1,12 @@
 package commons.sim;
 
-import static commons.io.TimeBasedWorkloadParser.DAY_IN_MILLIS;
-
 import java.io.IOException;
 import java.util.List;
 
 import provisioning.Monitor;
 
 import commons.cloud.Request;
+import commons.io.TickSize;
 import commons.io.WorkloadParser;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.MachineDescriptor;
@@ -64,7 +63,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	
 	protected void prepareBeforeStart() {
 		send(new JEEvent(JEEventType.READWORKLOAD, this, getScheduler().now()));
-		send(new JEEvent(JEEventType.CHARGE_USERS, this, getScheduler().now().plus(new JETime(DAY_IN_MILLIS * daysInMonths[currentMonth++]))));
+		send(new JEEvent(JEEventType.CHARGE_USERS, this, getScheduler().now().plus(new JETime(TickSize.DAY.getTickInMillis() * daysInMonths[currentMonth++]))));
 	}
 
 	/**
@@ -92,7 +91,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 				break;
 			case CHARGE_USERS:
 				this.monitor.chargeUsers(getScheduler().now().timeMilliSeconds);
-				JETime newEventTime = getScheduler().now().plus(new JETime(DAY_IN_MILLIS * daysInMonths[currentMonth++]));
+				JETime newEventTime = getScheduler().now().plus(new JETime(TickSize.DAY.getTickInMillis() * daysInMonths[currentMonth++]));
 				if(currentMonth < daysInMonths.length && newEventTime.timeMilliSeconds < simulationEndTime){
 					send(new JEEvent(JEEventType.CHARGE_USERS, this, newEventTime));
 				}
@@ -135,9 +134,5 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	@Override
 	public long getSimulationEndTime() {
 		return simulationEndTime;
-	}
-	
-	public List<LoadBalancer> getTiers(){
-		return this.tiers;
 	}
 }

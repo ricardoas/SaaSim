@@ -11,7 +11,7 @@ public class UtilityResultEntryTest {
 	
 	@Test
 	public void testConstructWithEmptyUsersAndProviders(){
-		UtilityResultEntry entry = new UtilityResultEntry(999, new HashMap<Integer, User>(), new HashMap<String, Provider>());
+		UtilityResultEntry entry = new UtilityResultEntry(999, new HashMap<String, User>(), new HashMap<String, Provider>());
 		assertEquals(999, entry.getTime());
 		assertEquals(0, entry.getCost(), 0.00001);
 		assertEquals(0, entry.getReceipt(), 0.00001);
@@ -21,21 +21,21 @@ public class UtilityResultEntryTest {
 	
 	@Test
 	public void testCompareToWithEqualTimes(){
-		UtilityResultEntry entry = new UtilityResultEntry(0, new HashMap<Integer, User>(), new HashMap<String, Provider>());
-		UtilityResultEntry entry2 = new UtilityResultEntry(0, new HashMap<Integer, User>(), new HashMap<String, Provider>());
+		UtilityResultEntry entry = new UtilityResultEntry(0, new HashMap<String, User>(), new HashMap<String, Provider>());
+		UtilityResultEntry entry2 = new UtilityResultEntry(0, new HashMap<String, User>(), new HashMap<String, Provider>());
 		
 		assertEquals(0, entry.compareTo(entry2));
 		
-		entry = new UtilityResultEntry(10000, new HashMap<Integer, User>(), new HashMap<String, Provider>());
-		entry2 = new UtilityResultEntry(10000, new HashMap<Integer, User>(), new HashMap<String, Provider>());
+		entry = new UtilityResultEntry(10000, new HashMap<String, User>(), new HashMap<String, Provider>());
+		entry2 = new UtilityResultEntry(10000, new HashMap<String, User>(), new HashMap<String, Provider>());
 		
 		assertEquals(0, entry.compareTo(entry2));
 	}
 	
 	@Test
 	public void testCompareToWithDifferentTimes(){
-		UtilityResultEntry entry = new UtilityResultEntry(0, new HashMap<Integer, User>(), new HashMap<String, Provider>());
-		UtilityResultEntry entry2 = new UtilityResultEntry(1, new HashMap<Integer, User>(), new HashMap<String, Provider>());
+		UtilityResultEntry entry = new UtilityResultEntry(0, new HashMap<String, User>(), new HashMap<String, Provider>());
+		UtilityResultEntry entry2 = new UtilityResultEntry(1, new HashMap<String, User>(), new HashMap<String, Provider>());
 		
 		assertEquals(-1, entry.compareTo(entry2));
 		assertEquals(1, entry2.compareTo(entry));
@@ -47,15 +47,15 @@ public class UtilityResultEntryTest {
 		User user2 = EasyMock.createStrictMock(User.class);
 		EasyMock.replay(user1, user2);
 		
-		HashMap<Integer, User> users = new HashMap<Integer, User>();
-		users.put(1, user1);
-		users.put(2, user2);
+		HashMap<String, User> users = new HashMap<String, User>();
+		users.put("user1", user1);
+		users.put("user2", user2);
 		
 		UtilityResultEntry entry = new UtilityResultEntry(0, users, new HashMap<String, Provider>());
 		int cpuCost = 50;
 		int transferenceCost = 111;
 		int storageCost = 999;
-		entry.addToReceipt(1, "c1", 100, cpuCost, 2500, transferenceCost, storageCost);
+		entry.addToReceipt("user1", "c1", 100, cpuCost, 2500, transferenceCost, storageCost);
 		assertEquals(cpuCost + transferenceCost + storageCost, entry.getReceipt(), 0.0001);
 		assertEquals(0, entry.getCost(), 0.00001);
 		assertEquals(0, entry.getPenalty(), 0.00001);
@@ -70,9 +70,9 @@ public class UtilityResultEntryTest {
 		User user2 = EasyMock.createStrictMock(User.class);
 		EasyMock.replay(user1, user2);
 		
-		HashMap<Integer, User> users = new HashMap<Integer, User>();
-		users.put(1, user1);
-		users.put(2, user2);
+		HashMap<String, User> users = new HashMap<String, User>();
+		users.put("user1", user1);
+		users.put("user2", user2);
 		
 		UtilityResultEntry entry = new UtilityResultEntry(0, users, new HashMap<String, Provider>());
 		int cpuCost = 50;
@@ -80,7 +80,7 @@ public class UtilityResultEntryTest {
 		int storageCost = 999;
 		
 		//Invalid user
-		entry.addToReceipt(11111, "c1", 100, cpuCost, 2500, transferenceCost, storageCost);
+		entry.addToReceipt("unregistered", "c1", 100, cpuCost, 2500, transferenceCost, storageCost);
 	}
 	
 	@Test
@@ -92,7 +92,7 @@ public class UtilityResultEntryTest {
 		HashMap<String, Provider> providers = new HashMap<String, Provider>();
 		providers.put("amazon", provider);
 		
-		UtilityResultEntry entry = new UtilityResultEntry(0, new HashMap<Integer, User>(), providers);
+		UtilityResultEntry entry = new UtilityResultEntry(0, new HashMap<String, User>(), providers);
 		double inCost = 111.999;
 		double outCost = 0.9999;
 		entry.addTransferenceToCost("amazon", 10000, inCost, 2000, outCost);
@@ -114,7 +114,7 @@ public class UtilityResultEntryTest {
 		HashMap<String, Provider> providers = new HashMap<String, Provider>();
 		providers.put("amazon", provider);
 		
-		UtilityResultEntry entry = new UtilityResultEntry(0, new HashMap<Integer, User>(), providers);
+		UtilityResultEntry entry = new UtilityResultEntry(0, new HashMap<String, User>(), providers);
 		double inCost = 111.999;
 		double outCost = 0.9999;
 		entry.addTransferenceToCost("rackspace", 10000, inCost, 2000, outCost);
@@ -131,7 +131,7 @@ public class UtilityResultEntryTest {
 		HashMap<String, Provider> providers = new HashMap<String, Provider>();
 		providers.put("amazon", provider);
 		
-		UtilityResultEntry entry = new UtilityResultEntry(0, new HashMap<Integer, User>(), providers);
+		UtilityResultEntry entry = new UtilityResultEntry(0, new HashMap<String, User>(), providers);
 		double onDemandCost = 1.23;
 		double reservedCost = 2.99;
 		double monitoringCost = 3.87;
@@ -151,9 +151,9 @@ public class UtilityResultEntryTest {
 		User user2 = EasyMock.createStrictMock(User.class);
 		EasyMock.replay(user1, user2);
 		
-		HashMap<Integer, User> users = new HashMap<Integer, User>();
-		users.put(1, user1);
-		users.put(2, user2);
+		HashMap<String, User> users = new HashMap<String, User>();
+		users.put("user1", user1);
+		users.put("user2", user2);
 		
 		Provider provider = EasyMock.createStrictMock(Provider.class);
 		EasyMock.expect(provider.getAvailableTypes()).andReturn(MachineType.values());
@@ -179,7 +179,7 @@ public class UtilityResultEntryTest {
 		double cpuCost = 129.33;
 		double transferenceCost = 87.1111;
 		double storageCost = 1.9999;
-		entry.addToReceipt(1, "c1", 100, cpuCost, 2500, transferenceCost, storageCost);
+		entry.addToReceipt("user1", "c1", 100, cpuCost, 2500, transferenceCost, storageCost);
 		
 		//Checking values
 		double totalReceipt = cpuCost + transferenceCost + storageCost;

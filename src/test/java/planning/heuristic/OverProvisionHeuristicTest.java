@@ -17,7 +17,7 @@ import commons.cloud.MachineType;
 import commons.cloud.Request;
 import commons.config.Configuration;
 import commons.config.PropertiesTesting;
-import commons.io.GEISTWorkloadParser;
+import commons.io.GEISTSingleFileWorkloadParser;
 import commons.io.TimeBasedWorkloadParser;
 import commons.sim.util.SaaSAppProperties;
 import commons.sim.util.SimulatorProperties;
@@ -37,7 +37,7 @@ public class OverProvisionHeuristicTest {
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
 	
-		TimeBasedWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(TimeBasedWorkloadParser.class, EasyMock.isA(GEISTWorkloadParser.class), EasyMock.anyLong());
+		TimeBasedWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(TimeBasedWorkloadParser.class, EasyMock.isA(GEISTSingleFileWorkloadParser.class), EasyMock.anyLong());
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(new ArrayList<Request>());
 		EasyMock.expect(parser.hasNext()).andReturn(false);
@@ -101,7 +101,7 @@ public class OverProvisionHeuristicTest {
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
 		
-		TimeBasedWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(TimeBasedWorkloadParser.class, EasyMock.isA(GEISTWorkloadParser.class), EasyMock.anyLong());
+		TimeBasedWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(TimeBasedWorkloadParser.class, EasyMock.isA(GEISTSingleFileWorkloadParser.class), EasyMock.anyLong());
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -167,7 +167,7 @@ public class OverProvisionHeuristicTest {
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
 		
-		TimeBasedWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(TimeBasedWorkloadParser.class, EasyMock.isA(GEISTWorkloadParser.class), EasyMock.anyLong());
+		TimeBasedWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(TimeBasedWorkloadParser.class, EasyMock.isA(GEISTSingleFileWorkloadParser.class), EasyMock.anyLong());
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -233,7 +233,7 @@ public class OverProvisionHeuristicTest {
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
 		
-		TimeBasedWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(TimeBasedWorkloadParser.class, EasyMock.isA(GEISTWorkloadParser.class), EasyMock.anyLong());
+		TimeBasedWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(TimeBasedWorkloadParser.class, EasyMock.isA(GEISTSingleFileWorkloadParser.class), EasyMock.anyLong());
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -296,7 +296,7 @@ public class OverProvisionHeuristicTest {
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
 		
-		TimeBasedWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(TimeBasedWorkloadParser.class, EasyMock.isA(GEISTWorkloadParser.class), EasyMock.anyLong());
+		TimeBasedWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(TimeBasedWorkloadParser.class, EasyMock.isA(GEISTSingleFileWorkloadParser.class), EasyMock.anyLong());
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -359,7 +359,7 @@ public class OverProvisionHeuristicTest {
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
 		
-		TimeBasedWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(TimeBasedWorkloadParser.class, EasyMock.isA(GEISTWorkloadParser.class), EasyMock.anyLong());
+		TimeBasedWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(TimeBasedWorkloadParser.class, EasyMock.isA(GEISTSingleFileWorkloadParser.class), EasyMock.anyLong());
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -422,7 +422,7 @@ public class OverProvisionHeuristicTest {
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
 		
-		TimeBasedWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(TimeBasedWorkloadParser.class, EasyMock.isA(GEISTWorkloadParser.class), EasyMock.anyLong());
+		TimeBasedWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(TimeBasedWorkloadParser.class, EasyMock.isA(GEISTSingleFileWorkloadParser.class), EasyMock.anyLong());
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);

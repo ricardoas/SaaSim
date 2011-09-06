@@ -19,7 +19,7 @@ import commons.cloud.TypeProvider;
 import commons.cloud.User;
 import commons.config.Configuration;
 import commons.config.PropertiesTesting;
-import commons.io.GEISTWorkloadParser;
+import commons.io.GEISTSingleFileWorkloadParser;
 import commons.io.WorkloadParser;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.MachineDescriptor;
@@ -288,7 +288,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(config.getWorkloads()).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
 		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(1d).times(2);
 		
-		GEISTWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(GEISTWorkloadParser.class, PropertiesTesting.VALID_WORKLOAD);
+		GEISTSingleFileWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(GEISTSingleFileWorkloadParser.class, PropertiesTesting.VALID_WORKLOAD);
 		
 		PowerMock.replayAll(config, parser);
 		
@@ -359,8 +359,8 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
 		
-		GEISTWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(GEISTWorkloadParser.class, PropertiesTesting.VALID_WORKLOAD);
-		PowerMock.replay(GEISTWorkloadParser.class);
+		GEISTSingleFileWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(GEISTSingleFileWorkloadParser.class, PropertiesTesting.VALID_WORKLOAD);
+		PowerMock.replay(GEISTSingleFileWorkloadParser.class);
 		PowerMock.replay(parser);
 		
 		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines();
@@ -423,8 +423,8 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
 		
-		GEISTWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(GEISTWorkloadParser.class, PropertiesTesting.VALID_WORKLOAD);
-		PowerMock.replay(GEISTWorkloadParser.class);
+		GEISTSingleFileWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(GEISTSingleFileWorkloadParser.class, PropertiesTesting.VALID_WORKLOAD);
+		PowerMock.replay(GEISTSingleFileWorkloadParser.class);
 		PowerMock.replay(parser);
 		
 		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines();
@@ -479,8 +479,8 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
 		
-		GEISTWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(GEISTWorkloadParser.class, PropertiesTesting.VALID_WORKLOAD);
-		PowerMock.replay(GEISTWorkloadParser.class);
+		GEISTSingleFileWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(GEISTSingleFileWorkloadParser.class, PropertiesTesting.VALID_WORKLOAD);
+		PowerMock.replay(GEISTSingleFileWorkloadParser.class);
 		PowerMock.replay(parser);
 		
 		//Creating dps

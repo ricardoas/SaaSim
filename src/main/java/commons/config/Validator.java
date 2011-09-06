@@ -136,11 +136,16 @@ public class Validator {
 	public static <T extends Enum<T>> void checkIsEnumArray(String propertyName, String[] values,
 			Class<T> enumClass) throws ConfigurationException {
 		for (String value : values) {
-			try{
-				Enum.valueOf(enumClass, value.trim().toUpperCase());
-			}catch(RuntimeException e){
-				throw new ConfigurationException(propertyName + " must be a valid member of enum " + enumClass.getCanonicalName() + ". " + value + " value is invalid.", e);
-			}
+			checkEnum(propertyName, value, enumClass);
+		}
+	}
+
+	public static <T extends Enum<T>> void checkEnum(String propertyName, String value,
+			Class<T> enumClass) throws ConfigurationException {
+		try{
+			Enum.valueOf(enumClass, value.trim().toUpperCase());
+		}catch(RuntimeException e){
+			throw new ConfigurationException(propertyName + " must be a valid member of enum " + enumClass.getCanonicalName() + ". " + value + " value is invalid.", e);
 		}
 	}
 

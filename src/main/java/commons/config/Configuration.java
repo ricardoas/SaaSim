@@ -32,6 +32,8 @@ import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.TypeProvider;
 import commons.cloud.User;
+import commons.io.ParserIdiom;
+import commons.io.TickSize;
 import commons.sim.schedulingheuristics.ProfitDrivenHeuristic;
 import commons.sim.schedulingheuristics.RanjanHeuristic;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
@@ -130,7 +132,7 @@ public class Configuration	extends PropertiesConfiguration{
 	}
 
 	public <T extends Enum<T>> T[] getEnumArray(String propertyName, Class<T> enumClass) {
-		return parseEnum(getStringArray(propertyName), enumClass);
+		return parseArrayEnum(getStringArray(propertyName), enumClass);
 	}
 	
 	public String[][] getString2DArray(String propertyName) {
@@ -143,12 +145,16 @@ public class Configuration	extends PropertiesConfiguration{
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <T extends Enum<T>> T[] parseEnum(String[] stringValues, Class<T> enumClass) {
+	private static <T extends Enum<T>> T[] parseArrayEnum(String[] stringValues, Class<T> enumClass) {
 		T [] enumValues = (T[]) Array.newInstance(enumClass, stringValues.length);
 		for (int j = 0; j < enumValues.length; j++) {
-			enumValues[j] = Enum.valueOf(enumClass, stringValues[j].trim().toUpperCase());
+			enumValues[j] = parseEnum(stringValues[j].trim().toUpperCase(), enumClass);
 		}
 		return enumValues;
+	}
+
+	private static <T extends Enum<T>> T parseEnum(String value, Class<T> enumClass) {
+		return Enum.valueOf(enumClass, value);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -156,7 +162,7 @@ public class Configuration	extends PropertiesConfiguration{
 		String[] machines = getStringArray(propertyName);
 		T[][] machineTypes = (T[][]) Array.newInstance(enumClass, machines.length, machines.length);
 		for(int i = 0; i < machines.length; i++){
-			machineTypes[i] = parseEnum(machines[i].split(ARRAY_SEPARATOR), enumClass);
+			machineTypes[i] = parseArrayEnum(machines[i].split(ARRAY_SEPARATOR), enumClass);
 		}
 		return machineTypes;
 	}
@@ -185,6 +191,14 @@ public class Configuration	extends PropertiesConfiguration{
 		} catch (ClassNotFoundException e) {
 			throw new ConfigurationRuntimeException("Problem loading " + heuristicName, e);
 		}
+	}
+	
+	public ParserIdiom getParserIdiom(){
+		return parseEnum(getString(PARSER_IDIOM), ParserIdiom.class);
+	}
+	
+	public TickSize getParserPageSize(){
+		return parseEnum(getString(PARSER_PAGE_SIZE), TickSize.class);
 	}
 
 	/**
@@ -268,6 +282,7 @@ public class Configuration	extends PropertiesConfiguration{
 							planStorageLimits[i], planExtraStorageCosts[i]));
 		}
 		
+		String[] ids = getStringArray(SAAS_USER_ID);
 		String[] plans = getStringArray(SAAS_USER_PLAN);
 		long[] storage = getLongArray(SAAS_USER_STORAGE);
 		
@@ -277,7 +292,7 @@ public class Configuration	extends PropertiesConfiguration{
 				throw new ConfigurationException("Cannot find configuration for plan " + plans[i] + ". Check contracts file.");
 			}
 			
-			users.add(new User(contractsPerName.get(plans[i]), storage[i]));
+			users.add(new User(ids[i], contractsPerName.get(plans[i]), storage[i]));
 		}
 	}
 
@@ -375,6 +390,8 @@ public class Configuration	extends PropertiesConfiguration{
 		checkDPSHeuristic();
 		checkPlanningHeuristic();
 		Validator.checkPositive(PLANNING_PERIOD, getString(PLANNING_PERIOD));
+		Validator.checkEnum(PARSER_IDIOM, getString(PARSER_IDIOM), ParserIdiom.class);
+		Validator.checkEnum(PARSER_PAGE_SIZE, getString(PARSER_PAGE_SIZE), TickSize.class);
 	}
 	
 	private void checkDPSHeuristic() throws ConfigurationException {
@@ -498,14 +515,20 @@ public class Configuration	extends PropertiesConfiguration{
 	
 	private void verifySaaSUsersProperties() throws ConfigurationException {
 		
-		checkSize(SAAS_USER_STORAGE, SAAS_NUMBER_OF_USERS);
-		
 		Validator.checkPositive(SAAS_NUMBER_OF_USERS, getString(SAAS_NUMBER_OF_USERS));
+		
+		checkSize(SAAS_USER_ID, SAAS_NUMBER_OF_USERS);
+		checkSize(SAAS_USER_STORAGE, SAAS_NUMBER_OF_USERS);
+		checkSize(SAAS_USER_PLAN, SAAS_NUMBER_OF_USERS);
+		
+		Validator.checkIsNonEmptyStringArray(SAAS_USER_ID, getStringArray(SAAS_USER_ID));
+		Validator.checkIsNonEmptyStringArray(SAAS_USER_PLAN, getStringArray(SAAS_USER_PLAN));
 		Validator.checkIsNonNegativeArray(SAAS_USER_STORAGE, getStringArray(SAAS_USER_STORAGE));
 		
 		String workload = getString(SAAS_WORKLOAD);
 		if(workload == null || workload.isEmpty()){
 			checkSize(SAAS_USER_WORKLOAD, SAAS_NUMBER_OF_USERS);
+			
 			Validator.checkIsNonEmptyStringArray(SAAS_USER_WORKLOAD, getStringArray(SAAS_USER_WORKLOAD));
 		}else{
 			if(getStringArray(SAAS_USER_WORKLOAD).length != 0){
@@ -633,10 +656,9 @@ public class Configuration	extends PropertiesConfiguration{
 
 	public String[] getWorkloads() {
 		String[] stringArray = this.getStringArray(SaaSUsersProperties.SAAS_USER_WORKLOAD);
-		if(stringArray == null || stringArray.length == 0){
-			String workload = getString(SAAS_WORKLOAD);
-			stringArray = new String[]{workload};
+		if(stringArray != null && stringArray.length != 0){
+			return stringArray;
 		}
-		return stringArray;
+		return new String[]{getString(SAAS_WORKLOAD)};
 	}
 }

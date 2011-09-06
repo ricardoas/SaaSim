@@ -12,7 +12,7 @@ import java.util.TreeSet;
 public class UtilityResult{
 	
 	private SortedSet<UtilityResultEntry> entries;
-	private Map<Integer, Double> usersUniqueFee;
+	private Map<String, Double> usersUniqueFee;
 	private Map<String, Map<MachineType, Double>> providersUniqueFee;
 	
 	private double uniqueReceipt;
@@ -23,7 +23,7 @@ public class UtilityResult{
 	 */
 	public UtilityResult() {
 		entries = new TreeSet<UtilityResultEntry>();
-		usersUniqueFee = new HashMap<Integer, Double>();
+		usersUniqueFee = new HashMap<String, Double>();
 		providersUniqueFee = new HashMap<String, Map<MachineType,Double>>();
 		uniqueCost = 0;
 		uniqueReceipt = 0;
@@ -65,7 +65,7 @@ public class UtilityResult{
 	/**
 	 * @param entry
 	 */
-	public void addUserUniqueFee(int userID, double fee) {
+	public void addUserUniqueFee(String userID, double fee) {
 		usersUniqueFee.put(userID, fee);
 		uniqueReceipt += fee;
 	}

@@ -18,6 +18,7 @@ public class Main {
 	/**
 	 * @param args
 	 * @throws ConfigurationException 
+	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws ConfigurationException {
 		

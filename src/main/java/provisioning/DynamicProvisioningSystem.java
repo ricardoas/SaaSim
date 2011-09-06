@@ -9,14 +9,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import provisioning.util.WorkloadParserFactory;
+
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
 import commons.cloud.UtilityResult;
 import commons.config.Configuration;
-import commons.io.GEISTWorkloadParser;
-import commons.io.TimeBasedWorkloadParser;
 import commons.sim.AccountingSystem;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.provisioningheuristics.RanjanStatistics;
@@ -36,7 +36,7 @@ public class DynamicProvisioningSystem implements DPS{
 	
 	protected final Map<Long, DynamicConfigurable> configurables;
 
-	protected Map<Integer, User> users;
+	protected Map<String, User> users;
 	
 	protected Map<String, Provider> providers;
 	
@@ -53,7 +53,7 @@ public class DynamicProvisioningSystem implements DPS{
 			this.providers.put(provider.getName(), provider);
 		}
 		
-		this.users = new HashMap<Integer, User>();
+		this.users = new HashMap<String, User>();
 		List<User> listOfUsers = Configuration.getInstance().getUsers();
 		for (User user : listOfUsers) {
 			this.users.put(user.getId(), user);
@@ -73,8 +73,7 @@ public class DynamicProvisioningSystem implements DPS{
 			addServersToTier(configurable, tier, initialServersPerTier[tier], typeList);
 		}
 
-		String[] workloads = Configuration.getInstance().getWorkloads();
-		configurable.setWorkloadParser(new TimeBasedWorkloadParser(new GEISTWorkloadParser(workloads), TimeBasedWorkloadParser.DAY_IN_MILLIS));
+		configurable.setWorkloadParser(WorkloadParserFactory.getWorkloadParser());
 	}
 	
 	private void addServersToTier(DynamicConfigurable configurable, int tier, int numberOfInitialServers, List<MachineType> typeList) {
@@ -135,11 +134,10 @@ public class DynamicProvisioningSystem implements DPS{
 	 * @param request
 	 */
 	protected void reportLostRequest(Request request) {
-		Integer saasClient = Integer.valueOf(request.getSaasClient());
-		if( !users.containsKey(saasClient) ){
-			throw new RuntimeException("Unregistered user with ID " + saasClient + ". Check configuration files.");
+		if( !users.containsKey(request.getSaasClient()) ){
+			throw new RuntimeException("Unregistered user with ID " + request.getSaasClient() + ". Check configuration files.");
 		}
-		users.get(saasClient).reportLostRequest(request);
+		users.get(request.getSaasClient()).reportLostRequest(request);
 	}
 	
 	protected List<Provider> canBuyMachine(MachineType type, boolean isReserved){

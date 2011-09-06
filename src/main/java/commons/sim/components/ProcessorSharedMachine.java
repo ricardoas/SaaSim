@@ -309,4 +309,22 @@ public class ProcessorSharedMachine extends JEAbstractEventHandler implements Ma
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public long getTotalTimeUsed() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int getNumberOfCores() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }
