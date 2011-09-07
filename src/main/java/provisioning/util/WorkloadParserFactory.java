@@ -20,8 +20,12 @@ import commons.io.WorkloadParser;
  */
 public class WorkloadParserFactory {
 	
-	@SuppressWarnings("unchecked")
 	public static WorkloadParser<List<Request>> getWorkloadParser(){
+		return getWorkloadParser(Configuration.getInstance().getParserPageSize().getTickInMillis());
+	}
+
+	@SuppressWarnings("unchecked")
+	public static WorkloadParser<List<Request>> getWorkloadParser(long pageSize){
 		Configuration config = Configuration.getInstance();
 		String[] workloads = config.getWorkloads();
 		ParserIdiom parserIdiom = config.getParserIdiom();
@@ -29,13 +33,13 @@ public class WorkloadParserFactory {
 		case GEIST:
 			WorkloadParser<Request>[] parsers = new WorkloadParser[workloads.length];
 			if(workloads.length == 1){
-				return new TimeBasedWorkloadParser(config.getParserPageSize(), new GEISTSingleFileWorkloadParser(workloads[0]));
+				return new TimeBasedWorkloadParser(pageSize, new GEISTSingleFileWorkloadParser(workloads[0]));
 			}
 			List<User> users = config.getUsers();
 			for (int i = 0; i < parsers.length; i++) {
 				parsers[i] = new GEISTMultiFileWorkloadParser(workloads[i], users.get(i).getId());
 			}
-			return new TimeBasedWorkloadParser(config.getParserPageSize(), parsers);
+			return new TimeBasedWorkloadParser(pageSize, parsers);
 		default:
 			throw new RuntimeException("No parser specified for value " + parserIdiom);
 		}

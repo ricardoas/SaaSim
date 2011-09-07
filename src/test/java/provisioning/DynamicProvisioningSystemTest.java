@@ -150,7 +150,7 @@ public class DynamicProvisioningSystemTest {
 		DynamicProvisioningSystem dps = new DynamicProvisioningSystem();
 		dps.registerConfigurable(configurable);
 		
-		EasyMock.verify();
+		EasyMock.verify(configurable);
 	}
 	
 	/**
@@ -240,7 +240,7 @@ public class DynamicProvisioningSystemTest {
 	@PrepareForTest(Configuration.class)
 	public void testReportLostRequest(){
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getSaasClient()).andReturn("0");
+		EasyMock.expect(request.getSaasClient()).andReturn("0").times(2);
 		
 		Contract contract = EasyMock.createStrictMock(Contract.class);
 

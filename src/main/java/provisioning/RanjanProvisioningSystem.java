@@ -1,5 +1,9 @@
 package provisioning;
 
+import java.util.List;
+
+import commons.cloud.MachineType;
+import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.sim.provisioningheuristics.RanjanStatistics;
 
@@ -57,8 +61,9 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 	}
 	
 	private void evaluateMachinesToBeAdded(int tier) {
-		if(canBuyMachine()){
-			configurable.addServer(tier, accountingSystem.buyMachine(), true);
+		List<Provider> providers = canBuyMachine(MachineType.SMALL, false);
+		if(!providers.isEmpty()){
+			configurable.addServer(tier, buyMachine(providers.get(0), MachineType.SMALL, false), true);
 		}
 	}
 	

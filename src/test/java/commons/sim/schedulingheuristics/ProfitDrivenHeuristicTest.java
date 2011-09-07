@@ -46,12 +46,10 @@ public class ProfitDrivenHeuristicTest {
 		String reqID = "1";
 		long time = 1000 * 60 * 1;
 		long size = 1024;
-		Integer requestOption = 0;
-		String URL = "";
-		String httpOperation = "GET";
-		long demand = 1000 * 60 * 20;
+		long response = 1024;
+		long [] demand = new long[]{1000 * 60 * 20};
 		
-		Request request = new Request(clientID, reqID, userID, time, size, URL, demand);
+		Request request = new Request(clientID, reqID, userID, time, size, response, demand);
 		Machine nextServer = this.heuristic.getNextServer(request, new ArrayList<Machine>());
 		assertNull(nextServer);
 	}
@@ -64,12 +62,10 @@ public class ProfitDrivenHeuristicTest {
 		String clientID = "c1";
 		String userID = "u1";
 		String reqID = "1";
-		long time = 1000 * 60 * 1;//in millis
+		long time = 1000 * 60 * 1;
 		long size = 1024;
-		Integer requestOption = 0;
-		String URL = "";
-		String httpOperation = "GET";
-		long demand = 1000 * 20;//in millis
+		long response = 1024;
+		long [] demand = new long[]{1000 * 20};
 		
 		JEEventScheduler eventScheduler = EasyMock.createMock(JEEventScheduler.class);
 		EasyMock.expect(eventScheduler.registerHandler(EasyMock.isA(Machine.class))).andReturn(1);
@@ -79,7 +75,7 @@ public class ProfitDrivenHeuristicTest {
 		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false, MachineType.SMALL), null);
 		servers.add(machine1);
 		
-		Request request = new Request(clientID, reqID, userID, time, size, URL, demand);
+		Request request = new Request(clientID, reqID, userID, time, size, response, demand);
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
@@ -94,12 +90,10 @@ public class ProfitDrivenHeuristicTest {
 		String clientID = "c1";
 		String userID = "u1";
 		String reqID = "1";
-		long time = 1000 * 60 * 1;//in millis
+		long time = 1000 * 60 * 1;
 		long size = 1024;
-		Integer requestOption = 0;
-		String URL = "";
-		String httpOperation = "GET";
-		long demand = 1000 * 20;//in millis
+		long response = 1024;
+		long [] demand = new long[]{1000 * 20};
 		
 		JEEventScheduler eventScheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		EasyMock.expect(eventScheduler.registerHandler(EasyMock.isA(Machine.class))).andReturn(1);
@@ -117,7 +111,7 @@ public class ProfitDrivenHeuristicTest {
 		servers.add(machine2);
 		servers.add(machine3);
 		
-		Request request = new Request(reqID, clientID, userID, time, size, URL, demand);
+		Request request = new Request(clientID, reqID, userID, time, size, response, demand);
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
@@ -128,7 +122,7 @@ public class ProfitDrivenHeuristicTest {
 		servers.add(machine2);
 		servers.add(machine1);
 		
-		request = new Request(clientID, reqID, userID, time, size, URL, demand);
+		request = new Request(clientID, reqID, userID, time, size, response, demand);
 		nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine3, nextServer);
@@ -150,12 +144,10 @@ public class ProfitDrivenHeuristicTest {
 		String clientID = "c1";
 		String userID = "u1";
 		String reqID = "1";
-		long time = 1000 * 60 * 1;//in millis
+		long time = 1000 * 60 * 1;
 		long size = 1024;
-		Integer requestOption = 0;
-		String URL = "";
-		String httpOperation = "GET";
-		long demand = 1000 * 10;//in millis
+		long response = 1024;
+		long [] demand = new long[]{1000 * 10};
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
 		JEEventScheduler eventScheduler = new JEEventScheduler();
@@ -165,13 +157,13 @@ public class ProfitDrivenHeuristicTest {
 		servers.add(machine1);
 		servers.add(machine2);
 		
-		Request request = new Request(clientID, reqID, userID, time, size, URL, demand);
-		Request request2 = new Request(clientID, reqID+1, userID, time, size, URL, demand);
+		Request request = new Request(clientID, reqID, userID, time, size, response, demand);
+		Request request2 = new Request(clientID, reqID+1, userID, time, size, response, demand);
 		machine1.sendRequest(request);
 		machine1.sendRequest(request2);
 		
-		demand = 1000 * 15;//in millis
-		Request request3 = new Request(clientID, reqID, userID, time, size, URL, demand);
+		demand[0] = 1000 * 15;
+		Request request3 = new Request(clientID, reqID, userID, time, size, response, demand);
 		Machine nextServer = this.heuristic.getNextServer(request3, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine2, nextServer);
@@ -191,12 +183,10 @@ public class ProfitDrivenHeuristicTest {
 		String clientID = "c1";
 		String userID = "u1";
 		String reqID = "1";
-		long time = 1000 * 60 * 1;//in millis
+		long time = 1000 * 60 * 1;
 		long size = 1024;
-		Integer requestOption = 0;
-		String URL = "";
-		String httpOperation = "GET";
-		long demand = 1000 * 10;//in millis
+		long response = 1024;
+		long [] demand = new long[]{1000 * 10};
 		
 		JEEventScheduler eventScheduler = new JEEventScheduler();
 		ArrayList<Machine> servers = new ArrayList<Machine>();
@@ -205,18 +195,18 @@ public class ProfitDrivenHeuristicTest {
 		servers.add(machine1);
 		servers.add(machine2);
 		
-		Request request = new Request(clientID, reqID, userID, time, size, URL, demand);
-		Request request2 = new Request(clientID, reqID, userID, time, size, URL, demand);
+		Request request = new Request(clientID, reqID, userID, time, size, response, demand);
+		Request request2 = new Request(clientID, reqID, userID, time, size, response, demand);
 		machine1.sendRequest(request);
 		machine1.sendRequest(request2);
 		
-		Request request3 = new Request(clientID, reqID, userID, time, size, URL, demand);
-		Request request4 = new Request(clientID, reqID, userID, time, size, URL, demand);
+		Request request3 = new Request(clientID, reqID, userID, time, size, response, demand);
+		Request request4 = new Request(clientID, reqID, userID, time, size, response, demand);
 		machine2.sendRequest(request3);
 		machine2.sendRequest(request4);
 		
-		demand = 1000 * 15;//in millis
-		Request request5 = new Request(clientID, reqID, userID, time, size, URL, demand);
+		demand[0] = 1000 * 15;//in millis
+		Request request5 = new Request(clientID, reqID, userID, time, size, response, demand);
 		Machine nextServer = this.heuristic.getNextServer(request5, servers);
 		assertNull(nextServer);
 	}
@@ -235,12 +225,10 @@ public class ProfitDrivenHeuristicTest {
 		String clientID = "c1";
 		String userID = "u1";
 		String reqID = "1";
-		long time = 1000 * 60 * 1;//in millis
+		long time = 1000 * 60 * 1;
 		long size = 1024;
-		Integer requestOption = 0;
-		String URL = "";
-		String httpOperation = "GET";
-		long demand = 1000 * 15;//in millis
+		long response = 1024;
+		long [] demand = new long[]{1000 * 15};
 		
 		JEEventScheduler eventScheduler = new JEEventScheduler();
 		ArrayList<Machine> servers = new ArrayList<Machine>();
@@ -249,13 +237,13 @@ public class ProfitDrivenHeuristicTest {
 		servers.add(machine1);
 		servers.add(machine2);
 		
-		Request request = new Request(clientID, reqID, userID, time, size, URL, demand);
+		Request request = new Request(clientID, reqID, userID, time, size, response, demand);
 		machine1.sendRequest(request);
 		
-		Request request3 = new Request(clientID, reqID, userID, time, size, URL, demand);
+		Request request3 = new Request(clientID, reqID, userID, time, size, response, demand);
 		machine2.sendRequest(request3);
 		
-		Request request5 = new Request(clientID, reqID, userID, time, size, URL, demand);
+		Request request5 = new Request(clientID, reqID, userID, time, size, response, demand);
 		Machine nextServer = this.heuristic.getNextServer(request5, servers);
 		assertNull(nextServer);
 	}

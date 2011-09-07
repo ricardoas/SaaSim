@@ -32,7 +32,7 @@ public class HistoryBasedWorkloadParser extends TimeBasedWorkloadParser{
 	 */
 	@SuppressWarnings("unchecked")
 	public HistoryBasedWorkloadParser(WorkloadParser<Request> parser, TickSize tick, int windowSize) {
-		super(tick, parser);
+		super(tick.getTickInMillis(), parser);
 		this.history = new LinkedBlockingQueue<List<Request>>(windowSize);
 	}
 	

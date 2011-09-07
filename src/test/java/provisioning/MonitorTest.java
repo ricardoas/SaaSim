@@ -61,7 +61,7 @@ public class MonitorTest {
 	public void testRequestQueued() {
 		
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getSaasClient()).andReturn("2");
+		EasyMock.expect(request.getSaasClient()).andReturn("client2").times(2);
 		EasyMock.expect(request.getTotalProcessed()).andReturn(0l);
 		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(0l);
 		EasyMock.replay(request);

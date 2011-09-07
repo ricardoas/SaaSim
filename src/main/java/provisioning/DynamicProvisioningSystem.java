@@ -93,7 +93,7 @@ public class DynamicProvisioningSystem implements DPS{
 
 	@Override
 	public void reportRequestFinished(Request request) {
-		Integer SaaSClientID = Integer.valueOf(request.getSaasClient());
+		String SaaSClientID = request.getSaasClient();
 		if( !users.containsKey(SaaSClientID) ){
 			throw new RuntimeException("Unregistered user with ID " + request.getSaasClient() + ". Check configuration files.");
 		}

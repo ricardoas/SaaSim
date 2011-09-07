@@ -33,13 +33,13 @@ public class GEISTSingleFileWorkloadParser extends AbstractWorkloadParser{
 	protected Request parseRequest(String line) {
 		String[] eventData = line.split("( +|\t+)+");
 		
-		long [] demand = new long[eventData.length - 5 - 1];
-		for (int i = 5; i < eventData.length - 1; i++) {
-			demand[i-5] = Long.valueOf(eventData[i]);
+		long [] demand = new long[eventData.length - 6];
+		for (int i = 6; i < eventData.length - 1; i++) {
+			demand[i-6] = Long.valueOf(eventData[i]);
 		}
 		
-		return new Request(eventData[1], eventData[eventData.length - 1], eventData[0], Long
-				.valueOf(eventData[2]), Long.valueOf(eventData[3]),
-				Long.valueOf(eventData[4]), demand);
+		return new Request(eventData[0], eventData[1], eventData[2], Long
+				.valueOf(eventData[3]), Long.valueOf(eventData[4]),
+				Long.valueOf(eventData[5]), demand);
 	}
 }

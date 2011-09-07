@@ -7,14 +7,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import provisioning.util.WorkloadParserFactory;
+
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
 import commons.config.Configuration;
-import commons.io.GEISTSingleFileWorkloadParser;
 import commons.io.HistoryBasedWorkloadParser;
-import commons.io.TimeBasedWorkloadParser;
+import commons.io.WorkloadParser;
 import commons.sim.util.SaaSAppProperties;
 import commons.sim.util.SimulatorProperties;
 
@@ -32,7 +33,7 @@ public class OverProvisionHeuristic implements PlanningHeuristic{
 	public void findPlan(HistoryBasedWorkloadParser workloadParser,
 			List<Provider> cloudProviders, List<User> cloudUsers) {
 		
-		TimeBasedWorkloadParser currentParser = new TimeBasedWorkloadParser(new GEISTSingleFileWorkloadParser(Configuration.getInstance().getWorkloads()), Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME));
+		WorkloadParser<List<Request>> currentParser = WorkloadParserFactory.getWorkloadParser(Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME));
 		maximumNumberOfServers = 0;
 		
 		while(currentParser.hasNext()){

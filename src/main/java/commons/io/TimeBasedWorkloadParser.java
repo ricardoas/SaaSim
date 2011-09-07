@@ -11,7 +11,7 @@ import commons.cloud.Request;
  */
 public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	
-	private final TickSize tick;
+	private final long tick;
 	private long currentTick;
 
 	private List<Request> leftOver;
@@ -22,7 +22,7 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	 * @param tick
 	 * @param parser
 	 */
-	public TimeBasedWorkloadParser(TickSize tick, WorkloadParser<Request>... parser) {
+	public TimeBasedWorkloadParser(long tick, WorkloadParser<Request>... parser) {
 		this.parsers = parser;
 		this.tick = tick;
 		this.currentTick = 0;
@@ -36,7 +36,7 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	public List<Request> next() throws IOException {
 		List<Request> requests = new ArrayList<Request>(leftOver);
 		
-		long time = (currentTick + 1) * tick.getTickInMillis();
+		long time = (currentTick + 1) * tick;
 		
 		for (Request request : requests) {
 			if(request.getArrivalTimeInMillis() >= time){
