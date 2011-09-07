@@ -117,7 +117,7 @@ public class JETime implements Comparable<JETime> {
      */
     @Override
 	public int compareTo(JETime o) {
-    	if(o.equals(INFINITY)){
+    	if(o.timeMilliSeconds == INFINITY.timeMilliSeconds){
     		return -1;
     	}
     	long diff = timeMilliSeconds - o.timeMilliSeconds;

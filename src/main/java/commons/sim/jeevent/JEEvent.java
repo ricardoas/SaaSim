@@ -50,7 +50,7 @@ public class JEEvent implements Comparable<JEEvent>{
 	/**
      * @return
      */
-    public Integer getTargetHandlerId() {
+    public int getTargetHandlerId() {
     	return targetHandlerId;
     }
     
@@ -80,12 +80,14 @@ public class JEEvent implements Comparable<JEEvent>{
 	 */
 	@Override
 	public int compareTo(JEEvent o) {
-		int result = getScheduledTime().compareTo(o.getScheduledTime());
+		int result = this.scheduledTime.compareTo(o.getScheduledTime());
 		if(result != 0){
 			return result;
 		}
-		if(type.compareTo(o.getType()) != 0){
-			return type.compareTo(o.getType());
+		
+		result = type.compareTo(o.getType());
+		if(result != 0){
+			return result;
 		}
 		return eventId - o.eventId;
 	}

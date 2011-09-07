@@ -3,6 +3,7 @@
  */
 package commons.sim.jeevent;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeSet;
@@ -27,7 +28,7 @@ public class JEEventScheduler {
     public JEEventScheduler() {
     	this.now = new JETime(0L);
 		this.simulationEnd = JETime.INFINITY;
-		this.handlerMap = new HashMap<Integer, JEEventHandler>();
+		this.handlerMap = new LinkedHashMap<Integer, JEEventHandler>();
 		this.eventSet = new TreeSet<JEEvent>();
 		this.random = new Random();
     }
