@@ -9,8 +9,9 @@ package commons.io;
 public enum TickSize {
 	
 	SECOND(1000), 
-	MINUTE(10 * SECOND.getTickInMillis()),
+	MINUTE(60 * SECOND.getTickInMillis()),
 	HOUR(60 * MINUTE.getTickInMillis()),
+	TWO_HOURS(2 * 60 * MINUTE.getTickInMillis()),
 	DAY(24 * HOUR.getTickInMillis()),
 	MONTH(31 * DAY.getTickInMillis()),
 	YEAR(365 * DAY.getTickInMillis());
