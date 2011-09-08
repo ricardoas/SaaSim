@@ -1,5 +1,9 @@
 package commons.io;
 
+import java.util.StringTokenizer;
+
+import org.apache.commons.math.random.RandomDataImpl;
+
 import commons.cloud.Request;
 
 /**
@@ -31,15 +35,25 @@ public class GEISTSingleFileWorkloadParser extends AbstractWorkloadParser{
 	 */
 	@Override
 	protected Request parseRequest(String line) {
-		String[] eventData = line.split("( +|\t+)+");
+		StringTokenizer st = new StringTokenizer(line, "( +|\t+)+");
 		
-		long [] demand = new long[eventData.length - 6];
-		for (int i = 6; i < eventData.length - 1; i++) {
-			demand[i-6] = Long.valueOf(eventData[i]);
+//		String[] eventData = line.split("( +|\t+)+");
+		
+//		long [] demand = new long[eventData.length - 5 - 1];
+//		for (int i = 5; i < eventData.length - 1; i++) {
+//			demand[i-5] = Long.valueOf(eventData[i]);
+//		}
+		long[] demand = new long[4];
+		RandomDataImpl r = new RandomDataImpl();
+		for (int i = 0; i < 4; i++){
+			demand[i] = (long)r.nextInt(200, 500);
 		}
 		
-		return new Request(eventData[0], eventData[1], eventData[2], Long
-				.valueOf(eventData[3]), Long.valueOf(eventData[4]),
-				Long.valueOf(eventData[5]), demand);
+		long userID = Long.valueOf(st.nextToken());
+		st.nextToken();
+		long requestID =  Long.valueOf(st.nextToken());
+		Long arrivalTime = Math.round(Double.valueOf(st.nextToken())*1000);
+		return new Request(requestID, 0, userID, arrivalTime, Long.valueOf(st.nextToken()),
+				Long.valueOf(st.nextToken()), demand);
 	}
 }
