@@ -1,6 +1,7 @@
 package commons.sim.schedulingheuristics;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +21,7 @@ public class RanjanHeuristic implements SchedulingHeuristic {
 	
 	private final long SESSION_LIMIT_IN_MILLIS = 1000 * 60 * 15;
 	
-	private Map<String, Long> lastRequestTimes; 
+	private Map<Long, Long> lastRequestTimes;
 	private Map<Long, Machine> serversOfLastRequests;
 	
 	private int lastUsed;
@@ -33,8 +34,8 @@ public class RanjanHeuristic implements SchedulingHeuristic {
 	 */
 	public RanjanHeuristic() {
 		this.lastUsed = -1;
-		this.lastRequestTimes = new HashMap<String, Long>();
-		this.serversOfLastRequests = new HashMap<Long, Machine>();
+		this.lastRequestTimes = new HashMap<Long, Long>();
+		this.serversOfLastRequests = new LinkedHashMap<Long, Machine>();
 		
 		this.requestsArrivalCounter = 0;
 		this.finishedRequestsCounter = 0;
@@ -70,7 +71,7 @@ public class RanjanHeuristic implements SchedulingHeuristic {
 		machine = servers.get(lastUsed);
 		
 		//Updating times
-		String userID = request.getUserID();
+		long userID = request.getUserID();
 		long timeInMillis = request.getArrivalTimeInMillis();
 		
 		Long lastRequestTime = this.lastRequestTimes.get(userID);
@@ -84,7 +85,7 @@ public class RanjanHeuristic implements SchedulingHeuristic {
 	
 	private Machine getServerOfPreviousRequestInSession(Request request) {
 		long timeInMillis = request.getArrivalTimeInMillis();
-		String userID = request.getUserID();
+		long userID = request.getUserID();
 
 		Long lastRequestTime = this.lastRequestTimes.get(userID);
 		if(lastRequestTime != null && timeInMillis - lastRequestTime <= SESSION_LIMIT_IN_MILLIS){

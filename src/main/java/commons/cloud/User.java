@@ -14,10 +14,12 @@ public class User implements Comparable<User>{
 	private final String id;
 	private final Contract contract;
 	
+	private long numberOfLostRequests;
 	private long consumedCpuInMillis;
 	private long consumedInTransferenceInBytes;
 	private long consumedOutTransferenceInBytes;
 	private final long consumedStorageInBytes;
+	
 
 	/**
 	 * Default constructor.
@@ -27,6 +29,7 @@ public class User implements Comparable<User>{
 		this.id = userID;
 		this.contract = contract;
 		this.consumedStorageInBytes = consumedStorageInBytes;
+		
 		reset();
 	}
 	
@@ -73,9 +76,10 @@ public class User implements Comparable<User>{
 	}
 
 	private void reset(){
-		consumedCpuInMillis = 0;
-		consumedInTransferenceInBytes = 0;
-		consumedOutTransferenceInBytes = 0;
+		this.consumedCpuInMillis = 0;
+		this.consumedInTransferenceInBytes = 0;
+		this.consumedOutTransferenceInBytes = 0;
+		this.numberOfLostRequests = 0;
 	}
 	
 	private void update(long consumedCpuInMillis, long inTransferenceInBytes, long outTransferenceInBytes){
@@ -155,6 +159,7 @@ public class User implements Comparable<User>{
 	 * @param request
 	 */
 	public void reportLostRequest(Request request) {
+		this.numberOfLostRequests++;
 		update(request.getTotalProcessed(), request.getRequestSizeInBytes(), 0);
 	}
 }

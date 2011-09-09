@@ -24,7 +24,6 @@ public class OverProvisionHeuristic implements PlanningHeuristic{
 	public static final double FACTOR = 0.2;//Utilisation factor according to Above the Clouds: ...
 	private int maximumNumberOfServers;
 	
-	
 	public OverProvisionHeuristic(){
 		this.maximumNumberOfServers = 0;
 	}
@@ -32,14 +31,14 @@ public class OverProvisionHeuristic implements PlanningHeuristic{
 	@Override
 	public void findPlan(HistoryBasedWorkloadParser workloadParser,
 			List<Provider> cloudProviders, List<User> cloudUsers) {
-		
+
 		WorkloadParser<List<Request>> currentParser = WorkloadParserFactory.getWorkloadParser(Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME));
 		maximumNumberOfServers = 0;
 		
 		while(currentParser.hasNext()){
 			try {
 				List<Request> requests = currentParser.next();
-				Set<String> simultaneousUsers = new HashSet<String>();
+				Set<Long> simultaneousUsers = new HashSet<Long>();
 				
 				for(Request request : requests){
 					simultaneousUsers.add(request.getUserID());

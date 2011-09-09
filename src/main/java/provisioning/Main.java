@@ -22,6 +22,7 @@ public class Main {
 	 */
 	public static void main(String[] args) throws ConfigurationException {
 		
+		System.out.println(System.currentTimeMillis());
 		Configuration.buildInstance(args[0]);
 		
 		DPS dps = DPSFactory.createDPS();
@@ -33,6 +34,7 @@ public class Main {
 		simulator.start();
 		
 		UtilityResult utilityResult = dps.calculateUtility();
+		System.out.println(System.currentTimeMillis());
 		System.out.println(utilityResult.getUtility());
 		System.out.println();
 		System.err.println(utilityResult);

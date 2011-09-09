@@ -17,15 +17,15 @@ import commons.cloud.Request;
  */
 public class GEISTMultiFileWorkloadParser extends AbstractWorkloadParser{
 	
-	private final String userID;
+	private final String saasClientID;
 
 	/**
 	 * Default constructor
 	 * @param workloadPath 
 	 */
-	public GEISTMultiFileWorkloadParser(String workloadPath, String userID) {
+	public GEISTMultiFileWorkloadParser(String workloadPath, String saasclientID) {
 		super(workloadPath);
-		this.userID = userID;
+		this.saasClientID = saasclientID;
 	}
 
 	/**
@@ -40,8 +40,8 @@ public class GEISTMultiFileWorkloadParser extends AbstractWorkloadParser{
 			demand[i-5] = Long.valueOf(eventData[i]);
 		}
 		
-		return new Request(eventData[1], userID, eventData[0], Long
-				.valueOf(eventData[2]), Long.valueOf(eventData[3]),
+		return new Request(Long.parseLong(eventData[1]), saasClientID, Long.parseLong(eventData[0]), Long
+				.valueOf(eventData[2]), Long.parseLong(eventData[3]),
 				Long.valueOf(eventData[4]), demand);
 	}
 }

@@ -63,7 +63,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	
 	protected void prepareBeforeStart() {
 		send(new JEEvent(JEEventType.READWORKLOAD, this, getScheduler().now()));
-		send(new JEEvent(JEEventType.CHARGE_USERS, this, getScheduler().now().add(TickSize.DAY.getTickInMillis() * daysInMonths[currentMonth++])));
+		send(new JEEvent(JEEventType.CHARGE_USERS, this, getScheduler().now() + (TickSize.DAY.getTickInMillis() * daysInMonths[currentMonth++])));
 	}
 
 	/**
@@ -84,20 +84,19 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 								simulationEndTime = request.getArrivalTimeInMillis();
 							}
 						}
-						
-					}
-					if(workloadParser.hasNext()){
-						JETime newEventTime = getScheduler().now().add(TickSize.HOUR.getTickInMillis());
-						send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime));
+						if(workloadParser.hasNext()){
+							long newEventTime = getScheduler().now() + TickSize.HOUR.getTickInMillis();
+							send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime));
+						}	
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 				break;
 			case CHARGE_USERS:
-				this.monitor.chargeUsers(getScheduler().now().timeMilliSeconds);
-				JETime newEventTime = getScheduler().now().add(TickSize.DAY.getTickInMillis() * daysInMonths[currentMonth++]);
-				if(currentMonth < daysInMonths.length && newEventTime.timeMilliSeconds < simulationEndTime){
+				this.monitor.chargeUsers(getScheduler().now());
+				long newEventTime = getScheduler().now() + (TickSize.DAY.getTickInMillis() * daysInMonths[currentMonth++]);
+				if(currentMonth < daysInMonths.length && newEventTime <= simulationEndTime){
 					send(new JEEvent(JEEventType.CHARGE_USERS, this, newEventTime));
 				}
 				break;
@@ -111,7 +110,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 * @return
 	 */
 	protected JEEvent parseEvent(Request request) {
-		return new JEEvent(JEEventType.NEWREQUEST, tiers.get(0), new JETime(request.getArrivalTimeInMillis()), request);
+		return new JEEvent(JEEventType.NEWREQUEST, tiers.get(0), request.getArrivalTimeInMillis(), request);
 	}
 
 	/**

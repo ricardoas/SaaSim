@@ -15,8 +15,8 @@ import java.util.TreeSet;
  */
 public class JEEventScheduler {
 	
-    private JETime now;
-    private JETime simulationEnd;
+	private long now;
+	private long simulationEnd;
     private Map<Integer,JEEventHandler> handlerMap;
     private TreeSet<JEEvent> eventSet;
 	private Random random;
@@ -25,8 +25,8 @@ public class JEEventScheduler {
      * Default private constructor.
      */
     public JEEventScheduler() {
-    	this.now = new JETime(0L);
-		this.simulationEnd = JETime.INFINITY;
+    	this.now = 0;
+    	this.simulationEnd = JETime.INFINITY.timeMilliSeconds;
 		this.handlerMap = new HashMap<Integer, JEEventHandler>();
 		this.eventSet = new TreeSet<JEEvent>();
 		this.random = new Random();
@@ -38,9 +38,9 @@ public class JEEventScheduler {
      */
     public void queueEvent(JEEvent event) {
     	
-		JETime anEventTime = event.getScheduledTime();
-		if (anEventTime.isEarlierThan(now)) {
-		    throw new JEException("ERROR: emulation time(" + now + ") already ahead of event time("+anEventTime+"). Event is outdated and will not be processed.");
+    	long anEventTime = event.getScheduledTime();
+		if (anEventTime - now() < 0) {
+		    throw new JEException("ERROR: emulation time(" + now() + ") already ahead of event time("+anEventTime+"). Event is outdated and will not be processed.");
 		}
 		eventSet.add(event);
     }
@@ -90,14 +90,15 @@ public class JEEventScheduler {
      */
     private void schedule() {
     	
-    	while(!eventSet.isEmpty() && now.isEarlierThan(simulationEnd)){
+    	while(!eventSet.isEmpty() && (now() != simulationEnd)){
     		JEEvent event = eventSet.pollFirst();
-			JETime scheduledTime = event.getScheduledTime();
-			if (scheduledTime.isEarlierThan(now)) {
-			    throw new JEException("ERROR: emulation time(" + now + ") " + "already ahead of event time(" + scheduledTime+ "). Event is outdated and will not be processed.");
+			
+    		long scheduledTime = event.getScheduledTime();
+			if (scheduledTime - now() < 0) {
+			    throw new JEException("ERROR: emulation time(" + now() + ") " + "already ahead of event time(" + scheduledTime+ "). Event is outdated and will not be processed.");
 			}
 			
-			if(scheduledTime.isEarlierThan(simulationEnd)){
+			if(scheduledTime != simulationEnd){
 				now = scheduledTime;
 				processEvent(event);
 			}else{
@@ -122,17 +123,17 @@ public class JEEventScheduler {
     /**
      * @return
      */
-    public JETime now() {
-    	return new JETime(now);
+    public long now() {
+    	return now;
     }
 
 	/**
 	 * @param time
 	 */
-	public void setEmulationEnd(JETime time) {
+	public void setEmulationEnd(long time) {
 		this.simulationEnd = time;
 	}
-	
+    
 	/**
 	 * @param id
 	 * @return

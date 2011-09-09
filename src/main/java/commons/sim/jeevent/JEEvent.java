@@ -17,7 +17,7 @@ public class JEEvent implements Comparable<JEEvent>{
 	
 	private final int eventId;
     private final int targetHandlerId;
-    private final JETime scheduledTime;
+    private long scheduledTime;
     private final JEEventType type;
 	private final Object[] value;
     
@@ -28,8 +28,8 @@ public class JEEvent implements Comparable<JEEvent>{
      * @param targetHandler
      * @param scheduledTime
      */
-    public JEEvent(JEEventType type, JEEventHandler targetHandler, JETime scheduledTime, Object... value) {
-	
+    public JEEvent(JEEventType type, JEEventHandler targetHandler, long scheduledTime, Object... value) {
+    	
 		this.eventId = eventIdSeed++;
     	
 		this.targetHandlerId = targetHandler.getHandlerId();
@@ -57,7 +57,7 @@ public class JEEvent implements Comparable<JEEvent>{
     /**
      * @return
      */
-    public JETime getScheduledTime() {
+    public long getScheduledTime() {
     	return scheduledTime;
     }
     
@@ -80,12 +80,16 @@ public class JEEvent implements Comparable<JEEvent>{
 	 */
 	@Override
 	public int compareTo(JEEvent o) {
-		int result = this.scheduledTime.compareTo(o.getScheduledTime());
-		if(result != 0){
-			return result;
+		long diff = (this.scheduledTime - o.getScheduledTime());
+		if(diff != 0){
+			if(diff < 0){
+				return -1;
+			}else if(diff > 0){
+				return 1;
+			}
 		}
 		
-		result = type.compareTo(o.getType());
+		int result = type.compareTo(o.getType());
 		if(result != 0){
 			return result;
 		}

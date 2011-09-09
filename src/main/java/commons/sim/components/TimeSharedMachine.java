@@ -32,9 +32,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	protected long lastUtilisationCalcTime;
 	protected long totalTimeUsedInLastPeriod;
 	protected long totalTimeUsed;
-	protected JETime lastUpdate;
-	
-	protected JEEvent nextFinishEvent;
+	protected long lastUpdate;
 	
 	protected List<Request> finishedRequests;
 	
@@ -119,8 +117,8 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 */
 	protected void tryToShutdown() {
 		if(processorQueue.isEmpty() && shutdownOnFinish){
-			JETime scheduledTime = getScheduler().now();
-			descriptor.setFinishTimeInMillis(scheduledTime.timeMilliSeconds);
+			long scheduledTime = getScheduler().now();
+			descriptor.setFinishTimeInMillis(scheduledTime);
 			send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, scheduledTime, descriptor));
 		}
 	}
@@ -169,7 +167,8 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	protected void scheduleNext() {
 		Request nextRequest = processorQueue.peek();
 		long nextQuantum = Math.min(nextRequest.getTotalToProcess(), cpuQuantumInMilis);
-		send(new JEEvent(JEEventType.PREEMPTION, this, getScheduler().now().add(nextQuantum), nextQuantum));
+		lastUpdate = getScheduler().now();
+		send(new JEEvent(JEEventType.PREEMPTION, this, nextQuantum + lastUpdate, nextQuantum));
 	}
 	
 	public boolean isBusy() {
@@ -221,7 +220,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 			return utilisation;
 		}
 		
-		long totalBeingProcessedNow = timeInMillis - lastUpdate.timeMilliSeconds;
+		long totalBeingProcessedNow = timeInMillis - lastUpdate;
 		double utilisation = (1.0* (totalTimeUsedInLastPeriod + totalBeingProcessedNow) )/(timeInMillis-lastUtilisationCalcTime);
 		totalTimeUsedInLastPeriod = -totalBeingProcessedNow;
 		lastUtilisationCalcTime = timeInMillis;

@@ -55,8 +55,8 @@ public class MultiCoreTimeSharedMachine extends TimeSharedMachine{
 	@Override
 	protected void tryToShutdown() {
 		if(processorQueue.isEmpty() && shutdownOnFinish && this.semaphore.availablePermits() == this.NUMBER_OF_CORES){
-			JETime scheduledTime = getScheduler().now();
-			descriptor.setFinishTimeInMillis(scheduledTime.timeMilliSeconds);
+			long scheduledTime = getScheduler().now();
+			descriptor.setFinishTimeInMillis(scheduledTime);
 			send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, scheduledTime, descriptor));
 		}
 	}
@@ -103,7 +103,8 @@ public class MultiCoreTimeSharedMachine extends TimeSharedMachine{
 	protected void scheduleNext() {
 		Request nextRequest = processorQueue.poll();
 		long nextQuantum = Math.min(nextRequest.getTotalToProcess(), cpuQuantumInMilis);
-		send(new JEEvent(JEEventType.PREEMPTION, this, getScheduler().now().add(nextQuantum), nextQuantum, nextRequest));
+		lastUpdate = getScheduler().now();
+		send(new JEEvent(JEEventType.PREEMPTION, this, nextQuantum+lastUpdate, nextQuantum, nextRequest));
 	}
 	
 	@Override
@@ -125,7 +126,7 @@ public class MultiCoreTimeSharedMachine extends TimeSharedMachine{
 			return utilisation;
 		}
 		
-		long totalBeingProcessedNow = (timeInMillis - lastUpdate.timeMilliSeconds);
+		long totalBeingProcessedNow = (timeInMillis - lastUpdate);
 		totalBeingProcessedNow *= this.NUMBER_OF_CORES - this.semaphore.availablePermits();
 		
 		double utilisation = (1.0* (totalTimeUsedInLastPeriod + totalBeingProcessedNow) )/((timeInMillis - lastUtilisationCalcTime) * this.NUMBER_OF_CORES);
@@ -134,86 +135,33 @@ public class MultiCoreTimeSharedMachine extends TimeSharedMachine{
 		return utilisation;
 	}
 	
-	private class Info{
-
-		private final Request request;
-		private long finishTimeBefore;
-		private long finishTimeAfter;
-		private long processedDemand;
-		
-
-		public Info(Request request) {
-			this.request = request;
-			this.processedDemand = 0;
-			this.finishTimeBefore = 0;
-			this.finishTimeAfter = 0;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getOuterType().hashCode();
-			result = prime * result
-					+ ((request == null) ? 0 : request.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			Info other = (Info) obj;
-			if (!getOuterType().equals(other.getOuterType()))
-				return false;
-			if (request == null) {
-				if (other.request != null)
-					return false;
-			} else if (!request.equals(other.request))
-				return false;
-			return true;
-		}
-
-		private MultiCoreTimeSharedMachine getOuterType() {
-			return MultiCoreTimeSharedMachine.this;
-		}
-
-		@Override
-		public String toString() {
-			return "Info [finishTimeBefore=" + finishTimeBefore + "]";
-		}
-	}
-
 	@Override
 	public List<Triple<Long, Long, Long>> estimateFinishTime(Request newRequest) {
 		//FIXME
-		List<Triple<Long, Long, Long>> executionTimes = new ArrayList<Triple<Long, Long, Long>>();
-		Map<Request, Info> times = new HashMap<Request, Info>();
-		Queue<Request> queue = getProcessorQueue();
-		for (Request request : queue) {
-			times.put(request, new Info(request));
-		}
-		
-		long processedTime = 0;
-		
-		while(!queue.isEmpty()){
-			Request request = queue.poll();
-			Info info = times.get(request);
-			long demand = Math.min(cpuQuantumInMilis, request.getTotalToProcess()-info.processedDemand);
-			processedTime += demand;
-			info.processedDemand += demand;
-			if(request.getTotalToProcess() - info.processedDemand == 0){
-				info.finishTimeBefore = processedTime;
-			}else{
-				queue.add(request);
-			}
-		}
-		
-		return executionTimes;
+//		List<Triple<Long, Long, Long>> executionTimes = new ArrayList<Triple<Long, Long, Long>>();
+//		Map<Request, Info> times = new HashMap<Request, Info>();
+//		Queue<Request> queue = getProcessorQueue();
+//		for (Request request : queue) {
+//			times.put(request, new Info(request));
+//		}
+//		
+//		long processedTime = 0;
+//		
+//		while(!queue.isEmpty()){
+//			Request request = queue.poll();
+//			Info info = times.get(request);
+//			long demand = Math.min(cpuQuantumInMilis, request.getTotalToProcess()-info.processedDemand);
+//			processedTime += demand;
+//			info.processedDemand += demand;
+//			if(request.getTotalToProcess() - info.processedDemand == 0){
+//				info.finishTimeBefore = processedTime;
+//			}else{
+//				queue.add(request);
+//			}
+//		}
+//		
+//		return executionTimes;
+		return null;
 	}
 	
 }

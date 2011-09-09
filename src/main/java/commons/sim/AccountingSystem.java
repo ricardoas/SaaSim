@@ -42,6 +42,7 @@ public class AccountingSystem {
 	 * during a whole year)  
 	 * @return
 	 */
+//	public UtilityResult calculateUtility(Map<Long, User> users, Map<String, Provider> providers){
 	public UtilityResult calculateUtility(Map<String, User> users, Map<String, Provider> providers){
 		for(Provider provider : providers.values()){
 			provider.calculateUniqueCost(utilityResult);

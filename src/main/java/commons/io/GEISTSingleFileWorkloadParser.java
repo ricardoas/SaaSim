@@ -49,8 +49,8 @@ public class GEISTSingleFileWorkloadParser extends AbstractWorkloadParser{
 			demand[i] = r.nextInt(200, 500);
 		}
 		
-		return new Request(eventData[2], eventData[1], eventData[0], 
-				(long) (Double.valueOf(eventData[3])*1000), Long.valueOf(eventData[4]),
+		return new Request(Long.parseLong(eventData[2]), eventData[1], Long.parseLong(eventData[0]), 
+				(long) (Double.parseDouble(eventData[3])*1000), Long.parseLong(eventData[4]),
 				Long.valueOf(eventData[5]), demand);
 	}
 }

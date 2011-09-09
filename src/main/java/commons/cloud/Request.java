@@ -10,8 +10,8 @@ import java.util.Arrays;
 public class Request{
 	
 	private final String saasClient;
-	private final String reqID;
-	private final String userID;
+	private final long userID;
+	private final long reqID;
 	private final long arrivalTimeInMillis;
 	private final long[] cpuDemandInMillis;
 	private final long requestSizeInBytes;
@@ -29,7 +29,7 @@ public class Request{
 	 * @param responseSizeInBytes
 	 * @param cpuDemandInMillis
 	 */
-	public Request(String reqID, String saasClient, String userID, long arrivalTimeInMillis,
+	public Request(long reqID, String saasClient, long userID, long arrivalTimeInMillis,
 			long requestSizeInBytes, long responseSizeInBytes, long[] cpuDemandInMillis) {
 		this.saasClient = saasClient;
 		this.reqID = reqID;
@@ -47,18 +47,11 @@ public class Request{
 	public String getSaasClient() {
 		return saasClient;
 	}
-
-	/**
-	 * @return the reqID
-	 */
-	public String getReqID() {
-		return reqID;
-	}
-
+	
 	/**
 	 * @return the userID
 	 */
-	public String getUserID() {
+	public long getUserID() {
 		return userID;
 	}
 
@@ -116,6 +109,32 @@ public class Request{
 		this.totalProcessed += Math.min(processedDemand, getTotalToProcess());
 	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ (int) (arrivalTimeInMillis ^ (arrivalTimeInMillis >>> 32));
+		result = prime * result + (int) (userID ^ (userID >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Request other = (Request) obj;
+		if (arrivalTimeInMillis != other.arrivalTimeInMillis)
+			return false;
+		if (userID != other.userID)
+			return false;
+		return true;
+	}
+
 	/**
 	 * @return
 	 */
@@ -143,37 +162,6 @@ public class Request{
 	}
 
 	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((reqID == null) ? 0 : reqID.hashCode());
-		return result;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Request other = (Request) obj;
-		if (reqID == null) {
-			if (other.reqID != null)
-				return false;
-		} else if (!reqID.equals(other.reqID))
-			return false;
-		return true;
-	}
-	
-	/**
 	 * @return the totalProcessed
 	 */
 	public long getTotalProcessed() {
@@ -194,6 +182,5 @@ public class Request{
 				+ ", totalProcessed=" + totalProcessed + ", assignedTo=" + value==null?"Nobody":value
 				+ "]";
 	}
-	
 	
 }
