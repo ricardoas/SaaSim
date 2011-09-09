@@ -1,7 +1,5 @@
 package commons.cloud;
 
-import java.util.ArrayList;
-import java.util.List;
 
 
 
@@ -20,9 +18,6 @@ public class User implements Comparable<User>{
 	private long consumedInTransferenceInBytes;
 	private long consumedOutTransferenceInBytes;
 	private final long consumedStorageInBytes;
-
-	private List<Request> finishedRequests;
-	private List<Request> lostRequests;
 
 	/**
 	 * Default constructor.
@@ -81,8 +76,6 @@ public class User implements Comparable<User>{
 		consumedCpuInMillis = 0;
 		consumedInTransferenceInBytes = 0;
 		consumedOutTransferenceInBytes = 0;
-		finishedRequests = new ArrayList<Request>();
-		lostRequests = new ArrayList<Request>();
 	}
 	
 	private void update(long consumedCpuInMillis, long inTransferenceInBytes, long outTransferenceInBytes){
@@ -155,7 +148,6 @@ public class User implements Comparable<User>{
 	 * @param request
 	 */
 	public void reportFinishedRequest(Request request) {
-		finishedRequests.add(request);
 		update(request.getTotalProcessed(), request.getRequestSizeInBytes(), request.getResponseSizeInBytes());
 	}
 
@@ -163,7 +155,6 @@ public class User implements Comparable<User>{
 	 * @param request
 	 */
 	public void reportLostRequest(Request request) {
-		lostRequests.add(request);
 		update(request.getTotalProcessed(), request.getRequestSizeInBytes(), 0);
 	}
 }

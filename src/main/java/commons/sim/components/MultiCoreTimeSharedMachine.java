@@ -55,8 +55,9 @@ public class MultiCoreTimeSharedMachine extends TimeSharedMachine{
 	@Override
 	protected void tryToShutdown() {
 		if(processorQueue.isEmpty() && shutdownOnFinish && this.semaphore.availablePermits() == this.NUMBER_OF_CORES){
-			descriptor.setFinishTimeInMillis(getScheduler().now().timeMilliSeconds);
-			send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, getScheduler().now(), descriptor));
+			JETime scheduledTime = getScheduler().now();
+			descriptor.setFinishTimeInMillis(scheduledTime.timeMilliSeconds);
+			send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, scheduledTime, descriptor));
 		}
 	}
 	
@@ -102,8 +103,7 @@ public class MultiCoreTimeSharedMachine extends TimeSharedMachine{
 	protected void scheduleNext() {
 		Request nextRequest = processorQueue.poll();
 		long nextQuantum = Math.min(nextRequest.getTotalToProcess(), cpuQuantumInMilis);
-		lastUpdate = getScheduler().now();
-		send(new JEEvent(JEEventType.PREEMPTION, this, new JETime(nextQuantum).plus(lastUpdate), nextQuantum, nextRequest));
+		send(new JEEvent(JEEventType.PREEMPTION, this, getScheduler().now().add(nextQuantum), nextQuantum, nextRequest));
 	}
 	
 	@Override

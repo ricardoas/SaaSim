@@ -3,7 +3,6 @@
  */
 package commons.sim.jeevent;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.TreeSet;
@@ -28,7 +27,7 @@ public class JEEventScheduler {
     public JEEventScheduler() {
     	this.now = new JETime(0L);
 		this.simulationEnd = JETime.INFINITY;
-		this.handlerMap = new LinkedHashMap<Integer, JEEventHandler>();
+		this.handlerMap = new HashMap<Integer, JEEventHandler>();
 		this.eventSet = new TreeSet<JEEvent>();
 		this.random = new Random();
     }
@@ -40,8 +39,8 @@ public class JEEventScheduler {
     public void queueEvent(JEEvent event) {
     	
 		JETime anEventTime = event.getScheduledTime();
-		if (anEventTime.isEarlierThan(now())) {
-		    throw new JEException("ERROR: emulation time(" + now() + ") already ahead of event time("+anEventTime+"). Event is outdated and will not be processed.");
+		if (anEventTime.isEarlierThan(now)) {
+		    throw new JEException("ERROR: emulation time(" + now + ") already ahead of event time("+anEventTime+"). Event is outdated and will not be processed.");
 		}
 		eventSet.add(event);
     }
@@ -91,11 +90,11 @@ public class JEEventScheduler {
      */
     private void schedule() {
     	
-    	while(!eventSet.isEmpty() && now().isEarlierThan(simulationEnd)){
+    	while(!eventSet.isEmpty() && now.isEarlierThan(simulationEnd)){
     		JEEvent event = eventSet.pollFirst();
 			JETime scheduledTime = event.getScheduledTime();
-			if (scheduledTime.isEarlierThan(now())) {
-			    throw new JEException("ERROR: emulation time(" + now() + ") " + "already ahead of event time(" + scheduledTime+ "). Event is outdated and will not be processed.");
+			if (scheduledTime.isEarlierThan(now)) {
+			    throw new JEException("ERROR: emulation time(" + now + ") " + "already ahead of event time(" + scheduledTime+ "). Event is outdated and will not be processed.");
 			}
 			
 			if(scheduledTime.isEarlierThan(simulationEnd)){
@@ -124,7 +123,7 @@ public class JEEventScheduler {
      * @return
      */
     public JETime now() {
-    	return now;
+    	return new JETime(now);
     }
 
 	/**

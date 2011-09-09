@@ -31,14 +31,12 @@ public class JETimeTest {
 
 	@Test
 	public void testPlus() {
-		assertEquals(new JETime(firstTime+secondTime), new JETime(firstTime).plus(new JETime(secondTime)));
+		assertEquals(new JETime(firstTime+secondTime), new JETime(firstTime).add(secondTime));
 	}
 	
 	@Test
 	public void testPlusWithinfinity() {
-		assertEquals(JETime.INFINITY, new JETime(firstTime).plus(JETime.INFINITY));
-		assertEquals(JETime.INFINITY, JETime.INFINITY.plus(new JETime(firstTime)));
-		assertEquals(JETime.INFINITY, JETime.INFINITY.plus(JETime.INFINITY));
+		assertEquals(JETime.INFINITY, JETime.INFINITY.add(firstTime));
 	}
 	
 	

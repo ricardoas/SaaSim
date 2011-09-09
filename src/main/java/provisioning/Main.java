@@ -34,6 +34,7 @@ public class Main {
 		
 		UtilityResult utilityResult = dps.calculateUtility();
 		System.out.println(utilityResult.getUtility());
+		System.out.println();
 		System.err.println(utilityResult);
 	}
 

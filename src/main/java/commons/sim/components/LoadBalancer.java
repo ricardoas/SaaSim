@@ -56,9 +56,8 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	private void initHeuristicEvents() {
 		if(this.heuristic.getClass().equals(RanjanHeuristic.class)){
 			long scheduledtime = Configuration.getInstance().getLong(SimulatorProperties.RANJAN_HEURISTIC_REPEAT_INTERVAL);
-			JETime newEventTime = new JETime(scheduledtime);
-			newEventTime = newEventTime.plus(getScheduler().now());
-			send(new JEEvent(JEEventType.EVALUATEUTILIZATION, this, newEventTime, newEventTime.timeMilliSeconds));
+			JETime newEventTime = getScheduler().now().add(scheduledtime);
+			send(new JEEvent(JEEventType.EVALUATEUTILIZATION, this, newEventTime));
 		}
 	}
 	
@@ -70,7 +69,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		Machine server = buildMachine(descriptor);
 		JETime serverUpTime = getScheduler().now();
 		if(useStartUpDelay){
-			serverUpTime = serverUpTime.plus(new JETime(Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SETUP_TIME)));
+			serverUpTime.add(Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SETUP_TIME));
 		}
 		send(new JEEvent(JEEventType.ADD_SERVER, this, serverUpTime, server));
 	}
@@ -125,16 +124,14 @@ public class LoadBalancer extends JEAbstractEventHandler{
 				}
 				break;
 			case EVALUATEUTILIZATION://RANJAN Scheduler
-				Long eventTime = (Long) event.getValue()[0];
-				RanjanStatistics statistics = this.collectStatistics(getServers(), eventTime);
+				RanjanStatistics statistics = this.collectStatistics(getServers(), event.getScheduledTime().timeMilliSeconds);
 				monitor.evaluateUtilisation(getScheduler().now().timeMilliSeconds, statistics, tier);
 				
 				long scheduledtime = Configuration.getInstance().getLong(SimulatorProperties.RANJAN_HEURISTIC_REPEAT_INTERVAL);
 				
-				JETime newEventTime = new JETime(scheduledtime);
-				newEventTime = newEventTime.plus(getScheduler().now());
+				JETime newEventTime = getScheduler().now().add(scheduledtime);
 				if(newEventTime.timeMilliSeconds < this.monitor.getSimulationEndTime()){
-					send(new JEEvent(JEEventType.EVALUATEUTILIZATION, this, newEventTime, newEventTime.timeMilliSeconds));
+					send(new JEEvent(JEEventType.EVALUATEUTILIZATION, this, newEventTime));
 				}
 				break;
 			case ADD_SERVER:

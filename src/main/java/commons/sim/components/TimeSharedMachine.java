@@ -119,8 +119,9 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 */
 	protected void tryToShutdown() {
 		if(processorQueue.isEmpty() && shutdownOnFinish){
-			descriptor.setFinishTimeInMillis(getScheduler().now().timeMilliSeconds);
-			send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, getScheduler().now(), descriptor));
+			JETime scheduledTime = getScheduler().now();
+			descriptor.setFinishTimeInMillis(scheduledTime.timeMilliSeconds);
+			send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, scheduledTime, descriptor));
 		}
 	}
 	
@@ -168,8 +169,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	protected void scheduleNext() {
 		Request nextRequest = processorQueue.peek();
 		long nextQuantum = Math.min(nextRequest.getTotalToProcess(), cpuQuantumInMilis);
-		lastUpdate = getScheduler().now();
-		send(new JEEvent(JEEventType.PREEMPTION, this, new JETime(nextQuantum).plus(lastUpdate), nextQuantum));
+		send(new JEEvent(JEEventType.PREEMPTION, this, getScheduler().now().add(nextQuantum), nextQuantum));
 	}
 	
 	public boolean isBusy() {

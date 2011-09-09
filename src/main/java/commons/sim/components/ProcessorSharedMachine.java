@@ -124,7 +124,7 @@ public class ProcessorSharedMachine extends JEAbstractEventHandler implements Ma
 	 * @return
 	 */
 	protected JETime calcEstimatedFinishTime(Request request, int queueSize) {
-		return new JETime(request.getTotalToProcess() * queueSize).plus(getScheduler().now());
+		return getScheduler().now().add(request.getTotalToProcess() * queueSize);
 	}
 
 	/**
@@ -267,12 +267,8 @@ public class ProcessorSharedMachine extends JEAbstractEventHandler implements Ma
 
 		for(Request currentRequest : this.queue){
 			Triple<Long, Long, Long> triple = new Triple<Long, Long, Long>();
-			JETime estimatedFinishTime = new JETime(currentRequest.getTotalToProcess() * requestsToShare); 
-			estimatedFinishTime = estimatedFinishTime.plus(getScheduler().now());
-			triple.firstValue = estimatedFinishTime.timeMilliSeconds;
-			estimatedFinishTime = new JETime(currentRequest.getTotalToProcess() * (requestsToShare+1)); 
-			estimatedFinishTime = estimatedFinishTime.plus(getScheduler().now());
-			triple.secondValue = estimatedFinishTime.timeMilliSeconds;
+			triple.firstValue = getScheduler().now().add(currentRequest.getTotalToProcess() * requestsToShare).timeMilliSeconds;
+			triple.secondValue = getScheduler().now().add(currentRequest.getTotalToProcess() * (requestsToShare+1)).timeMilliSeconds;
 			triple.thirdValue = currentRequest.getTotalToProcess();
 
 			executionTimes.add(triple);

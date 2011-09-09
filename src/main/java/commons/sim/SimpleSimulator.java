@@ -63,7 +63,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	
 	protected void prepareBeforeStart() {
 		send(new JEEvent(JEEventType.READWORKLOAD, this, getScheduler().now()));
-		send(new JEEvent(JEEventType.CHARGE_USERS, this, getScheduler().now().plus(new JETime(TickSize.DAY.getTickInMillis() * daysInMonths[currentMonth++]))));
+		send(new JEEvent(JEEventType.CHARGE_USERS, this, getScheduler().now().add(TickSize.DAY.getTickInMillis() * daysInMonths[currentMonth++])));
 	}
 
 	/**
@@ -76,6 +76,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 				try {
 					if(workloadParser.hasNext()) {
 						List<Request> list = workloadParser.next();
+						System.out.println(list.size());
 						for (Request request : list) {
 							request.reset();
 							send(parseEvent(request));
@@ -85,13 +86,17 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 						}
 						
 					}
+					if(workloadParser.hasNext()){
+						JETime newEventTime = getScheduler().now().add(TickSize.HOUR.getTickInMillis());
+						send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime));
+					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 				break;
 			case CHARGE_USERS:
 				this.monitor.chargeUsers(getScheduler().now().timeMilliSeconds);
-				JETime newEventTime = getScheduler().now().plus(new JETime(TickSize.DAY.getTickInMillis() * daysInMonths[currentMonth++]));
+				JETime newEventTime = getScheduler().now().add(TickSize.DAY.getTickInMillis() * daysInMonths[currentMonth++]);
 				if(currentMonth < daysInMonths.length && newEventTime.timeMilliSeconds < simulationEndTime){
 					send(new JEEvent(JEEventType.CHARGE_USERS, this, newEventTime));
 				}
