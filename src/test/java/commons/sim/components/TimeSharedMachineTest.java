@@ -72,7 +72,7 @@ public class TimeSharedMachineTest {
 		JEEvent event = captured.getValue();
 		assertNotNull(event);
 		assertEquals(JEEventType.PREEMPTION, event.getType());
-		assertEquals(new JETime(100L), event.getScheduledTime());
+		assertEquals(100L, event.getScheduledTime());
 		
 		EasyMock.verify(loadBalancer, request, machine);
 	}
@@ -103,7 +103,7 @@ public class TimeSharedMachineTest {
 		JEEvent event = captured.getValue();
 		assertNotNull(event);
 		assertEquals(JEEventType.PREEMPTION, event.getType());
-		assertEquals(new JETime(50L), event.getScheduledTime());
+		assertEquals(50L, event.getScheduledTime());
 		
 		EasyMock.verify(loadBalancer, request, machine);
 	}
@@ -181,7 +181,7 @@ public class TimeSharedMachineTest {
 		JEEvent event = captured.getValue();
 		assertNotNull(event);
 		assertEquals(JEEventType.PREEMPTION, event.getType());
-		assertEquals(new JETime(100L), event.getScheduledTime());
+		assertEquals(100L, event.getScheduledTime());
 		
 		EasyMock.verify(loadBalancer, request, machine);
 	}
@@ -301,8 +301,8 @@ public class TimeSharedMachineTest {
 		
 		JEEventScheduler scheduler = new JEEventScheduler();
 		Machine machine = new TimeSharedMachine(scheduler, descriptor, loadBalancer);
-		assertEquals(Double.NaN, machine.computeUtilisation(scheduler.now().timeMilliSeconds), 0.0001);
-		assertEquals(0, machine.computeUtilisation(scheduler.now().timeMilliSeconds + 300000), 0.0001);
+		assertEquals(Double.NaN, machine.computeUtilisation(scheduler.now()), 0.0001);
+		assertEquals(0, machine.computeUtilisation(scheduler.now() + 300000), 0.0001);
 		
 		EasyMock.verify(loadBalancer);
 	}
@@ -327,8 +327,8 @@ public class TimeSharedMachineTest {
 		
 		machine.sendRequest(request);
 		
-		assertEquals(Double.NaN, machine.computeUtilisation(scheduler.now().timeMilliSeconds), 0.0001);
-		assertEquals(1, machine.computeUtilisation(scheduler.now().timeMilliSeconds + 50), 0.0001);
+		assertEquals(Double.NaN, machine.computeUtilisation(scheduler.now()), 0.0001);
+		assertEquals(1, machine.computeUtilisation(scheduler.now() + 50), 0.0001);
 		
 		EasyMock.verify(loadBalancer, request);
 	}

@@ -3,6 +3,7 @@ package provisioning;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -11,6 +12,8 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import provisioning.util.WorkloadParserFactory;
+
 import commons.cloud.Contract;
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
@@ -18,13 +21,10 @@ import commons.cloud.Request;
 import commons.cloud.TypeProvider;
 import commons.cloud.User;
 import commons.config.Configuration;
-import commons.config.PropertiesTesting;
-import commons.io.GEISTSingleFileWorkloadParser;
 import commons.io.WorkloadParser;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEEventScheduler;
-import commons.sim.jeevent.JETime;
 import commons.sim.provisioningheuristics.RanjanStatistics;
 import commons.sim.util.SaaSAppProperties;
 
@@ -250,7 +250,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 	 * @throws Exception 
 	 */
 	@Test
-	@PrepareForTest({Configuration.class, DynamicProvisioningSystem.class})
+	@PrepareForTest({Configuration.class, WorkloadParserFactory.class})
 	public void testEvaluateUtilisationWithOneServerToBeAdded() throws Exception{
 		int reservationLimit = 1;
 		int onDemandLimit = 1;
@@ -262,7 +262,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		RanjanStatistics statistics = new RanjanStatistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(0));
+		EasyMock.expect(scheduler.now()).andReturn(0l);
 		EasyMock.replay(scheduler);
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
@@ -274,7 +274,11 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		//Mocks
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(5);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(4);
+		
+		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
+		PowerMock.mockStatic(WorkloadParserFactory.class);
+		EasyMock.expect(WorkloadParserFactory.getWorkloadParser()).andReturn(parser);
 		
 		ArrayList<Provider> providers = new ArrayList<Provider>();
 		ArrayList<TypeProvider> types = new ArrayList<TypeProvider>();
@@ -285,10 +289,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
-		EasyMock.expect(config.getWorkloads()).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
 		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(1d).times(2);
-		
-		GEISTSingleFileWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(GEISTSingleFileWorkloadParser.class, PropertiesTesting.VALID_WORKLOAD);
 		
 		PowerMock.replayAll(config, parser);
 		
@@ -309,7 +310,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 	 * @throws Exception 
 	 */
 	@Test
-	@PrepareForTest({Configuration.class, DynamicProvisioningSystem.class})
+	@PrepareForTest({Configuration.class, WorkloadParserFactory.class})
 	public void testEvaluateUtilisationWithOnDemandAndReservedServersToBeAdded() throws Exception{
 		int reservationLimit = 5;
 		int onDemandLimit = 10;
@@ -325,7 +326,6 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.replay(scheduler);
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
-		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		configurable.addServer(0, new MachineDescriptor(0, true, MachineType.MEDIUM), true);
 		configurable.addServer(0, new MachineDescriptor(1, true, MachineType.MEDIUM), true);
 		configurable.addServer(0, new MachineDescriptor(2, true, MachineType.MEDIUM), true);
@@ -335,12 +335,13 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		configurable.addServer(0, new MachineDescriptor(6, false, MachineType.SMALL), true);
 		configurable.addServer(0, new MachineDescriptor(7, false, MachineType.SMALL), true);
 		configurable.addServer(0, new MachineDescriptor(8, false, MachineType.SMALL), true);
+		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		EasyMock.replay(configurable);
 		
 		//Configuration mock
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(5);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(4);
 		
 		ArrayList<Provider> providers = new ArrayList<Provider>();
 		ArrayList<TypeProvider> types = new ArrayList<TypeProvider>();
@@ -352,16 +353,17 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
-		EasyMock.expect(config.getWorkloads()).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
 		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(10);
 		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d).times(10);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
 		
-		GEISTSingleFileWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(GEISTSingleFileWorkloadParser.class, PropertiesTesting.VALID_WORKLOAD);
-		PowerMock.replay(GEISTSingleFileWorkloadParser.class);
-		PowerMock.replay(parser);
+		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
+		PowerMock.mockStatic(WorkloadParserFactory.class);
+		EasyMock.expect(WorkloadParserFactory.getWorkloadParser()).andReturn(parser);
+		PowerMock.replay(WorkloadParserFactory.class);
+		EasyMock.replay(parser);
 		
 		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines();
 		this.dps.registerConfigurable(configurable);
@@ -380,7 +382,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 	 * @throws Exception 
 	 */
 	@Test
-	@PrepareForTest({Configuration.class, DynamicProvisioningSystem.class})
+	@PrepareForTest({Configuration.class, WorkloadParserFactory.class})
 	public void testEvaluateUtilisationWithOnlyReservedServersToBeAdded() throws Exception{
 		int reservationLimit = 5;
 		int onDemandLimit = 10;
@@ -396,17 +398,17 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.replay(scheduler);
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
-		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		configurable.addServer(0, new MachineDescriptor(0, true, MachineType.MEDIUM), true);
 		configurable.addServer(0, new MachineDescriptor(1, true, MachineType.MEDIUM), true);
 		configurable.addServer(0, new MachineDescriptor(2, true, MachineType.MEDIUM), true);
 		configurable.addServer(0, new MachineDescriptor(3, true, MachineType.MEDIUM), true);
+		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		EasyMock.replay(configurable);
 		
 		//Configuration mock
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(5);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(4);
 		
 		ArrayList<Provider> providers = new ArrayList<Provider>();
 		ArrayList<TypeProvider> types = new ArrayList<TypeProvider>();
@@ -417,15 +419,16 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
-		EasyMock.expect(config.getWorkloads()).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
 		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(4d).times(8);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
 		
-		GEISTSingleFileWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(GEISTSingleFileWorkloadParser.class, PropertiesTesting.VALID_WORKLOAD);
-		PowerMock.replay(GEISTSingleFileWorkloadParser.class);
-		PowerMock.replay(parser);
+		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
+		PowerMock.mockStatic(WorkloadParserFactory.class);
+		EasyMock.expect(WorkloadParserFactory.getWorkloadParser()).andReturn(parser);
+		PowerMock.replay(WorkloadParserFactory.class);
+		EasyMock.replay(parser);
 		
 		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines();
 		this.dps.registerConfigurable(configurable);
@@ -441,7 +444,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 	 * @throws Exception 
 	 */
 	@Test
-	@PrepareForTest({Configuration.class, DynamicProvisioningSystem.class})
+	@PrepareForTest({Configuration.class, WorkloadParserFactory.class})
 	public void handleEvaluateUtilisationWithServersToRemove() throws Exception{
 		int reservationLimit = 3;
 		int onDemandLimit = 10;
@@ -462,7 +465,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		//Configuration mock
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(4);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		ArrayList<Provider> providers = new ArrayList<Provider>();
 		ArrayList<TypeProvider> types = new ArrayList<TypeProvider>();
@@ -474,14 +477,15 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
-		EasyMock.expect(config.getWorkloads()).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
 		
-		GEISTSingleFileWorkloadParser parser = PowerMock.createStrictMockAndExpectNew(GEISTSingleFileWorkloadParser.class, PropertiesTesting.VALID_WORKLOAD);
-		PowerMock.replay(GEISTSingleFileWorkloadParser.class);
-		PowerMock.replay(parser);
+		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
+		PowerMock.mockStatic(WorkloadParserFactory.class);
+		EasyMock.expect(WorkloadParserFactory.getWorkloadParser()).andReturn(parser);
+		PowerMock.replay(WorkloadParserFactory.class);
+		EasyMock.replay(parser);
 		
 		//Creating dps
 		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines();

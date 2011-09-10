@@ -99,7 +99,7 @@ public class RanjanMachineTest {
 		JEEvent event = captured.getValue();
 		assertNotNull(event);
 		assertEquals(JEEventType.PREEMPTION, event.getType());
-		assertEquals(new JETime(100L), event.getScheduledTime());
+		assertEquals(100L, event.getScheduledTime());
 		
 		PowerMock.verifyAll();
 	}
@@ -135,7 +135,7 @@ public class RanjanMachineTest {
 		JEEvent event = captured.getValue();
 		assertNotNull(event);
 		assertEquals(JEEventType.PREEMPTION, event.getType());
-		assertEquals(new JETime(50L), event.getScheduledTime());
+		assertEquals(50L, event.getScheduledTime());
 		
 		PowerMock.verifyAll();
 	}
@@ -407,8 +407,8 @@ public class RanjanMachineTest {
 		EasyMock.expect(config.getLong(RANJAN_HEURISTIC_BACKLOG_SIZE)).andReturn(backlogSize);
 		
 		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(3);
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(100)).times(3);
+		EasyMock.expect(scheduler.now()).andReturn(0l).times(3);
+		EasyMock.expect(scheduler.now()).andReturn(100l).times(3);
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
 		firstRequest.assignTo(MachineType.SMALL);
@@ -456,7 +456,7 @@ public class RanjanMachineTest {
 		Configuration config = mockConfiguration();
 		
 		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(0L)).times(3);
+		EasyMock.expect(scheduler.now()).andReturn(0L).times(3);
 		
 		Request request = EasyMock.createStrictMock(Request.class);
 		request.assignTo(MachineType.SMALL);

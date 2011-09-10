@@ -38,12 +38,12 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 	}
 
 	public long evaluateNumberOfServersForNextInterval(RanjanStatistics statistics) {
-		double averageUtilization = statistics.averageUtilisation / statistics.totalNumberOfServers;
+		double averageUtilisation = statistics.averageUtilisation / statistics.totalNumberOfServers;
 		double d;
 		if(statistics.numberOfRequestsCompletionsInLastInterval == 0){
-			d = averageUtilization;
+			d = averageUtilisation;
 		}else{
-			d = averageUtilization / statistics.numberOfRequestsCompletionsInLastInterval;
+			d = averageUtilisation / statistics.numberOfRequestsCompletionsInLastInterval;
 		}
 		
 		double u_lign = Math.max(statistics.numberOfRequestsArrivalInLastInterval, statistics.numberOfRequestsCompletionsInLastInterval) * d;

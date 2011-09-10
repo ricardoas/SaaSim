@@ -38,7 +38,7 @@ public class RanjanHeuristicTest {
 	 */
 	@Test
 	public void testGetServerWithoutMachines(){
-		String userID = "u1";
+		long userID = 1l;
 		long time = ONE_MINUTE_IN_MILLIS * 10;
 		
 		Request request = EasyMock.createStrictMock(Request.class);
@@ -56,7 +56,7 @@ public class RanjanHeuristicTest {
 	
 	@Test
 	public void testGetServerForFirstRequest(){
-		String userID = "u1";
+		long userID = 1l;
 		long time = ONE_MINUTE_IN_MILLIS * 1;
 		
 		Request request = EasyMock.createNiceMock(Request.class);
@@ -82,12 +82,12 @@ public class RanjanHeuristicTest {
 	 */
 	@Test
 	public void testGetServerForFirstRequestsWithMultipleServers(){
-		String userID = "u1";
-		String secondUserID = "u2";
-		String thirdUserID = "u3";
-		String fourthUserID = "u4";
-		String fifthUserID = "u5";
-		String sixthUserID = "u6";
+		long userID = 1l;
+		long secondUserID = 2l;
+		long thirdUserID = 3l;
+		long fourthUserID = 4l;
+		long fifthUserID = 5l;
+		long sixthUserID =  6l;
 
 		long time = ONE_MINUTE_IN_MILLIS * 1;
 		
@@ -176,7 +176,7 @@ public class RanjanHeuristicTest {
 	 */
 	@Test
 	public void testGetServerForFirstRequestsWithMultipleServers2(){
-		String userID = "u1";
+		long userID = 1l;
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
 		Machine machine1 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false, MachineType.SMALL), null);
@@ -267,8 +267,8 @@ public class RanjanHeuristicTest {
 	 */
 	@Test
 	public void testGetServerForFirstRequestsWithMultipleServers3(){
-		String userID = "u1";
-		String secondUserID = "u2";
+		long userID = 999l;
+		long secondUserID = 888l;
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
 		Machine machine1 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false, MachineType.SMALL), null);
@@ -362,7 +362,7 @@ public class RanjanHeuristicTest {
 
 	@Test
 	public void testResetCounters(){
-		String userID = "u1";
+		long userID = 100000l;
 		long time = ONE_MINUTE_IN_MILLIS * 1;
 		
 		Request request = EasyMock.createNiceMock(Request.class);

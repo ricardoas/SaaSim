@@ -24,6 +24,7 @@ import commons.cloud.UtilityResultEntry;
 import commons.config.Configuration;
 import commons.config.PropertiesTesting;
 import commons.sim.components.MachineDescriptor;
+import commons.sim.provisioningheuristics.RanjanStatistics;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -76,7 +77,12 @@ public class MonitorTest {
 	 */
 	@Test
 	public void testEvaluateUtilisation() {
-		fail("Not yet implemented");
+		RanjanStatistics statistics = EasyMock.createStrictMock(RanjanStatistics.class);
+		EasyMock.replay(statistics);
+		
+		monitor.evaluateUtilisation(1000, statistics, 0);
+		
+		EasyMock.verify(statistics);
 	}
 
 	/**

@@ -39,11 +39,23 @@ public class JEEventScheduler {
     public void queueEvent(JEEvent event) {
     	
     	long anEventTime = event.getScheduledTime();
-		if (anEventTime - now() < 0) {
+		if (anEventTime - now() < 0 || isEventAfterEnd(anEventTime)) {
 		    throw new JEException("ERROR: emulation time(" + now() + ") already ahead of event time("+anEventTime+"). Event is outdated and will not be processed.");
 		}
 		eventSet.add(event);
     }
+
+	private boolean isEventAfterEnd(long anEventTime) {
+		if(anEventTime > this.simulationEnd){
+			if(this.simulationEnd == JETime.INFINITY.timeMilliSeconds){
+				return false;
+			}else{
+				return true;
+			}
+		}else{
+			return false;
+		}
+	}
     
     /**
      * Cancel a future event by removing it from the queue.
@@ -90,7 +102,7 @@ public class JEEventScheduler {
      */
     private void schedule() {
     	
-    	while(!eventSet.isEmpty() && (now() != simulationEnd)){
+    	while(!eventSet.isEmpty() && (shouldEventBeProcessed())){
     		JEEvent event = eventSet.pollFirst();
 			
     		long scheduledTime = event.getScheduledTime();
@@ -106,6 +118,15 @@ public class JEEventScheduler {
 			}
     	}
     }
+
+	private boolean shouldEventBeProcessed() {
+		if(now() <= simulationEnd){
+			return true;
+		}else if(simulationEnd == JETime.INFINITY.timeMilliSeconds){
+			return true;
+		}
+		return false;
+	}
     
     /**
      * Searches for the target handler and delivers the event.

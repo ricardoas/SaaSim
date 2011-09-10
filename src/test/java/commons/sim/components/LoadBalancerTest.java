@@ -56,7 +56,7 @@ public class LoadBalancerTest {
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(LoadBalancer.class))).andReturn(1);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(TimeSharedMachine.class))).andReturn(2);
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(2);
+		EasyMock.expect(scheduler.now()).andReturn(0l).times(2);
 		Capture<JEEvent> captured = new Capture<JEEvent>();
 		scheduler.queueEvent(EasyMock.capture(captured));
 		
@@ -78,7 +78,7 @@ public class LoadBalancerTest {
 		
 		JEEvent event = captured.getValue();
 		assertEquals(JEEventType.ADD_SERVER, event.getType());
-		assertEquals(1000l, event.getScheduledTime().timeMilliSeconds);
+		assertEquals(1000l, event.getScheduledTime());
 		
 		PowerMock.verifyAll();
 	}
@@ -90,7 +90,7 @@ public class LoadBalancerTest {
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(LoadBalancer.class))).andReturn(1);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(TimeSharedMachine.class))).andReturn(2);
-		EasyMock.expect(scheduler.now()).andReturn(new JETime(0)).times(2);
+		EasyMock.expect(scheduler.now()).andReturn(0l).times(2);
 		Capture<JEEvent> captured = new Capture<JEEvent>();
 		scheduler.queueEvent(EasyMock.capture(captured));
 		
@@ -112,7 +112,7 @@ public class LoadBalancerTest {
 		
 		JEEvent event = captured.getValue();
 		assertEquals(JEEventType.ADD_SERVER, event.getType());
-		assertEquals(0, event.getScheduledTime().timeMilliSeconds);
+		assertEquals(0, event.getScheduledTime());
 		
 		PowerMock.verifyAll();
 	}
@@ -200,7 +200,7 @@ public class LoadBalancerTest {
 		
 		lb = new LoadBalancer(eventScheduler, null, schedulingHeuristic, Integer.MAX_VALUE, 1);
 		lb.addServer(descriptor, false);
-		JEEvent machineIsUpEvent = new JEEvent(JEEventType.ADD_SERVER, lb, new JETime(0), machine);
+		JEEvent machineIsUpEvent = new JEEvent(JEEventType.ADD_SERVER, lb, 0l, machine);
 		lb.handleEvent(machineIsUpEvent);
 		lb.handleEvent(newRequestEvent);
 		
@@ -277,7 +277,7 @@ public class LoadBalancerTest {
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		monitor.evaluateUtilisation(0, new RanjanStatistics((utilisation1+utilisation2)/2, totalArrivals, totalCompletions, 2), 0);
-		EasyMock.expect(monitor.getSimulationEndTime()).andReturn(eventScheduler.now().timeMilliSeconds);
+		EasyMock.expect(monitor.getSimulationEndTime()).andReturn(eventScheduler.now());
 		EasyMock.replay(monitor);
 		
 		lb = new LoadBalancer(eventScheduler, monitor, schedulingHeuristic, Integer.MAX_VALUE, 0);
@@ -294,14 +294,14 @@ public class LoadBalancerTest {
 		lb.addServer(descriptor, true);
 		lb.addServer(descriptor2, true);
 		
-		JEEvent machineIsUpEvent = new JEEvent(JEEventType.ADD_SERVER, lb, new JETime(0), machine1);
-		JEEvent machineIsUpEvent2 = new JEEvent(JEEventType.ADD_SERVER, lb, new JETime(0), machine2);
+		JEEvent machineIsUpEvent = new JEEvent(JEEventType.ADD_SERVER, lb, 0l, machine1);
+		JEEvent machineIsUpEvent2 = new JEEvent(JEEventType.ADD_SERVER, lb, 0l, machine2);
 		
 		lb.handleEvent(machineIsUpEvent);
 		lb.handleEvent(machineIsUpEvent2);
 		
 		//Calculating utilisation
-		lb.handleEvent(new JEEvent(JEEventType.EVALUATEUTILIZATION, lb, new JETime(0), evaluationTime));
+		lb.handleEvent(new JEEvent(JEEventType.EVALUATEUTILIZATION, lb, 0l, evaluationTime));
 		
 		PowerMock.verifyAll();
 	}
@@ -328,13 +328,13 @@ public class LoadBalancerTest {
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		monitor.evaluateUtilisation(0, new RanjanStatistics(0, totalArrivals, totalCompletions, 0), 0);
-		EasyMock.expect(monitor.getSimulationEndTime()).andReturn(eventScheduler.now().timeMilliSeconds);
+		EasyMock.expect(monitor.getSimulationEndTime()).andReturn(eventScheduler.now());
 		EasyMock.replay(monitor);
 		
 		lb = new LoadBalancer(eventScheduler, monitor, schedulingHeuristic, Integer.MAX_VALUE, 0);
 		
 		//Calculating utilisation
-		lb.handleEvent(new JEEvent(JEEventType.EVALUATEUTILIZATION, lb, new JETime(0), evaluationTime));
+		lb.handleEvent(new JEEvent(JEEventType.EVALUATEUTILIZATION, lb, 0l, evaluationTime));
 		
 		PowerMock.verifyAll();
 	}
@@ -351,7 +351,7 @@ public class LoadBalancerTest {
 		
 		lb = new LoadBalancer(eventScheduler, monitor, schedulingHeuristic, Integer.MAX_VALUE, 0);
 		
-		lb.handleEvent(new JEEvent(JEEventType.MACHINE_TURNED_OFF, lb, new JETime(0), machineDescriptor));
+		lb.handleEvent(new JEEvent(JEEventType.MACHINE_TURNED_OFF, lb, 0l, machineDescriptor));
 		
 		EasyMock.verify(monitor, this.schedulingHeuristic);
 	}
@@ -368,7 +368,7 @@ public class LoadBalancerTest {
 		
 		lb = new LoadBalancer(eventScheduler, monitor, schedulingHeuristic, Integer.MAX_VALUE, 0);
 		
-		lb.handleEvent(new JEEvent(JEEventType.REQUESTQUEUED, lb, new JETime(0), request));
+		lb.handleEvent(new JEEvent(JEEventType.REQUESTQUEUED, lb, 0l, request));
 		
 		EasyMock.verify(monitor, this.schedulingHeuristic, request);
 	}

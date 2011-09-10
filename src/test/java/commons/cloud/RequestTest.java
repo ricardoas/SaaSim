@@ -21,7 +21,7 @@ public class RequestTest {
 	
 	@Before
 	public void setUp(){
-		request = new Request("1", "c1", "user1", 0, 100, 1024000, new long[]{SMALL_DEMAND, LARGE_DEMAND, XLARGE_DEMAND});
+		request = new Request(1l, "c1", 17756636l, 0, 100, 1024000, new long[]{SMALL_DEMAND, LARGE_DEMAND, XLARGE_DEMAND});
 	}
 
 	/**
