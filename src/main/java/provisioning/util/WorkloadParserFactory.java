@@ -6,7 +6,6 @@ package provisioning.util;
 import java.util.List;
 
 import commons.cloud.Request;
-import commons.cloud.User;
 import commons.config.Configuration;
 import commons.io.GEISTMultiFileWorkloadParser;
 import commons.io.GEISTSingleFileWorkloadParser;
@@ -35,9 +34,8 @@ public class WorkloadParserFactory {
 			if(workloads.length == 1){
 				return new TimeBasedWorkloadParser(pageSize, new GEISTSingleFileWorkloadParser(workloads[0]));
 			}
-			List<User> users = config.getUsers();
 			for (int i = 0; i < parsers.length; i++) {
-				parsers[i] = new GEISTMultiFileWorkloadParser(workloads[i], users.get(i).getId());
+				parsers[i] = new GEISTMultiFileWorkloadParser(workloads[i], i);
 			}
 			return new TimeBasedWorkloadParser(pageSize, parsers);
 		default:

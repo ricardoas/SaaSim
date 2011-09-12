@@ -30,7 +30,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 	
 	@Override
 	public void findPlan(HistoryBasedWorkloadParser workloadParser,
-			List<Provider> cloudProviders, List<User> cloudUsers) {
+			Provider[] cloudProviders, User[] cloudUsers) {
 		
 		DPS dps = DPSFactory.createDPS();
 		
@@ -65,7 +65,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 	}
 
 	@Override
-	public Map<MachineType, Integer> getPlan(List<User> cloudUsers) {
+	public Map<MachineType, Integer> getPlan(User[] cloudUsers) {
 		return this.plan;
 	}
 

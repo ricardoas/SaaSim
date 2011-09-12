@@ -30,6 +30,4 @@ public interface DynamicConfigurable {
 
 	void removeServer(int tier, boolean force);
 	
-	long getSimulationEndTime();
-	
 }

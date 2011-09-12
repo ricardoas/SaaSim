@@ -2,14 +2,13 @@ package provisioning;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.config.Configuration;
-import commons.sim.provisioningheuristics.RanjanStatistics;
+import commons.sim.provisioningheuristics.MachineStatistics;
 
 /**
  * This class represents the DPS business logic modified from original RANJAN. Here some statistics of current
@@ -33,7 +32,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 	}
 	
 	@Override
-	public void evaluateUtilisation(long now, RanjanStatistics statistics, int tier) {
+	public void sendStatistics(long now, MachineStatistics statistics, int tier) {
 		long numberOfServersToAdd = evaluateNumberOfServersForNextInterval(statistics);
 		
 		if(numberOfServersToAdd > 0){
@@ -45,7 +44,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 		}
 	}
 
-	public long evaluateNumberOfServersForNextInterval(RanjanStatistics statistics) {
+	public long evaluateNumberOfServersForNextInterval(MachineStatistics statistics) {
 		double averageUtilization = statistics.averageUtilisation;
 		double d;
 		if(statistics.numberOfRequestsCompletionsInLastInterval == 0){
@@ -75,9 +74,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 		List<MachineType> typeList = Arrays.asList(MachineType.values());
 		Collections.reverse(typeList);
 		for(MachineType machineType: typeList){//TODO test which order is the best
-			Iterator<Provider> iterator = this.providers.values().iterator();
-			while(iterator.hasNext()){
-				Provider provider = iterator.next();
+			for (Provider provider : providers) {
 				while(provider.canBuyMachine(true, machineType) && 
 						serversAdded + config.getRelativePower(machineType) <= numberOfServersToAdd){
 					configurable.addServer(tier, provider.buyMachine(true, machineType), true);
@@ -95,9 +92,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 		//If servers are still needed ...
 		if(serversAdded < numberOfServersToAdd){
 			for(MachineType machineType : this.acceleratorTypes){
-				Iterator<Provider> iterator = this.providers.values().iterator();
-				while(iterator.hasNext()){
-					Provider provider = iterator.next();
+				for (Provider provider : providers) {
 					while(provider.canBuyMachine(false, machineType) && 
 							serversAdded + config.getRelativePower(machineType) <= numberOfServersToAdd){
 						configurable.addServer(tier, provider.buyMachine(false, machineType), true);

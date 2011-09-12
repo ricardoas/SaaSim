@@ -1,6 +1,5 @@
 package planning.heuristic;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -30,25 +29,21 @@ public class OverProvisionHeuristic implements PlanningHeuristic{
 
 	@Override
 	public void findPlan(HistoryBasedWorkloadParser workloadParser,
-			List<Provider> cloudProviders, List<User> cloudUsers) {
+			Provider[] cloudProviders, User[] cloudUsers) {
 
 		WorkloadParser<List<Request>> currentParser = WorkloadParserFactory.getWorkloadParser(Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME));
 		maximumNumberOfServers = 0;
 		
 		while(currentParser.hasNext()){
-			try {
-				List<Request> requests = currentParser.next();
-				Set<Long> simultaneousUsers = new HashSet<Long>();
-				
-				for(Request request : requests){
-					simultaneousUsers.add(request.getUserID());
-				}
-				
-				if(simultaneousUsers.size() > maximumNumberOfServers){
-					maximumNumberOfServers = simultaneousUsers.size();
-				}
-			} catch (IOException e) {
-				throw new RuntimeException(e.getMessage());
+			List<Request> requests = currentParser.next();
+			Set<Integer> simultaneousUsers = new HashSet<Integer>();
+
+			for(Request request : requests){
+				simultaneousUsers.add(request.getUserID());
+			}
+
+			if(simultaneousUsers.size() > maximumNumberOfServers){
+				maximumNumberOfServers = simultaneousUsers.size();
 			}
 		}
 	}
@@ -59,7 +54,7 @@ public class OverProvisionHeuristic implements PlanningHeuristic{
 	}
 
 	@Override
-	public Map<MachineType, Integer> getPlan(List<User> cloudUsers) {
+	public Map<MachineType, Integer> getPlan(User[] cloudUsers) {
 		Map<MachineType, Integer> plan = new HashMap<MachineType, Integer>();
 		MachineType machineType = MachineType.valueOf(Configuration.getInstance().getString(SimulatorProperties.PLANNING_TYPE).toUpperCase());
 		plan.put(machineType, (int)Math.ceil(maximumNumberOfServers * FACTOR));

@@ -54,9 +54,9 @@ public class Configuration	extends PropertiesConfiguration{
 	 */
 	private static Configuration instance;
 	
-	private List<Provider> providers;
+	private Provider[] providers;
 	
-	private List<User> users;
+	private User[] users;
 
 	private HashMap<MachineType, Double> relativePower;
 	
@@ -207,7 +207,7 @@ public class Configuration	extends PropertiesConfiguration{
 	 * @return
 	 * @throws IOException
 	 */
-	public List<Provider> getProviders() {
+	public Provider[] getProviders() {
 		return this.providers;
 	}
 
@@ -226,7 +226,7 @@ public class Configuration	extends PropertiesConfiguration{
 	 * @return A map containing each contract name and its characterization
 	 * @throws IOException
 	 */
-	public List<User> getUsers() {
+	public User[] getUsers() {
 		return this.users;
 	}
 
@@ -282,17 +282,17 @@ public class Configuration	extends PropertiesConfiguration{
 							planStorageLimits[i], planExtraStorageCosts[i]));
 		}
 		
-		String[] ids = getStringArray(SAAS_USER_ID);
+//		String[] ids = getStringArray(SAAS_USER_ID);
 		String[] plans = getStringArray(SAAS_USER_PLAN);
 		long[] storage = getLongArray(SAAS_USER_STORAGE);
 		
-		users = new ArrayList<User>();
+		users = new User[plans.length];
 		for (int i = 0; i < plans.length; i++) {
 			if(!contractsPerName.containsKey(plans[i])){
 				throw new ConfigurationException("Cannot find configuration for plan " + plans[i] + ". Check contracts file.");
 			}
 			
-			users.add(new User(ids[i], contractsPerName.get(plans[i]), storage[i]));
+			users[i] = new User(i, contractsPerName.get(plans[i]), storage[i]);
 		}
 	}
 
@@ -325,7 +325,7 @@ public class Configuration	extends PropertiesConfiguration{
 		MachineType[][] machines = getEnum2DArray(IAAS_PLAN_PROVIDER_TYPES, MachineType.class);
 		long[][] reservations = getLong2DArray(IAAS_PLAN_PROVIDER_RESERVATION);
 		
-		providers = new ArrayList<Provider>();
+		providers = new Provider[numberOfProviders];
 		
 		for(int i = 0; i < numberOfProviders; i++){
 			
@@ -360,7 +360,7 @@ public class Configuration	extends PropertiesConfiguration{
 					int index = typeList.indexOf(machinesType[i][j]);
 					reservation = (index == -1)? 0: reservations[providerIndex][index];
 				}
-				types.add(new TypeProvider(machinesType[i][j], onDemandCpuCosts[i][j], reservedCpuCosts[i][j], 
+				types.add(new TypeProvider(i, machinesType[i][j], onDemandCpuCosts[i][j], reservedCpuCosts[i][j], 
 						reservationOneYearFees[i][j], reservationThreeYearsFees[i][j], reservation));
 			}
 			
@@ -372,9 +372,9 @@ public class Configuration	extends PropertiesConfiguration{
 				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TRANSFER_OUT + " and " + IAAS_PROVIDER_COST_TRANSFER_OUT);
 			}
 			
-			providers.add(new Provider(names[i], onDemandLimits[i], reservedLimits[i],
-							monitoringCosts[i], transferInLimits[i], transferInCosts[i], 
-							transferOutLimits[i], transferOutCosts[i], types));
+			providers[i] = new Provider(i, names[i], onDemandLimits[i],
+							reservedLimits[i], monitoringCosts[i], transferInLimits[i], 
+							transferInCosts[i], transferOutLimits[i], transferOutCosts[i], types);
 		}
 		
 		
@@ -517,11 +517,11 @@ public class Configuration	extends PropertiesConfiguration{
 		
 		Validator.checkPositive(SAAS_NUMBER_OF_USERS, getString(SAAS_NUMBER_OF_USERS));
 		
-		checkSize(SAAS_USER_ID, SAAS_NUMBER_OF_USERS);
+//		checkSize(SAAS_USER_ID, SAAS_NUMBER_OF_USERS);
 		checkSize(SAAS_USER_STORAGE, SAAS_NUMBER_OF_USERS);
 		checkSize(SAAS_USER_PLAN, SAAS_NUMBER_OF_USERS);
 		
-		Validator.checkIsNonEmptyStringArray(SAAS_USER_ID, getStringArray(SAAS_USER_ID));
+//		Validator.checkIsNonEmptyStringArray(SAAS_USER_ID, getStringArray(SAAS_USER_ID));
 		Validator.checkIsNonEmptyStringArray(SAAS_USER_PLAN, getStringArray(SAAS_USER_PLAN));
 		Validator.checkIsNonNegativeArray(SAAS_USER_STORAGE, getStringArray(SAAS_USER_STORAGE));
 		

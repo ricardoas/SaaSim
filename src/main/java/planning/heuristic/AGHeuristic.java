@@ -1,9 +1,10 @@
 package planning.heuristic;
 
-import static commons.sim.util.IaaSPlanProperties.*;
+import static commons.sim.util.IaaSPlanProperties.IAAS_PLAN_PROVIDER_NAME;
+import static commons.sim.util.IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION;
+import static commons.sim.util.IaaSPlanProperties.IAAS_PLAN_PROVIDER_TYPES;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import provisioning.DPS;
@@ -24,7 +25,7 @@ public class AGHeuristic implements PlanningHeuristic{
 
 	@Override
 	public void findPlan(HistoryBasedWorkloadParser workloadParser,
-			List<Provider> cloudProviders, List<User> cloudUsers) {
+			Provider[] cloudProviders, User[] cloudUsers) {
 		//TODO: Read data from output file of JGAP, and simulate it in order to obtain detailed information
 //		Configuration.buildInstance(args[0]);
 		Configuration config = Configuration.getInstance();
@@ -48,7 +49,7 @@ public class AGHeuristic implements PlanningHeuristic{
 	}
 
 	@Override
-	public Map<MachineType, Integer> getPlan(List<User> cloudUsers) {
+	public Map<MachineType, Integer> getPlan(User[] cloudUsers) {
 		Map<MachineType, Integer> plan = new HashMap<MachineType, Integer>();
 		//TODO read from files obtained from JGAP!
 		return plan;

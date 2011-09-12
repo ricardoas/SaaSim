@@ -8,6 +8,7 @@ package commons.sim.jeevent;
  *
  * @author thiago - thiago@lsd.ufcg.edu.br
  */
+@Deprecated
 public class JETime implements Comparable<JETime> {
 	
 	/**

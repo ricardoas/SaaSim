@@ -1,6 +1,5 @@
 package commons.io;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,11 +32,11 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<Request> next() throws IOException {
+	public List<Request> next(){
 		List<Request> requests = new ArrayList<Request>(leftOver);
 		
 		long time = (currentTick + 1) * tick;
-		
+		leftOver.clear();
 		for (Request request : requests) {
 			if(request.getArrivalTimeInMillis() >= time){
 				leftOver.add(request);

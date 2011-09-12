@@ -15,7 +15,7 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	 */
 	private static class UserEntry{
 
-		private final String userID;
+		private final int userID;
 		private String contractName;
 		private double totalReceipt;
 		private long extraConsumedCPU;
@@ -28,7 +28,7 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 		 * Default constructor.
 		 * @param userID
 		 */
-		public UserEntry(String userID) {
+		public UserEntry(int userID) {
 			this.userID = userID;
 		}
 
@@ -224,8 +224,8 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	private double cost;
 	private double penalty;
 	
-	private Map<String, UserEntry> users;
-	private Map<String, ProviderEntry> providers;
+	private UserEntry[] users;
+	private ProviderEntry[] providers;
 	
 	/**
 	 * Default constructor
@@ -233,18 +233,18 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	 * @param providers2 
 	 * @param users 
 	 */
-	public UtilityResultEntry(long time, Map<String, User> users, Map<String, Provider> providers) {
+	public UtilityResultEntry(long time, User[] users, Provider[] providers) {
 		this.time = time;
 		this.receipt = 0;
 		this.cost = 0;
 		this.penalty = 0;
-		this.users = new TreeMap<String, UserEntry>();
-		for (Entry<String, User> entry : users.entrySet()) {
-			this.users.put(entry.getKey(), new UserEntry(entry.getKey()));
+		this.users = new UserEntry[users.length];
+		for (int i = 0; i < users.length; i++) {
+			this.users[i] = new UserEntry(i);
 		}
-		this.providers = new TreeMap<String, ProviderEntry>();
-		for (Entry<String, Provider> entry : providers.entrySet()) {
-			this.providers.put(entry.getKey(), new ProviderEntry(entry.getKey(), entry.getValue().getAvailableTypes()));
+		this.providers = new ProviderEntry[providers.length];
+		for (int i = 0; i < providers.length; i++) {
+			this.providers[i] = new ProviderEntry(providers[i].getName(), providers[i].getAvailableTypes());
 		}
 	}
 	
@@ -298,19 +298,19 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	 * @param storageCost 
 	 * @param costOfCPU 
 	 */
-	public void addToReceipt(String userID, String contractName, long extraConsumedCPU, double cpuCost, long consumedTransference, double transferenceCost, double storageCost) {
+	public void addToReceipt(int userID, String contractName, long extraConsumedCPU, double cpuCost, long consumedTransference, double transferenceCost, double storageCost) {
 		double total = cpuCost + transferenceCost + storageCost;
-		users.get(userID).add(contractName, extraConsumedCPU, cpuCost, consumedTransference, transferenceCost, storageCost, total);
+		users[userID].add(contractName, extraConsumedCPU, cpuCost, consumedTransference, transferenceCost, storageCost, total);
 		receipt += total;
 	}
 
-	public void addTransferenceToCost(String provider, long inTransference, double inCost, long outTransference, double outCost) {
-		providers.get(provider).addTransference(inTransference, inCost, outTransference, outCost);
+	public void addTransferenceToCost(int provider, long inTransference, double inCost, long outTransference, double outCost) {
+		providers[provider].addTransference(inTransference, inCost, outTransference, outCost);
 		this.cost += (inCost + outCost);
 	}
 	
-	public void addUsageToCost(String provider, MachineType type, long onDemandCPUHours, double onDemandCost, long reservedCPUHours, double reservedCost, double monitoringCost) {
-		providers.get(provider).addUsage(type, onDemandCPUHours, onDemandCost, reservedCPUHours, reservedCost, monitoringCost);
+	public void addUsageToCost(int provider, MachineType type, long onDemandCPUHours, double onDemandCost, long reservedCPUHours, double reservedCost, double monitoringCost) {
+		providers[provider].addUsage(type, onDemandCPUHours, onDemandCost, reservedCPUHours, reservedCost, monitoringCost);
 		this.cost += (onDemandCost + reservedCost + monitoringCost);
 	}
 
@@ -367,4 +367,19 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 		}
 		return sb.toString().substring(0, sb.length()-1);
 	}
+	
+	/**
+	 * @param map
+	 * @return
+	 */
+	private static <T> String format(T[] map) {
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < map.length-1; i++) {
+			sb.append(map[i]);
+			sb.append(',');
+		}
+		sb.append(map[map.length-1]);
+		return sb.toString();
+	}
+
 }

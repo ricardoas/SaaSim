@@ -16,7 +16,7 @@ import commons.util.CostCalculus;
  */
 public class Provider {
 	
-	
+	private final int id;
 	private final String name;
 	private final int onDemandLimit;
 	private final int reservationLimit;
@@ -29,12 +29,13 @@ public class Provider {
 	
 	private int onDemandRunningMachines;
 	
-	public Provider(String name, int onDemandLimit,
-			int reservationLimit, double monitoringCost,
+	public Provider(int id, String name,
+			int onDemandLimit, int reservationLimit,
+			double monitoringCost,
 			long[] transferInLimits,
-			double[] transferInCosts,
-			long[] transferOutLimits, double[] transferOutCosts,
-			List<TypeProvider> types) {
+			double[] transferInCosts, long[] transferOutLimits,
+			double[] transferOutCosts, List<TypeProvider> types) {
+		this.id = id;
 		this.name = name;
 		this.onDemandLimit = onDemandLimit;
 		this.reservationLimit = reservationLimit;
@@ -140,7 +141,7 @@ public class Provider {
 		if(!reserved){
 			return types.containsKey(type) && onDemandRunningMachines < getOnDemandLimit();
 		}
-		return types.containsKey(type)?types.get(type).canBuy():false;
+		return types.containsKey(type) && types.get(type).canBuy();
 	}
 	
 	/**
@@ -185,20 +186,20 @@ public class Provider {
 			long [] typeTransferences = typeProvider.getTotalTransferences();
 			transferences[0] += typeTransferences[0];
 			transferences[1] += typeTransferences[1];
-			typeProvider.calculateMachinesCost(entry, getName(), currentTimeInMillis, monitoringCost);
+			typeProvider.calculateMachinesCost(entry, currentTimeInMillis, monitoringCost);
 		}
 		
 		double inCost = CostCalculus.calcTransferenceCost(transferences[0], transferInLimits, transferInCosts, CostCalculus.GB_IN_BYTES);
 		double outCost = CostCalculus.calcTransferenceCost(transferences[1], transferOutLimits, transferOutCosts, CostCalculus.GB_IN_BYTES);
 		
-		entry.addTransferenceToCost(getName(), transferences[0], inCost, transferences[1], outCost);
+		entry.addTransferenceToCost(id, transferences[0], inCost, transferences[1], outCost);
 	}
 	
 	public void calculateUniqueCost(UtilityResult result) {
 
 		for (TypeProvider typeProvider : types.values()) {
 			double cost = typeProvider.calculateUniqueCost();
-			result.addProviderUniqueCost(getName(), typeProvider.getType(), cost);
+			result.addProviderUniqueCost(id, typeProvider.getType(), cost);
 		}
 	}
 

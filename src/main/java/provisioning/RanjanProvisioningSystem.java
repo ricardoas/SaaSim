@@ -5,7 +5,7 @@ import java.util.List;
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.Request;
-import commons.sim.provisioningheuristics.RanjanStatistics;
+import commons.sim.provisioningheuristics.MachineStatistics;
 
 /**
  * This class represents the DPS business logic according to RANJAN. Here some statistics of current
@@ -24,7 +24,7 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 	}
 	
 	@Override
-	public void evaluateUtilisation(long now, RanjanStatistics statistics, int tier) {
+	public void sendStatistics(long now, MachineStatistics statistics, int tier) {
 		long numberOfServersToAdd = evaluateNumberOfServersForNextInterval(statistics);
 		if(numberOfServersToAdd > 0){
 			for(int i = 0; i < numberOfServersToAdd; i++){
@@ -37,7 +37,7 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 		}
 	}
 
-	public long evaluateNumberOfServersForNextInterval(RanjanStatistics statistics) {
+	public long evaluateNumberOfServersForNextInterval(MachineStatistics statistics) {
 		double averageUtilisation = statistics.averageUtilisation / statistics.totalNumberOfServers;
 		double d;
 		if(statistics.numberOfRequestsCompletionsInLastInterval == 0){

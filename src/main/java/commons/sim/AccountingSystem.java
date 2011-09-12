@@ -1,7 +1,5 @@
 package commons.sim;
 
-import java.util.Map;
-
 import commons.cloud.Provider;
 import commons.cloud.User;
 import commons.cloud.UtilityResult;
@@ -16,9 +14,11 @@ public class AccountingSystem {
 	
 	/**
 	 * Default constructor.
+	 * @param numberOfUsers 
+	 * @param numberOfProviders 
 	 */
-	public AccountingSystem(){
-		this.utilityResult = new UtilityResult();
+	public AccountingSystem(int numberOfUsers, int numberOfProviders){
+		this.utilityResult = new UtilityResult(numberOfUsers, numberOfProviders);
 	}
 	
 	/**
@@ -26,12 +26,12 @@ public class AccountingSystem {
 	 * @param users
 	 * @param providers
 	 */
-	public void accountPartialUtility(long currentTimeInMillis, Map<String, User> users, Map<String, Provider> providers){
+	public void accountPartialUtility(long currentTimeInMillis, User[] users, Provider[] providers){
 		UtilityResultEntry entry = new UtilityResultEntry(currentTimeInMillis, users, providers);
-		for (User user : users.values()) {
+		for (User user : users) {
 			user.calculatePartialReceipt(entry);
 		}
-		for (Provider provider : providers.values()) {
+		for (Provider provider : providers) {
 			provider.calculateCost(entry, currentTimeInMillis);
 		}
 		this.utilityResult.addEntry(entry);
@@ -42,12 +42,11 @@ public class AccountingSystem {
 	 * during a whole year)  
 	 * @return
 	 */
-//	public UtilityResult calculateUtility(Map<Long, User> users, Map<String, Provider> providers){
-	public UtilityResult calculateUtility(Map<String, User> users, Map<String, Provider> providers){
-		for(Provider provider : providers.values()){
+	public UtilityResult calculateUtility(User[] users, Provider[] providers){
+		for(Provider provider : providers){
 			provider.calculateUniqueCost(utilityResult);
 		}
-		for(User user : users.values()){
+		for(User user : users){
 			user.calculateOneTimeFees(utilityResult);
 		}
 		return utilityResult;

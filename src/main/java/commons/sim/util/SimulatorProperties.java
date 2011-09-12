@@ -6,11 +6,11 @@ public class SimulatorProperties {
 
 	public static final String DPS_CUSTOM_HEURISTIC = "dps.heuristicclass";
 	
+	public static final String DPS_MONITOR_INTERVAL = "dps.monitor.interval";
+
 	public static final String RANJAN_HEURISTIC_NUMBER_OF_TOKENS = "dps.ranjan.numberoftokens";
 	
 	public static final String RANJAN_HEURISTIC_BACKLOG_SIZE = "dps.ranjan.backlogsize";
-
-	public static final String RANJAN_HEURISTIC_REPEAT_INTERVAL = "dps.ranjan.repeatinterval";
 	
 	public static final String PLANNING_HEURISTIC = "planning.heuristic";
 	

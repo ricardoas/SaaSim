@@ -13,26 +13,21 @@ import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
-import commons.sim.jeevent.JETime;
-import commons.sim.provisioningheuristics.RanjanStatistics;
-import commons.sim.schedulingheuristics.RanjanHeuristic;
+import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
 import commons.sim.util.MachineFactory;
 import commons.sim.util.SaaSAppProperties;
-import commons.sim.util.SimulatorProperties;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public class LoadBalancer extends JEAbstractEventHandler{
 	
-	private int tier;
-	
+	private final int tier;
 	private final List<Machine> servers;
-	
-	private SchedulingHeuristic heuristic;
-	private Queue<Request> requestsToBeProcessed;
-	private Monitor monitor;
+	private final SchedulingHeuristic heuristic;
+	private final Queue<Request> requestsToBeProcessed;
+	private final Monitor monitor;
 	
 	/**
 	 * Default constructor.
@@ -46,21 +41,11 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		super(scheduler);
 		this.monitor = monitor;
 		this.heuristic = heuristic;
-		initHeuristicEvents();
-		
 		this.tier = tier;
 		this.servers = new ArrayList<Machine>();
 		this.requestsToBeProcessed = new LinkedList<Request>();
 	}
 
-	private void initHeuristicEvents() {
-		if(this.heuristic.getClass().equals(RanjanHeuristic.class)){
-			long scheduledtime = Configuration.getInstance().getLong(SimulatorProperties.RANJAN_HEURISTIC_REPEAT_INTERVAL);
-			long newEventTime = scheduledtime + getScheduler().now();
-			send(new JEEvent(JEEventType.EVALUATEUTILIZATION, this, newEventTime, newEventTime));
-		}
-	}
-	
 	/**
 	 * @param useStartUpDelay 
 	 * 
@@ -123,18 +108,6 @@ public class LoadBalancer extends JEAbstractEventHandler{
 					monitor.requestQueued(getScheduler().now(), request, tier);
 				}
 				break;
-			case EVALUATEUTILIZATION://RANJAN Scheduler
-				Long eventTime = (Long) event.getValue()[0];
-				RanjanStatistics statistics = this.collectStatistics(getServers(), eventTime);
-				monitor.evaluateUtilisation(getScheduler().now(), statistics, tier);
-				
-				long scheduledtime = Configuration.getInstance().getLong(SimulatorProperties.RANJAN_HEURISTIC_REPEAT_INTERVAL);
-				
-				long newEventTime = scheduledtime + getScheduler().now();
-				if(newEventTime < this.monitor.getSimulationEndTime()){
-					send(new JEEvent(JEEventType.EVALUATEUTILIZATION, this, newEventTime, newEventTime));
-				}
-				break;
 			case ADD_SERVER:
 				Machine machine = (Machine) event.getValue()[0];
 				machine.getDescriptor().setStartTimeInMillis(getScheduler().now());
@@ -154,9 +127,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		}
 	}
 
-	private RanjanStatistics collectStatistics(List<Machine> servers, long eventTime) {
-		
-		//Gathering total utilisation
+	public void collectStatistics(long eventTime) {
 		double averageUtilisation = 0d;
 		for(Machine machine : servers){
 			averageUtilisation += machine.computeUtilisation(eventTime);
@@ -170,7 +141,8 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		long finishedRequestsCounter = this.heuristic.getFinishedRequestsCounter();
 		this.heuristic.resetCounters();
 		
-		return new RanjanStatistics(averageUtilisation, requestsArrivalCounter, finishedRequestsCounter, servers.size());
+		MachineStatistics statistics = new MachineStatistics(averageUtilisation, requestsArrivalCounter, finishedRequestsCounter, servers.size());
+		monitor.sendStatistics(eventTime, statistics, tier);
 	}
 
 	/**
@@ -195,6 +167,10 @@ public class LoadBalancer extends JEAbstractEventHandler{
 			}
 		}
 		removeServer(servers.get(servers.size()-1).getDescriptor(), force);
+	}
+
+	public int getTier() {
+		return tier;
 	}
 
 }

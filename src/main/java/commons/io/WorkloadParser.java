@@ -16,9 +16,9 @@ public interface WorkloadParser<T> {
 	 * the read and return process depends on the implementation.
 	 * 
 	 * @return
-	 * @throws IOException 
+	 * @throws RuntimeException Encapsulation of {@link IOException}. 
 	 */
-	T next() throws IOException;
+	T next();
 
 	/**
 	 * @return

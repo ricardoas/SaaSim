@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -63,10 +62,10 @@ public class Main {
 		}
 	}
 
-	private static void createPlanFile(Map<MachineType, Integer> plan, List<Provider> providers) throws IOException {
+	private static void createPlanFile(Map<MachineType, Integer> plan, Provider[] providers) throws IOException {
 		FileWriter writer = new FileWriter(new File(OUTPUT_FILE));
 		
-		String providerName = providers.get(0).getName();
+		String providerName = providers[0].getName();
 		writer.write("iaas.plan.name="+providerName+"\n");
 		StringBuilder machinesTypes = new StringBuilder();
 		StringBuilder machinesAmount = new StringBuilder();

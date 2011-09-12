@@ -66,9 +66,8 @@
 
 		<dependency>
 			<groupId>xpp3</groupId>
-			<artifactId>xpp3</artifactId>
-			<version>1.1.3.4</version>
-  			<classifier>RC3_min</classifier>
+			<artifactId>xpp3_min</artifactId>
+			<version>1.1.3.4.O</version>
 		</dependency>
 
 		<!-- Interface -->
@@ -207,7 +206,7 @@
 						<artifactId>cobertura-runtime</artifactId>
 						<version>1.8</version>
 						<type>pom</type>
-						<scope>test</scope>
+						<scope>compile</scope>
 					</dependency>
 					<dependency>
 						<groupId>cobertura</groupId>

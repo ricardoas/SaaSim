@@ -9,8 +9,8 @@ import java.util.Arrays;
  */
 public class Request{
 	
-	private final String saasClient;
-	private final long userID;
+	private final int saasClient;
+	private final int userID;
 	private final long reqID;
 	private final long arrivalTimeInMillis;
 	private final long[] cpuDemandInMillis;
@@ -29,7 +29,7 @@ public class Request{
 	 * @param responseSizeInBytes
 	 * @param cpuDemandInMillis
 	 */
-	public Request(long reqID, String saasClient, long userID, long arrivalTimeInMillis,
+	public Request(long reqID, int saasClient, int userID, long arrivalTimeInMillis,
 			long requestSizeInBytes, long responseSizeInBytes, long[] cpuDemandInMillis) {
 		this.saasClient = saasClient;
 		this.reqID = reqID;
@@ -44,14 +44,14 @@ public class Request{
 	/**
 	 * @return the saasClient
 	 */
-	public String getSaasClient() {
+	public int getSaasClient() {
 		return saasClient;
 	}
 	
 	/**
 	 * @return the userID
 	 */
-	public long getUserID() {
+	public int getUserID() {
 		return userID;
 	}
 
@@ -103,9 +103,8 @@ public class Request{
 	 * @param processedDemand
 	 */
 	public void update(long processedDemand){
-		if(processedDemand < 0){
-			throw new RuntimeException("Invalid process amount: "+processedDemand+" in request "+this.reqID+" of "+this.saasClient);
-		}
+		assert processedDemand >= 0 : "Invalid process amount: "+processedDemand+" in request "+this.reqID+" of "+this.saasClient;
+		
 		this.totalProcessed += Math.min(processedDemand, getTotalToProcess());
 	}
 	
@@ -115,7 +114,7 @@ public class Request{
 		int result = 1;
 		result = prime * result
 				+ (int) (arrivalTimeInMillis ^ (arrivalTimeInMillis >>> 32));
-		result = prime * result + (int) (userID ^ (userID >>> 32));
+		result = prime * result + (userID ^ (userID >>> 32));
 		return result;
 	}
 
@@ -179,7 +178,7 @@ public class Request{
 				+ ", cpuDemandInMillis=" + Arrays.toString(cpuDemandInMillis)
 				+ ", requestSizeInBytes=" + requestSizeInBytes
 				+ ", responseSizeInBytes=" + responseSizeInBytes
-				+ ", totalProcessed=" + totalProcessed + ", assignedTo=" + value==null?"Nobody":value
+				+ ", totalProcessed=" + totalProcessed + ", assignedTo=" + (value==null?"Nobody":value.toString())
 				+ "]";
 	}
 	

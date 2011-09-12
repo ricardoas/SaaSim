@@ -1,8 +1,6 @@
 package commons.cloud;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -12,19 +10,21 @@ import java.util.TreeSet;
 public class UtilityResult{
 	
 	private SortedSet<UtilityResultEntry> entries;
-	private Map<String, Double> usersUniqueFee;
-	private Map<String, Map<MachineType, Double>> providersUniqueFee;
+	private double[] usersUniqueFee;
+	private double[][] providersUniqueFee;
 	
 	private double uniqueReceipt;
 	private double uniqueCost;
 	
 	/**
 	 * Default constructor.
+	 * @param numberOfUsers 
+	 * @param numberOfProviders 
 	 */
-	public UtilityResult() {
+	public UtilityResult(int numberOfUsers, int numberOfProviders) {
 		entries = new TreeSet<UtilityResultEntry>();
-		usersUniqueFee = new HashMap<String, Double>();
-		providersUniqueFee = new HashMap<String, Map<MachineType,Double>>();
+		usersUniqueFee = new double[numberOfUsers];
+		providersUniqueFee = new double[numberOfProviders][MachineType.values().length];
 		uniqueCost = 0;
 		uniqueReceipt = 0;
 	}
@@ -65,21 +65,18 @@ public class UtilityResult{
 	/**
 	 * @param entry
 	 */
-	public void addUserUniqueFee(String userID, double fee) {
-		usersUniqueFee.put(userID, fee);
+	public void addUserUniqueFee(int userID, double fee) {
+		usersUniqueFee[userID] = fee;
 		uniqueReceipt += fee;
 	}
 
 	/**
-	 * @param name
+	 * @param providerID
 	 * @param type
 	 * @param cost
 	 */
-	public void addProviderUniqueCost(String name, MachineType type, double cost) {
-		if(!providersUniqueFee.containsKey(name)){
-			providersUniqueFee.put(name, new HashMap<MachineType, Double>());
-		}
-		providersUniqueFee.get(name).put(type, cost);
+	public void addProviderUniqueCost(int providerID, MachineType type, double cost) {
+		providersUniqueFee[providerID][type.ordinal()] = cost;
 		uniqueCost += cost;
 	}
 

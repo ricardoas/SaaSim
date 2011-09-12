@@ -16,6 +16,7 @@ public class TypeProvider {
 	
 	private static final long HOUR_IN_MILLIS = 3600000;
 	
+	private final int providerID;
 	private final MachineType type;
 	private final double onDemandCpuCost;
 	private final double reservedCpuCost;
@@ -29,9 +30,11 @@ public class TypeProvider {
 	private List<MachineDescriptor> onDemandRunningMachines;
 	private List<MachineDescriptor> onDemandFinishedMachines;
 
+
 	
 	/**
 	 * Default constructor.
+	 * @param providerID TODO
 	 * @param value
 	 * @param onDemandCpuCost
 	 * @param reservedCpuCost
@@ -39,9 +42,10 @@ public class TypeProvider {
 	 * @param reservationThreeYearsFee
 	 * @param reservation TODO
 	 */
-	public TypeProvider(MachineType value, double onDemandCpuCost,
-			double reservedCpuCost, double reservationOneYearFee,
-			double reservationThreeYearsFee, long reservation) {
+	public TypeProvider(int providerID, MachineType value,
+			double onDemandCpuCost, double reservedCpuCost,
+			double reservationOneYearFee, double reservationThreeYearsFee, long reservation) {
+		this.providerID = providerID;
 		this.type = value;
 		this.onDemandCpuCost = onDemandCpuCost;
 		this.reservedCpuCost = reservedCpuCost;
@@ -96,12 +100,12 @@ public class TypeProvider {
 	public MachineDescriptor buyMachine(boolean isReserved) {
 		if(isReserved){
 			if(canBuy()){
-				MachineDescriptor descriptor = new MachineDescriptor(IDGenerator.GENERATOR.next(), isReserved, getType());
+				MachineDescriptor descriptor = new MachineDescriptor(IDGenerator.GENERATOR.next(), isReserved, getType(), providerID);
 				reservedRunningMachines.add(descriptor);
 				return descriptor;
 			}
 		}else{
-			MachineDescriptor descriptor = new MachineDescriptor(IDGenerator.GENERATOR.next(), isReserved, getType());
+			MachineDescriptor descriptor = new MachineDescriptor(IDGenerator.GENERATOR.next(), isReserved, getType(), providerID);
 			onDemandRunningMachines.add(descriptor);
 			return descriptor;
 		}
@@ -112,7 +116,7 @@ public class TypeProvider {
 		return reservedRunningMachines.size() < reservation;
 	}
 
-	public void calculateMachinesCost(UtilityResultEntry entry, String provider, long currentTimeInMillis, double monitoringCostPerHour) {
+	public void calculateMachinesCost(UtilityResultEntry entry, long currentTimeInMillis, double monitoringCostPerHour) {
 		long onDemandUpTimeInFullHours = 0;
 		long reservedUpTimeInFullHours = 0;
 		
@@ -135,7 +139,7 @@ public class TypeProvider {
 		double reservedCost = reservedUpTimeInFullHours * reservedCpuCost;
 		double monitoringCost = (onDemandUpTimeInFullHours + reservedUpTimeInFullHours) * monitoringCostPerHour;
 		
-		entry.addUsageToCost(provider, type, onDemandUpTimeInFullHours, onDemandCost, reservedUpTimeInFullHours, reservedCost, monitoringCost);
+		entry.addUsageToCost(providerID, type, onDemandUpTimeInFullHours, onDemandCost, reservedUpTimeInFullHours, reservedCost, monitoringCost);
 		
 		onDemandFinishedMachines.clear();
 		reservedFinishedMachines.clear();

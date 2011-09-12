@@ -22,7 +22,8 @@ public class Main {
 	 */
 	public static void main(String[] args) throws ConfigurationException {
 		
-		System.out.println(System.currentTimeMillis());
+		long currentTimeMillis = System.currentTimeMillis();
+		System.out.println(currentTimeMillis);
 		Configuration.buildInstance(args[0]);
 		
 		DPS dps = DPSFactory.createDPS();
@@ -34,10 +35,12 @@ public class Main {
 		simulator.start();
 		
 		UtilityResult utilityResult = dps.calculateUtility();
-		System.out.println(System.currentTimeMillis());
-		System.out.println(utilityResult.getUtility());
+		long diff = System.currentTimeMillis() - currentTimeMillis;
+		System.out.println("Time: " + diff);
+		System.out.println(diff < 78614? "Faster :)" : "Slower :(");
+		System.out.println("Utility: " + utilityResult.getUtility());
 		System.out.println();
-		System.err.println(utilityResult);
+		System.err.println("Details: " + utilityResult);
 	}
 
 }

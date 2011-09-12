@@ -3,6 +3,8 @@
  */
 package commons.sim.jeevent;
 
+import java.util.Arrays;
+
 
 /**
  * TODO make doc
@@ -130,4 +132,13 @@ public class JEEvent implements Comparable<JEEvent>{
 	public Object[] getValue() {
 		return value;
 	}
+
+	@Override
+	public String toString() {
+		return "JEEvent [eventId=" + eventId + ", targetHandlerId="
+				+ targetHandlerId + ", scheduledTime=" + scheduledTime
+				+ ", type=" + type + ", value=" + Arrays.toString(value) + "]";
+	}
+	
+	
 }

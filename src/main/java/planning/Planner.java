@@ -17,14 +17,14 @@ import commons.io.HistoryBasedWorkloadParser;
 
 public class Planner {
 
-	private List<Provider> cloudProviders;
+	private Provider[] cloudProviders;
 	private PlanningHeuristic planningHeuristic;
-	private List<User> cloudUsers;
+	private User[] cloudUsers;
 	private HistoryBasedWorkloadParser workloadParser;
 	
 	private final String OUTUPUT_FILE = "planning.dat"; 
 	
-	public Planner(List<Provider> providers, List<User> cloudUsers, HistoryBasedWorkloadParser workloadParser) {
+	public Planner(Provider[] providers, User[] cloudUsers, HistoryBasedWorkloadParser workloadParser) {
 		this.cloudProviders = providers;
 		this.planningHeuristic = PlanningHeuristicFactory.createHeuristic();
 		
@@ -34,10 +34,10 @@ public class Planner {
 	}
 	
 	private void verifyProperties() {
-		if(this.cloudUsers == null || this.cloudUsers.size() == 0){
+		if(this.cloudUsers == null || this.cloudUsers.length == 0){
 			throw new RuntimeException("Invalid users in Planner!");
 		}
-		if(this.cloudProviders == null || this.cloudProviders.size() == 0){
+		if(this.cloudProviders == null || this.cloudProviders.length == 0){
 			throw new RuntimeException("Invalid cloud providers in Planner!");
 		}
 		if(this.workloadParser == null){

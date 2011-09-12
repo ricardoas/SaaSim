@@ -1,6 +1,6 @@
 package commons.sim.provisioningheuristics;
 
-public class RanjanStatistics {
+public class MachineStatistics {
 	
 	public double averageUtilisation;
 	public long numberOfRequestsArrivalInLastInterval;
@@ -13,7 +13,7 @@ public class RanjanStatistics {
 	 * @param totalRequestsCompletions
 	 * @param totalNumberOfServers
 	 */
-	public RanjanStatistics(double averageUtilization, long totalRequestsArrivals, long totalRequestsCompletions, long totalNumberOfServers) {
+	public MachineStatistics(double averageUtilization, long totalRequestsArrivals, long totalRequestsCompletions, long totalNumberOfServers) {
 		this.averageUtilisation = averageUtilization;
 		this.numberOfRequestsArrivalInLastInterval = totalRequestsArrivals;
 		this.numberOfRequestsCompletionsInLastInterval = totalRequestsCompletions;
@@ -46,7 +46,7 @@ public class RanjanStatistics {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		RanjanStatistics other = (RanjanStatistics) obj;
+		MachineStatistics other = (MachineStatistics) obj;
 		if (numberOfRequestsArrivalInLastInterval != other.numberOfRequestsArrivalInLastInterval)
 			return false;
 		if (numberOfRequestsCompletionsInLastInterval != other.numberOfRequestsCompletionsInLastInterval)

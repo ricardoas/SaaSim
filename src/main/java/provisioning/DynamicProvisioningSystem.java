@@ -3,11 +3,7 @@ package provisioning;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import provisioning.util.WorkloadParserFactory;
 
@@ -19,7 +15,7 @@ import commons.cloud.UtilityResult;
 import commons.config.Configuration;
 import commons.sim.AccountingSystem;
 import commons.sim.components.MachineDescriptor;
-import commons.sim.provisioningheuristics.RanjanStatistics;
+import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.util.SaaSAppProperties;
 
 /**
@@ -28,37 +24,22 @@ import commons.sim.util.SaaSAppProperties;
  */
 public class DynamicProvisioningSystem implements DPS{
 
-	protected long availableIDs;
-	
-	protected AccountingSystem accountingSystem;
+	protected final AccountingSystem accountingSystem;
 	
 	protected DynamicConfigurable configurable;
 	
-	protected final Map<Long, DynamicConfigurable> configurables;
-
-	protected Map<String, User> users;
+	protected final User[] users;
 	
-	protected Map<String, Provider> providers;
+	protected final Provider[] providers;
 	
 	/**
 	 * Default constructor.
 	 */
 	public DynamicProvisioningSystem() {
-		this.availableIDs = 0;
-		this.configurables = new HashMap<Long, DynamicConfigurable>();
-		
-		this.providers = new TreeMap<String, Provider>();
-		List<Provider> listOfProviders = Configuration.getInstance().getProviders();
-		for (Provider provider : listOfProviders) {
-			this.providers.put(provider.getName(), provider);
-		}
-		
-		this.users = new HashMap<String, User>();
-		List<User> listOfUsers = Configuration.getInstance().getUsers();
-		for (User user : listOfUsers) {
-			this.users.put(user.getId(), user);
-		}
-		this.accountingSystem = new AccountingSystem();
+		Configuration config = Configuration.getInstance();
+		this.providers = config.getProviders();
+		this.users = config.getUsers();
+		this.accountingSystem = new AccountingSystem(users.length, providers.length);
 	}
 	
 	@Override
@@ -79,7 +60,7 @@ public class DynamicProvisioningSystem implements DPS{
 	private void addServersToTier(DynamicConfigurable configurable, int tier, int numberOfInitialServers, List<MachineType> typeList) {
 		int serversAdded = 0;
 		for(MachineType machineType : typeList){
-			for (Provider provider : this.providers.values()) {
+			for (Provider provider : this.providers) {
 				while(provider.canBuyMachine(true, machineType) && serversAdded < numberOfInitialServers){
 					configurable.addServer(tier, provider.buyMachine(true, machineType), false);
 					serversAdded++;
@@ -93,11 +74,9 @@ public class DynamicProvisioningSystem implements DPS{
 
 	@Override
 	public void reportRequestFinished(Request request) {
-		String SaaSClientID = request.getSaasClient();
-		if( !users.containsKey(SaaSClientID) ){
-			throw new RuntimeException("Unregistered user with ID " + request.getSaasClient() + ". Check configuration files.");
-		}
-		users.get(SaaSClientID).reportFinishedRequest(request);
+		assert request.getSaasClient() < users.length:"Unregistered user with ID " + request.getSaasClient() + ". Check configuration files.";
+		
+		users[request.getSaasClient()].reportFinishedRequest(request);
 	}
 	
 	@Override
@@ -106,18 +85,15 @@ public class DynamicProvisioningSystem implements DPS{
 	}
 
 	@Override
-	public void evaluateUtilisation(long now, RanjanStatistics statistics, int tier) {
+	public void sendStatistics(long now, MachineStatistics statistics, int tier) {
+		// Nothing to do
 		
 	}
 
 	@Override
 	public void machineTurnedOff(MachineDescriptor machineDescriptor) {
-		for (Provider provider : providers.values()) {
-			if(provider.shutdownMachine(machineDescriptor)){
-				return;
-			}
-		}
-		throw new RuntimeException("No provider is responsible for machine " + machineDescriptor);
+		assert machineDescriptor.getProviderID() < providers.length: "Inexistent provider, check configuration files.";
+		providers[machineDescriptor.getProviderID()].shutdownMachine(machineDescriptor);
 	}
 
 	@Override
@@ -134,17 +110,16 @@ public class DynamicProvisioningSystem implements DPS{
 	 * @param request
 	 */
 	protected void reportLostRequest(Request request) {
-		if( !users.containsKey(request.getSaasClient()) ){
-			throw new RuntimeException("Unregistered user with ID " + request.getSaasClient() + ". Check configuration files.");
-		}
-		users.get(request.getSaasClient()).reportLostRequest(request);
+		assert request.getSaasClient() < users.length: "Unregistered user with ID " + request.getSaasClient() + ". Check configuration files.";
+		
+		users[request.getSaasClient()].reportLostRequest(request);
 	}
 	
 	protected List<Provider> canBuyMachine(MachineType type, boolean isReserved){
 		List<Provider> available = new ArrayList<Provider>();
-		for (Entry<String, Provider> entry : providers.entrySet()) {
-			if(entry.getValue().canBuyMachine(isReserved, type)){
-				available.add(entry.getValue());
+		for (Provider provider : providers) {
+			if(provider.canBuyMachine(isReserved, type)){
+				available.add(provider);
 			}
 		}
 		return available;
@@ -152,10 +127,5 @@ public class DynamicProvisioningSystem implements DPS{
 
 	protected MachineDescriptor buyMachine(Provider provider, MachineType instanceType, boolean isReserved){
 		return provider.buyMachine(isReserved, instanceType);
-	}
-
-	@Override
-	public long getSimulationEndTime() {
-		return this.configurable.getSimulationEndTime();
 	}
 }

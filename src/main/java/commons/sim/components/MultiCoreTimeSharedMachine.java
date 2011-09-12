@@ -1,10 +1,6 @@
 package commons.sim.components;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
 import commons.cloud.Request;
@@ -12,7 +8,6 @@ import commons.config.Configuration;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
-import commons.sim.jeevent.JETime;
 import commons.util.Triple;
 
 /**

@@ -1,6 +1,5 @@
 package commons.io;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -47,7 +46,7 @@ public class HistoryBasedWorkloadParser extends TimeBasedWorkloadParser{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<Request> next() throws IOException {
+	public List<Request> next(){
 		if(readNexPeriod){
 			List<Request> next = super.next();
 			if(!history.offer(next)){
