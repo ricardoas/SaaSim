@@ -1,7 +1,6 @@
 package provisioning;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -318,7 +317,10 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 	@Test
 	public void testEvaluateUtilisationWithOnDemandAndReservedServersToBeAdded() throws ConfigurationException{
 
-		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
+		//Configuration mock
+		Configuration config = EasyMock.createStrictMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 
 		int reservationLimit = 5;
 		int onDemandLimit = 10;
@@ -339,6 +341,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		for (int i = 0; i < descriptor.length; i++) {
 			descriptor[i] = new Capture<MachineDescriptor>();
 		}
+		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [0]), EasyMock.anyBoolean());
 		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [1]), EasyMock.anyBoolean());
 		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [2]), EasyMock.anyBoolean());
@@ -348,13 +351,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [6]), EasyMock.anyBoolean());
 		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [7]), EasyMock.anyBoolean());
 		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [8]), EasyMock.anyBoolean());
-		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		EasyMock.replay(configurable);
-		
-		//Configuration mock
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		Provider[] providers = new Provider[1];
 		ArrayList<TypeProvider> types = new ArrayList<TypeProvider>();
@@ -385,9 +382,11 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		
 		for (int i = 0; i < 5; i++) {
 			assertEquals(MachineType.MEDIUM, descriptor[i].getValue().getType());
+			assertTrue(descriptor[i].getValue().isReserved());
 		}
 		for (int i = 5; i < 9; i++) {
 			assertEquals(MachineType.SMALL, descriptor[i].getValue().getType());
+			assertFalse(descriptor[i].getValue().isReserved());
 		}
 		
 		PowerMock.verifyAll();
@@ -403,6 +402,10 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 	 */
 	@Test
 	public void testEvaluateUtilisationWithOnlyReservedServersToBeAdded(){
+		//Configuration mock
+		Configuration config = EasyMock.createStrictMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		int reservationLimit = 5;
 		int onDemandLimit = 10;
@@ -419,21 +422,15 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
 
-		Capture<MachineDescriptor> [] descriptor = new Capture[4];
+		Capture<MachineDescriptor> [] descriptor = new Capture[3];
 		for (int i = 0; i < descriptor.length; i++) {
 			descriptor[i] = new Capture<MachineDescriptor>();
 		}
+		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [0]), EasyMock.anyBoolean());
 		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [1]), EasyMock.anyBoolean());
 		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [2]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [3]), EasyMock.anyBoolean());
-		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		EasyMock.replay(configurable);
-		
-		//Configuration mock
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		
 		Provider[] providers = new Provider[1];
 		ArrayList<TypeProvider> types = new ArrayList<TypeProvider>();
@@ -460,8 +457,86 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
 
 		this.dps.sendStatistics(0, statistics, 0);
 		
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 3; i++) {
 			assertEquals(MachineType.MEDIUM, descriptor[i].getValue().getType());
+			assertTrue(descriptor[i].getValue().isReserved());
+		}
+
+		PowerMock.verifyAll();
+	}
+	
+	/**
+	 * This scenario verifies that an utilization that is so much greater than the target
+	 * utilization (0.66), and so the number of completions is small, indicates that a 
+	 * large number of servers should be added. The reserved machine type supplies all the demand
+	 * with a lower number of machines than the number of machines purchased at 
+	 * {@link provisioning.RanjanProvisioningSystemForHeterogeneousMachinesTest#testEvaluateUtilisationWithOnDemandAndReservedServersToBeAdded()}
+	 * @throws Exception 
+	 */
+	@Test
+	public void testEvaluateUtilisationWithOnlyReservedServersToBeAdded2(){
+		//Configuration mock
+		Configuration config = EasyMock.createStrictMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
+		
+		int reservationLimit = 5;
+		int onDemandLimit = 10;
+		
+		double averageUtilisation = 1.0;
+		long totalRequestsArrivals = 55;
+		long totalRequestsCompletions = 15;
+		long totalNumberOfServers = 3;
+
+		MachineStatistics statistics = new MachineStatistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
+		
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EasyMock.replay(scheduler);
+		
+		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
+
+		Capture<MachineDescriptor> [] descriptor = new Capture[5];
+		for (int i = 0; i < descriptor.length; i++) {
+			descriptor[i] = new Capture<MachineDescriptor>();
+		}
+		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
+		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [0]), EasyMock.anyBoolean());
+		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [1]), EasyMock.anyBoolean());
+		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [2]), EasyMock.anyBoolean());
+		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [3]), EasyMock.anyBoolean());
+		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [4]), EasyMock.anyBoolean());
+		EasyMock.replay(configurable);
+		
+		Provider[] providers = new Provider[1];
+		ArrayList<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.1, 0.05, 100, 180, reservationLimit));//Reserved machines available
+		types.add(new TypeProvider(0, MachineType.SMALL, 0.1, 0.05, 100, 180, reservationLimit));//Reserved machines available
+		
+		Provider provider = new Provider(0, "1", 0, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
+		providers[0] = provider;
+		EasyMock.expect(config.getProviders()).andReturn(providers);
+		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
+		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(4d).times(7);
+		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d).times(5);
+		
+		PowerMock.replay(Configuration.class);
+		EasyMock.replay(config);
+		
+		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
+		PowerMock.mockStatic(WorkloadParserFactory.class);
+		EasyMock.expect(WorkloadParserFactory.getWorkloadParser()).andReturn(parser);
+		PowerMock.replay(WorkloadParserFactory.class);
+		EasyMock.replay(parser);
+		
+		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines();
+		this.dps.registerConfigurable(configurable);
+
+		this.dps.sendStatistics(0, statistics, 0);
+		
+		for (int i = 0; i < 3; i++) {
+			assertEquals(MachineType.MEDIUM, descriptor[i].getValue().getType());
+			assertTrue(descriptor[i].getValue().isReserved());
 		}
 
 		PowerMock.verifyAll();

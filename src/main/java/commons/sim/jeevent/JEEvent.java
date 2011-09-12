@@ -82,11 +82,12 @@ public class JEEvent implements Comparable<JEEvent>{
 	 */
 	@Override
 	public int compareTo(JEEvent o) {
-		long diff = (this.scheduledTime - o.getScheduledTime());
+		long diff = (this.scheduledTime - o.scheduledTime);
+
 		if(diff != 0){
 			if(diff < 0){
 				return -1;
-			}else if(diff > 0){
+			}else{
 				return 1;
 			}
 		}
@@ -132,6 +133,7 @@ public class JEEvent implements Comparable<JEEvent>{
 	public Object[] getValue() {
 		return value;
 	}
+	
 
 	@Override
 	public String toString() {
@@ -139,6 +141,4 @@ public class JEEvent implements Comparable<JEEvent>{
 				+ targetHandlerId + ", scheduledTime=" + scheduledTime
 				+ ", type=" + type + ", value=" + Arrays.toString(value) + "]";
 	}
-	
-	
 }

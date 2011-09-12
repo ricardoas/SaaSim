@@ -61,7 +61,7 @@ public class Main {
 			System.exit(1);
 		}
 	}
-
+	
 	private static void createPlanFile(Map<MachineType, Integer> plan, Provider[] providers) throws IOException {
 		FileWriter writer = new FileWriter(new File(OUTPUT_FILE));
 		

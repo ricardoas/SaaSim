@@ -48,7 +48,7 @@ public class JEEventScheduler {
     	assert event.getScheduledTime() >= 0: "Possible miscalculation or long overflow.";
     	
     	long anEventTime = event.getScheduledTime();
-		if (anEventTime < now) {
+    	if (anEventTime < now) {
 		    throw new JEException("ERROR: emulation time(" + now + ") already ahead of event time("+anEventTime+"). Event is outdated and will not be processed.");
 		}
 		eventSet.add(event);

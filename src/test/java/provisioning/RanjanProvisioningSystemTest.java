@@ -277,15 +277,15 @@ public class RanjanProvisioningSystemTest {
 		EasyMock.replay(scheduler);
 		
 		SimpleSimulator configurable = EasyMock.createStrictMock(SimpleSimulator.class);
-		configurable.addServer(0, new MachineDescriptor(0, false, MachineType.SMALL, 0), true);
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
+		configurable.addServer(0, new MachineDescriptor(0, false, MachineType.SMALL, 0), true);
 		
 		EasyMock.replay(configurable);
 		
 		//Mocks
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		Provider[] providers = new Provider[1];
 		ArrayList<TypeProvider> types = new ArrayList<TypeProvider>();
@@ -310,7 +310,6 @@ public class RanjanProvisioningSystemTest {
 		this.dps.sendStatistics(0, statistics, 0);
 		
 		PowerMock.verifyAll();
-		
 //		assertFalse(provider.canBuyMachine(true, MachineType.SMALL));
 //		assertTrue(provider.canBuyMachine(false, MachineType.SMALL));
 	}
