@@ -3,7 +3,9 @@
  */
 package commons.cloud;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +23,7 @@ public class RequestTest {
 	
 	@Before
 	public void setUp(){
-		request = new Request(1l, "c1", 17756636l, 0, 100, 1024000, new long[]{SMALL_DEMAND, LARGE_DEMAND, XLARGE_DEMAND});
+		request = new Request(1l, 1, 17756636, 0, 100, 1024000, new long[]{SMALL_DEMAND, LARGE_DEMAND, XLARGE_DEMAND});
 	}
 
 	/**
@@ -62,7 +64,7 @@ public class RequestTest {
 	/**
 	 * Test method for {@link commons.cloud.Request#update(long)}.
 	 */
-	@Test(expected=RuntimeException.class)
+	@Test(expected=AssertionError.class)
 	public void testUpdateWithNegativeDemand() {
 		request.assignTo(MachineType.SMALL);
 		assertEquals(SMALL_DEMAND, request.getTotalToProcess());

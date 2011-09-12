@@ -1,8 +1,5 @@
 package provisioning;
 
-import static org.junit.Assert.assertEquals;
-
-import org.easymock.EasyMock;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,12 +7,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import commons.config.Configuration;
-import commons.sim.AccountingSystem;
-import commons.sim.SimpleSimulator;
-import commons.sim.components.MachineDescriptor;
-import commons.sim.jeevent.JEEvent;
-import commons.sim.jeevent.JEEventScheduler;
-import commons.sim.jeevent.JETime;
 
 @RunWith(PowerMockRunner.class)
 public class ProfitDrivenProvisioningSystemTest {

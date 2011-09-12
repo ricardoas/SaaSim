@@ -22,8 +22,7 @@ import commons.config.Configuration;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
-import commons.sim.jeevent.JETime;
-import commons.sim.provisioningheuristics.RanjanStatistics;
+import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.schedulingheuristics.ProfitDrivenHeuristic;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
 import commons.sim.util.MachineFactory;
@@ -32,7 +31,6 @@ import commons.sim.util.SimulatorProperties;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Configuration.class, MachineFactory.class})
-
 public class LoadBalancerTest {
 	
 	private LoadBalancer lb;
@@ -46,7 +44,7 @@ public class LoadBalancerTest {
 	
 	@Test
 	public void testAddServerWithSetupDelay(){
-		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL);
+		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 		
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
@@ -85,7 +83,7 @@ public class LoadBalancerTest {
 	
 	@Test
 	public void testAddServerWithoutSetupDelay(){
-		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL);
+		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(LoadBalancer.class))).andReturn(1);
@@ -120,7 +118,7 @@ public class LoadBalancerTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testRemoveServer(){
-		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL);
+		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 		
 		this.schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
 		this.schedulingHeuristic.finishServer(EasyMock.isA(Machine.class), EasyMock.anyInt(), EasyMock.isA(List.class));
@@ -150,7 +148,7 @@ public class LoadBalancerTest {
 	
 	@Test
 	public void testRemoveServerThatDoesNotExist(){
-		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL);
+		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 		
 		this.schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
 		
@@ -173,7 +171,7 @@ public class LoadBalancerTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testHandleEventNewRequestWithOneMachine(){
-		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL);
+		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 		
 		Request request = EasyMock.createStrictMock(Request.class);
 		JEEvent newRequestEvent = EasyMock.createStrictMock(JEEvent.class);
@@ -249,15 +247,15 @@ public class LoadBalancerTest {
 		
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SETUP_TIME)).andReturn(1000l).times(2);
-		EasyMock.expect(config.getLong(SimulatorProperties.RANJAN_HEURISTIC_REPEAT_INTERVAL)).andReturn(1000l);
+		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(1000l);
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
 		
 		//Mocking machines actions
-		MachineDescriptor descriptor = new MachineDescriptor(0, false, MachineType.SMALL);
-		MachineDescriptor descriptor2 = new MachineDescriptor(1, true, MachineType.MEDIUM);
+		MachineDescriptor descriptor = new MachineDescriptor(0, false, MachineType.SMALL, 0);
+		MachineDescriptor descriptor2 = new MachineDescriptor(1, true, MachineType.MEDIUM, 0);
 		
 		RanjanMachine machine1 = EasyMock.createStrictMock(RanjanMachine.class);
 		RanjanMachine machine2 = EasyMock.createStrictMock(RanjanMachine.class);
@@ -276,8 +274,7 @@ public class LoadBalancerTest {
 		EasyMock.replay(this.schedulingHeuristic);
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
-		monitor.evaluateUtilisation(0, new RanjanStatistics((utilisation1+utilisation2)/2, totalArrivals, totalCompletions, 2), 0);
-		EasyMock.expect(monitor.getSimulationEndTime()).andReturn(eventScheduler.now());
+		monitor.sendStatistics(0, new MachineStatistics((utilisation1+utilisation2)/2, totalArrivals, totalCompletions, 2), 0);
 		EasyMock.replay(monitor);
 		
 		lb = new LoadBalancer(eventScheduler, monitor, schedulingHeuristic, Integer.MAX_VALUE, 0);
@@ -301,7 +298,7 @@ public class LoadBalancerTest {
 		lb.handleEvent(machineIsUpEvent2);
 		
 		//Calculating utilisation
-		lb.handleEvent(new JEEvent(JEEventType.EVALUATEUTILIZATION, lb, 0l, evaluationTime));
+		lb.handleEvent(new JEEvent(JEEventType.COLLECT_STATISTICS, lb, 0l, evaluationTime));
 		
 		PowerMock.verifyAll();
 	}
@@ -312,13 +309,6 @@ public class LoadBalancerTest {
 		long totalArrivals = 100l;
 		long totalCompletions = 0;
 		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config);
-		EasyMock.expect(config.getLong(SimulatorProperties.RANJAN_HEURISTIC_REPEAT_INTERVAL)).andReturn(1000l);
-		PowerMock.replay(Configuration.class);
-		EasyMock.replay(config);
-		
 		//Mocking scheduling heuristic actions
 		this.schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
 		EasyMock.expect(this.schedulingHeuristic.getRequestsArrivalCounter()).andReturn(totalArrivals);
@@ -327,21 +317,18 @@ public class LoadBalancerTest {
 		EasyMock.replay(this.schedulingHeuristic);
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
-		monitor.evaluateUtilisation(0, new RanjanStatistics(0, totalArrivals, totalCompletions, 0), 0);
-		EasyMock.expect(monitor.getSimulationEndTime()).andReturn(eventScheduler.now());
+		monitor.sendStatistics(0, new MachineStatistics(0, totalArrivals, totalCompletions, 0), 0);
 		EasyMock.replay(monitor);
 		
 		lb = new LoadBalancer(eventScheduler, monitor, schedulingHeuristic, Integer.MAX_VALUE, 0);
 		
 		//Calculating utilisation
-		lb.handleEvent(new JEEvent(JEEventType.EVALUATEUTILIZATION, lb, 0l, evaluationTime));
-		
-		PowerMock.verifyAll();
+		lb.handleEvent(new JEEvent(JEEventType.COLLECT_STATISTICS, lb, 0l, evaluationTime));
 	}
 	
 	@Test
 	public void testHandleEventMachineTurnedOff(){
-		MachineDescriptor machineDescriptor = new MachineDescriptor(1, false, MachineType.HIGHCPU);
+		MachineDescriptor machineDescriptor = new MachineDescriptor(1, false, MachineType.HIGHCPU, 0);
 
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		monitor.machineTurnedOff(machineDescriptor);

@@ -19,7 +19,7 @@ public class JEEventHandlerTest {
 	public void testJEEventHandler(){
 		JEEventHandler handler = new JEAbstractEventHandler(scheduler){
 			@Override
-			public void handleEvent(JEEvent event) {}
+			public void handleEvent(JEEvent event) {/* Empty implementation. */}
 		};
 		assertEquals(handler, scheduler.getHandler(handler.getHandlerId()));
 	}

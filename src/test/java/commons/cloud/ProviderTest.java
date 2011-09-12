@@ -29,7 +29,7 @@ public class ProviderTest {
 	@Before
 	public void setUp() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
-		amazon = Configuration.getInstance().getProviders().get(1);
+		amazon = Configuration.getInstance().getProviders()[1];
 		assert amazon.getName().equals("amazon"): "Check providers order in iaas.providers file.";
 	}
 	
@@ -42,7 +42,7 @@ public class ProviderTest {
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
 		EasyMock.replay(typeProvider);
 		
-		Provider provider = new Provider("amazon", 3, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		Provider provider = new Provider(0, "amazon", 3, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
 		assertFalse(provider.canBuyMachine(false, MachineType.SMALL));
 		
 		EasyMock.verify(typeProvider);
@@ -57,7 +57,7 @@ public class ProviderTest {
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
 		EasyMock.replay(typeProvider);
 		
-		Provider provider = new Provider("amazon", 3, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		Provider provider = new Provider(0, "amazon", 3, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
 		assertFalse(provider.canBuyMachine(false, null));
 		
 		EasyMock.verify(typeProvider);
@@ -72,7 +72,7 @@ public class ProviderTest {
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
 		EasyMock.replay(typeProvider);
 		
-		Provider provider = new Provider("amazon", 3, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		Provider provider = new Provider(0, "amazon", 3, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
 		assertTrue(provider.canBuyMachine(false, MachineType.LARGE));
 		
 		EasyMock.verify(typeProvider);
@@ -87,7 +87,7 @@ public class ProviderTest {
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
 		EasyMock.replay(typeProvider);
 		
-		Provider provider = new Provider("amazon", 0, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		Provider provider = new Provider(0, "amazon", 0, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
 		assertFalse(provider.canBuyMachine(false, MachineType.LARGE));
 		
 		EasyMock.verify(typeProvider);
@@ -102,7 +102,7 @@ public class ProviderTest {
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
 		EasyMock.replay(typeProvider);
 		
-		Provider provider = new Provider("amazon", 0, 1, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		Provider provider = new Provider(0, "amazon", 0, 1, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
 		assertFalse(provider.canBuyMachine(true, MachineType.SMALL));
 		
 		EasyMock.verify(typeProvider);
@@ -117,7 +117,7 @@ public class ProviderTest {
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
 		EasyMock.replay(typeProvider);
 		
-		Provider provider = new Provider("amazon", 0, 1, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		Provider provider = new Provider(0, "amazon", 0, 1, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
 		assertFalse(provider.canBuyMachine(true, null));
 		
 		EasyMock.verify(typeProvider);
@@ -133,7 +133,7 @@ public class ProviderTest {
 		EasyMock.expect(typeProvider.canBuy()).andReturn(false);
 		EasyMock.replay(typeProvider);
 		
-		Provider provider = new Provider("amazon", 0, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		Provider provider = new Provider(0, "amazon", 0, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
 		assertFalse(provider.canBuyMachine(true, MachineType.LARGE));
 		
 		EasyMock.verify(typeProvider);
@@ -146,11 +146,11 @@ public class ProviderTest {
 	public void testBuyMachineOnDemandMachineUntilNoMachineIsAvailable() {
 		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.SMALL);
-		EasyMock.expect(typeProvider.buyMachine(false)).andReturn(new MachineDescriptor(1, false, MachineType.SMALL));
+		EasyMock.expect(typeProvider.buyMachine(false)).andReturn(new MachineDescriptor(1, false, MachineType.SMALL, 0));
 		EasyMock.expect(typeProvider.buyMachine(false)).andReturn(null);
 		EasyMock.replay(typeProvider);
 		
-		Provider provider = new Provider("amazon", 1, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		Provider provider = new Provider(0, "amazon", 1, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
 		assertTrue(provider.canBuyMachine(false, MachineType.SMALL));
 		MachineDescriptor descriptor = provider.buyMachine(false, MachineType.SMALL);
 		assertNotNull(descriptor);
@@ -171,12 +171,12 @@ public class ProviderTest {
 		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
 		EasyMock.expect(typeProvider.canBuy()).andReturn(true);
-		EasyMock.expect(typeProvider.buyMachine(true)).andReturn(new MachineDescriptor(1, true, MachineType.LARGE));
+		EasyMock.expect(typeProvider.buyMachine(true)).andReturn(new MachineDescriptor(1, true, MachineType.LARGE, 0));
 		EasyMock.expect(typeProvider.canBuy()).andReturn(false);
 		EasyMock.expect(typeProvider.buyMachine(true)).andReturn(null);
 		EasyMock.replay(typeProvider);
 		
-		Provider provider = new Provider("amazon", 0, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		Provider provider = new Provider(0, "amazon", 0, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
 		assertTrue(provider.canBuyMachine(true, MachineType.LARGE));
 		MachineDescriptor descriptor = provider.buyMachine(true, MachineType.LARGE);
 		assertNotNull(descriptor);
@@ -194,8 +194,8 @@ public class ProviderTest {
 	 */
 	@Test
 	public void testShutdownInexistentOnDemandMachine() {
-		MachineDescriptor descriptor = new MachineDescriptor(111, false, MachineType.LARGE);
-		MachineDescriptor existentDescriptor = new MachineDescriptor(1, false, MachineType.LARGE);
+		MachineDescriptor descriptor = new MachineDescriptor(111, false, MachineType.LARGE, 0);
+		MachineDescriptor existentDescriptor = new MachineDescriptor(1, false, MachineType.LARGE, 0);
 
 		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
@@ -203,7 +203,7 @@ public class ProviderTest {
 		EasyMock.expect(typeProvider.shutdownMachine(descriptor)).andReturn(false);
 		EasyMock.replay(typeProvider);
 		
-		Provider provider = new Provider("amazon", 1, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		Provider provider = new Provider(0, "amazon", 1, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
 		provider.buyMachine(false, MachineType.LARGE);//Buying an on-demand machine
 		
 		assertFalse(provider.canBuyMachine(false, MachineType.LARGE));
@@ -218,14 +218,14 @@ public class ProviderTest {
 	 */
 	@Test
 	public void testShutdownInexistentReservedMachine() {
-		MachineDescriptor descriptor = new MachineDescriptor(1, true, MachineType.LARGE);
+		MachineDescriptor descriptor = new MachineDescriptor(1, true, MachineType.LARGE, 0);
 		
 		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
 		EasyMock.expect(typeProvider.shutdownMachine(descriptor)).andReturn(false);
 		EasyMock.replay(typeProvider);
 		
-		Provider provider = new Provider("amazon", 3, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		Provider provider = new Provider(0, "amazon", 3, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
 		assertFalse(provider.shutdownMachine(descriptor));
 		
 		EasyMock.verify(typeProvider);
@@ -238,12 +238,12 @@ public class ProviderTest {
 	public void testShutdownOnDemandMachine() {
 		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.SMALL);
-		EasyMock.expect(typeProvider.buyMachine(false)).andReturn(new MachineDescriptor(1, false, MachineType.SMALL));
+		EasyMock.expect(typeProvider.buyMachine(false)).andReturn(new MachineDescriptor(1, false, MachineType.SMALL, 0));
 		EasyMock.expect(typeProvider.shutdownMachine(EasyMock.isA(MachineDescriptor.class))).andReturn(true);
 		
 		EasyMock.replay(typeProvider);
 		
-		Provider provider = new Provider("amazon", 1, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		Provider provider = new Provider(0, "amazon", 1, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
 		MachineDescriptor descriptor = provider.buyMachine(false, MachineType.SMALL);
 		assertNotNull(descriptor);
 		assertFalse(provider.canBuyMachine(false, MachineType.SMALL));
@@ -258,7 +258,7 @@ public class ProviderTest {
 	 */
 	@Test
 	public void testShutdownReservedMachine() {
-		MachineDescriptor descriptorToSell = new MachineDescriptor(1, true, MachineType.LARGE);
+		MachineDescriptor descriptorToSell = new MachineDescriptor(1, true, MachineType.LARGE, 0);
 		
 		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
@@ -268,7 +268,7 @@ public class ProviderTest {
 		EasyMock.expect(typeProvider.canBuy()).andReturn(true);
 		EasyMock.replay(typeProvider);
 		
-		Provider provider = new Provider("amazon", 1, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		Provider provider = new Provider(0, "amazon", 1, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
 		MachineDescriptor descriptor = provider.buyMachine(true, MachineType.LARGE);
 		assertNotNull(descriptor);
 		assertFalse(provider.canBuyMachine(true, MachineType.LARGE));
@@ -284,15 +284,15 @@ public class ProviderTest {
 	@Test
 	public void testCalculateCostWithNoTransference() {
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addTransferenceToCost("amazon", 0, 0, 0, 0);
+		entry.addTransferenceToCost(0, 0, 0, 0, 0);
 
 		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.SMALL);
 		EasyMock.expect(typeProvider.getTotalTransferences()).andReturn(new long[]{0, 0});
-		typeProvider.calculateMachinesCost(entry, "amazon", 0, 3.0);
+		typeProvider.calculateMachinesCost(entry, 0, 3.0);
 		EasyMock.replay(entry, typeProvider);
 		
-		Provider provider = new Provider("amazon", 1, 0, 3.0, new long[]{0}, new double[]{0,0}, new long[]{1,10240,51200,153600}, new double[]{0,0.12,0.09,0.07,0.05}, Arrays.asList(typeProvider) );
+		Provider provider = new Provider(0, "amazon", 1, 0, 3.0, new long[]{0}, new double[]{0,0}, new long[]{1,10240,51200,153600}, new double[]{0,0.12,0.09,0.07,0.05}, Arrays.asList(typeProvider) );
 		provider.calculateCost(entry , 0);
 		
 		EasyMock.verify(entry, typeProvider);
@@ -304,15 +304,15 @@ public class ProviderTest {
 	@Test
 	public void testCalculateCostWithInTransferenceAndNoOutTransference() {
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addTransferenceToCost("amazon", 5 * CostCalculus.GB_IN_BYTES, 0, 0, 0);
+		entry.addTransferenceToCost(0, 5 * CostCalculus.GB_IN_BYTES, 0, 0, 0);
 
 		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.SMALL);
 		EasyMock.expect(typeProvider.getTotalTransferences()).andReturn(new long[]{5 * CostCalculus.GB_IN_BYTES, 0});
-		typeProvider.calculateMachinesCost(entry, "amazon", 0, 3.0);
+		typeProvider.calculateMachinesCost(entry, 0, 3.0);
 		EasyMock.replay(entry, typeProvider);
 		
-		Provider provider = new Provider("amazon", 1, 0, 3.0, new long[]{0}, new double[]{0,0}, new long[]{1,10240,51200,153600}, new double[]{0,0.12,0.09,0.07,0.05}, Arrays.asList(typeProvider) );
+		Provider provider = new Provider(0, "amazon", 1, 0, 3.0, new long[]{0}, new double[]{0,0}, new long[]{1,10240,51200,153600}, new double[]{0,0.12,0.09,0.07,0.05}, Arrays.asList(typeProvider) );
 		provider.calculateCost(entry , 0);
 		
 		EasyMock.verify(entry, typeProvider);
@@ -324,15 +324,15 @@ public class ProviderTest {
 	@Test
 	public void testCalculateCostWithOutTransferenceBelowMinimum() {
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addTransferenceToCost("amazon", 0, 0, CostCalculus.GB_IN_BYTES/2, 0);
+		entry.addTransferenceToCost(0, 0, 0, CostCalculus.GB_IN_BYTES/2, 0);
 
 		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.SMALL);
 		EasyMock.expect(typeProvider.getTotalTransferences()).andReturn(new long[]{0, CostCalculus.GB_IN_BYTES/2});
-		typeProvider.calculateMachinesCost(entry, "amazon", 0, 3.0);
+		typeProvider.calculateMachinesCost(entry, 0, 3.0);
 		EasyMock.replay(entry, typeProvider);
 		
-		Provider provider = new Provider("amazon", 1, 0, 3.0, new long[]{0}, new double[]{0,0}, new long[]{1,10240,51200,153600}, new double[]{0,0.12,0.09,0.07,0.05}, Arrays.asList(typeProvider) );
+		Provider provider = new Provider(0, "amazon", 1, 0, 3.0, new long[]{0}, new double[]{0,0}, new long[]{1,10240,51200,153600}, new double[]{0,0.12,0.09,0.07,0.05}, Arrays.asList(typeProvider) );
 		provider.calculateCost(entry , 0);
 		
 		EasyMock.verify(entry, typeProvider);
@@ -354,15 +354,15 @@ public class ProviderTest {
 								(transferOutLimits[3]-transferOutLimits[2]) * transferOutCosts[3] +
 								(outTransference - transferOutLimits[3]) * transferOutCosts[4];
 		
-		entry.addTransferenceToCost("amazon", 0, 0, outTransference * CostCalculus.GB_IN_BYTES, expectedCost);
+		entry.addTransferenceToCost(0, 0, 0, outTransference * CostCalculus.GB_IN_BYTES, expectedCost);
 
 		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.SMALL);
 		EasyMock.expect(typeProvider.getTotalTransferences()).andReturn(new long[]{0, outTransference * CostCalculus.GB_IN_BYTES});
-		typeProvider.calculateMachinesCost(entry, "amazon", 0, 3.0);
+		typeProvider.calculateMachinesCost(entry, 0, 3.0);
 		EasyMock.replay(entry, typeProvider);
 		
-		Provider provider = new Provider("amazon", 1, 0, 3.0, new long[]{0}, new double[]{0,0}, transferOutLimits, transferOutCosts, Arrays.asList(typeProvider) );
+		Provider provider = new Provider(0, "amazon", 1, 0, 3.0, new long[]{0}, new double[]{0,0}, transferOutLimits, transferOutCosts, Arrays.asList(typeProvider) );
 		provider.calculateCost(entry , 0);
 		
 		EasyMock.verify(entry, typeProvider);
@@ -374,7 +374,7 @@ public class ProviderTest {
 	@Test
 	public void testCalculateUniqueCostWithNoConsumption() {
 		UtilityResult result = EasyMock.createStrictMock(UtilityResult.class);
-		result.addProviderUniqueCost("amazon", MachineType.SMALL, 0);
+		result.addProviderUniqueCost(0, MachineType.SMALL, 0);
 		
 		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.SMALL);
@@ -382,7 +382,7 @@ public class ProviderTest {
 		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.SMALL);
 		EasyMock.replay(result, typeProvider);
 		
-		Provider provider = new Provider("amazon", 1, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		Provider provider = new Provider(0, "amazon", 1, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
 		provider.calculateUniqueCost(result);
 		
 		EasyMock.verify(result);

@@ -1,6 +1,7 @@
 package commons.sim.schedulingheuristics;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 
@@ -40,7 +41,7 @@ public class RoundRobinHeuristicTest {
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false, MachineType.SMALL), null);
+		Machine machine = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false, MachineType.SMALL, 0), null);
 		servers.add(machine);
 		
 		//Retrieving for the first time
@@ -70,9 +71,9 @@ public class RoundRobinHeuristicTest {
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false, MachineType.SMALL), null);
-		Machine machine2 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(2, false, MachineType.SMALL), null);
-		Machine machine3 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(3, false, MachineType.SMALL), null);
+		Machine machine = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, false, MachineType.SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(2, false, MachineType.SMALL, 0), null);
+		Machine machine3 = new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(3, false, MachineType.SMALL, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);

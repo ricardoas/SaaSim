@@ -19,7 +19,6 @@ import commons.config.Configuration;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
-import commons.sim.jeevent.JETime;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Configuration.class)
@@ -29,7 +28,7 @@ public class MultiCoreTimeSharedMachineTest {
 
 	@Before
 	public void setUp() {
-		this.descriptor = new MachineDescriptor(1, false, MachineType.MEDIUM);
+		this.descriptor = new MachineDescriptor(1, false, MachineType.MEDIUM, 0);
 	}
 
 	@Test
@@ -195,9 +194,9 @@ public class MultiCoreTimeSharedMachineTest {
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		EasyMock.replay(loadBalancer);
 
-		Request request = new Request(1l, "am", 1000, 0, 0, 0, new long[]{50, 50, 50, 50});
-		Request request2 = new Request(2l, "am", 999, 0, 0, 0, new long[]{140, 140, 140, 140});
-		Request request3 = new Request(3l, "am", 22, 0, 0, 0, new long[]{200, 200, 200, 200});
+		Request request = new Request(1l, 1, 1000, 0, 0, 0, new long[]{50, 50, 50, 50});
+		Request request2 = new Request(2l, 1, 999, 0, 0, 0, new long[]{140, 140, 140, 140});
+		Request request3 = new Request(3l, 1, 22, 0, 0, 0, new long[]{200, 200, 200, 200});
 		
 		Configuration config = mockConfiguration(1);
 		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(4d);

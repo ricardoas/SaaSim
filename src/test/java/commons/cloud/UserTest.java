@@ -26,7 +26,7 @@ public class UserTest {
 		
 		Contract contract = EasyMock.createStrictMock(Contract.class);
 		
-		User user = new User("1", contract, STORAGE_IN_BYTES);
+		User user = new User(1, contract, STORAGE_IN_BYTES);
 		
 		contract.calculateReceipt(entry, user.getId(), 0, 0, 0, STORAGE_IN_BYTES);
 		EasyMock.replay(contract, entry);
@@ -45,8 +45,8 @@ public class UserTest {
 		EasyMock.expect(contract.calculateOneTimeFees()).andReturn(SETUP);
 		EasyMock.replay(contract);
 		
-		User user = new User("1", contract, STORAGE_IN_BYTES);
-		user.calculateOneTimeFees(new UtilityResult());
+		User user = new User(0, contract, STORAGE_IN_BYTES);
+		user.calculateOneTimeFees(new UtilityResult(1, 0));
 	
 		EasyMock.verify(contract);
 	}
@@ -66,9 +66,9 @@ public class UserTest {
 		EasyMock.replay(gold, silver);
 		
 		
-		User goldUser1 = new User("1", gold, STORAGE_IN_BYTES);
-		User goldUser2 = new User("2", gold, STORAGE_IN_BYTES);
-		User silverUser = new User("3", silver, STORAGE_IN_BYTES);
+		User goldUser1 = new User(1, gold, STORAGE_IN_BYTES);
+		User goldUser2 = new User(2, gold, STORAGE_IN_BYTES);
+		User silverUser = new User(3, silver, STORAGE_IN_BYTES);
 		
 		assertEquals(0, goldUser1.compareTo(goldUser2));
 		assertEquals(0, goldUser2.compareTo(goldUser1));
@@ -92,7 +92,7 @@ public class UserTest {
 		
 		Contract gold = EasyMock.createStrictMock(Contract.class);
 		
-		User user = new User("1", gold , STORAGE_IN_BYTES);
+		User user = new User(1, gold , STORAGE_IN_BYTES);
 		
 		gold.calculateReceipt(entry, user.getId(), 2*totalProcessed, 2*requestSize, 2*responseSize, STORAGE_IN_BYTES);
 		
@@ -127,7 +127,7 @@ public class UserTest {
 		
 		Contract gold = EasyMock.createStrictMock(Contract.class);
 		
-		User user = new User("1", gold , STORAGE_IN_BYTES);
+		User user = new User(1, gold , STORAGE_IN_BYTES);
 		
 		gold.calculateReceipt(entry, user.getId(), 2*totalProcessed, 2*requestSize, 0, STORAGE_IN_BYTES);
 		

@@ -1,9 +1,10 @@
 package commons.config;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationRuntimeException;
@@ -179,8 +180,8 @@ public class ConfigurationTest {
 		Configuration.buildInstance(PropertiesTesting.EMPTY_IAAS_PLANS_FILE);
 		Configuration config = Configuration.getInstance();
 		
-		List<Provider> providers = config.getProviders();
-		assertEquals(3, providers.size());
+		Provider[] providers = config.getProviders();
+		assertEquals(3, providers.length);
 		for(Provider provider : providers){
 			assertFalse(provider.canBuyMachine(true, MachineType.SMALL));
 			assertFalse(provider.canBuyMachine(true, MachineType.MEDIUM));
@@ -218,11 +219,11 @@ public class ConfigurationTest {
 	public void testSaaSUsersAndPlansValidFile() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
 		Configuration config = Configuration.getInstance();
-		List<User> users = config.getUsers();
+		User[] users = config.getUsers();
 		assertNotNull(users);
-		assertEquals(2, users.size());
+		assertEquals(2, users.length);
 		
-		Contract c1 = users.get(0).getContract();
+		Contract c1 = users[0].getContract();
 		assertNotNull(c1);
 		assertEquals("bronze", c1.getName());
 		assertEquals(4, c1.getPriority());
@@ -235,7 +236,7 @@ public class ConfigurationTest {
 		assertEquals(200, c1.getStorageLimitInMB(), 0.0);
 		assertEquals(0.1, c1.getStorageCostPerMB(), 0.0);
 
-		Contract c2 = users.get(1).getContract();
+		Contract c2 = users[1].getContract();
 		assertNotNull(c2);
 		assertEquals("silver", c2.getName());
 		assertEquals(3, c2.getPriority());
@@ -257,11 +258,11 @@ public class ConfigurationTest {
 	public void testIaaSValidFile() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
 		Configuration config = Configuration.getInstance();
-		List<Provider> providers = config.getProviders();
+		Provider[] providers = config.getProviders();
 		assertNotNull(providers);
-		assertEquals(3, providers.size());
+		assertEquals(3, providers.length);
 
-		Provider provider2 = providers.get(0);
+		Provider provider2 = providers[0];
 		assertNotNull(provider2);
 		assertEquals("rackspace", provider2.getName());
 		assertEquals(20, provider2.getOnDemandLimit(), 0.0);
@@ -283,7 +284,7 @@ public class ConfigurationTest {
 		assertEquals(1500, provider2.getReservationOneYearFee(MachineType.LARGE), 0.0);
 		assertEquals(3500, provider2.getReservationThreeYearsFee(MachineType.LARGE), 0.0);
 
-		Provider provider = providers.get(1);
+		Provider provider = providers[1];
 		assertNotNull(provider);
 		assertEquals("amazon", provider.getName());
 		assertEquals(20, provider.getOnDemandLimit(), 0.0);
@@ -309,7 +310,7 @@ public class ConfigurationTest {
 		assertEquals(1820, provider.getReservationOneYearFee(MachineType.XLARGE), 0.0);
 		assertEquals(2800, provider.getReservationThreeYearsFee(MachineType.XLARGE), 0.0);
 
-		Provider provider3 = providers.get(2);
+		Provider provider3 = providers[2];
 		assertNotNull(provider3);
 		assertEquals("gogrid", provider3.getName());
 		assertEquals(5, provider3.getOnDemandLimit(), 0.0);

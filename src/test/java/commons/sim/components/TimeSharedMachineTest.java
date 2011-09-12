@@ -18,7 +18,6 @@ import commons.cloud.Request;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
-import commons.sim.jeevent.JETime;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(TimeSharedMachine.class)
@@ -28,7 +27,7 @@ public class TimeSharedMachineTest {
 
 	@Before
 	public void setUp() {
-		this.descriptor = new MachineDescriptor(1, false, MachineType.SMALL);
+		this.descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 	}
 
 	@Test

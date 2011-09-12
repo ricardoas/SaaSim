@@ -1,6 +1,7 @@
 package commons.sim.components;
 
-import static commons.sim.util.SimulatorProperties.*;
+import static commons.sim.util.SimulatorProperties.RANJAN_HEURISTIC_BACKLOG_SIZE;
+import static commons.sim.util.SimulatorProperties.RANJAN_HEURISTIC_NUMBER_OF_TOKENS;
 import static org.junit.Assert.*;
 
 import java.util.Queue;
@@ -20,7 +21,6 @@ import commons.config.Configuration;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
-import commons.sim.jeevent.JETime;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({JEEventScheduler.class, Configuration.class})
@@ -33,7 +33,7 @@ public class RanjanMachineTest {
 
 	@Before
 	public void setUp() {
-		this.descriptor = new MachineDescriptor(1, false, MachineType.SMALL);
+		this.descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 	}
 
 	@Test
@@ -407,8 +407,8 @@ public class RanjanMachineTest {
 		EasyMock.expect(config.getLong(RANJAN_HEURISTIC_BACKLOG_SIZE)).andReturn(backlogSize);
 		
 		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
-		EasyMock.expect(scheduler.now()).andReturn(0l).times(3);
-		EasyMock.expect(scheduler.now()).andReturn(100l).times(3);
+		EasyMock.expect(scheduler.now()).andReturn(0l).times(2);
+		EasyMock.expect(scheduler.now()).andReturn(100l).times(2);
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
 		firstRequest.assignTo(MachineType.SMALL);
@@ -456,7 +456,7 @@ public class RanjanMachineTest {
 		Configuration config = mockConfiguration();
 		
 		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
-		EasyMock.expect(scheduler.now()).andReturn(0L).times(3);
+		EasyMock.expect(scheduler.now()).andReturn(0L).times(2);
 		
 		Request request = EasyMock.createStrictMock(Request.class);
 		request.assignTo(MachineType.SMALL);

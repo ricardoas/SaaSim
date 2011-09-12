@@ -3,14 +3,11 @@
  */
 package provisioning;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,9 +58,9 @@ public class DynamicProvisioningSystemTest {
 	public void testDynamicProvisioningSystemWithEmptyUsersAndProviders() {
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
-		EasyMock.expect(config.getProviders()).andReturn(new ArrayList<Provider>());
-		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
+		EasyMock.expect(Configuration.getInstance()).andReturn(config);
+		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{});
+		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
 		PowerMock.replayAll(config);
 		
 		assertNotNull(new DynamicProvisioningSystem());
@@ -81,10 +78,10 @@ public class DynamicProvisioningSystemTest {
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		EasyMock.expect(config.getProviders()).andReturn(null);
-		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
+		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
 		PowerMock.replayAll(config);
 		
-		new DynamicProvisioningSystem();
+		assertNotNull(new DynamicProvisioningSystem());
 		
 		PowerMock.verifyAll();
 	}
@@ -99,11 +96,11 @@ public class DynamicProvisioningSystemTest {
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
-		EasyMock.expect(config.getProviders()).andReturn(new ArrayList<Provider>());
+		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{});
 		EasyMock.expect(config.getUsers()).andReturn(null);
 		PowerMock.replayAll(config);
 		
-		new DynamicProvisioningSystem();
+		assertNotNull(new DynamicProvisioningSystem());
 		
 		PowerMock.verifyAll();
 	}
@@ -117,19 +114,31 @@ public class DynamicProvisioningSystemTest {
 		Configuration.getInstance().setProperty(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER, "7");
 		
 		DynamicConfigurable configurable = EasyMock.createStrictMock(DynamicConfigurable.class);
-		configurable.addServer(0, new MachineDescriptor(0, true, MachineType.MEDIUM), false);
-		configurable.addServer(0, new MachineDescriptor(1, true, MachineType.MEDIUM), false);
-		configurable.addServer(0, new MachineDescriptor(2, true, MachineType.MEDIUM), false);
-		configurable.addServer(0, new MachineDescriptor(3, true, MachineType.MEDIUM), false);
-		configurable.addServer(0, new MachineDescriptor(4, true, MachineType.LARGE), false);
-		configurable.addServer(0, new MachineDescriptor(5, true, MachineType.LARGE), false);
-		configurable.addServer(0, new MachineDescriptor(6, true, MachineType.LARGE), false);
+		Capture<MachineDescriptor> [] descriptor = new Capture[7];
+		for (int i = 0; i < descriptor.length; i++) {
+			descriptor[i] = new Capture<MachineDescriptor>();
+		}
+		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [0]), EasyMock.anyBoolean());
+		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [1]), EasyMock.anyBoolean());
+		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [2]), EasyMock.anyBoolean());
+		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [3]), EasyMock.anyBoolean());
+		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [4]), EasyMock.anyBoolean());
+		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [5]), EasyMock.anyBoolean());
+		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [6]), EasyMock.anyBoolean());
 		configurable.setWorkloadParser(EasyMock.anyObject(WorkloadParser.class));
 		
 		EasyMock.replay(configurable);
 		
 		DynamicProvisioningSystem dps = new DynamicProvisioningSystem();
 		dps.registerConfigurable(configurable);
+		
+		assertEquals(MachineType.MEDIUM, descriptor[0].getValue().getType());
+		assertEquals(MachineType.MEDIUM, descriptor[1].getValue().getType());
+		assertEquals(MachineType.MEDIUM, descriptor[2].getValue().getType());
+		assertEquals(MachineType.MEDIUM, descriptor[3].getValue().getType());
+		assertEquals(MachineType.LARGE, descriptor[4].getValue().getType());
+		assertEquals(MachineType.LARGE, descriptor[5].getValue().getType());
+		assertEquals(MachineType.LARGE, descriptor[6].getValue().getType());
 		
 		EasyMock.verify(configurable);
 	}
@@ -162,8 +171,8 @@ public class DynamicProvisioningSystemTest {
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
-		EasyMock.expect(config.getProviders()).andReturn(new ArrayList<Provider>());
-		EasyMock.expect(config.getUsers()).andReturn(new ArrayList<User>());
+		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{});
+		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
 		PowerMock.replayAll(config);
 
 		DynamicProvisioningSystem dps = new DynamicProvisioningSystem();
@@ -181,7 +190,7 @@ public class DynamicProvisioningSystemTest {
 		DynamicProvisioningSystem dps = new DynamicProvisioningSystem();
 		UtilityResult result = dps.calculateUtility();
 		
-		UtilityResult currentResult = new UtilityResult();
+		UtilityResult currentResult = new UtilityResult(2, 3);
 		for(User user : Configuration.getInstance().getUsers()){
 			user.calculateOneTimeFees(currentResult);
 		}
@@ -196,38 +205,28 @@ public class DynamicProvisioningSystemTest {
 	@Test
 	@PrepareForTest(AccountingSystem.class)
 	public void testChargeUsers() throws Exception{
-		List<Provider> providers = Configuration.getInstance().getProviders();
-		List<User> users = Configuration.getInstance().getUsers();
+		Provider[] providers = Configuration.getInstance().getProviders();
+		User[] users = Configuration.getInstance().getUsers();
 
-		Map<String, User> usersMap = new TreeMap<String, User>();
-		for (User user : users) {
-			usersMap.put(user.getId(), user);
-		}
-		
-		Map<String, Provider> providersMap = new TreeMap<String, Provider>();
-		for (Provider provider : providers) {
-			providersMap.put(provider.getName(), provider);
-		}
-		
-		UtilityResultEntry entry = PowerMock.createStrictMockAndExpectNew(UtilityResultEntry.class, 0L, usersMap, providersMap);
-		entry.addToReceipt(EasyMock.anyObject(String.class), EasyMock.anyObject(String.class), EasyMock.anyLong(), 
+		UtilityResultEntry entry = PowerMock.createStrictMockAndExpectNew(UtilityResultEntry.class, 0L, users, providers);
+		entry.addToReceipt(EasyMock.anyInt(), EasyMock.anyObject(String.class), EasyMock.anyLong(), 
 				EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyDouble());
 		PowerMock.expectLastCall().times(2);
+		//RACKSPACE
+		entry.addUsageToCost(EasyMock.anyInt(), EasyMock.anyObject(MachineType.class), 
+				EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyDouble());
+		PowerMock.expectLastCall().times(2);
+		entry.addTransferenceToCost(EasyMock.anyInt(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble());
 		//AMAZON
-		entry.addUsageToCost(EasyMock.anyObject(String.class), EasyMock.anyObject(MachineType.class), 
+		entry.addUsageToCost(EasyMock.anyInt(), EasyMock.anyObject(MachineType.class), 
 				EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyDouble());
 		PowerMock.expectLastCall().times(3);
-		entry.addTransferenceToCost(EasyMock.anyObject(String.class), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble());
+		entry.addTransferenceToCost(EasyMock.anyInt(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble());
 		//GOGRID
-		entry.addUsageToCost(EasyMock.anyObject(String.class), EasyMock.anyObject(MachineType.class), 
+		entry.addUsageToCost(EasyMock.anyInt(), EasyMock.anyObject(MachineType.class), 
 				EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyDouble());
 		PowerMock.expectLastCall().times(2);
-		entry.addTransferenceToCost(EasyMock.anyObject(String.class), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble());
-		//RACKSPACE
-		entry.addUsageToCost(EasyMock.anyObject(String.class), EasyMock.anyObject(MachineType.class), 
-				EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyDouble());
-		PowerMock.expectLastCall().times(2);
-		entry.addTransferenceToCost(EasyMock.anyObject(String.class), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble());
+		entry.addTransferenceToCost(EasyMock.anyInt(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble());
 		PowerMock.replayAll();
 		
 		DynamicProvisioningSystem dps = new DynamicProvisioningSystem();
@@ -240,21 +239,20 @@ public class DynamicProvisioningSystemTest {
 	@PrepareForTest(Configuration.class)
 	public void testReportLostRequest(){
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getSaasClient()).andReturn("0").times(2);
+		EasyMock.expect(request.getSaasClient()).andReturn(0).times(2);
 		
 		Contract contract = EasyMock.createStrictMock(Contract.class);
 
 		//Configuration mock
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
-		EasyMock.expect(config.getProviders()).andReturn(new ArrayList<Provider>());
+		EasyMock.expect(Configuration.getInstance()).andReturn(config);
+		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{});
 		
 		User user = EasyMock.createStrictMock(User.class);
-		EasyMock.expect(user.getId()).andReturn("0");
 		user.reportLostRequest(request);
-		ArrayList<User> users = new ArrayList<User>();
-		users.add(user);
+		User[] users = new User[1];
+		users[0] = user;
 		EasyMock.expect(config.getUsers()).andReturn(users);
 		
 		PowerMock.replayAll(request, contract, config, user);
@@ -270,21 +268,20 @@ public class DynamicProvisioningSystemTest {
 	@PrepareForTest(Configuration.class)
 	public void testReportFinishedRequest(){
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getSaasClient()).andReturn("0");
+		EasyMock.expect(request.getSaasClient()).andReturn(0).times(2);
 		
 		Contract contract = EasyMock.createStrictMock(Contract.class);
 
 		//Configuration mock
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
-		EasyMock.expect(config.getProviders()).andReturn(new ArrayList<Provider>());
+		EasyMock.expect(Configuration.getInstance()).andReturn(config);
+		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{});
 		
 		User user = EasyMock.createStrictMock(User.class);
-		EasyMock.expect(user.getId()).andReturn("0");
 		user.reportFinishedRequest(request);
-		ArrayList<User> users = new ArrayList<User>();
-		users.add(user);
+		User[] users = new User[1];
+		users[0] = user;
 		EasyMock.expect(config.getUsers()).andReturn(users);
 		
 		PowerMock.replayAll(request, contract, config, user);

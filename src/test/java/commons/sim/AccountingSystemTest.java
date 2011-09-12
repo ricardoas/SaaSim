@@ -3,11 +3,9 @@
  */
 package commons.sim;
 
-import static org.junit.Assert.*;
-
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.EasyMock;
@@ -43,10 +41,10 @@ public class AccountingSystemTest {
 	 */
 	@Test
 	public void testAccountPartialUtilityWithoutUsersAndProviders() {
-		Map<String, User> users = new TreeMap<String, User>();
-		Map<String, Provider> providers = new TreeMap<String, Provider>();
+		User [] users = new User[]{};
+		Provider[] providers = new Provider[]{};
 		
-		AccountingSystem acc = new AccountingSystem();
+		AccountingSystem acc = new AccountingSystem(0, 0);
 		acc.accountPartialUtility(0, users, providers);
 		
 		UtilityResult result = acc.calculateUtility(users, providers);
@@ -62,42 +60,32 @@ public class AccountingSystemTest {
 	@PrepareForTest(AccountingSystem.class)
 	@Test
 	public void testAccountPartialUtility() throws Exception {
-		List<Provider> providers = Configuration.getInstance().getProviders();
-		List<User> users = Configuration.getInstance().getUsers();
+		Provider[] providers = Configuration.getInstance().getProviders();
+		User[] users = Configuration.getInstance().getUsers();
 
-		Map<String, User> usersMap = new TreeMap<String, User>();
-		for (User user : users) {
-			usersMap.put(user.getId(), user);
-		}
-		
-		Map<String, Provider> providersMap = new TreeMap<String, Provider>();
-		for (Provider provider : providers) {
-			providersMap.put(provider.getName(), provider);
-		}
-		
-		UtilityResultEntry entry = PowerMock.createStrictMockAndExpectNew(UtilityResultEntry.class, 0L, usersMap, providersMap);
-		entry.addToReceipt(EasyMock.anyObject(String.class), EasyMock.anyObject(String.class), EasyMock.anyLong(), 
+		UtilityResultEntry entry = PowerMock.createStrictMockAndExpectNew(UtilityResultEntry.class, 0L, users, providers);
+		entry.addToReceipt(EasyMock.anyInt(), EasyMock.anyObject(String.class), EasyMock.anyLong(), 
 				EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyDouble());
 		PowerMock.expectLastCall().times(2);
+		//RACKSPACE
+		entry.addUsageToCost(EasyMock.anyInt(), EasyMock.anyObject(MachineType.class), 
+				EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyDouble());
+		PowerMock.expectLastCall().times(2);
+		entry.addTransferenceToCost(EasyMock.anyInt(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble());
 		//AMAZON
-		entry.addUsageToCost(EasyMock.anyObject(String.class), EasyMock.anyObject(MachineType.class), 
+		entry.addUsageToCost(EasyMock.anyInt(), EasyMock.anyObject(MachineType.class), 
 				EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyDouble());
 		PowerMock.expectLastCall().times(3);
-		entry.addTransferenceToCost(EasyMock.anyObject(String.class), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble());
+		entry.addTransferenceToCost(EasyMock.anyInt(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble());
 		//GOGRID
-		entry.addUsageToCost(EasyMock.anyObject(String.class), EasyMock.anyObject(MachineType.class), 
+		entry.addUsageToCost(EasyMock.anyInt(), EasyMock.anyObject(MachineType.class), 
 				EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyDouble());
 		PowerMock.expectLastCall().times(2);
-		entry.addTransferenceToCost(EasyMock.anyObject(String.class), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble());
-		//RACKSPACE
-		entry.addUsageToCost(EasyMock.anyObject(String.class), EasyMock.anyObject(MachineType.class), 
-				EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyDouble());
-		PowerMock.expectLastCall().times(2);
-		entry.addTransferenceToCost(EasyMock.anyObject(String.class), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble());
+		entry.addTransferenceToCost(EasyMock.anyInt(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble());
 		PowerMock.replayAll();
 		
-		AccountingSystem acc = new AccountingSystem();
-		acc.accountPartialUtility(0, usersMap, providersMap);
+		AccountingSystem acc = new AccountingSystem(2, 3);
+		acc.accountPartialUtility(0, users, providers);
 
 		PowerMock.verifyAll();
 	}
@@ -107,10 +95,10 @@ public class AccountingSystemTest {
 	 */
 	@Test
 	public void testCalculateUtilityWithoutUsersAndProviders() {
-		Map<String, User> users = new TreeMap<String, User>();
-		Map<String, Provider> providers = new TreeMap<String, Provider>();
+		User [] users = new User[]{};
+		Provider[] providers = new Provider[]{};
 		
-		AccountingSystem acc = new AccountingSystem();
+		AccountingSystem acc = new AccountingSystem(0, 0);
 		UtilityResult utility = acc.calculateUtility(users, providers);
 		assertFalse(utility.iterator().hasNext());
 		assertEquals(0.0, utility.getUtility(), 0.0);
@@ -124,29 +112,19 @@ public class AccountingSystemTest {
 	@Test
 	public void testCalculateUtility() throws Exception {
 		
-		List<Provider> providers = Configuration.getInstance().getProviders();
-		List<User> users = Configuration.getInstance().getUsers();
+		Provider[] providers = Configuration.getInstance().getProviders();
+		User[] users = Configuration.getInstance().getUsers();
 
-		Map<String, User> usersMap = new TreeMap<String, User>();
-		for (User user : users) {
-			usersMap.put(user.getId(), user);
-		}
-		
-		Map<String, Provider> providersMap = new TreeMap<String, Provider>();
-		for (Provider provider : providers) {
-			providersMap.put(provider.getName(), provider);
-		}
-
-		UtilityResult result = PowerMock.createStrictMockAndExpectNew(UtilityResult.class);
-		result.addProviderUniqueCost(EasyMock.anyObject(String.class), EasyMock.anyObject(MachineType.class), EasyMock.anyDouble());
+		UtilityResult result = PowerMock.createStrictMockAndExpectNew(UtilityResult.class, 2, 3);
+		result.addProviderUniqueCost(EasyMock.anyInt(), EasyMock.anyObject(MachineType.class), EasyMock.anyDouble());
 		PowerMock.expectLastCall().times(7);
-		result.addUserUniqueFee(EasyMock.anyObject(String.class), EasyMock.anyDouble());
+		result.addUserUniqueFee(EasyMock.anyInt(), EasyMock.anyDouble());
 		PowerMock.expectLastCall().times(2);
 		
 		PowerMock.replayAll();
 
-		AccountingSystem acc = new AccountingSystem();
-		acc.calculateUtility(usersMap, providersMap);
+		AccountingSystem acc = new AccountingSystem(2, 3);
+		acc.calculateUtility(users, providers);
 		
 		PowerMock.verifyAll();
 	}

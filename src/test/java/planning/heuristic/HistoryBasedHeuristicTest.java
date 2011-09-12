@@ -1,12 +1,15 @@
 package planning.heuristic;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.EasyMock;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
@@ -19,6 +22,8 @@ import provisioning.util.DPSFactory;
 
 import commons.cloud.MachineType;
 import commons.cloud.UtilityResult;
+import commons.config.Configuration;
+import commons.config.PropertiesTesting;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.Machine;
@@ -27,6 +32,11 @@ import commons.sim.util.SimulatorFactory;
 
 @RunWith(PowerMockRunner.class)
 public class HistoryBasedHeuristicTest {
+	
+	@BeforeClass
+	public static void setUp() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
+	}
 	
 	@Test
 	@PrepareForTest({SimulatorFactory.class, DPSFactory.class})
@@ -50,7 +60,7 @@ public class HistoryBasedHeuristicTest {
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
 		dps.registerConfigurable(simulator);
-		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult());
+		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult(0, 0));
 		PowerMock.mockStatic(DPSFactory.class);
 		EasyMock.expect(DPSFactory.createDPS()).andReturn(dps);
 
@@ -73,7 +83,7 @@ public class HistoryBasedHeuristicTest {
 	public void testFindPlanWithWellUtilisedServersAndOneTier(){
 		
 		//First machine
-		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL);
+		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 		descriptor.setFinishTimeInMillis(200);
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
 		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(100l);
@@ -83,7 +93,7 @@ public class HistoryBasedHeuristicTest {
 		
 		//Second machine
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor2 = new MachineDescriptor(1, false, MachineType.SMALL);
+		MachineDescriptor descriptor2 = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 		descriptor2.setFinishTimeInMillis(999);
 		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(555l);
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
@@ -92,7 +102,7 @@ public class HistoryBasedHeuristicTest {
 		
 		//Third machine
 		Machine machine3 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor3 = new MachineDescriptor(1, false, MachineType.SMALL);
+		MachineDescriptor descriptor3 = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 		descriptor3.setFinishTimeInMillis(200);
 		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(200l);
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
@@ -122,7 +132,7 @@ public class HistoryBasedHeuristicTest {
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
 		dps.registerConfigurable(simulator);
-		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult());
+		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult(0, 0));
 		PowerMock.mockStatic(DPSFactory.class);
 		EasyMock.expect(DPSFactory.createDPS()).andReturn(dps);
 
@@ -146,7 +156,7 @@ public class HistoryBasedHeuristicTest {
 	public void testFindPlanWithUnderUtilisedServersAndOneTier(){
 		
 		//First machine
-		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL);
+		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 		descriptor.setFinishTimeInMillis(200);
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
 		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(99l);
@@ -155,7 +165,7 @@ public class HistoryBasedHeuristicTest {
 		
 		//Second machine
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor2 = new MachineDescriptor(1, false, MachineType.SMALL);
+		MachineDescriptor descriptor2 = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 		descriptor2.setFinishTimeInMillis(999);
 		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(400l);
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
@@ -163,7 +173,7 @@ public class HistoryBasedHeuristicTest {
 		
 		//Third machine
 		Machine machine3 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor3 = new MachineDescriptor(1, false, MachineType.SMALL);
+		MachineDescriptor descriptor3 = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 		descriptor3.setFinishTimeInMillis(200);
 		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(2l);
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
@@ -192,7 +202,7 @@ public class HistoryBasedHeuristicTest {
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
 		dps.registerConfigurable(simulator);
-		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult());
+		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult(0, 0));
 		PowerMock.mockStatic(DPSFactory.class);
 		EasyMock.expect(DPSFactory.createDPS()).andReturn(dps);
 
@@ -215,7 +225,7 @@ public class HistoryBasedHeuristicTest {
 	public void testFindPlanWithMixedUtilisedServersAndOneTier(){
 		
 		//First machine
-		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.MEDIUM);
+		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.MEDIUM, 0);
 		descriptor.setFinishTimeInMillis(200);
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
 		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(101l);
@@ -225,7 +235,7 @@ public class HistoryBasedHeuristicTest {
 		
 		//Second machine
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor2 = new MachineDescriptor(1, false, MachineType.SMALL);
+		MachineDescriptor descriptor2 = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 		descriptor2.setFinishTimeInMillis(999);
 		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(400l);
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
@@ -233,7 +243,7 @@ public class HistoryBasedHeuristicTest {
 		
 		//Third machine
 		Machine machine3 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor3 = new MachineDescriptor(1, false, MachineType.XLARGE);
+		MachineDescriptor descriptor3 = new MachineDescriptor(1, false, MachineType.XLARGE, 0);
 		descriptor3.setFinishTimeInMillis(333);
 		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(199l);
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
@@ -263,7 +273,7 @@ public class HistoryBasedHeuristicTest {
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
 		dps.registerConfigurable(simulator);
-		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult());
+		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult(0, 0));
 		PowerMock.mockStatic(DPSFactory.class);
 		EasyMock.expect(DPSFactory.createDPS()).andReturn(dps);
 
@@ -288,7 +298,7 @@ public class HistoryBasedHeuristicTest {
 	public void testFindPlanWithWellUtilisedServersAndMultipleTiers(){
 		
 		//First machine
-		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL);
+		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 		descriptor.setFinishTimeInMillis(200);
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
 		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(100l);
@@ -298,7 +308,7 @@ public class HistoryBasedHeuristicTest {
 		
 		//Second machine
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor2 = new MachineDescriptor(1, false, MachineType.SMALL);
+		MachineDescriptor descriptor2 = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 		descriptor2.setFinishTimeInMillis(999);
 		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(555l);
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
@@ -307,7 +317,7 @@ public class HistoryBasedHeuristicTest {
 		
 		//Third machine
 		Machine machine3 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor3 = new MachineDescriptor(1, false, MachineType.SMALL);
+		MachineDescriptor descriptor3 = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 		descriptor3.setFinishTimeInMillis(200);
 		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(200l);
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
@@ -338,7 +348,7 @@ public class HistoryBasedHeuristicTest {
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
 		dps.registerConfigurable(simulator);
-		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult());
+		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult(0, 0));
 		PowerMock.mockStatic(DPSFactory.class);
 		EasyMock.expect(DPSFactory.createDPS()).andReturn(dps);
 
@@ -362,7 +372,7 @@ public class HistoryBasedHeuristicTest {
 	public void testFindPlanWithUnderUtilisedServersAndMultipleTiers(){
 		
 		//First machine
-		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL);
+		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 		descriptor.setFinishTimeInMillis(99);
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
 		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(7l);
@@ -371,7 +381,7 @@ public class HistoryBasedHeuristicTest {
 		
 		//Second machine
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor2 = new MachineDescriptor(1, false, MachineType.SMALL);
+		MachineDescriptor descriptor2 = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 		descriptor2.setFinishTimeInMillis(2150);
 		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(179l);
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
@@ -379,7 +389,7 @@ public class HistoryBasedHeuristicTest {
 		
 		//Third machine
 		Machine machine3 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor3 = new MachineDescriptor(1, false, MachineType.SMALL);
+		MachineDescriptor descriptor3 = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 		descriptor3.setFinishTimeInMillis(10000);
 		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(200l);
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
@@ -409,7 +419,7 @@ public class HistoryBasedHeuristicTest {
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
 		dps.registerConfigurable(simulator);
-		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult());
+		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult(0, 0));
 		PowerMock.mockStatic(DPSFactory.class);
 		EasyMock.expect(DPSFactory.createDPS()).andReturn(dps);
 
@@ -432,7 +442,7 @@ public class HistoryBasedHeuristicTest {
 	public void testFindPlanWithMixedUtilisedServersAndMultipleTiers(){
 		
 		//First tier machines
-		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.HIGHCPU);
+		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.HIGHCPU, 0);
 		descriptor.setFinishTimeInMillis(100);
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
 		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(67l);
@@ -440,7 +450,7 @@ public class HistoryBasedHeuristicTest {
 		EasyMock.expect(machine1.getNumberOfCores()).andReturn(1);
 		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor).times(2);
 		
-		MachineDescriptor descriptor4 = new MachineDescriptor(4, false, MachineType.XLARGE);
+		MachineDescriptor descriptor4 = new MachineDescriptor(4, false, MachineType.XLARGE, 0);
 		descriptor4.setFinishTimeInMillis(333);
 		Machine machine4 = EasyMock.createStrictMock(Machine.class);
 		EasyMock.expect(machine4.getTotalTimeUsed()).andReturn(7l);
@@ -449,7 +459,7 @@ public class HistoryBasedHeuristicTest {
 		
 		//Second tier machine
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.LARGE);
+		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.LARGE, 0);
 		descriptor2.setFinishTimeInMillis(2150);
 		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(1798l);
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
@@ -458,14 +468,14 @@ public class HistoryBasedHeuristicTest {
 		
 		//Third tier machines
 		Machine machine3 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.MEDIUM);
+		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.MEDIUM, 0);
 		descriptor3.setFinishTimeInMillis(10);
 		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(2l);
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
 		EasyMock.expect(machine3.getNumberOfCores()).andReturn(1);
 		
 		Machine machine5 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor5 = new MachineDescriptor(5, false, MachineType.HIGHCPU);
+		MachineDescriptor descriptor5 = new MachineDescriptor(5, false, MachineType.HIGHCPU, 0);
 		descriptor5.setFinishTimeInMillis(10);
 		EasyMock.expect(machine5.getTotalTimeUsed()).andReturn(8l);
 		EasyMock.expect(machine5.getDescriptor()).andReturn(descriptor5);
@@ -496,7 +506,7 @@ public class HistoryBasedHeuristicTest {
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
 		dps.registerConfigurable(simulator);
-		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult());
+		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult(0, 0));
 		PowerMock.mockStatic(DPSFactory.class);
 		EasyMock.expect(DPSFactory.createDPS()).andReturn(dps);
 

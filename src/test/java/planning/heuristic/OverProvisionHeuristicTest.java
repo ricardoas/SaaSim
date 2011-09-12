@@ -1,6 +1,7 @@
 package planning.heuristic;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,23 +65,23 @@ public class OverProvisionHeuristicTest {
 		long sla = 8000l;
 		
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getUserID()).andReturn(1l);
+		EasyMock.expect(request.getUserID()).andReturn(1);
 		Request request2 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request2.getUserID()).andReturn(2l);
+		EasyMock.expect(request2.getUserID()).andReturn(2);
 		Request request3 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request3.getUserID()).andReturn(3l);
+		EasyMock.expect(request3.getUserID()).andReturn(3);
 		Request request4 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request4.getUserID()).andReturn(4l);
+		EasyMock.expect(request4.getUserID()).andReturn(4);
 		Request request5 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request5.getUserID()).andReturn(5l);
+		EasyMock.expect(request5.getUserID()).andReturn(5);
 		Request request6 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request6.getUserID()).andReturn(6l);
+		EasyMock.expect(request6.getUserID()).andReturn(6);
 		Request request7 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request7.getUserID()).andReturn(7l);
+		EasyMock.expect(request7.getUserID()).andReturn(7);
 		Request request8 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request8.getUserID()).andReturn(8l);
+		EasyMock.expect(request8.getUserID()).andReturn(8);
 		Request request9 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request9.getUserID()).andReturn(9l);
+		EasyMock.expect(request9.getUserID()).andReturn(9);
 		
 		List<Request> firstIntervalRequests = new ArrayList<Request>();
 		firstIntervalRequests.add(request);
@@ -130,23 +131,23 @@ public class OverProvisionHeuristicTest {
 		long sla = 8000l;
 		
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getUserID()).andReturn(1l);
+		EasyMock.expect(request.getUserID()).andReturn(1);
 		Request request2 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request2.getUserID()).andReturn(2l);
+		EasyMock.expect(request2.getUserID()).andReturn(2);
 		Request request3 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request3.getUserID()).andReturn(3l);
+		EasyMock.expect(request3.getUserID()).andReturn(3);
 		Request request4 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request4.getUserID()).andReturn(4l);
+		EasyMock.expect(request4.getUserID()).andReturn(4);
 		Request request5 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request5.getUserID()).andReturn(5l);
+		EasyMock.expect(request5.getUserID()).andReturn(5);
 		Request request6 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request6.getUserID()).andReturn(5l);
+		EasyMock.expect(request6.getUserID()).andReturn(5);
 		Request request7 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request7.getUserID()).andReturn(7l);
+		EasyMock.expect(request7.getUserID()).andReturn(7);
 		Request request8 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request8.getUserID()).andReturn(8l);
+		EasyMock.expect(request8.getUserID()).andReturn(8);
 		Request request9 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request9.getUserID()).andReturn(9l);
+		EasyMock.expect(request9.getUserID()).andReturn(9);
 		
 		List<Request> firstIntervalRequests = new ArrayList<Request>();
 		firstIntervalRequests.add(request);
@@ -196,23 +197,23 @@ public class OverProvisionHeuristicTest {
 		long sla = 8000l;
 		
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getUserID()).andReturn(1l);
+		EasyMock.expect(request.getUserID()).andReturn(1);
 		Request request2 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request2.getUserID()).andReturn(1l);
+		EasyMock.expect(request2.getUserID()).andReturn(1);
 		Request request3 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request3.getUserID()).andReturn(1l);
+		EasyMock.expect(request3.getUserID()).andReturn(1);
 		Request request4 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request4.getUserID()).andReturn(1l);
+		EasyMock.expect(request4.getUserID()).andReturn(1);
 		Request request5 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request5.getUserID()).andReturn(5l);
+		EasyMock.expect(request5.getUserID()).andReturn(5);
 		Request request6 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request6.getUserID()).andReturn(5l);
+		EasyMock.expect(request6.getUserID()).andReturn(5);
 		Request request7 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request7.getUserID()).andReturn(5l);
+		EasyMock.expect(request7.getUserID()).andReturn(5);
 		Request request8 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request8.getUserID()).andReturn(9l);
+		EasyMock.expect(request8.getUserID()).andReturn(9);
 		Request request9 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request9.getUserID()).andReturn(9l);
+		EasyMock.expect(request9.getUserID()).andReturn(9);
 		
 		List<Request> firstIntervalRequests = new ArrayList<Request>();
 		firstIntervalRequests.add(request);
@@ -262,21 +263,21 @@ public class OverProvisionHeuristicTest {
 		long sla = 8000l;
 		
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getUserID()).andReturn(1l);
+		EasyMock.expect(request.getUserID()).andReturn(1);
 		Request request2 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request2.getUserID()).andReturn(2l);
+		EasyMock.expect(request2.getUserID()).andReturn(2);
 		Request request3 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request3.getUserID()).andReturn(3l);
+		EasyMock.expect(request3.getUserID()).andReturn(3);
 		Request request4 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request4.getUserID()).andReturn(4l);
+		EasyMock.expect(request4.getUserID()).andReturn(4);
 		Request request5 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request5.getUserID()).andReturn(5l);
+		EasyMock.expect(request5.getUserID()).andReturn(5);
 		Request request6 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request6.getUserID()).andReturn(6l);
+		EasyMock.expect(request6.getUserID()).andReturn(6);
 		Request request7 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request7.getUserID()).andReturn(7l);
+		EasyMock.expect(request7.getUserID()).andReturn(7);
 		Request request8 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request8.getUserID()).andReturn(8l);
+		EasyMock.expect(request8.getUserID()).andReturn(8);
 		
 		List<Request> firstIntervalRequests = new ArrayList<Request>();
 		firstIntervalRequests.add(request);
@@ -325,21 +326,21 @@ public class OverProvisionHeuristicTest {
 		long sla = 8000l;
 		
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getUserID()).andReturn(1l);
+		EasyMock.expect(request.getUserID()).andReturn(1);
 		Request request2 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request2.getUserID()).andReturn(2l);
+		EasyMock.expect(request2.getUserID()).andReturn(2);
 		Request request3 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request3.getUserID()).andReturn(3l);
+		EasyMock.expect(request3.getUserID()).andReturn(3);
 		Request request4 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request4.getUserID()).andReturn(4l);
+		EasyMock.expect(request4.getUserID()).andReturn(4);
 		Request request5 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request5.getUserID()).andReturn(5l);
+		EasyMock.expect(request5.getUserID()).andReturn(5);
 		Request request6 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request6.getUserID()).andReturn(6l);
+		EasyMock.expect(request6.getUserID()).andReturn(6);
 		Request request7 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request7.getUserID()).andReturn(6l);
+		EasyMock.expect(request7.getUserID()).andReturn(6);
 		Request request8 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request8.getUserID()).andReturn(8l);
+		EasyMock.expect(request8.getUserID()).andReturn(8);
 		
 		List<Request> firstIntervalRequests = new ArrayList<Request>();
 		firstIntervalRequests.add(request);
@@ -388,21 +389,21 @@ public class OverProvisionHeuristicTest {
 		long sla = 8000l;
 		
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getUserID()).andReturn(1l);
+		EasyMock.expect(request.getUserID()).andReturn(1);
 		Request request2 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request2.getUserID()).andReturn(2l);
+		EasyMock.expect(request2.getUserID()).andReturn(2);
 		Request request3 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request3.getUserID()).andReturn(2l);
+		EasyMock.expect(request3.getUserID()).andReturn(2);
 		Request request4 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request4.getUserID()).andReturn(2l);
+		EasyMock.expect(request4.getUserID()).andReturn(2);
 		Request request5 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request5.getUserID()).andReturn(5l);
+		EasyMock.expect(request5.getUserID()).andReturn(5);
 		Request request6 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request6.getUserID()).andReturn(5l);
+		EasyMock.expect(request6.getUserID()).andReturn(5);
 		Request request7 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request7.getUserID()).andReturn(7l);
+		EasyMock.expect(request7.getUserID()).andReturn(7);
 		Request request8 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request8.getUserID()).andReturn(8l);
+		EasyMock.expect(request8.getUserID()).andReturn(8);
 		
 		List<Request> firstIntervalRequests = new ArrayList<Request>();
 		firstIntervalRequests.add(request);

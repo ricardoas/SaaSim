@@ -1,8 +1,6 @@
 package commons.cloud;
 
-import static org.junit.Assert.*;
-
-import java.util.HashMap;
+import static org.junit.Assert.assertEquals;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -15,7 +13,7 @@ public class UtilityResultTest {
 	
 	@Test
 	public void testUtilityWithoutAddingValues(){
-		UtilityResult result = new UtilityResult();
+		UtilityResult result = new UtilityResult(0, 0);
 		assertEquals(0, result.getUtility(), 0.0001);
 	}
 	
@@ -35,7 +33,7 @@ public class UtilityResultTest {
 		UtilityResultEntry entry = buildEntry(0, onDemandCost, reservedCost, monitoringCost, inCost, outCost,
 				cpuCost, transferenceCost, storageCost);
 		
-		UtilityResult result = new UtilityResult();
+		UtilityResult result = new UtilityResult(0, 0);
 		result.addEntry(entry);
 		
 		double totalReceipt = cpuCost + transferenceCost + storageCost;
@@ -52,57 +50,58 @@ public class UtilityResultTest {
 		PowerMock.verifyAll();
 	}
 
-	private UtilityResultEntry buildEntry(long time, double onDemandCost, double reservedCost, double monitoringCost, double inCost, double outCost, double cpuCost, double transferenceCost, double storageCost) {
+	private static UtilityResultEntry buildEntry(long time, double onDemandCost, double reservedCost, double monitoringCost, double inCost, double outCost, double cpuCost, double transferenceCost, double storageCost) {
 		User user1 = EasyMock.createStrictMock(User.class);
 		User user2 = EasyMock.createStrictMock(User.class);
 		EasyMock.replay(user1, user2);
 		
-		HashMap<String, User> users = new HashMap<String, User>();
-		users.put("user1", user1);
-		users.put("user2", user2);
+		User[] users = new User[2];
+		users[0] = user1;
+		users[1] = user2;
 		
 		Provider provider = EasyMock.createStrictMock(Provider.class);
+		EasyMock.expect(provider.getName()).andReturn("Amazon");
 		EasyMock.expect(provider.getAvailableTypes()).andReturn(MachineType.values());
 		EasyMock.replay(provider);
 		
-		HashMap<String, Provider> providers = new HashMap<String, Provider>();
-		providers.put("amazon", provider);
+		Provider[] providers = new Provider[1];
+		providers[0] = provider;
 		
 		UtilityResultEntry entry = new UtilityResultEntry(time, users, providers);
 		
 		//Adding usage to cost
-		entry.addUsageToCost("amazon", MachineType.SMALL, 55, onDemandCost, 99, reservedCost , monitoringCost);
+		entry.addUsageToCost(0, MachineType.SMALL, 55, onDemandCost, 99, reservedCost , monitoringCost);
 		
 		//Adding transference cost
-		entry.addTransferenceToCost("amazon", 10000, inCost, 2000, outCost);
+		entry.addTransferenceToCost(0, 10000, inCost, 2000, outCost);
 		
 		//Adding to receipt
-		entry.addToReceipt("user1", "c1", 100, cpuCost, 2500, transferenceCost, storageCost);
+		entry.addToReceipt(0, "c1", 100, cpuCost, 2500, transferenceCost, storageCost);
 		
 		return entry;
 	}
 	
 	@Test
 	public void testAddUserUniqueFee(){
-		UtilityResult result = new UtilityResult();
+		UtilityResult result = new UtilityResult(2, 0);
 		
 		int firstUserFee = 1000;
 		int secondUserFee = 2000;
 	
-		result.addUserUniqueFee("user1", firstUserFee);
-		result.addUserUniqueFee("user2", secondUserFee);
+		result.addUserUniqueFee(0, firstUserFee);
+		result.addUserUniqueFee(1, secondUserFee);
 		
 		assertEquals(firstUserFee + secondUserFee, result.getUtility(), 0.00001);
 	}
 	
 	@Test
 	public void testAddProviderUniqueCost(){
-		UtilityResult result = new UtilityResult();
+		UtilityResult result = new UtilityResult(0, 2);
 		
 		double amazonCost = 1000.0;
 		double rackspaceCost = 3000.0;
-		result.addProviderUniqueCost("amazon", MachineType.MEDIUM, amazonCost);
-		result.addProviderUniqueCost("rackspace", MachineType.MEDIUM, rackspaceCost);
+		result.addProviderUniqueCost(0, MachineType.MEDIUM, amazonCost);
+		result.addProviderUniqueCost(1, MachineType.MEDIUM, rackspaceCost);
 		
 		assertEquals(-(amazonCost + rackspaceCost), result.getUtility(), 0.00001);
 	}
@@ -123,18 +122,18 @@ public class UtilityResultTest {
 		UtilityResultEntry entry = buildEntry(0, onDemandCost, reservedCost, monitoringCost, inCost, outCost,
 				cpuCost, transferenceCost, storageCost);
 		
-		UtilityResult result = new UtilityResult();
+		UtilityResult result = new UtilityResult(1, 1);
 	
 		//Adding entry
 		result.addEntry(entry);
 		
 		//Adding user unique fee
 		int firstUserFee = 977;
-		result.addUserUniqueFee("user1", firstUserFee);
+		result.addUserUniqueFee(0, firstUserFee);
 		
 		//Adding provider unique cost
 		double rackspaceCost = 3333.0;
-		result.addProviderUniqueCost("rackspace", MachineType.MEDIUM, rackspaceCost);
+		result.addProviderUniqueCost(0, MachineType.MEDIUM, rackspaceCost);
 		
 		double totalReceipt = firstUserFee + cpuCost + transferenceCost + storageCost;
 		double totalCost = rackspaceCost + onDemandCost + reservedCost + monitoringCost + inCost + outCost;

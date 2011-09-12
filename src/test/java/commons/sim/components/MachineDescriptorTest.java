@@ -3,7 +3,9 @@
  */
 package commons.sim.components;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -15,9 +17,9 @@ import commons.cloud.MachineType;
  */
 public class MachineDescriptorTest {
 
-	private MachineDescriptor small = new MachineDescriptor(0, false, MachineType.SMALL);
-	private MachineDescriptor otherSmall = new MachineDescriptor(1, false, MachineType.SMALL);
-	private MachineDescriptor large = new MachineDescriptor(0, false, MachineType.LARGE);
+	private MachineDescriptor small = new MachineDescriptor(0, false, MachineType.SMALL, 0);
+	private MachineDescriptor otherSmall = new MachineDescriptor(1, false, MachineType.SMALL, 0);
+	private MachineDescriptor large = new MachineDescriptor(0, false, MachineType.LARGE, 0);
 	
 	/**
 	 * Test method for {@link commons.sim.components.MachineDescriptor#hashCode()}.
@@ -40,7 +42,7 @@ public class MachineDescriptorTest {
 	 */
 	@Test
 	public void testHashCodeForSameMachines() {
-		assertTrue(small.hashCode() == new MachineDescriptor(0, false, MachineType.SMALL).hashCode());
+		assertTrue(small.hashCode() == new MachineDescriptor(0, false, MachineType.SMALL, 0).hashCode());
 	}
 
 	/**
@@ -64,7 +66,7 @@ public class MachineDescriptorTest {
 	 */
 	@Test
 	public void testEqualsSameMachines() {
-		assertEquals(small, new MachineDescriptor(0, false, MachineType.SMALL));
+		assertEquals(small, new MachineDescriptor(0, false, MachineType.SMALL, 0));
 	}
 
 	/**
@@ -72,7 +74,7 @@ public class MachineDescriptorTest {
 	 */
 	@Test
 	public void testUpdateTransference() {
-		MachineDescriptor machine = new MachineDescriptor(0, false, MachineType.SMALL);
+		MachineDescriptor machine = new MachineDescriptor(0, false, MachineType.SMALL, 0);
 		assertEquals(0, machine.getInTransference());
 		assertEquals(0, machine.getOutTransference());
 		machine.updateTransference(1000, 0);
@@ -91,7 +93,7 @@ public class MachineDescriptorTest {
 	 */
 	@Test
 	public void testReset() {
-		MachineDescriptor machine = new MachineDescriptor(0, false, MachineType.SMALL);
+		MachineDescriptor machine = new MachineDescriptor(0, false, MachineType.SMALL, 0);
 		assertEquals(0, machine.getInTransference());
 		assertEquals(0, machine.getOutTransference());
 		assertEquals(0, machine.getStartTimeInMillis());

@@ -3,10 +3,6 @@
  */
 package provisioning;
 
-import static org.junit.Assert.fail;
-
-import java.util.Arrays;
-
 import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -24,7 +20,7 @@ import commons.cloud.UtilityResultEntry;
 import commons.config.Configuration;
 import commons.config.PropertiesTesting;
 import commons.sim.components.MachineDescriptor;
-import commons.sim.provisioningheuristics.RanjanStatistics;
+import commons.sim.provisioningheuristics.MachineStatistics;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -44,10 +40,10 @@ public class MonitorTest {
 	/**
 	 * Test method for {@link provisioning.Monitor#reportRequestFinished(commons.cloud.Request)}.
 	 */
-	@Test(expected=RuntimeException.class)
+	@Test(expected=AssertionError.class)
 	public void testReportRequestFinished() {
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getSaasClient()).andReturn("100").times(2);
+		EasyMock.expect(request.getSaasClient()).andReturn(100).times(2);
 		EasyMock.replay(request);
 		
 		monitor.reportRequestFinished(request);
@@ -62,7 +58,7 @@ public class MonitorTest {
 	public void testRequestQueued() {
 		
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getSaasClient()).andReturn("client2").times(2);
+		EasyMock.expect(request.getSaasClient()).andReturn(0).times(2);
 		EasyMock.expect(request.getTotalProcessed()).andReturn(0l);
 		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(0l);
 		EasyMock.replay(request);
@@ -73,14 +69,14 @@ public class MonitorTest {
 	}
 
 	/**
-	 * Test method for {@link provisioning.Monitor#evaluateUtilisation(long, commons.sim.provisioningheuristics.RanjanStatistics, int)}.
+	 * Test method for {@link provisioning.Monitor#sendStatistics(long, commons.sim.provisioningheuristics.MachineStatistics, int)}.
 	 */
 	@Test
 	public void testEvaluateUtilisation() {
-		RanjanStatistics statistics = EasyMock.createStrictMock(RanjanStatistics.class);
+		MachineStatistics statistics = EasyMock.createStrictMock(MachineStatistics.class);
 		EasyMock.replay(statistics);
 		
-		monitor.evaluateUtilisation(1000, statistics, 0);
+		monitor.sendStatistics(1000, statistics, 0);
 		
 		EasyMock.verify(statistics);
 	}
@@ -88,9 +84,9 @@ public class MonitorTest {
 	/**
 	 * Test method for {@link provisioning.Monitor#machineTurnedOff(MachineDescriptor)}.
 	 */
-	@Test(expected=RuntimeException.class)
-	public void testMachineTurnedOffWithInexistentMachine() {
-		monitor.machineTurnedOff(new MachineDescriptor(111, true, MachineType.SMALL));
+	@Test(expected=AssertionError.class)
+	public void testMachineTurnedOffWithInexistentProvider() {
+		monitor.machineTurnedOff(new MachineDescriptor(111, true, MachineType.SMALL, 5));
 	}
 
 	/**
@@ -98,7 +94,7 @@ public class MonitorTest {
 	 */
 	@Test
 	public void testMachineTurnedOffWithExistentMachine() {
-		MachineDescriptor machineDescriptor = Configuration.getInstance().getProviders().get(0).buyMachine(false, MachineType.LARGE);
+		MachineDescriptor machineDescriptor = Configuration.getInstance().getProviders()[0].buyMachine(false, MachineType.LARGE);
 		monitor.machineTurnedOff(machineDescriptor);
 	}
 
@@ -114,15 +110,14 @@ public class MonitorTest {
 		provider.calculateCost(EasyMock.isA(UtilityResultEntry.class), EasyMock.anyLong());
 		
 		User user = EasyMock.createStrictMock(User.class);
-		EasyMock.expect(user.getId()).andReturn("1");
 		user.calculatePartialReceipt(EasyMock.isA(UtilityResultEntry.class));
 		
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		EasyMock.expect(config.getProviders()).andReturn(Arrays.asList(provider));
-		EasyMock.expect(config.getUsers()).andReturn(Arrays.asList(user));
+		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider});
+		EasyMock.expect(config.getUsers()).andReturn(new User[]{user});
 		
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config);
 		
 		PowerMock.replayAll(config, provider, user);
 		

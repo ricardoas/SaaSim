@@ -1,6 +1,7 @@
 package commons.sim.components;
 
-import static commons.sim.util.SimulatorProperties.*;
+import static commons.sim.util.SimulatorProperties.RANJAN_HEURISTIC_BACKLOG_SIZE;
+import static commons.sim.util.SimulatorProperties.RANJAN_HEURISTIC_NUMBER_OF_TOKENS;
 import static org.junit.Assert.*;
 
 import java.util.Queue;
@@ -20,7 +21,6 @@ import commons.config.Configuration;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
-import commons.sim.jeevent.JETime;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({JEEventScheduler.class, Configuration.class})
@@ -33,7 +33,7 @@ public class MultiCoreRanjanMachineTest {
 
 	@Before
 	public void setUp() {
-		this.descriptor = new MachineDescriptor(1, false, MachineType.SMALL);
+		this.descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
 	}
 
 	@Test
@@ -204,9 +204,9 @@ public class MultiCoreRanjanMachineTest {
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		EasyMock.replay(loadBalancer);
 
-		Request request = new Request(1l, "am", 1l, 0, 0, 0, new long[]{50, 50, 50, 50});
-		Request request2 = new Request(2l, "am", 1l, 0, 0, 0, new long[]{140, 140, 140, 140});
-		Request request3 = new Request(3l, "am", 1l, 0, 0, 0, new long[]{200, 200, 200, 200});
+		Request request = new Request(1l, 1, 1, 0, 0, 0, new long[]{50, 50, 50, 50});
+		Request request2 = new Request(2l, 1, 1, 0, 0, 0, new long[]{140, 140, 140, 140});
+		Request request3 = new Request(3l, 1, 1, 0, 0, 0, new long[]{200, 200, 200, 200});
 		
 		Configuration config = mockConfiguration(3, DEFAULT_MAX_NUM_OF_THREADS, DEFAULT_BACKLOG_SIZE);
 		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(4d);

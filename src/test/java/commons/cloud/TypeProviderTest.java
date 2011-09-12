@@ -30,7 +30,7 @@ public class TypeProviderTest {
 	 */
 	@Test
 	public void testGetType() {
-		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 0);
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, 0, 0, 0, 0, 0);
 		assertEquals(MachineType.SMALL, type.getType());
 	}
 
@@ -39,7 +39,7 @@ public class TypeProviderTest {
 	 */
 	@Test
 	public void testGetNullType() {
-		TypeProvider type = new TypeProvider(null, 0, 0, 0, 0, 0);
+		TypeProvider type = new TypeProvider(0, null, 0, 0, 0, 0, 0);
 		assertNull(type.getType());
 	}
 
@@ -48,7 +48,7 @@ public class TypeProviderTest {
 	 */
 	@Test(expected=NullPointerException.class)
 	public void testShutdownNullMachine() {
-		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 0);
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, 0, 0, 0, 0, 0);
 		type.shutdownMachine(null);
 	}
 
@@ -57,8 +57,8 @@ public class TypeProviderTest {
 	 */
 	@Test
 	public void testShutdownInexistentReservedMachine() {
-		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 0);
-		assertFalse(type.shutdownMachine(new MachineDescriptor(1, true, MachineType.SMALL)));
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, 0, 0, 0, 0, 0);
+		assertFalse(type.shutdownMachine(new MachineDescriptor(1, true, MachineType.SMALL, 0)));
 	}
 
 	/**
@@ -66,8 +66,8 @@ public class TypeProviderTest {
 	 */
 	@Test
 	public void testShutdownInexistentOnDemandMachine() {
-		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 0);
-		assertFalse(type.shutdownMachine(new MachineDescriptor(1, false, MachineType.SMALL)));
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, 0, 0, 0, 0, 0);
+		assertFalse(type.shutdownMachine(new MachineDescriptor(1, false, MachineType.SMALL, 0)));
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class TypeProviderTest {
 	 */
 	@Test
 	public void testShutdownExistentReservedMachine() {
-		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 1);
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, 0, 0, 0, 0, 1);
 		MachineDescriptor descriptor = type.buyMachine(true);
 		assertTrue(type.shutdownMachine(descriptor));
 	}
@@ -85,7 +85,7 @@ public class TypeProviderTest {
 	 */
 	@Test
 	public void testShutdownExistentOnDemandMachine() {
-		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 1);
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, 0, 0, 0, 0, 1);
 		MachineDescriptor descriptor = type.buyMachine(false);
 		assertTrue(type.shutdownMachine(descriptor));
 	}
@@ -95,7 +95,7 @@ public class TypeProviderTest {
 	 */
 	@Test
 	public void testBuyOnDemandMachine() {
-		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 0);
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, 0, 0, 0, 0, 0);
 		MachineDescriptor descriptor = type.buyMachine(false);
 		assertNotNull(descriptor);
 		assertFalse(descriptor.isReserved());
@@ -107,7 +107,7 @@ public class TypeProviderTest {
 	 */
 	@Test
 	public void testBuyReservedMachineWithNoLimit() {
-		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 0);
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, 0, 0, 0, 0, 0);
 		assertNull(type.buyMachine(true));
 	}
 
@@ -116,7 +116,7 @@ public class TypeProviderTest {
 	 */
 	@Test
 	public void testBuyReservedMachineWithLimit() {
-		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 3);
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, 0, 0, 0, 0, 3);
 		assertNotNull(type.buyMachine(true));
 		assertNotNull(type.buyMachine(true));
 		assertNotNull(type.buyMachine(true));
@@ -128,7 +128,7 @@ public class TypeProviderTest {
 	 */
 	@Test
 	public void testCanBuyWithNoLimit() {
-		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 0);
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, 0, 0, 0, 0, 0);
 		assertFalse(type.canBuy());
 	}
 
@@ -137,7 +137,7 @@ public class TypeProviderTest {
 	 */
 	@Test
 	public void testCanBuyWithLimit() {
-		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 1);
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, 0, 0, 0, 0, 1);
 		assertTrue(type.canBuy());
 	}
 
@@ -146,7 +146,7 @@ public class TypeProviderTest {
 	 */
 	@Test
 	public void testCanBuyWithLimitChanging() {
-		TypeProvider type = new TypeProvider(MachineType.SMALL, 0, 0, 0, 0, 2);
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, 0, 0, 0, 0, 2);
 		assertTrue(type.canBuy());
 		type.buyMachine(true);
 		type.buyMachine(true);
@@ -155,48 +155,48 @@ public class TypeProviderTest {
 	
 	@Test
 	public void testCalculateUniqueCostWithNoReservation(){
-		TypeProvider type = new TypeProvider(MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 0);
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 0);
 		assertEquals(0.0, type.calculateUniqueCost(), 0.0);
 	}
 	
 	@Test
 	public void testCalculateUniqueCostWithReservation(){
-		TypeProvider type = new TypeProvider(MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 3);
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 3);
 		assertEquals(227.5 * 3, type.calculateUniqueCost(), 0.0);
 	}
 	
 	@Test
 	public void testCalculateUniqueCostWithNoMachineUsed(){
-		TypeProvider type = new TypeProvider(MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addUsageToCost("amazon", MachineType.SMALL, 0, 0, 0, 0, 0);
+		entry.addUsageToCost(0, MachineType.SMALL, 0, 0, 0, 0, 0);
 		EasyMock.replay(entry);
 		
-		type.calculateMachinesCost(entry, "amazon", 0, monitoringCost);
+		type.calculateMachinesCost(entry, 0, monitoringCost);
 		
 		EasyMock.verify(entry);
 	}
 	
 	@Test
 	public void testCalculateUniqueCostWithOndemandRunningMachineUsed(){
-		TypeProvider type = new TypeProvider(MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addUsageToCost("amazon", MachineType.SMALL, 1, 1 * onDemandCost, 0, 0, 1 * monitoringCost);
+		entry.addUsageToCost(0, MachineType.SMALL, 1, 1 * onDemandCost, 0, 0, 1 * monitoringCost);
 		EasyMock.replay(entry);
 		
 		MachineDescriptor descriptor = type.buyMachine(false);
 		descriptor.setStartTimeInMillis(0);
 		
-		type.calculateMachinesCost(entry, "amazon", HOUR_IN_MILLIS/2, monitoringCost);
+		type.calculateMachinesCost(entry, HOUR_IN_MILLIS/2, monitoringCost);
 		
 		EasyMock.verify(entry);
 	}
 	
 	@Test
 	public void testCalculateUniqueCostWithOndemandFinishedMachineUsed(){
-		TypeProvider type = new TypeProvider(MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addUsageToCost("amazon", MachineType.SMALL, 1, 1 * onDemandCost, 0, 0, 1 * monitoringCost);
+		entry.addUsageToCost(0, MachineType.SMALL, 1, 1 * onDemandCost, 0, 0, 1 * monitoringCost);
 		EasyMock.replay(entry);
 		
 		MachineDescriptor descriptor = type.buyMachine(false);
@@ -204,31 +204,31 @@ public class TypeProviderTest {
 		descriptor.setFinishTimeInMillis(HOUR_IN_MILLIS/2);
 		type.shutdownMachine(descriptor);
 		
-		type.calculateMachinesCost(entry, "amazon", HOUR_IN_MILLIS, monitoringCost);
+		type.calculateMachinesCost(entry, HOUR_IN_MILLIS, monitoringCost);
 		
 		EasyMock.verify(entry);
 	}
 	
 	@Test
 	public void testCalculateUniqueCostWithReservedRunningMachineUsed(){
-		TypeProvider type = new TypeProvider(MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addUsageToCost("amazon", MachineType.SMALL, 0, 0, 1, 1 * reservationCost, 1 * monitoringCost);
+		entry.addUsageToCost(0, MachineType.SMALL, 0, 0, 1, 1 * reservationCost, 1 * monitoringCost);
 		EasyMock.replay(entry);
 		
 		MachineDescriptor descriptor = type.buyMachine(true);
 		descriptor.setStartTimeInMillis(0);
 		
-		type.calculateMachinesCost(entry, "amazon", HOUR_IN_MILLIS/2, monitoringCost);
+		type.calculateMachinesCost(entry, HOUR_IN_MILLIS/2, monitoringCost);
 		
 		EasyMock.verify(entry);
 	}
 
 	@Test
 	public void testCalculateUniqueCostWithReservedFinishedMachineUsed(){
-		TypeProvider type = new TypeProvider(MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addUsageToCost("amazon", MachineType.SMALL, 0, 0, 1, 1 * reservationCost, 1 * monitoringCost);
+		entry.addUsageToCost(0, MachineType.SMALL, 0, 0, 1, 1 * reservationCost, 1 * monitoringCost);
 		EasyMock.replay(entry);
 		
 		MachineDescriptor descriptor = type.buyMachine(true);
@@ -236,7 +236,7 @@ public class TypeProviderTest {
 		descriptor.setFinishTimeInMillis(HOUR_IN_MILLIS/2);
 		type.shutdownMachine(descriptor);
 		
-		type.calculateMachinesCost(entry, "amazon", HOUR_IN_MILLIS, monitoringCost);
+		type.calculateMachinesCost(entry, HOUR_IN_MILLIS, monitoringCost);
 		
 		EasyMock.verify(entry);
 	}
