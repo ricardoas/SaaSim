@@ -92,7 +92,7 @@ public class JEEvent implements Comparable<JEEvent>{
 			}
 		}
 		
-		int result = type.compareTo(o.getType());
+		int result = type.compareTo(o.type);
 		if(result != 0){
 			return result;
 		}
