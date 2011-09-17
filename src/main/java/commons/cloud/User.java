@@ -148,4 +148,8 @@ public class User implements Comparable<User>{
 		this.numberOfLostRequests++;
 		update(request.getTotalProcessed(), request.getRequestSizeInBytes(), 0);
 	}
+
+	public double calculatePenalty(double totalLoss) {
+		return this.contract.calculatePenalty(totalLoss);
+	}
 }

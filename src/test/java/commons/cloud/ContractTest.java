@@ -185,4 +185,26 @@ public class ContractTest {
 	public void testCalculateOneTimeFees(){
 		assertEquals(0.0, c1.calculateOneTimeFees(), 0.0);
 	}
+	
+	@Test
+	public void testCalculatePenaltyWithoutLoss(){
+		assertEquals(0, c1.calculatePenalty(0), 0.0);
+		assertEquals(0, c2.calculatePenalty(0), 0.0);
+		assertEquals(0, c3.calculatePenalty(0), 0.0);
+	}
+	
+	@Test
+	public void testCalculatePenaltyWithSmallLoss(){
+		assertEquals(6.2375, c1.calculatePenalty(0.05), 0.0);
+		assertEquals(6.2375, c1.calculatePenalty(0.0001), 0.0);
+		assertEquals(6.2375, c1.calculatePenalty(0.09999999), 0.0);
+		assertEquals(6.2375, c1.calculatePenalty(0.1), 0.0);
+	}
+	
+	@Test
+	public void testCalculatePenaltyWithHigherLoss(){
+		assertEquals(6.2375 * 2, c1.calculatePenalty(0.100001), 0.0);
+		assertEquals(6.2375 * 2, c1.calculatePenalty(0.5), 0.0);
+		assertEquals(6.2375 * 2, c1.calculatePenalty(0.99999), 0.0);
+	}
 }

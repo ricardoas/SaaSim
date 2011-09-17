@@ -147,5 +147,52 @@ public class UserTest {
 		
 		EasyMock.verify(gold, request, entry);
 	}
+	
+	@Test
+	public void testCalculatePenaltyWithoutLoss(){
+		Contract gold = EasyMock.createStrictMock(Contract.class);
+		EasyMock.expect(gold.calculatePenalty(0)).andReturn(0d);
+		EasyMock.replay(gold);
+		
+		User user = new User(1, gold , STORAGE_IN_BYTES);
+		
+		assertEquals(0, user.calculatePenalty(0), 0.0);
+		
+		EasyMock.verify(gold);
+	}
+	
+	@Test
+	public void testCalculatePenaltyWithSmallLoss(){
+		Contract gold = EasyMock.createStrictMock(Contract.class);
+		EasyMock.expect(gold.calculatePenalty(0)).andReturn(10d);
+		EasyMock.expect(gold.calculatePenalty(0.0001)).andReturn(10d);
+		EasyMock.expect(gold.calculatePenalty(0.1)).andReturn(10d);
+		EasyMock.replay(gold);
+		
+		User user = new User(1, gold , STORAGE_IN_BYTES);
+		
+		assertEquals(10, user.calculatePenalty(0), 0.0);
+		assertEquals(10, user.calculatePenalty(0.0001), 0.0);
+		assertEquals(10, user.calculatePenalty(0.1), 0.0);
+		
+		EasyMock.verify(gold);
+	}
+	
+	@Test
+	public void testCalculatePenaltyWithHigherLoss(){
+		Contract gold = EasyMock.createStrictMock(Contract.class);
+		EasyMock.expect(gold.calculatePenalty(0.25)).andReturn(10d);
+		EasyMock.expect(gold.calculatePenalty(0.75)).andReturn(10d);
+		EasyMock.expect(gold.calculatePenalty(0.99999)).andReturn(10d);
+		EasyMock.replay(gold);
+		
+		User user = new User(1, gold , STORAGE_IN_BYTES);
+		
+		assertEquals(10, user.calculatePenalty(0.25), 0.0);
+		assertEquals(10, user.calculatePenalty(0.75), 0.0);
+		assertEquals(10, user.calculatePenalty(0.99999), 0.0);
+		
+		EasyMock.verify(gold);
+	}
 
 }

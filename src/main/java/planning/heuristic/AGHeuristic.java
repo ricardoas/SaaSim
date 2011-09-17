@@ -1,57 +1,195 @@
 package planning.heuristic;
 
-import static commons.sim.util.IaaSPlanProperties.IAAS_PLAN_PROVIDER_NAME;
-import static commons.sim.util.IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION;
-import static commons.sim.util.IaaSPlanProperties.IAAS_PLAN_PROVIDER_TYPES;
-
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import provisioning.DPS;
-import provisioning.util.DPSFactory;
+import org.apache.commons.configuration.ConfigurationException;
+import org.jgap.Chromosome;
+import org.jgap.Configuration;
+import org.jgap.Gene;
+import org.jgap.Genotype;
+import org.jgap.IChromosome;
+import org.jgap.InvalidConfigurationException;
+import org.jgap.impl.ChromosomePool;
+import org.jgap.impl.CrossoverOperator;
+import org.jgap.impl.DefaultConfiguration;
+import org.jgap.impl.IntegerGene;
+import org.jgap.impl.MutationOperator;
+import org.jgap.impl.StockRandomGenerator;
+import org.jgap.impl.WeightedRouletteSelector;
+
+import planning.io.PlanningWorkloadParser;
+import planning.util.Summary;
 
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.User;
-import commons.cloud.UtilityResult;
-import commons.config.Configuration;
 import commons.io.HistoryBasedWorkloadParser;
-import commons.sim.Simulator;
-import commons.sim.util.SimulatorFactory;
 
 public class AGHeuristic implements PlanningHeuristic{
 	
-	private UtilityResult utilityResult;
+	private static final long YEAR_IN_HOURS = 8640;
+	
+	private int POPULATION_SIZE = 1000;
+	private double CROSSOVER_RATE = 0.7;
+	private int MUTATION_DENOMINATOR = 1000/5;//0.5%
+	private double MINIMUM_IMPROVEMENT = 0.05;//1%
+	private int MINIMUM_NUMBER_OF_EVOLUTIONS = 40;
+	
+	private Map<User, List<Summary>> summaries;
+	private List<MachineType> types;
 
+	private IChromosome fittestChromosome;
+	
 	@Override
 	public void findPlan(HistoryBasedWorkloadParser workloadParser,
-			Provider[] cloudProviders, User[] cloudUsers) {
-		//TODO: Read data from output file of JGAP, and simulate it in order to obtain detailed information
-//		Configuration.buildInstance(args[0]);
-		Configuration config = Configuration.getInstance();
-		config.setProperty(IAAS_PLAN_PROVIDER_NAME, new String[]{});
-		config.setProperty(IAAS_PLAN_PROVIDER_TYPES, new String[]{});
-		config.setProperty(IAAS_PLAN_PROVIDER_RESERVATION, new long[]{});
+			Provider[] cloudProviders, User[] cloudUsers){
 		
-		DPS dps = DPSFactory.createDPS();
+		//Reading workload data
+		readWorkloadData(cloudUsers);
 		
-		Simulator simulator = SimulatorFactory.buildSimulator(dps);
-		dps.registerConfigurable(simulator);
+		//Configuring genetic algorithm
+		Configuration config = new DefaultConfiguration();
+		try {
+			config.setPopulationSize(POPULATION_SIZE);
+			config.setPreservFittestIndividual(true);
+			config.setRandomGenerator(new StockRandomGenerator());
+			config.setChromosomePool(new ChromosomePool());
+			
+			config.addGeneticOperator(new CrossoverOperator(config, CROSSOVER_RATE));
+			config.addGeneticOperator(new MutationOperator(config, MUTATION_DENOMINATOR));
+			config.removeNaturalSelectors(true);
+			config.removeNaturalSelectors(false);
+			config.addNaturalSelector(new WeightedRouletteSelector(), true);
+	//		config.setKeepPopulationSizeConstant(true);
+	//		config.setNaturalSelector(null);//Tournament, WeightedRoullete
+
+			PlanningFitnessFunction myFunc = createFitnessFunction(cloudUsers, cloudProviders);
+			config.setFitnessFunction(myFunc);
+			
+			IChromosome sampleChromosome = createSampleChromosome(config, cloudProviders[0]);
+			config.setSampleChromosome(sampleChromosome);
+			
+			Genotype population = Genotype.randomInitialGenotype(config);
+
+			//evaluating population
+			IChromosome previousFittestChromosome = null;
+			population.evolve();
+			IChromosome lastFittestChromosome = population.getFittestChromosome();
+			int evolutionsWithoutImprovement = 0;
+			
+			while(evolutionsWithoutImprovement < MINIMUM_NUMBER_OF_EVOLUTIONS){
+				population.evolve();
+				previousFittestChromosome = lastFittestChromosome;
+				lastFittestChromosome = population.getFittestChromosome();
+				if(isEvolutionComplete(lastFittestChromosome, lastFittestChromosome)){
+					evolutionsWithoutImprovement++;
+				}else{
+					evolutionsWithoutImprovement = 0;
+				}
+			}
+			
+			//store best config
+			fittestChromosome = population.getFittestChromosome();
+			
+		} catch (InvalidConfigurationException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void readWorkloadData(User[] cloudUsers) {
+		commons.config.Configuration simConfig = commons.config.Configuration.getInstance();
+		String[] workloads = simConfig.getWorkloads();
+		this.summaries = new HashMap<User, List<Summary>>();
 		
-		simulator.start();
+		int index = 0;
+		for(String workload : workloads){
+			PlanningWorkloadParser parser;
+			try {
+				parser = new PlanningWorkloadParser(workload);
+				parser.readData();
+				this.summaries.put(cloudUsers[index++], parser.getSummaries());
+				
+			} catch (ConfigurationException e) {
+				throw new RuntimeException(e.getMessage());
+			}
+		}
+	}
+
+	private boolean isEvolutionComplete(IChromosome fittestChromosome, IChromosome lastFittestChromosome) {
+		double firstFitnessValue = fittestChromosome.getFitnessValue();
+		double difference = lastFittestChromosome.getFitnessValue() - firstFitnessValue;
+		if(Math.abs(difference/firstFitnessValue) < MINIMUM_IMPROVEMENT){
+			return true;
+		}
+		return false;
+	}
+
+	private IChromosome createSampleChromosome(Configuration config, Provider cloudProvider) throws InvalidConfigurationException {
+		Gene[] genes = new IntegerGene[cloudProvider.getAvailableTypes().length];
 		
-		utilityResult = dps.calculateUtility();
+		Map<MachineType, Integer> limits = findReservationLimits(cloudProvider);
+		int i = 0;
+		for(MachineType type : limits.keySet()){
+			types.add(type);
+			genes[i] = new IntegerGene(config, 0, limits.get(type));
+		}
+		
+		IChromosome sampleChromosome = new Chromosome(config, genes);
+		return sampleChromosome;
+	}
+
+	private Map<MachineType, Integer> findReservationLimits(Provider cloudProvider) {
+		Map<MachineType, Integer> typesLimits = new HashMap<MachineType, Integer>();
+		
+		MachineType[] machineTypes = cloudProvider.getAvailableTypes();
+		long totalDemand = calcTotalDemand();
+		
+		for(MachineType type : machineTypes){
+			double yearFee = cloudProvider.getReservationOneYearFee(type);
+			double reservedCpuCost = cloudProvider.getReservedCpuCost(type);
+			double onDemandCpuCost = cloudProvider.getOnDemandCpuCost(type);
+			
+			long minimumHoursToBeUsed = Math.round(yearFee / (onDemandCpuCost - reservedCpuCost));
+			double usageProportion = minimumHoursToBeUsed / YEAR_IN_HOURS;
+			
+			int maximumNumberOfMachines = (int)Math.round(totalDemand / (usageProportion * YEAR_IN_HOURS));
+			typesLimits.put(type, maximumNumberOfMachines);
+		}
+		
+		return typesLimits;
+	}
+
+	private long calcTotalDemand() {
+		long totalDemand = 0;
+		for(List<Summary> summaries : this.summaries.values()){
+			for(Summary summary : summaries){
+				totalDemand += summary.getTotalCpuHrs();
+			}
+		}
+		
+		return totalDemand;
+	}
+
+	private PlanningFitnessFunction createFitnessFunction(User[] cloudUsers, Provider[] cloudProviders) {
+		return new PlanningFitnessFunction(this.summaries, cloudUsers, cloudProviders, this.types);
 	}
 
 	@Override
 	public double getEstimatedProfit(int period) {
-		return utilityResult.getUtility();
+		return 0;
 	}
 
 	@Override
 	public Map<MachineType, Integer> getPlan(User[] cloudUsers) {
 		Map<MachineType, Integer> plan = new HashMap<MachineType, Integer>();
-		//TODO read from files obtained from JGAP!
+		Gene[] genes = fittestChromosome.getGenes();
+		int index = 0;
+		
+		for(MachineType type : this.types){
+			plan.put(type, (Integer) genes[index++].getAllele());
+		}
 		return plan;
 	}
 }

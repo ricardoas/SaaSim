@@ -46,10 +46,6 @@ public class Main {
 			Map<MachineType, Integer> plan = planner.plan();
 			createPlanFile(plan, config.getProviders());
 			
-			//FIXME: Change workload! Performing plan execution! or Create an output iaas.plan file!
-//			Executor executor = new Executor(config.getProviders(), config.getUsers(), workloadParser, config.getDouble(APPLICATION_SLA_MAX_RESPONSE_TIME));
-//			executor.execute(plan);
-			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			System.exit(1);
