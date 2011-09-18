@@ -183,10 +183,10 @@ public class PlanningFitnessFunctionTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(5);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
-		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d);
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d);
+		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).times(2);
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(2);
 		
 		PowerMock.replayAll(config);
 		
@@ -201,7 +201,7 @@ public class PlanningFitnessFunctionTest {
 		currentPowerPerMachineType.put(MachineType.LARGE, 30);//10 machines with 3 cores
 		currentPowerPerMachineType.put(MachineType.MEDIUM, 16);//8 machines with 2 cores
 		
-		double expectedCost = 100 * 10 + 99 * 8 + 432 + 6480;//One year fee for large + one year fee for medium + large usage + medium usage
+		double expectedCost = 100 * 10 + 99 * 8 + 144 + 3240;//One year fee for large + one year fee for medium + large usage + medium usage
 		assertEquals(expectedCost, function.calcCost(throughputPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType), 0.00001);
 		
 		PowerMock.verifyAll();
@@ -218,10 +218,10 @@ public class PlanningFitnessFunctionTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(5);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
-		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d);
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d);
+		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).times(2);
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(2);
 		
 		PowerMock.replayAll(config);
 		
@@ -236,8 +236,8 @@ public class PlanningFitnessFunctionTest {
 		currentPowerPerMachineType.put(MachineType.LARGE, 30);//10 machines with 3 cores
 		currentPowerPerMachineType.put(MachineType.MEDIUM, 16);//8 machines with 2 cores
 		
-		double expectedCost = 100 * 10 + 99 *8 + 432;//One year fee for large + one year fee for medium + large usage + medium usage
-		assertEquals(expectedCost, function.calcCost(throughputPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType), 0.00001);
+		double expectedCost = 100 * 10 + 99 *8 + 143.9986;//One year fee for large + one year fee for medium + large usage + medium usage
+		assertEquals(expectedCost, function.calcCost(throughputPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType), 0.01);
 		
 		PowerMock.verifyAll();
 	}
@@ -283,10 +283,10 @@ public class PlanningFitnessFunctionTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(5);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(12l);
-		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d);
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d);
+		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).times(2);
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(2);
 		
 		PowerMock.replayAll(config);
 		
@@ -886,9 +886,9 @@ public class PlanningFitnessFunctionTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(8);
-		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).times(3);
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(3);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(10);
+		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).times(4);
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(4);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA * 1000);
 		
@@ -948,7 +948,7 @@ public class PlanningFitnessFunctionTest {
 		EasyMock.replay(chromosome, genes[0], genes[1]);
 		
 		double receipt = 555 + 100 + 0 + 99.765 + 100 + 6;//for each contract: price + setup + extra cpu
-		double cost = 100 * 15 + 25.92 * 0.01 + 99 * 5 + 17.28 * 0.25;//for each machine type: reservation fee + usage
+		double cost = 100 * 15 + 8640 * 0.01 + 99 * 5 + 8640 * 0.25;//for each machine type: reservation fee + usage
 		double penalties = 277.5 + 49.8825;//50% of each contract
 		
 		assertEquals(1/Math.abs(receipt - cost - penalties) + 1, function.evaluate(chromosome), 0.0001);
@@ -959,8 +959,8 @@ public class PlanningFitnessFunctionTest {
 	@Test
 	public void testEvaluateWithPositiveFitness(){
 		//SaaS clients contracts
-		Contract contract = new Contract("p1", 1, 100d, 5555d, 300 * 60 * 60 * 1000l, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
-		Contract contract2 = new Contract("p1", 1, 100d, 999.765d, 300 * 60 * 60 * 1000l, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		Contract contract = new Contract("p1", 1, 10000d, 555d, 300 * 60 * 60 * 1000l, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		Contract contract2 = new Contract("p1", 1, 10000d, 99.765d, 300 * 60 * 60 * 1000l, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
 		
 		User[] cloudUsers = new User[2];
 		cloudUsers[0] = new User(0, contract, 100);
@@ -968,9 +968,9 @@ public class PlanningFitnessFunctionTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(8);
-		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).times(3);
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(3);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(10);
+		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).times(4);
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(4);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA * 1000);
 		
@@ -1029,13 +1029,12 @@ public class PlanningFitnessFunctionTest {
 		
 		EasyMock.replay(chromosome, genes[0], genes[1]);
 		
-		double receipt = 5555 + 100 + 0 + 999.765 + 100 + 6;//for each contract: price + setup + extra cpu
-		double cost = 100 * 15 + 25.92 * 0.01 + 99 * 5 + 17.28 * 0.25;//for each machine type: reservation fee + usage
-		double penalties = 2777.5 + 499.8825;//50% of each contract
+		double receipt = 555 + 10000 + 0 + 99.765 + 10000 + 6;//for each contract: price + setup + extra cpu
+		double cost = 100 * 15 + 8640 * 0.01 + 99 * 5 + 8640 * 0.25;//for each machine type: reservation fee + usage
+		double penalties = 277.5 + 49.8825;//50% of each contract
 		
 		assertEquals(receipt - cost - penalties, function.evaluate(chromosome), 0.0001);
 		
 		PowerMock.verifyAll();
 	}
-
 }

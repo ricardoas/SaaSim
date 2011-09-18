@@ -28,12 +28,12 @@ public class PlanningWorkloadParser extends PropertiesConfiguration{
 	public void readData() {
 		String[] arrivalRates = getStringArray(ARRIVAL_RATE);
 		String[] cpuDemandInHours = getStringArray(CPU_DEMAND_IN_HOURS);
-		String[] requestServiceDemand = getStringArray(SERVICE_DEMAND);
-		String[] userThinkTime = getStringArray(USER_THINK_TIME);
+		String[] requestServiceDemandInMillis = getStringArray(SERVICE_DEMAND);
+		String[] userThinkTimeInSeconds = getStringArray(USER_THINK_TIME);
 		String[] numberOfUsers = getStringArray(NUMBER_OF_USERS);
 		for(int i = 0; i < arrivalRates.length; i++){
-			this.summariesPerMonth.add(parseMonthSummary(arrivalRates[i], cpuDemandInHours[i], requestServiceDemand[i],
-							userThinkTime[i], numberOfUsers[i]));
+			this.summariesPerMonth.add(parseMonthSummary(arrivalRates[i], cpuDemandInHours[i], requestServiceDemandInMillis[i],
+							userThinkTimeInSeconds[i], numberOfUsers[i]));
 		}
 	}
 
@@ -48,12 +48,12 @@ public class PlanningWorkloadParser extends PropertiesConfiguration{
 	protected Summary parseMonthSummary(String monthArrivalRate, String monthCpuDemandInHours, String monthRequestServiceDemand, String monthUserThinkTime, String monthNumberOfUsers){
 		double arrivalRate = Double.parseDouble(monthArrivalRate);
 		double totalCpuHrs = Double.parseDouble(monthCpuDemandInHours);
-		double serviceDemand = Double.parseDouble(monthRequestServiceDemand);
-		double userThinkTime = Double.parseDouble(monthUserThinkTime);
+		double serviceDemandInMillis = Double.parseDouble(monthRequestServiceDemand);
+		double userThinkTimeInSeconds = Double.parseDouble(monthUserThinkTime);
 		long numberOfUsers = Long.parseLong(monthNumberOfUsers);
 		
-		return new Summary(arrivalRate, totalCpuHrs, serviceDemand,
-				userThinkTime, numberOfUsers);
+		return new Summary(arrivalRate, totalCpuHrs, serviceDemandInMillis,
+				userThinkTimeInSeconds, numberOfUsers);
 		
 	}
 }

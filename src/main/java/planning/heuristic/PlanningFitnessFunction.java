@@ -38,7 +38,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 	protected double evaluate(IChromosome arg0) {
 		
 		double arrivalRate = aggregateArrivals();
-		double meanServiceTime = aggregateServiceTime();
+		double meanServiceTimeInMillis = aggregateServiceTime();
 		
 		//Since round-robin is used, the total arrival rate is splitted among reserved servers
 		Map<MachineType, Integer> currentPowerPerMachineType = new HashMap<MachineType, Integer>();
@@ -66,7 +66,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		double totalThroughput = 0d;
 		for(MachineType type : arrivalRatesPerMachineType.keySet()){
 			Double currentArrivalRate = arrivalRatesPerMachineType.get(type);
-			double maximumThroughput = (1 / meanServiceTime) * Configuration.getInstance().getRelativePower(type);
+			double maximumThroughput = (1 / (meanServiceTimeInMillis/1000)) * Configuration.getInstance().getRelativePower(type);//Using all cores
 			if(currentArrivalRate > maximumThroughput){//Requests are missed
 				throughputPerMachineType.put(type, maximumThroughput);
 				totalThroughput += maximumThroughput;
@@ -77,14 +77,14 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		}
 		
 		double totalNumberOfUsers = aggregateNumberOfUsers();
-		double averageThinkTime = aggregateThinkTime();
+		double averageThinkTimeInSeconds = aggregateThinkTime();
 		
 		//Estimated response time
-		double responseTimeInSeconds = totalNumberOfUsers / totalThroughput - averageThinkTime;
+		double responseTimeInSeconds = totalNumberOfUsers / totalThroughput - averageThinkTimeInSeconds;
 		
 		//Estimating utility
 		double receipt = calcReceipt();
-		double cost = calcCost(throughputPerMachineType, meanServiceTime, currentPowerPerMachineType);
+		double cost = calcCost(throughputPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType);
 		double penalties = calcPenalties(responseTimeInSeconds, arrivalRate, totalThroughput);
 		
 		double fitness = receipt - cost - penalties;
@@ -117,7 +117,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		double cost = 0;
 		
 		for(MachineType type : throughputPerMachineType.keySet()){
-			Double throughput = throughputPerMachineType.get(type);
+			Double throughput = throughputPerMachineType.get(type) / Configuration.getInstance().getRelativePower(type);
 			double CPUHoursPerType = (throughput * totalTimeInSeconds * meanServiceTimeInMillis) / 3600000;
 			
 			cost += provider.getReservationOneYearFee(type) * (currentPowerPerMachineType.get(type)/Configuration.getInstance().getRelativePower(type)) 
@@ -152,7 +152,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		for(Entry<User, List<Summary>> entry : this.summaries.entrySet()){
 			double currentPeriodMean = 0;
 			for(Summary summary : entry.getValue()){
-				currentPeriodMean += summary.getUserThinkTime();
+				currentPeriodMean += summary.getUserThinkTimeInSeconds();
 			}
 			currentPeriodMean /= entry.getValue().size();
 			thinkTime += currentPeriodMean;
@@ -182,12 +182,12 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		int totalNumberOfValues = 0;
 		
 		for(Entry<User, List<Summary>> entry : this.summaries.entrySet()){
-			double currentPeriodMean = 0;
+			double currentPeriodMeanInMillis = 0;
 			for(Summary summary : entry.getValue()){
-				currentPeriodMean += summary.getRequestServiceDemand();
+				currentPeriodMeanInMillis += summary.getRequestServiceDemandInMillis();
 			}
-			currentPeriodMean /= entry.getValue().size();
-			serviceTime += currentPeriodMean;
+			currentPeriodMeanInMillis /= entry.getValue().size();
+			serviceTime += currentPeriodMeanInMillis;
 			totalNumberOfValues++;
 		}
 		

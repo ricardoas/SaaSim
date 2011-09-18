@@ -4,16 +4,16 @@ public class Summary{
 	
 	double arrivalRate;
 	double totalCpuHrs;
-	double requestServiceDemand;
-	double userThinkTime;
+	double requestServiceDemandInMillis;
+	double userThinkTimeInSeconds;
 	long numberOfUsers;
 	
 	public Summary(double arrivalRate, double totalCpuHrs,
-			double serviceDemand, double userThinkTime, long numberOfUsers) {
+			double serviceDemandInMillis, double userThinkTimeInSeconds, long numberOfUsers) {
 		this.arrivalRate = arrivalRate;
 		this.totalCpuHrs = totalCpuHrs;
-		this.requestServiceDemand = serviceDemand;
-		this.userThinkTime = userThinkTime;
+		this.requestServiceDemandInMillis = serviceDemandInMillis;
+		this.userThinkTimeInSeconds = userThinkTimeInSeconds;
 		this.numberOfUsers = numberOfUsers;
 	}
 
@@ -33,20 +33,20 @@ public class Summary{
 		this.totalCpuHrs = totalCpuHrs;
 	}
 
-	public double getRequestServiceDemand() {
-		return requestServiceDemand;
+	public double getRequestServiceDemandInMillis() {
+		return requestServiceDemandInMillis;
 	}
 
 	public void setRequestServiceDemand(double requestServiceDemand) {
-		this.requestServiceDemand = requestServiceDemand;
+		this.requestServiceDemandInMillis = requestServiceDemand;
 	}
 
-	public double getUserThinkTime() {
-		return userThinkTime;
+	public double getUserThinkTimeInSeconds() {
+		return userThinkTimeInSeconds;
 	}
 
 	public void setUserThinkTime(double userThinkTime) {
-		this.userThinkTime = userThinkTime;
+		this.userThinkTimeInSeconds = userThinkTime;
 	}
 
 	public long getNumberOfUsers() {
