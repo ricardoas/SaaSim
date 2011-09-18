@@ -52,6 +52,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 			double relativePower = Configuration.getInstance().getRelativePower(type);
 			currentPowerPerMachineType.put(this.types.get(index), (int)Math.round(numberOfMachinesReserved * relativePower));
 			totalPower += Math.round(numberOfMachinesReserved * relativePower);
+			index++;
 		}
 		
 		//Calculating arrival rates per machine type
@@ -79,12 +80,12 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		double averageThinkTime = aggregateThinkTime();
 		
 		//Estimated response time
-		double responseTime = totalNumberOfUsers / totalThroughput - averageThinkTime;
+		double responseTimeInSeconds = totalNumberOfUsers / totalThroughput - averageThinkTime;
 		
 		//Estimating utility
 		double receipt = calcReceipt();
 		double cost = calcCost(throughputPerMachineType, meanServiceTime, currentPowerPerMachineType);
-		double penalties = calcPenalties(responseTime, arrivalRate, totalThroughput);
+		double penalties = calcPenalties(responseTimeInSeconds, arrivalRate, totalThroughput);
 		
 		double fitness = receipt - cost - penalties;
 		
@@ -95,9 +96,9 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		return fitness;
 	}
 
-	protected double calcPenalties(double responseTime, double arrivalRate, double totalThroughput) {
+	protected double calcPenalties(double responseTimeInSeconds, double arrivalRate, double totalThroughput) {
 		long maxRt = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME);
-		double responseTimeLoss = (responseTime - maxRt)/maxRt;
+		double responseTimeLoss = (responseTimeInSeconds * 1000 - maxRt)/maxRt;
 		
 		//TODO: Check if this makes sense ...
 		double rejectedLoss = (arrivalRate - totalThroughput) / arrivalRate;
@@ -111,7 +112,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 	}
 
 	protected double calcCost(Map<MachineType, Double> throughputPerMachineType, double meanServiceTimeInMillis, Map<MachineType, Integer> currentPowerPerMachineType) {
-		long totalTimeInSeconds = Configuration.getInstance().getLong(SimulatorProperties.PLANNING_PERIOD) * 30 * 24 * 60 * 60;
+		long totalTimeInSeconds = Configuration.getInstance().getLong(SimulatorProperties.PLANNING_PERIOD) * 24 * 60 * 60;
 		Provider provider = cloudProviders[0];
 		double cost = 0;
 		
@@ -165,9 +166,12 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		int totalNumberOfUsers = 0;
 		
 		for(Entry<User, List<Summary>> entry : this.summaries.entrySet()){
+			int currentNumberOfUsers = 0;
 			for(Summary summary : entry.getValue()){
-				totalNumberOfUsers += summary.getNumberOfUsers();
+				currentNumberOfUsers += summary.getNumberOfUsers();
 			}
+			currentNumberOfUsers /= entry.getValue().size();
+			totalNumberOfUsers += currentNumberOfUsers;
 		}
 		
 		return totalNumberOfUsers;

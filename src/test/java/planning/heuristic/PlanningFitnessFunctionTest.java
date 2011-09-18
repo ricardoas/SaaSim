@@ -1,14 +1,16 @@
 package planning.heuristic;
 
-import static commons.sim.util.SimulatorProperties.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.easymock.EasyMock;
+import org.jgap.Gene;
+import org.jgap.IChromosome;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
@@ -30,7 +32,7 @@ import commons.sim.util.SimulatorProperties;
 @PrepareForTest(Configuration.class)
 public class PlanningFitnessFunctionTest {
 	
-	private final long DEFAULT_SLA = 8000;
+	private final long DEFAULT_SLA = 8;
 	
 	@Test
 	public void calculatePenaltyWithoutLoss(){
@@ -44,17 +46,17 @@ public class PlanningFitnessFunctionTest {
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config);
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA * 1000);
 		
 		PowerMock.replayAll(config);
 		
 		PlanningFitnessFunction function = new PlanningFitnessFunction(null, cloudUsers, null, null);
 		
-		double responseTime = DEFAULT_SLA;
+		double responseTimeInSeconds = DEFAULT_SLA;
 		double arrivalRate = 10;
 		double totalThroughput = 10;
 		
-		assertEquals(0, function.calcPenalties(responseTime, arrivalRate, totalThroughput), 0.00001);
+		assertEquals(0, function.calcPenalties(responseTimeInSeconds, arrivalRate, totalThroughput), 0.00001);
 		PowerMock.verifyAll();
 	}
 	
@@ -70,18 +72,18 @@ public class PlanningFitnessFunctionTest {
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config);
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA * 1000);
 		
 		PowerMock.replayAll(config);
 		
 		PlanningFitnessFunction function = new PlanningFitnessFunction(null, cloudUsers, null, null);
 		
-		double responseTime = DEFAULT_SLA * 1.1;
+		double responseTimeInSeconds = DEFAULT_SLA * 1.1;
 		double arrivalRate = 10;
 		double totalThroughput = 10;
 		
 		double expectedPenalty = contract.calculatePenalty(0.1) + contract2.calculatePenalty(0.1);
-		assertEquals(expectedPenalty, function.calcPenalties(responseTime, arrivalRate, totalThroughput), 0.00001);
+		assertEquals(expectedPenalty, function.calcPenalties(responseTimeInSeconds, arrivalRate, totalThroughput), 0.00001);
 		
 		PowerMock.verifyAll();
 	}
@@ -98,18 +100,18 @@ public class PlanningFitnessFunctionTest {
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config);
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA * 1000);
 		
 		PowerMock.replayAll(config);
 		
 		PlanningFitnessFunction function = new PlanningFitnessFunction(null, cloudUsers, null, null);
 		
-		double responseTime = DEFAULT_SLA;
+		double responseTimeInSeconds = DEFAULT_SLA;
 		double arrivalRate = 10;
 		double totalThroughput = 5;
 		
 		double expectedPenalty = contract.calculatePenalty(0.5) + contract2.calculatePenalty(0.5);
-		assertEquals(expectedPenalty, function.calcPenalties(responseTime, arrivalRate, totalThroughput), 0.00001);
+		assertEquals(expectedPenalty, function.calcPenalties(responseTimeInSeconds, arrivalRate, totalThroughput), 0.00001);
 		
 		PowerMock.verifyAll();
 	}
@@ -126,18 +128,18 @@ public class PlanningFitnessFunctionTest {
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config);
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA * 1000);
 		
 		PowerMock.replayAll(config);
 		
 		PlanningFitnessFunction function = new PlanningFitnessFunction(null, cloudUsers, null, null);
 		
-		double responseTime = DEFAULT_SLA * 1.2;
+		double responseTimeInSeconds = DEFAULT_SLA * 1.2;
 		double arrivalRate = 10;
 		double totalThroughput = 6;
 		
 		double expectedPenalty = contract.calculatePenalty(0.6) + contract2.calculatePenalty(0.6);
-		assertEquals(expectedPenalty, function.calcPenalties(responseTime, arrivalRate, totalThroughput), 0.00001);
+		assertEquals(expectedPenalty, function.calcPenalties(responseTimeInSeconds, arrivalRate, totalThroughput), 0.00001);
 		
 		PowerMock.verifyAll();
 	}
@@ -154,18 +156,18 @@ public class PlanningFitnessFunctionTest {
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config);
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA * 1000);
 		
 		PowerMock.replayAll(config);
 		
 		PlanningFitnessFunction function = new PlanningFitnessFunction(null, cloudUsers, null, null);
 		
-		double responseTime = DEFAULT_SLA * 2;
+		double responseTimeInSeconds = DEFAULT_SLA * 2;
 		double arrivalRate = 10;
 		double totalThroughput = 0;
 		
 		double expectedPenalty = contract.calculatePenalty(2) + contract2.calculatePenalty(2);
-		assertEquals(expectedPenalty, function.calcPenalties(responseTime, arrivalRate, totalThroughput), 0.00001);
+		assertEquals(expectedPenalty, function.calcPenalties(responseTimeInSeconds, arrivalRate, totalThroughput), 0.00001);
 		
 		PowerMock.verifyAll();
 	}
@@ -182,7 +184,7 @@ public class PlanningFitnessFunctionTest {
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
-		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(12l);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
 		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d);
 		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d);
 		
@@ -217,7 +219,7 @@ public class PlanningFitnessFunctionTest {
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
-		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(12l);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
 		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d);
 		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d);
 		
@@ -599,7 +601,7 @@ public class PlanningFitnessFunctionTest {
 		
 		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
 		
-		assertEquals(24 * 100, function.aggregateNumberOfUsers(), 0.0001);
+		assertEquals(200, function.aggregateNumberOfUsers(), 0.0001);
 	}
 	
 	@Test
@@ -649,7 +651,391 @@ public class PlanningFitnessFunctionTest {
 		
 		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
 		
-		assertEquals(7554, function.aggregateNumberOfUsers(), 0.0001);
+		assertEquals(628, function.aggregateNumberOfUsers(), 0.0001);
+	}
+	
+	@Test
+	public void testAggregateNumberOfUsersWithoutUsers(){
+		double setupCost = 100d;
+		double price = 555d;
+		double price2 = 99.765d;
+		
+		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		data.add(new Summary(1, 10, 500, 0, 0));
+		data.add(new Summary(1, 10, 500, 0, 0));
+		data.add(new Summary(2, 20, 500, 0, 0));
+		data.add(new Summary(2, 20, 500, 0, 0));
+		data.add(new Summary(5, 40, 500, 0, 0));
+		data.add(new Summary(10, 70, 500, 0, 0));
+		data.add(new Summary(11, 75, 500, 0, 0));
+		data.add(new Summary(12, 80, 500, 0, 0));
+		data.add(new Summary(13, 90, 500, 0, 0));
+		data.add(new Summary(14, 90, 500, 0, 0));
+		data.add(new Summary(11, 75, 500, 0, 0));
+		data.add(new Summary(7, 60, 500, 0, 0));
+		summaries.put(cloudUsers[0], data);
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		data2.add(new Summary(1, 10, 500, 0, 0));
+		data2.add(new Summary(1, 10, 500, 0, 0));
+		data2.add(new Summary(2, 20, 500, 0, 0));
+		data2.add(new Summary(2, 20, 500, 0, 0));
+		data2.add(new Summary(5, 40, 500, 0, 0));
+		data2.add(new Summary(10, 40, 500, 0, 0));
+		data2.add(new Summary(11, 75, 500, 0, 0));
+		data2.add(new Summary(12, 80, 500, 0, 0));
+		data2.add(new Summary(13, 50, 500, 0, 0));
+		data2.add(new Summary(14, 50, 500, 0, 0));
+		data2.add(new Summary(11, 75, 500, 0, 0));
+		data2.add(new Summary(7, 60, 500, 0, 0));
+		summaries.put(cloudUsers[1], data2);
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
+		
+		assertEquals(0, function.aggregateNumberOfUsers(), 0.0001);
+	}
+	
+	@Test
+	public void testAggregateServiceTimeForOneSaaSClient(){
+		double setupCost = 100d;
+		double price = 555d;
+		double price2 = 99.765d;
+		
+		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		data.add(new Summary(1, 10, 500, 0, 100));
+		data.add(new Summary(1, 10, 600, 0, 200));
+		data.add(new Summary(2, 20, 400, 0, 300));
+		data.add(new Summary(2, 20, 700, 0, 400));
+		data.add(new Summary(5, 40, 300, 0, 500));
+		data.add(new Summary(10, 70, 800, 0, 500));
+		data.add(new Summary(11, 75, 200, 0, 600));
+		data.add(new Summary(12, 80, 500, 0, 700));
+		data.add(new Summary(13, 90, 500, 0, 800));
+		data.add(new Summary(14, 90, 900, 0, 900));
+		data.add(new Summary(11, 75, 100, 0, 1000));
+		data.add(new Summary(7, 60, 500, 0, 1100));
+		summaries.put(cloudUsers[0], data);
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
+		
+		assertEquals(500, function.aggregateServiceTime(), 0.0001);
+	}
+	
+	@Test
+	public void testAggregateServiceTimeForMultipleSaaSClients(){
+		double setupCost = 100d;
+		double price = 555d;
+		double price2 = 99.765d;
+		
+		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		data.add(new Summary(1, 10, 1000, 3, 100));
+		data.add(new Summary(1, 10, 2000, 15, 200));
+		data.add(new Summary(2, 20, 500, 7, 300));
+		data.add(new Summary(2, 20, 2500, 7, 400));
+		data.add(new Summary(5, 40, 3000, 15, 500));
+		data.add(new Summary(10, 70, 1000, 3, 500));
+		data.add(new Summary(11, 75, 2000, 3, 600));
+		data.add(new Summary(12, 80, 2500, 15, 700));
+		data.add(new Summary(13, 90, 2500, 7, 800));
+		data.add(new Summary(14, 90, 3000, 15, 900));
+		data.add(new Summary(11, 75, 1000, 7, 1000));
+		data.add(new Summary(7, 60, 2000, 3, 1100));
+		summaries.put(cloudUsers[0], data);//Average service time: 1916.667
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		data2.add(new Summary(1, 10, 100, 15, 1));
+		data2.add(new Summary(1, 10, 200, 7, 5));
+		data2.add(new Summary(2, 20, 300, 3, 6));
+		data2.add(new Summary(2, 20, 400, 3, 9));
+		data2.add(new Summary(5, 40, 500, 7, 11));
+		data2.add(new Summary(10, 40, 600, 15, 23));
+		data2.add(new Summary(11, 75, 700, 7, 35));
+		data2.add(new Summary(12, 80, 800, 3, 99));
+		data2.add(new Summary(13, 50, 900, 15, 88));
+		data2.add(new Summary(14, 50, 1000, 3, 77));
+		data2.add(new Summary(11, 75, 1000, 7, 99));
+		data2.add(new Summary(7, 60, 1000, 15, 1));
+		summaries.put(cloudUsers[1], data2);//Average service time: 625
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
+		
+		assertEquals(1270.8333333, function.aggregateServiceTime(), 0.0001);
+	}
+	
+	@Test
+	public void testAggregateArrivalsForOneSaaSClient(){
+		double setupCost = 100d;
+		double price = 555d;
+		double price2 = 99.765d;
+		
+		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		data.add(new Summary(1, 10, 500, 0, 100));
+		data.add(new Summary(1, 10, 600, 0, 200));
+		data.add(new Summary(2, 20, 400, 0, 300));
+		data.add(new Summary(2, 20, 700, 0, 400));
+		data.add(new Summary(5, 40, 300, 0, 500));
+		data.add(new Summary(10, 70, 800, 0, 500));
+		data.add(new Summary(11, 75, 200, 0, 600));
+		data.add(new Summary(12, 80, 500, 0, 700));
+		data.add(new Summary(13, 90, 500, 0, 800));
+		data.add(new Summary(14, 90, 900, 0, 900));
+		data.add(new Summary(11, 75, 100, 0, 1000));
+		data.add(new Summary(7, 60, 500, 0, 1100));
+		summaries.put(cloudUsers[0], data);
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
+		
+		assertEquals(7.416667, function.aggregateArrivals(), 0.0001);
+	}
+	
+	@Test
+	public void testAggregateArrivalsForMultipleSaaSClients(){
+		double setupCost = 100d;
+		double price = 555d;
+		double price2 = 99.765d;
+		
+		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		data.add(new Summary(10, 10, 1000, 3, 100));
+		data.add(new Summary(20, 10, 2000, 15, 200));
+		data.add(new Summary(25, 20, 500, 7, 300));
+		data.add(new Summary(30, 20, 2500, 7, 400));
+		data.add(new Summary(40, 40, 3000, 15, 500));
+		data.add(new Summary(50, 70, 1000, 3, 500));
+		data.add(new Summary(55, 75, 2000, 3, 600));
+		data.add(new Summary(60, 80, 2500, 15, 700));
+		data.add(new Summary(40, 90, 2500, 7, 800));
+		data.add(new Summary(30, 90, 3000, 15, 900));
+		data.add(new Summary(25, 75, 1000, 7, 1000));
+		data.add(new Summary(5, 60, 2000, 3, 1100));
+		summaries.put(cloudUsers[0], data);//Average arrival: 32.5
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		data2.add(new Summary(100, 10, 100, 15, 1));
+		data2.add(new Summary(300, 10, 200, 7, 5));
+		data2.add(new Summary(500, 20, 300, 3, 6));
+		data2.add(new Summary(400, 20, 400, 3, 9));
+		data2.add(new Summary(900, 40, 500, 7, 11));
+		data2.add(new Summary(800, 40, 600, 15, 23));
+		data2.add(new Summary(700, 75, 700, 7, 35));
+		data2.add(new Summary(600, 80, 800, 3, 99));
+		data2.add(new Summary(500, 50, 900, 15, 88));
+		data2.add(new Summary(300, 50, 1000, 3, 77));
+		data2.add(new Summary(400, 75, 1000, 7, 99));
+		data2.add(new Summary(250, 60, 1000, 15, 1));
+		summaries.put(cloudUsers[1], data2);//Average service time: 479.16667
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
+		
+		assertEquals(511.66667, function.aggregateArrivals(), 0.0001);
+	}
+	
+	@Test
+	public void testEvaluateWithNegativeFitness(){
+		//SaaS clients contracts
+		Contract contract = new Contract("p1", 1, 100d, 555d, 300 * 60 * 60 * 1000l, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		Contract contract2 = new Contract("p1", 1, 100d, 99.765d, 300 * 60 * 60 * 1000l, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(8);
+		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).times(3);
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(3);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA * 1000);
+		
+		//IaaS providers
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
+		
+		Provider[] providers = new Provider[1];
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
+		
+		PowerMock.replayAll(config);
+		
+		//Summaries
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		summaries.put(cloudUsers[0], data);//10 req/s, 240 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		summaries.put(cloudUsers[1], data2);//20 req/s, 360 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.LARGE, MachineType.MEDIUM));
+		
+		IChromosome chromosome = EasyMock.createStrictMock(IChromosome.class);
+		Gene[] genes = new Gene[2];
+		genes[0] = EasyMock.createStrictMock(Gene.class);
+		EasyMock.expect(genes[0].getAllele()).andReturn(15);
+		genes[1] = EasyMock.createStrictMock(Gene.class);
+		EasyMock.expect(genes[1].getAllele()).andReturn(5);
+		EasyMock.expect(chromosome.getGenes()).andReturn(genes);
+		
+		EasyMock.replay(chromosome, genes[0], genes[1]);
+		
+		double receipt = 555 + 100 + 0 + 99.765 + 100 + 6;//for each contract: price + setup + extra cpu
+		double cost = 100 * 15 + 25.92 * 0.01 + 99 * 5 + 17.28 * 0.25;//for each machine type: reservation fee + usage
+		double penalties = 277.5 + 49.8825;//50% of each contract
+		
+		assertEquals(1/Math.abs(receipt - cost - penalties) + 1, function.evaluate(chromosome), 0.0001);
+		
+		PowerMock.verifyAll();
+	}
+	
+	@Test
+	public void testEvaluateWithPositiveFitness(){
+		//SaaS clients contracts
+		Contract contract = new Contract("p1", 1, 100d, 5555d, 300 * 60 * 60 * 1000l, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		Contract contract2 = new Contract("p1", 1, 100d, 999.765d, 300 * 60 * 60 * 1000l, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(8);
+		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).times(3);
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(3);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA * 1000);
+		
+		//IaaS providers
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
+		
+		Provider[] providers = new Provider[1];
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
+		
+		PowerMock.replayAll(config);
+		
+		//Summaries
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
+		summaries.put(cloudUsers[0], data);//10 req/s, 240 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		summaries.put(cloudUsers[1], data2);//20 req/s, 360 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.LARGE, MachineType.MEDIUM));
+		
+		IChromosome chromosome = EasyMock.createStrictMock(IChromosome.class);
+		Gene[] genes = new Gene[2];
+		genes[0] = EasyMock.createStrictMock(Gene.class);
+		EasyMock.expect(genes[0].getAllele()).andReturn(15);
+		genes[1] = EasyMock.createStrictMock(Gene.class);
+		EasyMock.expect(genes[1].getAllele()).andReturn(5);
+		EasyMock.expect(chromosome.getGenes()).andReturn(genes);
+		
+		EasyMock.replay(chromosome, genes[0], genes[1]);
+		
+		double receipt = 5555 + 100 + 0 + 999.765 + 100 + 6;//for each contract: price + setup + extra cpu
+		double cost = 100 * 15 + 25.92 * 0.01 + 99 * 5 + 17.28 * 0.25;//for each machine type: reservation fee + usage
+		double penalties = 2777.5 + 499.8825;//50% of each contract
+		
+		assertEquals(receipt - cost - penalties, function.evaluate(chromosome), 0.0001);
+		
+		PowerMock.verifyAll();
 	}
 
 }
