@@ -1,5 +1,6 @@
 package planning.heuristic;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,10 +32,10 @@ public class AGHeuristic implements PlanningHeuristic{
 	
 	private static final long YEAR_IN_HOURS = 8640;
 	
-	private int POPULATION_SIZE = 1000;
-	private double CROSSOVER_RATE = 0.7;
+	private int POPULATION_SIZE = 2000;
+	private double CROSSOVER_RATE = 0.6;
 	private int MUTATION_DENOMINATOR = 1000/5;//0.5%
-	private double MINIMUM_IMPROVEMENT = 0.05;//1%
+	private double MINIMUM_IMPROVEMENT = 0.01;//1%
 	private int MINIMUM_NUMBER_OF_EVOLUTIONS = 40;
 	
 	private Map<User, List<Summary>> summaries;
@@ -42,13 +43,18 @@ public class AGHeuristic implements PlanningHeuristic{
 
 	private IChromosome fittestChromosome;
 	
+	public AGHeuristic(){
+		this.types = new ArrayList<MachineType>();
+		this.summaries = new HashMap<User, List<Summary>>();
+	}
+	
 	@Override
 	public void findPlan(HistoryBasedWorkloadParser workloadParser,
 			Provider[] cloudProviders, User[] cloudUsers){
 		
 		//Reading workload data
 		readWorkloadData(cloudUsers);
-		
+	
 		//Configuring genetic algorithm
 		Configuration config = new DefaultConfiguration();
 		try {
@@ -61,7 +67,7 @@ public class AGHeuristic implements PlanningHeuristic{
 			config.addGeneticOperator(new MutationOperator(config, MUTATION_DENOMINATOR));
 			config.removeNaturalSelectors(true);
 			config.removeNaturalSelectors(false);
-			config.addNaturalSelector(new WeightedRouletteSelector(), true);
+			config.addNaturalSelector(new WeightedRouletteSelector(config), true);
 	//		config.setKeepPopulationSizeConstant(true);
 	//		config.setNaturalSelector(null);//Tournament, WeightedRoullete
 
@@ -71,31 +77,46 @@ public class AGHeuristic implements PlanningHeuristic{
 			IChromosome sampleChromosome = createSampleChromosome(config, cloudProviders[0]);
 			config.setSampleChromosome(sampleChromosome);
 			
-			Genotype population = Genotype.randomInitialGenotype(config);
-
-			//evaluating population
-			IChromosome previousFittestChromosome = null;
-			population.evolve();
-			IChromosome lastFittestChromosome = population.getFittestChromosome();
-			int evolutionsWithoutImprovement = 0;
-			
-			while(evolutionsWithoutImprovement < MINIMUM_NUMBER_OF_EVOLUTIONS){
+			for(int i = 0; i < 30; i++){
+				Genotype population = Genotype.randomInitialGenotype(config);
+	
+				//evaluating population
+				IChromosome previousFittestChromosome = null;
 				population.evolve();
-				previousFittestChromosome = lastFittestChromosome;
-				lastFittestChromosome = population.getFittestChromosome();
-				if(isEvolutionComplete(lastFittestChromosome, lastFittestChromosome)){
-					evolutionsWithoutImprovement++;
-				}else{
-					evolutionsWithoutImprovement = 0;
+				IChromosome lastFittestChromosome = population.getFittestChromosome();
+				int evolutionsWithoutImprovement = 0;
+				
+				while(evolutionsWithoutImprovement < MINIMUM_NUMBER_OF_EVOLUTIONS){
+					population.evolve();
+					previousFittestChromosome = lastFittestChromosome;
+					lastFittestChromosome = population.getFittestChromosome();
+					if(isEvolutionComplete(previousFittestChromosome, lastFittestChromosome)){
+						evolutionsWithoutImprovement++;
+					}else{
+						evolutionsWithoutImprovement = 0;
+					}
+				}
+				
+				//store best config
+				IChromosome currentFittest = population.getFittestChromosome();
+				if(fittestChromosome == null || currentFittest.getFitnessValue() > fittestChromosome.getFitnessValue()){
+					fittestChromosome = currentFittest;
 				}
 			}
-			
-			//store best config
-			fittestChromosome = population.getFittestChromosome();
 			
 		} catch (InvalidConfigurationException e) {
 			e.printStackTrace();
 		}
+		
+	}
+	
+	private boolean isEvolutionComplete(IChromosome previousFittestChromosome, IChromosome lastFittestChromosome) {
+		double previousFitnessValue = previousFittestChromosome.getFitnessValue();
+		double difference = lastFittestChromosome.getFitnessValue() - previousFitnessValue;
+		if(Math.abs(difference/previousFitnessValue) < MINIMUM_IMPROVEMENT){
+			return true;
+		}
+		return false;
 	}
 
 	private void readWorkloadData(User[] cloudUsers) {
@@ -117,14 +138,6 @@ public class AGHeuristic implements PlanningHeuristic{
 		}
 	}
 
-	private boolean isEvolutionComplete(IChromosome fittestChromosome, IChromosome lastFittestChromosome) {
-		double firstFitnessValue = fittestChromosome.getFitnessValue();
-		double difference = lastFittestChromosome.getFitnessValue() - firstFitnessValue;
-		if(Math.abs(difference/firstFitnessValue) < MINIMUM_IMPROVEMENT){
-			return true;
-		}
-		return false;
-	}
 
 	private IChromosome createSampleChromosome(Configuration config, Provider cloudProvider) throws InvalidConfigurationException {
 		Gene[] genes = new IntegerGene[cloudProvider.getAvailableTypes().length];
@@ -133,7 +146,7 @@ public class AGHeuristic implements PlanningHeuristic{
 		int i = 0;
 		for(MachineType type : limits.keySet()){
 			types.add(type);
-			genes[i] = new IntegerGene(config, 0, limits.get(type));
+			genes[i++] = new IntegerGene(config, 0, limits.get(type));
 		}
 		
 		IChromosome sampleChromosome = new Chromosome(config, genes);
@@ -152,7 +165,7 @@ public class AGHeuristic implements PlanningHeuristic{
 			double onDemandCpuCost = cloudProvider.getOnDemandCpuCost(type);
 			
 			long minimumHoursToBeUsed = Math.round(yearFee / (onDemandCpuCost - reservedCpuCost));
-			double usageProportion = minimumHoursToBeUsed / YEAR_IN_HOURS;
+			double usageProportion = 1.0 * minimumHoursToBeUsed / YEAR_IN_HOURS;
 			
 			int maximumNumberOfMachines = (int)Math.round(totalDemand / (usageProportion * YEAR_IN_HOURS));
 			typesLimits.put(type, maximumNumberOfMachines);
@@ -190,6 +203,8 @@ public class AGHeuristic implements PlanningHeuristic{
 		for(MachineType type : this.types){
 			plan.put(type, (Integer) genes[index++].getAllele());
 		}
+		System.out.println("CONFIG: "+genes[0].getAllele()+" "+genes[1].getAllele()+" "+genes[2].getAllele());
+		System.out.println("BEST: "+fittestChromosome.getFitnessValue());
 		return plan;
 	}
 }

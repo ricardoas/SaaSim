@@ -40,9 +40,6 @@ public class Planner {
 		if(this.cloudProviders == null || this.cloudProviders.length == 0){
 			throw new RuntimeException("Invalid cloud providers in Planner!");
 		}
-		if(this.workloadParser == null){
-			throw new RuntimeException("Invalid workload parser in Planner!");
-		}
 	}
 
 	/**
