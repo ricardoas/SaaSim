@@ -237,7 +237,7 @@ public class Configuration	extends PropertiesConfiguration{
 	 * @param propertiesFileName
 	 * @throws ConfigurationException
 	 */
-	protected Configuration(String propertiesFileName) throws ConfigurationException {
+	private Configuration(String propertiesFileName) throws ConfigurationException {
 		super(propertiesFileName);
 		verifyProperties();
 		parseProperties();
