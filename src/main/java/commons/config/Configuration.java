@@ -21,6 +21,7 @@ import org.apache.commons.configuration.ConfigurationRuntimeException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import planning.heuristic.AGHeuristic;
+import planning.heuristic.OptimalHeuristic;
 import planning.heuristic.OverProvisionHeuristic;
 import provisioning.DynamicProvisioningSystem;
 import provisioning.ProfitDrivenProvisioningSystem;
@@ -441,6 +442,9 @@ public class Configuration	extends PropertiesConfiguration{
 			case OVERPROVISIONING:
 				heuristicName = OverProvisionHeuristic.class.getCanonicalName();
 				checkPlanningType();
+				break;
+			case OPTIMAL:
+				heuristicName = OptimalHeuristic.class.getCanonicalName();
 				break;
 			default:
 				throw new ConfigurationException("Unsupported value: " + value + " for PlanningHeuristicValues.");

@@ -12,16 +12,9 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
 import org.jgap.Gene;
-import org.jgap.Genotype;
-import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
-import org.jgap.impl.ChromosomePool;
-import org.jgap.impl.CrossoverOperator;
 import org.jgap.impl.DefaultConfiguration;
 import org.jgap.impl.IntegerGene;
-import org.jgap.impl.MutationOperator;
-import org.jgap.impl.StockRandomGenerator;
-import org.jgap.impl.WeightedRouletteSelector;
 
 import planning.io.PlanningWorkloadParser;
 import planning.util.Summary;
@@ -31,25 +24,17 @@ import commons.cloud.Provider;
 import commons.cloud.User;
 import commons.io.HistoryBasedWorkloadParser;
 
-public class AGHeuristic implements PlanningHeuristic{
+public class OptimalHeuristic implements PlanningHeuristic{
 	
 	private static final long YEAR_IN_HOURS = 8640;
 	
-	private int POPULATION_SIZE = 2000;
-	private double CROSSOVER_RATE = 0.6;
-	private int MUTATION_DENOMINATOR = 1000/5;//0.5%
-	private double MINIMUM_IMPROVEMENT = 0.01;//1%
-	private int MINIMUM_NUMBER_OF_EVOLUTIONS = 40;
-	
 	private Map<User, List<Summary>> summaries;
 	private List<MachineType> types;
-
-	private IChromosome fittestChromosome;
 	
 	private FileWriter writer;
-	private static final String OUTPUT_FILE = "ag.plan";
+	private static final String OUTPUT_FILE = "optimal.plan";
 	
-	public AGHeuristic(){
+	public OptimalHeuristic(){
 		this.types = new ArrayList<MachineType>();
 		this.summaries = new HashMap<User, List<Summary>>();
 		try {
@@ -69,61 +54,43 @@ public class AGHeuristic implements PlanningHeuristic{
 		//Configuring genetic algorithm
 		Configuration config = new DefaultConfiguration();
 		try {
-			config.setPopulationSize(POPULATION_SIZE);
-			config.setPreservFittestIndividual(true);
-			config.setRandomGenerator(new StockRandomGenerator());
-			config.setChromosomePool(new ChromosomePool());
-			
-			config.addGeneticOperator(new CrossoverOperator(config, CROSSOVER_RATE));
-			config.addGeneticOperator(new MutationOperator(config, MUTATION_DENOMINATOR));
-			config.removeNaturalSelectors(true);
-			config.removeNaturalSelectors(false);
-			config.addNaturalSelector(new WeightedRouletteSelector(config), true);
-	//		config.setKeepPopulationSizeConstant(true);
-	//		config.setNaturalSelector(null);//Tournament, WeightedRoullete
-
-			IChromosome sampleChromosome = createSampleChromosome(config, cloudProviders[0]);
-			config.setSampleChromosome(sampleChromosome);
 
 			PlanningFitnessFunction myFunc = createFitnessFunction(cloudUsers, cloudProviders);
-			config.setFitnessFunction(myFunc);
 			
-			for(int i = 0; i < 30; i++){
-				Genotype population = Genotype.randomInitialGenotype(config);
-	
-				//evaluating population
-				IChromosome previousFittestChromosome = null;
-				population.evolve();
-				IChromosome lastFittestChromosome = population.getFittestChromosome();
-				int evolutionsWithoutImprovement = 0;
-				
-				while(evolutionsWithoutImprovement < MINIMUM_NUMBER_OF_EVOLUTIONS){
-					population.evolve();
-					previousFittestChromosome = lastFittestChromosome;
-					lastFittestChromosome = population.getFittestChromosome();
-					if(isEvolutionComplete(previousFittestChromosome, lastFittestChromosome)){
-						evolutionsWithoutImprovement++;
-					}else{
-						evolutionsWithoutImprovement = 0;
-					}
-				}
-				
-				//store best config
-				IChromosome currentFittest = population.getFittestChromosome();
-				persistData(currentFittest, currentFittest.getFitnessValue());
-				
-				if(fittestChromosome == null || currentFittest.getFitnessValue() > fittestChromosome.getFitnessValue()){
-					fittestChromosome = currentFittest;
-				}
+			Map<MachineType, Integer> limits = findReservationLimits(cloudProviders[0]);
+			for(MachineType type : limits.keySet()){
+				types.add(type);
 			}
+			int [] currentValues = new int[limits.size()];
 			
+			evaluateGenes(config, myFunc, cloudProviders[0], limits, 0, currentValues);
 		} catch (InvalidConfigurationException e) {
 			e.printStackTrace();
 		}
 		
 	}
 	
-	private void persistData(IChromosome key, double fitness) {
+	private void evaluateGenes(Configuration config, PlanningFitnessFunction function, Provider provider, Map<MachineType, Integer> limits, int typesIndex, int[] currentValues) throws InvalidConfigurationException {
+		if(typesIndex < this.types.size()){
+			MachineType machineType = this.types.get(typesIndex);
+			Integer limit = limits.get(machineType);
+			for(int i = 0; i <= limit; i++){
+				currentValues[typesIndex] = i;
+				evaluateGenes(config, function, provider, limits, typesIndex+1, currentValues);
+			}
+		}else{
+			Gene[] genes = new IntegerGene[provider.getAvailableTypes().length];
+			for(int i = 0; i < provider.getAvailableTypes().length; i++){
+				genes[i] = new IntegerGene(config);
+				genes[i].setAllele(currentValues[i]);
+			}
+			Chromosome chrom = new Chromosome(config, genes);
+			double fitness = function.evaluate(chrom);
+			persistData(chrom, fitness);
+		}
+	}
+
+	private void persistData(Chromosome key, double fitness) {
 		StringBuilder result = new StringBuilder();
 		for(Gene gene : key.getGenes()){
 			result.append(gene.getAllele()+"\t");
@@ -134,15 +101,6 @@ public class AGHeuristic implements PlanningHeuristic{
 		} catch (IOException e) {
 			throw new RuntimeException("Could not write in optimal output file");
 		}
-	}
-	
-	private boolean isEvolutionComplete(IChromosome previousFittestChromosome, IChromosome lastFittestChromosome) {
-		double previousFitnessValue = previousFittestChromosome.getFitnessValue();
-		double difference = lastFittestChromosome.getFitnessValue() - previousFitnessValue;
-		if(Math.abs(difference/previousFitnessValue) < MINIMUM_IMPROVEMENT){
-			return true;
-		}
-		return false;
 	}
 
 	private void readWorkloadData(User[] cloudUsers) {
@@ -164,20 +122,6 @@ public class AGHeuristic implements PlanningHeuristic{
 		}
 	}
 
-
-	private IChromosome createSampleChromosome(Configuration config, Provider cloudProvider) throws InvalidConfigurationException {
-		Gene[] genes = new IntegerGene[cloudProvider.getAvailableTypes().length];
-		
-		Map<MachineType, Integer> limits = findReservationLimits(cloudProvider);
-		int i = 0;
-		for(MachineType type : limits.keySet()){
-			types.add(type);
-			genes[i++] = new IntegerGene(config, 0, limits.get(type));
-		}
-		
-		IChromosome sampleChromosome = new Chromosome(config, genes);
-		return sampleChromosome;
-	}
 
 	private Map<MachineType, Integer> findReservationLimits(Provider cloudProvider) {
 		Map<MachineType, Integer> typesLimits = new HashMap<MachineType, Integer>();
@@ -222,21 +166,11 @@ public class AGHeuristic implements PlanningHeuristic{
 
 	@Override
 	public Map<MachineType, Integer> getPlan(User[] cloudUsers) {
-		Map<MachineType, Integer> plan = new HashMap<MachineType, Integer>();
-		Gene[] genes = fittestChromosome.getGenes();
-		int index = 0;
-		
-		for(MachineType type : this.types){
-			plan.put(type, (Integer) genes[index++].getAllele());
-		}
-		System.out.println("CONFIG: "+genes[0].getAllele()+" "+genes[1].getAllele()+" "+genes[2].getAllele());
-		System.out.println("BEST: "+fittestChromosome.getFitnessValue());
-		
 		try {
 			writer.close();
 		} catch (IOException e) {
-			throw new RuntimeException(e.getMessage());
+			throw new RuntimeException("Could not close optimal output file");
 		}
-		return plan;
+		return new HashMap<MachineType, Integer>();
 	}
 }

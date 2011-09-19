@@ -5,6 +5,6 @@ package commons.config;
  */
 public enum PlanningHeuristicValues {
 	
-	EVOLUTIONARY, OVERPROVISIONING
+	EVOLUTIONARY, OVERPROVISIONING, OPTIMAL
 
 }
