@@ -142,6 +142,20 @@ public class ProviderTest {
 	/**
 	 * Test method for {@link commons.cloud.Provider#buyMachine(boolean, commons.cloud.MachineType)}.
 	 */
+	@Test (expected = RuntimeException.class)
+	public void testBuyMachineOfUnavailableType() {
+		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
+		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.SMALL);
+		EasyMock.replay(typeProvider);
+		
+		Provider provider = new Provider(0, "amazon", 1, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );	
+		assertNull(provider.buyMachine(false, MachineType.LARGE));
+		EasyMock.verify(typeProvider);
+	}
+	
+	/**
+	 * Test method for {@link commons.cloud.Provider#buyMachine(boolean, commons.cloud.MachineType)}.
+	 */
 	@Test
 	public void testBuyMachineOnDemandMachineUntilNoMachineIsAvailable() {
 		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
@@ -189,6 +203,22 @@ public class ProviderTest {
 		EasyMock.verify(typeProvider);
 	}
 
+	/**
+	 * Test method for {@link commons.cloud.Provider#shutdownMachine(commons.sim.components.MachineDescriptor)}.
+	 */
+	@Test 
+	public void testShutdownOfInexistentType() {
+		MachineDescriptor machineDescriptor = new MachineDescriptor(0, false, MachineType.SMALL, 0);
+		TypeProvider typeProvider = EasyMock.createStrictMock(TypeProvider.class);
+		EasyMock.expect(typeProvider.getType()).andReturn(MachineType.LARGE);
+		EasyMock.replay(typeProvider);
+		
+		Provider provider = new Provider(0, "amazon", 1, 0, 3.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, Arrays.asList(typeProvider) );
+		assertFalse(provider.shutdownMachine(machineDescriptor));
+		
+		EasyMock.verify(typeProvider);
+	}
+	
 	/**
 	 * Test method for {@link commons.cloud.Provider#shutdownMachine(commons.sim.components.MachineDescriptor)}.
 	 */

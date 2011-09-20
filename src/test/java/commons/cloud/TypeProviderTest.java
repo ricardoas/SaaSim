@@ -29,9 +29,10 @@ public class TypeProviderTest {
 	 * Test method for {@link commons.cloud.TypeProvider#getType()}.
 	 */
 	@Test
-	public void testGetType() {
-		TypeProvider type = new TypeProvider(0, MachineType.SMALL, 0, 0, 0, 0, 0);
+	public void testConstructor() {
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
 		assertEquals(MachineType.SMALL, type.getType());
+		assertEquals(5, type.getReservation());
 	}
 
 	/**
@@ -239,5 +240,31 @@ public class TypeProviderTest {
 		type.calculateMachinesCost(entry, HOUR_IN_MILLIS, monitoringCost);
 		
 		EasyMock.verify(entry);
+	}
+
+	@Test
+	public void testGetTotalEmptyTransferences(){
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
+		
+		assertArrayEquals(new long[]{0,0}, type.getTotalTransferences());
+	}
+	
+	@Test
+	public void testGetTotalTransferences(){
+		TypeProvider type = new TypeProvider(0, MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
+		
+		MachineDescriptor onDemandRunning = type.buyMachine(false);
+		MachineDescriptor onDemandFinished = type.buyMachine(false);
+		MachineDescriptor reservedRunning = type.buyMachine(true);
+		MachineDescriptor reservedFinished = type.buyMachine(true);
+		
+		onDemandRunning.updateTransference(11, 11);
+		onDemandFinished.updateTransference(13, 13);
+		reservedRunning.updateTransference(17, 17);
+		reservedFinished.updateTransference(19, 19);
+		type.shutdownMachine(onDemandFinished);
+		type.shutdownMachine(reservedFinished);
+		
+		assertArrayEquals(new long[]{11+13+17+19, 11+13+17+19}, type.getTotalTransferences());
 	}
 }
