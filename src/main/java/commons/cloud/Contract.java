@@ -167,12 +167,14 @@ public class Contract implements Comparable<Contract>{
 	
 	//According to https://signin.crm.dynamics.com/portal/static/1046/sla.htm
 	public double calculatePenalty(double totalLoss) {
-		if(totalLoss == 0){
+		if(totalLoss <= 0.001){
 			return 0;
-		}else if(totalLoss <= 0.1){
+		}else if(totalLoss > 0.001 && totalLoss <= 0.01){
 			return price * 0.25;
-		}else {
+		}else if(totalLoss > 0.01 && totalLoss <= 0.05){
 			return price * 0.5;
+		}else{
+			return price  * 1;
 		}
 	}
 	

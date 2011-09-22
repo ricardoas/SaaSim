@@ -949,7 +949,7 @@ public class PlanningFitnessFunctionTest {
 		
 		double receipt = 555 + 100 + 0 + 99.765 + 100 + 6;//for each contract: price + setup + extra cpu
 		double cost = 100 * 15 + 8640 * 0.01 + 99 * 5 + 8640 * 0.25;//for each machine type: reservation fee + usage
-		double penalties = 277.5 + 49.8825;//50% of each contract
+		double penalties = 555 + 99.765;//Since loss is more than 5%, SaaS client does not pay the provider
 		
 		assertEquals(1/Math.abs(receipt - cost - penalties) + 1, function.evaluate(chromosome), 0.0001);
 		
@@ -1031,7 +1031,7 @@ public class PlanningFitnessFunctionTest {
 		
 		double receipt = 555 + 10000 + 0 + 99.765 + 10000 + 6;//for each contract: price + setup + extra cpu
 		double cost = 100 * 15 + 8640 * 0.01 + 99 * 5 + 8640 * 0.25;//for each machine type: reservation fee + usage
-		double penalties = 277.5 + 49.8825;//50% of each contract
+		double penalties = 555 + 99.765;//Since loss is more than 5%, SaaS client does not pay the provider
 		
 		assertEquals(receipt - cost - penalties, function.evaluate(chromosome), 0.0001);
 		
