@@ -46,8 +46,10 @@ public class RequestTest {
 	public void testUpdate() {
 		request.assignTo(MachineType.SMALL);
 		assertEquals(SMALL_DEMAND, request.getTotalToProcess());
+		assertEquals(0, request.getTotalProcessed());
 		request.update(100);
 		assertEquals(SMALL_DEMAND-100, request.getTotalToProcess());
+		assertEquals(100, request.getTotalProcessed());
 	}
 
 	/**
@@ -113,5 +115,57 @@ public class RequestTest {
 		request.reset();
 		request.getTotalToProcess();
 	}
+	
+	/**
+	 * Test method for {@link commons.cloud.Request#equals()} and 
+	 * {@link commons.cloud.Request#hashCode()}.
+	 */
+	@Test
+	public void testEqualsHashCodeConsistencySameRequest() {
+		Request cloneRequest = new Request(1l, 1, 17756636, 0, 100, 1024000, new long[]{SMALL_DEMAND, LARGE_DEMAND, XLARGE_DEMAND});
+		assertEquals(request, cloneRequest);
+		assertEquals(request.hashCode(), cloneRequest.hashCode());
+	}
+	
+	/**
+	 * Test method for {@link commons.cloud.Request#equals()} and 
+	 * {@link commons.cloud.Request#hashCode()}.
+	 */
+	@Test
+	public void testEqualsHashCodeConsistencyWithRequestID() {
+		Request cloneRequest = new Request(2l, 1, 17756636, 1, 100, 1024000, new long[]{SMALL_DEMAND, LARGE_DEMAND, XLARGE_DEMAND});
+		assertTrue(!request.equals(cloneRequest));
+		assertTrue(request.hashCode() != cloneRequest.hashCode());
+	}
+	
+	/**
+	 * Test method for {@link commons.cloud.Request#equals()} and 
+	 * {@link commons.cloud.Request#hashCode()}.
+	 */
+	@Test
+	public void testEqualsHashCodeConsistencyWithDifferentSaaSClient() {
+		Request cloneRequest = new Request(1l, 2, 17756636, 0, 100, 1024000, new long[]{SMALL_DEMAND, LARGE_DEMAND, XLARGE_DEMAND});
+		assertTrue(!request.equals(cloneRequest));
+		assertTrue(request.hashCode() != cloneRequest.hashCode());
+	}
+	
+	/**
+	 * Test method for {@link commons.cloud.Request#equals()} and 
+	 * {@link commons.cloud.Request#hashCode()}.
+	 */
+	@Test(expected=AssertionError.class)
+	public void testEqualsWithNullObject() {
+		request.equals(null);
+	}
+	
+	/**
+	 * Test method for {@link commons.cloud.Request#equals()} and 
+	 * {@link commons.cloud.Request#hashCode()}.
+	 */
+	@Test(expected=AssertionError.class)
+	public void testEqualsWithAnotherClassObject() {
+		request.equals(new String(""));
+	}
+	
 
 }

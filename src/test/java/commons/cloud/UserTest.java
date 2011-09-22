@@ -3,7 +3,7 @@
  */
 package commons.cloud;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -194,5 +194,81 @@ public class UserTest {
 		
 		EasyMock.verify(gold);
 	}
+	
+	/**
+	 * Test method for {@link commons.cloud.User#equals()} and 
+	 * {@link commons.cloud.Request#hashCode()}.
+	 */
+	@Test
+	public void testEqualsHashCodeConsistencySameRequest() {
+		Contract gold = EasyMock.createStrictMock(Contract.class);
+		EasyMock.replay(gold);
+
+		User user = new User(1, gold , STORAGE_IN_BYTES);
+		assertEquals(user, user);
+		assertTrue(user.hashCode() == user.hashCode());
+		
+		EasyMock.verify(gold);
+	}
+	
+	/**
+	 * Test method for {@link commons.cloud.Request#equals()} and 
+	 * {@link commons.cloud.Request#hashCode()}.
+	 */
+	@Test
+	public void testEqualsHashCodeConsistencyWithSameID() {
+		Contract gold = EasyMock.createStrictMock(Contract.class);
+		EasyMock.replay(gold);
+		
+		User userA = new User(1, gold , STORAGE_IN_BYTES);
+		User cloneUserA = new User(1, gold , STORAGE_IN_BYTES);
+		
+		assertEquals(userA, cloneUserA);
+		assertTrue(userA.hashCode() == cloneUserA.hashCode());
+		EasyMock.verify(gold);
+	}
+	
+	/**
+	 * Test method for {@link commons.cloud.Request#equals()} and 
+	 * {@link commons.cloud.Request#hashCode()}.
+	 */
+	@Test
+	public void testEqualsHashCodeConsistencyWithDifferentID() {
+		
+		Contract gold = EasyMock.createStrictMock(Contract.class);
+		EasyMock.replay(gold);
+		
+		User userA = new User(1, gold , STORAGE_IN_BYTES);
+		User userB = new User(2, gold , STORAGE_IN_BYTES);
+		
+		assertTrue(!userA.equals(userB));
+		assertTrue(userA.hashCode() != userB.hashCode());
+		EasyMock.verify(gold);
+	}
+	
+	/**
+	 * Test method for {@link commons.cloud.Request#equals()} and 
+	 * {@link commons.cloud.Request#hashCode()}.
+	 */
+	@Test(expected=AssertionError.class)
+	public void testEqualsWithNullObject() {
+		Contract gold = EasyMock.createStrictMock(Contract.class);
+		EasyMock.replay(gold);
+		
+		new User(1, gold , STORAGE_IN_BYTES).equals(null);
+	}
+	
+	/**
+	 * Test method for {@link commons.cloud.Request#equals()} and 
+	 * {@link commons.cloud.Request#hashCode()}.
+	 */
+	@Test(expected=AssertionError.class)
+	public void testEqualsWithAnotherClassObject() {
+		Contract gold = EasyMock.createStrictMock(Contract.class);
+		EasyMock.replay(gold);
+		
+		new User(1, gold , STORAGE_IN_BYTES).equals(new String(""));
+	}
+
 
 }

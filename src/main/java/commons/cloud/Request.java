@@ -108,28 +108,30 @@ public class Request{
 		this.totalProcessed += Math.min(processedDemand, getTotalToProcess());
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ (int) (arrivalTimeInMillis ^ (arrivalTimeInMillis >>> 32));
-		result = prime * result + (userID ^ (userID >>> 32));
+		result = prime * result + (int) (reqID ^ (reqID >>> 32));
+		result = prime * result + saasClient;
 		return result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		assert obj != null: "Comparing with a null object, check code.";
+		assert obj.getClass() == getClass(): "Comparing with an object of another class, check code."; 
+		
 		Request other = (Request) obj;
-		if (arrivalTimeInMillis != other.arrivalTimeInMillis)
+		if (saasClient != other.saasClient)
 			return false;
-		if (userID != other.userID)
+		if (reqID != other.reqID)
 			return false;
 		return true;
 	}

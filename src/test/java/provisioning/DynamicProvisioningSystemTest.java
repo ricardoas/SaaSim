@@ -27,6 +27,7 @@ import commons.config.Configuration;
 import commons.config.PropertiesTesting;
 import commons.io.WorkloadParser;
 import commons.sim.AccountingSystem;
+import commons.sim.DynamicConfigurable;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.util.SaaSAppProperties;
 
@@ -82,8 +83,6 @@ public class DynamicProvisioningSystemTest {
 		PowerMock.replayAll(config);
 		
 		assertNotNull(new DynamicProvisioningSystem());
-		
-		PowerMock.verifyAll();
 	}
 	
 
@@ -106,7 +105,7 @@ public class DynamicProvisioningSystemTest {
 	}
 
 	/**
-	 * Test method for {@link provisioning.DynamicProvisioningSystem#registerConfigurable(provisioning.DynamicConfigurable)}.
+	 * Test method for {@link provisioning.DynamicProvisioningSystem#registerConfigurable(commons.sim.DynamicConfigurable)}.
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
@@ -144,7 +143,7 @@ public class DynamicProvisioningSystemTest {
 	}
 	
 	/**
-	 * Test method for {@link provisioning.DynamicProvisioningSystem#registerConfigurable(provisioning.DynamicConfigurable)}.
+	 * Test method for {@link provisioning.DynamicProvisioningSystem#registerConfigurable(commons.sim.DynamicConfigurable)}.
 	 */
 	@SuppressWarnings("unchecked")
 	@Test

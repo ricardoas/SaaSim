@@ -6,6 +6,8 @@ public class PropertiesTesting {
 	public static final String VALID_WORKLOAD_2 = "src/test/resources/workload/w2.dat";
 	
 	public static final String VALID_FILE = "src/test/resources/config.properties";
+	public static final String VALID_RANJAN_FILE = "src/test/resources/config-ranjan.properties";
+	
 	public static final String INEXISTENT_CONFIG_FILE = "src/test/resources/inexistent.config";
 	public static final String INEXISTENT_PLANS_FILE = "src/test/resources/inexistent1.properties";
 	public static final String INEXISTENT_APP_FILE = "src/test/resources/inexistent2.properties";

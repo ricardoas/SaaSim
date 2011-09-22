@@ -1,14 +1,15 @@
 package commons.sim.components;
 
-import static commons.sim.util.SimulatorProperties.RANJAN_HEURISTIC_BACKLOG_SIZE;
-import static commons.sim.util.SimulatorProperties.RANJAN_HEURISTIC_NUMBER_OF_TOKENS;
+import static commons.sim.util.SimulatorProperties.*;
 import static org.junit.Assert.*;
 
 import java.util.Queue;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
@@ -18,6 +19,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import commons.cloud.MachineType;
 import commons.cloud.Request;
 import commons.config.Configuration;
+import commons.config.PropertiesTesting;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
@@ -30,10 +32,16 @@ public class MultiCoreRanjanMachineTest {
 	private static final long DEFAULT_MAX_NUM_OF_THREADS = 3;
 	
 	private MachineDescriptor descriptor;
+	
+	@BeforeClass
+	public static void buildConf() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.VALID_RANJAN_FILE);
+	}
 
 	@Before
 	public void setUp() {
 		this.descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
+		
 	}
 
 	@Test

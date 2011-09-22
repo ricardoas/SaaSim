@@ -1,6 +1,5 @@
 package commons.sim;
 
-import provisioning.DynamicConfigurable;
 
 
 /**

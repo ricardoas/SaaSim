@@ -14,6 +14,7 @@ import commons.cloud.User;
 import commons.cloud.UtilityResult;
 import commons.config.Configuration;
 import commons.sim.AccountingSystem;
+import commons.sim.DynamicConfigurable;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.util.SaaSAppProperties;

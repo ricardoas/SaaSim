@@ -103,12 +103,11 @@ public class User implements Comparable<User>{
 
 	@Override
 	public boolean equals(Object obj) {
+		assert obj != null: "Comparing with a null object, check code.";
+		assert obj.getClass() == getClass(): "Comparing with an object of another class, check code."; 
+
 		if (this == obj)
 			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
 		User other = (User) obj;
 		if (id != other.id)
 			return false;

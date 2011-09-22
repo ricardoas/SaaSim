@@ -2,6 +2,7 @@ package provisioning;
 
 
 import commons.cloud.UtilityResult;
+import commons.sim.DynamicConfigurable;
 
 /**
  * Dynamic Provisioning System interface. A DPS is a {@link Monitor} object too.
