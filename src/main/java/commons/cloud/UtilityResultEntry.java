@@ -58,13 +58,13 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 		@Override
 		public String toString() {
 			return userID 
-					+ "," + contractName 
-					+ "," + totalReceipt
-					+ "," + extraConsumedCPU 
-					+ "," + cpuCost
-					+ "," + consumedTransference
-					+ "," + transferenceCost
-					+ "," + storageCost;
+					+ "\t" + contractName 
+					+ "\t" + totalReceipt
+					+ "\t" + extraConsumedCPU 
+					+ "\t" + cpuCost
+					+ "\t" + consumedTransference
+					+ "\t" + transferenceCost
+					+ "\t" + storageCost;
 		}
 	}
 	
@@ -111,10 +111,10 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 		@Override
 		public String toString() {
 			return type 
-					+ "," + onDemandCPUHours 
-					+ "," + onDemandCost
-					+ "," + reservedCPUHours
-					+ "," + reservedCost;
+					+ "\t" + onDemandCPUHours 
+					+ "\t" + onDemandCost
+					+ "\t" + reservedCPUHours
+					+ "\t" + reservedCost;
 		}
 		
 		
@@ -205,17 +205,17 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 		@Override
 		public String toString() {
 			return name 
-					+ "," + cost
-					+ "," + inCost 
-					+ "," + outCost
-					+ "," + onDemandCost 
-					+ "," + reservedCost 
-					+ "," + inTransference
-					+ "," + outTransference
-					+ "," + onDemandCPUHours
-					+ "," + reservedCPUHours 
-					+ "," + monitoringCost
-					+ "," + format(types);
+					+ "\t" + cost
+					+ "\t" + inCost 
+					+ "\t" + outCost
+					+ "\t" + onDemandCost 
+					+ "\t" + reservedCost 
+					+ "\t" + inTransference
+					+ "\t" + outTransference
+					+ "\t" + onDemandCPUHours
+					+ "\t" + reservedCPUHours 
+					+ "\t" + monitoringCost
+					+ "\t" + format(types);
 		}
 	}
 
@@ -351,8 +351,8 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 
 	@Override
 	public String toString() {
-		return time + "," + getUtility() + "," + receipt	+ "," + cost + "," + penalty + ","
-				+ format(users) + "," + format(providers);
+		return time + "\t" + getUtility() + "\t" + receipt	+ "\t" + cost + "\t" + penalty + "\t"
+				+ format(users) + "\t" + format(providers);
 	}
 
 	/**
@@ -363,7 +363,7 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 		StringBuilder sb = new StringBuilder();
 		for (Entry<K, V> entry : map.entrySet()) {
 			sb.append(entry.getValue());
-			sb.append(',');
+			sb.append('\t');
 		}
 		return sb.toString().substring(0, sb.length()-1);
 	}
@@ -376,7 +376,7 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < map.length-1; i++) {
 			sb.append(map[i]);
-			sb.append(',');
+			sb.append('\t');
 		}
 		sb.append(map[map.length-1]);
 		return sb.toString();
