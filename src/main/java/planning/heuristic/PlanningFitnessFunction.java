@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.jgap.Chromosome;
 import org.jgap.FitnessFunction;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
