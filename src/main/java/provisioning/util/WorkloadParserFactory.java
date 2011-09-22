@@ -19,6 +19,8 @@ import commons.io.WorkloadParser;
  */
 public class WorkloadParserFactory {
 	
+	private static int index = 0;
+	
 	public static WorkloadParser<List<Request>> getWorkloadParser(){
 		return getWorkloadParser(Configuration.getInstance().getParserPageSize().getTickInMillis());
 	}
@@ -29,18 +31,34 @@ public class WorkloadParserFactory {
 		String[] workloads = config.getWorkloads();
 		ParserIdiom parserIdiom = config.getParserIdiom();
 		switch (parserIdiom) {
-		case GEIST:
-			WorkloadParser<Request>[] parsers = new WorkloadParser[workloads.length];
-			if(workloads.length == 1){
-				return new TimeBasedWorkloadParser(pageSize, new GEISTSingleFileWorkloadParser(workloads[0]));
-			}
-			for (int i = 0; i < parsers.length; i++) {
-				parsers[i] = new GEISTMultiFileWorkloadParser(workloads[i], i);
-			}
-			return new TimeBasedWorkloadParser(pageSize, parsers);
-		default:
-			throw new RuntimeException("No parser specified for value " + parserIdiom);
+			case GEIST:
+				WorkloadParser<Request>[] parsers = new WorkloadParser[workloads.length];
+				if(workloads.length == 1){
+					return new TimeBasedWorkloadParser(pageSize, new GEISTSingleFileWorkloadParser(workloads[0]));
+				}
+				for (int i = 0; i < parsers.length; i++) {
+					parsers[i] = new GEISTMultiFileWorkloadParser(workloads[i], index++);
+				}
+				return new TimeBasedWorkloadParser(pageSize, parsers);
+			default:
+				throw new RuntimeException("No parser specified for value " + parserIdiom);
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static WorkloadParser<Request>[] createNewParsers(long pageSize, String workloadFile, int numberOfParsers){
+		Configuration config = Configuration.getInstance();
+		ParserIdiom parserIdiom = config.getParserIdiom();
+		switch (parserIdiom) {
+			case GEIST:
+				WorkloadParser<Request>[] parsers = new WorkloadParser[numberOfParsers];
+				for (int i = 0; i < numberOfParsers; i++) {
+					parsers[i] = new GEISTMultiFileWorkloadParser(workloadFile, index++);
+				}
+				return parsers;
+			default:
+				throw new RuntimeException("No parser specified for value " + parserIdiom);
+		}	
 	}
 
 }
