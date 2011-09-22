@@ -173,10 +173,11 @@ public class PlanningFitnessFunctionTest {
 	}
 	
 	@Test
-	public void testCalculateCostWith2MachineTypes(){
+	public void testCalculateCostWith2MachineTypesAndNoOnDemandResources(){
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
 		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
 		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.SMALL, 0.6, 0.25, 99, 188, 5));
 		
 		Provider[] providers = new Provider[1];
 		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
@@ -202,7 +203,43 @@ public class PlanningFitnessFunctionTest {
 		currentPowerPerMachineType.put(MachineType.MEDIUM, 16);//8 machines with 2 cores
 		
 		double expectedCost = 100 * 10 + 99 * 8 + 144 + 3240;//One year fee for large + one year fee for medium + large usage + medium usage
-		assertEquals(expectedCost, function.calcCost(throughputPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType), 0.00001);
+		assertEquals(expectedCost, function.calcCost(throughputPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType, 0), 0.00001);
+		
+		PowerMock.verifyAll();
+	}
+	
+	@Test
+	public void testCalculateCostWith2MachineTypesAndOnDemandResources(){
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.SMALL, 0.2, 0.1, 50, 70, 5));
+		
+		Provider[] providers = new Provider[1];
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(5);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
+		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).times(2);
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(2);
+		
+		PowerMock.replayAll(config);
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(null, null, providers, null);
+		
+		Map<MachineType, Double> throughputPerMachineType = new HashMap<MachineType, Double>();
+		throughputPerMachineType.put(MachineType.LARGE, 10d);
+		throughputPerMachineType.put(MachineType.MEDIUM, 6d);
+		double meanServiceTimeInMillis = 500;
+		
+		Map<MachineType, Integer> currentPowerPerMachineType = new HashMap<MachineType, Integer>();
+		currentPowerPerMachineType.put(MachineType.LARGE, 30);//10 machines with 3 cores
+		currentPowerPerMachineType.put(MachineType.MEDIUM, 16);//8 machines with 2 cores
+		
+		double expectedCost = 100 * 10 + 99 * 8 + 144 + 3240 + 4320;//One year fee for large + one year fee for medium + large usage + medium usage + on-demand cost
+		assertEquals(expectedCost, function.calcCost(throughputPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType, 5), 0.00001);
 		
 		PowerMock.verifyAll();
 	}
@@ -212,6 +249,7 @@ public class PlanningFitnessFunctionTest {
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
 		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
 		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.SMALL, 0.2, 0.1, 50, 70, 5));
 		
 		Provider[] providers = new Provider[1];
 		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
@@ -237,7 +275,43 @@ public class PlanningFitnessFunctionTest {
 		currentPowerPerMachineType.put(MachineType.MEDIUM, 16);//8 machines with 2 cores
 		
 		double expectedCost = 100 * 10 + 99 *8 + 143.9986;//One year fee for large + one year fee for medium + large usage + medium usage
-		assertEquals(expectedCost, function.calcCost(throughputPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType), 0.01);
+		assertEquals(expectedCost, function.calcCost(throughputPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType, 0), 0.01);
+		
+		PowerMock.verifyAll();
+	}
+	
+	@Test
+	public void testCalculateCostWithOnlyOneThroughputAndOnDemandResources(){
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.SMALL, 0.1, 0.05, 50, 70, 5));
+		
+		Provider[] providers = new Provider[1];
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(5);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
+		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).times(2);
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(2);
+		
+		PowerMock.replayAll(config);
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(null, null, providers, null);
+		
+		Map<MachineType, Double> throughputPerMachineType = new HashMap<MachineType, Double>();
+		throughputPerMachineType.put(MachineType.LARGE, 10d);
+		throughputPerMachineType.put(MachineType.MEDIUM, 0d);//Machine reserved but not used
+		double meanServiceTimeInMillis = 500;
+		
+		Map<MachineType, Integer> currentPowerPerMachineType = new HashMap<MachineType, Integer>();
+		currentPowerPerMachineType.put(MachineType.LARGE, 30);//10 machines with 3 cores
+		currentPowerPerMachineType.put(MachineType.MEDIUM, 16);//8 machines with 2 cores
+		
+		double expectedCost = 100 * 10 + 99 *8 + 143.9986 + 2160;//One year fee for large + one year fee for medium + large usage + medium usage
+		assertEquals(expectedCost, function.calcCost(throughputPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType, 5), 0.01);
 		
 		PowerMock.verifyAll();
 	}
@@ -247,6 +321,7 @@ public class PlanningFitnessFunctionTest {
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
 		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
 		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.SMALL, 0.1, 0.05, 50, 70, 5));
 		
 		Provider[] providers = new Provider[1];
 		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
@@ -267,7 +342,7 @@ public class PlanningFitnessFunctionTest {
 		currentPowerPerMachineType.put(MachineType.LARGE, 30);//10 machines with 3 cores
 		currentPowerPerMachineType.put(MachineType.MEDIUM, 16);//8 machines with 2 cores
 		
-		assertEquals(0, function.calcCost(throughputPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType), 0.00001);
+		assertEquals(0, function.calcCost(throughputPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType, 0d), 0.00001);
 		
 		PowerMock.verifyAll();
 	}
@@ -277,6 +352,7 @@ public class PlanningFitnessFunctionTest {
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
 		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
 		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.SMALL, 0.1, 0.05, 50, 70, 5));
 		
 		Provider[] providers = new Provider[1];
 		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
@@ -302,7 +378,43 @@ public class PlanningFitnessFunctionTest {
 		currentPowerPerMachineType.put(MachineType.MEDIUM, 16);//8 machines with 2 cores
 		
 		double expectedCost = 100 * 10 + 99 *8;//One year fee for large + one year fee for medium + large usage + medium usage
-		assertEquals(expectedCost, function.calcCost(throughputPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType), 0.00001);
+		assertEquals(expectedCost, function.calcCost(throughputPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType, 0d), 0.00001);
+		
+		PowerMock.verifyAll();
+	}
+	
+	@Test
+	public void testCalculateCostWithoutDemand2AndOnDemandResources(){
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.SMALL, 0.1, 0.05, 50, 70, 5));
+		
+		Provider[] providers = new Provider[1];
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(5);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(12l);
+		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).times(2);
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(2);
+		
+		PowerMock.replayAll(config);
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(null, null, providers, null);
+		
+		Map<MachineType, Double> throughputPerMachineType = new HashMap<MachineType, Double>();
+		throughputPerMachineType.put(MachineType.LARGE, 10d);
+		throughputPerMachineType.put(MachineType.MEDIUM, 0d);//Machine reserved but not used
+		double meanServiceTimeInMillis = 0;
+		
+		Map<MachineType, Integer> currentPowerPerMachineType = new HashMap<MachineType, Integer>();
+		currentPowerPerMachineType.put(MachineType.LARGE, 30);//10 machines with 3 cores
+		currentPowerPerMachineType.put(MachineType.MEDIUM, 16);//8 machines with 2 cores
+		
+		double expectedCost = 100 * 10 + 99 *8;//One year fee for large + one year fee for medium + large usage + medium usage
+		assertEquals(expectedCost, function.calcCost(throughputPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType, 10d), 0.00001);
 		
 		PowerMock.verifyAll();
 	}
@@ -896,6 +1008,7 @@ public class PlanningFitnessFunctionTest {
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
 		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
 		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.SMALL, 0.01, 0.0005, 99, 188, 5));
 		
 		Provider[] providers = new Provider[1];
 		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
@@ -948,8 +1061,8 @@ public class PlanningFitnessFunctionTest {
 		EasyMock.replay(chromosome, genes[0], genes[1]);
 		
 		double receipt = 555 + 100 + 0 + 99.765 + 100 + 6;//for each contract: price + setup + extra cpu
-		double cost = 100 * 15 + 8640 * 0.01 + 99 * 5 + 8640 * 0.25;//for each machine type: reservation fee + usage
-		double penalties = 555 + 99.765;//Since loss is more than 5%, SaaS client does not pay the provider
+		double cost = 100 * 15 + 8640 * 0.01 + 99 * 5 + 8640 * 0.25 + 864;//for each machine type: reservation fee + usage + on-demand cost
+		double penalties = 0;//Since loss is more than 5%, SaaS client does not pay the provider
 		
 		assertEquals(1/Math.abs(receipt - cost - penalties) + 1, function.evaluate(chromosome), 0.0001);
 		
@@ -978,6 +1091,7 @@ public class PlanningFitnessFunctionTest {
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
 		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
 		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.SMALL, 0.01, 0.0005, 99, 188, 5));
 		
 		Provider[] providers = new Provider[1];
 		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
@@ -1030,8 +1144,8 @@ public class PlanningFitnessFunctionTest {
 		EasyMock.replay(chromosome, genes[0], genes[1]);
 		
 		double receipt = 555 + 10000 + 0 + 99.765 + 10000 + 6;//for each contract: price + setup + extra cpu
-		double cost = 100 * 15 + 8640 * 0.01 + 99 * 5 + 8640 * 0.25;//for each machine type: reservation fee + usage
-		double penalties = 555 + 99.765;//Since loss is more than 5%, SaaS client does not pay the provider
+		double cost = 100 * 15 + 8640 * 0.01 + 99 * 5 + 8640 * 0.25 + 864;//for each machine type: reservation fee + usage
+		double penalties = 0;//Since loss is more than 5%, SaaS client does not pay the provider
 		
 		assertEquals(receipt - cost - penalties, function.evaluate(chromosome), 0.0001);
 		

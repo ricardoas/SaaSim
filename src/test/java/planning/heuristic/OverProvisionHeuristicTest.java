@@ -1,9 +1,9 @@
 package planning.heuristic;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,13 +16,16 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import provisioning.util.WorkloadParserFactory;
 
+import commons.cloud.Contract;
 import commons.cloud.MachineType;
 import commons.cloud.Request;
 import commons.config.Configuration;
 import commons.io.TimeBasedWorkloadParser;
 import commons.io.WorkloadParser;
 import commons.sim.util.SaaSAppProperties;
+import commons.sim.util.SaaSUsersProperties;
 import commons.sim.util.SimulatorProperties;
+import commons.util.Pair;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({WorkloadParserFactory.class, Configuration.class})
@@ -31,11 +34,21 @@ public class OverProvisionHeuristicTest {
 	@Test
 	public void testFindPlanWithWorkloadWithEmptyWorkload() throws Exception{
 		long sla = 8000l;
+		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
 		
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
+		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
+		
+		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
+		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
+		
+		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
+		config.setWorkloadsPerUser(workloadsPerUser);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
 	
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
@@ -44,6 +57,7 @@ public class OverProvisionHeuristicTest {
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(new ArrayList<Request>());
 		EasyMock.expect(parser.hasNext()).andReturn(false);
+		parser.clear();
 		PowerMock.replay(TimeBasedWorkloadParser.class);
 		
 		PowerMock.replayAll(config, parser);
@@ -63,6 +77,8 @@ public class OverProvisionHeuristicTest {
 	@Test
 	public void testFindPlanWithWorkloadWithUniqueUsersAndDifferentNumberOfRequests() throws Exception{
 		long sla = 8000l;
+		
+		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
 		
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(request.getUserID()).andReturn(1);
@@ -98,18 +114,29 @@ public class OverProvisionHeuristicTest {
 		
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
-		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
+		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
 		
+		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
+		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
+		
+		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
+		config.setWorkloadsPerUser(workloadsPerUser);
+		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
+	
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
 		EasyMock.expect(WorkloadParserFactory.getWorkloadParser(sla)).andReturn(parser);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
+		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(false);
+		parser.clear();
 		PowerMock.replay(TimeBasedWorkloadParser.class);
 		
 		PowerMock.replayAll(parser, config, request, request2, request3, request4, request5, request6, request7, request8, request9);
@@ -129,6 +156,7 @@ public class OverProvisionHeuristicTest {
 	@Test
 	public void testFindPlanWithWorkloadWithRepeatedUsersAndDifferentNumberOfRequests() throws Exception{
 		long sla = 8000l;
+		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
 		
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(request.getUserID()).andReturn(1);
@@ -164,18 +192,29 @@ public class OverProvisionHeuristicTest {
 		
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
-		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
+		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
 		
+		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
+		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
+		
+		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
+		config.setWorkloadsPerUser(workloadsPerUser);
+		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
+	
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
 		EasyMock.expect(WorkloadParserFactory.getWorkloadParser(sla)).andReturn(parser);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
+		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(false);
+		parser.clear();
 		PowerMock.replay(TimeBasedWorkloadParser.class);
 		
 		PowerMock.replayAll(parser, config, request, request2, request3, request4, request5, request6, request7, request8, request9);
@@ -195,6 +234,7 @@ public class OverProvisionHeuristicTest {
 	@Test
 	public void testFindPlanWithWorkloadWithRepeatedUsersAndDifferentNumberOfRequests2() throws Exception{
 		long sla = 8000l;
+		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
 		
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(request.getUserID()).andReturn(1);
@@ -230,18 +270,29 @@ public class OverProvisionHeuristicTest {
 		
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
-		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
+		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
 		
+		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
+		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
+		
+		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
+		config.setWorkloadsPerUser(workloadsPerUser);
+		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
+	
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
 		EasyMock.expect(WorkloadParserFactory.getWorkloadParser(sla)).andReturn(parser);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
+		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(false);
+		parser.clear();
 		PowerMock.replay(TimeBasedWorkloadParser.class);
 		
 		PowerMock.replayAll(parser, config, request, request2, request3, request4, request5, request6, request7, request8, request9);
@@ -261,6 +312,7 @@ public class OverProvisionHeuristicTest {
 	@Test
 	public void testFindPlanWithWorkloadWithUniqueUsersAndSameNumberOfRequests() throws Exception{
 		long sla = 8000l;
+		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
 		
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(request.getUserID()).andReturn(1);
@@ -293,18 +345,29 @@ public class OverProvisionHeuristicTest {
 		
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
-		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
+		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
 		
+		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
+		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
+		
+		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
+		config.setWorkloadsPerUser(workloadsPerUser);
+		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
+	
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
 		EasyMock.expect(WorkloadParserFactory.getWorkloadParser(sla)).andReturn(parser);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
+		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(false);
+		parser.clear();
 		PowerMock.replay(TimeBasedWorkloadParser.class);
 		
 		PowerMock.replayAll(parser, config, request, request2, request3, request4, request5, request6, request7, request8);
@@ -324,6 +387,7 @@ public class OverProvisionHeuristicTest {
 	@Test
 	public void testFindPlanWithWorkloadWithRepeatedUsersAndSameNumberOfRequests() throws Exception{
 		long sla = 8000l;
+		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
 		
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(request.getUserID()).andReturn(1);
@@ -356,18 +420,29 @@ public class OverProvisionHeuristicTest {
 		
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
-		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
+		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
 		
+		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
+		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
+		
+		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
+		config.setWorkloadsPerUser(workloadsPerUser);
+		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
+	
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
 		EasyMock.expect(WorkloadParserFactory.getWorkloadParser(sla)).andReturn(parser);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
+		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(false);
+		parser.clear();
 		PowerMock.replay(TimeBasedWorkloadParser.class);
 		
 		PowerMock.replayAll(parser, config, request, request2, request3, request4, request5, request6, request7, request8);
@@ -387,6 +462,7 @@ public class OverProvisionHeuristicTest {
 	@Test
 	public void testFindPlanWithWorkloadWithRepeatedUsersAndSametNumberOfRequests2() throws Exception{
 		long sla = 8000l;
+		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
 		
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(request.getUserID()).andReturn(1);
@@ -419,18 +495,29 @@ public class OverProvisionHeuristicTest {
 		
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
-		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
+		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
 		
+		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
+		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
+		
+		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
+		config.setWorkloadsPerUser(workloadsPerUser);
+		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
+	
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
 		EasyMock.expect(WorkloadParserFactory.getWorkloadParser(sla)).andReturn(parser);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
+		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(false);
+		parser.clear();
 		PowerMock.replay(TimeBasedWorkloadParser.class);
 		
 		PowerMock.replayAll(parser, config, request, request2, request3, request4, request5, request6, request7, request8);

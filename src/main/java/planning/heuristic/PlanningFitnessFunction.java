@@ -64,16 +64,18 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		//Assuming a base computing power (e.g., EC2 unit for each core)
 		Map<MachineType, Double> throughputPerMachineType = new HashMap<MachineType, Double>();
 		double totalThroughput = 0d;
+		double onDemandThroughput = 0d;
 		for(MachineType type : arrivalRatesPerMachineType.keySet()){
 			Double currentArrivalRate = arrivalRatesPerMachineType.get(type);
 			double maximumThroughput = (1 / (meanServiceTimeInMillis/1000)) * Configuration.getInstance().getRelativePower(type);//Using all cores
 			if(currentArrivalRate > maximumThroughput){//Requests are missed
 				throughputPerMachineType.put(type, maximumThroughput);
-				totalThroughput += maximumThroughput;
+				onDemandThroughput += currentArrivalRate - maximumThroughput;
+//				totalThroughput += maximumThroughput;
 			}else{
 				throughputPerMachineType.put(type, currentArrivalRate);
-				totalThroughput += currentArrivalRate;
 			}
+			totalThroughput += currentArrivalRate;
 		}
 		
 		double totalNumberOfUsers = aggregateNumberOfUsers();
@@ -84,7 +86,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		
 		//Estimating utility
 		double receipt = calcReceipt();
-		double cost = calcCost(throughputPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType);
+		double cost = calcCost(throughputPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType, onDemandThroughput);
 		double penalties = calcPenalties(responseTimeInSeconds, arrivalRate, totalThroughput);
 		
 		double fitness = receipt - cost - penalties;
@@ -111,11 +113,12 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		return penalty;
 	}
 
-	protected double calcCost(Map<MachineType, Double> throughputPerMachineType, double meanServiceTimeInMillis, Map<MachineType, Integer> currentPowerPerMachineType) {
+	protected double calcCost(Map<MachineType, Double> throughputPerMachineType, double meanServiceTimeInMillis, Map<MachineType, Integer> currentPowerPerMachineType, double onDemandThroughput) {
 		long totalTimeInSeconds = Configuration.getInstance().getLong(SimulatorProperties.PLANNING_PERIOD) * 24 * 60 * 60;
 		Provider provider = cloudProviders[0];
 		double cost = 0;
 		
+		//Reserved Costs
 		for(MachineType type : throughputPerMachineType.keySet()){
 			Double throughput = throughputPerMachineType.get(type) / Configuration.getInstance().getRelativePower(type);
 			double CPUHoursPerType = (throughput * totalTimeInSeconds * meanServiceTimeInMillis) / 3600000;
@@ -123,6 +126,10 @@ public class PlanningFitnessFunction extends FitnessFunction{
 			cost += provider.getReservationOneYearFee(type) * (currentPowerPerMachineType.get(type)/Configuration.getInstance().getRelativePower(type)) 
 							+ provider.getReservedCpuCost(type) * CPUHoursPerType;
 		}
+		
+		//On-demand costs
+		double onDemandCPUHours = (onDemandThroughput * totalTimeInSeconds * meanServiceTimeInMillis) / 3600000;
+		cost +=  provider.getOnDemandCpuCost(MachineType.SMALL) * onDemandCPUHours;
 		
 		return cost;
 	}
