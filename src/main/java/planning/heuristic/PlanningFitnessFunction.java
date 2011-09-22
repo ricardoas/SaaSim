@@ -58,7 +58,11 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		//Calculating arrival rates per machine type
 		Map<MachineType, Double> arrivalRatesPerMachineType = new HashMap<MachineType, Double>();
 		for(MachineType type : currentPowerPerMachineType.keySet()){
-			arrivalRatesPerMachineType.put(type, (currentPowerPerMachineType.get(type) / totalPower) * arrivalRate);
+			if(totalPower == 0){
+				arrivalRatesPerMachineType.put(type, 0d);
+			}else{
+				arrivalRatesPerMachineType.put(type, (currentPowerPerMachineType.get(type) / totalPower) * arrivalRate);
+			}
 		}
 		
 		//Assuming a base computing power (e.g., EC2 unit for each core)
@@ -71,11 +75,15 @@ public class PlanningFitnessFunction extends FitnessFunction{
 			if(currentArrivalRate > maximumThroughput){//Requests are missed
 				throughputPerMachineType.put(type, maximumThroughput);
 				onDemandThroughput += currentArrivalRate - maximumThroughput;
-//				totalThroughput += maximumThroughput;
 			}else{
 				throughputPerMachineType.put(type, currentArrivalRate);
 			}
 			totalThroughput += currentArrivalRate;
+		}
+		
+		if(totalThroughput == 0){//No arrival at reserved machines!
+			totalThroughput = arrivalRate;
+			onDemandThroughput = arrivalRate;
 		}
 		
 		double totalNumberOfUsers = aggregateNumberOfUsers();
@@ -87,7 +95,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		//Estimating utility
 		double receipt = calcReceipt();
 		double cost = calcCost(throughputPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType, onDemandThroughput);
-		double penalties = calcPenalties(responseTimeInSeconds, arrivalRate, totalThroughput);
+		double penalties = calcPenalties(responseTimeInSeconds, arrivalRate, arrivalRate);
 		
 		double fitness = receipt - cost - penalties;
 		
@@ -140,12 +148,10 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		double oneTimeFees = 0d;
 		for(Entry<User, List<Summary>> entry : this.summaries.entrySet()){
 			Contract contract = entry.getKey().getContract();
-			long totalCPUHrs = 0l;
 			for(Summary summary : entry.getValue()){
-				totalCPUHrs += summary.getTotalCpuHrs();
+				long totalCPUHrs = (long) summary.getTotalCpuHrs();
+				contract.calculateReceipt(resultEntry, entry.getKey().getId(), totalCPUHrs * 60 * 60 * 1000, 0l, 0l, 0l);
 			}
-			
-			contract.calculateReceipt(resultEntry, entry.getKey().getId(), totalCPUHrs * 60 * 60 * 1000, 0l, 0l, 0l);
 			oneTimeFees += contract.calculateOneTimeFees();
 		}
 		
