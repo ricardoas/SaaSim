@@ -118,9 +118,8 @@ public class Contract implements Comparable<Contract>{
 		if (getClass() != obj.getClass())
 			return false;
 		Contract other = (Contract) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
+		if (name == null && other.name != null) {
+			return false;
 		} else if (!name.equals(other.name))
 			return false;
 		return true;

@@ -32,6 +32,8 @@
   		<groupId>org.jgap</groupId>
   		<artifactId>JGAP</artifactId>
   		<version>3.5</version>
+  		<scope>system</scope>
+  		<systemPath>${basedir}/3rdparty/jgap.jar</systemPath>
   	</dependency>
   	<dependency>
   		<groupId>org.powermock</groupId>

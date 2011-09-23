@@ -1,7 +1,6 @@
 package commons.cloud;
 
-import static org.junit.Assert.assertEquals;
-
+import static org.junit.Assert.*;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -196,6 +195,7 @@ public class ContractTest {
 	@Test
 	public void testCalculatePenaltyWithSmallLoss(){
 		assertEquals(0, c1.calculatePenalty(0.0001), 0.0);
+		assertEquals(price / 4, c1.calculatePenalty(0.005), 0.0);
 		assertEquals(price / 2, c1.calculatePenalty(0.05), 0.0);
 		assertEquals(price, c1.calculatePenalty(0.09999999), 0.0);
 		assertEquals(price, c1.calculatePenalty(0.1), 0.0);
@@ -206,5 +206,35 @@ public class ContractTest {
 		assertEquals(price, c1.calculatePenalty(0.100001), 0.0);
 		assertEquals(price, c1.calculatePenalty(0.5), 0.0);
 		assertEquals(price, c1.calculatePenalty(0.99999), 0.0);
+	}
+	
+	@Test 
+	public void testHashCodeEqualsConsistencyWithSameName() {
+		assertTrue(c1.equals(c1));
+		assertTrue(c2.equals(c1));
+		assertTrue(c1.equals(c2));
+		assertTrue(c2.hashCode() == c1.hashCode());
+	}
+	
+	@Test 
+	public void testHashCodeEqualsConsistencyWithDifferentName() {
+		Contract c4 = new Contract("gold", HIGH, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
+		assertFalse(c4.equals(c3));
+		assertFalse(c3.equals(c4));
+		assertFalse(c4.hashCode() == c3.hashCode());
+	}
+	
+	@Test
+	public void testHashCodeEqualsConsistencyWithNameNull() {
+		Contract c5 = new Contract(null, HIGH, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
+		assertFalse(c3.equals(null));
+		assertFalse(c5.equals(c3));
+		assertFalse(c3.hashCode() == c5.hashCode()); 
+	}
+	
+	@Test
+	public void testEqualsWithAnotherObjectClass() {
+		Contract c5 = new Contract(null, HIGH, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
+		assertFalse(c1.equals(new User(1, c5, 0)));
 	}
 }

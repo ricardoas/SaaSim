@@ -1,9 +1,10 @@
 package commons.cloud;
 
-import static org.junit.Assert.assertEquals;
-
+import static org.junit.Assert.*;
 import org.easymock.EasyMock;
 import org.junit.Test;
+
+import commons.sim.components.MachineDescriptor;
 
 public class UtilityResultEntryTest {
 	
@@ -69,9 +70,7 @@ public class UtilityResultEntryTest {
 		EasyMock.replay(user1, user2);
 		
 		User [] users = new User[]{};
-		users[0] = user1;
-		users[1] = user2;
-		
+	
 		UtilityResultEntry entry = new UtilityResultEntry(0, users, new Provider[]{});
 		int cpuCost = 50;
 		int transferenceCost = 111;
@@ -189,6 +188,37 @@ public class UtilityResultEntryTest {
 		assertEquals(totalCost, entry.getCost(), 0.00001);
 		assertEquals(0, entry.getPenalty(), 0.00001);
 		assertEquals(totalReceipt - totalCost, entry.getUtility(), 0.0001);
+	}
+	
+	@Test
+	public void testHashCodeEqualsConsistencyWithSameTime() {
+		UtilityResultEntry entry = new UtilityResultEntry(2, new User[]{}, new Provider[]{});
+		UtilityResultEntry entryClone = new UtilityResultEntry(2, new User[]{}, new Provider[]{});
+		assertTrue(entry.equals(entryClone));
+		assertTrue(entry.equals(entryClone));
+		assertTrue(entryClone.equals(entry));
+		assertTrue(entry.hashCode() == entryClone.hashCode());
+	}
+	
+	@Test
+	public void testHashCodeEqualsConsistencyWithDifferentTime() {
+		UtilityResultEntry entry1 = new UtilityResultEntry(2, new User[]{}, new Provider[]{});
+		UtilityResultEntry entry2 = new UtilityResultEntry(10, new User[]{}, new Provider[]{});
+		assertFalse(entry1.equals(entry2));
+		assertFalse(entry2.equals(entry1));
+		assertFalse(entry1.hashCode() == entry2.hashCode());
+	}
+	
+	@Test
+	public void testEqualsConsistencyWithNullObject() {
+		UtilityResultEntry entry1 = new UtilityResultEntry(2, new User[]{}, new Provider[]{});
+		assertFalse(entry1.equals(null));
+	}
+	
+	@Test
+	public void testEqualsConsistencyWithAnotherClassObject() {
+		UtilityResultEntry entry1 = new UtilityResultEntry(2, new User[]{}, new Provider[]{});
+		assertFalse(entry1.equals(new MachineDescriptor(0, false, MachineType.SMALL, 0)));
 	}
 }
 

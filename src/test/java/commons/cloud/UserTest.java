@@ -16,7 +16,7 @@ public class UserTest {
 	
 	private static final int STORAGE_IN_BYTES = 1024000;
 	private static final double SETUP = 1000.0;
-
+	
 	/**
 	 * Test method for {@link commons.cloud.User#calculatePartialReceipt()}.
 	 */
@@ -30,7 +30,7 @@ public class UserTest {
 		
 		contract.calculateReceipt(entry, user.getId(), 0, 0, 0, STORAGE_IN_BYTES);
 		EasyMock.replay(contract, entry);
-		
+	
 		user.calculatePartialReceipt(entry);
 	
 		EasyMock.verify(contract, entry);

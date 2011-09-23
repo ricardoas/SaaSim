@@ -25,6 +25,17 @@ public class RequestTest {
 	public void setUp(){
 		request = new Request(1l, 1, 17756636, 0, 100, 1024000, new long[]{SMALL_DEMAND, LARGE_DEMAND, XLARGE_DEMAND});
 	}
+	
+	@Test
+	public void testConstructor() {
+		Request request = new Request(1l, 1, 17756636, 0, 100, 1024000, new long[]{SMALL_DEMAND, LARGE_DEMAND, XLARGE_DEMAND});
+		assertEquals(1, request.getSaasClient());
+		assertEquals(17756636, request.getUserID());
+		assertEquals(0, request.getArrivalTimeInMillis());
+		assertEquals(100, request.getRequestSizeInBytes());
+		assertEquals(1024000, request.getResponseSizeInBytes());
+		assertEquals(3, request.getCpuDemandInMillis().length);
+	}
 
 	/**
 	 * Test method for {@link commons.cloud.Request#assignTo(MachineType)}.
@@ -37,6 +48,7 @@ public class RequestTest {
 		assertEquals(LARGE_DEMAND, request.getTotalToProcess());
 		request.assignTo(MachineType.XLARGE);
 		assertEquals(XLARGE_DEMAND, request.getTotalToProcess());
+		assertEquals(MachineType.XLARGE, request.getValue());
 	}
 
 	/**
