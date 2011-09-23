@@ -29,6 +29,7 @@ import commons.config.PropertiesTesting;
  *
  */
 @RunWith(PowerMockRunner.class)
+@PrepareForTest(AccountingSystem.class)
 public class AccountingSystemTest {
 	
 	@Before
@@ -57,7 +58,6 @@ public class AccountingSystemTest {
 	 * Test method for {@link commons.sim.AccountingSystem#accountPartialUtility(long)}.
 	 * @throws Exception 
 	 */
-	@PrepareForTest(AccountingSystem.class)
 	@Test
 	public void testAccountPartialUtility() throws Exception {
 		Provider[] providers = Configuration.getInstance().getProviders();
@@ -108,7 +108,6 @@ public class AccountingSystemTest {
 	 * Test method for {@link commons.sim.AccountingSystem#calculateUtility()}.
 	 * @throws Exception 
 	 */
-	@PrepareForTest(AccountingSystem.class)
 	@Test
 	public void testCalculateUtility() throws Exception {
 		

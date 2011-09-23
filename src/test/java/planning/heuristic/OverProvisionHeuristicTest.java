@@ -27,510 +27,510 @@ import commons.sim.util.SaaSUsersProperties;
 import commons.sim.util.SimulatorProperties;
 import commons.util.Pair;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({WorkloadParserFactory.class, Configuration.class})
+//@RunWith(PowerMockRunner.class)
+//@PrepareForTest({WorkloadParserFactory.class, Configuration.class})
 public class OverProvisionHeuristicTest {
 	
-	@Test
-	public void testFindPlanWithWorkloadWithEmptyWorkload() throws Exception{
-		long sla = 8000l;
-		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
-		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
-		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
-		
-		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
-		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
-		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
-		
-		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
-		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
-		config.setWorkloadsPerUser(workloadsPerUser);
-		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
-	
-		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
-		PowerMock.mockStatic(WorkloadParserFactory.class);
-		EasyMock.expect(WorkloadParserFactory.getWorkloadParser(sla)).andReturn(parser);
-		EasyMock.expect(parser.hasNext()).andReturn(true);
-		EasyMock.expect(parser.next()).andReturn(new ArrayList<Request>());
-		EasyMock.expect(parser.hasNext()).andReturn(false);
-		parser.clear();
-		PowerMock.replay(TimeBasedWorkloadParser.class);
-		
-		PowerMock.replayAll(config, parser);
-		
-		OverProvisionHeuristic heuristic = new OverProvisionHeuristic();
-		heuristic.findPlan(null, null, null);
-		
-		Map<MachineType, Integer> plan = heuristic.getPlan(null);
-		assertNotNull(plan);
-		assertEquals(1, plan.size());
-		int value = plan.get(MachineType.SMALL);
-		assertEquals(0, value);
-		
-		PowerMock.verifyAll();
-	}
-	
-	@Test
-	public void testFindPlanWithWorkloadWithUniqueUsersAndDifferentNumberOfRequests() throws Exception{
-		long sla = 8000l;
-		
-		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
-		
-		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getUserID()).andReturn(1);
-		Request request2 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request2.getUserID()).andReturn(2);
-		Request request3 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request3.getUserID()).andReturn(3);
-		Request request4 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request4.getUserID()).andReturn(4);
-		Request request5 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request5.getUserID()).andReturn(5);
-		Request request6 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request6.getUserID()).andReturn(6);
-		Request request7 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request7.getUserID()).andReturn(7);
-		Request request8 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request8.getUserID()).andReturn(8);
-		Request request9 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request9.getUserID()).andReturn(9);
-		
-		List<Request> firstIntervalRequests = new ArrayList<Request>();
-		firstIntervalRequests.add(request);
-		firstIntervalRequests.add(request2);
-		firstIntervalRequests.add(request3);
-		firstIntervalRequests.add(request4);
-		
-		List<Request> secondIntervalRequests = new ArrayList<Request>();
-		secondIntervalRequests.add(request5);
-		secondIntervalRequests.add(request6);
-		secondIntervalRequests.add(request7);
-		secondIntervalRequests.add(request8);
-		secondIntervalRequests.add(request9);
-		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
-		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
-		
-		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
-		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
-		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
-		
-		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
-		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
-		config.setWorkloadsPerUser(workloadsPerUser);
-		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
-	
-		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
-		PowerMock.mockStatic(WorkloadParserFactory.class);
-		EasyMock.expect(WorkloadParserFactory.getWorkloadParser(sla)).andReturn(parser);
-		EasyMock.expect(parser.hasNext()).andReturn(true);
-		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
-		EasyMock.expect(parser.hasNext()).andReturn(true);
-		EasyMock.expect(parser.hasNext()).andReturn(true);
-		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
-		EasyMock.expect(parser.hasNext()).andReturn(false);
-		parser.clear();
-		PowerMock.replay(TimeBasedWorkloadParser.class);
-		
-		PowerMock.replayAll(parser, config, request, request2, request3, request4, request5, request6, request7, request8, request9);
-		
-		OverProvisionHeuristic heuristic = new OverProvisionHeuristic();
-		heuristic.findPlan(null, null, null);
-		
-		Map<MachineType, Integer> plan = heuristic.getPlan(null);
-		assertNotNull(plan);
-		assertEquals(1, plan.size());
-		int value = plan.get(MachineType.SMALL);
-		assertEquals(5 * OverProvisionHeuristic.FACTOR, value, 0.0001);
-		
-		PowerMock.verifyAll();
-	}
-	
-	@Test
-	public void testFindPlanWithWorkloadWithRepeatedUsersAndDifferentNumberOfRequests() throws Exception{
-		long sla = 8000l;
-		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
-		
-		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getUserID()).andReturn(1);
-		Request request2 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request2.getUserID()).andReturn(2);
-		Request request3 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request3.getUserID()).andReturn(3);
-		Request request4 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request4.getUserID()).andReturn(4);
-		Request request5 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request5.getUserID()).andReturn(5);
-		Request request6 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request6.getUserID()).andReturn(5);
-		Request request7 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request7.getUserID()).andReturn(7);
-		Request request8 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request8.getUserID()).andReturn(8);
-		Request request9 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request9.getUserID()).andReturn(9);
-		
-		List<Request> firstIntervalRequests = new ArrayList<Request>();
-		firstIntervalRequests.add(request);
-		firstIntervalRequests.add(request2);
-		firstIntervalRequests.add(request3);
-		firstIntervalRequests.add(request4);
-		
-		List<Request> secondIntervalRequests = new ArrayList<Request>();
-		secondIntervalRequests.add(request5);
-		secondIntervalRequests.add(request6);
-		secondIntervalRequests.add(request7);
-		secondIntervalRequests.add(request8);
-		secondIntervalRequests.add(request9);
-		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
-		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
-		
-		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
-		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
-		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
-		
-		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
-		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
-		config.setWorkloadsPerUser(workloadsPerUser);
-		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
-	
-		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
-		PowerMock.mockStatic(WorkloadParserFactory.class);
-		EasyMock.expect(WorkloadParserFactory.getWorkloadParser(sla)).andReturn(parser);
-		EasyMock.expect(parser.hasNext()).andReturn(true);
-		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
-		EasyMock.expect(parser.hasNext()).andReturn(true);
-		EasyMock.expect(parser.hasNext()).andReturn(true);
-		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
-		EasyMock.expect(parser.hasNext()).andReturn(false);
-		parser.clear();
-		PowerMock.replay(TimeBasedWorkloadParser.class);
-		
-		PowerMock.replayAll(parser, config, request, request2, request3, request4, request5, request6, request7, request8, request9);
-		
-		OverProvisionHeuristic heuristic = new OverProvisionHeuristic();
-		heuristic.findPlan(null, null, null);
-		
-		Map<MachineType, Integer> plan = heuristic.getPlan(null);
-		assertNotNull(plan);
-		assertEquals(1, plan.size());
-		int value = plan.get(MachineType.SMALL);
-		assertEquals(Math.ceil(4 * OverProvisionHeuristic.FACTOR), value, 0.0001);
-		
-		PowerMock.verifyAll();
-	}
-	
-	@Test
-	public void testFindPlanWithWorkloadWithRepeatedUsersAndDifferentNumberOfRequests2() throws Exception{
-		long sla = 8000l;
-		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
-		
-		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getUserID()).andReturn(1);
-		Request request2 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request2.getUserID()).andReturn(1);
-		Request request3 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request3.getUserID()).andReturn(1);
-		Request request4 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request4.getUserID()).andReturn(1);
-		Request request5 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request5.getUserID()).andReturn(5);
-		Request request6 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request6.getUserID()).andReturn(5);
-		Request request7 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request7.getUserID()).andReturn(5);
-		Request request8 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request8.getUserID()).andReturn(9);
-		Request request9 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request9.getUserID()).andReturn(9);
-		
-		List<Request> firstIntervalRequests = new ArrayList<Request>();
-		firstIntervalRequests.add(request);
-		firstIntervalRequests.add(request2);
-		firstIntervalRequests.add(request3);
-		firstIntervalRequests.add(request4);
-		
-		List<Request> secondIntervalRequests = new ArrayList<Request>();
-		secondIntervalRequests.add(request5);
-		secondIntervalRequests.add(request6);
-		secondIntervalRequests.add(request7);
-		secondIntervalRequests.add(request8);
-		secondIntervalRequests.add(request9);
-		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
-		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
-		
-		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
-		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
-		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
-		
-		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
-		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
-		config.setWorkloadsPerUser(workloadsPerUser);
-		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
-	
-		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
-		PowerMock.mockStatic(WorkloadParserFactory.class);
-		EasyMock.expect(WorkloadParserFactory.getWorkloadParser(sla)).andReturn(parser);
-		EasyMock.expect(parser.hasNext()).andReturn(true);
-		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
-		EasyMock.expect(parser.hasNext()).andReturn(true);
-		EasyMock.expect(parser.hasNext()).andReturn(true);
-		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
-		EasyMock.expect(parser.hasNext()).andReturn(false);
-		parser.clear();
-		PowerMock.replay(TimeBasedWorkloadParser.class);
-		
-		PowerMock.replayAll(parser, config, request, request2, request3, request4, request5, request6, request7, request8, request9);
-		
-		OverProvisionHeuristic heuristic = new OverProvisionHeuristic();
-		heuristic.findPlan(null, null, null);
-		
-		Map<MachineType, Integer> plan = heuristic.getPlan(null);
-		assertNotNull(plan);
-		assertEquals(1, plan.size());
-		int value = plan.get(MachineType.SMALL);
-		assertEquals(Math.ceil(2 * OverProvisionHeuristic.FACTOR), value, 0.00001);
-		
-		PowerMock.verifyAll();
-	}
-
-	@Test
-	public void testFindPlanWithWorkloadWithUniqueUsersAndSameNumberOfRequests() throws Exception{
-		long sla = 8000l;
-		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
-		
-		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getUserID()).andReturn(1);
-		Request request2 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request2.getUserID()).andReturn(2);
-		Request request3 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request3.getUserID()).andReturn(3);
-		Request request4 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request4.getUserID()).andReturn(4);
-		Request request5 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request5.getUserID()).andReturn(5);
-		Request request6 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request6.getUserID()).andReturn(6);
-		Request request7 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request7.getUserID()).andReturn(7);
-		Request request8 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request8.getUserID()).andReturn(8);
-		
-		List<Request> firstIntervalRequests = new ArrayList<Request>();
-		firstIntervalRequests.add(request);
-		firstIntervalRequests.add(request2);
-		firstIntervalRequests.add(request3);
-		firstIntervalRequests.add(request4);
-		
-		List<Request> secondIntervalRequests = new ArrayList<Request>();
-		secondIntervalRequests.add(request5);
-		secondIntervalRequests.add(request6);
-		secondIntervalRequests.add(request7);
-		secondIntervalRequests.add(request8);
-		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
-		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
-		
-		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
-		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
-		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
-		
-		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
-		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
-		config.setWorkloadsPerUser(workloadsPerUser);
-		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
-	
-		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
-		PowerMock.mockStatic(WorkloadParserFactory.class);
-		EasyMock.expect(WorkloadParserFactory.getWorkloadParser(sla)).andReturn(parser);
-		EasyMock.expect(parser.hasNext()).andReturn(true);
-		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
-		EasyMock.expect(parser.hasNext()).andReturn(true);
-		EasyMock.expect(parser.hasNext()).andReturn(true);
-		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
-		EasyMock.expect(parser.hasNext()).andReturn(false);
-		parser.clear();
-		PowerMock.replay(TimeBasedWorkloadParser.class);
-		
-		PowerMock.replayAll(parser, config, request, request2, request3, request4, request5, request6, request7, request8);
-		
-		OverProvisionHeuristic heuristic = new OverProvisionHeuristic();
-		heuristic.findPlan(null, null, null);
-		
-		Map<MachineType, Integer> plan = heuristic.getPlan(null);
-		assertNotNull(plan);
-		assertEquals(1, plan.size());
-		int value = plan.get(MachineType.SMALL);
-		assertEquals(Math.ceil(4 * OverProvisionHeuristic.FACTOR), value, 0.0001);
-		
-		PowerMock.verifyAll();
-	}
-	
-	@Test
-	public void testFindPlanWithWorkloadWithRepeatedUsersAndSameNumberOfRequests() throws Exception{
-		long sla = 8000l;
-		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
-		
-		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getUserID()).andReturn(1);
-		Request request2 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request2.getUserID()).andReturn(2);
-		Request request3 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request3.getUserID()).andReturn(3);
-		Request request4 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request4.getUserID()).andReturn(4);
-		Request request5 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request5.getUserID()).andReturn(5);
-		Request request6 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request6.getUserID()).andReturn(6);
-		Request request7 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request7.getUserID()).andReturn(6);
-		Request request8 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request8.getUserID()).andReturn(8);
-		
-		List<Request> firstIntervalRequests = new ArrayList<Request>();
-		firstIntervalRequests.add(request);
-		firstIntervalRequests.add(request2);
-		firstIntervalRequests.add(request3);
-		firstIntervalRequests.add(request4);
-		
-		List<Request> secondIntervalRequests = new ArrayList<Request>();
-		secondIntervalRequests.add(request5);
-		secondIntervalRequests.add(request6);
-		secondIntervalRequests.add(request7);
-		secondIntervalRequests.add(request8);
-		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
-		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
-		
-		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
-		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
-		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
-		
-		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
-		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
-		config.setWorkloadsPerUser(workloadsPerUser);
-		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
-	
-		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
-		PowerMock.mockStatic(WorkloadParserFactory.class);
-		EasyMock.expect(WorkloadParserFactory.getWorkloadParser(sla)).andReturn(parser);
-		EasyMock.expect(parser.hasNext()).andReturn(true);
-		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
-		EasyMock.expect(parser.hasNext()).andReturn(true);
-		EasyMock.expect(parser.hasNext()).andReturn(true);
-		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
-		EasyMock.expect(parser.hasNext()).andReturn(false);
-		parser.clear();
-		PowerMock.replay(TimeBasedWorkloadParser.class);
-		
-		PowerMock.replayAll(parser, config, request, request2, request3, request4, request5, request6, request7, request8);
-		
-		OverProvisionHeuristic heuristic = new OverProvisionHeuristic();
-		heuristic.findPlan(null, null, null);
-		
-		Map<MachineType, Integer> plan = heuristic.getPlan(null);
-		assertNotNull(plan);
-		assertEquals(1, plan.size());
-		int value = plan.get(MachineType.SMALL);
-		assertEquals(Math.ceil(4 * OverProvisionHeuristic.FACTOR), value, 0.00001);
-		
-		PowerMock.verifyAll();
-	}
-	
-	@Test
-	public void testFindPlanWithWorkloadWithRepeatedUsersAndSametNumberOfRequests2() throws Exception{
-		long sla = 8000l;
-		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
-		
-		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getUserID()).andReturn(1);
-		Request request2 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request2.getUserID()).andReturn(2);
-		Request request3 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request3.getUserID()).andReturn(2);
-		Request request4 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request4.getUserID()).andReturn(2);
-		Request request5 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request5.getUserID()).andReturn(5);
-		Request request6 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request6.getUserID()).andReturn(5);
-		Request request7 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request7.getUserID()).andReturn(7);
-		Request request8 = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request8.getUserID()).andReturn(8);
-		
-		List<Request> firstIntervalRequests = new ArrayList<Request>();
-		firstIntervalRequests.add(request);
-		firstIntervalRequests.add(request2);
-		firstIntervalRequests.add(request3);
-		firstIntervalRequests.add(request4);
-		
-		List<Request> secondIntervalRequests = new ArrayList<Request>();
-		secondIntervalRequests.add(request5);
-		secondIntervalRequests.add(request6);
-		secondIntervalRequests.add(request7);
-		secondIntervalRequests.add(request8);
-		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
-		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
-		
-		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
-		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
-		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
-		
-		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
-		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
-		config.setWorkloadsPerUser(workloadsPerUser);
-		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
-	
-		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
-		PowerMock.mockStatic(WorkloadParserFactory.class);
-		EasyMock.expect(WorkloadParserFactory.getWorkloadParser(sla)).andReturn(parser);
-		EasyMock.expect(parser.hasNext()).andReturn(true);
-		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
-		EasyMock.expect(parser.hasNext()).andReturn(true);
-		EasyMock.expect(parser.hasNext()).andReturn(true);
-		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
-		EasyMock.expect(parser.hasNext()).andReturn(false);
-		parser.clear();
-		PowerMock.replay(TimeBasedWorkloadParser.class);
-		
-		PowerMock.replayAll(parser, config, request, request2, request3, request4, request5, request6, request7, request8);
-		
-		OverProvisionHeuristic heuristic = new OverProvisionHeuristic();
-		heuristic.findPlan(null, null, null);
-		
-		Map<MachineType, Integer> plan = heuristic.getPlan(null);
-		assertNotNull(plan);
-		assertEquals(1, plan.size());
-		int value = plan.get(MachineType.SMALL);
-		assertEquals(Math.ceil(3 * OverProvisionHeuristic.FACTOR), value, 0.000001);
-		
-		PowerMock.verifyAll();
-	}
+//	@Test
+//	public void testFindPlanWithWorkloadWithEmptyWorkload() throws Exception{
+//		long sla = 8000l;
+//		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
+//		
+//		Configuration config = EasyMock.createStrictMock(Configuration.class);
+//		PowerMock.mockStatic(Configuration.class);
+//		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
+//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
+//		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
+//		
+//		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
+//		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+//		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
+//		
+//		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+//		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
+//		config.setWorkloadsPerUser(workloadsPerUser);
+//		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
+//	
+//		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
+//		PowerMock.mockStatic(WorkloadParserFactory.class);
+//		EasyMock.expect(WorkloadParserFactory.getWorkloadParser(sla)).andReturn(parser);
+//		EasyMock.expect(parser.hasNext()).andReturn(true);
+//		EasyMock.expect(parser.next()).andReturn(new ArrayList<Request>());
+//		EasyMock.expect(parser.hasNext()).andReturn(false);
+//		parser.clear();
+//		PowerMock.replay(TimeBasedWorkloadParser.class);
+//		
+//		PowerMock.replayAll(config, parser);
+//		
+//		OverProvisionHeuristic heuristic = new OverProvisionHeuristic();
+//		heuristic.findPlan(null, null, null);
+//		
+//		Map<MachineType, Integer> plan = heuristic.getPlan(null);
+//		assertNotNull(plan);
+//		assertEquals(1, plan.size());
+//		int value = plan.get(MachineType.SMALL);
+//		assertEquals(0, value);
+//		
+//		PowerMock.verifyAll();
+//	}
+//	
+//	@Test
+//	public void testFindPlanWithWorkloadWithUniqueUsersAndDifferentNumberOfRequests() throws Exception{
+//		long sla = 8000l;
+//		
+//		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
+//		
+//		Request request = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request.getUserID()).andReturn(1);
+//		Request request2 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request2.getUserID()).andReturn(2);
+//		Request request3 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request3.getUserID()).andReturn(3);
+//		Request request4 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request4.getUserID()).andReturn(4);
+//		Request request5 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request5.getUserID()).andReturn(5);
+//		Request request6 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request6.getUserID()).andReturn(6);
+//		Request request7 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request7.getUserID()).andReturn(7);
+//		Request request8 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request8.getUserID()).andReturn(8);
+//		Request request9 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request9.getUserID()).andReturn(9);
+//		
+//		List<Request> firstIntervalRequests = new ArrayList<Request>();
+//		firstIntervalRequests.add(request);
+//		firstIntervalRequests.add(request2);
+//		firstIntervalRequests.add(request3);
+//		firstIntervalRequests.add(request4);
+//		
+//		List<Request> secondIntervalRequests = new ArrayList<Request>();
+//		secondIntervalRequests.add(request5);
+//		secondIntervalRequests.add(request6);
+//		secondIntervalRequests.add(request7);
+//		secondIntervalRequests.add(request8);
+//		secondIntervalRequests.add(request9);
+//		
+//		Configuration config = EasyMock.createStrictMock(Configuration.class);
+//		PowerMock.mockStatic(Configuration.class);
+//		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
+//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
+//		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
+//		
+//		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
+//		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+//		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
+//		
+//		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+//		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
+//		config.setWorkloadsPerUser(workloadsPerUser);
+//		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
+//	
+//		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
+//		PowerMock.mockStatic(WorkloadParserFactory.class);
+//		EasyMock.expect(WorkloadParserFactory.getWorkloadParser(sla)).andReturn(parser);
+//		EasyMock.expect(parser.hasNext()).andReturn(true);
+//		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
+//		EasyMock.expect(parser.hasNext()).andReturn(true);
+//		EasyMock.expect(parser.hasNext()).andReturn(true);
+//		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
+//		EasyMock.expect(parser.hasNext()).andReturn(false);
+//		parser.clear();
+//		PowerMock.replay(TimeBasedWorkloadParser.class);
+//		
+//		PowerMock.replayAll(parser, config, request, request2, request3, request4, request5, request6, request7, request8, request9);
+//		
+//		OverProvisionHeuristic heuristic = new OverProvisionHeuristic();
+//		heuristic.findPlan(null, null, null);
+//		
+//		Map<MachineType, Integer> plan = heuristic.getPlan(null);
+//		assertNotNull(plan);
+//		assertEquals(1, plan.size());
+//		int value = plan.get(MachineType.SMALL);
+//		assertEquals(5 * OverProvisionHeuristic.FACTOR, value, 0.0001);
+//		
+//		PowerMock.verifyAll();
+//	}
+//	
+//	@Test
+//	public void testFindPlanWithWorkloadWithRepeatedUsersAndDifferentNumberOfRequests() throws Exception{
+//		long sla = 8000l;
+//		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
+//		
+//		Request request = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request.getUserID()).andReturn(1);
+//		Request request2 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request2.getUserID()).andReturn(2);
+//		Request request3 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request3.getUserID()).andReturn(3);
+//		Request request4 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request4.getUserID()).andReturn(4);
+//		Request request5 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request5.getUserID()).andReturn(5);
+//		Request request6 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request6.getUserID()).andReturn(5);
+//		Request request7 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request7.getUserID()).andReturn(7);
+//		Request request8 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request8.getUserID()).andReturn(8);
+//		Request request9 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request9.getUserID()).andReturn(9);
+//		
+//		List<Request> firstIntervalRequests = new ArrayList<Request>();
+//		firstIntervalRequests.add(request);
+//		firstIntervalRequests.add(request2);
+//		firstIntervalRequests.add(request3);
+//		firstIntervalRequests.add(request4);
+//		
+//		List<Request> secondIntervalRequests = new ArrayList<Request>();
+//		secondIntervalRequests.add(request5);
+//		secondIntervalRequests.add(request6);
+//		secondIntervalRequests.add(request7);
+//		secondIntervalRequests.add(request8);
+//		secondIntervalRequests.add(request9);
+//		
+//		Configuration config = EasyMock.createStrictMock(Configuration.class);
+//		PowerMock.mockStatic(Configuration.class);
+//		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
+//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
+//		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
+//		
+//		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
+//		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+//		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
+//		
+//		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+//		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
+//		config.setWorkloadsPerUser(workloadsPerUser);
+//		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
+//	
+//		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
+//		PowerMock.mockStatic(WorkloadParserFactory.class);
+//		EasyMock.expect(WorkloadParserFactory.getWorkloadParser(sla)).andReturn(parser);
+//		EasyMock.expect(parser.hasNext()).andReturn(true);
+//		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
+//		EasyMock.expect(parser.hasNext()).andReturn(true);
+//		EasyMock.expect(parser.hasNext()).andReturn(true);
+//		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
+//		EasyMock.expect(parser.hasNext()).andReturn(false);
+//		parser.clear();
+//		PowerMock.replay(TimeBasedWorkloadParser.class);
+//		
+//		PowerMock.replayAll(parser, config, request, request2, request3, request4, request5, request6, request7, request8, request9);
+//		
+//		OverProvisionHeuristic heuristic = new OverProvisionHeuristic();
+//		heuristic.findPlan(null, null, null);
+//		
+//		Map<MachineType, Integer> plan = heuristic.getPlan(null);
+//		assertNotNull(plan);
+//		assertEquals(1, plan.size());
+//		int value = plan.get(MachineType.SMALL);
+//		assertEquals(Math.ceil(4 * OverProvisionHeuristic.FACTOR), value, 0.0001);
+//		
+//		PowerMock.verifyAll();
+//	}
+//	
+//	@Test
+//	public void testFindPlanWithWorkloadWithRepeatedUsersAndDifferentNumberOfRequests2() throws Exception{
+//		long sla = 8000l;
+//		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
+//		
+//		Request request = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request.getUserID()).andReturn(1);
+//		Request request2 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request2.getUserID()).andReturn(1);
+//		Request request3 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request3.getUserID()).andReturn(1);
+//		Request request4 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request4.getUserID()).andReturn(1);
+//		Request request5 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request5.getUserID()).andReturn(5);
+//		Request request6 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request6.getUserID()).andReturn(5);
+//		Request request7 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request7.getUserID()).andReturn(5);
+//		Request request8 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request8.getUserID()).andReturn(9);
+//		Request request9 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request9.getUserID()).andReturn(9);
+//		
+//		List<Request> firstIntervalRequests = new ArrayList<Request>();
+//		firstIntervalRequests.add(request);
+//		firstIntervalRequests.add(request2);
+//		firstIntervalRequests.add(request3);
+//		firstIntervalRequests.add(request4);
+//		
+//		List<Request> secondIntervalRequests = new ArrayList<Request>();
+//		secondIntervalRequests.add(request5);
+//		secondIntervalRequests.add(request6);
+//		secondIntervalRequests.add(request7);
+//		secondIntervalRequests.add(request8);
+//		secondIntervalRequests.add(request9);
+//		
+//		Configuration config = EasyMock.createStrictMock(Configuration.class);
+//		PowerMock.mockStatic(Configuration.class);
+//		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
+//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
+//		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
+//		
+//		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
+//		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+//		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
+//		
+//		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+//		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
+//		config.setWorkloadsPerUser(workloadsPerUser);
+//		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
+//	
+//		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
+//		PowerMock.mockStatic(WorkloadParserFactory.class);
+//		EasyMock.expect(WorkloadParserFactory.getWorkloadParser(sla)).andReturn(parser);
+//		EasyMock.expect(parser.hasNext()).andReturn(true);
+//		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
+//		EasyMock.expect(parser.hasNext()).andReturn(true);
+//		EasyMock.expect(parser.hasNext()).andReturn(true);
+//		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
+//		EasyMock.expect(parser.hasNext()).andReturn(false);
+//		parser.clear();
+//		PowerMock.replay(TimeBasedWorkloadParser.class);
+//		
+//		PowerMock.replayAll(parser, config, request, request2, request3, request4, request5, request6, request7, request8, request9);
+//		
+//		OverProvisionHeuristic heuristic = new OverProvisionHeuristic();
+//		heuristic.findPlan(null, null, null);
+//		
+//		Map<MachineType, Integer> plan = heuristic.getPlan(null);
+//		assertNotNull(plan);
+//		assertEquals(1, plan.size());
+//		int value = plan.get(MachineType.SMALL);
+//		assertEquals(Math.ceil(2 * OverProvisionHeuristic.FACTOR), value, 0.00001);
+//		
+//		PowerMock.verifyAll();
+//	}
+//
+//	@Test
+//	public void testFindPlanWithWorkloadWithUniqueUsersAndSameNumberOfRequests() throws Exception{
+//		long sla = 8000l;
+//		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
+//		
+//		Request request = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request.getUserID()).andReturn(1);
+//		Request request2 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request2.getUserID()).andReturn(2);
+//		Request request3 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request3.getUserID()).andReturn(3);
+//		Request request4 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request4.getUserID()).andReturn(4);
+//		Request request5 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request5.getUserID()).andReturn(5);
+//		Request request6 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request6.getUserID()).andReturn(6);
+//		Request request7 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request7.getUserID()).andReturn(7);
+//		Request request8 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request8.getUserID()).andReturn(8);
+//		
+//		List<Request> firstIntervalRequests = new ArrayList<Request>();
+//		firstIntervalRequests.add(request);
+//		firstIntervalRequests.add(request2);
+//		firstIntervalRequests.add(request3);
+//		firstIntervalRequests.add(request4);
+//		
+//		List<Request> secondIntervalRequests = new ArrayList<Request>();
+//		secondIntervalRequests.add(request5);
+//		secondIntervalRequests.add(request6);
+//		secondIntervalRequests.add(request7);
+//		secondIntervalRequests.add(request8);
+//		
+//		Configuration config = EasyMock.createStrictMock(Configuration.class);
+//		PowerMock.mockStatic(Configuration.class);
+//		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
+//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
+//		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
+//		
+//		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
+//		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+//		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
+//		
+//		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+//		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
+//		config.setWorkloadsPerUser(workloadsPerUser);
+//		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
+//	
+//		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
+//		PowerMock.mockStatic(WorkloadParserFactory.class);
+//		EasyMock.expect(WorkloadParserFactory.getWorkloadParser(sla)).andReturn(parser);
+//		EasyMock.expect(parser.hasNext()).andReturn(true);
+//		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
+//		EasyMock.expect(parser.hasNext()).andReturn(true);
+//		EasyMock.expect(parser.hasNext()).andReturn(true);
+//		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
+//		EasyMock.expect(parser.hasNext()).andReturn(false);
+//		parser.clear();
+//		PowerMock.replay(TimeBasedWorkloadParser.class);
+//		
+//		PowerMock.replayAll(parser, config, request, request2, request3, request4, request5, request6, request7, request8);
+//		
+//		OverProvisionHeuristic heuristic = new OverProvisionHeuristic();
+//		heuristic.findPlan(null, null, null);
+//		
+//		Map<MachineType, Integer> plan = heuristic.getPlan(null);
+//		assertNotNull(plan);
+//		assertEquals(1, plan.size());
+//		int value = plan.get(MachineType.SMALL);
+//		assertEquals(Math.ceil(4 * OverProvisionHeuristic.FACTOR), value, 0.0001);
+//		
+//		PowerMock.verifyAll();
+//	}
+//	
+//	@Test
+//	public void testFindPlanWithWorkloadWithRepeatedUsersAndSameNumberOfRequests() throws Exception{
+//		long sla = 8000l;
+//		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
+//		
+//		Request request = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request.getUserID()).andReturn(1);
+//		Request request2 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request2.getUserID()).andReturn(2);
+//		Request request3 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request3.getUserID()).andReturn(3);
+//		Request request4 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request4.getUserID()).andReturn(4);
+//		Request request5 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request5.getUserID()).andReturn(5);
+//		Request request6 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request6.getUserID()).andReturn(6);
+//		Request request7 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request7.getUserID()).andReturn(6);
+//		Request request8 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request8.getUserID()).andReturn(8);
+//		
+//		List<Request> firstIntervalRequests = new ArrayList<Request>();
+//		firstIntervalRequests.add(request);
+//		firstIntervalRequests.add(request2);
+//		firstIntervalRequests.add(request3);
+//		firstIntervalRequests.add(request4);
+//		
+//		List<Request> secondIntervalRequests = new ArrayList<Request>();
+//		secondIntervalRequests.add(request5);
+//		secondIntervalRequests.add(request6);
+//		secondIntervalRequests.add(request7);
+//		secondIntervalRequests.add(request8);
+//		
+//		Configuration config = EasyMock.createStrictMock(Configuration.class);
+//		PowerMock.mockStatic(Configuration.class);
+//		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
+//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
+//		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
+//		
+//		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
+//		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+//		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
+//		
+//		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+//		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
+//		config.setWorkloadsPerUser(workloadsPerUser);
+//		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
+//	
+//		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
+//		PowerMock.mockStatic(WorkloadParserFactory.class);
+//		EasyMock.expect(WorkloadParserFactory.getWorkloadParser(sla)).andReturn(parser);
+//		EasyMock.expect(parser.hasNext()).andReturn(true);
+//		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
+//		EasyMock.expect(parser.hasNext()).andReturn(true);
+//		EasyMock.expect(parser.hasNext()).andReturn(true);
+//		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
+//		EasyMock.expect(parser.hasNext()).andReturn(false);
+//		parser.clear();
+//		PowerMock.replay(TimeBasedWorkloadParser.class);
+//		
+//		PowerMock.replayAll(parser, config, request, request2, request3, request4, request5, request6, request7, request8);
+//		
+//		OverProvisionHeuristic heuristic = new OverProvisionHeuristic();
+//		heuristic.findPlan(null, null, null);
+//		
+//		Map<MachineType, Integer> plan = heuristic.getPlan(null);
+//		assertNotNull(plan);
+//		assertEquals(1, plan.size());
+//		int value = plan.get(MachineType.SMALL);
+//		assertEquals(Math.ceil(4 * OverProvisionHeuristic.FACTOR), value, 0.00001);
+//		
+//		PowerMock.verifyAll();
+//	}
+//	
+//	@Test
+//	public void testFindPlanWithWorkloadWithRepeatedUsersAndSametNumberOfRequests2() throws Exception{
+//		long sla = 8000l;
+//		Map<Contract, Pair<Integer, String>> workloadsPerUser = new HashMap<Contract, Pair<Integer,String>>();
+//		
+//		Request request = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request.getUserID()).andReturn(1);
+//		Request request2 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request2.getUserID()).andReturn(2);
+//		Request request3 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request3.getUserID()).andReturn(2);
+//		Request request4 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request4.getUserID()).andReturn(2);
+//		Request request5 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request5.getUserID()).andReturn(5);
+//		Request request6 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request6.getUserID()).andReturn(5);
+//		Request request7 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request7.getUserID()).andReturn(7);
+//		Request request8 = EasyMock.createStrictMock(Request.class);
+//		EasyMock.expect(request8.getUserID()).andReturn(8);
+//		
+//		List<Request> firstIntervalRequests = new ArrayList<Request>();
+//		firstIntervalRequests.add(request);
+//		firstIntervalRequests.add(request2);
+//		firstIntervalRequests.add(request3);
+//		firstIntervalRequests.add(request4);
+//		
+//		List<Request> secondIntervalRequests = new ArrayList<Request>();
+//		secondIntervalRequests.add(request5);
+//		secondIntervalRequests.add(request6);
+//		secondIntervalRequests.add(request7);
+//		secondIntervalRequests.add(request8);
+//		
+//		Configuration config = EasyMock.createStrictMock(Configuration.class);
+//		PowerMock.mockStatic(Configuration.class);
+//		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(6);
+//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
+//		EasyMock.expect(config.getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD)).andReturn(new long[]{12});
+//		
+//		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH)).andReturn(0d);
+//		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+//		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
+//		
+//		EasyMock.expect(config.getWorkloadsPerUser()).andReturn(workloadsPerUser);
+//		EasyMock.expect(config.getDouble(SaaSUsersProperties.SAAS_PEAK)).andReturn(2d);
+//		config.setWorkloadsPerUser(workloadsPerUser);
+//		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL");
+//	
+//		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
+//		PowerMock.mockStatic(WorkloadParserFactory.class);
+//		EasyMock.expect(WorkloadParserFactory.getWorkloadParser(sla)).andReturn(parser);
+//		EasyMock.expect(parser.hasNext()).andReturn(true);
+//		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
+//		EasyMock.expect(parser.hasNext()).andReturn(true);
+//		EasyMock.expect(parser.hasNext()).andReturn(true);
+//		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
+//		EasyMock.expect(parser.hasNext()).andReturn(false);
+//		parser.clear();
+//		PowerMock.replay(TimeBasedWorkloadParser.class);
+//		
+//		PowerMock.replayAll(parser, config, request, request2, request3, request4, request5, request6, request7, request8);
+//		
+//		OverProvisionHeuristic heuristic = new OverProvisionHeuristic();
+//		heuristic.findPlan(null, null, null);
+//		
+//		Map<MachineType, Integer> plan = heuristic.getPlan(null);
+//		assertNotNull(plan);
+//		assertEquals(1, plan.size());
+//		int value = plan.get(MachineType.SMALL);
+//		assertEquals(Math.ceil(3 * OverProvisionHeuristic.FACTOR), value, 0.000001);
+//		
+//		PowerMock.verifyAll();
+//	}
 }

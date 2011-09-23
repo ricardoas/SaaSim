@@ -1,7 +1,6 @@
 package planning.heuristic;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -31,6 +31,8 @@ import commons.sim.components.MachineDescriptor;
 import commons.sim.util.SimulatorFactory;
 
 @RunWith(PowerMockRunner.class)
+@PowerMockIgnore("org.apache.log4j.*")
+@PrepareForTest({SimulatorFactory.class, DPSFactory.class})
 public class HistoryBasedHeuristicTest {
 	
 	@BeforeClass
@@ -39,7 +41,6 @@ public class HistoryBasedHeuristicTest {
 	}
 	
 	@Test
-	@PrepareForTest({SimulatorFactory.class, DPSFactory.class})
 	public void testFindPlanWithoutServers(){
 		
 		//Load balancer
@@ -79,7 +80,6 @@ public class HistoryBasedHeuristicTest {
 	}
 	
 	@Test
-	@PrepareForTest({SimulatorFactory.class, DPSFactory.class})
 	public void testFindPlanWithWellUtilisedServersAndOneTier(){
 		
 		//First machine
@@ -152,7 +152,6 @@ public class HistoryBasedHeuristicTest {
 	}
 	
 	@Test
-	@PrepareForTest({SimulatorFactory.class, DPSFactory.class})
 	public void testFindPlanWithUnderUtilisedServersAndOneTier(){
 		
 		//First machine
@@ -221,7 +220,6 @@ public class HistoryBasedHeuristicTest {
 	}
 	
 	@Test
-	@PrepareForTest({SimulatorFactory.class, DPSFactory.class})
 	public void testFindPlanWithMixedUtilisedServersAndOneTier(){
 		
 		//First machine
@@ -294,7 +292,6 @@ public class HistoryBasedHeuristicTest {
 	}
 	
 	@Test
-	@PrepareForTest({SimulatorFactory.class, DPSFactory.class})
 	public void testFindPlanWithWellUtilisedServersAndMultipleTiers(){
 		
 		//First machine
@@ -368,7 +365,6 @@ public class HistoryBasedHeuristicTest {
 	}
 	
 	@Test
-	@PrepareForTest({SimulatorFactory.class, DPSFactory.class})
 	public void testFindPlanWithUnderUtilisedServersAndMultipleTiers(){
 		
 		//First machine
@@ -438,7 +434,6 @@ public class HistoryBasedHeuristicTest {
 	}
 
 	@Test
-	@PrepareForTest({SimulatorFactory.class, DPSFactory.class})
 	public void testFindPlanWithMixedUtilisedServersAndMultipleTiers(){
 		
 		//First tier machines

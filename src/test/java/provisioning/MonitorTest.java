@@ -27,6 +27,7 @@ import commons.sim.provisioningheuristics.MachineStatistics;
  *
  */
 @RunWith(PowerMockRunner.class)
+@PrepareForTest(Configuration.class)
 public class MonitorTest {
 
 	private Monitor monitor;
@@ -47,8 +48,6 @@ public class MonitorTest {
 		EasyMock.replay(request);
 		
 		monitor.reportRequestFinished(request);
-		
-		EasyMock.verify(request);
 	}
 
 	/**
@@ -101,7 +100,6 @@ public class MonitorTest {
 	/**
 	 * Test method for {@link provisioning.Monitor#chargeUsers(long)}.
 	 */
-	@PrepareForTest(Configuration.class)
 	@Test
 	public void testChargeUsers() {
 		Provider provider = EasyMock.createStrictMock(Provider.class);

@@ -36,6 +36,7 @@ import commons.sim.util.SaaSAppProperties;
  *
  */
 @RunWith(PowerMockRunner.class)
+@PrepareForTest(Configuration.class)
 public class DynamicProvisioningSystemTest {
 	
 	@Before
@@ -55,7 +56,6 @@ public class DynamicProvisioningSystemTest {
 	 * Test method for {@link provisioning.DynamicProvisioningSystem#DynamicProvisioningSystem()}.
 	 */
 	@Test
-	@PrepareForTest(Configuration.class)
 	public void testDynamicProvisioningSystemWithEmptyUsersAndProviders() {
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
@@ -73,7 +73,6 @@ public class DynamicProvisioningSystemTest {
 	 * Test method for {@link provisioning.DynamicProvisioningSystem#DynamicProvisioningSystem()}.
 	 */
 	@Test(expected=NullPointerException.class)
-	@PrepareForTest(Configuration.class)
 	public void testDynamicProvisioningSystemWithNullProviders() {
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
@@ -90,7 +89,6 @@ public class DynamicProvisioningSystemTest {
 	 * Test method for {@link provisioning.DynamicProvisioningSystem#DynamicProvisioningSystem()}.
 	 */
 	@Test(expected=NullPointerException.class)
-	@PrepareForTest(Configuration.class)
 	public void testDynamicProvisioningSystemWithNullUsers() {
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
@@ -165,7 +163,6 @@ public class DynamicProvisioningSystemTest {
 	 * Test method for {@link provisioning.DynamicProvisioningSystem#calculateUtility()}.
 	 */
 	@Test
-	@PrepareForTest(Configuration.class)
 	public void testCalculateUtilityWithoutUsersAndProviders() {
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
@@ -235,7 +232,6 @@ public class DynamicProvisioningSystemTest {
 	}
 	
 	@Test
-	@PrepareForTest(Configuration.class)
 	public void testReportLostRequest(){
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(request.getSaasClient()).andReturn(0).times(2);
@@ -264,7 +260,6 @@ public class DynamicProvisioningSystemTest {
 	}
 	
 	@Test
-	@PrepareForTest(Configuration.class)
 	public void testReportFinishedRequest(){
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(request.getSaasClient()).andReturn(0).times(2);
