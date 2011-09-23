@@ -1,14 +1,14 @@
 package commons.cloud;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
+import java.util.Iterator;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.easymock.PowerMock;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-@RunWith(PowerMockRunner.class)
 public class UtilityResultTest {
 	
 	@Test
@@ -46,8 +46,6 @@ public class UtilityResultTest {
 				cpuCost, transferenceCost, storageCost);
 		result.addEntry(entry);
 		assertEquals(2 * (totalReceipt - totalCost), result.getUtility(), 0.0001);
-		
-		PowerMock.verifyAll();
 	}
 
 	private static UtilityResultEntry buildEntry(long time, double onDemandCost, double reservedCost, double monitoringCost, double inCost, double outCost, double cpuCost, double transferenceCost, double storageCost) {
@@ -139,7 +137,13 @@ public class UtilityResultTest {
 		double totalCost = rackspaceCost + onDemandCost + reservedCost + monitoringCost + inCost + outCost;
 		
 		assertEquals(totalReceipt - totalCost, result.getUtility(), 0.00001);
-		
-		PowerMock.verifyAll();
+	}
+	
+	@Test
+	public void testIterator(){
+		UtilityResult result = new UtilityResult(1, 1);
+		Iterator<UtilityResultEntry> iterator = result.iterator();
+		assertNotNull(iterator);
+		assertFalse(iterator.hasNext());
 	}
 }

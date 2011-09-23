@@ -119,7 +119,6 @@ public class UtilityResultEntryTest {
 		double outCost = 0.9999;
 		entry.addTransferenceToCost(1, 10000, inCost, 2000, outCost);
 		
-		EasyMock.verify(provider);
 	}
 	
 	@Test
