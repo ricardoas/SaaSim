@@ -1,0 +1,21 @@
+Welcome to SaaSim!
+
+Table of Contents
+--------------------------
+ 1 - General Info
+ 2 - People
+ 3 - What is SaaSim?
+ 4 - Building
+ 5 - Configuring
+ 6 - Running
+--------------------------
+
+
+*** 4 - Building ***
+
+On a terminal window run:
+
+	mvn package
+
+and a target/saasim-${version}-all.zip file will be created.
+
