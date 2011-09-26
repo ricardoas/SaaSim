@@ -103,26 +103,21 @@ public class Contract implements Comparable<Contract>{
 
 	@Override
 	public int hashCode() {
+		assert name != null: "Null names are not allowed! Check your code.";
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + name.hashCode();
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
+		assert obj != null: "Can't compare with a null object!";
+		assert obj.getClass() == getClass(): "Can't compare with another class objects!";
 		if (this == obj)
 			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
 		Contract other = (Contract) obj;
-		if (name == null && other.name != null) {
-			return false;
-		} else if (!name.equals(other.name))
-			return false;
-		return true;
+		return name.equals(other.name);
 	}
 
 	@Override

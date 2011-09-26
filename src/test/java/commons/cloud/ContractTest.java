@@ -1,6 +1,8 @@
 package commons.cloud;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +22,8 @@ public class ContractTest {
 	private static final long HOUR_IN_MILLIS = 3600000;
 	private static final long MB_IN_BYTES = 1024 * 1024;
 
-	private String planName = "bronze";
+	private String plan1 = "bronze";
+	private String plan2 = "gold";
 	private static final int HIGH = 0;
 	private static final int LOW = 1;
 	private double setupCost = 0.0;
@@ -38,9 +41,9 @@ public class ContractTest {
 	
 	@Before
 	public void setUp(){
-		c1 = new Contract(planName, HIGH, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
-		c2 = new Contract(planName, LOW, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
-		c3 = new Contract(planName, LOW, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
+		c1 = new Contract(plan1, HIGH, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
+		c2 = new Contract(plan2, LOW, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
+		c3 = new Contract(plan2, LOW, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
 	}
 
 	/**
@@ -67,7 +70,7 @@ public class ContractTest {
 		int userID = 1;
 		
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addToReceipt(userID, planName, 0, price, 0, 0, 0);
+		entry.addToReceipt(userID, plan1, 0, price, 0, 0, 0);
 		EasyMock.replay(entry);
 		
 		c1.calculateReceipt(entry, userID, 0, 0, 0, 0);
@@ -83,7 +86,7 @@ public class ContractTest {
 		int userID = 1;
 		
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addToReceipt(userID, planName, 0, price, 0, 0, 0);
+		entry.addToReceipt(userID, plan1, 0, price, 0, 0, 0);
 		EasyMock.replay(entry);
 		
 		c1.calculateReceipt(entry, userID, 10, 0, 0, 0);
@@ -100,7 +103,7 @@ public class ContractTest {
 		int userID = 1;
 		
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addToReceipt(userID , planName, 50 * HOUR_IN_MILLIS, price + 50 * extraCpuCost, 0, 0, 0);
+		entry.addToReceipt(userID , plan1, 50 * HOUR_IN_MILLIS, price + 50 * extraCpuCost, 0, 0, 0);
 		EasyMock.replay(entry);
 
 		c1.calculateReceipt(entry, userID, cpuLimit + extraConsumedCpu, 0, 0, 0);
@@ -117,7 +120,7 @@ public class ContractTest {
 		int userID = 1;
 		
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addToReceipt(userID, planName, 0, price, transferenceInBytes, 0, 0);
+		entry.addToReceipt(userID, plan1, 0, price, transferenceInBytes, 0, 0);
 		EasyMock.replay(entry);
 
 		c1.calculateReceipt(entry, userID, cpuLimit, transferenceInBytes, 0, 0);
@@ -136,7 +139,7 @@ public class ContractTest {
 		int userID = 1;
 		
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addToReceipt(userID, planName, 0, price, transferenceInMB * MB_IN_BYTES, expectedCost, 0);
+		entry.addToReceipt(userID, plan1, 0, price, transferenceInMB * MB_IN_BYTES, expectedCost, 0);
 		EasyMock.replay(entry);
 
 		c1.calculateReceipt(entry, userID, cpuLimit, transferenceInMB * MB_IN_BYTES, 0, 0);
@@ -152,7 +155,7 @@ public class ContractTest {
 		int userID = 1;
 
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addToReceipt(userID, planName, 0, price, 0, 0, 0);
+		entry.addToReceipt(userID, plan1, 0, price, 0, 0, 0);
 		EasyMock.replay(entry);
 
 		c1.calculateReceipt(entry, userID, cpuLimit, 0, 0, storageLimits * MB_IN_BYTES);
@@ -169,7 +172,7 @@ public class ContractTest {
 		int userID = 1;
 
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addToReceipt(userID, planName, 0, price, 0, 0, extraStorageConsumedInMB * storageCosts);
+		entry.addToReceipt(userID, plan1, 0, price, 0, 0, extraStorageConsumedInMB * storageCosts);
 		EasyMock.replay(entry);
 
 		c1.calculateReceipt(entry, userID, cpuLimit, 0, 0, (storageLimits + extraStorageConsumedInMB) * MB_IN_BYTES);
@@ -193,7 +196,7 @@ public class ContractTest {
 	}
 	
 	@Test
-	public void testCalculatePenaltyWithSmallLoss(){
+	public void testCalculatePenaltyWithSmallestLoss(){
 		assertEquals(0, c1.calculatePenalty(0.0001), 0.0);
 		assertEquals(price / 4, c1.calculatePenalty(0.005), 0.0);
 		assertEquals(price / 2, c1.calculatePenalty(0.05), 0.0);
@@ -202,39 +205,51 @@ public class ContractTest {
 	}
 	
 	@Test
+	public void testCalculatePenaltyWithLoss(){
+		assertEquals(price / 4, c1.calculatePenalty(0.005), 0.0);
+		assertEquals(price / 4, c1.calculatePenalty(0.01), 0.0);
+		assertEquals(0, c1.calculatePenalty(0.001), 0.0);
+	}
+	
+	@Test
 	public void testCalculatePenaltyWithHigherLoss(){
 		assertEquals(price, c1.calculatePenalty(0.100001), 0.0);
 		assertEquals(price, c1.calculatePenalty(0.5), 0.0);
 		assertEquals(price, c1.calculatePenalty(0.99999), 0.0);
 	}
-	
-	@Test 
-	public void testHashCodeEqualsConsistencyWithSameName() {
-		assertTrue(c1.equals(c1));
-		assertTrue(c2.equals(c1));
-		assertTrue(c1.equals(c2));
-		assertTrue(c2.hashCode() == c1.hashCode());
-	}
-	
-	@Test 
-	public void testHashCodeEqualsConsistencyWithDifferentName() {
-		Contract c4 = new Contract("gold", HIGH, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
-		assertFalse(c4.equals(c3));
-		assertFalse(c3.equals(c4));
-		assertFalse(c4.hashCode() == c3.hashCode());
-	}
-	
+
 	@Test
-	public void testHashCodeEqualsConsistencyWithNameNull() {
-		Contract c5 = new Contract(null, HIGH, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
-		assertFalse(c3.equals(null));
-		assertFalse(c5.equals(c3));
-		assertFalse(c3.hashCode() == c5.hashCode()); 
+	public void testEqualsHashCodeIntegrityWithSameObject(){
+		assertEquals(c2, c2);
+		assertEquals(c2.hashCode(), c2.hashCode());
+	}
+
+	@Test
+	public void testEqualsHashCodeIntegrityWithCloneObject(){
+		assertEquals(c2, c3);
+		assertEquals(c2.hashCode(), c3.hashCode());
+	}
+
+	@Test
+	public void testEqualsHashCodeIntegrityWithDifferentObject(){
+		assertTrue(!c1.equals(c2));
+		assertTrue(c1.hashCode() != c2.hashCode());
 	}
 	
-	@Test
-	public void testEqualsWithAnotherObjectClass() {
-		Contract c5 = new Contract(null, HIGH, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
-		assertFalse(c1.equals(new User(1, c5, 0)));
+	@Test(expected=AssertionError.class)
+	public void testHashCodeWithNullName(){
+		Contract fakeContract = new Contract(null, HIGH, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
+		fakeContract.hashCode();
 	}
+	
+	@Test(expected=AssertionError.class)
+	public void testEqualsWithNull(){
+		c1.equals(null);
+	}
+	
+	@Test(expected=AssertionError.class)
+	public void testEqualsWithAnotherClassObject(){
+		c1.equals(new String(""));
+	}
+	
 }
