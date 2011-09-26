@@ -1,7 +1,0 @@
-saas.number=#clients#
-saas.week.growth=0
-saas.peak=8
-saas.peak.period=3,4
-saas.user.plan=platinum
-saas.user.storage=10240000
-#saas.workload=/local/david/workspace/SaaSim/trace.trc
