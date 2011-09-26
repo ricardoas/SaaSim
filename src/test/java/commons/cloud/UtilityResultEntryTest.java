@@ -69,8 +69,10 @@ public class UtilityResultEntryTest {
 		User user2 = EasyMock.createStrictMock(User.class);
 		EasyMock.replay(user1, user2);
 		
-		User [] users = new User[]{};
-	
+		User [] users = new User[2];
+		users[0] = user1;
+		users[1] = user2;
+		
 		UtilityResultEntry entry = new UtilityResultEntry(0, users, new Provider[]{});
 		int cpuCost = 50;
 		int transferenceCost = 111;

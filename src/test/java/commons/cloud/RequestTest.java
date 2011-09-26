@@ -48,7 +48,6 @@ public class RequestTest {
 		assertEquals(LARGE_DEMAND, request.getTotalToProcess());
 		request.assignTo(MachineType.XLARGE);
 		assertEquals(XLARGE_DEMAND, request.getTotalToProcess());
-		assertEquals(MachineType.XLARGE, request.getValue());
 	}
 
 	/**
