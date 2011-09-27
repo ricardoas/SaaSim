@@ -10,6 +10,13 @@
 	<fileSets>
 		<fileSet>
 			<outputDirectory></outputDirectory>
+			<directory>src/main/resources</directory>
+			<includes>
+				<include>*</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory></outputDirectory>
 			<directory>scripts/bin/</directory>
 			<includes>
 				<include>*</include>
@@ -26,24 +33,6 @@
 	<files>
 		<file>
 			<source>README</source>
-		</file>
-		<file>
-			<source>config.properties</source>
-		</file>
-		<file>
-			<source>iaas.plan</source>
-		</file>
-		<file>
-			<source>iaas.providers</source>
-		</file>
-		<file>
-			<source>saas.app</source>
-		</file>
-		<file>
-			<source>saas.plans</source>
-		</file>
-		<file>
-			<source>saas.users</source>
 		</file>
 	</files>
 	<dependencySets>
