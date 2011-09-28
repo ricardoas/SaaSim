@@ -10,6 +10,31 @@ Table of Contents
  6 - Running
 --------------------------
 
+*** 1 - General Info ***
+
+SaaS Intelligent Management
+
+Link to the public page in redmine:
+	http://redmine.lsd.ufcg.edu.br/projects/elasticinfra
+Link to the code svn:
+	https://svn.ufcg.edu.br/repos/alunos
+	
+*** 2 - People ***
+
+Members:
+	Raquel Vigolvino Lopes, teacher. Contact: raquel at dsc.ufcg.edu.br
+	David Candeia Maia, mestrando. Contact: davidcmm at lsd.ufcg.edu.br
+	Ricardo Araújo Santos, mestrando. Contact: ricardo at lsd.ufcg.edu.br
+	Lília Rodrigues Sampaio, developer. Contact: liliars at lsd.ufcg.edu.br
+
+*** 3 - What is SaaSim? ***
+
+SaaSim is a simulator based on market of Cloud Computing, where companies provide
+virtual resources on demand, such as infrastructure, data storage and software services. 
+So, SaaSim aims to simulate the behavior of such companies when dealing with planning 
+and management capacity of a SaaS application, and also how is the dynamic provisioning 
+in the act of meeting the requests from a client, seeking the best solutions with an 
+emphasis on business metrics.
 
 *** 4 - Building ***
 
@@ -19,3 +44,26 @@ On a terminal window run:
 
 and a target/saasim-${version}-all.zip file will be created.
 
+*** 5 - Configuring ***
+
+SaaSim need some configuration files to work, 
+	** config.properties : contains the basic informations to SaaSim work, like the 
+planning heuristic, machine type, provisioning heuristic, workload parser, and others. 
+Also, this file include all files necessary to SaaSim: saas.plans, saas.app, saas.users, 
+iaas.providers, iaas.plan ;
+	** saas.plans : contains values of plans based on big commerce values. Informations 
+like the plan name(bronze, gold, etc), price, limits of cpu, storage, and others.
+	** saas.app : contains information about the application, like number of tiers and 
+heuristic.
+	** saas.users : contains information about the client(s) using the simulator(his id,
+plan chosen, storage, others).
+	** iaas.plan : contains information about the plan and its provider(name, machine types, reservation).
+	** iaas.providers : contains information about the providers and yours features. 
+
+*** 6 - Running ***
+
+SaaSim need the file config.properties to run, and the output is like this template:
+	>> Time: 5774
+	>> Faster :) (or Slower :()
+	>> Details: 2678400000	-747.868066034317	716.1657585811615	1464.0338246154786	0.0	0	platinum	358.0852641916275	0	149.95	59755255917	208.1352641916275	0.0	1	platinum	358.080494389534	0	149.95	59754255617	208.130494389534	0.0	amazon	1464.0338246154786	0.0	13.233824615478515	0.0	892.8	21511534	119488000000	0	3720	558.0	SMALL	0	0.0	0	0.0	LARGE	0	0.0	0	0.0	XLARGE	0	0.0	3720	892.8
+	>> Utility: -28047.868066034316  
