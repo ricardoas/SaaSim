@@ -3,7 +3,9 @@
  */
 package commons.cloud;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +35,6 @@ public class RequestTest {
 		assertEquals(100, request.getRequestSizeInBytes());
 		assertEquals(1024000, request.getResponseSizeInBytes());
 		assertEquals(3, request.getCpuDemandInMillis().length);
-		assertNull(request.getValue());
 	}
 
 	/**
@@ -41,16 +42,12 @@ public class RequestTest {
 	 */
 	@Test
 	public void testAssign() {
-		assertNull(request.getValue());
 		request.assignTo(MachineType.SMALL);
 		assertEquals(SMALL_DEMAND, request.getTotalToProcess());
-		assertEquals(MachineType.SMALL, request.getValue());
 		request.assignTo(MachineType.LARGE);
 		assertEquals(LARGE_DEMAND, request.getTotalToProcess());
-		assertEquals(MachineType.LARGE, request.getValue());
 		request.assignTo(MachineType.XLARGE);
 		assertEquals(XLARGE_DEMAND, request.getTotalToProcess());
-		assertEquals(MachineType.XLARGE, request.getValue());
 	}
 
 	/**
