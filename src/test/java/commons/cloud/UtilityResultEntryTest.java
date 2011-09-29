@@ -1,10 +1,9 @@
 package commons.cloud;
 
 import static org.junit.Assert.*;
+
 import org.easymock.EasyMock;
 import org.junit.Test;
-
-import commons.sim.components.MachineDescriptor;
 
 public class UtilityResultEntryTest {
 	
@@ -212,15 +211,20 @@ public class UtilityResultEntryTest {
 	}
 	
 	@Test
-	public void testEqualsConsistencyWithNullObject() {
-		UtilityResultEntry entry1 = new UtilityResultEntry(2, new User[]{}, new Provider[]{});
-		assertFalse(entry1.equals(null));
+	public void testEqualsWithSameObject() {
+		UtilityResultEntry entry = new UtilityResultEntry(2, new User[]{}, new Provider[]{});
+		assertEquals(entry, entry);
 	}
 	
-	@Test
+	@Test(expected=AssertionError.class)
+	public void testEqualsConsistencyWithNullObject() {
+		new UtilityResultEntry(2, new User[]{}, new Provider[]{}).equals(null);
+	}
+	
+	@Test(expected=AssertionError.class)
 	public void testEqualsConsistencyWithAnotherClassObject() {
 		UtilityResultEntry entry1 = new UtilityResultEntry(2, new User[]{}, new Provider[]{});
-		assertFalse(entry1.equals(new MachineDescriptor(0, false, MachineType.SMALL, 0)));
+		entry1.equals(new String(""));
 	}
 }
 

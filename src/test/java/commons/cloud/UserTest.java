@@ -108,8 +108,17 @@ public class UserTest {
 		
 		EasyMock.replay(gold, request, entry);
 		
+		assertEquals(0, user.getTotalConsumedCpuInMillis());
+		assertEquals(0, user.getConsumedInTransferenceInBytes());
+		assertEquals(0, user.getConsumedOutTransferenceInBytes());
+		
 		user.reportFinishedRequest(request);
 		user.reportFinishedRequest(request);
+
+		assertEquals(2 * totalProcessed, user.getTotalConsumedCpuInMillis());
+		assertEquals(2 * requestSize, user.getConsumedInTransferenceInBytes());
+		assertEquals(2 * responseSize, user.getConsumedOutTransferenceInBytes());
+
 		user.calculatePartialReceipt(entry);
 		
 		EasyMock.verify(gold, request, entry);
