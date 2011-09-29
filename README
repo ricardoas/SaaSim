@@ -62,8 +62,8 @@ plan chosen, storage, others).
 
 *** 6 - Running ***
 
-SaaSim need the file config.properties to run, and the output is like this template:
-	>> Time: 5774
-	>> Faster :) (or Slower :()
-	>> Details: 2678400000	-747.868066034317	716.1657585811615	1464.0338246154786	0.0	0	platinum	358.0852641916275	0	149.95	59755255917	208.1352641916275	0.0	1	platinum	358.080494389534	0	149.95	59754255617	208.130494389534	0.0	amazon	1464.0338246154786	0.0	13.233824615478515	0.0	892.8	21511534	119488000000	0	3720	558.0	SMALL	0	0.0	0	0.0	LARGE	0	0.0	0	0.0	XLARGE	0	0.0	3720	892.8
-	>> Utility: -28047.868066034316  
+On the terminal window run
+ 
+	saasim.sh in /scripts/bin 
+
+with one configuration file like config.properties and SaaSim will be run.
