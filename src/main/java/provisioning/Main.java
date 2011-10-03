@@ -7,6 +7,7 @@ import provisioning.util.DPSFactory;
 import commons.cloud.UtilityResult;
 import commons.config.Configuration;
 import commons.sim.Simulator;
+import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.SimulatorFactory;
 
 /**
@@ -28,7 +29,7 @@ public class Main {
 		
 		DPS dps = DPSFactory.createDPS();
 		
-		Simulator simulator = SimulatorFactory.buildSimulator(dps);
+		Simulator simulator = SimulatorFactory.buildSimulator(new JEEventScheduler(), dps);
 		
 		dps.registerConfigurable(simulator);
 		

@@ -15,7 +15,6 @@ import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
-import commons.sim.util.ApplicationFactory;
 import commons.sim.util.SimulatorProperties;
 
 /**
@@ -31,19 +30,21 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 
 	private WorkloadParser<List<Request>> workloadParser;
 	
-	private List<LoadBalancer> tiers;
+	private LoadBalancer tiers [];
 	
 	private final Monitor monitor;
 
 	/**
 	 * Constructor
+	 * @param scheduler TODO
+	 * @param scheduler 
 	 * @param list 
 	 * @throws IOException 
 	 */
-	public SimpleSimulator(Monitor monitor){
-		super(new JEEventScheduler());
+	public SimpleSimulator(JEEventScheduler scheduler, Monitor monitor, LoadBalancer... tiers){
+		super(scheduler);
 		this.monitor = monitor;
-		this.tiers = ApplicationFactory.getInstance().createNewApplication(getScheduler(), monitor);
+		this.tiers = tiers;
 	}
 	
 	/**
@@ -114,7 +115,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 * @return
 	 */
 	protected JEEvent parseEvent(Request request) {
-		return new JEEvent(JEEventType.NEWREQUEST, tiers.get(0), request.getArrivalTimeInMillis(), request);
+		return new JEEvent(JEEventType.NEWREQUEST, tiers[0], request.getArrivalTimeInMillis(), request);
 	}
 
 	/**
@@ -122,7 +123,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 */
 	@Override
 	public void addServer(int tier, MachineDescriptor machineDescriptor, boolean useStartUpDelay) {
-		tiers.get(tier).addServer(machineDescriptor, useStartUpDelay);
+		tiers[tier].addServer(machineDescriptor, useStartUpDelay);
 	}
 
 	/**
@@ -131,18 +132,18 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	@Override
 	public void removeServer(int tier, MachineDescriptor machineDescriptor,
 			boolean force) {
-		tiers.get(tier).removeServer(machineDescriptor, force);
+		tiers[tier].removeServer(machineDescriptor, force);
 	}
 
 	@Override
 	public void removeServer(int tier, boolean force) {
-		tiers.get(tier).removeServer(force);
+		tiers[tier].removeServer(force);
 	}
 
 	/**
 	 * @return
 	 */
-	public List<LoadBalancer> getTiers() {
+	public LoadBalancer[] getTiers() {
 		return this.tiers;
 	}
 }

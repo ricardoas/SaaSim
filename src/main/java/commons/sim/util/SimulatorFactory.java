@@ -5,6 +5,7 @@ import provisioning.Monitor;
 
 import commons.sim.SimpleSimulator;
 import commons.sim.Simulator;
+import commons.sim.jeevent.JEEventScheduler;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -12,10 +13,11 @@ import commons.sim.Simulator;
 public class SimulatorFactory {
 	
 	/**
+	 * @param scheduler 
 	 * @param monitor {@link Monitor} to collect information of this simulator. 
 	 * Such information is important to {@link DPS}. 
 	 */
-	public static Simulator buildSimulator(Monitor monitor){
-		return new SimpleSimulator(monitor);
+	public static Simulator buildSimulator(JEEventScheduler scheduler, Monitor monitor){
+		return new SimpleSimulator(scheduler, monitor, ApplicationFactory.getInstance().createNewApplication(scheduler, monitor));
 	}
 }

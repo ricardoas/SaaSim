@@ -28,6 +28,7 @@ import commons.sim.SimpleSimulator;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
+import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.SimulatorFactory;
 
 @RunWith(PowerMockRunner.class)
@@ -47,8 +48,7 @@ public class HistoryBasedHeuristicTest {
 		LoadBalancer lb1 = EasyMock.createStrictMock(LoadBalancer.class);
 		EasyMock.expect(lb1.getServers()).andReturn(new ArrayList<Machine>());
 		
-		ArrayList<LoadBalancer> loadBalancers = new ArrayList<LoadBalancer>();
-		loadBalancers.add(lb1);
+		LoadBalancer[] loadBalancers = new LoadBalancer[]{lb1};
 		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
@@ -56,7 +56,7 @@ public class HistoryBasedHeuristicTest {
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(Monitor.class))).andReturn(simulator);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class), EasyMock.isA(Monitor.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -118,8 +118,7 @@ public class HistoryBasedHeuristicTest {
 		LoadBalancer lb1 = EasyMock.createStrictMock(LoadBalancer.class);
 		EasyMock.expect(lb1.getServers()).andReturn(machines);
 		
-		ArrayList<LoadBalancer> loadBalancers = new ArrayList<LoadBalancer>();
-		loadBalancers.add(lb1);
+		LoadBalancer[] loadBalancers = new LoadBalancer[]{lb1};
 		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
@@ -127,7 +126,7 @@ public class HistoryBasedHeuristicTest {
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(Monitor.class))).andReturn(simulator);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class), EasyMock.isA(Monitor.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -187,8 +186,7 @@ public class HistoryBasedHeuristicTest {
 		LoadBalancer lb1 = EasyMock.createStrictMock(LoadBalancer.class);
 		EasyMock.expect(lb1.getServers()).andReturn(machines);
 		
-		ArrayList<LoadBalancer> loadBalancers = new ArrayList<LoadBalancer>();
-		loadBalancers.add(lb1);
+		LoadBalancer[] loadBalancers = new LoadBalancer[]{lb1};
 		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
@@ -196,7 +194,7 @@ public class HistoryBasedHeuristicTest {
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(Monitor.class))).andReturn(simulator);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class), EasyMock.isA(Monitor.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -257,8 +255,7 @@ public class HistoryBasedHeuristicTest {
 		LoadBalancer lb1 = EasyMock.createStrictMock(LoadBalancer.class);
 		EasyMock.expect(lb1.getServers()).andReturn(machines);
 		
-		ArrayList<LoadBalancer> loadBalancers = new ArrayList<LoadBalancer>();
-		loadBalancers.add(lb1);
+		LoadBalancer[] loadBalancers = new LoadBalancer[]{lb1};
 		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
@@ -266,7 +263,7 @@ public class HistoryBasedHeuristicTest {
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(Monitor.class))).andReturn(simulator);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class), EasyMock.isA(Monitor.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -329,10 +326,7 @@ public class HistoryBasedHeuristicTest {
 		EasyMock.expect(lb2.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine2)));
 		EasyMock.expect(lb3.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine3)));
 		
-		ArrayList<LoadBalancer> loadBalancers = new ArrayList<LoadBalancer>();
-		loadBalancers.add(lb1);
-		loadBalancers.add(lb2);
-		loadBalancers.add(lb3);
+		LoadBalancer[] loadBalancers = new LoadBalancer[]{lb1, lb2, lb3};
 		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
@@ -340,7 +334,7 @@ public class HistoryBasedHeuristicTest {
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(Monitor.class))).andReturn(simulator);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class), EasyMock.isA(Monitor.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -399,10 +393,7 @@ public class HistoryBasedHeuristicTest {
 		EasyMock.expect(lb2.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine2)));
 		EasyMock.expect(lb3.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine3)));
 		
-		ArrayList<LoadBalancer> loadBalancers = new ArrayList<LoadBalancer>();
-		loadBalancers.add(lb1);
-		loadBalancers.add(lb2);
-		loadBalancers.add(lb3);
+		LoadBalancer[] loadBalancers = new LoadBalancer[]{lb1, lb2, lb3};
 		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
@@ -410,7 +401,7 @@ public class HistoryBasedHeuristicTest {
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(Monitor.class))).andReturn(simulator);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class), EasyMock.isA(Monitor.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -485,10 +476,7 @@ public class HistoryBasedHeuristicTest {
 		EasyMock.expect(lb2.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine2)));
 		EasyMock.expect(lb3.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine3, machine5)));
 		
-		ArrayList<LoadBalancer> loadBalancers = new ArrayList<LoadBalancer>();
-		loadBalancers.add(lb1);
-		loadBalancers.add(lb2);
-		loadBalancers.add(lb3);
+		LoadBalancer[] loadBalancers = new LoadBalancer[]{lb1, lb2, lb3};
 		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
@@ -496,7 +484,7 @@ public class HistoryBasedHeuristicTest {
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(Monitor.class))).andReturn(simulator);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class), EasyMock.isA(Monitor.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);

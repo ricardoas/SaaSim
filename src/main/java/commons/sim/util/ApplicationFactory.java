@@ -1,7 +1,5 @@
 package commons.sim.util;
 
-import java.util.List;
-
 import provisioning.Monitor;
 
 import commons.config.Configuration;
@@ -44,5 +42,5 @@ public abstract class ApplicationFactory {
 	 * @param monitor
 	 * @return
 	 */
-	public abstract List<LoadBalancer> createNewApplication(JEEventScheduler scheduler, Monitor monitor);
+	public abstract LoadBalancer[] createNewApplication(JEEventScheduler scheduler, Monitor monitor);
 }

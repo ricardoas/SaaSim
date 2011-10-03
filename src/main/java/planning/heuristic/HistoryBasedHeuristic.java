@@ -15,6 +15,7 @@ import commons.io.HistoryBasedWorkloadParser;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.Machine;
+import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.SimulatorFactory;
 
 public class HistoryBasedHeuristic implements PlanningHeuristic{
@@ -23,6 +24,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 	private Map<MachineType, Integer> plan;
 	
 	private double UTILISATION_THRESHOLD = 0.5;
+	private JEEventScheduler scheduler;
 
 	public HistoryBasedHeuristic(){
 		this.plan = new HashMap<MachineType, Integer>();
@@ -34,7 +36,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 		
 		DPS dps = DPSFactory.createDPS();
 		
-		SimpleSimulator simulator = (SimpleSimulator) SimulatorFactory.buildSimulator(dps);
+		SimpleSimulator simulator = (SimpleSimulator) SimulatorFactory.buildSimulator(scheduler, dps);
 		
 		dps.registerConfigurable(simulator);
 		
@@ -42,7 +44,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 		
 		utilityResult = dps.calculateUtility();
 		
-		List<LoadBalancer> loadBalancers = simulator.getTiers();
+		LoadBalancer[] loadBalancers = simulator.getTiers();
 		for(LoadBalancer lb : loadBalancers){
 			List<Machine> servers = lb.getServers();
 			for(Machine server : servers){

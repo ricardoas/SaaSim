@@ -1,8 +1,5 @@
 package commons.sim.util;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import provisioning.Monitor;
 
 import commons.config.Configuration;
@@ -20,7 +17,7 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<LoadBalancer> createNewApplication(JEEventScheduler scheduler,
+	public LoadBalancer[] createNewApplication(JEEventScheduler scheduler,
 			Monitor monitor) {
 		Configuration config = Configuration.getInstance();
 		int numOfTiers = config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS);
@@ -28,10 +25,10 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 		Class<?>[] heuristicClasses = config.getApplicationHeuristics();
 		int [] maxServerPerTier = config.getIntegerArray(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER);
 
-		List<LoadBalancer> loadBalancers = new ArrayList<LoadBalancer>();
+		LoadBalancer [] loadBalancers = new LoadBalancer[numOfTiers];
 		
 		for (int i = 0; i < numOfTiers; i++) {
-			loadBalancers.add(buildLoadBalancer(scheduler, monitor, heuristicClasses[i], maxServerPerTier[i], i));
+			loadBalancers[i] = buildLoadBalancer(scheduler, monitor, heuristicClasses[i], maxServerPerTier[i], i);
 		}
 		
 		return loadBalancers;
