@@ -61,6 +61,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 */
 	@Override
 	public void setWorkloadParser(WorkloadParser<List<Request>> workloadParser) {
+		assert workloadParser != null : "WorkloadParser could not be null! Check your code.";
 		this.workloadParser = workloadParser;
 	}
 	
@@ -123,6 +124,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 */
 	@Override
 	public void addServer(int tier, MachineDescriptor machineDescriptor, boolean useStartUpDelay) {
+		assert tiers.length > tier : "This tier not exists!";
 		tiers[tier].addServer(machineDescriptor, useStartUpDelay);
 	}
 
@@ -132,11 +134,13 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	@Override
 	public void removeServer(int tier, MachineDescriptor machineDescriptor,
 			boolean force) {
+		assert tiers.length > tier : "This tier not exists!";
 		tiers[tier].removeServer(machineDescriptor, force);
 	}
 
 	@Override
 	public void removeServer(int tier, boolean force) {
+		assert tiers.length > tier : "This tier not exists!";
 		tiers[tier].removeServer(force);
 	}
 

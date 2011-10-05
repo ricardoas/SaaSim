@@ -159,7 +159,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	}
 
 	public void removeServer(boolean force) {
-		for (int i = servers.size()-1; i >= 0; i++) {
+		for (int i = servers.size()-1; i >= 0; i--) {
 			MachineDescriptor descriptor = servers.get(i).getDescriptor();
 			if(!descriptor.isReserved()){
 				removeServer(descriptor, force);
