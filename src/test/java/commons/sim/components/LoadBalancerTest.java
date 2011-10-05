@@ -3,7 +3,6 @@ package commons.sim.components;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
-
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -12,10 +11,9 @@ import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
 import provisioning.DPS;
 import provisioning.Monitor;
-
+import util.MockedConfigurationTest;
 import commons.cloud.MachineType;
 import commons.cloud.Request;
 import commons.config.Configuration;
@@ -31,7 +29,7 @@ import commons.sim.util.SimulatorProperties;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Configuration.class, MachineFactory.class})
-public class LoadBalancerTest {
+public class LoadBalancerTest extends MockedConfigurationTest {
 	
 	private LoadBalancer lb;
 	private JEEventScheduler eventScheduler;

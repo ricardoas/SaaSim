@@ -10,11 +10,13 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+import util.CleanConfigurationTest;
+
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public class RequestTest {
+public class RequestTest extends CleanConfigurationTest {
 
 	private static final int XLARGE_DEMAND = 300000;
 	private static final int LARGE_DEMAND = 500000;

@@ -8,6 +8,8 @@ import static org.junit.Assert.*;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
+import util.CleanConfigurationTest;
+
 import commons.sim.components.MachineDescriptor;
 
 /**
@@ -15,7 +17,7 @@ import commons.sim.components.MachineDescriptor;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class TypeProviderTest {
+public class TypeProviderTest extends CleanConfigurationTest {
 
 	private static final long HOUR_IN_MILLIS = 3600000;
 

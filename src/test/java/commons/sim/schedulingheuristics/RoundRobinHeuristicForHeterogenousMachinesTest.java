@@ -13,6 +13,8 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import util.MockedConfigurationTest;
+
 import commons.cloud.MachineType;
 import commons.cloud.Request;
 import commons.config.Configuration;
@@ -23,7 +25,7 @@ import commons.sim.jeevent.JEEventScheduler;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Configuration.class)
-public class RoundRobinHeuristicForHeterogenousMachinesTest {
+public class RoundRobinHeuristicForHeterogenousMachinesTest extends MockedConfigurationTest {
 	
 	private RoundRobinHeuristicForHeterogenousMachines heuristic;
 	

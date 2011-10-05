@@ -9,7 +9,9 @@ import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JETimeTest {
+import util.CleanConfigurationTest;
+
+public class JETimeTest extends CleanConfigurationTest {
 	
 	/**
 	 * This is quite realistic for our usage.

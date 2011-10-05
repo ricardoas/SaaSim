@@ -13,6 +13,8 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import util.MockedConfigurationTest;
+
 import commons.cloud.MachineType;
 import commons.cloud.Request;
 import commons.config.Configuration;
@@ -22,7 +24,7 @@ import commons.sim.jeevent.JEEventType;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Configuration.class)
-public class MultiCoreTimeSharedMachineTest {
+public class MultiCoreTimeSharedMachineTest extends MockedConfigurationTest {
 
 	private MachineDescriptor descriptor;
 

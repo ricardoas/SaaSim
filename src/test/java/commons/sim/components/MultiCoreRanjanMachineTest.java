@@ -17,6 +17,8 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import util.MockedConfigurationTest;
+
 import commons.cloud.MachineType;
 import commons.cloud.Request;
 import commons.config.Configuration;
@@ -28,8 +30,8 @@ import commons.sim.jeevent.JEEventType;
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore("org.apache.log4j.*")
 @PrepareForTest({JEEventScheduler.class, Configuration.class})
-public class MultiCoreRanjanMachineTest {
-	
+public class MultiCoreRanjanMachineTest extends MockedConfigurationTest {
+	//ValidConfigurationTest
 	private static final long DEFAULT_BACKLOG_SIZE = 2;
 	private static final long DEFAULT_MAX_NUM_OF_THREADS = 3;
 	

@@ -10,6 +10,8 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
+import util.CleanConfigurationTest;
+
 import commons.cloud.MachineType;
 import commons.cloud.Request;
 import commons.sim.components.Machine;
@@ -18,7 +20,7 @@ import commons.sim.components.TimeSharedMachine;
 import commons.sim.jeevent.JEEventScheduler;
 
 
-public class RanjanHeuristicTest {
+public class RanjanHeuristicTest extends CleanConfigurationTest {
 
 	private static final long ONE_MINUTE_IN_MILLIS = 1000 * 60;
 	

@@ -2,11 +2,10 @@ package commons.cloud;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-
+import util.CleanConfigurationTest;
 import commons.config.Configuration;
 
 /**
@@ -17,7 +16,7 @@ import commons.config.Configuration;
  * @author davidcmm
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class ContractTest {
+public class ContractTest extends CleanConfigurationTest {
 	
 	private static final long HOUR_IN_MILLIS = 3600000;
 	private static final long MB_IN_BYTES = 1024 * 1024;

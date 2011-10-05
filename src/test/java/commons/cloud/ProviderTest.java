@@ -9,8 +9,9 @@ import java.util.Arrays;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.EasyMock;
-import org.junit.Before;
 import org.junit.Test;
+
+import util.ValidConfigurationTest;
 
 import commons.config.Configuration;
 import commons.config.PropertiesTesting;
@@ -22,15 +23,20 @@ import commons.util.CostCalculus;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public class ProviderTest {
+public class ProviderTest extends ValidConfigurationTest {
 	
 	private Provider amazon;
 	
-	@Before
+	@Override
 	public void setUp() throws ConfigurationException{
-		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
+		super.setUp();
 		amazon = Configuration.getInstance().getProviders()[1];
 		assert amazon.getName().equals("amazon"): "Check providers order in iaas.providers file.";
+	}
+	
+	@Override
+	public String getConfigurationFile() {
+		return PropertiesTesting.VALID_FILE;
 	}
 	
 	/**

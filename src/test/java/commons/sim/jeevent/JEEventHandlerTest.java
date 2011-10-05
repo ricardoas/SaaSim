@@ -6,7 +6,9 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-public class JEEventHandlerTest {
+import util.CleanConfigurationTest;
+
+public class JEEventHandlerTest extends CleanConfigurationTest {
 	
 	private JEEventScheduler scheduler;
 

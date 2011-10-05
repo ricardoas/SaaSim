@@ -15,6 +15,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import provisioning.util.WorkloadParserFactory;
+import util.MockedConfigurationTest;
 
 import commons.cloud.Contract;
 import commons.cloud.MachineType;
@@ -33,7 +34,7 @@ import commons.sim.util.SaaSAppProperties;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Configuration.class, WorkloadParserFactory.class})
-public class RanjanProvisioningSystemForHeterogeneousMachinesTest {
+public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends MockedConfigurationTest {
 
 	private RanjanProvisioningSystemForHeterogeneousMachines dps;
 

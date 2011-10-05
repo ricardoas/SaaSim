@@ -16,6 +16,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import provisioning.util.WorkloadParserFactory;
+import util.MockedConfigurationTest;
 
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
@@ -36,8 +37,8 @@ import commons.sim.util.SaaSUsersProperties;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Configuration.class, WorkloadParserFactory.class})
-public class RanjanProvisioningSystemTest {
-	
+public class RanjanProvisioningSystemTest extends MockedConfigurationTest {
+	//ValidConfigurationTest
 	private RanjanProvisioningSystem dps;
 
 	@Test

@@ -5,7 +5,9 @@ import static org.junit.Assert.assertEquals;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
-public class JEEventTest {
+import util.CleanConfigurationTest;
+
+public class JEEventTest extends CleanConfigurationTest {
 
 	@Test
 	public void testCompareToWithDifferentTimes(){

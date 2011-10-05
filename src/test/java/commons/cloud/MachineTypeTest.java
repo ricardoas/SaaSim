@@ -1,17 +1,16 @@
-/**
- * 
- */
 package commons.cloud;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import util.CleanConfigurationTest;
+
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public class MachineTypeTest {
+public class MachineTypeTest extends CleanConfigurationTest {
 
 	@Test
 	public void testValueOfWithExistentValue() {

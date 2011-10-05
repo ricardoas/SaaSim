@@ -6,7 +6,9 @@ import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.Test;
 
-public class JEEventSchedulerTest {
+import util.CleanConfigurationTest;
+
+public class JEEventSchedulerTest extends CleanConfigurationTest {
 	
 	@Test
 	public void testRegisterHandler() {

@@ -7,14 +7,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.EasyMock;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import util.ValidConfigurationTest;
 
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
@@ -30,11 +30,11 @@ import commons.config.PropertiesTesting;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(AccountingSystem.class)
-public class AccountingSystemTest {
+public class AccountingSystemTest extends ValidConfigurationTest {
 	
-	@Before
-	public void setUp() throws ConfigurationException{
-		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
+	@Override
+	public String getConfigurationFile() {
+		return PropertiesTesting.VALID_FILE;
 	}
 
 	/**

@@ -4,9 +4,11 @@ import static org.junit.Assert.*;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
+import util.CleanConfigurationTest;
+
 import commons.sim.components.MachineDescriptor;
 
-public class UtilityResultEntryTest {
+public class UtilityResultEntryTest extends CleanConfigurationTest {
 	
 	@Test
 	public void testConstructWithEmptyUsersAndProviders(){

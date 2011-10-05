@@ -15,6 +15,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import provisioning.util.WorkloadParserFactory;
+import util.MockedConfigurationTest;
 
 import commons.cloud.Contract;
 import commons.cloud.MachineType;
@@ -29,7 +30,7 @@ import commons.util.Pair;
 
 //@RunWith(PowerMockRunner.class)
 //@PrepareForTest({WorkloadParserFactory.class, Configuration.class})
-public class OverProvisionHeuristicTest {
+public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 	
 //	@Test
 //	public void testFindPlanWithWorkloadWithEmptyWorkload() throws Exception{

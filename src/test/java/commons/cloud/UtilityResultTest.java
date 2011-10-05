@@ -9,7 +9,9 @@ import java.util.Iterator;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
-public class UtilityResultTest {
+import util.CleanConfigurationTest;
+
+public class UtilityResultTest extends CleanConfigurationTest {
 	
 	@Test
 	public void testUtilityWithoutAddingValues(){

@@ -6,11 +6,13 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import util.CleanConfigurationTest;
+
 import commons.config.Configuration;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Configuration.class)
-public class ProfitDrivenProvisioningSystemTest {
+public class ProfitDrivenProvisioningSystemTest extends CleanConfigurationTest {
 	
 	/**
 	 * This scenario verifies that if an event requesting a machine occurs when limits have been reached

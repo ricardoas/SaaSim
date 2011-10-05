@@ -5,12 +5,13 @@ package provisioning;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.EasyMock;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import util.ValidConfigurationTest;
 
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
@@ -28,14 +29,19 @@ import commons.sim.provisioningheuristics.MachineStatistics;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Configuration.class)
-public class MonitorTest {
+public class MonitorTest extends ValidConfigurationTest {
 
 	private Monitor monitor;
 
-	@Before
+	@Override
 	public void setUp() throws ConfigurationException{
-		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
+		super.setUp();
 		monitor = new DynamicProvisioningSystem();
+	}
+	
+	@Override
+	public String getConfigurationFile() {
+		return PropertiesTesting.VALID_FILE;
 	}
 
 	/**

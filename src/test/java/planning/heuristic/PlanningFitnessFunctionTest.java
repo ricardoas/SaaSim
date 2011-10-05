@@ -18,6 +18,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import planning.util.Summary;
+import util.MockedConfigurationTest;
 
 import commons.cloud.Contract;
 import commons.cloud.MachineType;
@@ -30,7 +31,7 @@ import commons.sim.util.SimulatorProperties;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Configuration.class)
-public class PlanningFitnessFunctionTest {
+public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 	
 	private final long DEFAULT_SLA = 8;
 	

@@ -9,13 +9,15 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import util.CleanConfigurationTest;
+
 import commons.cloud.MachineType;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public class MachineDescriptorTest {
+public class MachineDescriptorTest extends CleanConfigurationTest {
 
 	private MachineDescriptor small = new MachineDescriptor(0, false, MachineType.SMALL, 0);
 	private MachineDescriptor otherSmall = new MachineDescriptor(1, false, MachineType.SMALL, 0);

@@ -16,6 +16,8 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import util.MockedConfigurationTest;
+
 import commons.cloud.Contract;
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
@@ -37,8 +39,8 @@ import commons.sim.util.SaaSAppProperties;
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(Configuration.class)
-public class DynamicProvisioningSystemTest {
-	
+public class DynamicProvisioningSystemTest extends MockedConfigurationTest {
+	//ValidConfigurationTest
 	@Before
 	public void setUp() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.VALID_FILE);

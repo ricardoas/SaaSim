@@ -11,27 +11,34 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
+import util.ValidConfigurationTest;
+
 import commons.cloud.MachineType;
 import commons.cloud.Request;
 import commons.config.Configuration;
+import commons.config.PropertiesTesting;
 import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.components.TimeSharedMachine;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.SaaSAppProperties;
 
-
-public class ProfitDrivenHeuristicTest {
+public class ProfitDrivenHeuristicTest extends ValidConfigurationTest {
 	
 	private final String CONFIG_FILE = "src/test/resources/config.properties";
 	private double sla = 1000 * 50;//50 sec in millis
 	private ProfitDrivenHeuristic heuristic;
 	
-	@Before
+	@Override
 	public void setUp() throws ConfigurationException{
-		Configuration.buildInstance(CONFIG_FILE);
+		super.setUp();
 		Configuration.getInstance().setProperty(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME, this.sla);
 		this.heuristic = new ProfitDrivenHeuristic();
+	}
+	
+	@Override
+	public String getConfigurationFile() {
+		return CONFIG_FILE;
 	}
 	
 	@Test

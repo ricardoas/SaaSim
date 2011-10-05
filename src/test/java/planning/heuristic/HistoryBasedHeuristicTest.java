@@ -6,9 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.EasyMock;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
@@ -19,10 +17,10 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import provisioning.DPS;
 import provisioning.Monitor;
 import provisioning.util.DPSFactory;
+import util.ValidConfigurationTest;
 
 import commons.cloud.MachineType;
 import commons.cloud.UtilityResult;
-import commons.config.Configuration;
 import commons.config.PropertiesTesting;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.LoadBalancer;
@@ -34,11 +32,11 @@ import commons.sim.util.SimulatorFactory;
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore("org.apache.log4j.*")
 @PrepareForTest({SimulatorFactory.class, DPSFactory.class})
-public class HistoryBasedHeuristicTest {
-	
-	@BeforeClass
-	public static void setUp() throws ConfigurationException{
-		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
+public class HistoryBasedHeuristicTest extends ValidConfigurationTest {
+		
+	@Override
+	public String getConfigurationFile() {
+		return PropertiesTesting.VALID_FILE;
 	}
 	
 	@Test

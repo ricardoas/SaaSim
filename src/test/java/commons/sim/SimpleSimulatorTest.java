@@ -7,6 +7,7 @@ import java.util.Queue;
 import org.easymock.*;
 import org.junit.*;
 import provisioning.Monitor;
+import util.ValidConfigurationTest;
 import commons.cloud.*;
 import commons.config.*;
 import commons.io.WorkloadParser;
@@ -15,11 +16,11 @@ import commons.sim.jeevent.*;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
 
-public class SimpleSimulatorTest {
+public class SimpleSimulatorTest extends ValidConfigurationTest {
 	
-	@Before
-	public void setUp() throws Exception {
-		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
+	@Override
+	public String getConfigurationFile() {
+		return PropertiesTesting.VALID_FILE;
 	}
 
 	@Test(expected=AssertionError.class)

@@ -8,11 +8,13 @@ import static org.junit.Assert.*;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
+import util.CleanConfigurationTest;
+
 /**
  * Test class for {@link User}
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class UserTest {
+public class UserTest extends CleanConfigurationTest {
 	
 	private static final int STORAGE_IN_BYTES = 1024000;
 	private static final double SETUP = 1000.0;
