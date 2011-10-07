@@ -1,7 +1,6 @@
 package util;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.junit.Before;
 
 import commons.config.Configuration;
 import commons.config.PropertiesTesting;

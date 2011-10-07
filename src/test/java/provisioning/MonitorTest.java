@@ -3,13 +3,9 @@
  */
 package provisioning;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.EasyMock;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import util.ValidConfigurationTest;
 
@@ -19,7 +15,6 @@ import commons.cloud.Request;
 import commons.cloud.User;
 import commons.cloud.UtilityResultEntry;
 import commons.config.Configuration;
-import commons.config.PropertiesTesting;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.provisioningheuristics.MachineStatistics;
 
@@ -27,21 +22,15 @@ import commons.sim.provisioningheuristics.MachineStatistics;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Configuration.class)
 public class MonitorTest extends ValidConfigurationTest {
 
 	private Monitor monitor;
 
 	@Override
-	public void setUp() throws ConfigurationException{
+	public void setUp() throws Exception {
 		super.setUp();
+		buildFullConfiguration();
 		monitor = new DynamicProvisioningSystem();
-	}
-	
-	@Override
-	public String getConfigurationFile() {
-		return PropertiesTesting.VALID_FILE;
 	}
 
 	/**
@@ -115,15 +104,6 @@ public class MonitorTest extends ValidConfigurationTest {
 		
 		User user = EasyMock.createStrictMock(User.class);
 		user.calculatePartialReceipt(EasyMock.isA(UtilityResultEntry.class));
-		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider});
-		EasyMock.expect(config.getUsers()).andReturn(new User[]{user});
-		
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config);
-		
-		PowerMock.replayAll(config, provider, user);
 		
 		new DynamicProvisioningSystem().chargeUsers(0);
 		

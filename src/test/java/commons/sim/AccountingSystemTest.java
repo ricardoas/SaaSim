@@ -3,9 +3,7 @@
  */
 package commons.sim;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -22,7 +20,6 @@ import commons.cloud.User;
 import commons.cloud.UtilityResult;
 import commons.cloud.UtilityResultEntry;
 import commons.config.Configuration;
-import commons.config.PropertiesTesting;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -33,8 +30,9 @@ import commons.config.PropertiesTesting;
 public class AccountingSystemTest extends ValidConfigurationTest {
 	
 	@Override
-	public String getConfigurationFile() {
-		return PropertiesTesting.VALID_FILE;
+	public void setUp() throws Exception {
+		super.setUp();
+		buildFullConfiguration();
 	}
 
 	/**

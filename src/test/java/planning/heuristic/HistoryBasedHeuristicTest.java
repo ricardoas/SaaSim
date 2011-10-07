@@ -21,7 +21,6 @@ import util.ValidConfigurationTest;
 
 import commons.cloud.MachineType;
 import commons.cloud.UtilityResult;
-import commons.config.PropertiesTesting;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.Machine;
@@ -35,8 +34,9 @@ import commons.sim.util.SimulatorFactory;
 public class HistoryBasedHeuristicTest extends ValidConfigurationTest {
 		
 	@Override
-	public String getConfigurationFile() {
-		return PropertiesTesting.VALID_FILE;
+	public void setUp() throws Exception {
+		super.setUp();
+		buildFullConfiguration();
 	}
 	
 	@Test

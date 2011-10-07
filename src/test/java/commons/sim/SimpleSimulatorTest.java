@@ -15,7 +15,6 @@ import util.ValidConfigurationTest;
 
 import commons.cloud.MachineType;
 import commons.cloud.Request;
-import commons.config.PropertiesTesting;
 import commons.io.WorkloadParser;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.MachineDescriptor;
@@ -27,11 +26,17 @@ import commons.sim.jeevent.JEEventType;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
 
+/**
+ * 
+ * @author Lilia Sampaio - liliars@lsd.ufcg.edu.br
+ *
+ */
 public class SimpleSimulatorTest extends ValidConfigurationTest {
 	
 	@Override
-	public String getConfigurationFile() {
-		return PropertiesTesting.VALID_FILE;
+	public void setUp() throws Exception {
+		super.setUp();
+		buildFullConfiguration();
 	}
 
 	@Test(expected=AssertionError.class)
@@ -284,6 +289,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.verify(monitor, scheduler, handler, workloadParser);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testSetWorkloadParser() {
 		WorkloadParser<List<Request>> workloadParser = EasyMock.createMock(WorkloadParser.class);
@@ -318,6 +324,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testHandleEventReadWorkload() {
+		@SuppressWarnings("unchecked")
 		WorkloadParser<List<Request>> workloadParser = EasyMock.createMock(WorkloadParser.class);
 		JEEventHandler handler = EasyMock.createMock(JEEventHandler.class);
 		JEEventScheduler scheduler = EasyMock.createMock(JEEventScheduler.class);
@@ -352,6 +359,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.verify(monitor, scheduler, handler, workloadParser, timeSharedMachine, request);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testHandleEventChargeUsers() {
 		WorkloadParser<List<Request>> workloadParser = EasyMock.createMock(WorkloadParser.class);
@@ -385,6 +393,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.verify(monitor, scheduler, handler, workloadParser, timeSharedMachine);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testHandleEventCollectStatistics() {
 		WorkloadParser<List<Request>> workloadParser = EasyMock.createMock(WorkloadParser.class);

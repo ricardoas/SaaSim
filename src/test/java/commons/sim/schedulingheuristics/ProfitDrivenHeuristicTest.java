@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
@@ -21,20 +20,15 @@ import commons.sim.util.SaaSAppProperties;
 
 public class ProfitDrivenHeuristicTest extends ValidConfigurationTest {
 	
-	private final String CONFIG_FILE = "src/test/resources/config.properties";
 	private double sla = 1000 * 50;//50 sec in millis
 	private ProfitDrivenHeuristic heuristic;
 	
 	@Override
-	public void setUp() throws ConfigurationException{
+	public void setUp() throws Exception {
 		super.setUp();
+		buildFullConfiguration();
 		Configuration.getInstance().setProperty(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME, this.sla);
 		this.heuristic = new ProfitDrivenHeuristic();
-	}
-	
-	@Override
-	public String getConfigurationFile() {
-		return CONFIG_FILE;
 	}
 	
 	@Test
