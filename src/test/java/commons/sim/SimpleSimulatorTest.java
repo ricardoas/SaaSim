@@ -1,18 +1,29 @@
 package commons.sim;
 
 import static org.junit.Assert.*;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import org.easymock.*;
-import org.junit.*;
+
+import org.easymock.Capture;
+import org.easymock.EasyMock;
+import org.junit.Test;
+
 import provisioning.Monitor;
 import util.ValidConfigurationTest;
-import commons.cloud.*;
-import commons.config.*;
+
+import commons.cloud.MachineType;
+import commons.cloud.Request;
+import commons.config.PropertiesTesting;
 import commons.io.WorkloadParser;
-import commons.sim.components.*;
-import commons.sim.jeevent.*;
+import commons.sim.components.LoadBalancer;
+import commons.sim.components.MachineDescriptor;
+import commons.sim.components.TimeSharedMachine;
+import commons.sim.jeevent.JEEvent;
+import commons.sim.jeevent.JEEventHandler;
+import commons.sim.jeevent.JEEventScheduler;
+import commons.sim.jeevent.JEEventType;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
 

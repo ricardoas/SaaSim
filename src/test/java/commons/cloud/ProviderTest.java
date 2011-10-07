@@ -7,14 +7,12 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
 import util.ValidConfigurationTest;
 
 import commons.config.Configuration;
-import commons.config.PropertiesTesting;
 import commons.sim.components.MachineDescriptor;
 import commons.util.CostCalculus;
 
@@ -28,15 +26,12 @@ public class ProviderTest extends ValidConfigurationTest {
 	private Provider amazon;
 	
 	@Override
-	public void setUp() throws ConfigurationException{
+	public void setUp() throws Exception{
 		super.setUp();
+		buildFullConfiguration();
+		
 		amazon = Configuration.getInstance().getProviders()[1];
 		assert amazon.getName().equals("amazon"): "Check providers order in iaas.providers file.";
-	}
-	
-	@Override
-	public String getConfigurationFile() {
-		return PropertiesTesting.VALID_FILE;
 	}
 	
 	/**

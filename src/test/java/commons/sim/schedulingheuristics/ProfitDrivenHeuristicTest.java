@@ -1,14 +1,11 @@
 package commons.sim.schedulingheuristics;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.EasyMock;
-import org.junit.Before;
 import org.junit.Test;
 
 import util.ValidConfigurationTest;
@@ -16,7 +13,6 @@ import util.ValidConfigurationTest;
 import commons.cloud.MachineType;
 import commons.cloud.Request;
 import commons.config.Configuration;
-import commons.config.PropertiesTesting;
 import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.components.TimeSharedMachine;
