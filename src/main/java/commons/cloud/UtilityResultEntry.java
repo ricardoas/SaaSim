@@ -313,6 +313,10 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 		providers[provider].addUsage(type, onDemandCPUHours, onDemandCost, reservedCPUHours, reservedCost, monitoringCost);
 		this.cost += (onDemandCost + reservedCost + monitoringCost);
 	}
+	
+	public void addPenalty(double penalty){
+		this.penalty += penalty;
+	}
 
 	/**
 	 * @return The utility value of this entry.

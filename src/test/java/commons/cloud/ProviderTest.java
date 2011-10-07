@@ -5,14 +5,17 @@ package commons.cloud;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.util.Arrays;
 
 import org.easymock.EasyMock;
+import org.junit.After;
 import org.junit.Test;
 
 import util.ValidConfigurationTest;
 
 import commons.config.Configuration;
+import commons.io.Checkpointer;
 import commons.sim.components.MachineDescriptor;
 import commons.util.CostCalculus;
 
@@ -28,10 +31,23 @@ public class ProviderTest extends ValidConfigurationTest {
 	@Override
 	public void setUp() throws Exception{
 		super.setUp();
-		buildFullConfiguration();
+		deleteSimulationFiles();
 		
+		buildFullConfiguration();
 		amazon = Configuration.getInstance().getProviders()[1];
 		assert amazon.getName().equals("amazon"): "Check providers order in iaas.providers file.";
+	}
+
+	private void deleteSimulationFiles() {
+		new File(Checkpointer.MACHINES_DUMP).delete();
+		new File(Checkpointer.PROVIDERS_DUMP).delete();
+		new File(Checkpointer.SIMULATION_DUMP).delete();
+		new File(Checkpointer.USERS_DUMP).delete();
+	}
+	
+	@After
+	public void tearDown(){
+		deleteSimulationFiles();
 	}
 	
 	/**

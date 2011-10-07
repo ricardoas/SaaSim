@@ -1,7 +1,5 @@
 package planning.heuristic;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,12 +22,16 @@ import org.jgap.impl.StockRandomGenerator;
 import org.jgap.impl.WeightedRouletteSelector;
 
 import planning.io.PlanningWorkloadParser;
+import planning.util.PlanIOHandler;
 import planning.util.Summary;
+import provisioning.Monitor;
 
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.User;
 import commons.io.HistoryBasedWorkloadParser;
+import commons.sim.components.LoadBalancer;
+import commons.sim.jeevent.JEEventScheduler;
 
 public class AGHeuristic implements PlanningHeuristic{
 	
@@ -46,22 +48,21 @@ public class AGHeuristic implements PlanningHeuristic{
 
 	private IChromosome fittestChromosome;
 	
-	private FileWriter writer;
-	private static final String OUTPUT_FILE = "ag.plan";
+//	private FileWriter writer;
+//	private static final String OUTPUT_FILE = "ag.plan";
 	
-	public AGHeuristic(){
+	public AGHeuristic(JEEventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
 		this.types = new ArrayList<MachineType>();
 		this.summaries = new HashMap<User, List<Summary>>();
-		try {
-			writer = new FileWriter(new File(OUTPUT_FILE));
-		} catch (IOException e) {
-			throw new RuntimeException("Invalid optimal output file!");
-		}
+//		try {
+//			writer = new FileWriter(new File(OUTPUT_FILE));
+//		} catch (IOException e) {
+//			throw new RuntimeException("Invalid optimal output file!");
+//		}
 	}
 	
 	@Override
-	public void findPlan(HistoryBasedWorkloadParser workloadParser,
-			Provider[] cloudProviders, User[] cloudUsers){
+	public void findPlan(Provider[] cloudProviders, User[] cloudUsers){
 		
 		//Reading workload data
 		readWorkloadData(cloudUsers);
@@ -110,7 +111,7 @@ public class AGHeuristic implements PlanningHeuristic{
 				
 				//store best config
 				IChromosome currentFittest = population.getFittestChromosome();
-				persistData(currentFittest, currentFittest.getFitnessValue());
+//				persistData(currentFittest, currentFittest.getFitnessValue());
 				
 				if(fittestChromosome == null || currentFittest.getFitnessValue() > fittestChromosome.getFitnessValue()){
 					fittestChromosome = currentFittest;
@@ -121,20 +122,27 @@ public class AGHeuristic implements PlanningHeuristic{
 			e.printStackTrace();
 		}
 		
+		Map<MachineType, Integer> plan = this.getPlan(cloudUsers);
+		try {
+			PlanIOHandler.createPlanFile(plan, cloudProviders);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		
 	}
 	
-	private void persistData(IChromosome key, double fitness) {
-		StringBuilder result = new StringBuilder();
-		for(Gene gene : key.getGenes()){
-			result.append(gene.getAllele()+"\t");
-		}
-		result.append(fitness+"\n");
-		try {
-			writer.write(result.toString());
-		} catch (IOException e) {
-			throw new RuntimeException("Could not write in optimal output file");
-		}
-	}
+//	private void persistData(IChromosome key, double fitness) {
+//		StringBuilder result = new StringBuilder();
+//		for(Gene gene : key.getGenes()){
+//			result.append(gene.getAllele()+"\t");
+//		}
+//		result.append(fitness+"\n");
+//		try {
+//			writer.write(result.toString());
+//		} catch (IOException e) {
+//			throw new RuntimeException("Could not write in optimal output file");
+//		}
+//	}
 	
 	private boolean isEvolutionComplete(IChromosome previousFittestChromosome, IChromosome lastFittestChromosome) {
 		double previousFitnessValue = previousFittestChromosome.getFitnessValue();
@@ -232,11 +240,11 @@ public class AGHeuristic implements PlanningHeuristic{
 		System.out.println("CONFIG: "+genes[0].getAllele()+" "+genes[1].getAllele()+" "+genes[2].getAllele());
 		System.out.println("BEST: "+fittestChromosome.getFitnessValue());
 		
-		try {
-			writer.close();
-		} catch (IOException e) {
-			throw new RuntimeException(e.getMessage());
-		}
+//		try {
+//			writer.close();
+//		} catch (IOException e) {
+//			throw new RuntimeException(e.getMessage());
+//		}
 		return plan;
 	}
 }

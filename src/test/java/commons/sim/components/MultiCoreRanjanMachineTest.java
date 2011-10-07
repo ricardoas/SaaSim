@@ -1095,4 +1095,35 @@ public class MultiCoreRanjanMachineTest extends MockedConfigurationTest {
 		
 		assertFalse(machine.isBusy());//Verifying if machine is busy
 	}
+	
+	@Test
+	public void testRestartMachine() throws InterruptedException{
+		JEEventScheduler scheduler = new JEEventScheduler();
+		
+		Configuration config = EasyMock.createStrictMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(4);
+		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d);
+		EasyMock.expect(config.getLong(RANJAN_HEURISTIC_NUMBER_OF_TOKENS)).andReturn(DEFAULT_MAX_NUM_OF_THREADS);
+		EasyMock.expect(config.getLong(RANJAN_HEURISTIC_BACKLOG_SIZE)).andReturn(DEFAULT_BACKLOG_SIZE);
+		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d);
+		PowerMock.replay(Configuration.class);
+		
+		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		
+		PowerMock.replayAll(config, loadBalancer);
+		
+		MultiCoreRanjanMachine machine = new MultiCoreRanjanMachine(scheduler, descriptor, null);
+		assertNull(machine.loadBalancer);
+		assertEquals(1, machine.semaphore.availablePermits());
+		machine.semaphore.acquire(1);
+		assertEquals(0, machine.semaphore.availablePermits());
+		
+		//Restarting machine
+		machine.restart(loadBalancer, scheduler);
+		assertEquals(1, machine.semaphore.availablePermits());
+		assertEquals(loadBalancer, machine.loadBalancer);
+		
+		PowerMock.verifyAll();
+	}
 }

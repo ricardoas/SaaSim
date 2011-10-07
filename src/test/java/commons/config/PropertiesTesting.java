@@ -44,8 +44,12 @@ public class PropertiesTesting {
 	public static final String WRONG_USERS_FILE_5 = "src/test/resources/users/config5.properties";
 	public static final String WRONG_USERS_FILE_6 = "src/test/resources/users/config6.properties";
 	public static final String WRONG_USERS_FILE_7 = "src/test/resources/users/config7.properties";
+	public static final String WRONG_USERS_FILE_8 = "src/test/resources/users/config8.properties";
 
-
+	public static final String VALID_PLANNING_PROPERTIES = "src/test/resources/planning/valid.sum";
+	public static final String INVALID_PLANNING_PROPERTIES = "src/test/resources/planning/invalid.sum";
+	public static final String INVALID_PLANNING_PROPERTIES_2 = "src/test/resources/planning/invalid2.sum";
+	public static final String INVALID_PLANNING_PROPERTIES_3 = "src/test/resources/planning/invalid3.sum";
 
 }
 

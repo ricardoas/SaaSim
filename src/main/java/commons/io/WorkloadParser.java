@@ -25,4 +25,13 @@ public interface WorkloadParser<T> {
 	 */
 	boolean hasNext();
 
+	void clear();
+
+	int changeToPeak();
+	
+	int changeToTransition();
+	
+	int changeToNormal();
+
+	void setDaysAlreadyRead(int simulatedDays);
 }

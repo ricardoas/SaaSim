@@ -24,12 +24,16 @@ public class UserTest extends CleanConfigurationTest {
 	 */
 	@Test
 	public void testCalculateReceipt() {
+		double penalty = 0d;
+		
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
+		entry.addPenalty(penalty);
 		
 		Contract contract = EasyMock.createStrictMock(Contract.class);
 		
 		User user = new User(1, contract, STORAGE_IN_BYTES);
 		
+		EasyMock.expect(contract.calculatePenalty(Double.NaN)).andReturn(penalty);
 		contract.calculateReceipt(entry, user.getId(), 0, 0, 0, STORAGE_IN_BYTES);
 		EasyMock.replay(contract, entry);
 	
@@ -67,7 +71,6 @@ public class UserTest extends CleanConfigurationTest {
 		
 		EasyMock.replay(gold, silver);
 		
-		
 		User goldUser1 = new User(1, gold, STORAGE_IN_BYTES);
 		User goldUser2 = new User(2, gold, STORAGE_IN_BYTES);
 		User silverUser = new User(3, silver, STORAGE_IN_BYTES);
@@ -89,13 +92,16 @@ public class UserTest extends CleanConfigurationTest {
 		long totalProcessed = 250;
 		long requestSize = 1024 * 100;
 		long responseSize = 1024 * 1024 * 5;
+		Double penalty = 0d;
 		
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
+		entry.addPenalty(penalty);
 		
 		Contract gold = EasyMock.createStrictMock(Contract.class);
 		
 		User user = new User(1, gold , STORAGE_IN_BYTES);
 		
+		EasyMock.expect(gold.calculatePenalty(0.0)).andReturn(penalty);
 		gold.calculateReceipt(entry, user.getId(), 2*totalProcessed, 2*requestSize, 2*responseSize, STORAGE_IN_BYTES);
 		
 		Request request = EasyMock.createStrictMock(Request.class);;
@@ -112,9 +118,20 @@ public class UserTest extends CleanConfigurationTest {
 		
 		user.reportFinishedRequest(request);
 		user.reportFinishedRequest(request);
+		
+		assertEquals(STORAGE_IN_BYTES, user.getConsumedStorageInBytes());
+		assertEquals(totalProcessed * 2, user.getConsumedCpuInMillis());
+		assertEquals(requestSize * 2, user.getConsumedInTransferenceInBytes());
+		assertEquals(responseSize * 2, user.getConsumedOutTransferenceInBytes());
+		
 		user.calculatePartialReceipt(entry);
 		
 		EasyMock.verify(gold, request, entry);
+		
+		assertEquals(STORAGE_IN_BYTES, user.getConsumedStorageInBytes());
+		assertEquals(0, user.getConsumedCpuInMillis());
+		assertEquals(0, user.getConsumedInTransferenceInBytes());
+		assertEquals(0, user.getConsumedOutTransferenceInBytes());
 	}
 
 	/**
@@ -124,13 +141,16 @@ public class UserTest extends CleanConfigurationTest {
 	public void testReportLostRequest(){
 		long totalProcessed = 250;
 		long requestSize = 1024 * 100;
+		Double penalty = 100d;
 		
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
+		entry.addPenalty(penalty);
 		
 		Contract gold = EasyMock.createStrictMock(Contract.class);
 		
 		User user = new User(1, gold , STORAGE_IN_BYTES);
 		
+		EasyMock.expect(gold.calculatePenalty(1.0)).andReturn(penalty);
 		gold.calculateReceipt(entry, user.getId(), 2*totalProcessed, 2*requestSize, 0, STORAGE_IN_BYTES);
 		
 		Request request = EasyMock.createStrictMock(Request.class);;
@@ -140,12 +160,16 @@ public class UserTest extends CleanConfigurationTest {
 		EasyMock.expect(request.getTotalProcessed()).andReturn(totalProcessed);
 		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(requestSize);
 		
-		
 		EasyMock.replay(gold, request, entry);
 		
 		user.reportLostRequest(request);
 		user.reportLostRequest(request);
+		
+		assertEquals(2, user.getNumberOfLostRequests());
+
 		user.calculatePartialReceipt(entry);
+		
+		assertEquals(0, user.getNumberOfLostRequests());
 		
 		EasyMock.verify(gold, request, entry);
 	}

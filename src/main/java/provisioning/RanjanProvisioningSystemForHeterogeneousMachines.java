@@ -45,12 +45,12 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 	}
 
 	public long evaluateNumberOfServersForNextInterval(MachineStatistics statistics) {
-		double averageUtilization = statistics.averageUtilisation;
+		double averageUtilisation = statistics.averageUtilisation;
 		double d;
 		if(statistics.numberOfRequestsCompletionsInLastInterval == 0){
-			d = averageUtilization;
+			d = averageUtilisation;
 		}else{
-			d = averageUtilization / statistics.numberOfRequestsCompletionsInLastInterval;
+			d = averageUtilisation / statistics.numberOfRequestsCompletionsInLastInterval;
 		}
 		
 		double u_lign = Math.max(statistics.numberOfRequestsArrivalInLastInterval, statistics.numberOfRequestsCompletionsInLastInterval) * d;

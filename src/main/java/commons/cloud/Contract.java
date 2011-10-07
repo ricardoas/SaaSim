@@ -1,34 +1,36 @@
 package commons.cloud;
 
+import java.io.Serializable;
+
 import commons.util.CostCalculus;
 
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class Contract implements Comparable<Contract>{
+public class Contract implements Comparable<Contract>, Serializable{
 	
 	private static final long HOUR_IN_MILLIS = 3600000;
 	private static final long MB_IN_BYTES = 1024 * 1024;
 
-	private final String name;
-	private final int priority;
-	private final double price;//in $
-	private final double setupCost;//in $
-	private final long cpuLimitInMillis;// in hours
-	private final double extraCpuCost;// in $/hour
-	private final long[] transferenceLimitsInBytes;
-	private final double[] transferenceCosts;
-	private final long storageLimitInMB;
-	private final double storageCostPerMB;
+	private String name;
+	private int priority;
+	private double price;//in $
+	private double setupCost;//in $
+	private long cpuLimitInMillis;// in hours
+	private double extraCpuCost;// in $/hour
+	private long[] transferenceLimitsInBytes;
+	private double[] transferenceCosts;
+	private long storageLimitInMB;
+	private double storageCostPerMB;
 	
 	public Contract(String planName, int priority, double setupCost, double price,
 			long cpuLimitInMillis, double extraCpuCost, long[] transferenceLimitsInBytes, double[] transferenceCosts,
 			long storageLimitInMB, double storageCostPerMB) {
 		this.name = planName;
 		this.priority = priority;
-		this.setupCost = setupCost;
 		this.price = price;
+		this.setupCost = setupCost;
 		this.cpuLimitInMillis = cpuLimitInMillis;
 		this.extraCpuCost = extraCpuCost;
 		this.transferenceLimitsInBytes = transferenceLimitsInBytes;
@@ -37,6 +39,46 @@ public class Contract implements Comparable<Contract>{
 		this.storageCostPerMB = storageCostPerMB;
 	}
 	
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setPriority(int priority) {
+		this.priority = priority;
+	}
+
+	public void setPrice(double price) {
+		this.price = price;
+	}
+
+	public void setSetupCost(double setupCost) {
+		this.setupCost = setupCost;
+	}
+
+	public void setCpuLimitInMillis(long cpuLimitInMillis) {
+		this.cpuLimitInMillis = cpuLimitInMillis;
+	}
+
+	public void setExtraCpuCost(double extraCpuCost) {
+		this.extraCpuCost = extraCpuCost;
+	}
+
+	public void setTransferenceLimitsInBytes(long[] transferenceLimitsInBytes) {
+		this.transferenceLimitsInBytes = transferenceLimitsInBytes;
+	}
+
+	public void setTransferenceCosts(double[] transferenceCosts) {
+		this.transferenceCosts = transferenceCosts;
+	}
+
+	public void setStorageLimitInMB(long storageLimitInMB) {
+		this.storageLimitInMB = storageLimitInMB;
+	}
+
+	public void setStorageCostPerMB(double storageCostPerMB) {
+		this.storageCostPerMB = storageCostPerMB;
+	}
+
 	/**
 	 * @return the name
 	 */
@@ -161,7 +203,7 @@ public class Contract implements Comparable<Contract>{
 	
 	//According to https://signin.crm.dynamics.com/portal/static/1046/sla.htm
 	public double calculatePenalty(double totalLoss) {
-		if(totalLoss <= 0.001){
+		if(totalLoss <= 0.001 || Double.isInfinite(totalLoss) || Double.isNaN(totalLoss)){
 			return 0;
 		}else if(totalLoss > 0.001 && totalLoss <= 0.01){
 			return price * 0.25;

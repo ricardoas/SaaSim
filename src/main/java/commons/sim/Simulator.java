@@ -1,5 +1,7 @@
 package commons.sim;
 
+import commons.sim.components.LoadBalancer;
+
 
 
 /**
@@ -14,4 +16,6 @@ public interface Simulator extends DynamicConfigurable{
 	 * Start simulation.
 	 */
 	void start();
+
+	LoadBalancer[] getTiers();
 }

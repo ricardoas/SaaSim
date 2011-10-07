@@ -1,5 +1,6 @@
 package commons.cloud;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 
@@ -7,15 +8,15 @@ import java.util.Arrays;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public class Request{
+public class Request implements Serializable{
 	
-	private final int saasClient;
-	private final int userID;
-	private final long reqID;
-	private final long arrivalTimeInMillis;
-	private final long[] cpuDemandInMillis;
-	private final long requestSizeInBytes;
-	private final long responseSizeInBytes;
+	private int saasClient;
+	private int userID;
+	private long reqID;
+	private long arrivalTimeInMillis;
+	private long[] cpuDemandInMillis;
+	private long requestSizeInBytes;
+	private long responseSizeInBytes;
 	
 	private long totalProcessed;
 	private MachineType value;
@@ -41,6 +42,59 @@ public class Request{
 		this.totalProcessed = 0;
 	}
 	
+	public Request(int userID, long reqID, int saasClient,
+			long arrivalTimeInMillis, long requestSizeInBytes, long responseSizeInBytes,
+			long[] cpuDemandInMillis) {
+		this.saasClient = saasClient;
+		this.reqID = reqID;
+		this.userID = userID;
+		this.arrivalTimeInMillis = arrivalTimeInMillis;
+		this.requestSizeInBytes = requestSizeInBytes;
+		this.responseSizeInBytes = responseSizeInBytes;
+		this.cpuDemandInMillis = cpuDemandInMillis;
+		this.totalProcessed = 0;
+	}
+
+	public long getReqID() {
+		return reqID;
+	}
+
+	public void setReqID(long reqID) {
+		this.reqID = reqID;
+	}
+
+	public void setSaasClient(int saasClient) {
+		this.saasClient = saasClient;
+	}
+
+	public void setUserID(int userID) {
+		this.userID = userID;
+	}
+
+	public void setArrivalTimeInMillis(long arrivalTimeInMillis) {
+		this.arrivalTimeInMillis = arrivalTimeInMillis;
+	}
+
+	public void setCpuDemandInMillis(long[] cpuDemandInMillis) {
+		this.cpuDemandInMillis = cpuDemandInMillis;
+	}
+
+	public void setRequestSizeInBytes(long requestSizeInBytes) {
+		this.requestSizeInBytes = requestSizeInBytes;
+	}
+
+	public void setResponseSizeInBytes(long responseSizeInBytes) {
+		this.responseSizeInBytes = responseSizeInBytes;
+	}
+
+	public void setTotalProcessed(long totalProcessed) {
+		this.totalProcessed = totalProcessed;
+	}
+
+	public void setValue(MachineType value) {
+		this.value = value;
+	}
+
 	/**
 	 * @return the saasClient
 	 */
@@ -150,6 +204,15 @@ public class Request{
 		return getDemand() - this.totalProcessed;
 	}
 	
+	public long getTotalMeanToProcess() {
+		long total = 0;
+		for(long demand : this.cpuDemandInMillis){
+			total += demand;
+		}
+		
+		return total / this.cpuDemandInMillis.length;
+	}
+	
 	private long getDemand(){
 		return cpuDemandInMillis[value.ordinal()];
 	}
@@ -183,5 +246,6 @@ public class Request{
 				+ ", totalProcessed=" + totalProcessed + ", assignedTo=" + (value==null?"Nobody":value.toString())
 				+ "]";
 	}
+
 	
 }

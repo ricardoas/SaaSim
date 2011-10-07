@@ -1,69 +1,197 @@
 package planning.heuristic;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import planning.util.MachineUsageData;
+import planning.util.PlanIOHandler;
 import provisioning.DPS;
-import provisioning.util.DPSFactory;
+import provisioning.Monitor;
 
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.User;
-import commons.cloud.UtilityResult;
-import commons.io.HistoryBasedWorkloadParser;
+import commons.config.Configuration;
+import commons.io.Checkpointer;
+import commons.io.TickSize;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.Machine;
+import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.SimulatorFactory;
+import commons.sim.util.SimulatorProperties;
 
 public class HistoryBasedHeuristic implements PlanningHeuristic{
 
-	private UtilityResult utilityResult;
 	private Map<MachineType, Integer> plan;
 	
-	private double UTILISATION_THRESHOLD = 0.5;
-	private JEEventScheduler scheduler;
+	private static final long YEAR_IN_HOURS = 8640;
+	
+	private MachineUsageData machineData;
 
-	public HistoryBasedHeuristic(){
+	private final JEEventScheduler scheduler;
+
+	private final Monitor monitor;
+
+	public HistoryBasedHeuristic(JEEventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
+		this.scheduler = scheduler;
+		this.monitor = monitor;
+		
 		this.plan = new HashMap<MachineType, Integer>();
+		
+		try {
+			machineData = PlanIOHandler.getMachineData();
+		} catch (IOException e) {
+		} catch (ClassNotFoundException e) {
+		}
+		if(machineData == null){
+			machineData = new MachineUsageData();
+		}
 	}
 	
 	@Override
-	public void findPlan(HistoryBasedWorkloadParser workloadParser,
-			Provider[] cloudProviders, User[] cloudUsers) {
+	public void findPlan(Provider[] cloudProviders, User[] cloudUsers) {
 		
-		DPS dps = DPSFactory.createDPS();
+		//Simulating ...
+		DPS dps = (DPS) this.monitor;
 		
-		SimpleSimulator simulator = (SimpleSimulator) SimulatorFactory.buildSimulator(scheduler, dps);
+		SimpleSimulator simulator = (SimpleSimulator) SimulatorFactory.buildSimulator(this.scheduler, dps);
 		
 		dps.registerConfigurable(simulator);
 		
 		simulator.start();
 		
-		utilityResult = dps.calculateUtility();
+		//Calculating machines use data
+		LoadBalancer[] loadBalancers = calculateMachinesUsage(simulator);
+		Configuration config = Configuration.getInstance();
 		
-		LoadBalancer[] loadBalancers = simulator.getTiers();
-		for(LoadBalancer lb : loadBalancers){
-			List<Machine> servers = lb.getServers();
-			for(Machine server : servers){
-				double utilisation = (1.0 * server.getTotalTimeUsed())/(server.getDescriptor().getUpTimeInMillis() * server.getNumberOfCores());
-				if(utilisation >= UTILISATION_THRESHOLD){
-					Integer numberOfServers = this.plan.get(server.getDescriptor().getType());
+		if(config.getSimulationInfo().getSimulatedDays() == config.getLong(SimulatorProperties.PLANNING_PERIOD)){//Simulation finished!
+			
+			calculateMachinesToReserve(config);
+			try {
+				PlanIOHandler.createPlanFile(this.plan, config.getProviders());
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			
+		}else{//Persist data to other round
+			
+			persisDataToNextRound(loadBalancers, config);
+		}
+	}
+	
+	private Map<MachineType, Double> findReservationLimits(Provider cloudProvider) {
+		Map<MachineType, Double> typesLimits = new HashMap<MachineType, Double>();
+		
+		MachineType[] machineTypes = cloudProvider.getAvailableTypes();
+		
+		for(MachineType type : machineTypes){
+			double yearFee = cloudProvider.getReservationOneYearFee(type);
+			double reservedCpuCost = cloudProvider.getReservedCpuCost(type);
+			double onDemandCpuCost = cloudProvider.getOnDemandCpuCost(type);
+			
+			long minimumHoursToBeUsed = Math.round(yearFee / (onDemandCpuCost - reservedCpuCost));
+			double usageProportion = 1.0 * minimumHoursToBeUsed / YEAR_IN_HOURS;
+			typesLimits.put(type, usageProportion);
+		}
+		
+		return typesLimits;
+	}
+
+	private void calculateMachinesToReserve(Configuration config) {
+		Map<MachineType, Map<Long, Double>> map = this.machineData.getMachineUsagePerType();
+		Map<MachineType, Double> limits = findReservationLimits(config.getProviders()[0]);
+		long planningPeriod = config.getLong(SimulatorProperties.PLANNING_PERIOD);
+	
+		Map<MachineType, List<Double>> typeUse = new HashMap<MachineType, List<Double>>();
+		
+		for(MachineType type : map.keySet()	){//Checking if any machine was very used!
+			Map<Long, Double> machines = map.get(type);
+			typeUse.put(type, new ArrayList<Double>());
+			
+			for(long machineID : machines.keySet()){
+				double machineUsage = machines.get(machineID) / ( config.getRelativePower(type) * planningPeriod * 
+						TickSize.DAY.getTickInMillis());
+				
+				if( machineUsage >= limits.get(type) ){
+					Integer numberOfServers = this.plan.get(type);
 					if(numberOfServers == null ){
 						numberOfServers = 0;
 					}
 					numberOfServers++;
-					this.plan.put(server.getDescriptor().getType(), numberOfServers);
+					this.plan.put(type, numberOfServers);
+				}else{
+					typeUse.get(type).add(machineUsage);
 				}
 			}
 		}
+		
+		//Trying to aggregate machines use in order to check if other machines could be reserved
+		double currentUse = 0;
+		List<MachineType> typeList = Arrays.asList(MachineType.values());
+		Collections.reverse(typeList);
+		
+		for(Entry<MachineType, List<Double>> entry : typeUse.entrySet()){
+			for(Double use : entry.getValue()){
+				currentUse += use;
+				for(MachineType type : typeList){
+					if(limits.containsKey(type) && currentUse >= limits.get(type)){
+						Integer machinesToReserve = this.plan.get(type);
+						if(machinesToReserve == null){
+							machinesToReserve = 0;
+						}
+						machinesToReserve++;
+						this.plan.put(type, machinesToReserve);
+						currentUse -= limits.get(type);
+					}
+				}
+			}
+			
+		}
+	}
+
+	private void persisDataToNextRound(LoadBalancer[] loadBalancers,
+			Configuration config) {
+		User[] users = config.getUsers();
+		Provider[] providers = config.getProviders();
+		
+		List<Machine> machines = new ArrayList<Machine>();
+		for(LoadBalancer balancer : loadBalancers){
+			machines.addAll(balancer.getServers());
+		}
+		
+		try {
+			Checkpointer.dumpObjects(config.getSimulationInfo(), users, providers, machines);
+			Checkpointer.dumpMachineData(this.machineData);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private LoadBalancer[] calculateMachinesUsage(SimpleSimulator simulator) {
+		LoadBalancer[] loadBalancers = simulator.getTiers();
+		
+		for(LoadBalancer lb : loadBalancers){
+			List<Machine> servers = lb.getServers();
+			for(Machine server : servers){
+				MachineDescriptor descriptor = server.getDescriptor();
+				this.machineData.addUsage(descriptor.getType(),
+						descriptor.getMachineID(), server.getTotalTimeUsed());
+			}
+		}
+		return loadBalancers;
 	}
 
 	@Override
 	public double getEstimatedProfit(int period) {
-		return this.utilityResult.getUtility();
+		return 0;
 	}
 
 	@Override

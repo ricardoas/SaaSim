@@ -12,7 +12,6 @@ saas.plan.ex_transfer=0.5|1.5
 saas.plan.storage_lim=5120
 saas.plan.ex_storage=0.005
 
-
 #Second plan
 saas.plan.name=p2
 saas.plan.priority=1

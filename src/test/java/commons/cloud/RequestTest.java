@@ -3,9 +3,7 @@
  */
 package commons.cloud;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,25 +16,26 @@ import util.CleanConfigurationTest;
  */
 public class RequestTest extends CleanConfigurationTest {
 
-	private static final int XLARGE_DEMAND = 300000;
-	private static final int LARGE_DEMAND = 500000;
 	private static final int SMALL_DEMAND = 1000000;
+	private static final int LARGE_DEMAND = 500000;
+	private static final int MEDIUM_DEMAND = 400000;
+	private static final int XLARGE_DEMAND = 300000;
 	private Request request;
 	
 	@Before
 	public void setUp(){
-		request = new Request(1l, 1, 17756636, 0, 100, 1024000, new long[]{SMALL_DEMAND, LARGE_DEMAND, XLARGE_DEMAND});
+		request = new Request(1l, 1, 17756636, 0, 100, 1024000, new long[]{SMALL_DEMAND, LARGE_DEMAND, MEDIUM_DEMAND, XLARGE_DEMAND});
 	}
 	
 	@Test
 	public void testConstructor() {
-		Request request = new Request(1l, 1, 17756636, 0, 100, 1024000, new long[]{SMALL_DEMAND, LARGE_DEMAND, XLARGE_DEMAND});
+		Request request = new Request(1l, 1, 17756636, 0, 100, 1024000, new long[]{SMALL_DEMAND, LARGE_DEMAND, MEDIUM_DEMAND, XLARGE_DEMAND});
 		assertEquals(1, request.getSaasClient());
 		assertEquals(17756636, request.getUserID());
 		assertEquals(0, request.getArrivalTimeInMillis());
 		assertEquals(100, request.getRequestSizeInBytes());
 		assertEquals(1024000, request.getResponseSizeInBytes());
-		assertEquals(3, request.getCpuDemandInMillis().length);
+		assertEquals(4, request.getCpuDemandInMillis().length);
 	}
 
 	/**
@@ -63,6 +62,21 @@ public class RequestTest extends CleanConfigurationTest {
 		request.update(100);
 		assertEquals(SMALL_DEMAND-100, request.getTotalToProcess());
 		assertEquals(100, request.getTotalProcessed());
+	}
+	
+	@Test
+	public void testUpdateWithReset() {
+		request.assignTo(MachineType.SMALL);
+		request.update(100);
+		assertEquals(SMALL_DEMAND-100, request.getTotalToProcess());
+		assertEquals(100, request.getTotalProcessed());
+		
+		request.reset();
+		assertNull(request.getValue());
+		
+		request.assignTo(MachineType.SMALL);
+		assertEquals(SMALL_DEMAND, request.getTotalToProcess());
+		assertEquals(0, request.getTotalProcessed());
 	}
 
 	/**

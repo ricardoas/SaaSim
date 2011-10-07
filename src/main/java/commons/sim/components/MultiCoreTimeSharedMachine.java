@@ -16,7 +16,7 @@ import commons.util.Triple;
  */
 public class MultiCoreTimeSharedMachine extends TimeSharedMachine{
 	
-	protected Semaphore semaphore;
+	protected transient Semaphore semaphore;
 	
 	/**
 	 * Default constructor
@@ -27,6 +27,21 @@ public class MultiCoreTimeSharedMachine extends TimeSharedMachine{
 	public MultiCoreTimeSharedMachine(JEEventScheduler scheduler, MachineDescriptor descriptor, 
 			LoadBalancer loadBalancer) {
 		super(scheduler, descriptor, loadBalancer);
+		this.NUMBER_OF_CORES = (int) Math.floor(Configuration.getInstance().getRelativePower(descriptor.getType()));
+		this.semaphore = new Semaphore(this.NUMBER_OF_CORES, true);
+	}
+	
+	public MultiCoreTimeSharedMachine(MachineDescriptor descriptor, List<Request> processorQueue, 
+			long cpuQuantumInMilis, long lastUtilisationCalcTime, long totalTimeUsed, 
+			long lastUpdate, long totalTimeUsedInLastPeriod){
+		super(descriptor, processorQueue, cpuQuantumInMilis, lastUtilisationCalcTime, totalTimeUsed, lastUpdate, totalTimeUsedInLastPeriod);
+		this.NUMBER_OF_CORES = (int) Math.floor(Configuration.getInstance().getRelativePower(descriptor.getType()));
+		this.semaphore = new Semaphore(this.NUMBER_OF_CORES, true);
+	}
+	
+	@Override
+	public void restart(LoadBalancer loadBalancer, JEEventScheduler scheduler) {
+		super.restart(loadBalancer, scheduler);
 		this.NUMBER_OF_CORES = (int) Math.floor(Configuration.getInstance().getRelativePower(descriptor.getType()));
 		this.semaphore = new Semaphore(this.NUMBER_OF_CORES, true);
 	}

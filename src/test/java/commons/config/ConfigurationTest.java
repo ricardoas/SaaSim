@@ -1,24 +1,59 @@
 package commons.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationRuntimeException;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+
+import planning.heuristic.AGHeuristic;
+import provisioning.DynamicProvisioningSystem;
 
 import commons.cloud.Contract;
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
+import commons.cloud.TypeProvider;
 import commons.cloud.User;
-
+import commons.io.Checkpointer;
+import commons.sim.components.Machine;
+import commons.sim.components.MachineDescriptor;
+import commons.sim.components.TimeSharedMachine;
+import commons.sim.jeevent.JEEventScheduler;
+import commons.sim.schedulingheuristics.RoundRobinHeuristic;
+import commons.util.SimulationInfo;
 
 public class ConfigurationTest {
-
+	
+	@Before
+	public void setUp() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		Field field = Configuration.class.getDeclaredField("instance");
+		field.setAccessible(true);
+		field.set(null, null);
+		deleteSimulationFiles();
+	}
+	
+	@After
+	public void tearDown(){
+		deleteSimulationFiles();
+	}
+	
+	private void deleteSimulationFiles(){
+		new File(Checkpointer.MACHINES_DUMP).delete();
+		new File(Checkpointer.USERS_DUMP).delete();
+		new File(Checkpointer.SIMULATION_DUMP).delete();
+		new File(Checkpointer.PROVIDERS_DUMP).delete();
+	}
+	
 	@Test(expected=ConfigurationException.class)
 	public void testBuildInstanceWithNullArgument() throws ConfigurationException {
 		Configuration.buildInstance(null);
@@ -70,6 +105,44 @@ public class ConfigurationTest {
 		assertNotNull(Configuration.getInstance());
 	}
 	
+	@Test
+	public void testBuildInstanceWithValidConfigurationAndPreviousSimData() throws ConfigurationException {
+		savePreviousData();
+		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
+		assertNotNull(Configuration.getInstance());
+	}
+	
+	private void savePreviousData() {
+		deleteSimulationFiles();
+		
+		Contract contract = new Contract("p1", 1, 55.55, 101.10, 86400000, 0.1, new long[]{0}, new double[]{0.0, 0.0}, 
+				10000, 0.2);
+		User user = new User(0, contract, 1000);
+		User user2 = new User(1, contract, 1000);
+		SimulationInfo info = new SimulationInfo(100, 4);
+		
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(0, MachineType.SMALL, 0.1, 0.01, 100, 160, 10));
+		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.25, 0.1, 240, 360, 10));
+		
+		Provider provider = new Provider(0, "prov1", 10, 20, 0.15, new long[]{0}, new double[]{0.0, 0.0}, new long[]{1000}, 
+				new double[]{0.0, 0.1}, types);
+		Provider provider2 = new Provider(1, "prov2", 10, 20, 0.15, new long[]{0}, new double[]{0.0, 0.0}, new long[]{1000}, 
+				new double[]{0.0, 0.1}, types);
+		Provider provider3 = new Provider(2, "prov3", 10, 20, 0.15, new long[]{0}, new double[]{0.0, 0.0}, new long[]{1000}, 
+				new double[]{0.0, 0.1}, types);
+		
+		List<Machine> machines = new ArrayList<Machine>();
+		machines.add(new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(0, true, MachineType.MEDIUM, 0), null));
+		machines.add(new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, true, MachineType.SMALL, 0), null));
+		machines.add(new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(2, false, MachineType.MEDIUM, 0), null));
+		
+		try {
+			Checkpointer.dumpObjects(info, new User[]{user, user2}, new Provider[]{provider, provider2, provider3}, machines);
+		} catch (IOException e) {
+		}
+	}
+
 	@Test(expected=ConfigurationException.class)
 	public void testSaaSUsersWrongFile1() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.WRONG_USERS_FILE_1);
@@ -103,6 +176,11 @@ public class ConfigurationTest {
 	@Test(expected=ConfigurationException.class)
 	public void testSaaSUsersWrongFile7() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.WRONG_USERS_FILE_7);
+	}
+	
+	@Test(expected=ConfigurationException.class)
+	public void testSaaSUsersWrongFile8() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.WRONG_USERS_FILE_8);
 	}
 	
 	@Test(expected=ConfigurationException.class)
@@ -204,15 +282,53 @@ public class ConfigurationTest {
 	public void testValidFile() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
 		Configuration config = Configuration.getInstance();
-		config.getApplicationHeuristics();
-		config.getDPSHeuristicClass();
-		config.getPlanningHeuristicClass();
+		assertEquals(RoundRobinHeuristic.class, config.getApplicationHeuristics()[0]);
+		assertEquals(DynamicProvisioningSystem.class, config.getDPSHeuristicClass());
+		assertEquals(AGHeuristic.class, config.getPlanningHeuristicClass());
 //		config.getProviders();
 		assertEquals(1, config.getRelativePower(MachineType.SMALL), 0.0);
 		assertEquals(4, config.getRelativePower(MachineType.MEDIUM), 0.0);
 		assertEquals(2, config.getRelativePower(MachineType.LARGE), 0.0);
 		assertEquals(4, config.getRelativePower(MachineType.XLARGE), 0.0);
 //		config.getUsers();
+	}
+	
+	@Test
+	public void testValidFileWithPreviousData() throws ConfigurationException{
+		savePreviousData();
+
+		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
+		Configuration config = Configuration.getInstance();
+		assertEquals(RoundRobinHeuristic.class, config.getApplicationHeuristics()[0]);
+		assertEquals(DynamicProvisioningSystem.class, config.getDPSHeuristicClass());
+		assertEquals(AGHeuristic.class, config.getPlanningHeuristicClass());
+		assertEquals(1, config.getRelativePower(MachineType.SMALL), 0.0);
+		assertEquals(4, config.getRelativePower(MachineType.MEDIUM), 0.0);
+		
+		//Checking users
+		assertEquals(2, config.getUsers().length);
+		assertEquals(0, config.getUsers()[0].getId());
+		assertEquals(1, config.getUsers()[1].getId());
+		assertEquals(55.55, config.getUsers()[0].getContract().getSetupCost(), 0.00001);
+		assertEquals(86400000, config.getUsers()[0].getContract().getCpuLimitInMillis());
+		assertEquals(101.10, config.getUsers()[0].getContract().getPrice(), 0.000001);
+		
+		//Checking Simulation info
+		assertEquals(100, config.getSimulationInfo().getSimulatedDays());
+		assertEquals(4, config.getSimulationInfo().getCurrentMonth());
+		
+		//Checking providers
+		assertEquals(3, config.getProviders().length);
+		assertEquals(10, config.getProviders()[0].getOnDemandLimit());
+		assertEquals(20, config.getProviders()[0].getReservationLimit());
+		assertEquals(0.25, config.getProviders()[0].getOnDemandCpuCost(MachineType.MEDIUM), 0.00001);
+		assertEquals(0.01, config.getProviders()[0].getReservedCpuCost(MachineType.SMALL), 0.00001);
+		
+		//Checking machines
+		assertEquals(3, config.getPreviousMachines().size());
+		assertEquals(MachineType.MEDIUM, config.getPreviousMachines().get(0).getDescriptor().getType());
+		assertEquals(MachineType.SMALL, config.getPreviousMachines().get(1).getDescriptor().getType());
+		assertEquals(MachineType.MEDIUM, config.getPreviousMachines().get(2).getDescriptor().getType());
 	}
 
 	@Test
@@ -238,15 +354,15 @@ public class ConfigurationTest {
 
 		Contract c2 = users[1].getContract();
 		assertNotNull(c2);
-		assertEquals("silver", c2.getName());
-		assertEquals(3, c2.getPriority());
-		assertEquals(39.95, c2.getPrice(), 0.0);
-		assertEquals(0, c2.getSetupCost(), 0.0);
+		assertEquals("bronze", c2.getName());
+		assertEquals(4, c2.getPriority());
+		assertEquals(24.95, c2.getPrice(), 0.0);
+		assertEquals(0.0, c2.getSetupCost(), 0.0);
 		assertEquals(10, c2.getCpuLimitInMillis(), 0.0);
 		assertEquals(1, c2.getExtraCpuCost(), 0.0);
-		Assert.assertArrayEquals(new long[]{4096}, c2.getTransferenceLimitsInBytes());
+		Assert.assertArrayEquals(new long[]{2048}, c2.getTransferenceLimitsInBytes());
 		Assert.assertArrayEquals(new double[]{0,0.005}, c2.getTransferenceCosts(), 0.0);
-		assertEquals(300, c2.getStorageLimitInMB(), 0.0);
+		assertEquals(200, c2.getStorageLimitInMB(), 0.0);
 		assertEquals(0.1, c2.getStorageCostPerMB(), 0.0);
 	}
 	

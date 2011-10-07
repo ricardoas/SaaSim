@@ -19,6 +19,7 @@ public class JEEventScheduler {
 	private long simulationEnd;
     private Map<Integer,JEEventHandler> handlerMap;
     private TreeSet<JEEvent> eventSet;
+    
 	private Random random;
 	
     /**
@@ -111,6 +112,7 @@ public class JEEventScheduler {
     		JEEvent event = eventSet.pollFirst();
     		now = event.getScheduledTime();
     		processEvent(event);
+    		event = null;
     	}
     }
 
@@ -121,8 +123,8 @@ public class JEEventScheduler {
     private void processEvent(JEEvent event) {
 		
     	assert handlerMap.containsKey(event.getTargetHandlerId()): "ERROR: no Handler registered with id " + (event.getTargetHandlerId());
-    	
-    	handlerMap.get(event.getTargetHandlerId()).handleEvent(event);
+
+		handlerMap.get(event.getTargetHandlerId()).handleEvent(event);
     }
     
     /**

@@ -3,6 +3,8 @@
  */
 package commons.sim.jeevent;
 
+import java.io.Serializable;
+
 
 /**
  * TODO make doc
@@ -10,11 +12,11 @@ package commons.sim.jeevent;
  * @author thiago - thiago@lsd.ufcg.edu.br
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public abstract class JEAbstractEventHandler implements JEEventHandler {
+public abstract class JEAbstractEventHandler implements JEEventHandler, Serializable {
 	
-    private final int id;
+    private transient int id;
     
-    private final JEEventScheduler scheduler;
+    private transient JEEventScheduler scheduler;
     
     /**
      * Default empty constructor. Creates and registers a handler in the scheduler.
@@ -23,6 +25,16 @@ public abstract class JEAbstractEventHandler implements JEEventHandler {
     	
     	this.scheduler = scheduler;
 		this.id = this.scheduler.registerHandler(this);
+    }
+    
+    public JEAbstractEventHandler(){
+    	this.scheduler = null;
+    	this.id = 0;
+    }
+    
+    public JEAbstractEventHandler(JEEventScheduler scheduler, int id){
+		this.scheduler = scheduler;
+		this.id = id;
     }
     
     /**
@@ -44,6 +56,11 @@ public abstract class JEAbstractEventHandler implements JEEventHandler {
     @Override
 	public void forward(JEEvent event, JEEventHandler handler) {
     	getScheduler().queueEvent(new JEEvent(event, handler));
+    }
+    
+    protected void setScheduler(JEEventScheduler scheduler){
+    	this.scheduler = scheduler;
+    	this.id = this.scheduler.registerHandler(this);
     }
     
     /**

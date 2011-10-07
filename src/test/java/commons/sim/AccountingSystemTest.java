@@ -5,13 +5,17 @@ package commons.sim;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+
 import org.easymock.EasyMock;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import planning.util.PlanIOHandler;
 import util.ValidConfigurationTest;
 
 import commons.cloud.MachineType;
@@ -20,6 +24,7 @@ import commons.cloud.User;
 import commons.cloud.UtilityResult;
 import commons.cloud.UtilityResultEntry;
 import commons.config.Configuration;
+import commons.io.Checkpointer;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -29,9 +34,24 @@ import commons.config.Configuration;
 @PrepareForTest(AccountingSystem.class)
 public class AccountingSystemTest extends ValidConfigurationTest {
 	
+	private void cleanDumpFiles() {
+		new File(Checkpointer.MACHINE_DATA_DUMP).delete();
+		new File(Checkpointer.MACHINES_DUMP).delete();
+		new File(Checkpointer.PROVIDERS_DUMP).delete();
+		new File(Checkpointer.SIMULATION_DUMP).delete();
+		new File(Checkpointer.USERS_DUMP).delete();
+		new File(PlanIOHandler.NUMBER_OF_MACHINES_FILE).delete();
+	}
+	
+	@After
+	public void tearDown(){
+		cleanDumpFiles();
+	}
+
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
+		cleanDumpFiles();
 		buildFullConfiguration();
 	}
 
@@ -62,9 +82,12 @@ public class AccountingSystemTest extends ValidConfigurationTest {
 		User[] users = Configuration.getInstance().getUsers();
 
 		UtilityResultEntry entry = PowerMock.createStrictMockAndExpectNew(UtilityResultEntry.class, 0L, users, providers);
+		entry.addPenalty(0.0);
 		entry.addToReceipt(EasyMock.anyInt(), EasyMock.anyObject(String.class), EasyMock.anyLong(), 
 				EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyDouble());
-		PowerMock.expectLastCall().times(2);
+		entry.addPenalty(0.0);
+		entry.addToReceipt(EasyMock.anyInt(), EasyMock.anyObject(String.class), EasyMock.anyLong(), 
+				EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyDouble());
 		//RACKSPACE
 		entry.addUsageToCost(EasyMock.anyInt(), EasyMock.anyObject(MachineType.class), 
 				EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyLong(), EasyMock.anyDouble(), EasyMock.anyDouble());

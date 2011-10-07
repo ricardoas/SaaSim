@@ -20,8 +20,8 @@ public class JEEvent implements Comparable<JEEvent>{
 	private final int eventId;
     private final int targetHandlerId;
     private long scheduledTime;
-    private final JEEventType type;
-	private final Object[] value;
+    private JEEventType type;
+	private Object[] value;
     
     
     /**

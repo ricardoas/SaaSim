@@ -4,6 +4,7 @@ import java.util.List;
 
 import commons.cloud.Request;
 import commons.io.WorkloadParser;
+import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 
 /**
@@ -19,6 +20,8 @@ public interface DynamicConfigurable {
 	 */
 	void addServer(int tier, MachineDescriptor machineDescriptor, boolean useStartUpDelay);
 	
+	void addServer(int tier, Machine machine);
+	
 	/**
 	 * @param tier
 	 * @param serverID
@@ -29,5 +32,6 @@ public interface DynamicConfigurable {
 	void setWorkloadParser(WorkloadParser<List<Request>> parser);
 
 	void removeServer(int tier, boolean force);
+
 	
 }

@@ -944,6 +944,36 @@ public class MultiCoreTimeSharedMachineTest extends MockedConfigurationTest {
 		assertFalse(machine.isBusy());//Verifying if machine is busy
 	}
 	
+	@Test
+	public void testRestartMachine() throws InterruptedException{
+		JEEventScheduler scheduler = new JEEventScheduler();
+		
+		Configuration config = EasyMock.createStrictMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
+		EasyMock.expect(config.getRelativePower(MachineType.XLARGE)).andReturn(3d);
+		EasyMock.expect(config.getRelativePower(MachineType.XLARGE)).andReturn(3d);
+		PowerMock.replay(Configuration.class);
+		
+		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		
+		PowerMock.replay(config, loadBalancer);
+		
+		this.descriptor = new MachineDescriptor(1, false, MachineType.XLARGE, 0);
+		MultiCoreTimeSharedMachine machine = new MultiCoreTimeSharedMachine(scheduler, descriptor, null);
+		assertNull(machine.loadBalancer);
+		assertEquals(3, machine.semaphore.availablePermits());
+		machine.semaphore.acquire(2);
+		assertEquals(1, machine.semaphore.availablePermits());
+		
+		//Restarting machine
+		machine.restart(loadBalancer, scheduler);
+		assertEquals(loadBalancer, machine.loadBalancer);
+		assertEquals(3, machine.semaphore.availablePermits());
+		
+		PowerMock.verifyAll();
+	}
+	
 //	@Test
 //	public void testEstimateFinishTime(){
 //		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);

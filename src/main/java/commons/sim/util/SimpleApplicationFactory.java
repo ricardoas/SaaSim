@@ -17,8 +17,7 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public LoadBalancer[] createNewApplication(JEEventScheduler scheduler,
-			Monitor monitor) {
+	public LoadBalancer[] createNewApplication(JEEventScheduler scheduler, Monitor monitor) {
 		Configuration config = Configuration.getInstance();
 		int numOfTiers = config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS);
 		

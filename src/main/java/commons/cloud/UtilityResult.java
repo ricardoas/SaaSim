@@ -15,6 +15,7 @@ public class UtilityResult{
 	
 	private double uniqueReceipt;
 	private double uniqueCost;
+	private double finalProfit;
 	
 	/**
 	 * Default constructor.
@@ -27,18 +28,19 @@ public class UtilityResult{
 		providersUniqueFee = new double[numberOfProviders][MachineType.values().length];
 		uniqueCost = 0;
 		uniqueReceipt = 0;
+		finalProfit = 0;
 	}
 
 	/**
 	 * @return The total utility value.
 	 */
 	public double getUtility() {
-		double result = 0;
+		finalProfit = 0d;
 		for ( UtilityResultEntry entry : entries) {
-			result += entry.getUtility();
+			finalProfit += entry.getUtility();
 		}
-		result += (uniqueReceipt - uniqueCost);
-		return result;
+		finalProfit += (uniqueReceipt - uniqueCost);
+		return finalProfit;
 	}
 	
 	/**
@@ -48,6 +50,9 @@ public class UtilityResult{
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
+		
+		sb.append(finalProfit+"\t"+uniqueReceipt+"\t"+uniqueCost+"\n");
+		
 		for (UtilityResultEntry entry : entries) {
 			sb.append(entry);
 			sb.append('\n');

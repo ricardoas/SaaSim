@@ -1,5 +1,6 @@
 package planning.heuristic;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -219,6 +220,35 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		}
 		
 		return totalArrivalRate;
+	}
+	
+	public static void main(String[] args) {
+		int arrivaRate = 2;
+		int completeRate = 1;
+		List<Integer> queue = new ArrayList<Integer>();
+		
+		int lostCounter = 0;
+		
+		for(int i = 0; i < 100; i++){
+			//Requests being completed
+			for(int j = 0; j < completeRate; j++){
+				if(queue.size() > 0){
+					queue.remove(0);
+				}
+			}
+			
+			//Requests arriving
+			for(int j = 0; j < arrivaRate; j++){
+				if(queue.size() >= 5){
+					System.out.println("Lost "+i);
+					lostCounter++;
+				}else{
+					queue.add(i);
+				}
+			}
+		}
+		
+		System.out.println(lostCounter);
 	}
 
 }

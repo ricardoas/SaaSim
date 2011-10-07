@@ -169,7 +169,7 @@ public class TypeProviderTest extends CleanConfigurationTest {
 	}
 	
 	@Test
-	public void testCalculateUniqueCostWithNoMachineUsed(){
+	public void testCalculateCostWithNoMachineUsed(){
 		TypeProvider type = new TypeProvider(0, MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
 		entry.addUsageToCost(0, MachineType.SMALL, 0, 0, 0, 0, 0);
@@ -181,7 +181,7 @@ public class TypeProviderTest extends CleanConfigurationTest {
 	}
 	
 	@Test
-	public void testCalculateUniqueCostWithOndemandRunningMachineUsed(){
+	public void testCalculateCostWithOndemandRunningMachineUsed(){
 		TypeProvider type = new TypeProvider(0, MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
 		entry.addUsageToCost(0, MachineType.SMALL, 1, 1 * onDemandCost, 0, 0, 1 * monitoringCost);
@@ -196,7 +196,7 @@ public class TypeProviderTest extends CleanConfigurationTest {
 	}
 	
 	@Test
-	public void testCalculateUniqueCostWithOndemandFinishedMachineUsed(){
+	public void testCalculateCostWithOndemandFinishedMachineUsed(){
 		TypeProvider type = new TypeProvider(0, MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
 		entry.addUsageToCost(0, MachineType.SMALL, 1, 1 * onDemandCost, 0, 0, 1 * monitoringCost);
@@ -213,7 +213,7 @@ public class TypeProviderTest extends CleanConfigurationTest {
 	}
 	
 	@Test
-	public void testCalculateUniqueCostWithReservedRunningMachineUsed(){
+	public void testCalculateCostWithReservedRunningMachineUsed(){
 		TypeProvider type = new TypeProvider(0, MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
 		entry.addUsageToCost(0, MachineType.SMALL, 0, 0, 1, 1 * reservationCost, 1 * monitoringCost);
@@ -228,7 +228,7 @@ public class TypeProviderTest extends CleanConfigurationTest {
 	}
 
 	@Test
-	public void testCalculateUniqueCostWithReservedFinishedMachineUsed(){
+	public void testCalculateCostWithReservedFinishedMachineUsed(){
 		TypeProvider type = new TypeProvider(0, MachineType.SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
 		entry.addUsageToCost(0, MachineType.SMALL, 0, 0, 1, 1 * reservationCost, 1 * monitoringCost);

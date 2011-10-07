@@ -386,7 +386,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		SimpleSimulator simulator = new SimpleSimulator(scheduler, monitor, loadBalancer);
 		
 		simulator.setWorkloadParser(workloadParser);
-		JEEvent event = new JEEvent(JEEventType.CHARGE_USERS, handler, 1L, timeSharedMachine);
+		JEEvent event = new JEEvent(JEEventType.CHARGE_USERS, handler, 1L, 31);
 		simulator.handleEvent(event);
 		assertEquals(JEEventType.CHARGE_USERS, eventChargeUser.getValue().getType());
 		

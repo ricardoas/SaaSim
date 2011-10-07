@@ -3,6 +3,7 @@ package commons.sim.components;
 import static org.junit.Assert.assertEquals;
 
 import java.util.List;
+
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -11,9 +12,11 @@ import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
 import provisioning.DPS;
 import provisioning.Monitor;
 import util.MockedConfigurationTest;
+
 import commons.cloud.MachineType;
 import commons.cloud.Request;
 import commons.config.Configuration;
@@ -109,6 +112,39 @@ public class LoadBalancerTest extends MockedConfigurationTest {
 		JEEvent event = captured.getValue();
 		assertEquals(JEEventType.ADD_SERVER, event.getType());
 		assertEquals(0, event.getScheduledTime());
+		
+		PowerMock.verifyAll();
+	}
+	
+	@Test
+	public void testAddNewServerDirectlyToLoadBalancer() throws InterruptedException{
+		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
+		
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(LoadBalancer.class))).andReturn(1);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(MultiCoreTimeSharedMachine.class))).andReturn(2);
+		EasyMock.expect(scheduler.now()).andReturn(0l);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(MultiCoreTimeSharedMachine.class))).andReturn(2);
+		
+		this.schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
+		
+		Configuration config = EasyMock.createStrictMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
+		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(2d).times(2);
+		
+		PowerMock.replayAll(this.schedulingHeuristic, config, scheduler);
+		
+		lb = new LoadBalancer(scheduler, null, schedulingHeuristic, Integer.MAX_VALUE, 0);
+		MultiCoreTimeSharedMachine machine = new MultiCoreTimeSharedMachine(scheduler, descriptor, lb);
+		machine.semaphore.acquire(2);
+		
+		assertEquals(0, lb.getServers().size());
+		assertEquals(0, machine.semaphore.availablePermits());
+		
+		lb.addServer(machine);//It also resets machine ...
+		assertEquals(1, lb.getServers().size());
+		assertEquals(2, machine.semaphore.availablePermits());
 		
 		PowerMock.verifyAll();
 	}

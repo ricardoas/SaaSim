@@ -1,11 +1,13 @@
 package commons.cloud;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+
 import util.CleanConfigurationTest;
+
 import commons.config.Configuration;
 
 /**
@@ -25,7 +27,7 @@ public class ContractTest extends CleanConfigurationTest {
 	private String plan2 = "gold";
 	private static final int HIGH = 0;
 	private static final int LOW = 1;
-	private double setupCost = 0.0;
+	private double setupCost = 1000.0;
 	private double price = 24.95;
 	private long cpuLimit = 10 * HOUR_IN_MILLIS;
 	private double extraCpuCost = 5.0;
@@ -184,7 +186,7 @@ public class ContractTest extends CleanConfigurationTest {
 	 */
 	@Test
 	public void testCalculateOneTimeFees(){
-		assertEquals(0.0, c1.calculateOneTimeFees(), 0.0);
+		assertEquals(setupCost, c1.calculateOneTimeFees(), 0.0);
 	}
 	
 	@Test

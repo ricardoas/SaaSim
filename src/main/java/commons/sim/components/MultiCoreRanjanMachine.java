@@ -1,9 +1,10 @@
 package commons.sim.components;
 
-import static commons.sim.util.SimulatorProperties.RANJAN_HEURISTIC_BACKLOG_SIZE;
-import static commons.sim.util.SimulatorProperties.RANJAN_HEURISTIC_NUMBER_OF_TOKENS;
+import static commons.sim.util.SimulatorProperties.*;
 
+import java.io.Serializable;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 import commons.cloud.Request;
@@ -21,7 +22,7 @@ import commons.sim.jeevent.JEEventType;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public class MultiCoreRanjanMachine extends MultiCoreTimeSharedMachine {
+public class MultiCoreRanjanMachine extends MultiCoreTimeSharedMachine implements Serializable {
 	
 	private Queue<Request> backlog;
 	
@@ -38,6 +39,46 @@ public class MultiCoreRanjanMachine extends MultiCoreTimeSharedMachine {
 		this.backlogMaximumNumberOfRequests = Configuration.getInstance().getLong(RANJAN_HEURISTIC_BACKLOG_SIZE);
 	}
 	
+	public MultiCoreRanjanMachine(MachineDescriptor descriptor, List<Request> processorQueue, 
+			long cpuQuantumInMilis, long lastUtilisationCalcTime, long totalTimeUsed, 
+			long lastUpdate, long totalTimeUsedInLastPeriod, Queue<Request> backlog, long maximumNumberOfSimultaneousThreads, long backlogMaximumNumberOfRequests){
+		super(descriptor, processorQueue, cpuQuantumInMilis, lastUtilisationCalcTime, totalTimeUsed, lastUpdate, totalTimeUsedInLastPeriod);
+		this.backlog = backlog;
+		this.maximumNumberOfSimultaneousThreads = maximumNumberOfSimultaneousThreads;
+		this.backlogMaximumNumberOfRequests = backlogMaximumNumberOfRequests;
+	}
+	
+	@Override
+	public void restart(LoadBalancer loadBalancer, JEEventScheduler scheduler) {
+		super.restart(loadBalancer, scheduler);
+	}
+	
+	public Queue<Request> getBacklog() {
+		return backlog;
+	}
+
+	public void setBacklog(Queue<Request> backlog) {
+		this.backlog = backlog;
+	}
+
+	public long getMaximumNumberOfSimultaneousThreads() {
+		return maximumNumberOfSimultaneousThreads;
+	}
+
+	public void setMaximumNumberOfSimultaneousThreads(
+			long maximumNumberOfSimultaneousThreads) {
+		this.maximumNumberOfSimultaneousThreads = maximumNumberOfSimultaneousThreads;
+	}
+
+	public long getBacklogMaximumNumberOfRequests() {
+		return backlogMaximumNumberOfRequests;
+	}
+
+	public void setBacklogMaximumNumberOfRequests(
+			long backlogMaximumNumberOfRequests) {
+		this.backlogMaximumNumberOfRequests = backlogMaximumNumberOfRequests;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -49,6 +90,7 @@ public class MultiCoreRanjanMachine extends MultiCoreTimeSharedMachine {
 			this.backlog.add(request);
 		}else{
 			send(new JEEvent(JEEventType.REQUESTQUEUED, getLoadBalancer(), getScheduler().now(), request));
+			request = null;
 		}
 	}
 

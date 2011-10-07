@@ -506,6 +506,25 @@ public class TimeSharedMachineTest extends CleanConfigurationTest {
 		assertFalse(machine.isBusy());//Verifying if machine is busy
 	}
 	
+	@Test
+	public void testRestartMachine() throws InterruptedException{
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(TimeSharedMachine.class))).andReturn(1);
+		EasyMock.expect(scheduler.now()).andReturn(0l);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(TimeSharedMachine.class))).andReturn(1);
+		
+		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		PowerMock.replayAll(scheduler, loadBalancer);
+		
+		TimeSharedMachine machine = new TimeSharedMachine(scheduler, descriptor, null);
+		assertNull(machine.loadBalancer);
+		
+		machine.restart(loadBalancer, scheduler);
+		assertEquals(loadBalancer, machine.loadBalancer);
+		
+		PowerMock.verifyAll();
+	}
+	
 //	@Test
 //	public void testEstimateFinishTime(){
 //		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);

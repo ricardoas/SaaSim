@@ -1,7 +1,6 @@
 package commons.sim.components;
 
-import static commons.sim.util.SimulatorProperties.RANJAN_HEURISTIC_BACKLOG_SIZE;
-import static commons.sim.util.SimulatorProperties.RANJAN_HEURISTIC_NUMBER_OF_TOKENS;
+import static commons.sim.util.SimulatorProperties.*;
 import static org.junit.Assert.*;
 
 import java.util.Queue;
@@ -557,5 +556,31 @@ public class RanjanMachineTest extends MockedConfigurationTest {
 		PowerMock.verifyAll();
 		
 		assertFalse(machine.isBusy());//Verifying if machine is busy
+	}
+	
+	@Test
+	public void testRestartMachine() throws InterruptedException{
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(RanjanMachine.class))).andReturn(1);
+		EasyMock.expect(scheduler.now()).andReturn(0l);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(RanjanMachine.class))).andReturn(1);
+		
+		Configuration config = EasyMock.createStrictMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
+		EasyMock.expect(config.getLong(RANJAN_HEURISTIC_NUMBER_OF_TOKENS)).andReturn(DEFAULT_MAX_NUM_OF_THREADS);
+		EasyMock.expect(config.getLong(RANJAN_HEURISTIC_BACKLOG_SIZE)).andReturn(DEFAULT_BACKLOG_SIZE);
+		PowerMock.replay(Configuration.class);
+		
+		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		PowerMock.replayAll(scheduler, config, loadBalancer);
+		
+		RanjanMachine machine = new RanjanMachine(scheduler, descriptor, null);
+		assertNull(machine.loadBalancer);
+		
+		machine.restart(loadBalancer, scheduler);
+		
+		assertEquals(loadBalancer, machine.loadBalancer);
+		PowerMock.verifyAll();
 	}
 }

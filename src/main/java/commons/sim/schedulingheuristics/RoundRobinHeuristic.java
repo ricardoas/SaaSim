@@ -15,13 +15,13 @@ import commons.sim.components.Machine;
  */
 public class RoundRobinHeuristic implements SchedulingHeuristic {
 	
-	private int lastUsed;
+	private int nextToUse;
 	
 	/**
 	 * Default constructor
 	 */
 	public RoundRobinHeuristic() {
-		this.lastUsed = -1;
+		this.nextToUse = 0;
 	}
 
 	/**
@@ -30,8 +30,8 @@ public class RoundRobinHeuristic implements SchedulingHeuristic {
 	@Override
 	public Machine getNextServer(Request request, List<Machine> servers) {
 		
-		lastUsed = (lastUsed + 1) % servers.size();
-		return servers.get(lastUsed);
+		nextToUse = (nextToUse) % servers.size();
+		return servers.get(nextToUse++);
 	}
 
 	@Override
@@ -54,10 +54,8 @@ public class RoundRobinHeuristic implements SchedulingHeuristic {
 
 	@Override
 	public void finishServer(Machine server, int index, List<Machine> servers){
-		if(lastUsed == index){
-			lastUsed = (lastUsed + 1) % servers.size();
-		}else if(lastUsed > index){
-			lastUsed = Math.max(lastUsed - 1, 0);
+		if(nextToUse > index){
+			nextToUse = nextToUse - 1;
 		}
 	}
 }

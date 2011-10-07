@@ -1,131 +1,179 @@
 package planning.heuristic;
 
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import provisioning.util.WorkloadParserFactory;
+import planning.util.PlanIOHandler;
+import provisioning.DPS;
+import provisioning.Monitor;
 
-import commons.cloud.Contract;
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
 import commons.config.Configuration;
-import commons.io.HistoryBasedWorkloadParser;
-import commons.io.TickSize;
-import commons.io.WorkloadParser;
-import commons.sim.jeevent.JEAbstractEventHandler;
+import commons.io.Checkpointer;
+import commons.sim.SimpleSimulator;
+import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.util.SaaSAppProperties;
-import commons.sim.util.SaaSUsersProperties;
 import commons.sim.util.SimulatorProperties;
-import commons.util.Pair;
 
-public class OverProvisionHeuristic extends JEAbstractEventHandler implements PlanningHeuristic {
+public class OverProvisionHeuristic extends SimpleSimulator implements PlanningHeuristic {
 
 	public static final double FACTOR = 0.2;//Utilisation factor according to Above the Clouds: ...
+	private final long COUNTING_PAGE_SIZE = 100;
+
 	private int maximumNumberOfServers;
-	private WorkloadParser<List<Request>> workloadParser;
-	private Map<Contract, Pair<Integer, String>> workloadsBeforePeak;
+	private double requestsMeanDemand;
 	
-	private final long PARSER_PAGE_SIZE = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME);
+	private int[] currentRequestsCounter;
+	private int[] nextRequestsCounter;
+	private double totalProcessingTime;
+	private long numberOfRequests;
 	
-	public OverProvisionHeuristic(){
-		super(new JEEventScheduler());
-		this.maximumNumberOfServers = 0;
+	public OverProvisionHeuristic(JEEventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
+		super(scheduler, monitor, loadBalancers);
+		try{
+			this.maximumNumberOfServers = PlanIOHandler.getNumberOfMachinesFromFile();
+		}catch(Exception e){
+			this.maximumNumberOfServers = 0;
+		}
+		try{
+			this.currentRequestsCounter = PlanIOHandler.getNumberOfMachinesArray();
+		}catch(Exception e){
+			this.currentRequestsCounter = new int[600];
+		}
+		
+		try{
+			this.requestsMeanDemand = PlanIOHandler.getRequestsMeanDemandFromFile();
+		}catch(Exception e){
+			this.requestsMeanDemand = 0d;
+		}
+		
+		this.totalProcessingTime = 0d;
+		this.numberOfRequests = 0l;
 	}
 
 	@Override
-	public void findPlan(HistoryBasedWorkloadParser parser,
-			Provider[] cloudProviders, User[] cloudUsers) {
+	public void findPlan(Provider[] cloudProviders, User[] cloudUsers) {
 		
-//		send(new JEEvent(JEEventType.READWORKLOAD, this, getScheduler().now(), false));
-//		send(new JEEvent(JEEventType.ADD_USERS, this, getScheduler().now() + (TickSize.DAY.getTickInMillis() * 7)));
-//		long[] longArray = Configuration.getInstance().getLongArray(SaaSUsersProperties.SAAS_PEAK_PERIOD);
-//		for(int i = 0; i < longArray.length; i++){
-//			send(new JEEvent(JEEventType.PEAK, this, getScheduler().now() + ( TickSize.DAY.getTickInMillis() * longArray[i] ) ));
-//		}
-//		
-//		workloadParser = WorkloadParserFactory.getWorkloadParser(PARSER_PAGE_SIZE);
-//		maximumNumberOfServers = 0;
-//		
-//		getScheduler().start();
+		//Simulating ...
+		DPS dps = (DPS) this.monitor;
+		
+		dps.registerConfigurable(this);
+		
+		this.start();
+		
+		Configuration config = Configuration.getInstance();
+		
+		//Calculating requests mean demand
+		this.requestsMeanDemand = this.totalProcessingTime / this.numberOfRequests;
+
+		if(config.getSimulationInfo().getSimulatedDays() == config.getLong(SimulatorProperties.PLANNING_PERIOD)){//Simulation finished!
+			
+			Map<MachineType, Integer> plan = this.getPlan(null);
+			try {
+				PlanIOHandler.createPlanFile(plan, config.getProviders());
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}else{
+			try {
+				Checkpointer.dumpObjects(config.getSimulationInfo(), null, null, null);
+				PlanIOHandler.createNumberOfMachinesFile(this.maximumNumberOfServers, this.nextRequestsCounter, this.requestsMeanDemand);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 	
 	@Override
 	public void handleEvent(JEEvent event) {
+		
 		switch (event.getType()) {
 			case READWORKLOAD:
 				if(workloadParser.hasNext()) {
 					List<Request> requests = workloadParser.next();
-					Set<Integer> simultaneousUsers = new HashSet<Integer>();
-
-					for(Request request : requests){
-						simultaneousUsers.add(request.getUserID());
-					}
-
-					if(simultaneousUsers.size() > maximumNumberOfServers){
-						maximumNumberOfServers = simultaneousUsers.size();
-					}
+					numberOfRequests += requests.size();
+					
+					totalProcessingTime += calcNumberOfMachines(requests, event.getScheduledTime());
+					evaluateMaximumNumber();
+//					Set<Integer> simultaneousUsers = new HashSet<Integer>();
+//
+//					for(Request request : requests){
+//						simultaneousUsers.add(request.getUserID());
+//					}
+//
+//					if(simultaneousUsers.size() > maximumNumberOfServers){
+//						maximumNumberOfServers = simultaneousUsers.size();
+//					}
 					
 					if(workloadParser.hasNext()){
 						long newEventTime = getScheduler().now() + PARSER_PAGE_SIZE;
 						send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime, true));
+					}else{
+						//Persisting information in simulation info
+						Configuration.getInstance().getSimulationInfo().addSimulatedDay();
 					}
 				}
 				break;
-//			case ADD_USERS:
-//				Configuration config = Configuration.getInstance();
-//				double growthRate = config.getDouble(SaaSUsersProperties.SAAS_WEEK_GROWTH);
-//				Map<Contract, Pair<Integer, String>> workloadsPerUser = config.getWorkloadsPerUser();
-//				for(Contract contract : workloadsPerUser.keySet()){
-//					Pair<Integer, String> pair = workloadsPerUser.get(contract);
-//					int newNumberOfUsers = (int)Math.ceil((1+growthRate)*(pair.firstValue));
-//					WorkloadParser<Request>[] newParsers = WorkloadParserFactory.createNewParsers(config.getParserPageSize().getTickInMillis(), pair.secondValue, 
-//							newNumberOfUsers-pair.firstValue);
-//					pair.firstValue = newNumberOfUsers;
-//					this.workloadParser.addParsers(newParsers);
-//				}
-//				long newEventTime = getScheduler().now() + (TickSize.DAY.getTickInMillis() * 7);
-//				if(newEventTime < config.getLong(SimulatorProperties.PLANNING_PERIOD) * TickSize.DAY.getTickInMillis()){
-//					send(new JEEvent(JEEventType.ADD_USERS, this, newEventTime));
-//				}
-//				break;
-//			case PEAK:
-//				Configuration configuration = Configuration.getInstance();
-//				workloadsBeforePeak = configuration.getWorkloadsPerUser();
-//				double peakRate = configuration.getDouble(SaaSUsersProperties.SAAS_PEAK);
-//				
-//				for(Contract contract : workloadsBeforePeak.keySet()){
-//					Pair<Integer, String> pair = workloadsBeforePeak.get(contract);
-//					int newNumberOfUsers = (int)Math.ceil((1+peakRate)*(pair.firstValue));
-//					WorkloadParser<Request>[] newParsers = WorkloadParserFactory.createNewParsers(configuration.getParserPageSize().getTickInMillis(), pair.secondValue, 
-//							newNumberOfUsers-pair.firstValue);
-//					pair.firstValue = newNumberOfUsers;
-//					this.workloadParser.addParsers(newParsers);
-//				}
-//				send(new JEEvent(JEEventType.PEAK_END, this, getScheduler().now() + (TickSize.MONTH.getTickInMillis())));
-//				break;
-//			case PEAK_END:
-//				Configuration.getInstance().setWorkloadsPerUser(workloadsBeforePeak);
-//				this.workloadParser.clear();
-//				for(Contract contract : workloadsBeforePeak.keySet()){
-//					Pair<Integer, String> pair = workloadsBeforePeak.get(contract);
-//					WorkloadParser<Request>[] newParsers = WorkloadParserFactory.createNewParsers(Configuration.getInstance().getParserPageSize().getTickInMillis(), pair.secondValue, 
-//							pair.firstValue);
-//					this.workloadParser.addParsers(newParsers);
-//				}
-//				break;
 			default:
 				break;
-		}
+		}	
+		
 	}
 	
+	private void evaluateMaximumNumber() {
+		for(int value : this.currentRequestsCounter){
+			if(value > this.maximumNumberOfServers){
+				this.maximumNumberOfServers = value;
+			}
+		}
+		
+		for(int value : this.nextRequestsCounter){
+			if(value > this.maximumNumberOfServers){
+				this.maximumNumberOfServers = value;
+			}
+		}
+	}
+
+	private double calcNumberOfMachines(List<Request> requests, long currentTime) {
+		double totalProcessingTime = 0d;
+		
+		if(this.nextRequestsCounter != null){
+			this.currentRequestsCounter = this.nextRequestsCounter;
+		}
+		this.nextRequestsCounter = new int[600];
+		
+		for(Request request : requests){
+			int index = (int) ((request.getArrivalTimeInMillis() - currentTime) / this.COUNTING_PAGE_SIZE);
+			this.currentRequestsCounter[index]++;//Adding demand in arrival interval
+			
+			long totalMeanToProcess = request.getTotalMeanToProcess();
+			totalProcessingTime+= totalMeanToProcess;
+			
+			long intervalsToProcess = totalMeanToProcess / this.COUNTING_PAGE_SIZE;
+			if(totalMeanToProcess == this.COUNTING_PAGE_SIZE){
+				intervalsToProcess = 0;
+			}
+			
+			for(int i = index+1; i < index + intervalsToProcess; i++){//Adding demand to subsequent intervals
+				if(i >= this.currentRequestsCounter.length){
+					this.nextRequestsCounter[i - this.currentRequestsCounter.length]++;
+				}else{
+					this.currentRequestsCounter[i]++;
+				}
+			}
+		}
+		
+		return totalProcessingTime;
+	}
+
 	@Override
 	public double getEstimatedProfit(int period) {
 		return 0;
@@ -133,9 +181,13 @@ public class OverProvisionHeuristic extends JEAbstractEventHandler implements Pl
 
 	@Override
 	public Map<MachineType, Integer> getPlan(User[] cloudUsers) {
+		Configuration config = Configuration.getInstance();
+		int machinesToReserve = (int)Math.ceil( ( maximumNumberOfServers / 
+		( config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME) / this.requestsMeanDemand ) ) * FACTOR );
+		
 		Map<MachineType, Integer> plan = new HashMap<MachineType, Integer>();
-		MachineType machineType = MachineType.valueOf(Configuration.getInstance().getString(SimulatorProperties.PLANNING_TYPE).toUpperCase());
-		plan.put(machineType, (int)Math.ceil(maximumNumberOfServers * FACTOR));
+		MachineType machineType = MachineType.valueOf(config.getString(SimulatorProperties.PLANNING_TYPE).toUpperCase());
+		plan.put(machineType, machinesToReserve);
 		return plan;
 	}
 }

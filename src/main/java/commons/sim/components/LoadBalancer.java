@@ -59,6 +59,11 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		send(new JEEvent(JEEventType.ADD_SERVER, this, serverUpTime, server));
 	}
 	
+	public void addServer(Machine machine) {
+		machine.restart(this, getScheduler());
+		servers.add(machine);
+	}
+	
 	private Machine buildMachine(MachineDescriptor machineDescriptor) {
 		return MachineFactory.getInstance().createMachine(getScheduler(), machineDescriptor, this);
 	}
@@ -154,8 +159,15 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	}
 
 	public void reportRequestFinished(Request requestFinished) {
-		heuristic.reportRequestFinished();
-		monitor.reportRequestFinished(requestFinished);
+		
+		if(getScheduler().now() - requestFinished.getArrivalTimeInMillis() > 
+				Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)){
+			monitor.requestQueued(getScheduler().now(), requestFinished, tier);
+		}else{
+			heuristic.reportRequestFinished();
+			monitor.reportRequestFinished(requestFinished);
+		}
+		
 	}
 
 	public void removeServer(boolean force) {

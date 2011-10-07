@@ -5,6 +5,7 @@ import java.util.Queue;
 
 import commons.cloud.Request;
 import commons.sim.jeevent.JEEventHandler;
+import commons.sim.jeevent.JEEventScheduler;
 import commons.util.Triple;
 
 /**
@@ -60,4 +61,6 @@ public interface Machine extends JEEventHandler{
 	 * @return
 	 */
 	List<Triple<Long, Long, Long>> estimateFinishTime(Request request);
+
+	void restart(LoadBalancer loadBalancer, JEEventScheduler jeEventScheduler);
 }

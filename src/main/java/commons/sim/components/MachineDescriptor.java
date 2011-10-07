@@ -1,12 +1,14 @@
 package commons.sim.components;
 
+import java.io.Serializable;
+
 import commons.cloud.MachineType;
 
 /**
  * Machine information.
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class MachineDescriptor {
+public class MachineDescriptor implements Serializable{
 	
 	private final long machineID;
 	private final MachineType type;
@@ -29,6 +31,16 @@ public class MachineDescriptor {
 		this.reserved = reserved;
 		this.type = type;
 		this.providerID = providerID;
+		this.finishTimeInMillis = 0;
+		this.startTimeInMillis = 0;
+	}
+
+	public void setInTransference(long inTransference) {
+		this.inTransference = inTransference;
+	}
+
+	public void setOutTransference(long outTransference) {
+		this.outTransference = outTransference;
 	}
 
 	public MachineType getType(){

@@ -20,6 +20,7 @@ public class HistoryBasedWorkloadParser extends TimeBasedWorkloadParser{
 	 * @param parser
 	 * @param tick
 	 */
+	//FIXME!
 	public HistoryBasedWorkloadParser(WorkloadParser<Request> parser, TickSize tick) {
 		this(parser, tick, DEFAULT_WINDOW_SIZE);
 	}
@@ -31,7 +32,7 @@ public class HistoryBasedWorkloadParser extends TimeBasedWorkloadParser{
 	 */
 	@SuppressWarnings("unchecked")
 	public HistoryBasedWorkloadParser(WorkloadParser<Request> parser, TickSize tick, int windowSize) {
-		super(tick.getTickInMillis(), parser);
+		super(null, tick.getTickInMillis(), parser);//FIXME remove null
 		this.history = new LinkedBlockingQueue<List<Request>>(windowSize);
 	}
 	

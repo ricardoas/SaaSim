@@ -2,11 +2,17 @@ package planning.heuristic;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.easymock.EasyMock;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
@@ -14,39 +20,82 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import planning.util.MachineUsageData;
+import planning.util.PlanIOHandler;
 import provisioning.DPS;
 import provisioning.Monitor;
 import provisioning.util.DPSFactory;
 import util.ValidConfigurationTest;
 
 import commons.cloud.MachineType;
-import commons.cloud.UtilityResult;
+import commons.cloud.Provider;
+import commons.cloud.TypeProvider;
+import commons.cloud.User;
+import commons.config.Configuration;
+import commons.io.Checkpointer;
+import commons.io.TickSize;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.SimulatorFactory;
+import commons.sim.util.SimulatorProperties;
+import commons.util.SimulationInfo;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore("org.apache.log4j.*")
-@PrepareForTest({SimulatorFactory.class, DPSFactory.class})
-public class HistoryBasedHeuristicTest extends ValidConfigurationTest {
-		
+@PrepareForTest({SimulatorFactory.class, DPSFactory.class, Configuration.class, PlanIOHandler.class})
+public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
+	
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		buildFullConfiguration();
+		cleanDumpFiles();
+	}
+	
+	@After
+	public void tearDown(){
+		cleanDumpFiles();
+	}
+	
+	private void cleanDumpFiles() {
+		new File(Checkpointer.MACHINE_DATA_DUMP).delete();
+		new File(Checkpointer.MACHINES_DUMP).delete();
+		new File(Checkpointer.PROVIDERS_DUMP).delete();
+		new File(Checkpointer.SIMULATION_DUMP).delete();
+		new File(Checkpointer.USERS_DUMP).delete();
 	}
 	
 	@Test
-	public void testFindPlanWithoutServers(){
+	public void testFindPlanWithoutServersAndOneDayFinished() throws IOException, ClassNotFoundException{
+		SimulationInfo simulationInfo = new SimulationInfo(1, 0);
+		
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(1, MachineType.SMALL, 0.085, 0.03, 227.50, 350, 10));
+		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
+				types);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
+		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
+		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider}).times(2);
+		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d);
+		
+		PowerMock.replay(Configuration.class);
+		EasyMock.replay(config);
 		
 		//Load balancer
 		LoadBalancer lb1 = EasyMock.createStrictMock(LoadBalancer.class);
 		EasyMock.expect(lb1.getServers()).andReturn(new ArrayList<Machine>());
 		
-		LoadBalancer[] loadBalancers = new LoadBalancer[]{lb1};
+		LoadBalancer[] loadBalancers = new LoadBalancer[1];
+		loadBalancers[0] = lb1;
 		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
@@ -59,64 +108,145 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest {
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
 		dps.registerConfigurable(simulator);
-		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult(0, 0));
-		PowerMock.mockStatic(DPSFactory.class);
-		EasyMock.expect(DPSFactory.createDPS()).andReturn(dps);
 
-		PowerMock.replay(SimulatorFactory.class);
-		PowerMock.replay(DPSFactory.class);
-		PowerMock.replayAll(lb1, simulator, dps);
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		
-		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic();
-		heuristic.findPlan(null, null, null);
+		PowerMock.replay(SimulatorFactory.class);
+		PowerMock.replayAll(lb1, simulator, dps, scheduler);
+		
+		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
+		heuristic.findPlan(null, null);
 		
 		Map<MachineType, Integer> plan = heuristic.getPlan(null);
 		assertNotNull(plan);
 		assertEquals(0, plan.size());
 		
+		File output = new File(Checkpointer.MACHINE_DATA_DUMP);
+		assertFalse(output.exists());
+		
 		PowerMock.verifyAll();
 	}
 	
 	@Test
-	public void testFindPlanWithWellUtilisedServersAndOneTier(){
+	public void testFindPlanWithoutServersAndMoreSimulationDaysNeeded() throws IOException, ClassNotFoundException{
+
+		SimulationInfo simulationInfo = new SimulationInfo(1, 0);
+		
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(1, MachineType.SMALL, 0.085, 0.03, 227.50, 350, 10));
+		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
+				types);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(1);
+		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo).times(2);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(2l);
+		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider}).times(2);
+		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
+		
+		PowerMock.replay(Configuration.class);
+		EasyMock.replay(config);
+		
+		//Load balancer
+		LoadBalancer lb1 = EasyMock.createStrictMock(LoadBalancer.class);
+		EasyMock.expect(lb1.getServers()).andReturn(new ArrayList<Machine>()).times(2);
+		
+		LoadBalancer[] loadBalancers = new LoadBalancer[1];
+		loadBalancers[0] = lb1;
+		
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		
+		//Simulator
+		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		simulator.start();
+		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
+		
+		PowerMock.mockStatic(SimulatorFactory.class);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class), EasyMock.isA(Monitor.class))).andReturn(simulator);
+		
+		//Provisioning system
+		DPS dps = EasyMock.createStrictMock(DPS.class);
+		dps.registerConfigurable(simulator);
+
+		PowerMock.replay(SimulatorFactory.class);
+		PowerMock.replayAll(lb1, simulator, dps, scheduler);
+		
+		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
+		heuristic.findPlan(null, null);
+		
+		Map<MachineType, Integer> plan = heuristic.getPlan(null);
+		assertNotNull(plan);
+		assertEquals(0, plan.size());
+		
+		assertTrue(new File(Checkpointer.MACHINE_DATA_DUMP).exists());
+		assertTrue(new File(Checkpointer.USERS_DUMP).exists());
+		assertTrue(new File(Checkpointer.PROVIDERS_DUMP).exists());
+		assertTrue(new File(Checkpointer.SIMULATION_DUMP).exists());
+		assertTrue(new File(Checkpointer.MACHINES_DUMP).exists());
+		
+		PowerMock.verifyAll();
+	}
+	
+	@Test
+	public void testFindPlanWithWellUsedServersAndOneTier() throws IOException, ClassNotFoundException{
 		
 		//First machine
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
-		descriptor.setFinishTimeInMillis(200);
+		descriptor.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
-		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(100l);
 		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
-		EasyMock.expect(machine1.getNumberOfCores()).andReturn(1);
-		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor).times(2);
+		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis());
 		
 		//Second machine
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor2 = new MachineDescriptor(1, false, MachineType.SMALL, 0);
-		descriptor2.setFinishTimeInMillis(999);
-		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(555l);
+		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.SMALL, 0);
+		descriptor2.setFinishTimeInMillis(TickSize.DAY.getTickInMillis() / 2);
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
-		EasyMock.expect(machine2.getNumberOfCores()).andReturn(1);
-		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2).times(2);
+		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() / 2);
 		
 		//Third machine
 		Machine machine3 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor3 = new MachineDescriptor(1, false, MachineType.SMALL, 0);
-		descriptor3.setFinishTimeInMillis(200);
-		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(200l);
+		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.SMALL, 0);
+		descriptor3.setFinishTimeInMillis(TickSize.DAY.getTickInMillis() / 2);
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
-		EasyMock.expect(machine3.getNumberOfCores()).andReturn(1);
-		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3).times(2);
+		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() / 2);
 
 		ArrayList<Machine> machines = new ArrayList<Machine>();
 		machines.add(machine1);
 		machines.add(machine2);
 		machines.add(machine3);
 		
+		SimulationInfo simulationInfo = new SimulationInfo(1, 0);
+		
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(1, MachineType.SMALL, 0.085, 0.03, 227.50, 350, 10));
+		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
+				types);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(1);
+		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
+		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider}).times(2);
+		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d).times(3);
+		
+		PowerMock.replay(Configuration.class);
+		EasyMock.replay(config);
+		
 		//Load balancer
 		LoadBalancer lb1 = EasyMock.createStrictMock(LoadBalancer.class);
 		EasyMock.expect(lb1.getServers()).andReturn(machines);
 		
-		LoadBalancer[] loadBalancers = new LoadBalancer[]{lb1};
+		LoadBalancer[] loadBalancers = new LoadBalancer[1];
+		loadBalancers[0] = lb1;
+		
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
@@ -129,62 +259,81 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest {
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
 		dps.registerConfigurable(simulator);
-		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult(0, 0));
-		PowerMock.mockStatic(DPSFactory.class);
-		EasyMock.expect(DPSFactory.createDPS()).andReturn(dps);
 
 		PowerMock.replay(SimulatorFactory.class);
-		PowerMock.replay(DPSFactory.class);
-		PowerMock.replayAll(machine1, machine2, machine3, lb1, simulator, dps);
+		PowerMock.replayAll(machine1, machine2, machine3, lb1, simulator, dps, scheduler);
 		
-		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic();
-		heuristic.findPlan(null, null, null);
+		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
+		heuristic.findPlan(null, null);
 		
 		Map<MachineType, Integer> plan = heuristic.getPlan(null);
 		assertNotNull(plan);
 		assertEquals(1, plan.size());
 		assertEquals(3, (int)plan.get(MachineType.SMALL));
 		
+		File output = new File(Checkpointer.MACHINE_DATA_DUMP);
+		assertFalse(output.exists());
+		
 		PowerMock.verifyAll();
 	}
 	
 	@Test
-	public void testFindPlanWithUnderUtilisedServersAndOneTier(){
+	public void testFindPlanWithUnderUsedServersAndOneTier() throws IOException, ClassNotFoundException{
 		
 		//First machine
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
-		descriptor.setFinishTimeInMillis(200);
+		descriptor.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
-		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(99l);
 		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
-		EasyMock.expect(machine1.getNumberOfCores()).andReturn(1);
+		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() / 6);
 		
 		//Second machine
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor2 = new MachineDescriptor(1, false, MachineType.SMALL, 0);
-		descriptor2.setFinishTimeInMillis(999);
-		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(400l);
+		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.SMALL, 0);
+		descriptor2.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
-		EasyMock.expect(machine2.getNumberOfCores()).andReturn(1);
+		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() / 5);
 		
 		//Third machine
 		Machine machine3 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor3 = new MachineDescriptor(1, false, MachineType.SMALL, 0);
-		descriptor3.setFinishTimeInMillis(200);
-		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(2l);
+		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.SMALL, 0);
+		descriptor3.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
-		EasyMock.expect(machine3.getNumberOfCores()).andReturn(1);
+		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() / 10);
 
 		ArrayList<Machine> machines = new ArrayList<Machine>();
 		machines.add(machine1);
 		machines.add(machine2);
 		machines.add(machine3);
 		
+		SimulationInfo simulationInfo = new SimulationInfo(1, 0);
+		
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(1, MachineType.SMALL, 0.085, 0.03, 227.50, 350, 10));
+		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
+				types);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(1);
+		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
+		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider}).times(2);
+		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d).times(3);
+		
+		PowerMock.replay(Configuration.class);
+		EasyMock.replay(config);
+		
 		//Load balancer
 		LoadBalancer lb1 = EasyMock.createStrictMock(LoadBalancer.class);
 		EasyMock.expect(lb1.getServers()).andReturn(machines);
 		
-		LoadBalancer[] loadBalancers = new LoadBalancer[]{lb1};
+		LoadBalancer[] loadBalancers = new LoadBalancer[1];
+		loadBalancers[0] = lb1;
+		
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
@@ -197,63 +346,82 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest {
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
 		dps.registerConfigurable(simulator);
-		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult(0, 0));
-		PowerMock.mockStatic(DPSFactory.class);
-		EasyMock.expect(DPSFactory.createDPS()).andReturn(dps);
 
 		PowerMock.replay(SimulatorFactory.class);
-		PowerMock.replay(DPSFactory.class);
-		PowerMock.replayAll(machine1, machine2, machine3, lb1, simulator, dps);
+		PowerMock.replayAll(machine1, machine2, machine3, lb1, simulator, dps, scheduler);
 		
-		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic();
-		heuristic.findPlan(null, null, null);
+		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
+		heuristic.findPlan(null, null);
 		
 		Map<MachineType, Integer> plan = heuristic.getPlan(null);
 		assertNotNull(plan);
 		assertEquals(0, plan.size());
 		
+		File output = new File(Checkpointer.MACHINE_DATA_DUMP);
+		assertFalse(output.exists());
+		
 		PowerMock.verifyAll();
 	}
 	
 	@Test
-	public void testFindPlanWithMixedUtilisedServersAndOneTier(){
+	public void testFindPlanWithUnderUsedServersAndOneTierAndServersAggregation() throws IOException, ClassNotFoundException{
 		
 		//First machine
-		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.MEDIUM, 0);
-		descriptor.setFinishTimeInMillis(200);
+		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
+		descriptor.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
-		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(101l);
 		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
-		EasyMock.expect(machine1.getNumberOfCores()).andReturn(1);
-		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor).times(2);
+		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TickSize.HOUR.getTickInMillis() * 6);
 		
 		//Second machine
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor2 = new MachineDescriptor(1, false, MachineType.SMALL, 0);
-		descriptor2.setFinishTimeInMillis(999);
-		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(400l);
+		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.SMALL, 0);
+		descriptor2.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
-		EasyMock.expect(machine2.getNumberOfCores()).andReturn(1);
+		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TickSize.HOUR.getTickInMillis() * 5);
 		
 		//Third machine
 		Machine machine3 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor3 = new MachineDescriptor(1, false, MachineType.XLARGE, 0);
-		descriptor3.setFinishTimeInMillis(333);
-		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(199l);
+		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.SMALL, 0);
+		descriptor3.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
-		EasyMock.expect(machine3.getNumberOfCores()).andReturn(1);
-		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3).times(2);
+		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TickSize.HOUR.getTickInMillis() * 8);
 
 		ArrayList<Machine> machines = new ArrayList<Machine>();
 		machines.add(machine1);
 		machines.add(machine2);
 		machines.add(machine3);
 		
+		SimulationInfo simulationInfo = new SimulationInfo(1, 0);
+		
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(1, MachineType.SMALL, 0.085, 0.03, 227.50, 350, 10));//0.4787037037037037 minimum utilisation
+		types.add(new TypeProvider(1, MachineType.MEDIUM, 0.17, 0.06, 455, 700, 10));
+		types.add(new TypeProvider(1, MachineType.XLARGE, 0.68, 0.24, 1820, 2800, 10));
+		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
+				types);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(1);
+		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
+		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider}).times(2);
+		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d).times(3);
+		
+		PowerMock.replay(Configuration.class);
+		EasyMock.replay(config);
+		
 		//Load balancer
 		LoadBalancer lb1 = EasyMock.createStrictMock(LoadBalancer.class);
 		EasyMock.expect(lb1.getServers()).andReturn(machines);
 		
-		LoadBalancer[] loadBalancers = new LoadBalancer[]{lb1};
+		LoadBalancer[] loadBalancers = new LoadBalancer[1];
+		loadBalancers[0] = lb1;
+		
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
@@ -266,16 +434,103 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest {
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
 		dps.registerConfigurable(simulator);
-		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult(0, 0));
-		PowerMock.mockStatic(DPSFactory.class);
-		EasyMock.expect(DPSFactory.createDPS()).andReturn(dps);
 
 		PowerMock.replay(SimulatorFactory.class);
-		PowerMock.replay(DPSFactory.class);
-		PowerMock.replayAll(machine1, machine2, machine3, lb1, simulator, dps);
+		PowerMock.replayAll(machine1, machine2, machine3, lb1, simulator, dps, scheduler);
 		
-		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic();
-		heuristic.findPlan(null, null, null);
+		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
+		heuristic.findPlan(null, null);
+		
+		Map<MachineType, Integer> plan = heuristic.getPlan(null);
+		assertNotNull(plan);
+		assertEquals(1, plan.size());
+		assertEquals(1, (int)plan.get(MachineType.XLARGE));
+		
+		File output = new File(Checkpointer.MACHINE_DATA_DUMP);
+		assertFalse(output.exists());
+		
+		PowerMock.verifyAll();
+	}
+	
+	@Test
+	public void testFindPlanWithMixedUsedServersAndOneTier() throws IOException, ClassNotFoundException{
+		
+		//First machine
+		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.MEDIUM, 0);
+		descriptor.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		Machine machine1 = EasyMock.createStrictMock(Machine.class);
+		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
+		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() * 2);
+		
+		//Second machine
+		Machine machine2 = EasyMock.createStrictMock(Machine.class);
+		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.SMALL, 0);
+		descriptor2.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
+		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() / 3);
+		
+		//Third machine
+		Machine machine3 = EasyMock.createStrictMock(Machine.class);
+		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.XLARGE, 0);
+		descriptor3.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
+		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() * 3);
+
+		ArrayList<Machine> machines = new ArrayList<Machine>();
+		machines.add(machine1);
+		machines.add(machine2);
+		machines.add(machine3);
+		
+		SimulationInfo simulationInfo = new SimulationInfo(1, 0);
+		
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(1, MachineType.SMALL, 0.085, 0.03, 227.50, 350, 10));
+		types.add(new TypeProvider(1, MachineType.MEDIUM, 0.17, 0.06, 455, 700, 10));
+		types.add(new TypeProvider(1, MachineType.XLARGE, 0.68, 0.24, 1820, 2800, 10));
+		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
+				types);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(1);
+		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
+		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider}).times(2);
+		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d);
+		EasyMock.expect(config.getRelativePower(MachineType.XLARGE)).andReturn(3d);
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d);
+		
+		PowerMock.replay(Configuration.class);
+		EasyMock.replay(config);
+		
+		//Load balancer
+		LoadBalancer lb1 = EasyMock.createStrictMock(LoadBalancer.class);
+		EasyMock.expect(lb1.getServers()).andReturn(machines);
+		
+		LoadBalancer[] loadBalancers = new LoadBalancer[1];
+		loadBalancers[0] = lb1;
+		
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		
+		//Simulator
+		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		simulator.start();
+		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
+		
+		PowerMock.mockStatic(SimulatorFactory.class);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class), EasyMock.isA(Monitor.class))).andReturn(simulator);
+		
+		//Provisioning system
+		DPS dps = EasyMock.createStrictMock(DPS.class);
+		dps.registerConfigurable(simulator);
+
+		PowerMock.replay(SimulatorFactory.class);
+		PowerMock.replayAll(machine1, machine2, machine3, lb1, simulator, dps, scheduler);
+		
+		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
+		heuristic.findPlan(null, null);
 		
 		Map<MachineType, Integer> plan = heuristic.getPlan(null);
 		assertNotNull(plan);
@@ -283,189 +538,487 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest {
 		assertEquals(1, (int)plan.get(MachineType.MEDIUM));
 		assertEquals(1, (int)plan.get(MachineType.XLARGE));
 		
-		PowerMock.verifyAll();
-	}
-	
-	@Test
-	public void testFindPlanWithWellUtilisedServersAndMultipleTiers(){
-		
-		//First machine
-		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
-		descriptor.setFinishTimeInMillis(200);
-		Machine machine1 = EasyMock.createStrictMock(Machine.class);
-		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(100l);
-		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
-		EasyMock.expect(machine1.getNumberOfCores()).andReturn(1);
-		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor).times(2);
-		
-		//Second machine
-		Machine machine2 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor2 = new MachineDescriptor(1, false, MachineType.SMALL, 0);
-		descriptor2.setFinishTimeInMillis(999);
-		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(555l);
-		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
-		EasyMock.expect(machine2.getNumberOfCores()).andReturn(1);
-		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2).times(2);
-		
-		//Third machine
-		Machine machine3 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor3 = new MachineDescriptor(1, false, MachineType.SMALL, 0);
-		descriptor3.setFinishTimeInMillis(200);
-		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(200l);
-		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
-		EasyMock.expect(machine3.getNumberOfCores()).andReturn(1);
-		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3).times(2);
-
-		//Load balancer
-		LoadBalancer lb1 = EasyMock.createStrictMock(LoadBalancer.class);
-		LoadBalancer lb2 = EasyMock.createStrictMock(LoadBalancer.class);
-		LoadBalancer lb3 = EasyMock.createStrictMock(LoadBalancer.class);
-		EasyMock.expect(lb1.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine1)));
-		EasyMock.expect(lb2.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine2)));
-		EasyMock.expect(lb3.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine3)));
-		
-		LoadBalancer[] loadBalancers = new LoadBalancer[]{lb1, lb2, lb3};
-		
-		//Simulator
-		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
-		simulator.start();
-		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
-		
-		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class), EasyMock.isA(Monitor.class))).andReturn(simulator);
-		
-		//Provisioning system
-		DPS dps = EasyMock.createStrictMock(DPS.class);
-		dps.registerConfigurable(simulator);
-		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult(0, 0));
-		PowerMock.mockStatic(DPSFactory.class);
-		EasyMock.expect(DPSFactory.createDPS()).andReturn(dps);
-
-		PowerMock.replay(SimulatorFactory.class);
-		PowerMock.replay(DPSFactory.class);
-		PowerMock.replayAll(machine1, machine2, machine3, lb1, lb2, lb3, simulator, dps);
-		
-		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic();
-		heuristic.findPlan(null, null, null);
-		
-		Map<MachineType, Integer> plan = heuristic.getPlan(null);
-		assertNotNull(plan);
-		assertEquals(1, plan.size());
-		assertEquals(3, (int)plan.get(MachineType.SMALL));
+		File output = new File(Checkpointer.MACHINE_DATA_DUMP);
+		assertFalse(output.exists());
 		
 		PowerMock.verifyAll();
 	}
 	
 	@Test
-	public void testFindPlanWithUnderUtilisedServersAndMultipleTiers(){
+	public void testFindPlanWithWellUsedServersAndMoreThanOneDay() throws IOException, ClassNotFoundException{
 		
 		//First machine
-		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
-		descriptor.setFinishTimeInMillis(99);
+		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.LARGE, 0);
+		descriptor.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
-		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(7l);
 		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
-		EasyMock.expect(machine1.getNumberOfCores()).andReturn(1);
+		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() * 3);
+		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
+		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() * 3);
 		
 		//Second machine
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor2 = new MachineDescriptor(1, false, MachineType.SMALL, 0);
-		descriptor2.setFinishTimeInMillis(2150);
-		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(179l);
+		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.HIGHCPU, 0);
+		descriptor2.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
-		EasyMock.expect(machine2.getNumberOfCores()).andReturn(1);
+		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() * 2);
+		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
+		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() * 2);
 		
 		//Third machine
 		Machine machine3 = EasyMock.createStrictMock(Machine.class);
-		MachineDescriptor descriptor3 = new MachineDescriptor(1, false, MachineType.SMALL, 0);
-		descriptor3.setFinishTimeInMillis(10000);
-		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(200l);
+		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.MEDIUM, 0);
+		descriptor3.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
-		EasyMock.expect(machine3.getNumberOfCores()).andReturn(1);
-
+		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis());
+		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
+		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis());
+		
+		SimulationInfo simulationInfo = new SimulationInfo(1, 0);
+		SimulationInfo simulationInfo2 = new SimulationInfo(2, 0);
+		
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(1, MachineType.LARGE, 0.085, 0.03, 227.50, 350, 10));
+		types.add(new TypeProvider(1, MachineType.HIGHCPU, 0.17, 0.06, 455, 700, 10));
+		types.add(new TypeProvider(1, MachineType.MEDIUM, 0.68, 0.24, 1820, 2800, 10));
+		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
+				types);
+		
+		//Machine usage data to be used in the second day
+		Map<MachineType, Map<Long, Double>> machineUsagePerType = new HashMap<MachineType, Map<Long,Double>>();
+		Map<Long, Double> value = new HashMap<Long, Double>();
+		value.put(1l, TickSize.DAY.getTickInMillis() * 3.0);
+		machineUsagePerType.put(MachineType.LARGE, value);
+		
+		Map<Long, Double> value2 = new HashMap<Long, Double>();
+		value2.put(3l, TickSize.DAY.getTickInMillis() * 1.0);
+		machineUsagePerType.put(MachineType.MEDIUM, value2);
+		
+		Map<Long, Double> value3 = new HashMap<Long, Double>();
+		value3.put(2l, TickSize.DAY.getTickInMillis() * 2.0);
+		machineUsagePerType.put(MachineType.HIGHCPU, value3);
+		
+		MachineUsageData machineData = new MachineUsageData(machineUsagePerType);
+		Provider[] providers = new Provider[]{provider};
+		
+		PowerMock.mockStatic(PlanIOHandler.class);
+		EasyMock.expect(PlanIOHandler.getMachineData()).andReturn(null);
+		EasyMock.expect(PlanIOHandler.getMachineData()).andReturn(machineData);
+		Map<MachineType, Integer> map = new HashMap<MachineType, Integer>();
+		map.put(MachineType.HIGHCPU, 1);
+		map.put(MachineType.LARGE, 1);
+		map.put(MachineType.MEDIUM, 1);
+		PlanIOHandler.createPlanFile(map, providers);
+		
+		//Configuration
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
+		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo).times(2);
+		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo2);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(2l).times(3);
+		EasyMock.expect(config.getProviders()).andReturn(providers).times(3);
+		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(1d);
+		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d);
+		EasyMock.expect(config.getRelativePower(MachineType.HIGHCPU)).andReturn(2d);
+		
+		PowerMock.replay(Configuration.class, PlanIOHandler.class);
+		EasyMock.replay(config);
+		
 		//Load balancer
 		LoadBalancer lb1 = EasyMock.createStrictMock(LoadBalancer.class);
 		LoadBalancer lb2 = EasyMock.createStrictMock(LoadBalancer.class);
 		LoadBalancer lb3 = EasyMock.createStrictMock(LoadBalancer.class);
-		EasyMock.expect(lb1.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine1)));
-		EasyMock.expect(lb2.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine2)));
-		EasyMock.expect(lb3.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine3)));
+		EasyMock.expect(lb1.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine1))).times(3);
+		EasyMock.expect(lb2.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine2))).times(3);
+		EasyMock.expect(lb3.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine3))).times(3);
 		
-		LoadBalancer[] loadBalancers = new LoadBalancer[]{lb1, lb2, lb3};
+		LoadBalancer[] loadBalancers = new LoadBalancer[3];
+		loadBalancers[0] = lb1;
+		loadBalancers[1] = lb2;
+		loadBalancers[2] = lb3;
+		
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
+		simulator.start();
+		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class), EasyMock.isA(Monitor.class))).andReturn(simulator);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class), EasyMock.isA(Monitor.class))).andReturn(simulator).times(2);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
 		dps.registerConfigurable(simulator);
-		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult(0, 0));
-		PowerMock.mockStatic(DPSFactory.class);
-		EasyMock.expect(DPSFactory.createDPS()).andReturn(dps);
+		EasyMock.expectLastCall().times(2);
 
 		PowerMock.replay(SimulatorFactory.class);
-		PowerMock.replay(DPSFactory.class);
-		PowerMock.replayAll(machine1, machine2, machine3, lb1, lb2, lb3, simulator, dps);
+		PowerMock.replayAll(machine1, machine2, machine3, lb1, lb2, lb3, simulator, dps, scheduler);
 		
-		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic();
-		heuristic.findPlan(null, null, null);
+		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
+		heuristic.findPlan(null, null);
 		
 		Map<MachineType, Integer> plan = heuristic.getPlan(null);
 		assertNotNull(plan);
 		assertEquals(0, plan.size());
 		
+		File output = new File(Checkpointer.MACHINE_DATA_DUMP);
+		assertTrue(output.exists());
+		
+		//Second day
+		output.delete();
+		
+		heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
+		heuristic.findPlan(null, null);
+		
+		plan = heuristic.getPlan(null);
+		assertNotNull(plan);
+		assertEquals(3, plan.size());
+		assertEquals(1, (int)plan.get(MachineType.HIGHCPU));
+		assertEquals(1, (int)plan.get(MachineType.MEDIUM));
+		assertEquals(1, (int)plan.get(MachineType.LARGE));
+		
+		output = new File(Checkpointer.MACHINE_DATA_DUMP);
+		assertFalse(output.exists());
+		
+		PowerMock.verifyAll();
+	}
+	
+	@Test
+	public void testFindPlanWithWellUsedServersAndMultipleTiers() throws IOException, ClassNotFoundException{
+		
+		//First machine
+		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.LARGE, 0);
+		descriptor.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		Machine machine1 = EasyMock.createStrictMock(Machine.class);
+		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
+		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() * 3);
+		
+		//Second machine
+		Machine machine2 = EasyMock.createStrictMock(Machine.class);
+		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.HIGHCPU, 0);
+		descriptor2.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
+		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() * 2);
+		
+		//Third machine
+		Machine machine3 = EasyMock.createStrictMock(Machine.class);
+		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.MEDIUM, 0);
+		descriptor3.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
+		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis());
+		
+		SimulationInfo simulationInfo = new SimulationInfo(1, 0);
+		
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(1, MachineType.LARGE, 0.085, 0.03, 227.50, 350, 10));
+		types.add(new TypeProvider(1, MachineType.HIGHCPU, 0.17, 0.06, 455, 700, 10));
+		types.add(new TypeProvider(1, MachineType.MEDIUM, 0.68, 0.24, 1820, 2800, 10));
+		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
+				types);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(1);
+		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
+		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider}).times(2);
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(1d);
+		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d);
+		EasyMock.expect(config.getRelativePower(MachineType.HIGHCPU)).andReturn(2d);
+		
+		PowerMock.replay(Configuration.class);
+		EasyMock.replay(config);
+		
+		//Load balancer
+		LoadBalancer lb1 = EasyMock.createStrictMock(LoadBalancer.class);
+		LoadBalancer lb2 = EasyMock.createStrictMock(LoadBalancer.class);
+		LoadBalancer lb3 = EasyMock.createStrictMock(LoadBalancer.class);
+		EasyMock.expect(lb1.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine1)));
+		EasyMock.expect(lb2.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine2)));
+		EasyMock.expect(lb3.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine3)));
+		
+		LoadBalancer[] loadBalancers = new LoadBalancer[3];
+		loadBalancers[0] = lb1;
+		loadBalancers[1] = lb2;
+		loadBalancers[2] = lb3;
+		
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		
+		//Simulator
+		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		simulator.start();
+		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
+		
+		PowerMock.mockStatic(SimulatorFactory.class);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class), EasyMock.isA(Monitor.class))).andReturn(simulator);
+		
+		//Provisioning system
+		DPS dps = EasyMock.createStrictMock(DPS.class);
+		dps.registerConfigurable(simulator);
+
+		PowerMock.replay(SimulatorFactory.class);
+		PowerMock.replayAll(machine1, machine2, machine3, lb1, lb2, lb3, simulator, dps, scheduler);
+		
+		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
+		heuristic.findPlan(null, null);
+		
+		Map<MachineType, Integer> plan = heuristic.getPlan(null);
+		assertNotNull(plan);
+		assertEquals(3, plan.size());
+		assertEquals(1, (int)plan.get(MachineType.HIGHCPU));
+		assertEquals(1, (int)plan.get(MachineType.MEDIUM));
+		assertEquals(1, (int)plan.get(MachineType.LARGE));
+		
+		PowerMock.verifyAll();
+	}
+	
+	@Test
+	public void testFindPlanWithUnderUsedServersAndMultipleTiers() throws IOException, ClassNotFoundException{
+		
+		//First machine
+		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
+		descriptor.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		Machine machine1 = EasyMock.createStrictMock(Machine.class);
+		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
+		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() / 10);
+		
+		//Second machine
+		Machine machine2 = EasyMock.createStrictMock(Machine.class);
+		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.SMALL, 0);
+		descriptor2.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
+		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() / 9);
+		
+		//Third machine
+		Machine machine3 = EasyMock.createStrictMock(Machine.class);
+		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.SMALL, 0);
+		descriptor3.setFinishTimeInMillis(2 * TickSize.DAY.getTickInMillis());
+		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
+		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() / 6);
+		
+		SimulationInfo simulationInfo = new SimulationInfo(1, 0);
+		
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(1, MachineType.SMALL, 0.085, 0.03, 227.50, 350, 10));
+		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
+				types);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(1);
+		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
+		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider}).times(2);
+		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d).times(3);
+		
+		PowerMock.replay(Configuration.class);
+		EasyMock.replay(config);
+		
+		//Load balancer
+		LoadBalancer lb1 = EasyMock.createStrictMock(LoadBalancer.class);
+		LoadBalancer lb2 = EasyMock.createStrictMock(LoadBalancer.class);
+		LoadBalancer lb3 = EasyMock.createStrictMock(LoadBalancer.class);
+		EasyMock.expect(lb1.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine1)));
+		EasyMock.expect(lb2.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine2)));
+		EasyMock.expect(lb3.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine3)));
+		
+		LoadBalancer[] loadBalancers = new LoadBalancer[3];
+		loadBalancers[0] = lb1;
+		loadBalancers[1] = lb2;
+		loadBalancers[2] = lb3;
+		
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		
+		//Simulator
+		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		simulator.start();
+		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
+		
+		PowerMock.mockStatic(SimulatorFactory.class);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class), EasyMock.isA(Monitor.class))).andReturn(simulator);
+		
+		//Provisioning system
+		DPS dps = EasyMock.createStrictMock(DPS.class);
+		dps.registerConfigurable(simulator);
+
+		PowerMock.replay(SimulatorFactory.class);
+		PowerMock.replayAll(machine1, machine2, machine3, lb1, lb2, lb3, simulator, dps, scheduler);
+		
+		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
+		heuristic.findPlan(null, null);
+		
+		Map<MachineType, Integer> plan = heuristic.getPlan(null);
+		assertNotNull(plan);
+		assertEquals(0, plan.size());
+		
+		File output = new File(Checkpointer.MACHINE_DATA_DUMP);
+		assertFalse(output.exists());
+		
+		PowerMock.verifyAll();
+	}
+	
+	@Test
+	public void testFindPlanWithUnderUsedServersAndMultipleTiersAndAggregatedServers() throws IOException, ClassNotFoundException{
+		
+		//First machine
+		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
+		descriptor.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		Machine machine1 = EasyMock.createStrictMock(Machine.class);
+		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
+		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TickSize.HOUR.getTickInMillis() * 3);
+		
+		//Second machine
+		Machine machine2 = EasyMock.createStrictMock(Machine.class);
+		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.SMALL, 0);
+		descriptor2.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
+		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TickSize.HOUR.getTickInMillis() * 4);
+		
+		//Third machine
+		Machine machine3 = EasyMock.createStrictMock(Machine.class);
+		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.SMALL, 0);
+		descriptor3.setFinishTimeInMillis(2 * TickSize.DAY.getTickInMillis());
+		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
+		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TickSize.HOUR.getTickInMillis() * 5);
+		
+		SimulationInfo simulationInfo = new SimulationInfo(1, 0);
+		
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(1, MachineType.SMALL, 0.085, 0.03, 227.50, 350, 10));
+		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
+				types);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(1);
+		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
+		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider}).times(2);
+		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d).times(3);
+		
+		PowerMock.replay(Configuration.class);
+		EasyMock.replay(config);
+		
+		//Load balancer
+		LoadBalancer lb1 = EasyMock.createStrictMock(LoadBalancer.class);
+		LoadBalancer lb2 = EasyMock.createStrictMock(LoadBalancer.class);
+		LoadBalancer lb3 = EasyMock.createStrictMock(LoadBalancer.class);
+		EasyMock.expect(lb1.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine1)));
+		EasyMock.expect(lb2.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine2)));
+		EasyMock.expect(lb3.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine3)));
+		
+		LoadBalancer[] loadBalancers = new LoadBalancer[3];
+		loadBalancers[0] = lb1;
+		loadBalancers[1] = lb2;
+		loadBalancers[2] = lb3;
+		
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		
+		//Simulator
+		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		simulator.start();
+		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
+		
+		PowerMock.mockStatic(SimulatorFactory.class);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class), EasyMock.isA(Monitor.class))).andReturn(simulator);
+		
+		//Provisioning system
+		DPS dps = EasyMock.createStrictMock(DPS.class);
+		dps.registerConfigurable(simulator);
+
+		PowerMock.replay(SimulatorFactory.class);
+		PowerMock.replayAll(machine1, machine2, machine3, lb1, lb2, lb3, simulator, dps, scheduler);
+		
+		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
+		heuristic.findPlan(null, null);
+		
+		Map<MachineType, Integer> plan = heuristic.getPlan(null);
+		assertNotNull(plan);
+		assertEquals(1, plan.size());
+		assertEquals(1, (int)plan.get(MachineType.SMALL));
+		
+		File output = new File(Checkpointer.MACHINE_DATA_DUMP);
+		assertFalse(output.exists());
+		
 		PowerMock.verifyAll();
 	}
 
 	@Test
-	public void testFindPlanWithMixedUtilisedServersAndMultipleTiers(){
+	public void testFindPlanWithMixedUsedServersAndMultipleTiers() throws IOException, ClassNotFoundException{
 		
 		//First tier machines
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.HIGHCPU, 0);
-		descriptor.setFinishTimeInMillis(100);
+		descriptor.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
-		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(67l);
 		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
-		EasyMock.expect(machine1.getNumberOfCores()).andReturn(1);
-		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor).times(2);
+		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TickSize.HOUR.getTickInMillis() * 20);
 		
 		MachineDescriptor descriptor4 = new MachineDescriptor(4, false, MachineType.XLARGE, 0);
-		descriptor4.setFinishTimeInMillis(333);
+		descriptor4.setFinishTimeInMillis(3 * TickSize.DAY.getTickInMillis());
 		Machine machine4 = EasyMock.createStrictMock(Machine.class);
-		EasyMock.expect(machine4.getTotalTimeUsed()).andReturn(7l);
-		EasyMock.expect(machine4.getDescriptor()).andReturn(descriptor);
-		EasyMock.expect(machine4.getNumberOfCores()).andReturn(1);
+		EasyMock.expect(machine4.getDescriptor()).andReturn(descriptor4);
+		EasyMock.expect(machine4.getTotalTimeUsed()).andReturn(TickSize.HOUR.getTickInMillis());
 		
 		//Second tier machine
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.LARGE, 0);
-		descriptor2.setFinishTimeInMillis(2150);
-		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(1798l);
+		descriptor2.setFinishTimeInMillis(2 * TickSize.DAY.getTickInMillis());
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
-		EasyMock.expect(machine2.getNumberOfCores()).andReturn(1);
-		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2).times(2);
+		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TickSize.HOUR.getTickInMillis() * 22);
 		
 		//Third tier machines
 		Machine machine3 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.MEDIUM, 0);
-		descriptor3.setFinishTimeInMillis(10);
-		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(2l);
+		descriptor3.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
-		EasyMock.expect(machine3.getNumberOfCores()).andReturn(1);
+		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() / 5);
 		
 		Machine machine5 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor5 = new MachineDescriptor(5, false, MachineType.HIGHCPU, 0);
-		descriptor5.setFinishTimeInMillis(10);
-		EasyMock.expect(machine5.getTotalTimeUsed()).andReturn(8l);
+		descriptor5.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
 		EasyMock.expect(machine5.getDescriptor()).andReturn(descriptor5);
-		EasyMock.expect(machine5.getNumberOfCores()).andReturn(1);
-		EasyMock.expect(machine5.getDescriptor()).andReturn(descriptor5).times(2);
-
+		EasyMock.expect(machine5.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis());
+		
+		SimulationInfo simulationInfo = new SimulationInfo(1, 0);
+		
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(1, MachineType.MEDIUM, 0.17, 0.06, 455, 700, 10));
+		types.add(new TypeProvider(1, MachineType.HIGHCPU, 0.68, 0.24, 1820, 2800, 10));
+		types.add(new TypeProvider(1, MachineType.LARGE, 0.34, 0.12, 910, 1400, 10));
+		types.add(new TypeProvider(1, MachineType.XLARGE, 0.68, 0.24, 1820, 2800, 10));
+		
+		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
+				types);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(1);
+		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
+		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider}).times(2);
+		EasyMock.expect(config.getRelativePower(MachineType.HIGHCPU)).andReturn(1d).times(2);
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(1d);
+		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(1d);
+		EasyMock.expect(config.getRelativePower(MachineType.XLARGE)).andReturn(1d);
+		
+		PowerMock.replay(Configuration.class);
+		EasyMock.replay(config);
+		
 		//Load balancer
 		LoadBalancer lb1 = EasyMock.createStrictMock(LoadBalancer.class);
 		LoadBalancer lb2 = EasyMock.createStrictMock(LoadBalancer.class);
@@ -474,7 +1027,12 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest {
 		EasyMock.expect(lb2.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine2)));
 		EasyMock.expect(lb3.getServers()).andReturn(new ArrayList<Machine>(Arrays.asList(machine3, machine5)));
 		
-		LoadBalancer[] loadBalancers = new LoadBalancer[]{lb1, lb2, lb3};
+		LoadBalancer[] loadBalancers = new LoadBalancer[3];
+		loadBalancers[0] = lb1;
+		loadBalancers[1] = lb2;
+		loadBalancers[2] = lb3;
+		
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
@@ -487,16 +1045,12 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest {
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
 		dps.registerConfigurable(simulator);
-		EasyMock.expect(dps.calculateUtility()).andReturn(new UtilityResult(0, 0));
-		PowerMock.mockStatic(DPSFactory.class);
-		EasyMock.expect(DPSFactory.createDPS()).andReturn(dps);
 
 		PowerMock.replay(SimulatorFactory.class);
-		PowerMock.replay(DPSFactory.class);
-		PowerMock.replayAll(machine1, machine2, machine3, machine4, machine5, lb1, lb2, lb3, simulator, dps);
+		PowerMock.replayAll(machine1, machine2, machine3, machine4, machine5, lb1, lb2, lb3, simulator, dps, scheduler);
 		
-		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic();
-		heuristic.findPlan(null, null, null);
+		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
+		heuristic.findPlan(null, null);
 		
 		Map<MachineType, Integer> plan = heuristic.getPlan(null);
 		assertNotNull(plan);
@@ -506,5 +1060,4 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest {
 		
 		PowerMock.verifyAll();
 	}
-	
 }

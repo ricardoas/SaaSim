@@ -15,6 +15,7 @@ import commons.cloud.UtilityResult;
 import commons.config.Configuration;
 import commons.sim.AccountingSystem;
 import commons.sim.DynamicConfigurable;
+import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.util.SaaSAppProperties;
@@ -45,19 +46,32 @@ public class DynamicProvisioningSystem implements DPS{
 	
 	@Override
 	public void registerConfigurable(DynamicConfigurable configurable) {
-		this.configurable = configurable;
-		int[] initialServersPerTier = Configuration.getInstance().getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER);
+		Configuration config = Configuration.getInstance();
 		
-		List<MachineType> typeList = Arrays.asList(MachineType.values());
-		Collections.reverse(typeList);
-		//Looking for reserved instances!
-		for (int tier = 0; tier < initialServersPerTier.length; tier++) {
-			addServersToTier(configurable, tier, initialServersPerTier[tier], typeList);
+		this.configurable = configurable;
+		int[] initialServersPerTier = config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER);
+		if(config.hasPreviousMachines()){
+			for (int tier = 0; tier < initialServersPerTier.length; tier++) {
+				addPreviousMachinesToTier(configurable, tier, config.getPreviousMachines());
+			}
+		}else{
+			List<MachineType> typeList = Arrays.asList(MachineType.values());
+			Collections.reverse(typeList);
+			//Looking for reserved instances!
+			for (int tier = 0; tier < initialServersPerTier.length; tier++) {
+				addServersToTier(configurable, tier, initialServersPerTier[tier], typeList);
+			}
 		}
-
+		
 		configurable.setWorkloadParser(WorkloadParserFactory.getWorkloadParser());
 	}
 	
+	private void addPreviousMachinesToTier(DynamicConfigurable configurable, int tier, List<Machine> previousMachines) {
+		for(Machine machine : previousMachines){
+			configurable.addServer(tier, machine);
+		}
+	}
+
 	private void addServersToTier(DynamicConfigurable configurable, int tier, int numberOfInitialServers, List<MachineType> typeList) {
 		int serversAdded = 0;
 		for(MachineType machineType : typeList){
@@ -77,7 +91,11 @@ public class DynamicProvisioningSystem implements DPS{
 	public void reportRequestFinished(Request request) {
 		assert request.getSaasClient() < users.length:"Unregistered user with ID " + request.getSaasClient() + ". Check configuration files.";
 		
-		users[request.getSaasClient()].reportFinishedRequest(request);
+		try{
+			users[request.getSaasClient()].reportFinishedRequest(request);
+		}catch(NullPointerException e){
+			throw e;
+		}
 	}
 	
 	@Override

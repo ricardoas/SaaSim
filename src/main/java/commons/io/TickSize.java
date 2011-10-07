@@ -10,6 +10,7 @@ public enum TickSize {
 	
 	SECOND(1000), 
 	MINUTE(60 * SECOND.getTickInMillis()),
+	TEN_MINUTES(10 * MINUTE.getTickInMillis()),
 	HALF_HOUR(30 * MINUTE.getTickInMillis()),
 	HOUR(60 * MINUTE.getTickInMillis()),
 	TWO_HOURS(2 * 60 * MINUTE.getTickInMillis()),

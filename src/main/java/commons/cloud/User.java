@@ -1,17 +1,20 @@
 package commons.cloud;
 
+import java.io.Serializable;
+
 /**
  * Class representing a SaaS client. For a user that generates request using an application see
  * {@link Request#getUserID()}.
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class User implements Comparable<User>{
+public class User implements Comparable<User>, Serializable{
 	
 	private final int id;
 	private final Contract contract;
 	
 	private long numberOfLostRequests;
+	private int numberOfFinishedRequests;
 	private long consumedCpuInMillis;
 	private long consumedInTransferenceInBytes;
 	private long consumedOutTransferenceInBytes;
@@ -28,6 +31,43 @@ public class User implements Comparable<User>{
 		reset();
 	}
 	
+	
+	public User(int id, Contract contract, long numberOfLostRequests,
+			long consumedCpuInMillis, long consumedInTransferenceInBytes,
+			long consumedOutTransferenceInBytes, long consumedStorageInBytes) {
+		this.id = id;
+		this.contract = contract;
+		this.numberOfLostRequests = numberOfLostRequests;
+		this.consumedCpuInMillis = consumedCpuInMillis;
+		this.consumedInTransferenceInBytes = consumedInTransferenceInBytes;
+		this.consumedOutTransferenceInBytes = consumedOutTransferenceInBytes;
+		this.consumedStorageInBytes = consumedStorageInBytes;
+	}
+
+	public long getNumberOfLostRequests() {
+		return numberOfLostRequests;
+	}
+
+	public void setNumberOfLostRequests(long numberOfLostRequests) {
+		this.numberOfLostRequests = numberOfLostRequests;
+	}
+
+	public long getConsumedCpuInMillis() {
+		return consumedCpuInMillis;
+	}
+
+	public void setConsumedCpuInMillis(long consumedCpuInMillis) {
+		this.consumedCpuInMillis = consumedCpuInMillis;
+	}
+
+	public void setConsumedInTransferenceInBytes(long consumedInTransferenceInBytes) {
+		this.consumedInTransferenceInBytes = consumedInTransferenceInBytes;
+	}
+
+	public void setConsumedOutTransferenceInBytes(long consumedOutTransferenceInBytes) {
+		this.consumedOutTransferenceInBytes = consumedOutTransferenceInBytes;
+	}
+
 	/**
 	 * @return the user's id
 	 */
@@ -75,6 +115,7 @@ public class User implements Comparable<User>{
 		this.consumedInTransferenceInBytes = 0;
 		this.consumedOutTransferenceInBytes = 0;
 		this.numberOfLostRequests = 0;
+		this.numberOfFinishedRequests = 0;
 	}
 	
 	private void update(long consumedCpuInMillis, long inTransferenceInBytes, long outTransferenceInBytes){
@@ -84,10 +125,12 @@ public class User implements Comparable<User>{
 	}
 	
 	public void calculatePartialReceipt(UtilityResultEntry entry) {
+		double penalty = this.contract.calculatePenalty((1.0 * numberOfLostRequests) / (numberOfLostRequests+numberOfFinishedRequests));
+		entry.addPenalty(penalty);
+		
 		this.contract.calculateReceipt(entry, id, consumedCpuInMillis, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, consumedStorageInBytes);
 		this.reset();
 	}
-
 
 	public void calculateOneTimeFees(UtilityResult result) {
 		result.addUserUniqueFee(id, this.contract.calculateOneTimeFees());
@@ -137,6 +180,7 @@ public class User implements Comparable<User>{
 	 * @param request
 	 */
 	public void reportFinishedRequest(Request request) {
+		this.numberOfFinishedRequests++;
 		update(request.getTotalProcessed(), request.getRequestSizeInBytes(), request.getResponseSizeInBytes());
 	}
 

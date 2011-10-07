@@ -1,11 +1,13 @@
 package commons.cloud;
 
+import java.io.Serializable;
+
 /**
  * @author David Candeia - davidcmm@lsd.ufcg.edu.br
  *
  */
-public enum MachineType {
+public enum MachineType implements Serializable{
 
-	SMALL, LARGE, XLARGE, MEDIUM, HIGHCPU
+	SMALL, LARGE, MEDIUM, XLARGE, HIGHCPU
 
 };

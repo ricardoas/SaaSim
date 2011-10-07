@@ -17,14 +17,14 @@ import commons.sim.components.Machine;
  */
 public class RoundRobinHeuristicForHeterogenousMachines implements SchedulingHeuristic {
 	
-	private int lastUsed;
+	private int nextToUse;
 	private List<Integer> allocationsPerServer;
 	
 	/**
 	 * Default constructor
 	 */
 	public RoundRobinHeuristicForHeterogenousMachines() {
-		this.lastUsed = 0;
+		this.nextToUse = 0;
 		this.allocationsPerServer = new ArrayList<Integer>();
 	}
 
@@ -36,19 +36,19 @@ public class RoundRobinHeuristicForHeterogenousMachines implements SchedulingHeu
 		initList(servers);
 		Configuration config = Configuration.getInstance();
 		
-		Integer alreadyAllocated = this.allocationsPerServer.get(lastUsed);
-		double relativePower = config.getRelativePower(servers.get(lastUsed).getDescriptor().getType());
+		Integer alreadyAllocated = this.allocationsPerServer.get(nextToUse);
+		double relativePower = config.getRelativePower(servers.get(nextToUse).getDescriptor().getType());
 		
 		//Retrieving server
-		Machine server = servers.get(lastUsed);
+		Machine server = servers.get(nextToUse);
 		
 		//Incrementing allocations for current server
 		alreadyAllocated++;
-		this.allocationsPerServer.set(lastUsed, alreadyAllocated);
+		this.allocationsPerServer.set(nextToUse, alreadyAllocated);
 		
 		if(alreadyAllocated >= relativePower){//Limit reached for current machine type, next server will be used
-			this.allocationsPerServer.set(lastUsed, 0);
-			lastUsed = (lastUsed + 1) % servers.size();
+			this.allocationsPerServer.set(nextToUse, 0);
+			nextToUse = (nextToUse + 1) % servers.size();
 		}
 		
 		return server;
@@ -90,10 +90,8 @@ public class RoundRobinHeuristicForHeterogenousMachines implements SchedulingHeu
 	 */
 	@Override
 	public void finishServer(Machine server, int index, List<Machine> servers) {
-		if(lastUsed == index){
-			lastUsed = (lastUsed + 1) % servers.size();
-		}else if(lastUsed > index){
-			lastUsed = lastUsed - 1;
+		if(nextToUse > index){
+			nextToUse = nextToUse - 1;
 		}
 		this.allocationsPerServer.remove(index);
 	}

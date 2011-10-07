@@ -2,8 +2,6 @@ package commons.io;
 
 import java.util.regex.Pattern;
 
-import org.apache.commons.math.random.RandomDataImpl;
-
 import commons.cloud.Request;
 
 /**
@@ -23,13 +21,15 @@ import commons.cloud.Request;
 public class GEISTSingleFileWorkloadParser extends AbstractWorkloadParser{
 	
 	private static final Pattern pattern = Pattern.compile("( +|\t+)+");
+	private int reqID;
+	private int userID;
 
 	/**
 	 * Default constructor
-	 * @param workloadPath 
+	 * @param workloads 
 	 */
-	public GEISTSingleFileWorkloadParser(String workloadPath) {
-		super(workloadPath);
+	public GEISTSingleFileWorkloadParser(String[] workloads) {
+		super(workloads, 1);
 	}
 
 	/**
@@ -44,13 +44,30 @@ public class GEISTSingleFileWorkloadParser extends AbstractWorkloadParser{
 //			demand[i-5] = Long.valueOf(eventData[i]);
 //		}
 		long[] demand = new long[4];
-		RandomDataImpl r = new RandomDataImpl();
-		for (int i = 0; i < 4; i++){
-			demand[i] = r.nextInt(200, 500);
-		}
+		demand[0] = Long.parseLong("200");
+		demand[1] = Long.parseLong("200");
+		demand[2] = Long.parseLong("200");
+		demand[3] = Long.parseLong("200");
+			
+		long parseLong = (Long.parseLong(eventData[3]));
+		return null;/* FIXME new Request(reqID++, 0, userID++, 
+				parseLong, Long.parseLong(eventData[4]),
+				Long.parseLong(eventData[5]), demand);*/
+	}
+	
+	public static void main(String[] args) {
+		int total = 27;
+		int counter = 1;
 		
-		return new Request(Long.valueOf(eventData[2]), Integer.valueOf(eventData[1]), Integer.valueOf(eventData[0]), 
-				Long.valueOf(eventData[3]), Long.valueOf(eventData[4]),
-				Long.valueOf(eventData[5]), demand);
+		for(int i = 0; i <= total; i++){
+			for(int j = 0; j <= total -i; j++){
+				for(int k = 0; k <= total - i - j; k++){
+					for(int l = 0; l <= total - i -j - k; l++){
+						System.out.println(counter++);
+					}
+				}
+			}
+		}
 	}
 }
+

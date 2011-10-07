@@ -1,7 +1,5 @@
 package planning.heuristic;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,17 +10,22 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.jgap.Chromosome;
 import org.jgap.Configuration;
 import org.jgap.Gene;
+import org.jgap.IChromosome;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.impl.DefaultConfiguration;
 import org.jgap.impl.IntegerGene;
 
 import planning.io.PlanningWorkloadParser;
+import planning.util.PlanIOHandler;
 import planning.util.Summary;
+import provisioning.Monitor;
 
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.User;
 import commons.io.HistoryBasedWorkloadParser;
+import commons.sim.components.LoadBalancer;
+import commons.sim.jeevent.JEEventScheduler;
 
 public class OptimalHeuristic implements PlanningHeuristic{
 	
@@ -31,22 +34,24 @@ public class OptimalHeuristic implements PlanningHeuristic{
 	private Map<User, List<Summary>> summaries;
 	private List<MachineType> types;
 	
-	private FileWriter writer;
-	private static final String OUTPUT_FILE = "optimal.plan";
+	private IChromosome bestChromosome; 
 	
-	public OptimalHeuristic(){
+//	private FileWriter writer;
+//	private static final String OUTPUT_FILE = "optimal.plan";
+	
+	public OptimalHeuristic(JEEventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
 		this.types = new ArrayList<MachineType>();
 		this.summaries = new HashMap<User, List<Summary>>();
-		try {
-			writer = new FileWriter(new File(OUTPUT_FILE));
-		} catch (IOException e) {
-			throw new RuntimeException("Invalid optimal output file!");
-		}
+		this.bestChromosome = null;
+//		try {
+//			writer = new FileWriter(new File(OUTPUT_FILE));
+//		} catch (IOException e) {
+//			throw new RuntimeException("Invalid optimal output file!");
+//		}
 	}
 	
 	@Override
-	public void findPlan(HistoryBasedWorkloadParser workloadParser,
-			Provider[] cloudProviders, User[] cloudUsers){
+	public void findPlan(Provider[] cloudProviders, User[] cloudUsers){
 		
 		//Reading workload data
 		readWorkloadData(cloudUsers);
@@ -63,11 +68,17 @@ public class OptimalHeuristic implements PlanningHeuristic{
 			}
 			int [] currentValues = new int[limits.size()];
 			
-			evaluateGenes(config, myFunc, cloudProviders[0], limits, 0, currentValues);
+			evaluateGenes(config, myFunc, cloudProviders[0], limits, 0, currentValues);//Searching best configuration
 		} catch (InvalidConfigurationException e) {
 			e.printStackTrace();
 		}
 		
+		Map<MachineType, Integer> plan = this.getPlan(cloudUsers);
+		try {
+			PlanIOHandler.createPlanFile(plan, cloudProviders);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	private void evaluateGenes(Configuration config, PlanningFitnessFunction function, Provider provider, Map<MachineType, Integer> limits, int typesIndex, int[] currentValues) throws InvalidConfigurationException {
@@ -86,22 +97,25 @@ public class OptimalHeuristic implements PlanningHeuristic{
 			}
 			Chromosome chrom = new Chromosome(config, genes);
 			double fitness = function.evaluate(chrom);
-			persistData(chrom, fitness);
+			if(this.bestChromosome == null || this.bestChromosome.getFitnessValue() < fitness){
+				this.bestChromosome = chrom;
+			}
+//			persistData(chrom, fitness);
 		}
 	}
 
-	private void persistData(Chromosome key, double fitness) {
-		StringBuilder result = new StringBuilder();
-		for(Gene gene : key.getGenes()){
-			result.append(gene.getAllele()+"\t");
-		}
-		result.append(fitness+"\n");
-		try {
-			writer.write(result.toString());
-		} catch (IOException e) {
-			throw new RuntimeException("Could not write in optimal output file");
-		}
-	}
+//	private void persistData(Chromosome key, double fitness) {
+//		StringBuilder result = new StringBuilder();
+//		for(Gene gene : key.getGenes()){
+//			result.append(gene.getAllele()+"\t");
+//		}
+//		result.append(fitness+"\n");
+//		try {
+//			writer.write(result.toString());
+//		} catch (IOException e) {
+//			throw new RuntimeException("Could not write in optimal output file");
+//		}
+//	}
 
 	private void readWorkloadData(User[] cloudUsers) {
 		commons.config.Configuration simConfig = commons.config.Configuration.getInstance();
@@ -166,11 +180,21 @@ public class OptimalHeuristic implements PlanningHeuristic{
 
 	@Override
 	public Map<MachineType, Integer> getPlan(User[] cloudUsers) {
-		try {
-			writer.close();
-		} catch (IOException e) {
-			throw new RuntimeException("Could not close optimal output file");
+		Map<MachineType, Integer> plan = new HashMap<MachineType, Integer>();
+		Gene[] genes = this.bestChromosome.getGenes();
+		int index = 0;
+		
+		for(MachineType type : this.types){
+			plan.put(type, (Integer) genes[index++].getAllele());
 		}
-		return new HashMap<MachineType, Integer>();
+		System.out.println("CONFIG: "+genes[0].getAllele()+" "+genes[1].getAllele()+" "+genes[2].getAllele());
+		System.out.println("BEST: "+bestChromosome.getFitnessValue());
+		
+//		try {
+//			writer.close();
+//		} catch (IOException e) {
+//			throw new RuntimeException(e.getMessage());
+//		}
+		return plan;
 	}
 }

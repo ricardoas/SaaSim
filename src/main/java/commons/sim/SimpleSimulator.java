@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.util.List;
 
 import provisioning.Monitor;
+import provisioning.util.WorkloadParserFactory;
 
 import commons.cloud.Request;
 import commons.config.Configuration;
 import commons.io.TickSize;
 import commons.io.WorkloadParser;
 import commons.sim.components.LoadBalancer;
+import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
@@ -22,29 +24,29 @@ import commons.sim.util.SimulatorProperties;
  */
 public class SimpleSimulator extends JEAbstractEventHandler implements Simulator{
 	
-	private static final long MONITOR_INTERVAL = Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL);
-	private static final long PARSER_PAGE_SIZE = Configuration.getInstance().getParserPageSize().getTickInMillis();
-	private static int[] daysInMonths = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	protected static final long MONITOR_INTERVAL = Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL);
+	protected static final long PARSER_PAGE_SIZE = Configuration.getInstance().getParserPageSize().getTickInMillis();
+	protected static int[] daysInMonths = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 	
-	private int currentMonth = 0;
+	protected int currentMonth;
 
-	private WorkloadParser<List<Request>> workloadParser;
+	protected WorkloadParser<List<Request>> workloadParser;
 	
 	private LoadBalancer tiers [];
 	
-	private final Monitor monitor;
+	protected final Monitor monitor;
 
 	/**
 	 * Constructor
-	 * @param scheduler TODO
-	 * @param scheduler 
 	 * @param list 
 	 * @throws IOException 
 	 */
 	public SimpleSimulator(JEEventScheduler scheduler, Monitor monitor, LoadBalancer... tiers){
 		super(scheduler);
+		WorkloadParserFactory.setScheduler(getScheduler());
 		this.monitor = monitor;
 		this.tiers = tiers;
+		this.currentMonth = Configuration.getInstance().getSimulationInfo().getCurrentMonth();
 	}
 	
 	/**
@@ -66,9 +68,16 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	}
 	
 	protected void prepareBeforeStart() {
-		send(new JEEvent(JEEventType.READWORKLOAD, this, getScheduler().now()));
-		send(new JEEvent(JEEventType.CHARGE_USERS, this, getScheduler().now() + (TickSize.DAY.getTickInMillis() * daysInMonths[currentMonth++])));
-		send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + MONITOR_INTERVAL));
+		
+		int simulatedDays = Configuration.getInstance().getSimulationInfo().getSimulatedDays();
+		if(simulatedDays < Configuration.getInstance().getLong(SimulatorProperties.PLANNING_PERIOD)){
+			send(new JEEvent(JEEventType.READWORKLOAD, this, getScheduler().now()));
+			send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + MONITOR_INTERVAL));
+			
+			if(simulatedDays + 1 == daysInMonths[currentMonth]){
+				send(new JEEvent(JEEventType.CHARGE_USERS, this, TickSize.DAY.getTickInMillis(), simulatedDays + 1 ));
+			}
+		}
 	}
 
 	/**
@@ -85,16 +94,22 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 					}
 					if(workloadParser.hasNext()){
 						long newEventTime = getScheduler().now() + PARSER_PAGE_SIZE;
-						send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime));
-					}	
+						send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime, true));
+					}else{
+						//Persisting information in simulation info
+						Configuration.getInstance().getSimulationInfo().addSimulatedDay();
+					}
 				}
 				break;
 			case CHARGE_USERS:
-				this.monitor.chargeUsers(getScheduler().now());
-				if(workloadParser.hasNext()){
-					long newEventTime = getScheduler().now() + (TickSize.DAY.getTickInMillis() * daysInMonths[currentMonth]);
-					send(new JEEvent(JEEventType.CHARGE_USERS, this, newEventTime));
+				int simulatedDays = (Integer) event.getValue()[0];
+				this.monitor.chargeUsers(simulatedDays * TickSize.DAY.getTickInMillis());
+				if( simulatedDays < Configuration.getInstance().getLong(SimulatorProperties.PLANNING_PERIOD) ){
+					currentMonth++;
 					currentMonth %= daysInMonths.length;
+					
+					//Persisting information in simulation info
+					Configuration.getInstance().getSimulationInfo().setCurrentMonth(currentMonth);
 				}
 				break;
 			case COLLECT_STATISTICS:
@@ -126,6 +141,11 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	public void addServer(int tier, MachineDescriptor machineDescriptor, boolean useStartUpDelay) {
 		assert tiers.length > tier : "This tier not exists!";
 		tiers[tier].addServer(machineDescriptor, useStartUpDelay);
+	}
+	
+	@Override
+	public void addServer(int tier, Machine machine) {
+		this.tiers[tier].addServer(machine);
 	}
 
 	/**

@@ -1,5 +1,7 @@
 package planning.io;
 
+import static planning.io.PlanningWorkloadProperties.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,7 +9,8 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
 import planning.util.Summary;
-import static planning.io.PlanningWorkloadProperties.*;
+
+import commons.config.Validator;
 
 public class PlanningWorkloadParser extends PropertiesConfiguration{
 	
@@ -16,8 +19,46 @@ public class PlanningWorkloadParser extends PropertiesConfiguration{
 	public PlanningWorkloadParser(String workloadPath) throws ConfigurationException{
 		super(workloadPath);
 		this.summariesPerMonth = new ArrayList<Summary>();
+		checkProperties();
 	}
 	
+	private void checkProperties() throws ConfigurationException {
+		String[] arrivalRates = getStringArray(ARRIVAL_RATE);
+		if(arrivalRates != null && arrivalRates.length != 0){
+			Validator.checkIsNonEmptyStringArray(ARRIVAL_RATE, arrivalRates);
+		}else{
+			throw new ConfigurationException("Missing arrival rates!");
+		}
+		
+		String[] cpuDemands = getStringArray(CPU_DEMAND_IN_HOURS);
+		if(cpuDemands != null && cpuDemands.length != 0){
+			Validator.checkIsNonEmptyStringArray(CPU_DEMAND_IN_HOURS, cpuDemands);
+		}else{
+			throw new ConfigurationException("Missing cpu demands!");
+		}
+		
+		String[] serviceDemands = getStringArray(SERVICE_DEMAND);
+		if(serviceDemands != null && serviceDemands.length != 0){
+			Validator.checkIsNonEmptyStringArray(SERVICE_DEMAND, serviceDemands);
+		}else{
+			throw new ConfigurationException("Missing service demands!");
+		}
+
+		String[] userThinkTimes = getStringArray(USER_THINK_TIME);
+		if(userThinkTimes != null && userThinkTimes.length != 0){
+			Validator.checkIsNonEmptyStringArray(USER_THINK_TIME, userThinkTimes);
+		}else{
+			throw new ConfigurationException("Missing users think times!");
+		}
+		
+		String[] numberOfUsers = getStringArray(NUMBER_OF_USERS);
+		if(numberOfUsers != null && numberOfUsers.length != 0){
+			Validator.checkIsNonEmptyStringArray(NUMBER_OF_USERS, numberOfUsers);
+		}else{
+			throw new ConfigurationException("Missing number of users!");
+		}
+	}
+
 	public List<Summary> getSummaries(){
 		return this.summariesPerMonth;
 	}

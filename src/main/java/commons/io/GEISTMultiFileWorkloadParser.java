@@ -1,6 +1,6 @@
 package commons.io;
 
-import java.util.regex.Pattern;
+import java.util.StringTokenizer;
 
 import commons.cloud.Request;
 
@@ -20,15 +20,15 @@ import commons.cloud.Request;
 public class GEISTMultiFileWorkloadParser extends AbstractWorkloadParser{
 	
 	private final int saasClientID;
-	private static final Pattern pattern = Pattern.compile("( +|\t+)+");
+//	private static final Pattern pattern = Pattern.compile("( +|\t+)+");
 
 
 	/**
 	 * Default constructor
-	 * @param workloadPath 
+	 * @param workloads 
 	 */
-	public GEISTMultiFileWorkloadParser(String workloadPath, int saasclientID) {
-		super(workloadPath);
+	public GEISTMultiFileWorkloadParser(String[] workloads, int saasclientID) {
+		super(workloads, saasclientID);
 		this.saasClientID = saasclientID;
 	}
 
@@ -37,15 +37,32 @@ public class GEISTMultiFileWorkloadParser extends AbstractWorkloadParser{
 	 */
 	@Override
 	protected Request parseRequest(String line) {
-		String[] eventData = pattern.split(line);
+//		String[] eventData = pattern.split(line);
+		StringTokenizer tokenizer = new StringTokenizer(line, "( +|\t+)+");
 		
-		long [] demand = new long[eventData.length - 5];
-		for (int i = 5; i < eventData.length; i++) {
-			demand[i-5] = Long.valueOf(eventData[i]);
+//		long [] demand = new long[4];
+//		demand[0] = 10;
+//		demand[1] = 10;
+//		demand[2] = 10;
+//		demand[3] = 10;
+		
+//		return new Request(Long.valueOf(eventData[1]), saasClientID, Integer.valueOf(eventData[0]), Long
+//				.valueOf(eventData[2])+(periodsAlreadyRead * TickSize.DAY.getTickInMillis()), Long.valueOf(eventData[3]),
+//				Long.valueOf(eventData[4]), demand);
+		int userID = Integer.parseInt(tokenizer.nextToken());
+		long reqID = Long.parseLong(tokenizer.nextToken());
+		long arrivalTimeInMillis = Long.parseLong(tokenizer.nextToken());
+		long requestSizeInBytes = Long.parseLong(tokenizer.nextToken());
+		long responseSizeInBytes = Long.parseLong(tokenizer.nextToken());
+		
+		long [] demand = new long[tokenizer.countTokens()];
+		int index = 0;
+		while(tokenizer.hasMoreTokens()){
+			demand[index++] = Long.parseLong(tokenizer.nextToken());
 		}
 		
-		return new Request(Long.valueOf(eventData[1]), saasClientID, Integer.valueOf(eventData[0]), Long
-				.valueOf(eventData[2]), Long.valueOf(eventData[3]),
-				Long.valueOf(eventData[4]), demand);
+		return new Request(userID, reqID, saasClientID, 
+				arrivalTimeInMillis, requestSizeInBytes,
+				responseSizeInBytes, demand);
 	}
 }

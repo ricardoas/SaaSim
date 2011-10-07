@@ -1,5 +1,6 @@
 package commons.cloud;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,7 @@ import commons.util.CostCalculus;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class Provider {
+public class Provider implements Serializable{
 	
 	private final int id;
 	private final String name;
@@ -50,6 +51,22 @@ public class Provider {
 			this.types.put(machineType.getType(), machineType);
 		}
 		this.onDemandRunningMachines = 0;
+	}
+
+	public int getOnDemandRunningMachines() {
+		return onDemandRunningMachines;
+	}
+
+	public void setOnDemandRunningMachines(int onDemandRunningMachines) {
+		this.onDemandRunningMachines = onDemandRunningMachines;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public Map<MachineType, TypeProvider> getTypes() {
+		return types;
 	}
 
 	/**
@@ -137,6 +154,11 @@ public class Provider {
 	}
 
 
+	public MachineType[] getAvailableTypes() {
+		Set<MachineType> set = types.keySet();
+		return set.toArray(new MachineType[set.size()]);
+	}
+
 	public boolean canBuyMachine(boolean reserved, MachineType type) {
 		if(!reserved){
 			return types.containsKey(type) && onDemandRunningMachines < getOnDemandLimit();
@@ -201,10 +223,5 @@ public class Provider {
 			double cost = typeProvider.calculateUniqueCost();
 			result.addProviderUniqueCost(id, typeProvider.getType(), cost);
 		}
-	}
-
-	public MachineType[] getAvailableTypes() {
-		Set<MachineType> set = types.keySet();
-		return set.toArray(new MachineType[set.size()]);
 	}
 }
