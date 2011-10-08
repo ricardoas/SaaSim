@@ -14,11 +14,11 @@ import commons.config.Validator;
 
 public class PlanningWorkloadParser extends PropertiesConfiguration{
 	
-	private List<Summary> summariesPerMonth;
+	private List<Summary> summariesPerInterval;
 
 	public PlanningWorkloadParser(String workloadPath) throws ConfigurationException{
 		super(workloadPath);
-		this.summariesPerMonth = new ArrayList<Summary>();
+		this.summariesPerInterval = new ArrayList<Summary>();
 		checkProperties();
 	}
 	
@@ -60,7 +60,7 @@ public class PlanningWorkloadParser extends PropertiesConfiguration{
 	}
 
 	public List<Summary> getSummaries(){
-		return this.summariesPerMonth;
+		return this.summariesPerInterval;
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class PlanningWorkloadParser extends PropertiesConfiguration{
 		String[] userThinkTimeInSeconds = getStringArray(USER_THINK_TIME);
 		String[] numberOfUsers = getStringArray(NUMBER_OF_USERS);
 		for(int i = 0; i < arrivalRates.length; i++){
-			this.summariesPerMonth.add(parseMonthSummary(arrivalRates[i], cpuDemandInHours[i], requestServiceDemandInMillis[i],
+			this.summariesPerInterval.add(parseSummaryInterval(arrivalRates[i], cpuDemandInHours[i], requestServiceDemandInMillis[i],
 							userThinkTimeInSeconds[i], numberOfUsers[i]));
 		}
 	}
@@ -86,7 +86,7 @@ public class PlanningWorkloadParser extends PropertiesConfiguration{
 	 * @param cpuDemandInHours 
 	 * @return
 	 */
-	protected Summary parseMonthSummary(String monthArrivalRate, String monthCpuDemandInHours, String monthRequestServiceDemand, String monthUserThinkTime, String monthNumberOfUsers){
+	protected Summary parseSummaryInterval(String monthArrivalRate, String monthCpuDemandInHours, String monthRequestServiceDemand, String monthUserThinkTime, String monthNumberOfUsers){
 		double arrivalRate = Double.parseDouble(monthArrivalRate);
 		double totalCpuHrs = Double.parseDouble(monthCpuDemandInHours);
 		double serviceDemandInMillis = Double.parseDouble(monthRequestServiceDemand);

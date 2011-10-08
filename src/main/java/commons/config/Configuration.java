@@ -520,6 +520,16 @@ public class Configuration	extends PropertiesConfiguration{
 	private void verifySimulatorProperties() throws ConfigurationException {
 		checkDPSHeuristic();
 		checkPlanningHeuristic();
+		
+		String value = getString(PLANNING_RISK);
+		if(value != null && value.length() > 0){
+			Validator.checkPositiveDouble(PLANNING_RISK, value);
+		}
+		value = getString(PLANNING_INTERVAL_SIZE);
+		if(value != null && value.length() > 0){
+			Validator.checkPositive(PLANNING_INTERVAL_SIZE, value);
+		}
+		
 		Validator.checkPositive(PLANNING_PERIOD, getString(PLANNING_PERIOD));
 		Validator.checkEnum(PARSER_IDIOM, getString(PARSER_IDIOM), ParserIdiom.class);
 		Validator.checkEnum(PARSER_PAGE_SIZE, getString(PARSER_PAGE_SIZE), TickSize.class);

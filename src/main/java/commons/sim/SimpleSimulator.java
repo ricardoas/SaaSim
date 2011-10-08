@@ -26,7 +26,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	
 	protected static final long MONITOR_INTERVAL = Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL);
 	protected static final long PARSER_PAGE_SIZE = Configuration.getInstance().getParserPageSize().getTickInMillis();
-	protected static int[] daysInMonths = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+	public static int[] daysInMonths = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 	
 	protected int currentMonth;
 

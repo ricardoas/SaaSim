@@ -18,6 +18,10 @@ public class SimulatorProperties {
 	
 	public static final String PLANNING_TYPE = "planning.type";
 	
+	public static final String PLANNING_RISK = "planning.risk";
+	
+	public static final String PLANNING_INTERVAL_SIZE = "planning.interval.size";
+	
 	public static final String PARSER_IDIOM = "dps.workload.parser";
 	
 	public static final String PARSER_PAGE_SIZE = "dps.workload.pagesize";
