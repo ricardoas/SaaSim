@@ -31,7 +31,7 @@ import commons.sim.jeevent.JEEventType;
 @PowerMockIgnore("org.apache.log4j.*")
 @PrepareForTest({JEEventScheduler.class, Configuration.class})
 public class MultiCoreRanjanMachineTest extends MockedConfigurationTest {
-	//ValidConfigurationTest
+	
 	private static final long DEFAULT_BACKLOG_SIZE = 2;
 	private static final long DEFAULT_MAX_NUM_OF_THREADS = 3;
 	
@@ -45,7 +45,6 @@ public class MultiCoreRanjanMachineTest extends MockedConfigurationTest {
 	@Before
 	public void setUp() {
 		this.descriptor = new MachineDescriptor(1, false, MachineType.SMALL, 0);
-		
 	}
 
 	@Test

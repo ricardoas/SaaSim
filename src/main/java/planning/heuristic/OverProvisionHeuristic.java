@@ -72,7 +72,11 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 		Configuration config = Configuration.getInstance();
 		
 		//Calculating requests mean demand
-		this.requestsMeanDemand = this.totalProcessingTime / this.numberOfRequests;
+		if(this.requestsMeanDemand == 0d){//first day
+			this.requestsMeanDemand = this.totalProcessingTime / this.numberOfRequests;
+		}else{//other days
+			this.requestsMeanDemand = (this.requestsMeanDemand + (this.totalProcessingTime / this.numberOfRequests)) / 2;
+		}
 
 		if(config.getSimulationInfo().getSimulatedDays() == config.getLong(SimulatorProperties.PLANNING_PERIOD)){//Simulation finished!
 			
