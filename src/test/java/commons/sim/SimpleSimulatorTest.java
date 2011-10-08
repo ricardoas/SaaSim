@@ -9,12 +9,15 @@ import java.util.Queue;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Test;
+import org.powermock.api.easymock.PowerMock;
 
 import provisioning.Monitor;
 import util.ValidConfigurationTest;
 
 import commons.cloud.MachineType;
 import commons.cloud.Request;
+import commons.config.Configuration;
+import commons.io.TickSize;
 import commons.io.WorkloadParser;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.MachineDescriptor;
@@ -25,6 +28,8 @@ import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
+import commons.sim.util.SimulatorProperties;
+import commons.util.SimulationInfo;
 
 /**
  * 
@@ -362,35 +367,32 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testHandleEventChargeUsers() {
-		WorkloadParser<List<Request>> workloadParser = EasyMock.createMock(WorkloadParser.class);
+		Configuration config = EasyMock.createStrictMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
+		EasyMock.expect(config.getSimulationInfo()).andReturn(new SimulationInfo(30, 0));
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(40l);
+		EasyMock.expect(config.getSimulationInfo()).andReturn(new SimulationInfo(30, 0));
+		
 		JEEventHandler handler = EasyMock.createMock(JEEventHandler.class);
 		JEEventScheduler scheduler = EasyMock.createMock(JEEventScheduler.class);
 		Monitor monitor = EasyMock.createMock(Monitor.class);
-		TimeSharedMachine timeSharedMachine = EasyMock.createMock(TimeSharedMachine.class);
 		
 		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(2);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1);
-		EasyMock.expect(scheduler.now()).andReturn(0L).times(2);
 		
-		Capture<JEEvent> eventChargeUser = new Capture<JEEvent>();
-		scheduler.queueEvent(EasyMock.capture(eventChargeUser));
+		monitor.chargeUsers(TickSize.DAY.getTickInMillis() * 31);
 		EasyMock.expectLastCall().times(1);
 		
-		monitor.chargeUsers(0L);
-		EasyMock.expectLastCall().times(1);
-		EasyMock.expect(workloadParser.hasNext()).andReturn(true).times(1);
-		
-		EasyMock.replay(monitor, scheduler, handler, workloadParser, timeSharedMachine);
+		PowerMock.replayAll(monitor, scheduler, handler, config);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator = new SimpleSimulator(scheduler, monitor, loadBalancer);
+		SimpleSimulator simulator =  new SimpleSimulator(scheduler, monitor, loadBalancer);
 		
-		simulator.setWorkloadParser(workloadParser);
 		JEEvent event = new JEEvent(JEEventType.CHARGE_USERS, handler, 1L, 31);
 		simulator.handleEvent(event);
-		assertEquals(JEEventType.CHARGE_USERS, eventChargeUser.getValue().getType());
 		
-		EasyMock.verify(monitor, scheduler, handler, workloadParser, timeSharedMachine);
+		PowerMock.verifyAll();
 	}
 	
 	@SuppressWarnings("unchecked")
