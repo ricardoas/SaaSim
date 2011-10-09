@@ -1,6 +1,6 @@
 package planning.heuristic;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -560,7 +560,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, null);
 		
 		double receipt = setupCost + price + 320 * 0.1;
-		assertEquals(receipt, function.calcReceipt(31), 0.0001);
+		assertEquals(receipt, function.calcReceipt(), 0.0001);
 		
 		PowerMock.verifyAll();
 	}
@@ -605,7 +605,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, null);
 		
 		double receipt = setupCost * 2;
-		assertEquals(receipt, function.calcReceipt(31), 0.0001);
+		assertEquals(receipt, function.calcReceipt(), 0.0001);
 		
 		PowerMock.verifyAll();
 	}
@@ -712,7 +712,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, null);
 		
 		double receipt = setupCost * 2 + price + price2;
-		assertEquals(receipt, function.calcReceipt(31), 0.0001);
+		assertEquals(receipt, function.calcReceipt(), 0.0001);
 	}
 	
 	@Test
@@ -873,7 +873,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, null);
 		
 		double receipt = setupCost * 2 + 2 * price + 2 * price2;
-		assertEquals(receipt, function.calcReceipt(59), 0.0001);
+		assertEquals(receipt, function.calcReceipt(), 0.0001);
 		
 		PowerMock.verifyAll();
 	}
@@ -1036,13 +1036,13 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, null);
 		
 		double receipt = setupCost * 2 + 2 * price + 2 * price2 + 40 * 0.1 + 58 * 0.2;
-		assertEquals(receipt, function.calcReceipt(59), 0.0001);
+		assertEquals(receipt, function.calcReceipt(), 0.0001);
 		
 		PowerMock.verifyAll();
 	}
 	
 	@Test
-	public void testAggregateThinkTimeInCorrectOrder(){
+	public void testAggregateThinkTimeInTimeOrder(){
 		double setupCost = 100d;
 		double price = 555d;
 		double price2 = 99.765d;
@@ -1194,326 +1194,601 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		function.aggregateThinkTime(12);
 	}
 	
-//	@Test
-//	public void testAggregateNumberOfUsers(){
-//		double setupCost = 100d;
-//		double price = 555d;
-//		double price2 = 99.765d;
-//		
-//		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
-//		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
-//		
-//		User[] cloudUsers = new User[2];
-//		cloudUsers[0] = new User(0, contract, 100);
-//		cloudUsers[1] = new User(1, contract2, 100);
-//		
-//		//Workload summaries
-//		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
-//		List<Summary> data = new ArrayList<Summary>();
-//		data.add(new Summary(1, 10, 500, 3, 100));
-//		data.add(new Summary(1, 10, 500, 15, 100));
-//		data.add(new Summary(2, 20, 500, 7, 100));
-//		data.add(new Summary(2, 20, 500, 7, 100));
-//		data.add(new Summary(5, 40, 500, 15, 100));
-//		data.add(new Summary(10, 70, 500, 3, 100));
-//		data.add(new Summary(11, 75, 500, 3, 100));
-//		data.add(new Summary(12, 80, 500, 15, 100));
-//		data.add(new Summary(13, 90, 500, 7, 100));
-//		data.add(new Summary(14, 90, 500, 15, 100));
-//		data.add(new Summary(11, 75, 500, 7, 100));
-//		data.add(new Summary(7, 60, 500, 3, 100));
-//		summaries.put(cloudUsers[0], data);//640 cpu-hrs
-//		
-//		List<Summary> data2 = new ArrayList<Summary>();
-//		data2.add(new Summary(1, 10, 500, 15, 100));
-//		data2.add(new Summary(1, 10, 500, 7, 100));
-//		data2.add(new Summary(2, 20, 500, 3, 100));
-//		data2.add(new Summary(2, 20, 500, 3, 100));
-//		data2.add(new Summary(5, 40, 500, 7, 100));
-//		data2.add(new Summary(10, 40, 500, 15, 100));
-//		data2.add(new Summary(11, 75, 500, 7, 100));
-//		data2.add(new Summary(12, 80, 500, 3, 100));
-//		data2.add(new Summary(13, 50, 500, 15, 100));
-//		data2.add(new Summary(14, 50, 500, 3, 100));
-//		data2.add(new Summary(11, 75, 500, 7, 100));
-//		data2.add(new Summary(7, 60, 500, 15, 100));
-//		summaries.put(cloudUsers[1], data2);//530 cpu-hrs
-//		
-//		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
-//		
-//		assertEquals(200, function.aggregateNumberOfUsers(), 0.0001);
-//	}
-//	
-//	@Test
-//	public void testAggregateNumberOfUsers2(){
-//		double setupCost = 100d;
-//		double price = 555d;
-//		double price2 = 99.765d;
-//		
-//		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
-//		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
-//		
-//		User[] cloudUsers = new User[2];
-//		cloudUsers[0] = new User(0, contract, 100);
-//		cloudUsers[1] = new User(1, contract2, 100);
-//		
-//		//Workload summaries
-//		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
-//		List<Summary> data = new ArrayList<Summary>();
-//		data.add(new Summary(1, 10, 500, 3, 100));
-//		data.add(new Summary(1, 10, 500, 15, 200));
-//		data.add(new Summary(2, 20, 500, 7, 300));
-//		data.add(new Summary(2, 20, 500, 7, 400));
-//		data.add(new Summary(5, 40, 500, 15, 500));
-//		data.add(new Summary(10, 70, 500, 3, 500));
-//		data.add(new Summary(11, 75, 500, 3, 600));
-//		data.add(new Summary(12, 80, 500, 15, 700));
-//		data.add(new Summary(13, 90, 500, 7, 800));
-//		data.add(new Summary(14, 90, 500, 15, 900));
-//		data.add(new Summary(11, 75, 500, 7, 1000));
-//		data.add(new Summary(7, 60, 500, 3, 1100));
-//		summaries.put(cloudUsers[0], data);//7100 users
-//		
-//		List<Summary> data2 = new ArrayList<Summary>();
-//		data2.add(new Summary(1, 10, 500, 15, 1));
-//		data2.add(new Summary(1, 10, 500, 7, 5));
-//		data2.add(new Summary(2, 20, 500, 3, 6));
-//		data2.add(new Summary(2, 20, 500, 3, 9));
-//		data2.add(new Summary(5, 40, 500, 7, 11));
-//		data2.add(new Summary(10, 40, 500, 15, 23));
-//		data2.add(new Summary(11, 75, 500, 7, 35));
-//		data2.add(new Summary(12, 80, 500, 3, 99));
-//		data2.add(new Summary(13, 50, 500, 15, 88));
-//		data2.add(new Summary(14, 50, 500, 3, 77));
-//		data2.add(new Summary(11, 75, 500, 7, 99));
-//		data2.add(new Summary(7, 60, 500, 15, 1));
-//		summaries.put(cloudUsers[1], data2);//454 users
-//		
-//		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
-//		
-//		assertEquals(628, function.aggregateNumberOfUsers(), 0.0001);
-//	}
-//	
-//	@Test
-//	public void testAggregateNumberOfUsersWithoutUsers(){
-//		double setupCost = 100d;
-//		double price = 555d;
-//		double price2 = 99.765d;
-//		
-//		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
-//		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
-//		
-//		User[] cloudUsers = new User[2];
-//		cloudUsers[0] = new User(0, contract, 100);
-//		cloudUsers[1] = new User(1, contract2, 100);
-//		
-//		//Workload summaries
-//		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
-//		List<Summary> data = new ArrayList<Summary>();
-//		data.add(new Summary(1, 10, 500, 0, 0));
-//		data.add(new Summary(1, 10, 500, 0, 0));
-//		data.add(new Summary(2, 20, 500, 0, 0));
-//		data.add(new Summary(2, 20, 500, 0, 0));
-//		data.add(new Summary(5, 40, 500, 0, 0));
-//		data.add(new Summary(10, 70, 500, 0, 0));
-//		data.add(new Summary(11, 75, 500, 0, 0));
-//		data.add(new Summary(12, 80, 500, 0, 0));
-//		data.add(new Summary(13, 90, 500, 0, 0));
-//		data.add(new Summary(14, 90, 500, 0, 0));
-//		data.add(new Summary(11, 75, 500, 0, 0));
-//		data.add(new Summary(7, 60, 500, 0, 0));
-//		summaries.put(cloudUsers[0], data);
-//		
-//		List<Summary> data2 = new ArrayList<Summary>();
-//		data2.add(new Summary(1, 10, 500, 0, 0));
-//		data2.add(new Summary(1, 10, 500, 0, 0));
-//		data2.add(new Summary(2, 20, 500, 0, 0));
-//		data2.add(new Summary(2, 20, 500, 0, 0));
-//		data2.add(new Summary(5, 40, 500, 0, 0));
-//		data2.add(new Summary(10, 40, 500, 0, 0));
-//		data2.add(new Summary(11, 75, 500, 0, 0));
-//		data2.add(new Summary(12, 80, 500, 0, 0));
-//		data2.add(new Summary(13, 50, 500, 0, 0));
-//		data2.add(new Summary(14, 50, 500, 0, 0));
-//		data2.add(new Summary(11, 75, 500, 0, 0));
-//		data2.add(new Summary(7, 60, 500, 0, 0));
-//		summaries.put(cloudUsers[1], data2);
-//		
-//		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
-//		
-//		assertEquals(0, function.aggregateNumberOfUsers(), 0.0001);
-//	}
-//	
-//	@Test
-//	public void testAggregateServiceTimeForOneSaaSClient(){
-//		double setupCost = 100d;
-//		double price = 555d;
-//		double price2 = 99.765d;
-//		
-//		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
-//		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
-//		
-//		User[] cloudUsers = new User[2];
-//		cloudUsers[0] = new User(0, contract, 100);
-//		cloudUsers[1] = new User(1, contract2, 100);
-//		
-//		//Workload summaries
-//		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
-//		List<Summary> data = new ArrayList<Summary>();
-//		data.add(new Summary(1, 10, 500, 0, 100));
-//		data.add(new Summary(1, 10, 600, 0, 200));
-//		data.add(new Summary(2, 20, 400, 0, 300));
-//		data.add(new Summary(2, 20, 700, 0, 400));
-//		data.add(new Summary(5, 40, 300, 0, 500));
-//		data.add(new Summary(10, 70, 800, 0, 500));
-//		data.add(new Summary(11, 75, 200, 0, 600));
-//		data.add(new Summary(12, 80, 500, 0, 700));
-//		data.add(new Summary(13, 90, 500, 0, 800));
-//		data.add(new Summary(14, 90, 900, 0, 900));
-//		data.add(new Summary(11, 75, 100, 0, 1000));
-//		data.add(new Summary(7, 60, 500, 0, 1100));
-//		summaries.put(cloudUsers[0], data);
-//		
-//		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
-//		
-//		assertEquals(500, function.aggregateServiceTime(), 0.0001);
-//	}
-//	
-//	@Test
-//	public void testAggregateServiceTimeForMultipleSaaSClients(){
-//		double setupCost = 100d;
-//		double price = 555d;
-//		double price2 = 99.765d;
-//		
-//		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
-//		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
-//		
-//		User[] cloudUsers = new User[2];
-//		cloudUsers[0] = new User(0, contract, 100);
-//		cloudUsers[1] = new User(1, contract2, 100);
-//		
-//		//Workload summaries
-//		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
-//		List<Summary> data = new ArrayList<Summary>();
-//		data.add(new Summary(1, 10, 1000, 3, 100));
-//		data.add(new Summary(1, 10, 2000, 15, 200));
-//		data.add(new Summary(2, 20, 500, 7, 300));
-//		data.add(new Summary(2, 20, 2500, 7, 400));
-//		data.add(new Summary(5, 40, 3000, 15, 500));
-//		data.add(new Summary(10, 70, 1000, 3, 500));
-//		data.add(new Summary(11, 75, 2000, 3, 600));
-//		data.add(new Summary(12, 80, 2500, 15, 700));
-//		data.add(new Summary(13, 90, 2500, 7, 800));
-//		data.add(new Summary(14, 90, 3000, 15, 900));
-//		data.add(new Summary(11, 75, 1000, 7, 1000));
-//		data.add(new Summary(7, 60, 2000, 3, 1100));
-//		summaries.put(cloudUsers[0], data);//Average service time: 1916.667
-//		
-//		List<Summary> data2 = new ArrayList<Summary>();
-//		data2.add(new Summary(1, 10, 100, 15, 1));
-//		data2.add(new Summary(1, 10, 200, 7, 5));
-//		data2.add(new Summary(2, 20, 300, 3, 6));
-//		data2.add(new Summary(2, 20, 400, 3, 9));
-//		data2.add(new Summary(5, 40, 500, 7, 11));
-//		data2.add(new Summary(10, 40, 600, 15, 23));
-//		data2.add(new Summary(11, 75, 700, 7, 35));
-//		data2.add(new Summary(12, 80, 800, 3, 99));
-//		data2.add(new Summary(13, 50, 900, 15, 88));
-//		data2.add(new Summary(14, 50, 1000, 3, 77));
-//		data2.add(new Summary(11, 75, 1000, 7, 99));
-//		data2.add(new Summary(7, 60, 1000, 15, 1));
-//		summaries.put(cloudUsers[1], data2);//Average service time: 625
-//		
-//		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
-//		
-//		assertEquals(1270.8333333, function.aggregateServiceTime(), 0.0001);
-//	}
-//	
-//	@Test
-//	public void testAggregateArrivalsForOneSaaSClient(){
-//		double setupCost = 100d;
-//		double price = 555d;
-//		double price2 = 99.765d;
-//		
-//		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
-//		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
-//		
-//		User[] cloudUsers = new User[2];
-//		cloudUsers[0] = new User(0, contract, 100);
-//		cloudUsers[1] = new User(1, contract2, 100);
-//		
-//		//Workload summaries
-//		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
-//		List<Summary> data = new ArrayList<Summary>();
-//		data.add(new Summary(1, 10, 500, 0, 100));
-//		data.add(new Summary(1, 10, 600, 0, 200));
-//		data.add(new Summary(2, 20, 400, 0, 300));
-//		data.add(new Summary(2, 20, 700, 0, 400));
-//		data.add(new Summary(5, 40, 300, 0, 500));
-//		data.add(new Summary(10, 70, 800, 0, 500));
-//		data.add(new Summary(11, 75, 200, 0, 600));
-//		data.add(new Summary(12, 80, 500, 0, 700));
-//		data.add(new Summary(13, 90, 500, 0, 800));
-//		data.add(new Summary(14, 90, 900, 0, 900));
-//		data.add(new Summary(11, 75, 100, 0, 1000));
-//		data.add(new Summary(7, 60, 500, 0, 1100));
-//		summaries.put(cloudUsers[0], data);
-//		
-//		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
-//		
-//		assertEquals(7.416667, function.aggregateArrivals(), 0.0001);
-//	}
-//	
-//	@Test
-//	public void testAggregateArrivalsForMultipleSaaSClients(){
-//		double setupCost = 100d;
-//		double price = 555d;
-//		double price2 = 99.765d;
-//		
-//		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
-//		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
-//		
-//		User[] cloudUsers = new User[2];
-//		cloudUsers[0] = new User(0, contract, 100);
-//		cloudUsers[1] = new User(1, contract2, 100);
-//		
-//		//Workload summaries
-//		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
-//		List<Summary> data = new ArrayList<Summary>();
-//		data.add(new Summary(10, 10, 1000, 3, 100));
-//		data.add(new Summary(20, 10, 2000, 15, 200));
-//		data.add(new Summary(25, 20, 500, 7, 300));
-//		data.add(new Summary(30, 20, 2500, 7, 400));
-//		data.add(new Summary(40, 40, 3000, 15, 500));
-//		data.add(new Summary(50, 70, 1000, 3, 500));
-//		data.add(new Summary(55, 75, 2000, 3, 600));
-//		data.add(new Summary(60, 80, 2500, 15, 700));
-//		data.add(new Summary(40, 90, 2500, 7, 800));
-//		data.add(new Summary(30, 90, 3000, 15, 900));
-//		data.add(new Summary(25, 75, 1000, 7, 1000));
-//		data.add(new Summary(5, 60, 2000, 3, 1100));
-//		summaries.put(cloudUsers[0], data);//Average arrival: 32.5
-//		
-//		List<Summary> data2 = new ArrayList<Summary>();
-//		data2.add(new Summary(100, 10, 100, 15, 1));
-//		data2.add(new Summary(300, 10, 200, 7, 5));
-//		data2.add(new Summary(500, 20, 300, 3, 6));
-//		data2.add(new Summary(400, 20, 400, 3, 9));
-//		data2.add(new Summary(900, 40, 500, 7, 11));
-//		data2.add(new Summary(800, 40, 600, 15, 23));
-//		data2.add(new Summary(700, 75, 700, 7, 35));
-//		data2.add(new Summary(600, 80, 800, 3, 99));
-//		data2.add(new Summary(500, 50, 900, 15, 88));
-//		data2.add(new Summary(300, 50, 1000, 3, 77));
-//		data2.add(new Summary(400, 75, 1000, 7, 99));
-//		data2.add(new Summary(250, 60, 1000, 15, 1));
-//		summaries.put(cloudUsers[1], data2);//Average service time: 479.16667
-//		
-//		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
-//		
-//		assertEquals(511.66667, function.aggregateArrivals(), 0.0001);
-//	}
-//	
+	@Test
+	public void testAggregateNumberOfUsersInTimeOrder(){
+		double setupCost = 100d;
+		double price = 555d;
+		double price2 = 99.765d;
+		
+		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		data.add(new Summary(1, 10, 500, 3, 100));
+		data.add(new Summary(1, 10, 500, 15, 100));
+		data.add(new Summary(2, 20, 500, 7, 100));
+		data.add(new Summary(2, 20, 500, 7, 100));
+		data.add(new Summary(5, 40, 500, 15, 100));
+		data.add(new Summary(10, 70, 500, 3, 300));
+		data.add(new Summary(11, 75, 500, 3, 100));
+		data.add(new Summary(12, 80, 500, 15, 100));
+		data.add(new Summary(13, 90, 500, 7, 100));
+		data.add(new Summary(14, 90, 500, 15, 100));
+		data.add(new Summary(11, 75, 500, 7, 100));
+		data.add(new Summary(7, 60, 500, 3, 181));
+		summaries.put(cloudUsers[0], data);//640 cpu-hrs
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		data2.add(new Summary(1, 10, 500, 15, 100));
+		data2.add(new Summary(1, 10, 500, 7, 100));
+		data2.add(new Summary(2, 20, 500, 3, 100));
+		data2.add(new Summary(2, 20, 500, 3, 100));
+		data2.add(new Summary(5, 40, 500, 7, 100));
+		data2.add(new Summary(10, 40, 500, 15, 100));
+		data2.add(new Summary(11, 75, 500, 7, 100));
+		data2.add(new Summary(12, 80, 500, 3, 100));
+		data2.add(new Summary(13, 50, 500, 15, 100));
+		data2.add(new Summary(14, 50, 500, 3, 100));
+		data2.add(new Summary(11, 75, 500, 7, 100));
+		data2.add(new Summary(7, 60, 500, 15, 99));
+		summaries.put(cloudUsers[1], data2);//530 cpu-hrs
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
+		
+		assertEquals(200, function.aggregateNumberOfUsers(0), 0.0001);
+		assertEquals(400, function.aggregateNumberOfUsers(5), 0.0001);
+		assertEquals(280, function.aggregateNumberOfUsers(11), 0.0001);
+	}
+	
+	@Test
+	public void testAggregateNumberOfUsersInAnyOrder(){
+		double setupCost = 100d;
+		double price = 555d;
+		double price2 = 99.765d;
+		
+		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		data.add(new Summary(1, 10, 500, 3, 100));
+		data.add(new Summary(1, 10, 500, 15, 200));
+		data.add(new Summary(2, 20, 500, 7, 300));
+		data.add(new Summary(2, 20, 500, 7, 400));
+		data.add(new Summary(5, 40, 500, 15, 500));
+		data.add(new Summary(10, 70, 500, 3, 500));
+		data.add(new Summary(11, 75, 500, 3, 600));
+		data.add(new Summary(12, 80, 500, 15, 700));
+		data.add(new Summary(13, 90, 500, 7, 800));
+		data.add(new Summary(14, 90, 500, 15, 900));
+		data.add(new Summary(11, 75, 500, 7, 1000));
+		data.add(new Summary(7, 60, 500, 3, 1100));
+		summaries.put(cloudUsers[0], data);//7100 users
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		data2.add(new Summary(1, 10, 500, 15, 1));
+		data2.add(new Summary(1, 10, 500, 7, 5));
+		data2.add(new Summary(2, 20, 500, 3, 6));
+		data2.add(new Summary(2, 20, 500, 3, 9));
+		data2.add(new Summary(5, 40, 500, 7, 11));
+		data2.add(new Summary(10, 40, 500, 15, 23));
+		data2.add(new Summary(11, 75, 500, 7, 35));
+		data2.add(new Summary(12, 80, 500, 3, 99));
+		data2.add(new Summary(13, 50, 500, 15, 88));
+		data2.add(new Summary(14, 50, 500, 3, 77));
+		data2.add(new Summary(11, 75, 500, 7, 99));
+		data2.add(new Summary(7, 60, 500, 15, 1));
+		summaries.put(cloudUsers[1], data2);//454 users
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
+		
+		assertEquals(799, function.aggregateNumberOfUsers(7), 0.0001);
+		assertEquals(306, function.aggregateNumberOfUsers(2), 0.0001);
+		assertEquals(1099, function.aggregateNumberOfUsers(10), 0.0001);
+		assertEquals(1101, function.aggregateNumberOfUsers(11), 0.0001);
+		assertEquals(101, function.aggregateNumberOfUsers(0), 0.0001);
+	}
+	
+	@Test(expected=IndexOutOfBoundsException.class)
+	public void testAggregateNumberOfUsersWithInvalidIndex(){
+		double setupCost = 100d;
+		double price = 555d;
+		double price2 = 99.765d;
+		
+		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		data.add(new Summary(1, 10, 500, 3, 100));
+		data.add(new Summary(1, 10, 500, 15, 200));
+		data.add(new Summary(2, 20, 500, 7, 300));
+		data.add(new Summary(2, 20, 500, 7, 400));
+		data.add(new Summary(5, 40, 500, 15, 500));
+		data.add(new Summary(10, 70, 500, 3, 500));
+		data.add(new Summary(11, 75, 500, 3, 600));
+		data.add(new Summary(12, 80, 500, 15, 700));
+		data.add(new Summary(13, 90, 500, 7, 800));
+		data.add(new Summary(14, 90, 500, 15, 900));
+		data.add(new Summary(11, 75, 500, 7, 1000));
+		data.add(new Summary(7, 60, 500, 3, 1100));
+		summaries.put(cloudUsers[0], data);//7100 users
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		data2.add(new Summary(1, 10, 500, 15, 1));
+		data2.add(new Summary(1, 10, 500, 7, 5));
+		data2.add(new Summary(2, 20, 500, 3, 6));
+		data2.add(new Summary(2, 20, 500, 3, 9));
+		data2.add(new Summary(5, 40, 500, 7, 11));
+		data2.add(new Summary(10, 40, 500, 15, 23));
+		data2.add(new Summary(11, 75, 500, 7, 35));
+		data2.add(new Summary(12, 80, 500, 3, 99));
+		data2.add(new Summary(13, 50, 500, 15, 88));
+		data2.add(new Summary(14, 50, 500, 3, 77));
+		data2.add(new Summary(11, 75, 500, 7, 99));
+		data2.add(new Summary(7, 60, 500, 15, 1));
+		summaries.put(cloudUsers[1], data2);//454 users
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
+		
+		function.aggregateNumberOfUsers(101);
+	}
+	
+	@Test
+	public void testAggregateNumberOfUsersWithoutUsers(){
+		double setupCost = 100d;
+		double price = 555d;
+		double price2 = 99.765d;
+		
+		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		data.add(new Summary(1, 10, 500, 0, 0));
+		data.add(new Summary(1, 10, 500, 0, 0));
+		data.add(new Summary(2, 20, 500, 0, 0));
+		data.add(new Summary(2, 20, 500, 0, 0));
+		data.add(new Summary(5, 40, 500, 0, 0));
+		data.add(new Summary(10, 70, 500, 0, 0));
+		data.add(new Summary(11, 75, 500, 0, 0));
+		data.add(new Summary(12, 80, 500, 0, 0));
+		data.add(new Summary(13, 90, 500, 0, 0));
+		data.add(new Summary(14, 90, 500, 0, 0));
+		data.add(new Summary(11, 75, 500, 0, 0));
+		data.add(new Summary(7, 60, 500, 0, 0));
+		summaries.put(cloudUsers[0], data);
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		data2.add(new Summary(1, 10, 500, 0, 0));
+		data2.add(new Summary(1, 10, 500, 0, 0));
+		data2.add(new Summary(2, 20, 500, 0, 0));
+		data2.add(new Summary(2, 20, 500, 0, 0));
+		data2.add(new Summary(5, 40, 500, 0, 0));
+		data2.add(new Summary(10, 40, 500, 0, 0));
+		data2.add(new Summary(11, 75, 500, 0, 0));
+		data2.add(new Summary(12, 80, 500, 0, 0));
+		data2.add(new Summary(13, 50, 500, 0, 0));
+		data2.add(new Summary(14, 50, 500, 0, 0));
+		data2.add(new Summary(11, 75, 500, 0, 0));
+		data2.add(new Summary(7, 60, 500, 0, 0));
+		summaries.put(cloudUsers[1], data2);
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
+		
+		assertEquals(0, function.aggregateNumberOfUsers(0), 0.0001);
+		assertEquals(0, function.aggregateNumberOfUsers(3), 0.0001);
+		assertEquals(0, function.aggregateNumberOfUsers(9), 0.0001);
+		assertEquals(0, function.aggregateNumberOfUsers(10), 0.0001);
+	}
+	
+	@Test
+	public void testAggregateServiceDemandForOneSaaSClient(){
+		double setupCost = 100d;
+		double price = 555d;
+		double price2 = 99.765d;
+		
+		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		data.add(new Summary(1, 10, 500, 0, 100));
+		data.add(new Summary(1, 10, 600, 0, 200));
+		data.add(new Summary(2, 20, 400, 0, 300));
+		data.add(new Summary(2, 20, 700, 0, 400));
+		data.add(new Summary(5, 40, 300, 0, 500));
+		data.add(new Summary(10, 70, 800, 0, 500));
+		data.add(new Summary(11, 75, 200, 0, 600));
+		data.add(new Summary(12, 80, 500, 0, 700));
+		data.add(new Summary(13, 90, 500, 0, 800));
+		data.add(new Summary(14, 90, 900, 0, 900));
+		data.add(new Summary(11, 75, 100, 0, 1000));
+		data.add(new Summary(7, 60, 500, 0, 1100));
+		summaries.put(cloudUsers[0], data);
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
+		
+		assertEquals(500, function.aggregateServiceDemand(0), 0.0001);
+		assertEquals(300, function.aggregateServiceDemand(4), 0.0001);
+		assertEquals(500, function.aggregateServiceDemand(8), 0.0001);
+		assertEquals(900, function.aggregateServiceDemand(9), 0.0001);
+		assertEquals(100, function.aggregateServiceDemand(10), 0.0001);
+	}
+	
+	@Test
+	public void testAggregateServiceTimeForMultipleSaaSClients(){
+		double setupCost = 100d;
+		double price = 555d;
+		double price2 = 99.765d;
+		
+		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		data.add(new Summary(1, 10, 1000, 3, 100));
+		data.add(new Summary(1, 10, 2000, 15, 200));
+		data.add(new Summary(2, 20, 500, 7, 300));
+		data.add(new Summary(2, 20, 2500, 7, 400));
+		data.add(new Summary(5, 40, 3000, 15, 500));
+		data.add(new Summary(10, 70, 1000, 3, 500));
+		data.add(new Summary(11, 75, 2000, 3, 600));
+		data.add(new Summary(12, 80, 2500, 15, 700));
+		data.add(new Summary(13, 90, 2500, 7, 800));
+		data.add(new Summary(14, 90, 3000, 15, 900));
+		data.add(new Summary(11, 75, 1000, 7, 1000));
+		data.add(new Summary(7, 60, 2000, 3, 1100));
+		summaries.put(cloudUsers[0], data);//Average service time: 1916.667
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		data2.add(new Summary(1, 10, 100, 15, 1));
+		data2.add(new Summary(1, 10, 200, 7, 5));
+		data2.add(new Summary(2, 20, 300, 3, 6));
+		data2.add(new Summary(2, 20, 400, 3, 9));
+		data2.add(new Summary(5, 40, 500, 7, 11));
+		data2.add(new Summary(10, 40, 600, 15, 23));
+		data2.add(new Summary(11, 75, 700, 7, 35));
+		data2.add(new Summary(12, 80, 800, 3, 99));
+		data2.add(new Summary(13, 50, 900, 15, 88));
+		data2.add(new Summary(14, 50, 1000, 3, 77));
+		data2.add(new Summary(11, 75, 1000, 7, 99));
+		data2.add(new Summary(7, 60, 1000, 15, 1));
+		summaries.put(cloudUsers[1], data2);//Average service time: 625
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
+		
+		assertEquals(550, function.aggregateServiceDemand(0), 0.0001);
+		assertEquals(1750, function.aggregateServiceDemand(4), 0.0001);
+		assertEquals(2000, function.aggregateServiceDemand(9), 0.0001);
+		assertEquals(1500, function.aggregateServiceDemand(11), 0.0001);
+	}
+	
+	@Test
+	public void testAggregateServiceTimeForMultipleSaaSClientsInAnyOrder(){
+		double setupCost = 100d;
+		double price = 555d;
+		double price2 = 99.765d;
+		
+		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		data.add(new Summary(1, 10, 1000, 3, 100));
+		data.add(new Summary(1, 10, 2000, 15, 200));
+		data.add(new Summary(2, 20, 500, 7, 300));
+		data.add(new Summary(2, 20, 2500, 7, 400));
+		data.add(new Summary(5, 40, 3000, 15, 500));
+		data.add(new Summary(10, 70, 1000, 3, 500));
+		data.add(new Summary(11, 75, 2000, 3, 600));
+		data.add(new Summary(12, 80, 2500, 15, 700));
+		data.add(new Summary(13, 90, 2500, 7, 800));
+		data.add(new Summary(14, 90, 3000, 15, 900));
+		data.add(new Summary(11, 75, 1000, 7, 1000));
+		data.add(new Summary(7, 60, 2000, 3, 1100));
+		summaries.put(cloudUsers[0], data);//Average service time: 1916.667
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		data2.add(new Summary(1, 10, 100, 15, 1));
+		data2.add(new Summary(1, 10, 200, 7, 5));
+		data2.add(new Summary(2, 20, 300, 3, 6));
+		data2.add(new Summary(2, 20, 400, 3, 9));
+		data2.add(new Summary(5, 40, 500, 7, 11));
+		data2.add(new Summary(10, 40, 600, 15, 23));
+		data2.add(new Summary(11, 75, 700, 7, 35));
+		data2.add(new Summary(12, 80, 800, 3, 99));
+		data2.add(new Summary(13, 50, 900, 15, 88));
+		data2.add(new Summary(14, 50, 1000, 3, 77));
+		data2.add(new Summary(11, 75, 1000, 7, 99));
+		data2.add(new Summary(7, 60, 1000, 15, 1));
+		summaries.put(cloudUsers[1], data2);//Average service time: 625
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
+		
+		assertEquals(1000, function.aggregateServiceDemand(10), 0.0001);
+		assertEquals(1100, function.aggregateServiceDemand(1), 0.0001);
+		assertEquals(1450, function.aggregateServiceDemand(3), 0.0001);
+	}
+	
+	@Test(expected=IndexOutOfBoundsException.class)
+	public void testAggregateServiceTimeForMultipleSaaSClientsAndInvalidIndex(){
+		double setupCost = 100d;
+		double price = 555d;
+		double price2 = 99.765d;
+		
+		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		data.add(new Summary(1, 10, 1000, 3, 100));
+		data.add(new Summary(1, 10, 2000, 15, 200));
+		data.add(new Summary(2, 20, 500, 7, 300));
+		data.add(new Summary(2, 20, 2500, 7, 400));
+		data.add(new Summary(5, 40, 3000, 15, 500));
+		data.add(new Summary(10, 70, 1000, 3, 500));
+		data.add(new Summary(11, 75, 2000, 3, 600));
+		data.add(new Summary(12, 80, 2500, 15, 700));
+		data.add(new Summary(13, 90, 2500, 7, 800));
+		data.add(new Summary(14, 90, 3000, 15, 900));
+		data.add(new Summary(11, 75, 1000, 7, 1000));
+		data.add(new Summary(7, 60, 2000, 3, 1100));
+		summaries.put(cloudUsers[0], data);//Average service time: 1916.667
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		data2.add(new Summary(1, 10, 100, 15, 1));
+		data2.add(new Summary(1, 10, 200, 7, 5));
+		data2.add(new Summary(2, 20, 300, 3, 6));
+		data2.add(new Summary(2, 20, 400, 3, 9));
+		data2.add(new Summary(5, 40, 500, 7, 11));
+		data2.add(new Summary(10, 40, 600, 15, 23));
+		data2.add(new Summary(11, 75, 700, 7, 35));
+		data2.add(new Summary(12, 80, 800, 3, 99));
+		data2.add(new Summary(13, 50, 900, 15, 88));
+		data2.add(new Summary(14, 50, 1000, 3, 77));
+		data2.add(new Summary(11, 75, 1000, 7, 99));
+		data2.add(new Summary(7, 60, 1000, 15, 1));
+		summaries.put(cloudUsers[1], data2);//Average service time: 625
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
+		
+		function.aggregateServiceDemand(99999999);
+	}
+	
+	@Test
+	public void testAggregateArrivalsForOneSaaSClient(){
+		double setupCost = 100d;
+		double price = 555d;
+		double price2 = 99.765d;
+		
+		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		data.add(new Summary(1, 10, 500, 0, 100));
+		data.add(new Summary(1, 10, 600, 0, 200));
+		data.add(new Summary(2, 20, 400, 0, 300));
+		data.add(new Summary(2, 20, 700, 0, 400));
+		data.add(new Summary(5, 40, 300, 0, 500));
+		data.add(new Summary(10, 70, 800, 0, 500));
+		data.add(new Summary(11, 75, 200, 0, 600));
+		data.add(new Summary(12, 80, 500, 0, 700));
+		data.add(new Summary(13, 90, 500, 0, 800));
+		data.add(new Summary(14, 90, 900, 0, 900));
+		data.add(new Summary(11, 75, 100, 0, 1000));
+		data.add(new Summary(7, 60, 500, 0, 1100));
+		summaries.put(cloudUsers[0], data);
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
+		
+		assertEquals(1, function.aggregateArrivals(0), 0.0001);
+		assertEquals(5, function.aggregateArrivals(4), 0.0001);
+		assertEquals(12, function.aggregateArrivals(7), 0.0001);
+		assertEquals(7, function.aggregateArrivals(11), 0.0001);
+	}
+	
+	@Test
+	public void testAggregateArrivalsForMultipleSaaSClients(){
+		double setupCost = 100d;
+		double price = 555d;
+		double price2 = 99.765d;
+		
+		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		data.add(new Summary(10, 10, 1000, 3, 100));
+		data.add(new Summary(20, 10, 2000, 15, 200));
+		data.add(new Summary(25, 20, 500, 7, 300));
+		data.add(new Summary(30, 20, 2500, 7, 400));
+		data.add(new Summary(40, 40, 3000, 15, 500));
+		data.add(new Summary(50, 70, 1000, 3, 500));
+		data.add(new Summary(55, 75, 2000, 3, 600));
+		data.add(new Summary(60, 80, 2500, 15, 700));
+		data.add(new Summary(40, 90, 2500, 7, 800));
+		data.add(new Summary(30, 90, 3000, 15, 900));
+		data.add(new Summary(25, 75, 1000, 7, 1000));
+		data.add(new Summary(5, 60, 2000, 3, 1100));
+		summaries.put(cloudUsers[0], data);//Average arrival: 32.5
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		data2.add(new Summary(100, 10, 100, 15, 1));
+		data2.add(new Summary(300, 10, 200, 7, 5));
+		data2.add(new Summary(500, 20, 300, 3, 6));
+		data2.add(new Summary(400, 20, 400, 3, 9));
+		data2.add(new Summary(900, 40, 500, 7, 11));
+		data2.add(new Summary(800, 40, 600, 15, 23));
+		data2.add(new Summary(700, 75, 700, 7, 35));
+		data2.add(new Summary(600, 80, 800, 3, 99));
+		data2.add(new Summary(500, 50, 900, 15, 88));
+		data2.add(new Summary(300, 50, 1000, 3, 77));
+		data2.add(new Summary(400, 75, 1000, 7, 99));
+		data2.add(new Summary(250, 60, 1000, 15, 1));
+		summaries.put(cloudUsers[1], data2);//Average service time: 479.16667
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
+		
+		assertEquals(320, function.aggregateArrivals(1), 0.0001);
+		assertEquals(755, function.aggregateArrivals(6), 0.0001);
+		assertEquals(425, function.aggregateArrivals(10), 0.0001);
+	}
+	
+	@Test
+	public void testAggregateArrivalsForMultipleSaaSClientsInAnyOrder(){
+		double setupCost = 100d;
+		double price = 555d;
+		double price2 = 99.765d;
+		
+		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		data.add(new Summary(10, 10, 1000, 3, 100));
+		data.add(new Summary(20, 10, 2000, 15, 200));
+		data.add(new Summary(25, 20, 500, 7, 300));
+		data.add(new Summary(30, 20, 2500, 7, 400));
+		data.add(new Summary(40, 40, 3000, 15, 500));
+		data.add(new Summary(50, 70, 1000, 3, 500));
+		data.add(new Summary(55, 75, 2000, 3, 600));
+		data.add(new Summary(60, 80, 2500, 15, 700));
+		data.add(new Summary(40, 90, 2500, 7, 800));
+		data.add(new Summary(30, 90, 3000, 15, 900));
+		data.add(new Summary(25, 75, 1000, 7, 1000));
+		data.add(new Summary(5, 60, 2000, 3, 1100));
+		summaries.put(cloudUsers[0], data);//Average arrival: 32.5
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		data2.add(new Summary(100, 10, 100, 15, 1));
+		data2.add(new Summary(300, 10, 200, 7, 5));
+		data2.add(new Summary(500, 20, 300, 3, 6));
+		data2.add(new Summary(400, 20, 400, 3, 9));
+		data2.add(new Summary(900, 40, 500, 7, 11));
+		data2.add(new Summary(800, 40, 600, 15, 23));
+		data2.add(new Summary(700, 75, 700, 7, 35));
+		data2.add(new Summary(600, 80, 800, 3, 99));
+		data2.add(new Summary(500, 50, 900, 15, 88));
+		data2.add(new Summary(300, 50, 1000, 3, 77));
+		data2.add(new Summary(400, 75, 1000, 7, 99));
+		data2.add(new Summary(250, 60, 1000, 15, 1));
+		summaries.put(cloudUsers[1], data2);//Average service time: 479.16667
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
+		
+		assertEquals(255, function.aggregateArrivals(11), 0.0001);
+		assertEquals(430, function.aggregateArrivals(3), 0.0001);
+		assertEquals(540, function.aggregateArrivals(8), 0.0001);
+	}
+	
+	@Test(expected=IndexOutOfBoundsException.class)
+	public void testAggregateArrivalsForMultipleSaaSClientsAndInvalidIndex(){
+		double setupCost = 100d;
+		double price = 555d;
+		double price2 = 99.765d;
+		
+		Contract contract = new Contract("p1", 1, setupCost, price, 640 * 60 * 60 * 1000l, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, 530 * 60 * 60 * 1000l, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		data.add(new Summary(10, 10, 1000, 3, 100));
+		data.add(new Summary(20, 10, 2000, 15, 200));
+		data.add(new Summary(25, 20, 500, 7, 300));
+		data.add(new Summary(30, 20, 2500, 7, 400));
+		data.add(new Summary(40, 40, 3000, 15, 500));
+		data.add(new Summary(50, 70, 1000, 3, 500));
+		data.add(new Summary(55, 75, 2000, 3, 600));
+		data.add(new Summary(60, 80, 2500, 15, 700));
+		data.add(new Summary(40, 90, 2500, 7, 800));
+		data.add(new Summary(30, 90, 3000, 15, 900));
+		data.add(new Summary(25, 75, 1000, 7, 1000));
+		data.add(new Summary(5, 60, 2000, 3, 1100));
+		summaries.put(cloudUsers[0], data);//Average arrival: 32.5
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		data2.add(new Summary(100, 10, 100, 15, 1));
+		data2.add(new Summary(300, 10, 200, 7, 5));
+		data2.add(new Summary(500, 20, 300, 3, 6));
+		data2.add(new Summary(400, 20, 400, 3, 9));
+		data2.add(new Summary(900, 40, 500, 7, 11));
+		data2.add(new Summary(800, 40, 600, 15, 23));
+		data2.add(new Summary(700, 75, 700, 7, 35));
+		data2.add(new Summary(600, 80, 800, 3, 99));
+		data2.add(new Summary(500, 50, 900, 15, 88));
+		data2.add(new Summary(300, 50, 1000, 3, 77));
+		data2.add(new Summary(400, 75, 1000, 7, 99));
+		data2.add(new Summary(250, 60, 1000, 15, 1));
+		summaries.put(cloudUsers[1], data2);//Average service time: 479.16667
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, null, null);
+		
+		function.aggregateArrivals(109);
+	}
+	
 //	@Test
 //	public void testEvaluateWithNegativeFitness(){
 //		//SaaS clients contracts

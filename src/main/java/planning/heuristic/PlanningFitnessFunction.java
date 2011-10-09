@@ -24,6 +24,8 @@ import commons.sim.util.SimulatorProperties;
 
 public class PlanningFitnessFunction extends FitnessFunction{
 
+	private static final int HOUR_IN_MILLIS = 3600000;
+
 	private long SUMMARY_LENGTH_IN_SECONDS;
 	
 	private final Provider[] cloudProviders;
@@ -130,19 +132,19 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		}
 		
 		Map<MachineType, Double> totalRequestsFinished = new HashMap<MachineType, Double>();
-		long responseTimeRequestsLost = 0;
-		long throughputRequestsLost = 0;
+		long requestsLostDueToResponseTime = 0;
+		long requestsLostDueToThroughput = 0;
 		double ratesDifference = 0d;
 		double accumulatedRequestsMeanServiceTime = 0d;
 		
 		int currentSummaryInterval = 0;
 		int totalNumberOfIntervals = calcNumberOfIntervals();
-		long maxRt = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME);
+		long maxResponseTimeInMillis = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME);
 		
 		while(currentSummaryInterval < totalNumberOfIntervals){
 			
 			double arrivalRate = aggregateArrivals(currentSummaryInterval);
-			double meanServiceTimeInMillis = aggregateServiceTime(currentSummaryInterval);
+			double meanServiceTimeInMillis = aggregateServiceDemand(currentSummaryInterval);
 			accumulatedRequestsMeanServiceTime += meanServiceTimeInMillis;
 			
 			//Calculating arrival rates per machine type
@@ -150,15 +152,15 @@ public class PlanningFitnessFunction extends FitnessFunction{
 			
 			//Assuming a base computing power (e.g., EC2 unit for each core)
 			Map<MachineType, Double> throughputPerMachineType = new HashMap<MachineType, Double>();
-			double totalThroughput = 0d;
+			double reservedThroughput = 0d;
 			double missingThroughput = 0d;
 			for(MachineType type : arrivalRatesPerMachineType.keySet()){
 				Double currentArrivalRate = arrivalRatesPerMachineType.get(type);
 				double maximumThroughput = (1 / (meanServiceTimeInMillis/1000)) * Configuration.getInstance().getRelativePower(type);//Using all cores
 				if(currentArrivalRate > maximumThroughput){//Requests are missed
 					throughputPerMachineType.put(type, maximumThroughput);
-					missingThroughput += currentArrivalRate - maximumThroughput;
-					totalThroughput += maximumThroughput;
+					missingThroughput += (currentArrivalRate - maximumThroughput);
+					reservedThroughput += maximumThroughput;
 					
 					Double totalFinished = totalRequestsFinished.get(type);
 					if(totalFinished == null){
@@ -169,7 +171,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 					
 				}else{//All requests are attended!
 					throughputPerMachineType.put(type, currentArrivalRate);
-					totalThroughput += currentArrivalRate;
+					reservedThroughput += currentArrivalRate;
 					
 					Double totalFinished = totalRequestsFinished.get(type);
 					if(totalFinished == null){
@@ -180,7 +182,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 				}
 			}
 			
-			if(totalThroughput == 0){//No arrival at reserved machines!
+			if(reservedThroughput == 0){//No arrival at reserved machines!
 //				totalThroughput = arrivalRate;
 				missingThroughput = arrivalRate;
 			}
@@ -188,26 +190,26 @@ public class PlanningFitnessFunction extends FitnessFunction{
 			//Calculating missing requests. This value is amortized by queue size!
 			long requestsMissed = Math.round(missingThroughput * SUMMARY_LENGTH_IN_SECONDS);
 			if(ratesDifference == 0){//Queue starts at this interval, so some requests are not really missed!
-				requestsMissed -= maxRt / meanServiceTimeInMillis;
+				requestsMissed -= maxResponseTimeInMillis / meanServiceTimeInMillis;
 			}
 			ratesDifference = missingThroughput;
-			throughputRequestsLost += requestsMissed;
+			requestsLostDueToThroughput += requestsMissed;
 			
 			//Estimated response time
 			double totalNumberOfUsers = aggregateNumberOfUsers(currentSummaryInterval);
 			double averageThinkTimeInSeconds = aggregateThinkTime(currentSummaryInterval);
-			if(totalThroughput != 0){
-				double responseTimeInSeconds = totalNumberOfUsers / totalThroughput - averageThinkTimeInSeconds;
-				double responseTimeLoss = Math.max((responseTimeInSeconds * 1000 - maxRt)/maxRt, 0);
-				responseTimeRequestsLost += calcResponseTimeLoss(responseTimeLoss, totalRequestsFinished);
+			if(reservedThroughput != 0){
+				double responseTimeInSeconds = totalNumberOfUsers / reservedThroughput - averageThinkTimeInSeconds;
+				double responseTimeLoss = Math.max( (responseTimeInSeconds * 1000 - maxResponseTimeInMillis)/maxResponseTimeInMillis, 0 );
+				requestsLostDueToResponseTime += calcResponseTimeLoss(responseTimeLoss, totalRequestsFinished);
 			}
 			
 			currentSummaryInterval++;
 		}
 		
 		//Estimating utility
-		double receipt = calcReceipt(totalNumberOfIntervals);
-		double cost = calcCost(totalRequestsFinished, accumulatedRequestsMeanServiceTime / totalNumberOfIntervals, currentPowerPerMachineType, responseTimeRequestsLost, throughputRequestsLost);
+		double receipt = calcReceipt();
+		double cost = calcCost(totalRequestsFinished, accumulatedRequestsMeanServiceTime / totalNumberOfIntervals, currentPowerPerMachineType, requestsLostDueToResponseTime, requestsLostDueToThroughput);
 		
 		double fitness = receipt - cost;
 		
@@ -226,7 +228,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 	 * @param arrivalRate
 	 * @return
 	 */
-	protected Map<MachineType, Double> extractArrivalsPerMachineType(	Map<MachineType, Integer> currentPowerPerMachineType,
+	protected Map<MachineType, Double> extractArrivalsPerMachineType(Map<MachineType, Integer> currentPowerPerMachineType,
 			double totalPower, double arrivalRate) {
 		Map<MachineType, Double> arrivalRatesPerMachineType = new HashMap<MachineType, Double>();
 		for(MachineType type : currentPowerPerMachineType.keySet()){
@@ -283,51 +285,43 @@ public class PlanningFitnessFunction extends FitnessFunction{
 	}
 
 	protected double calcCost(Map<MachineType, Double> requestsFinishedPerMachineType, double meanServiceTimeInMillis, 
-			Map<MachineType, Integer> currentPowerPerMachineType, double responseTimeRequestsLost, double throughputRequestsLost) {
+			Map<MachineType, Integer> currentPowerPerMachineType, double requestsLostDueToResponseTime, double requestsLostDueToThroughput) {
 		
 		//Verifying on-demand resources that can be used
 		double onDemandRisk = Configuration.getInstance().getDouble(SimulatorProperties.PLANNING_RISK);
 		long onDemandResources = Math.round(cloudProviders[0].getOnDemandLimit() * (1-onDemandRisk));
 		
-//		long totalTimeInSeconds = Configuration.getInstance().getLong(SimulatorProperties.PLANNING_PERIOD) * 24 * 60 * 60;
 		Provider provider = cloudProviders[0];
 		double cost = 0;
 		
 		//Reserved Costs
 		long totalRequestsFinished = 0;
 		for(MachineType type : requestsFinishedPerMachineType.keySet()){
-//			Double throughput = requestsFinishedPerMachineType.get(type) / Configuration.getInstance().getRelativePower(type);
-//			double CPUHoursPerType = (throughput * totalTimeInSeconds * meanServiceTimeInMillis) / 3600000;
-//			
-//			cost += provider.getReservationOneYearFee(type) * (currentPowerPerMachineType.get(type)/Configuration.getInstance().getRelativePower(type)) 
-//							+ provider.getReservedCpuCost(type) * CPUHoursPerType;
 			totalRequestsFinished += requestsFinishedPerMachineType.get(type);
-			double CPUHoursPerType = (requestsFinishedPerMachineType.get(type) * meanServiceTimeInMillis) / 3600000;
-			cost += provider.getReservationOneYearFee(type) * (currentPowerPerMachineType.get(type)/Configuration.getInstance().getRelativePower(type)) 
+			double CPUHoursPerType = (requestsFinishedPerMachineType.get(type) * meanServiceTimeInMillis) / HOUR_IN_MILLIS;
+			cost += provider.getReservationOneYearFee(type) * ( currentPowerPerMachineType.get(type)/Configuration.getInstance().getRelativePower(type) ) 
 						+ provider.getReservedCpuCost(type) * CPUHoursPerType;
 		}
 		
 		//On-demand costs
-//		double onDemandCPUHours = (totalRequestsLost * totalTimeInSeconds * meanServiceTimeInMillis) / 3600000;
-//		cost +=  provider.getOnDemandCpuCost(MachineType.SMALL) * onDemandCPUHours;
-		double onDemandCPUHours = (throughputRequestsLost * meanServiceTimeInMillis) / 3600000;
+		double onDemandCPUHours = (requestsLostDueToThroughput * meanServiceTimeInMillis) / HOUR_IN_MILLIS;
 		long requestsThatCouldNotBeAttended = 0;
 		long planningPeriod = Configuration.getInstance().getLong(SimulatorProperties.PLANNING_PERIOD);
 		if(onDemandCPUHours > onDemandResources * planningPeriod * 24){//Demand is greater than what could be retrieved!
 			requestsThatCouldNotBeAttended =  Math.round( (( onDemandCPUHours - 
-			(onDemandResources * planningPeriod * 24) ) * 3600000 / meanServiceTimeInMillis) );
+			(onDemandResources * planningPeriod * 24) ) * HOUR_IN_MILLIS / meanServiceTimeInMillis) );
 			
 			onDemandCPUHours = onDemandResources * planningPeriod * 24;
 		}
 		cost += provider.getOnDemandCpuCost(MachineType.SMALL) * onDemandCPUHours;
 		
 		//Penalties
-		double penalties = calcPenalties(responseTimeRequestsLost, requestsThatCouldNotBeAttended, totalRequestsFinished);
+		double penalties = calcPenalties(requestsLostDueToResponseTime, requestsThatCouldNotBeAttended, totalRequestsFinished);
 		
 		return cost + penalties;
 	}
 
-	protected double calcReceipt(long numberOfIntervals) {
+	protected double calcReceipt() {
 		UtilityResultEntry resultEntry = new UtilityResultEntry(0, this.cloudUsers, this.cloudProviders);
 
 		double oneTimeFees = 0d;
@@ -359,12 +353,6 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		int totalNumberOfValues = 0;
 		
 		for(Entry<User, List<Summary>> entry : this.summaries.entrySet()){
-//			double currentPeriodMean = 0;
-//			for(Summary summary : entry.getValue()){
-//				currentPeriodMean += summary.getUserThinkTimeInSeconds();
-//			}
-//			currentPeriodMean /= entry.getValue().size();
-//			thinkTime += currentPeriodMean;
 			thinkTime += entry.getValue().get(currentSummaryInterval).getUserThinkTimeInSeconds();
 			totalNumberOfValues++;
 		}
@@ -376,29 +364,17 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		int totalNumberOfUsers = 0;
 		
 		for(Entry<User, List<Summary>> entry : this.summaries.entrySet()){
-//			int currentNumberOfUsers = 0;
-//			for(Summary summary : entry.getValue()){
-//				currentNumberOfUsers += summary.getNumberOfUsers();
-//			}
-//			currentNumberOfUsers /= entry.getValue().size();
-//			totalNumberOfUsers += currentNumberOfUsers;
 			totalNumberOfUsers += entry.getValue().get(currentSummaryInterval).getNumberOfUsers();
 		}
 		
 		return totalNumberOfUsers;
 	}
 
-	protected double aggregateServiceTime(int currentSummaryInterval) {
+	protected double aggregateServiceDemand(int currentSummaryInterval) {
 		double serviceTime = 0d;
 		int totalNumberOfValues = 0;
 		
 		for(Entry<User, List<Summary>> entry : this.summaries.entrySet()){
-//			double currentPeriodMeanInMillis = 0;
-//			for(Summary summary : entry.getValue()){
-//				currentPeriodMeanInMillis += summary.getRequestServiceDemandInMillis();
-//			}
-//			currentPeriodMeanInMillis /= entry.getValue().size();
-//			serviceTime += currentPeriodMeanInMillis;
 			serviceTime += entry.getValue().get(currentSummaryInterval).getRequestServiceDemandInMillis();
 			totalNumberOfValues++;
 		}
@@ -409,12 +385,6 @@ public class PlanningFitnessFunction extends FitnessFunction{
 	protected double aggregateArrivals(int currentSummaryInterval) {
 		double totalArrivalRate = 0;
 		for(Entry<User, List<Summary>> entry : this.summaries.entrySet()){
-//			double meanArrivalRate = 0;
-//			for(Summary summary : entry.getValue()){
-//				meanArrivalRate += summary.getArrivalRate();
-//			}
-//			meanArrivalRate /= entry.getValue().size();
-//			totalArrivalRate += meanArrivalRate;
 			totalArrivalRate += entry.getValue().get(currentSummaryInterval).getArrivalRate();
 		}
 		
