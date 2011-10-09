@@ -521,39 +521,10 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		//Workload summaries
 		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
 		List<Summary> data = new ArrayList<Summary>();
-		data.add(new Summary(1, 20, 500, 5, 100));
-		data.add(new Summary(1, 20, 500, 5, 100));
-		data.add(new Summary(2, 20, 500, 5, 100));
-		data.add(new Summary(2, 20, 500, 5, 100));
-		data.add(new Summary(5, 20, 500, 5, 100));
-		data.add(new Summary(10, 20, 500, 5, 100));
-		data.add(new Summary(11, 20, 500, 5, 100));
-		data.add(new Summary(12, 20, 500, 5, 100));
-		data.add(new Summary(13, 20, 500, 5, 100));
-		data.add(new Summary(14, 20, 500, 5, 100));
-		data.add(new Summary(11, 20, 500, 5, 100));
-		data.add(new Summary(7, 20, 500, 5, 100));
-		data.add(new Summary(1, 20, 500, 5, 100));
-		data.add(new Summary(1, 20, 500, 5, 100));
-		data.add(new Summary(2, 20, 500, 5, 100));
-		data.add(new Summary(2, 20, 500, 5, 100));
-		data.add(new Summary(5, 20, 500, 5, 100));
-		data.add(new Summary(10, 20, 500, 5, 100));
-		data.add(new Summary(11, 20, 500, 5, 100));
-		data.add(new Summary(12, 20, 500, 5, 100));
-		data.add(new Summary(13, 20, 500, 5, 100));
-		data.add(new Summary(14, 20, 500, 5, 100));
-		data.add(new Summary(11, 20, 500, 5, 100));
-		data.add(new Summary(7, 20, 500, 5, 100));
-		data.add(new Summary(7, 20, 500, 5, 100));
-		data.add(new Summary(7, 20, 500, 5, 100));
-		data.add(new Summary(7, 20, 500, 5, 100));
-		data.add(new Summary(7, 20, 500, 5, 100));
-		data.add(new Summary(7, 20, 500, 5, 100));
-		data.add(new Summary(7, 20, 500, 5, 100));
-		data.add(new Summary(7, 20, 500, 5, 100));
+		for(int i = 0; i < 31 * 24; i++){
+			data.add(new Summary(1, 20, 500, 5, 100));
+		}
 		summaries.put(cloudUsers[0], data);//320 extra cpu-hrs
-//		summaries.put(cloudUsers[1], data2);//100 extra cpu-hrs
 		
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
 		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
@@ -563,7 +534,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		
 		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, null);
 		
-		double receipt = setupCost + price + 320 * 0.1;
+		double receipt = setupCost + price + 14580 * 0.1;
 		assertEquals(receipt, function.calcReceipt(), 0.0001);
 		
 		PowerMock.verifyAll();
@@ -651,25 +622,10 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		data.add(new Summary(13, 90, 500, 5, 100));
 		data.add(new Summary(14, 90, 500, 5, 100));
 		data.add(new Summary(11, 75, 500, 5, 100));
-		data.add(new Summary(7, 60, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
+		data.add(new Summary(7, 60, 500, 5, 100));//First 12 hours of the month have gone
+		for(int i = 0; i < 732; i++){//missing hours of month
+			data.add(new Summary(7, 0, 500, 5, 100));
+		}
 		data.add(new Summary(7, 0, 500, 5, 100));
 		summaries.put(cloudUsers[0], data);//640 cpu-hrs
 		
@@ -685,26 +641,10 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		data2.add(new Summary(13, 50, 500, 5, 100));
 		data2.add(new Summary(14, 50, 500, 5, 100));
 		data2.add(new Summary(11, 75, 500, 5, 100));
-		data2.add(new Summary(7, 60, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
+		data2.add(new Summary(7, 60, 500, 5, 100));//First 12 hours of the month have gone
+		for(int i = 0; i < 732; i++){//missing hours of month
+			data2.add(new Summary(7, 0, 500, 5, 100));
+		}
 		summaries.put(cloudUsers[1], data2);//530 cpu-hrs
 		
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
@@ -756,26 +696,11 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		data.add(new Summary(13, 90, 500, 5, 100));
 		data.add(new Summary(14, 90, 500, 5, 100));
 		data.add(new Summary(11, 75, 500, 5, 100));
-		data.add(new Summary(7, 60, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
+		data.add(new Summary(7, 60, 500, 5, 100));//First 12 hours of first month
+		for(int i = 0; i < 732; i++){//missing hours of first month
+			data.add(new Summary(7, 0, 500, 5, 100));
+		}
+		
 		data.add(new Summary(1, 10, 500, 5, 100));
 		data.add(new Summary(1, 10, 500, 5, 100));
 		data.add(new Summary(2, 20, 500, 5, 100));
@@ -787,23 +712,10 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		data.add(new Summary(13, 90, 500, 5, 100));
 		data.add(new Summary(14, 90, 500, 5, 100));
 		data.add(new Summary(11, 75, 500, 5, 100));
-		data.add(new Summary(7, 60, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
+		data.add(new Summary(7, 60, 500, 5, 100));//First 12 hours of second month
+		for(int i = 0; i < 732; i++){//missing hours of second month
+			data.add(new Summary(7, 0, 500, 5, 100));
+		}
 		summaries.put(cloudUsers[0], data);//640 cpu-hrs
 		
 		List<Summary> data2 = new ArrayList<Summary>();
@@ -818,26 +730,11 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		data2.add(new Summary(13, 50, 500, 5, 100));
 		data2.add(new Summary(14, 50, 500, 5, 100));
 		data2.add(new Summary(11, 75, 500, 5, 100));
-		data2.add(new Summary(7, 60, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
+		data2.add(new Summary(7, 60, 500, 5, 100));//First 12 hours of first month
+		for(int i = 0; i < 732; i++){//missing hours of first month
+			data2.add(new Summary(7, 0, 500, 5, 100));
+		}
+		
 		data2.add(new Summary(1, 10, 500, 5, 100));
 		data2.add(new Summary(1, 10, 500, 5, 100));
 		data2.add(new Summary(2, 20, 500, 5, 100));
@@ -849,23 +746,10 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		data2.add(new Summary(13, 50, 500, 5, 100));
 		data2.add(new Summary(14, 50, 500, 5, 100));
 		data2.add(new Summary(11, 75, 500, 5, 100));
-		data2.add(new Summary(7, 60, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
+		data2.add(new Summary(7, 60, 500, 5, 100));//First 12 hours of second month
+		for(int i = 0; i < 732; i++){//missing hours of second month
+			data2.add(new Summary(7, 0, 500, 5, 100));
+		}
 		summaries.put(cloudUsers[1], data2);//530 cpu-hrs
 		
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
@@ -919,26 +803,17 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		data.add(new Summary(13, 90, 500, 5, 100));
 		data.add(new Summary(14, 90, 500, 5, 100));
 		data.add(new Summary(11, 75, 500, 5, 100));
-		data.add(new Summary(7, 60, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
+		data.add(new Summary(7, 60, 500, 5, 100));//First 12 hours of first month
+		for(int i = 0; i < 12; i++){//next 12 hours of first month
+			data.add(new Summary(7, 0, 500, 5, 100));
+		}
 		data.add(new Summary(7, 10, 500, 5, 100));
 		data.add(new Summary(7, 10, 500, 5, 100));
-		data.add(new Summary(7, 10, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
+		data.add(new Summary(7, 10, 500, 5, 100));//Three more hours of first month
+		for(int i = 0; i < 717; i++){//Missing hours of first month
+			data.add(new Summary(7, 0, 500, 5, 100));
+		}
+		
 		data.add(new Summary(1, 10, 500, 5, 100));
 		data.add(new Summary(1, 10, 500, 5, 100));
 		data.add(new Summary(2, 20, 500, 5, 100));
@@ -950,23 +825,14 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		data.add(new Summary(13, 90, 500, 5, 100));
 		data.add(new Summary(14, 90, 500, 5, 100));
 		data.add(new Summary(11, 75, 500, 5, 100));
-		data.add(new Summary(7, 60, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
+		data.add(new Summary(7, 60, 500, 5, 100));//First 12 hours of second month
+		for(int i = 0; i < 84; i++){//End of first day and next three days of second month
+			data.add(new Summary(7, 0, 500, 5, 100));
+		}
 		data.add(new Summary(7, 10, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
-		data.add(new Summary(7, 0, 500, 5, 100));
+		for(int i = 0; i < 647; i++){//Missing hours of second month
+			data.add(new Summary(7, 0, 500, 5, 100));
+		}
 		summaries.put(cloudUsers[0], data);//30 extra cpu-hours at first month, 10 cpu-hours at second
 		
 		List<Summary> data2 = new ArrayList<Summary>();
@@ -981,26 +847,15 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		data2.add(new Summary(13, 50, 500, 5, 100));
 		data2.add(new Summary(14, 50, 500, 5, 100));
 		data2.add(new Summary(11, 75, 500, 5, 100));
-		data2.add(new Summary(7, 60, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
+		data2.add(new Summary(7, 60, 500, 5, 100));//First 12 hours of first month
+		for(int i = 0; i < 12; i++){//next 12 hours of first month
+			data2.add(new Summary(7, 0, 500, 5, 100));
+		}
 		data2.add(new Summary(7, 50, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
+		for(int i = 0; i < 719; i++){//Missing hours of first month
+			data2.add(new Summary(7, 0, 500, 5, 100));
+		}
+		
 		data2.add(new Summary(1, 10, 500, 5, 100));
 		data2.add(new Summary(1, 10, 500, 5, 100));
 		data2.add(new Summary(2, 20, 500, 5, 100));
@@ -1012,23 +867,17 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		data2.add(new Summary(13, 50, 500, 5, 100));
 		data2.add(new Summary(14, 50, 500, 5, 100));
 		data2.add(new Summary(11, 75, 500, 5, 100));
-		data2.add(new Summary(7, 60, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
+		data2.add(new Summary(7, 60, 500, 5, 100));//First 12 hours of second month
+		for(int i = 0; i < 12; i++){//next 12 hours of second month
+			data2.add(new Summary(7, 0, 500, 5, 100));
+		}
+
 		data2.add(new Summary(7, 5, 500, 5, 100));
 		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
 		data2.add(new Summary(7, 3, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
-		data2.add(new Summary(7, 0, 500, 5, 100));
+		for(int i = 0; i < 717; i++){//Missing hours of second month
+			data2.add(new Summary(7, 0, 500, 5, 100));
+		}
 		summaries.put(cloudUsers[1], data2);//50 extra cpu-hrs at first month, 8 cpu-hours at second 
 		
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
@@ -1829,37 +1678,16 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		
 		PowerMock.replayAll(config);
 		
-		//Summaries
 		//Workload summaries
 		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
 		List<Summary> data = new ArrayList<Summary>();
 		data.add(new Summary(10, 20, 500, 5, 100));
-		data.add(new Summary(10, 20, 500, 5, 100));
-//		data.add(new Summary(10, 20, 500, 5, 100));
-//		data.add(new Summary(10, 20, 500, 5, 100));
-//		data.add(new Summary(10, 20, 500, 5, 100));
-//		data.add(new Summary(10, 20, 500, 5, 100));
-//		data.add(new Summary(10, 20, 500, 5, 100));
-//		data.add(new Summary(10, 20, 500, 5, 100));
-//		data.add(new Summary(10, 20, 500, 5, 100));
-//		data.add(new Summary(10, 20, 500, 5, 100));
-//		data.add(new Summary(10, 20, 500, 5, 100));
-//		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));//2 hours of first month
 		summaries.put(cloudUsers[0], data);//10 req/s, 240 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
 		
 		List<Summary> data2 = new ArrayList<Summary>();
 		data2.add(new Summary(20, 30, 500, 5, 100));
-		data2.add(new Summary(20, 30, 500, 5, 100));
-//		data2.add(new Summary(20, 30, 500, 5, 100));
-//		data2.add(new Summary(20, 30, 500, 5, 100));
-//		data2.add(new Summary(20, 30, 500, 5, 100));
-//		data2.add(new Summary(20, 30, 500, 5, 100));
-//		data2.add(new Summary(20, 30, 500, 5, 100));
-//		data2.add(new Summary(20, 30, 500, 5, 100));
-//		data2.add(new Summary(20, 30, 500, 5, 100));
-//		data2.add(new Summary(20, 30, 500, 5, 100));
-//		data2.add(new Summary(20, 30, 500, 5, 100));
-//		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));//2 hours of first month
 		summaries.put(cloudUsers[1], data2);//20 req/s, 360 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
 		
 		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.LARGE, MachineType.MEDIUM));
@@ -1919,18 +1747,17 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		
 		PowerMock.replayAll(config);
 		
-		//Summaries
 		//Workload summaries
 		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
 		List<Summary> data = new ArrayList<Summary>();
-		for(int i = 0; i < 31; i++){
-			data.add(new Summary(10, 20, 500, 5, 100));
+		for(int i = 0; i < 31 * 24; i++){//One month hours!
+			data.add(new Summary(10, 0.8333333, 500, 5, 100));
 		}
 		summaries.put(cloudUsers[0], data);//10 req/s, 240 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
 		
 		List<Summary> data2 = new ArrayList<Summary>();
-		for(int i = 0; i < 31; i++){
-			data2.add(new Summary(20, 30, 500, 5, 100));
+		for(int i = 0; i < 31 * 24; i++){//One month hours!
+			data2.add(new Summary(20, 1.25, 500, 5, 100));
 		}
 		summaries.put(cloudUsers[1], data2);//20 req/s, 360 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
 		
@@ -1947,7 +1774,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		EasyMock.replay(chromosome, genes[0], genes[1]);
 		
 		double receipt = 555 + 100 + 0 + 99.765 + 100 + 0;//for each contract: price + setup + extra cpu
-		double cost = largeReservationFee * 15 + 93 * 0.01 + mediumReservationFee * 5 + 62 * 0.25 + 310 * 0.01;//for each machine type: reservation fee + usage + on-demand cost
+		double cost = largeReservationFee * 15 + 2232 * 0.01 + mediumReservationFee * 5 + 1488 * 0.25 + 7440 * 0.01;//for each machine type: reservation fee + usage + on-demand cost
 		double penalties = 0 + 0;//Since loss is more than 5%, SaaS client does not pay the provider
 		
 		assertEquals(1/Math.abs(receipt - cost - penalties) + 1, function.evaluate(chromosome), 0.000001);
@@ -1990,18 +1817,17 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		
 		PowerMock.replayAll(config);
 		
-		//Summaries
 		//Workload summaries
 		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
 		List<Summary> data = new ArrayList<Summary>();
-		for(int i = 0; i < 31; i++){
-			data.add(new Summary(10, 20, 500, 5, 100));
+		for(int i = 0; i < 31 * 24; i++){
+			data.add(new Summary(10, 0.8333333, 500, 5, 100));
 		}
 		summaries.put(cloudUsers[0], data);//10 req/s, 200 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
 		
 		List<Summary> data2 = new ArrayList<Summary>();
-		for(int i = 0; i < 31; i++){
-			data2.add(new Summary(20, 30, 500, 5, 100));
+		for(int i = 0; i < 31 * 24; i++){
+			data2.add(new Summary(20, 1.25, 500, 5, 100));
 		}
 		summaries.put(cloudUsers[1], data2);//20 req/s, 300 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
 		
@@ -2021,7 +1847,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 //		double cost = 100 * 15 + 8640 * 0.01 + 99 * 5 + 8640 * 0.25 + 864;//for each machine type: reservation fee + usage
 //		double penalties = 0;//Since loss is more than 5%, SaaS client does not pay the provider
 		double receipt = 555 + 10000 + 630 * 0.1 + 99.765 + 10000 + 320 * 0.1;//for each contract: price + setup + extra cpu
-		double cost = 100 * 15 + 93 * 0.01 + 99 * 5 + 62 * 0.25 + 310 * 0.01;//for each machine type: reservation fee + usage
+		double cost = 100 * 15 + 2232 * 0.01 + 99 * 5 + 1488 * 0.25 + 7440 * 0.01;//for each machine type: reservation fee + usage
 		double penalties = 0;//Since loss is more than 5%, SaaS client does not pay the provider
 		
 		assertEquals(receipt - cost - penalties, function.evaluate(chromosome), 0.0001);
@@ -2064,18 +1890,17 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		
 		PowerMock.replayAll(config);
 		
-		//Summaries
 		//Workload summaries
 		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
 		List<Summary> data = new ArrayList<Summary>();
-		for(int i = 0; i < 90; i++){
-			data.add(new Summary(10, 20, 500, 5, 100));
+		for(int i = 0; i < 2160; i++){
+			data.add(new Summary(10, 0.8333333, 500, 5, 100));
 		}
 		summaries.put(cloudUsers[0], data);//10 req/s, 200 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
 		
 		List<Summary> data2 = new ArrayList<Summary>();
-		for(int i = 0; i < 90; i++){
-			data2.add(new Summary(20, 30, 500, 5, 100));
+		for(int i = 0; i < 2160; i++){
+			data2.add(new Summary(20, 1.25, 500, 5, 100));
 		}
 		summaries.put(cloudUsers[1], data2);//20 req/s, 300 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
 		
@@ -2091,8 +1916,8 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		
 		EasyMock.replay(chromosome, genes[0], genes[1]);
 		
-		double receipt = 3 * 555 + 10000 + (630 + 540 + 630) * 0.1 + 3 * 99.765 + 10000 + (320 + 260 + 320)* 0.1;//for each contract: price + setup + extra cpu
-		double cost = 100 * 15 + (93 + 84 + 93) * 0.01 + 99 * 5 + (62 + 56 + 62) * 0.25 + (310 + 280 + 310) * 0.01;//for each machine type: reservation fee + usage
+		double receipt = 3 * 555 + 10000 + (630 + 540 + 630) * 0.1 + 3 * 99.765 + 10000 + (320 + 260 + 320) * 0.1;//for each contract: price + setup + extra cpu
+		double cost = 100 * 15 + (2232 + 2016 + 2232) * 0.01 + 99 * 5 + (1488 + 1344 + 1488) * 0.25 + (7440 + 6720 + 7440) * 0.01;//for each machine type: reservation fee + usage
 		double penalties = 0;//Since loss is more than 5%, SaaS client does not pay the provider
 		
 		assertEquals(receipt - cost - penalties, function.evaluate(chromosome), 0.0001);
@@ -2139,14 +1964,14 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		//Workload summaries
 		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
 		List<Summary> data = new ArrayList<Summary>();
-		for(int i = 0; i < 31; i++){
-			data.add(new Summary(10, 20, 500, 5, 100));
+		for(int i = 0; i < 31 * 24; i++){
+			data.add(new Summary(10, 0.8333333, 500, 5, 100));
 		}
 		summaries.put(cloudUsers[0], data);//10 req/s, 200 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
 		
 		List<Summary> data2 = new ArrayList<Summary>();
-		for(int i = 0; i < 31; i++){
-			data2.add(new Summary(20, 30, 500, 5, 100));
+		for(int i = 0; i < 31 * 24; i++){
+			data2.add(new Summary(20, 1.25, 500, 5, 100));
 		}
 		summaries.put(cloudUsers[1], data2);//20 req/s, 300 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
 		
@@ -2163,7 +1988,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		EasyMock.replay(chromosome, genes[0], genes[1]);
 		
 		double receipt = 555 + 10000 + 630 * 0.1 + 99.765 + 10000 + 320 * 0.1;//for each contract: price + setup + extra cpu
-		double cost = (93 + 62 + 310) * 0.01;//for each machine type: reservation fee + usage
+		double cost = (2232 + 1488 + 7440) * 0.01;//for each machine type: reservation fee + usage
 		double penalties = 0;//Since loss is more than 5%, SaaS client does not pay the provider
 		
 		assertEquals(receipt - cost - penalties, function.evaluate(chromosome), 0.0001);
@@ -2212,18 +2037,17 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		
 		PowerMock.replayAll(config);
 		
-		//Summaries
 		//Workload summaries
 		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
 		List<Summary> data = new ArrayList<Summary>();
-		for(int i = 0; i < 31; i++){
-			data.add(new Summary(10, 20, 500, 5, 100));
+		for(int i = 0; i < 31 * 24; i++){
+			data.add(new Summary(10, 0.8333333, 500, 5, 100));
 		}
 		summaries.put(cloudUsers[0], data);//10 req/s, 200 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
 		
 		List<Summary> data2 = new ArrayList<Summary>();
-		for(int i = 0; i < 31; i++){
-			data2.add(new Summary(20, 30, 500, 5, 100));
+		for(int i = 0; i < 31 * 24; i++){
+			data2.add(new Summary(20, 1.25, 500, 5, 100));
 		}
 		summaries.put(cloudUsers[1], data2);//20 req/s, 300 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
 		
@@ -2240,7 +2064,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		EasyMock.replay(chromosome, genes[0], genes[1]);
 		
 		double receipt = price + setupCost + 630 * 0.1 + price2 + setupCost + 320 * 0.1;//for each contract: price + setup + extra cpu
-		double cost = largeReservation * 15 + 93 * 0.12 + mediumReservation * 5 + 62 * 0.06 + 310 * 0.085;//for each machine type: reservation fee + usage
+		double cost = largeReservation * 15 + 2232 * 0.12 + mediumReservation * 5 + 1488 * 0.06 + 7440 * 0.085;//for each machine type: reservation fee + usage
 		double penalties = 0;//Since loss is more than 5%, SaaS client does not pay the provider
 		
 		assertEquals(receipt - cost - penalties, function.evaluate(chromosome), 0.01);

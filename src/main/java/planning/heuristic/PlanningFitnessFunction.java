@@ -49,74 +49,6 @@ public class PlanningFitnessFunction extends FitnessFunction{
 	@Override
 	protected double evaluate(IChromosome arg0) {
 		
-//		double arrivalRate = aggregateArrivals();
-//		double meanServiceTimeInMillis = aggregateServiceTime();
-//		
-//		//Since round-robin is used, the total arrival rate is splitted among reserved servers
-//		Map<MachineType, Integer> currentPowerPerMachineType = new HashMap<MachineType, Integer>();
-//		int index = 0;
-//		double totalPower = 0;
-//		
-//		for(Gene gene : arg0.getGenes()){
-//			Integer numberOfMachinesReserved = (Integer)gene.getAllele();
-//			MachineType type = this.types.get(index);
-//			
-//			double relativePower = Configuration.getInstance().getRelativePower(type);
-//			currentPowerPerMachineType.put(this.types.get(index), (int)Math.round(numberOfMachinesReserved * relativePower));
-//			totalPower += Math.round(numberOfMachinesReserved * relativePower);
-//			index++;
-//		}
-//		
-//		//Calculating arrival rates per machine type
-//		Map<MachineType, Double> arrivalRatesPerMachineType = new HashMap<MachineType, Double>();
-//		for(MachineType type : currentPowerPerMachineType.keySet()){
-//			if(totalPower == 0){
-//				arrivalRatesPerMachineType.put(type, 0d);
-//			}else{
-//				arrivalRatesPerMachineType.put(type, (currentPowerPerMachineType.get(type) / totalPower) * arrivalRate);
-//			}
-//		}
-//		
-//		//Assuming a base computing power (e.g., EC2 unit for each core)
-//		Map<MachineType, Double> throughputPerMachineType = new HashMap<MachineType, Double>();
-//		double totalThroughput = 0d;
-//		double onDemandThroughput = 0d;
-//		for(MachineType type : arrivalRatesPerMachineType.keySet()){
-//			Double currentArrivalRate = arrivalRatesPerMachineType.get(type);
-//			double maximumThroughput = (1 / (meanServiceTimeInMillis/1000)) * Configuration.getInstance().getRelativePower(type);//Using all cores
-//			if(currentArrivalRate > maximumThroughput){//Requests are missed
-//				throughputPerMachineType.put(type, maximumThroughput);
-//				onDemandThroughput += currentArrivalRate - maximumThroughput;
-//			}else{
-//				throughputPerMachineType.put(type, currentArrivalRate);
-//			}
-//			totalThroughput += currentArrivalRate;
-//		}
-//		
-//		if(totalThroughput == 0){//No arrival at reserved machines!
-//			totalThroughput = arrivalRate;
-//			onDemandThroughput = arrivalRate;
-//		}
-//		
-//		double totalNumberOfUsers = aggregateNumberOfUsers();
-//		double averageThinkTimeInSeconds = aggregateThinkTime();
-//		
-//		//Estimated response time
-//		double responseTimeInSeconds = totalNumberOfUsers / totalThroughput - averageThinkTimeInSeconds;
-//		
-//		//Estimating utility
-//		double receipt = calcReceipt();
-//		double cost = calcCost(throughputPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType, onDemandThroughput);
-//		double penalties = calcPenalties(responseTimeInSeconds, arrivalRate, arrivalRate);
-//		
-//		double fitness = receipt - cost - penalties;
-//		
-//		if(fitness < 1){
-//			return (1/Math.abs(fitness))+1;
-//		}
-//		
-//		return fitness;
-		
 		//Since round-robin is used, the total arrival rate is splitted among reserved servers according to each server power
 		Map<MachineType, Integer> currentPowerPerMachineType = new HashMap<MachineType, Integer>();
 		int index = 0;
@@ -183,7 +115,6 @@ public class PlanningFitnessFunction extends FitnessFunction{
 			}
 			
 			if(reservedThroughput == 0){//No arrival at reserved machines!
-//				totalThroughput = arrivalRate;
 				missingThroughput = arrivalRate;
 			}
 			
@@ -332,13 +263,13 @@ public class PlanningFitnessFunction extends FitnessFunction{
 			Contract contract = entry.getKey().getContract();
 			int index = 0;
 			int counter = 0;
-			long totalCPUHrs = 0;
+			double totalCPUHrs = 0;
 			
 			for(Summary summary : entry.getValue()){
 				counter++;
-				totalCPUHrs += (long) summary.getTotalCpuHrs();
-				if(counter == SimpleSimulator.daysInMonths[index]){//Calculate receipt for a complete month!
-					contract.calculateReceipt(resultEntry, entry.getKey().getId(), totalCPUHrs * 60 * 60 * 1000, 0l, 0l, 0l);
+				totalCPUHrs += summary.getTotalCpuHrs();
+				if(counter == SimpleSimulator.daysInMonths[index] * 24){//Calculate receipt for a complete month!
+					contract.calculateReceipt(resultEntry, entry.getKey().getId(), (long)Math.ceil(totalCPUHrs * 60 * 60 * 1000), 0l, 0l, 0l);
 					index++;
 					totalCPUHrs = 0;
 					counter = 0;
