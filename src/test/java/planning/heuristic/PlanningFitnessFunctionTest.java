@@ -3,11 +3,14 @@ package planning.heuristic;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.easymock.EasyMock;
+import org.jgap.Gene;
+import org.jgap.IChromosome;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
@@ -24,6 +27,7 @@ import commons.cloud.TypeProvider;
 import commons.cloud.User;
 import commons.config.Configuration;
 import commons.io.TickSize;
+import commons.sim.util.SaaSAppProperties;
 import commons.sim.util.SimulatorProperties;
 
 @RunWith(PowerMockRunner.class)
@@ -1789,42 +1793,48 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		function.aggregateArrivals(109);
 	}
 	
-//	@Test
-//	public void testEvaluateWithNegativeFitness(){
-//		//SaaS clients contracts
-//		Contract contract = new Contract("p1", 1, 100d, 555d, 300 * 60 * 60 * 1000l, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
-//		Contract contract2 = new Contract("p1", 1, 100d, 99.765d, 300 * 60 * 60 * 1000l, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
-//		
-//		User[] cloudUsers = new User[2];
-//		cloudUsers[0] = new User(0, contract, 100);
-//		cloudUsers[1] = new User(1, contract2, 100);
-//		
-//		Configuration config = EasyMock.createMock(Configuration.class);
-//		PowerMock.mockStatic(Configuration.class);
-//		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(10);
-//		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).times(4);
-//		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(4);
-//		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
-//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA * 1000);
-//		
-//		//IaaS providers
-//		List<TypeProvider> types = new ArrayList<TypeProvider>();
-//		int largeReservationFee = 1000;
-//		int mediumReservationFee = 990;
-//		int smallReservationFee = 300;
-//		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, largeReservationFee, 170, 5));
-//		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, mediumReservationFee, 188, 5));
-//		types.add(new TypeProvider(0, MachineType.SMALL, 0.01, 0.0005, smallReservationFee, 188, 5));
-//		
-//		Provider[] providers = new Provider[1];
-//		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
-//		
-//		PowerMock.replayAll(config);
-//		
-//		//Summaries
-//		//Workload summaries
-//		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
-//		List<Summary> data = new ArrayList<Summary>();
+	@Test
+	public void testEvaluateWithNegativeFitnessNoLossAndNoReceipt(){
+		//SaaS clients contracts
+		Contract contract = new Contract("p1", 1, 100d, 555d, 300 * 60 * 60 * 1000l, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		Contract contract2 = new Contract("p1", 1, 100d, 99.765d, 300 * 60 * 60 * 1000l, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(12);
+		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).times(4);
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(4);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_INTERVAL_SIZE)).andReturn(60l * 60l);
+//		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(500l);
+//		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_RISK)).andReturn(0.0);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA * 1000);
+		
+		//IaaS providers
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		int largeReservationFee = 1000;
+		int mediumReservationFee = 990;
+		int smallReservationFee = 300;
+		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, largeReservationFee, 170, 5));
+		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, mediumReservationFee, 188, 5));
+		types.add(new TypeProvider(0, MachineType.SMALL, 0.01, 0.0005, smallReservationFee, 188, 5));
+		
+		Provider[] providers = new Provider[1];
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
+		
+		PowerMock.replayAll(config);
+		
+		//Summaries
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		data.add(new Summary(10, 20, 500, 5, 100));
+		data.add(new Summary(10, 20, 500, 5, 100));
 //		data.add(new Summary(10, 20, 500, 5, 100));
 //		data.add(new Summary(10, 20, 500, 5, 100));
 //		data.add(new Summary(10, 20, 500, 5, 100));
@@ -1835,11 +1845,11 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 //		data.add(new Summary(10, 20, 500, 5, 100));
 //		data.add(new Summary(10, 20, 500, 5, 100));
 //		data.add(new Summary(10, 20, 500, 5, 100));
-//		data.add(new Summary(10, 20, 500, 5, 100));
-//		data.add(new Summary(10, 20, 500, 5, 100));
-//		summaries.put(cloudUsers[0], data);//10 req/s, 240 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
-//		
-//		List<Summary> data2 = new ArrayList<Summary>();
+		summaries.put(cloudUsers[0], data);//10 req/s, 240 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		data2.add(new Summary(20, 30, 500, 5, 100));
+		data2.add(new Summary(20, 30, 500, 5, 100));
 //		data2.add(new Summary(20, 30, 500, 5, 100));
 //		data2.add(new Summary(20, 30, 500, 5, 100));
 //		data2.add(new Summary(20, 30, 500, 5, 100));
@@ -1850,289 +1860,391 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 //		data2.add(new Summary(20, 30, 500, 5, 100));
 //		data2.add(new Summary(20, 30, 500, 5, 100));
 //		data2.add(new Summary(20, 30, 500, 5, 100));
-//		data2.add(new Summary(20, 30, 500, 5, 100));
-//		data2.add(new Summary(20, 30, 500, 5, 100));
-//		summaries.put(cloudUsers[1], data2);//20 req/s, 360 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
-//		
-//		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.LARGE, MachineType.MEDIUM));
-//		
-//		IChromosome chromosome = EasyMock.createStrictMock(IChromosome.class);
-//		Gene[] genes = new Gene[2];
-//		genes[0] = EasyMock.createStrictMock(Gene.class);
-//		EasyMock.expect(genes[0].getAllele()).andReturn(15);
-//		genes[1] = EasyMock.createStrictMock(Gene.class);
-//		EasyMock.expect(genes[1].getAllele()).andReturn(5);
-//		EasyMock.expect(chromosome.getGenes()).andReturn(genes);
-//		
-//		EasyMock.replay(chromosome, genes[0], genes[1]);
-//		
-//		double receipt = 555 + 100 + 0 + 99.765 + 100 + 6;//for each contract: price + setup + extra cpu
-//		double cost = largeReservationFee * 15 + 8640 * 0.01 + mediumReservationFee * 5 + 8640 * 0.25 + 864;//for each machine type: reservation fee + usage + on-demand cost
-//		double penalties = 0;//Since loss is more than 5%, SaaS client does not pay the provider
-//		
-//		assertEquals(1/Math.abs(receipt - cost - penalties) + 1, function.evaluate(chromosome), 0.0001);
-//		
-//		PowerMock.verifyAll();
-//	}
-//	
-//	@Test
-//	public void testEvaluateWithPositiveFitness(){
-//		long cpuLimitInMillis = 300 * 60 * 60 * 1000l;
-//		
-//		//SaaS clients contracts
-//		Contract contract = new Contract("p1", 1, 10000d, 555d, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
-//		Contract contract2 = new Contract("p1", 1, 10000d, 99.765d, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
-//		
-//		User[] cloudUsers = new User[2];
-//		cloudUsers[0] = new User(0, contract, 100);
-//		cloudUsers[1] = new User(1, contract2, 100);
-//		
-//		Configuration config = EasyMock.createMock(Configuration.class);
-//		PowerMock.mockStatic(Configuration.class);
-//		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(10);
-//		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).times(4);
-//		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(4);
-//		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
-//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA * 1000);
-//		
-//		//IaaS providers
-//		List<TypeProvider> types = new ArrayList<TypeProvider>();
-//		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
-//		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
-//		types.add(new TypeProvider(0, MachineType.SMALL, 0.01, 0.0005, 99, 188, 5));
-//		
-//		Provider[] providers = new Provider[1];
-//		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
-//		
-//		PowerMock.replayAll(config);
-//		
-//		//Summaries
-//		//Workload summaries
-//		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
-//		List<Summary> data = new ArrayList<Summary>();
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		summaries.put(cloudUsers[0], data);//10 req/s, 200 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
-//		
-//		List<Summary> data2 = new ArrayList<Summary>();
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		summaries.put(cloudUsers[1], data2);//20 req/s, 300 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
-//		
-//		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.LARGE, MachineType.MEDIUM));
-//		
-//		IChromosome chromosome = EasyMock.createStrictMock(IChromosome.class);
-//		Gene[] genes = new Gene[2];
-//		genes[0] = EasyMock.createStrictMock(Gene.class);
-//		EasyMock.expect(genes[0].getAllele()).andReturn(15);
-//		genes[1] = EasyMock.createStrictMock(Gene.class);
-//		EasyMock.expect(genes[1].getAllele()).andReturn(5);
-//		EasyMock.expect(chromosome.getGenes()).andReturn(genes);
-//		
-//		EasyMock.replay(chromosome, genes[0], genes[1]);
-//		
+		summaries.put(cloudUsers[1], data2);//20 req/s, 360 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.LARGE, MachineType.MEDIUM));
+		
+		IChromosome chromosome = EasyMock.createStrictMock(IChromosome.class);
+		Gene[] genes = new Gene[2];
+		genes[0] = EasyMock.createStrictMock(Gene.class);
+		EasyMock.expect(genes[0].getAllele()).andReturn(15);
+		genes[1] = EasyMock.createStrictMock(Gene.class);
+		EasyMock.expect(genes[1].getAllele()).andReturn(5);
+		EasyMock.expect(chromosome.getGenes()).andReturn(genes);
+		
+		EasyMock.replay(chromosome, genes[0], genes[1]);
+		
+		double receipt = 0 + 100 + 0 + 0 + 100 + 0;//for each contract: price + setup + extra cpu
+		double cost = largeReservationFee * 15 + 6 * 0.01 + mediumReservationFee * 5 + 4 * 0.25 + 20 * 0.01;//for each machine type: reservation fee + usage + on-demand cost
+		double penalties = 0 + 0;//Since loss is more than 5%, SaaS client does not pay the provider
+		
+		assertEquals(1/Math.abs(receipt - cost - penalties) + 1, function.evaluate(chromosome), 0.01);
+		
+		PowerMock.verifyAll();
+	}
+	
+	@Test
+	public void testEvaluateWithNegativeFitnessNoLossAndReceipt(){
+		//SaaS clients contracts
+		Contract contract = new Contract("p1", 1, 100d, 555d, 700 * 60 * 60 * 1000l, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		Contract contract2 = new Contract("p1", 1, 100d, 99.765d, 700 * 60 * 60 * 1000l, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).anyTimes();
+		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).anyTimes();
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).anyTimes();
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_INTERVAL_SIZE)).andReturn(60l * 60l);
+//		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(500l);
+//		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_RISK)).andReturn(0.0);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA * 1000);
+		
+		//IaaS providers
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		int largeReservationFee = 1000;
+		int mediumReservationFee = 990;
+		int smallReservationFee = 300;
+		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, largeReservationFee, 170, 5));
+		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, mediumReservationFee, 188, 5));
+		types.add(new TypeProvider(0, MachineType.SMALL, 0.01, 0.0005, smallReservationFee, 188, 5));
+		
+		Provider[] providers = new Provider[1];
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
+		
+		PowerMock.replayAll(config);
+		
+		//Summaries
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		for(int i = 0; i < 31; i++){
+			data.add(new Summary(10, 20, 500, 5, 100));
+		}
+		summaries.put(cloudUsers[0], data);//10 req/s, 240 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		for(int i = 0; i < 31; i++){
+			data2.add(new Summary(20, 30, 500, 5, 100));
+		}
+		summaries.put(cloudUsers[1], data2);//20 req/s, 360 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.LARGE, MachineType.MEDIUM));
+		
+		IChromosome chromosome = EasyMock.createStrictMock(IChromosome.class);
+		Gene[] genes = new Gene[2];
+		genes[0] = EasyMock.createStrictMock(Gene.class);
+		EasyMock.expect(genes[0].getAllele()).andReturn(15);
+		genes[1] = EasyMock.createStrictMock(Gene.class);
+		EasyMock.expect(genes[1].getAllele()).andReturn(5);
+		EasyMock.expect(chromosome.getGenes()).andReturn(genes);
+		
+		EasyMock.replay(chromosome, genes[0], genes[1]);
+		
+		double receipt = 555 + 100 + 0 + 99.765 + 100 + 0;//for each contract: price + setup + extra cpu
+		double cost = largeReservationFee * 15 + 93 * 0.01 + mediumReservationFee * 5 + 62 * 0.25 + 310 * 0.01;//for each machine type: reservation fee + usage + on-demand cost
+		double penalties = 0 + 0;//Since loss is more than 5%, SaaS client does not pay the provider
+		
+		assertEquals(1/Math.abs(receipt - cost - penalties) + 1, function.evaluate(chromosome), 0.000001);
+		
+		PowerMock.verifyAll();
+	}
+	
+	@Test
+	public void testEvaluateWithPositiveFitness(){
+		long cpuLimitInMillis = 300 * 60 * 60 * 1000l;
+		
+		//SaaS clients contracts
+		Contract contract = new Contract("p1", 1, 10000d, 555d, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		Contract contract2 = new Contract("p1", 1, 10000d, 99.765d, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).anyTimes();
+		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).anyTimes();
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).anyTimes();
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_INTERVAL_SIZE)).andReturn(60l * 60l);
+//		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(500l);
+//		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_RISK)).andReturn(0.0);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA * 1000);
+		
+		//IaaS providers
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.SMALL, 0.01, 0.0005, 99, 188, 5));
+		
+		Provider[] providers = new Provider[1];
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
+		
+		PowerMock.replayAll(config);
+		
+		//Summaries
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		for(int i = 0; i < 31; i++){
+			data.add(new Summary(10, 20, 500, 5, 100));
+		}
+		summaries.put(cloudUsers[0], data);//10 req/s, 200 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		for(int i = 0; i < 31; i++){
+			data2.add(new Summary(20, 30, 500, 5, 100));
+		}
+		summaries.put(cloudUsers[1], data2);//20 req/s, 300 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.LARGE, MachineType.MEDIUM));
+		
+		IChromosome chromosome = EasyMock.createStrictMock(IChromosome.class);
+		Gene[] genes = new Gene[2];
+		genes[0] = EasyMock.createStrictMock(Gene.class);
+		EasyMock.expect(genes[0].getAllele()).andReturn(15);
+		genes[1] = EasyMock.createStrictMock(Gene.class);
+		EasyMock.expect(genes[1].getAllele()).andReturn(5);
+		EasyMock.expect(chromosome.getGenes()).andReturn(genes);
+		
+		EasyMock.replay(chromosome, genes[0], genes[1]);
+		
 //		double receipt = 12 * 555 + 10000 + 0 + 12 * 99.765 + 10000 + 0;//for each contract: price + setup + extra cpu
 //		double cost = 100 * 15 + 8640 * 0.01 + 99 * 5 + 8640 * 0.25 + 864;//for each machine type: reservation fee + usage
 //		double penalties = 0;//Since loss is more than 5%, SaaS client does not pay the provider
-//		
-//		assertEquals(receipt - cost - penalties, function.evaluate(chromosome), 0.0001);
-//		
-//		PowerMock.verifyAll();
-//	}
-//	
-//	@Test
-//	public void testEvaluateWithoutReservingMachines(){
-//		long cpuLimitInMillis = 300 * 60 * 60 * 1000l;
-//		
-//		//SaaS clients contracts
-//		Contract contract = new Contract("p1", 1, 10000d, 555d, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
-//		Contract contract2 = new Contract("p1", 1, 10000d, 99.765d, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
-//		
-//		User[] cloudUsers = new User[2];
-//		cloudUsers[0] = new User(0, contract, 100);
-//		cloudUsers[1] = new User(1, contract2, 100);
-//		
-//		Configuration config = EasyMock.createMock(Configuration.class);
-//		PowerMock.mockStatic(Configuration.class);
-//		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(10);
-//		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).times(4);
-//		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(4);
-//		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
-//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA * 1000);
-//		
-//		//IaaS providers
-//		List<TypeProvider> types = new ArrayList<TypeProvider>();
-//		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
-//		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
-//		types.add(new TypeProvider(0, MachineType.SMALL, 0.01, 0.0005, 99, 188, 5));
-//		
-//		Provider[] providers = new Provider[1];
-//		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
-//		
-//		PowerMock.replayAll(config);
-//		
-//		//Summaries
-//		//Workload summaries
-//		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
-//		List<Summary> data = new ArrayList<Summary>();
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		summaries.put(cloudUsers[0], data);//10 req/s, 200 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
-//		
-//		List<Summary> data2 = new ArrayList<Summary>();
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		summaries.put(cloudUsers[1], data2);//20 req/s, 300 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
-//		
-//		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.LARGE, MachineType.MEDIUM));
-//		
-//		IChromosome chromosome = EasyMock.createStrictMock(IChromosome.class);
-//		Gene[] genes = new Gene[2];
-//		genes[0] = EasyMock.createStrictMock(Gene.class);
-//		EasyMock.expect(genes[0].getAllele()).andReturn(0);
-//		genes[1] = EasyMock.createStrictMock(Gene.class);
-//		EasyMock.expect(genes[1].getAllele()).andReturn(0);
-//		EasyMock.expect(chromosome.getGenes()).andReturn(genes);
-//		
-//		EasyMock.replay(chromosome, genes[0], genes[1]);
-//		
-//		double receipt = 12 * 555 + 10000 + 0 + 12 * 99.765 + 10000 + 0;//for each contract: price + setup + extra cpu
-//		double cost = (129600.0) * 0.01;//for each machine type: reservation fee + usage
-//		double penalties = 0;//Since loss is more than 5%, SaaS client does not pay the provider
-//		
-//		assertEquals(receipt - cost - penalties, function.evaluate(chromosome), 0.0001);
-//		
-//		PowerMock.verifyAll();
-//	}
-//	
-//	@Test
-//	public void testEvaluateWithPositiveFitnessAndAmazonValues(){
-//		long cpuLimitInMillis = 300 * 60 * 60 * 1000l;
-//		double setupCost = 18 * 50d;
-//		
-//		//SaaS clients contracts
-//		double price = 18 * 150d;
-//		Contract contract = new Contract("p1", 1, setupCost, price, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
-//		double price2 = 18 * 300d;
-//		Contract contract2 = new Contract("p2", 1, setupCost, price2, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
-//		
-//		User[] cloudUsers = new User[2];
-//		cloudUsers[0] = new User(0, contract, 100);
-//		cloudUsers[1] = new User(1, contract2, 100);
-//		
-//		Configuration config = EasyMock.createMock(Configuration.class);
-//		PowerMock.mockStatic(Configuration.class);
-//		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(10);
-//		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).times(4);
-//		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(4);
-//		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
-//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA * 1000);
-//		
-//		//IaaS providers
-//		List<TypeProvider> types = new ArrayList<TypeProvider>();
-//		int largeReservation = 910;
-//		types.add(new TypeProvider(0, MachineType.LARGE, 0.34, 0.12, largeReservation, 170, 5));
-//		int mediumReservation = 455;
-//		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.17, 0.06, mediumReservation, 188, 5));
-//		double smallReservation = 227.5;
-//		types.add(new TypeProvider(0, MachineType.SMALL, 0.085, 0.03, smallReservation, 188, 5));
-//		
-//		Provider[] providers = new Provider[1];
-//		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
-//		
-//		PowerMock.replayAll(config);
-//		
-//		//Summaries
-//		//Workload summaries
-//		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
-//		List<Summary> data = new ArrayList<Summary>();
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		data.add(new Summary(10, 200, 500, 5, 100));
-//		summaries.put(cloudUsers[0], data);//10 req/s, 200 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
-//		
-//		List<Summary> data2 = new ArrayList<Summary>();
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 299, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		data2.add(new Summary(20, 300, 500, 5, 100));
-//		summaries.put(cloudUsers[1], data2);//20 req/s, 300 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
-//		
-//		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.LARGE, MachineType.MEDIUM));
-//		
-//		IChromosome chromosome = EasyMock.createStrictMock(IChromosome.class);
-//		Gene[] genes = new Gene[2];
-//		genes[0] = EasyMock.createStrictMock(Gene.class);
-//		EasyMock.expect(genes[0].getAllele()).andReturn(15);
-//		genes[1] = EasyMock.createStrictMock(Gene.class);
-//		EasyMock.expect(genes[1].getAllele()).andReturn(5);
-//		EasyMock.expect(chromosome.getGenes()).andReturn(genes);
-//		
-//		EasyMock.replay(chromosome, genes[0], genes[1]);
-//		
-//		double receipt = 12 * price + setupCost + 0 + 12 * price2 + setupCost;//for each contract: price + setup + extra cpu
-//		double cost = largeReservation * 15 + 8640 * 0.12 + mediumReservation * 5 + 8640 * 0.06 + 86400 * 0.085;//for each machine type: reservation fee + usage
-//		double penalties = 0;//Since loss is more than 5%, SaaS client does not pay the provider
-//		
-//		assertEquals(receipt - cost - penalties, function.evaluate(chromosome), 0.0001);
-//		
-//		PowerMock.verifyAll();
-//	}
+		double receipt = 555 + 10000 + 630 * 0.1 + 99.765 + 10000 + 320 * 0.1;//for each contract: price + setup + extra cpu
+		double cost = 100 * 15 + 93 * 0.01 + 99 * 5 + 62 * 0.25 + 310 * 0.01;//for each machine type: reservation fee + usage
+		double penalties = 0;//Since loss is more than 5%, SaaS client does not pay the provider
+		
+		assertEquals(receipt - cost - penalties, function.evaluate(chromosome), 0.0001);
+		
+		PowerMock.verifyAll();
+	}
+	
+	@Test
+	public void testEvaluateWithPositiveFitnessAndThreeMonths(){
+		long cpuLimitInMillis = 300 * 60 * 60 * 1000l;
+		
+		//SaaS clients contracts
+		Contract contract = new Contract("p1", 1, 10000d, 555d, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		Contract contract2 = new Contract("p1", 1, 10000d, 99.765d, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).anyTimes();
+		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).anyTimes();
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).anyTimes();
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_INTERVAL_SIZE)).andReturn(60l * 60l);
+//		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(500l);
+//		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_RISK)).andReturn(0.0);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA * 1000);
+		
+		//IaaS providers
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.SMALL, 0.01, 0.0005, 99, 188, 5));
+		
+		Provider[] providers = new Provider[1];
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
+		
+		PowerMock.replayAll(config);
+		
+		//Summaries
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		for(int i = 0; i < 90; i++){
+			data.add(new Summary(10, 20, 500, 5, 100));
+		}
+		summaries.put(cloudUsers[0], data);//10 req/s, 200 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		for(int i = 0; i < 90; i++){
+			data2.add(new Summary(20, 30, 500, 5, 100));
+		}
+		summaries.put(cloudUsers[1], data2);//20 req/s, 300 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.LARGE, MachineType.MEDIUM));
+		
+		IChromosome chromosome = EasyMock.createStrictMock(IChromosome.class);
+		Gene[] genes = new Gene[2];
+		genes[0] = EasyMock.createStrictMock(Gene.class);
+		EasyMock.expect(genes[0].getAllele()).andReturn(15);
+		genes[1] = EasyMock.createStrictMock(Gene.class);
+		EasyMock.expect(genes[1].getAllele()).andReturn(5);
+		EasyMock.expect(chromosome.getGenes()).andReturn(genes);
+		
+		EasyMock.replay(chromosome, genes[0], genes[1]);
+		
+		double receipt = 3 * 555 + 10000 + (630 + 540 + 630) * 0.1 + 3 * 99.765 + 10000 + (320 + 260 + 320)* 0.1;//for each contract: price + setup + extra cpu
+		double cost = 100 * 15 + (93 + 84 + 93) * 0.01 + 99 * 5 + (62 + 56 + 62) * 0.25 + (310 + 280 + 310) * 0.01;//for each machine type: reservation fee + usage
+		double penalties = 0;//Since loss is more than 5%, SaaS client does not pay the provider
+		
+		assertEquals(receipt - cost - penalties, function.evaluate(chromosome), 0.0001);
+		
+		PowerMock.verifyAll();
+	}
+	
+	@Test
+	public void testEvaluateWithoutReservingMachines(){
+		long cpuLimitInMillis = 300 * 60 * 60 * 1000l;
+		
+		//SaaS clients contracts
+		Contract contract = new Contract("p1", 1, 10000d, 555d, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		Contract contract2 = new Contract("p1", 1, 10000d, 99.765d, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).anyTimes();
+		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).anyTimes();
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).anyTimes();
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_INTERVAL_SIZE)).andReturn(60l * 60l);
+//		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(500l);
+//		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_RISK)).andReturn(0.0);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA * 1000);
+		
+		//IaaS providers
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.SMALL, 0.01, 0.0005, 99, 188, 5));
+		
+		Provider[] providers = new Provider[1];
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
+		
+		PowerMock.replayAll(config);
+		
+		//Summaries
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		for(int i = 0; i < 31; i++){
+			data.add(new Summary(10, 20, 500, 5, 100));
+		}
+		summaries.put(cloudUsers[0], data);//10 req/s, 200 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		for(int i = 0; i < 31; i++){
+			data2.add(new Summary(20, 30, 500, 5, 100));
+		}
+		summaries.put(cloudUsers[1], data2);//20 req/s, 300 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.LARGE, MachineType.MEDIUM));
+		
+		IChromosome chromosome = EasyMock.createStrictMock(IChromosome.class);
+		Gene[] genes = new Gene[2];
+		genes[0] = EasyMock.createStrictMock(Gene.class);
+		EasyMock.expect(genes[0].getAllele()).andReturn(0);
+		genes[1] = EasyMock.createStrictMock(Gene.class);
+		EasyMock.expect(genes[1].getAllele()).andReturn(0);
+		EasyMock.expect(chromosome.getGenes()).andReturn(genes);
+		
+		EasyMock.replay(chromosome, genes[0], genes[1]);
+		
+		double receipt = 555 + 10000 + 630 * 0.1 + 99.765 + 10000 + 320 * 0.1;//for each contract: price + setup + extra cpu
+		double cost = (93 + 62 + 310) * 0.01;//for each machine type: reservation fee + usage
+		double penalties = 0;//Since loss is more than 5%, SaaS client does not pay the provider
+		
+		assertEquals(receipt - cost - penalties, function.evaluate(chromosome), 0.0001);
+		
+		PowerMock.verifyAll();
+	}
+	
+	@Test
+	public void testEvaluateWithPositiveFitnessAndAmazonValues(){
+		long cpuLimitInMillis = 300 * 60 * 60 * 1000l;
+		double setupCost = 18 * 500d;
+		
+		//SaaS clients contracts
+		double price = 18 * 150d;
+		Contract contract = new Contract("p1", 1, setupCost, price, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		double price2 = 18 * 300d;
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		
+		User[] cloudUsers = new User[2];
+		cloudUsers[0] = new User(0, contract, 100);
+		cloudUsers[1] = new User(1, contract2, 100);
+		
+		Configuration config = EasyMock.createMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).anyTimes();
+		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).anyTimes();
+		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).anyTimes();
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_INTERVAL_SIZE)).andReturn(60l * 60l);
+//		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(500l);
+//		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_RISK)).andReturn(0.0);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(DEFAULT_SLA * 1000);
+		
+		//IaaS providers
+		List<TypeProvider> types = new ArrayList<TypeProvider>();
+		int largeReservation = 910;
+		types.add(new TypeProvider(0, MachineType.LARGE, 0.34, 0.12, largeReservation, 170, 5));
+		int mediumReservation = 455;
+		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.17, 0.06, mediumReservation, 188, 5));
+		double smallReservation = 227.5;
+		types.add(new TypeProvider(0, MachineType.SMALL, 0.085, 0.03, smallReservation, 188, 5));
+		
+		Provider[] providers = new Provider[1];
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
+		
+		PowerMock.replayAll(config);
+		
+		//Summaries
+		//Workload summaries
+		Map<User, List<Summary>> summaries = new HashMap<User, List<Summary>>();
+		List<Summary> data = new ArrayList<Summary>();
+		for(int i = 0; i < 31; i++){
+			data.add(new Summary(10, 20, 500, 5, 100));
+		}
+		summaries.put(cloudUsers[0], data);//10 req/s, 200 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
+		
+		List<Summary> data2 = new ArrayList<Summary>();
+		for(int i = 0; i < 31; i++){
+			data2.add(new Summary(20, 30, 500, 5, 100));
+		}
+		summaries.put(cloudUsers[1], data2);//20 req/s, 300 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
+		
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.LARGE, MachineType.MEDIUM));
+		
+		IChromosome chromosome = EasyMock.createStrictMock(IChromosome.class);
+		Gene[] genes = new Gene[2];
+		genes[0] = EasyMock.createStrictMock(Gene.class);
+		EasyMock.expect(genes[0].getAllele()).andReturn(15);
+		genes[1] = EasyMock.createStrictMock(Gene.class);
+		EasyMock.expect(genes[1].getAllele()).andReturn(5);
+		EasyMock.expect(chromosome.getGenes()).andReturn(genes);
+		
+		EasyMock.replay(chromosome, genes[0], genes[1]);
+		
+		double receipt = price + setupCost + 630 * 0.1 + price2 + setupCost + 320 * 0.1;//for each contract: price + setup + extra cpu
+		double cost = largeReservation * 15 + 93 * 0.12 + mediumReservation * 5 + 62 * 0.06 + 310 * 0.085;//for each machine type: reservation fee + usage
+		double penalties = 0;//Since loss is more than 5%, SaaS client does not pay the provider
+		
+		assertEquals(receipt - cost - penalties, function.evaluate(chromosome), 0.01);
+		
+		PowerMock.verifyAll();
+	}
 }

@@ -189,14 +189,14 @@ public class PlanningFitnessFunction extends FitnessFunction{
 			
 			//Calculating missing requests. This value is amortized by queue size!
 			long requestsMissed = Math.round(missingThroughput * SUMMARY_LENGTH_IN_SECONDS);
-			if(ratesDifference == 0){//Queue starts at this interval, so some requests are not really missed!
+			if(ratesDifference == 0 && reservedThroughput != 0){//Queue starts at this interval, so some requests are not really missed!
 				requestsMissed -= maxResponseTimeInMillis / meanServiceTimeInMillis;
 			}
 			ratesDifference = missingThroughput;
 			requestsLostDueToThroughput += requestsMissed;
 			
 			//Estimated response time
-			double totalNumberOfUsers = aggregateNumberOfUsers(currentSummaryInterval);
+			double totalNumberOfUsers = aggregateNumberOfUsers(currentSummaryInterval) * (reservedThroughput / arrivalRate);
 			double averageThinkTimeInSeconds = aggregateThinkTime(currentSummaryInterval);
 			if(reservedThroughput != 0){
 				double responseTimeInSeconds = totalNumberOfUsers / reservedThroughput - averageThinkTimeInSeconds;
@@ -312,8 +312,11 @@ public class PlanningFitnessFunction extends FitnessFunction{
 			(onDemandResources * planningPeriod * 24) ) * HOUR_IN_MILLIS / meanServiceTimeInMillis) );
 			
 			onDemandCPUHours = onDemandResources * planningPeriod * 24;
+			totalRequestsFinished -= requestsThatCouldNotBeAttended; 
 		}
+		totalRequestsFinished += requestsLostDueToThroughput;
 		cost += provider.getOnDemandCpuCost(MachineType.SMALL) * onDemandCPUHours;
+		
 		
 		//Penalties
 		double penalties = calcPenalties(requestsLostDueToResponseTime, requestsThatCouldNotBeAttended, totalRequestsFinished);
