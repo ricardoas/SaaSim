@@ -21,15 +21,14 @@ import commons.cloud.Request;
 public class GEISTSingleFileWorkloadParser extends AbstractWorkloadParser{
 	
 	private static final Pattern pattern = Pattern.compile("( +|\t+)+");
-	private int reqID;
-	private int userID;
 
 	/**
 	 * Default constructor
 	 * @param workloads 
 	 */
-	public GEISTSingleFileWorkloadParser(String[] workloads) {
-		super(workloads, 1);
+//	public GEISTSingleFileWorkloadParser(String[] workloads) {
+	public GEISTSingleFileWorkloadParser(String workload) {
+		super(workload, 1);
 	}
 
 	/**
@@ -53,21 +52,6 @@ public class GEISTSingleFileWorkloadParser extends AbstractWorkloadParser{
 		return null;/* FIXME new Request(reqID++, 0, userID++, 
 				parseLong, Long.parseLong(eventData[4]),
 				Long.parseLong(eventData[5]), demand);*/
-	}
-	
-	public static void main(String[] args) {
-		int total = 27;
-		int counter = 1;
-		
-		for(int i = 0; i <= total; i++){
-			for(int j = 0; j <= total -i; j++){
-				for(int k = 0; k <= total - i - j; k++){
-					for(int l = 0; l <= total - i -j - k; l++){
-						System.out.println(counter++);
-					}
-				}
-			}
-		}
 	}
 }
 

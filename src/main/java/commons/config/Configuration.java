@@ -46,6 +46,7 @@ import commons.sim.schedulingheuristics.ProfitDrivenHeuristic;
 import commons.sim.schedulingheuristics.RanjanHeuristic;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
 import commons.sim.schedulingheuristics.RoundRobinHeuristicForHeterogenousMachines;
+import commons.sim.util.SaaSUsersProperties;
 import commons.util.SimulationInfo;
 
 /**
@@ -412,18 +413,20 @@ public class Configuration	extends PropertiesConfiguration{
 		}
 		
 //		String[] ids = getStringArray(SAAS_USER_ID);
-		String plan = getString(SAAS_USER_PLAN);
-		long storage = getLong(SAAS_USER_STORAGE);
+//		String plan = getString(SAAS_USER_PLAN);
+//		long storage = getLong(SAAS_USER_STORAGE);
+		String[] plans = getStringArray(SAAS_USER_PLAN);
+		long[] storage = getLongArray(SAAS_USER_STORAGE);
+		
 		int numberOfUsers = getInt(SAAS_NUMBER_OF_USERS);
 		
 		users = new User[numberOfUsers];
 		for (int i = 0; i < numberOfUsers; i++) {
-			if(!contractsPerName.containsKey(plan)){
-				throw new ConfigurationException("Cannot find configuration for plan " + plan + ". Check contracts file.");
+			if(!contractsPerName.containsKey(plans[i])){
+				throw new ConfigurationException("Cannot find configuration for plan " + plans[i] + ". Check contracts file.");
 			}
 			
-			Contract contract = contractsPerName.get(plan);
-			users[i] = new User(i, contract, storage);
+			users[i] = new User(i, contractsPerName.get(plans[i]), storage[i]);
 		}
 	}
 
@@ -523,7 +526,7 @@ public class Configuration	extends PropertiesConfiguration{
 		
 		String value = getString(PLANNING_RISK);
 		if(value != null && value.length() > 0){
-			Validator.checkPositiveDouble(PLANNING_RISK, value);
+			Validator.checkNonNegativeDouble(PLANNING_RISK, value);
 		}
 		value = getString(PLANNING_INTERVAL_SIZE);
 		if(value != null && value.length() > 0){
@@ -664,34 +667,34 @@ public class Configuration	extends PropertiesConfiguration{
 		
 		Validator.checkPositive(SAAS_NUMBER_OF_USERS, getString(SAAS_NUMBER_OF_USERS));
 
-		String[] peakPeriod = getStringArray(SAAS_PEAK_PERIOD);
-		if(peakPeriod != null && peakPeriod.length != 0){
-			Validator.checkIsPositiveArray(SAAS_PEAK_PERIOD, peakPeriod);
-		}
+//		String[] peakPeriod = getStringArray(SAAS_PEAK_PERIOD);
+//		if(peakPeriod != null && peakPeriod.length != 0){
+//			Validator.checkIsPositiveArray(SAAS_PEAK_PERIOD, peakPeriod);
+//		}
+//		Validator.checkPositive(SAAS_USER_STORAGE, getString(SAAS_USER_STORAGE));
 		
 //		checkSize(SAAS_USER_ID, SAAS_NUMBER_OF_USERS);
-		Validator.checkPositive(SAAS_USER_STORAGE, getString(SAAS_USER_STORAGE));
-//		checkSize(SAAS_USER_STORAGE, SAAS_NUMBER_OF_USERS);
-//		checkSize(SAAS_USER_PLAN, SAAS_NUMBER_OF_USERS);
+		checkSize(SAAS_USER_STORAGE, SAAS_NUMBER_OF_USERS);
+		checkSize(SAAS_USER_PLAN, SAAS_NUMBER_OF_USERS);
 		
 //		Validator.checkIsNonEmptyStringArray(SAAS_USER_ID, getStringArray(SAAS_USER_ID));
 		Validator.checkIsNonEmptyStringArray(SAAS_USER_PLAN, getStringArray(SAAS_USER_PLAN));
-//		Validator.checkIsNonNegativeArray(SAAS_USER_STORAGE, getStringArray(SAAS_USER_STORAGE));
+		Validator.checkIsNonNegativeArray(SAAS_USER_STORAGE, getStringArray(SAAS_USER_STORAGE));
 		
-		Validator.checkNotEmpty(SAAS_WORKLOAD_NORMAL, getString(SAAS_WORKLOAD_NORMAL));
-		Validator.checkNotEmpty(SAAS_WORKLOAD_TRANSITION, getString(SAAS_WORKLOAD_TRANSITION));
-		Validator.checkNotEmpty(SAAS_WORKLOAD_PEAK, getString(SAAS_WORKLOAD_PEAK));
-//		String workload = getString(SAAS_WORKLOAD);
-//		if(workload == null || workload.isEmpty()){
-//			checkSize(SAAS_USER_WORKLOAD, SAAS_NUMBER_OF_USERS);
-//			
-//			Validator.checkIsNonEmptyStringArray(SAAS_USER_WORKLOAD, getStringArray(SAAS_USER_WORKLOAD));
-//		}else{
-//			if(getStringArray(SAAS_USER_WORKLOAD).length != 0){
-//				throw new ConfigurationException("Cannot define user specific workload when " +
-//						"an unique workload has been already specified.");
-//			}
-//		}
+//		Validator.checkNotEmpty(SAAS_WORKLOAD_NORMAL, getString(SAAS_WORKLOAD_NORMAL));
+//		Validator.checkNotEmpty(SAAS_WORKLOAD_TRANSITION, getString(SAAS_WORKLOAD_TRANSITION));
+//		Validator.checkNotEmpty(SAAS_WORKLOAD_PEAK, getString(SAAS_WORKLOAD_PEAK));
+		String workload = getString(SAAS_WORKLOAD);
+		if(workload == null || workload.isEmpty()){
+			checkSize(SAAS_USER_WORKLOAD, SAAS_NUMBER_OF_USERS);
+			
+			Validator.checkIsNonEmptyStringArray(SAAS_USER_WORKLOAD, getStringArray(SAAS_USER_WORKLOAD));
+		}else{
+			if(getStringArray(SAAS_USER_WORKLOAD).length != 0){
+				throw new ConfigurationException("Cannot define user specific workload when " +
+						"an unique workload has been already specified.");
+			}
+		}
 	}
 	
 	private void checkSize(String propertyName, String sizePropertyName) throws ConfigurationException {
@@ -811,9 +814,14 @@ public class Configuration	extends PropertiesConfiguration{
 	}
 
 	public String[] getWorkloads() {
-		String[] workloadsPath = new String[]{getString(SAAS_WORKLOAD_NORMAL), getString(SAAS_WORKLOAD_TRANSITION), 
-				getString(SAAS_WORKLOAD_PEAK)};
-		return workloadsPath;
+//		String[] workloadsPath = new String[]{getString(SAAS_WORKLOAD_NORMAL), getString(SAAS_WORKLOAD_TRANSITION), 
+//				getString(SAAS_WORKLOAD_PEAK)};
+//		return workloadsPath;
+		String[] stringArray = this.getStringArray(SaaSUsersProperties.SAAS_USER_WORKLOAD);
+		if(stringArray != null && stringArray.length != 0){
+			return stringArray;
+		}
+		return new String[]{getString(SAAS_WORKLOAD)};
 	}
 
 	public boolean hasPreviousMachines() {

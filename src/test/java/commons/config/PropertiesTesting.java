@@ -4,6 +4,7 @@ public class PropertiesTesting {
 	
 	public static final String VALID_WORKLOAD = "src/test/resources/workload/w1.dat";
 	public static final String VALID_WORKLOAD_2 = "src/test/resources/workload/w2.dat";
+	public static final String VALID_WORKLOAD_3 = "src/test/resources/workload/workload.trc";
 	
 	public static final String VALID_FILE = "src/test/resources/config.properties";
 	public static final String VALID_RANJAN_FILE = "src/test/resources/config-ranjan.properties";

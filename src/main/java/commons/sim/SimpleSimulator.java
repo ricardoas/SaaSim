@@ -43,7 +43,6 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 */
 	public SimpleSimulator(JEEventScheduler scheduler, Monitor monitor, LoadBalancer... tiers){
 		super(scheduler);
-		WorkloadParserFactory.setScheduler(getScheduler());
 		this.monitor = monitor;
 		this.tiers = tiers;
 		this.currentMonth = Configuration.getInstance().getSimulationInfo().getCurrentMonth();

@@ -5,7 +5,10 @@ package provisioning;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import util.ValidConfigurationTest;
 
@@ -22,17 +25,19 @@ import commons.sim.provisioningheuristics.MachineStatistics;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(Configuration.class)
 public class MonitorTest extends ValidConfigurationTest {
 
 	private Monitor monitor;
 
 	@Override
-	public void setUp() throws Exception {
+	public void setUp() throws Exception{
 		super.setUp();
 		buildFullConfiguration();
 		monitor = new DynamicProvisioningSystem();
 	}
-
+	
 	/**
 	 * Test method for {@link provisioning.Monitor#reportRequestFinished(commons.cloud.Request)}.
 	 */
@@ -104,6 +109,15 @@ public class MonitorTest extends ValidConfigurationTest {
 		
 		User user = EasyMock.createStrictMock(User.class);
 		user.calculatePartialReceipt(EasyMock.isA(UtilityResultEntry.class));
+		
+		Configuration config = EasyMock.createStrictMock(Configuration.class);
+		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider});
+		EasyMock.expect(config.getUsers()).andReturn(new User[]{user});
+		
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config);
+		
+		PowerMock.replayAll(config, provider, user);
 		
 		new DynamicProvisioningSystem().chargeUsers(0);
 		

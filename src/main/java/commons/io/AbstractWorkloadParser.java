@@ -6,43 +6,47 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import commons.cloud.Request;
+import commons.config.Configuration;
 
 public abstract class AbstractWorkloadParser implements WorkloadParser<Request> {
 	
-	private static final int TRACE_LENGTH_IN_DAYS = 1;
 	private BufferedReader reader;
-	private final StringBuilder[] workloadPath;
-	private int periodType;
+	private int currentDay = 0;
+	
 	
 	protected int periodsAlreadyRead = 0;
-
 	private Request next;
 
-	public AbstractWorkloadParser(String[] workloads, int saasclientID) {
-		this.workloadPath = new StringBuilder[workloads.length];
-		this.periodType = 0;
-		for(int i = 0; i < workloads.length; i++){
-			this.workloadPath[i] = new StringBuilder(workloads[i]);
-//			this.workloadPath[i].append("/"+saasclientID+".trc");
-			this.workloadPath[i].append("/trace_user.trc");
-		}
+	public AbstractWorkloadParser(String workload, int saasclientID) {
 		try {
-			this.reader = new BufferedReader(new FileReader(this.workloadPath[periodType].toString()));//Using normal load file
-			
-//			if(periodsAlreadyRead  < Configuration.getInstance().getLong(SimulatorProperties.PLANNING_PERIOD)){
-				this.next = readNext();
-//			}else{
-//				this.next = null;
-//			}
+			this.reader = new BufferedReader(new FileReader(readFileToUse(workload)));//Using normal load file
+			this.next = readNext();
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException("Problem reading workload file.", e);
 		}
 	}
 	
+	private String readFileToUse(String workload) {
+		this.currentDay = Configuration.getInstance().getSimulationInfo().getSimulatedDays();
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(workload));
+			String file = reader.readLine();
+			int currentLine = 0;
+			while(currentLine < this.currentDay){
+				currentLine++;
+				file = reader.readLine();
+			}
+			return file;
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException("Problem reading workload file.", e);
+		} catch (IOException e) {
+			throw new RuntimeException("Problem reading workload file.", e);
+		}
+	}
+
 	@Override
 	public void setDaysAlreadyRead(int simulatedDays){
 		throw new RuntimeException("not yet implemented");
-//		this.periodsAlreadyRead = simulatedDays;
 	}
 	
 	@Override
@@ -71,84 +75,8 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request> 
 			line = reader.readLine();
 			if(line == null){
 				return null;
-//				System.gc();
-//
-//				periodsAlreadyRead += TRACE_LENGTH_IN_DAYS;
-//				System.out.println("OTHER DAY: "+periodsAlreadyRead);
-//				if(periodsAlreadyRead  < Configuration.getInstance().getLong(SimulatorProperties.PLANNING_PERIOD)){
-//					reader.close();
-//					reader = null;
-//					reader = new BufferedReader(new FileReader( this.workloadPath[periodType].toString() ) );
-//					line = reader.readLine();
-//					System.out.println("new line: "+line);
-				}
+			}
 			return parseRequest(line);
-		} catch (IOException e) {
-			throw new RuntimeException("Problem reading workload file.", e);
-		}
-	}
-	
-	public int changeToPeak(){
-		try {
-			this.periodType = 2;
-			this.reader.close();
-			reader = null;
-			this.reader = new BufferedReader(new FileReader(this.workloadPath[periodType].toString()));//Using peak load file
-			
-//			periodsAlreadyRead += TRACE_LENGTH_IN_DAYS;
-//			if(periodsAlreadyRead  < Configuration.getInstance().getLong(SimulatorProperties.PLANNING_PERIOD)){
-				this.next = readNext();
-//			}else{
-//				this.next = null;
-//			}
-			return periodsAlreadyRead;
-			
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Problem reading workload file.", e);
-		} catch (IOException e) {
-			throw new RuntimeException("Problem reading workload file.", e);
-		}
-	}
-	
-	public int changeToTransition(){
-		try {
-			this.periodType = 1;
-			this.reader.close();
-			reader = null;
-			this.reader = new BufferedReader(new FileReader(this.workloadPath[periodType].toString()));//Using transition load file
-		
-//			periodsAlreadyRead += TRACE_LENGTH_IN_DAYS;
-//			if(periodsAlreadyRead  < Configuration.getInstance().getLong(SimulatorProperties.PLANNING_PERIOD)){
-				this.next = readNext();
-//			}else{
-//				this.next = null;
-//			}
-			
-			return periodsAlreadyRead;
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Problem reading workload file.", e);
-		} catch (IOException e) {
-			throw new RuntimeException("Problem reading workload file.", e);
-		}
-	}
-	
-	public int changeToNormal(){
-		try {
-			this.periodType = 0;
-			this.reader.close();
-			reader = null;
-			this.reader = new BufferedReader(new FileReader(this.workloadPath[periodType].toString()));//Using normal load file
-			
-//			periodsAlreadyRead += TRACE_LENGTH_IN_DAYS;
-//			if(periodsAlreadyRead  < Configuration.getInstance().getLong(SimulatorProperties.PLANNING_PERIOD)){
-				this.next = readNext();
-//			}else{
-//				this.next = null;
-//			}
-			
-			return periodsAlreadyRead;
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Problem reading workload file.", e);
 		} catch (IOException e) {
 			throw new RuntimeException("Problem reading workload file.", e);
 		}

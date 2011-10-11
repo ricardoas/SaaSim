@@ -27,11 +27,5 @@ public interface WorkloadParser<T> {
 
 	void clear();
 
-	int changeToPeak();
-	
-	int changeToTransition();
-	
-	int changeToNormal();
-
 	void setDaysAlreadyRead(int simulatedDays);
 }

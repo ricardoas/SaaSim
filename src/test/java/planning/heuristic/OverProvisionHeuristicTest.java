@@ -88,7 +88,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-		WorkloadParserFactory.setScheduler(EasyMock.isA(JEEventScheduler.class));
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(new ArrayList<Request>());
 		EasyMock.expect(parser.hasNext()).andReturn(false);
@@ -180,7 +179,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-		WorkloadParserFactory.setScheduler(EasyMock.isA(JEEventScheduler.class));
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -290,7 +288,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-		WorkloadParserFactory.setScheduler(EasyMock.isA(JEEventScheduler.class));
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -400,7 +397,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-		WorkloadParserFactory.setScheduler(EasyMock.isA(JEEventScheduler.class));
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -515,7 +511,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-		WorkloadParserFactory.setScheduler(EasyMock.isA(JEEventScheduler.class));
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -625,7 +620,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-		WorkloadParserFactory.setScheduler(EasyMock.isA(JEEventScheduler.class));
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -739,7 +733,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-		WorkloadParserFactory.setScheduler(EasyMock.isA(JEEventScheduler.class));
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(false);
@@ -887,11 +880,9 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-		WorkloadParserFactory.setScheduler(EasyMock.isA(JEEventScheduler.class));
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstDayRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(false);
-		WorkloadParserFactory.setScheduler(EasyMock.isA(JEEventScheduler.class));
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(secondDayRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(false);

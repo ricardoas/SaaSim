@@ -27,8 +27,8 @@ public class GEISTMultiFileWorkloadParser extends AbstractWorkloadParser{
 	 * Default constructor
 	 * @param workloads 
 	 */
-	public GEISTMultiFileWorkloadParser(String[] workloads, int saasclientID) {
-		super(workloads, saasclientID);
+	public GEISTMultiFileWorkloadParser(String workload, int saasclientID) {
+		super(workload, saasclientID);
 		this.saasClientID = saasclientID;
 	}
 
@@ -59,6 +59,8 @@ public class GEISTMultiFileWorkloadParser extends AbstractWorkloadParser{
 		int index = 0;
 		while(tokenizer.hasMoreTokens()){
 			demand[index++] = Long.parseLong(tokenizer.nextToken());
+//			tokenizer.nextToken();
+//			demand[index++] = 200;
 		}
 		
 		return new Request(userID, reqID, saasClientID, 
