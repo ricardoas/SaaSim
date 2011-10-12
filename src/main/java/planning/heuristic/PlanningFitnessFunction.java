@@ -24,7 +24,7 @@ import commons.sim.util.SimulatorProperties;
 
 public class PlanningFitnessFunction extends FitnessFunction{
 
-	private static final int HOUR_IN_MILLIS = 3600000;
+	public static final int HOUR_IN_MILLIS = 3600000;
 
 	private long SUMMARY_LENGTH_IN_SECONDS;
 	

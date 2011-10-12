@@ -2,7 +2,7 @@
 #Esse script é responsável por executar as várias heurísticas de planejamento para um cenário de X clientes SaaS durante um período Y de tempo.
 
 if [ $# -lt 2 ]; then
-        echo "usage: $0 <number of saas clients> <simulation period in days>"
+        echo "usage: $0 <saas users configuration file> <simulation period in days>"
         exit 1
 fi
 
@@ -25,11 +25,16 @@ PERIOD=$2
 
 for plan_heur in EVOLUTIONARY OVERPROVISIONING OPTIMAL; do
 	#Replacing constants in files
-	sed "s/#clients#/${USERS}/g" model.users > ${USERS}.users
+	#sed "s/#clients#/${USERS}/g" model.users > ${USERS}.users
 
 	sed "s/#heur#/${plan_heur}/g" model.properties > ${USERS}_${PERIOD}_${plan_heur}.properties
 	sed -i "s/#period#/${PERIOD}/g" ${USERS}_${PERIOD}_${plan_heur}.properties
-	sed -i "s/#users#/${USERS}.users/g" ${USERS}_${PERIOD}_${plan_heur}.properties
+	sed -i "s/#users#/users.properties/g" ${USERS}_${PERIOD}_${plan_heur}.properties
+
+	if [ ${plan_heur} == EVOLUTIONARY ] || [ ${plan_heur} == OPTIMAL ]; then
+		java -server -cp $CLASSPATH commons.util.AggregateWorkload ${USERS}_${PERIOD}_${plan_heur}.properties
+		sed -i "s/users.properties/newUsers.properties/g" ${USERS}_${PERIOD}_${plan_heur}.properties
+	fi 
 
 	#Running planning
 	java -Xmx1024m -server -cp $CLASSPATH planning.main.Main ${USERS}_${PERIOD}_${plan_heur}.properties

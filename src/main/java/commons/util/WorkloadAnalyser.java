@@ -10,7 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class TrafficAggregator {
+/**
+ * This class is responsible for evaluating a geist trace file in order to aggregate the amount of
+ * requests at each interval of MINUTE_IN_MILLIS. 
+ * 
+ * @author david
+ *
+ */
+public class WorkloadAnalyser {
 	
 	private static final Pattern pattern = Pattern.compile("( +|\t+)+");
 	private static long MINUTE_IN_MILLIS = 1000 * 60 * 5;
