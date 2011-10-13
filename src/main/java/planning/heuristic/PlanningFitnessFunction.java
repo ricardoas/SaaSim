@@ -272,7 +272,6 @@ public class PlanningFitnessFunction extends FitnessFunction{
 					contract.calculateReceipt(resultEntry, entry.getKey().getId(), (long)Math.ceil(totalCPUHrs * 60 * 60 * 1000), 0l, 0l, 0l);
 					index++;
 					totalCPUHrs = 0;
-					counter = 0;
 				}
 			}
 			

@@ -525,12 +525,49 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 	}
 	
 	@Test
-	public void testStartInChargeUsersDay() throws Exception{
+	public void testStartInFirstChargeUsersDay() throws Exception{
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(new SimulationInfo(30, 0)).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(40l);
+		
+		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleSimulator.class))).andReturn(1);
+		EasyMock.expect(scheduler.now()).andReturn(0l);
+		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
+		EasyMock.expect(scheduler.now()).andReturn(0l);
+		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
+		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
+		scheduler.start();
+		PowerMock.expectNew(JEEventScheduler.class).andReturn(scheduler);
+		
+		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		EasyMock.expect(loadBalancer.getHandlerId()).andReturn(2);
+		
+		ApplicationFactory appFactory = EasyMock.createStrictMock(ApplicationFactory.class);
+		PowerMock.mockStatic(ApplicationFactory.class);
+		EasyMock.expect(ApplicationFactory.getInstance()).andReturn(appFactory);
+		LoadBalancer[] loadBalancers = new LoadBalancer[1];
+		loadBalancers[0] = loadBalancer;
+		EasyMock.expect(appFactory.createNewApplication(EasyMock.isA(JEEventScheduler.class), 
+				EasyMock.anyObject(Monitor.class))).andReturn(loadBalancers);
+		
+		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
+		PowerMock.replayAll(config, appFactory, monitor, loadBalancer, scheduler);
+		
+		SimpleSimulator simulator =  new SimpleSimulator(scheduler, monitor, loadBalancer);
+		simulator.start();
+		
+	}
+	
+	@Test
+	public void testStartInOtherChargeUsersDay() throws Exception{
+		Configuration config = EasyMock.createStrictMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
+		EasyMock.expect(config.getSimulationInfo()).andReturn(new SimulationInfo(180, 5)).times(2);
+		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(181l);
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleSimulator.class))).andReturn(1);
