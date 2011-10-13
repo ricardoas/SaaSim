@@ -13,7 +13,6 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request> 
 	private BufferedReader reader;
 	private int currentDay = 0;
 	
-	
 	protected int periodsAlreadyRead = 0;
 	private Request next;
 
@@ -74,6 +73,7 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request> 
 		try {
 			line = reader.readLine();
 			if(line == null){
+				reader.close();
 				return null;
 			}
 			return parseRequest(line);

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import planning.util.PlanIOHandler;
 import provisioning.DPS;
@@ -15,6 +16,7 @@ import commons.cloud.Request;
 import commons.cloud.User;
 import commons.config.Configuration;
 import commons.io.Checkpointer;
+import commons.io.WorkloadParser;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEEvent;
@@ -66,6 +68,13 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 		DPS dps = (DPS) this.monitor;
 		
 		dps.registerConfigurable(this);
+		
+		WorkloadParser<List<Request>> parser = this.getParser();
+		try{
+			double error = Configuration.getInstance().getDouble(SimulatorProperties.PLANNING_ERROR);
+			parser.applyError(error);
+		}catch(NoSuchElementException e){
+		}
 		
 		this.start();
 		

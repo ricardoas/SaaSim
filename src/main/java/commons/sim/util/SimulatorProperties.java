@@ -20,6 +20,8 @@ public class SimulatorProperties {
 	
 	public static final String PLANNING_RISK = "planning.risk";
 	
+	public static final String PLANNING_ERROR = "planning.error";
+	
 	public static final String PLANNING_INTERVAL_SIZE = "planning.interval.size";
 	
 	public static final String PARSER_IDIOM = "dps.workload.parser";

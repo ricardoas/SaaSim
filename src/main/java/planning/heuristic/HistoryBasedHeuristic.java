@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Map.Entry;
 
 import planning.util.MachineUsageData;
@@ -16,10 +17,12 @@ import provisioning.Monitor;
 
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
+import commons.cloud.Request;
 import commons.cloud.User;
 import commons.config.Configuration;
 import commons.io.Checkpointer;
 import commons.io.TickSize;
+import commons.io.WorkloadParser;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.Machine;
@@ -65,6 +68,13 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 		SimpleSimulator simulator = (SimpleSimulator) SimulatorFactory.buildSimulator(this.scheduler, dps);
 		
 		dps.registerConfigurable(simulator);
+		
+		WorkloadParser<List<Request>> parser = simulator.getParser();
+		try{
+			double error = Configuration.getInstance().getDouble(SimulatorProperties.PLANNING_ERROR);
+			parser.applyError(error);
+		}catch(NoSuchElementException e){
+		}
 		
 		simulator.start();
 		

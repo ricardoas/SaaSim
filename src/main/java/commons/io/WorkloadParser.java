@@ -28,4 +28,6 @@ public interface WorkloadParser<T> {
 	void clear();
 
 	void setDaysAlreadyRead(int simulatedDays);
+
+	void applyError(double error);
 }

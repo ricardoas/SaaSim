@@ -528,6 +528,10 @@ public class Configuration	extends PropertiesConfiguration{
 		if(value != null && value.length() > 0){
 			Validator.checkNonNegativeDouble(PLANNING_RISK, value);
 		}
+		value = getString(PLANNING_ERROR);
+		if(value != null && value.length() > 0){
+			Validator.checkNonNegativeDouble(PLANNING_ERROR, value);
+		}
 		value = getString(PLANNING_INTERVAL_SIZE);
 		if(value != null && value.length() > 0){
 			Validator.checkPositive(PLANNING_INTERVAL_SIZE, value);

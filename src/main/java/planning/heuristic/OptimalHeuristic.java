@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.jgap.Chromosome;
@@ -23,9 +24,9 @@ import provisioning.Monitor;
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.User;
-import commons.io.HistoryBasedWorkloadParser;
 import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEEventScheduler;
+import commons.sim.util.SimulatorProperties;
 
 public class OptimalHeuristic implements PlanningHeuristic{
 	
@@ -36,18 +37,10 @@ public class OptimalHeuristic implements PlanningHeuristic{
 	
 	private IChromosome bestChromosome; 
 	
-//	private FileWriter writer;
-//	private static final String OUTPUT_FILE = "optimal.plan";
-	
 	public OptimalHeuristic(JEEventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
 		this.types = new ArrayList<MachineType>();
 		this.summaries = new HashMap<User, List<Summary>>();
 		this.bestChromosome = null;
-//		try {
-//			writer = new FileWriter(new File(OUTPUT_FILE));
-//		} catch (IOException e) {
-//			throw new RuntimeException("Invalid optimal output file!");
-//		}
 	}
 	
 	@Override
@@ -100,26 +93,37 @@ public class OptimalHeuristic implements PlanningHeuristic{
 			if(this.bestChromosome == null || this.bestChromosome.getFitnessValue() < fitness){
 				this.bestChromosome = chrom;
 			}
-//			persistData(chrom, fitness);
 		}
 	}
-
-//	private void persistData(Chromosome key, double fitness) {
-//		StringBuilder result = new StringBuilder();
-//		for(Gene gene : key.getGenes()){
-//			result.append(gene.getAllele()+"\t");
-//		}
-//		result.append(fitness+"\n");
-//		try {
-//			writer.write(result.toString());
-//		} catch (IOException e) {
-//			throw new RuntimeException("Could not write in optimal output file");
-//		}
-//	}
 
 	private void readWorkloadData(User[] cloudUsers) {
 		commons.config.Configuration simConfig = commons.config.Configuration.getInstance();
 		String[] workloads = simConfig.getWorkloads();
+		
+		//Applying a planning error in workload if it was defined!
+		try{
+			double error = simConfig.getDouble(SimulatorProperties.PLANNING_ERROR);
+			int totalWorkloads = (int)Math.round(workloads.length * (1+error));
+			String [] newWorkloads = new String[totalWorkloads];
+			
+			if(totalWorkloads > workloads.length){//Should add some workloads
+				for(int i = 0; i < workloads.length; i++){
+					newWorkloads[i] = workloads[i];
+				}
+				int difference = totalWorkloads - workloads.length;
+				int index = workloads.length;
+				for(int i = 0; i < difference; i++){
+					newWorkloads[index++] = workloads[i];
+				}
+			}else{//Should remove some workloads
+				for(int i = 0; i < totalWorkloads; i++){
+					newWorkloads[i] = workloads[i];
+				}
+			}
+			workloads = newWorkloads;
+		}catch(NoSuchElementException e){
+		}
+		
 		this.summaries = new HashMap<User, List<Summary>>();
 		
 		int index = 0;
@@ -189,12 +193,7 @@ public class OptimalHeuristic implements PlanningHeuristic{
 		}
 		System.out.println("CONFIG: "+genes[0].getAllele()+" "+genes[1].getAllele()+" "+genes[2].getAllele());
 		System.out.println("BEST: "+bestChromosome.getFitnessValue());
-		
-//		try {
-//			writer.close();
-//		} catch (IOException e) {
-//			throw new RuntimeException(e.getMessage());
-//		}
+
 		return plan;
 	}
 }

@@ -53,5 +53,9 @@ public class GEISTSingleFileWorkloadParser extends AbstractWorkloadParser{
 				parseLong, Long.parseLong(eventData[4]),
 				Long.parseLong(eventData[5]), demand);*/
 	}
+
+	@Override
+	public void applyError(double error) {
+	}
 }
 

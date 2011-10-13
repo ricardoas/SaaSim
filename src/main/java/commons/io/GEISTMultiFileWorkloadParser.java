@@ -67,4 +67,8 @@ public class GEISTMultiFileWorkloadParser extends AbstractWorkloadParser{
 				arrivalTimeInMillis, requestSizeInBytes,
 				responseSizeInBytes, demand);
 	}
+
+	@Override
+	public void applyError(double error) {
+	}
 }

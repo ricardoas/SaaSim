@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 
 import provisioning.Monitor;
-import provisioning.util.WorkloadParserFactory;
 
 import commons.cloud.Request;
 import commons.config.Configuration;
@@ -168,5 +167,9 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 */
 	public LoadBalancer[] getTiers() {
 		return this.tiers;
+	}
+
+	public WorkloadParser<List<Request>> getParser() {
+		return this.workloadParser;
 	}
 }
