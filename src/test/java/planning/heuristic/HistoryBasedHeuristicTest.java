@@ -28,11 +28,13 @@ import util.ValidConfigurationTest;
 
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
+import commons.cloud.Request;
 import commons.cloud.TypeProvider;
 import commons.cloud.User;
 import commons.config.Configuration;
 import commons.io.Checkpointer;
 import commons.io.TickSize;
+import commons.io.WorkloadParser;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.Machine;
@@ -78,13 +80,14 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(4);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
 		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider}).times(2);
 		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d);
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -96,8 +99,13 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		LoadBalancer[] loadBalancers = new LoadBalancer[1];
 		loadBalancers[0] = lb1;
 		
+		WorkloadParser parser = EasyMock.createStrictMock(WorkloadParser.class);
+		parser.applyError(0.0);
+		EasyMock.expectLastCall();
+		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		EasyMock.expect(simulator.getParser()).andReturn(parser);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -111,7 +119,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		
 		PowerMock.replay(SimulatorFactory.class);
-		PowerMock.replayAll(lb1, simulator, dps, scheduler);
+		PowerMock.replayAll(lb1, simulator, dps, scheduler, parser);
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);
@@ -138,13 +146,15 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(1);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
 		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(2l);
 		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider}).times(2);
 		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
+		
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -158,8 +168,13 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		
+		WorkloadParser parser = EasyMock.createStrictMock(WorkloadParser.class);
+		parser.applyError(0.0);
+		EasyMock.expectLastCall();
+		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		EasyMock.expect(simulator.getParser()).andReturn(parser);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -171,7 +186,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		dps.registerConfigurable(simulator);
 
 		PowerMock.replay(SimulatorFactory.class);
-		PowerMock.replayAll(lb1, simulator, dps, scheduler);
+		PowerMock.replayAll(lb1, simulator, dps, scheduler, parser);
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);
@@ -227,13 +242,14 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(1);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
 		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider}).times(2);
 		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d).times(3);
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -247,8 +263,13 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		
+		WorkloadParser parser = EasyMock.createStrictMock(WorkloadParser.class);
+		parser.applyError(0.0);
+		EasyMock.expectLastCall();
+		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		EasyMock.expect(simulator.getParser()).andReturn(parser);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -260,7 +281,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		dps.registerConfigurable(simulator);
 
 		PowerMock.replay(SimulatorFactory.class);
-		PowerMock.replayAll(machine1, machine2, machine3, lb1, simulator, dps, scheduler);
+		PowerMock.replayAll(machine1, machine2, machine3, lb1, simulator, dps, scheduler, parser);
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);
@@ -314,13 +335,14 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(1);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
 		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider}).times(2);
 		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d).times(3);
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -334,8 +356,13 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		
+		WorkloadParser parser = EasyMock.createStrictMock(WorkloadParser.class);
+		parser.applyError(0.0);
+		EasyMock.expectLastCall();
+		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		EasyMock.expect(simulator.getParser()).andReturn(parser);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -347,7 +374,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		dps.registerConfigurable(simulator);
 
 		PowerMock.replay(SimulatorFactory.class);
-		PowerMock.replayAll(machine1, machine2, machine3, lb1, simulator, dps, scheduler);
+		PowerMock.replayAll(machine1, machine2, machine3, lb1, simulator, dps, scheduler, parser);
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);
@@ -402,13 +429,14 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(1);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
 		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider}).times(2);
 		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d).times(3);
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -422,8 +450,13 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		
+		WorkloadParser parser = EasyMock.createStrictMock(WorkloadParser.class);
+		parser.applyError(0.0);
+		EasyMock.expectLastCall();
+		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		EasyMock.expect(simulator.getParser()).andReturn(parser);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -435,7 +468,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		dps.registerConfigurable(simulator);
 
 		PowerMock.replay(SimulatorFactory.class);
-		PowerMock.replayAll(machine1, machine2, machine3, lb1, simulator, dps, scheduler);
+		PowerMock.replayAll(machine1, machine2, machine3, lb1, simulator, dps, scheduler, parser);
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);
@@ -491,7 +524,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(1);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
 		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
@@ -500,7 +533,8 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d);
 		EasyMock.expect(config.getRelativePower(MachineType.XLARGE)).andReturn(3d);
 		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d);
-		
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
+
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
 		
@@ -513,8 +547,13 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		
+		WorkloadParser parser = EasyMock.createStrictMock(WorkloadParser.class);
+		parser.applyError(0.0);
+		EasyMock.expectLastCall();
+		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		EasyMock.expect(simulator.getParser()).andReturn(parser);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -526,7 +565,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		dps.registerConfigurable(simulator);
 
 		PowerMock.replay(SimulatorFactory.class);
-		PowerMock.replayAll(machine1, machine2, machine3, lb1, simulator, dps, scheduler);
+		PowerMock.replayAll(machine1, machine2, machine3, lb1, simulator, dps, scheduler, parser);
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);
@@ -612,7 +651,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		//Configuration
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(4);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
 		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo).times(2);
@@ -623,6 +662,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(1d);
 		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d);
 		EasyMock.expect(config.getRelativePower(MachineType.HIGHCPU)).andReturn(2d);
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0).times(2);
 		
 		PowerMock.replay(Configuration.class, PlanIOHandler.class);
 		EasyMock.replay(config);
@@ -642,10 +682,16 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		
+		WorkloadParser parser = EasyMock.createStrictMock(WorkloadParser.class);
+		parser.applyError(0.0);
+		EasyMock.expectLastCall().times(2);
+		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		EasyMock.expect(simulator.getParser()).andReturn(parser);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
+		EasyMock.expect(simulator.getParser()).andReturn(parser);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -658,7 +704,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expectLastCall().times(2);
 
 		PowerMock.replay(SimulatorFactory.class);
-		PowerMock.replayAll(machine1, machine2, machine3, lb1, lb2, lb3, simulator, dps, scheduler);
+		PowerMock.replayAll(machine1, machine2, machine3, lb1, lb2, lb3, simulator, dps, scheduler, parser);
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);
@@ -724,7 +770,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(1);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
 		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
@@ -733,6 +779,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(1d);
 		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d);
 		EasyMock.expect(config.getRelativePower(MachineType.HIGHCPU)).andReturn(2d);
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -752,8 +799,13 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		
+		WorkloadParser parser = EasyMock.createStrictMock(WorkloadParser.class);
+		parser.applyError(0.0);
+		EasyMock.expectLastCall();
+		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		EasyMock.expect(simulator.getParser()).andReturn(parser);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -765,7 +817,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		dps.registerConfigurable(simulator);
 
 		PowerMock.replay(SimulatorFactory.class);
-		PowerMock.replayAll(machine1, machine2, machine3, lb1, lb2, lb3, simulator, dps, scheduler);
+		PowerMock.replayAll(machine1, machine2, machine3, lb1, lb2, lb3, simulator, dps, scheduler, parser);
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);
@@ -813,13 +865,14 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(1);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
 		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider}).times(2);
 		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d).times(3);
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -839,8 +892,13 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		
+		WorkloadParser parser = EasyMock.createStrictMock(WorkloadParser.class);
+		parser.applyError(0.0);
+		EasyMock.expectLastCall();
+		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		EasyMock.expect(simulator.getParser()).andReturn(parser);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -852,7 +910,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		dps.registerConfigurable(simulator);
 
 		PowerMock.replay(SimulatorFactory.class);
-		PowerMock.replayAll(machine1, machine2, machine3, lb1, lb2, lb3, simulator, dps, scheduler);
+		PowerMock.replayAll(machine1, machine2, machine3, lb1, lb2, lb3, simulator, dps, scheduler, parser);
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);
@@ -900,13 +958,14 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(1);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
 		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider}).times(2);
 		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d).times(3);
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -926,8 +985,13 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		
+		WorkloadParser parser = EasyMock.createStrictMock(WorkloadParser.class);
+		parser.applyError(0.0);
+		EasyMock.expectLastCall();
+		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		EasyMock.expect(simulator.getParser()).andReturn(parser);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -939,7 +1003,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		dps.registerConfigurable(simulator);
 
 		PowerMock.replay(SimulatorFactory.class);
-		PowerMock.replayAll(machine1, machine2, machine3, lb1, lb2, lb3, simulator, dps, scheduler);
+		PowerMock.replayAll(machine1, machine2, machine3, lb1, lb2, lb3, simulator, dps, scheduler, parser);
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);
@@ -1004,7 +1068,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(1);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
 		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
@@ -1014,6 +1078,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(1d);
 		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(1d);
 		EasyMock.expect(config.getRelativePower(MachineType.XLARGE)).andReturn(1d);
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -1033,8 +1098,13 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		
+		WorkloadParser parser = EasyMock.createStrictMock(WorkloadParser.class);
+		parser.applyError(0.0);
+		EasyMock.expectLastCall();
+		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		EasyMock.expect(simulator.getParser()).andReturn(parser);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -1046,7 +1116,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		dps.registerConfigurable(simulator);
 
 		PowerMock.replay(SimulatorFactory.class);
-		PowerMock.replayAll(machine1, machine2, machine3, machine4, machine5, lb1, lb2, lb3, simulator, dps, scheduler);
+		PowerMock.replayAll(machine1, machine2, machine3, machine4, machine5, lb1, lb2, lb3, simulator, dps, scheduler, parser);
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);

@@ -124,4 +124,29 @@ public class GEISTMultiFileWorkloadParserTest {
 		
 		PowerMock.verifyAll();
 	}
+	
+	/**
+	 * Not yet implemented!
+	 */
+	@Test(expected=RuntimeException.class)
+	public void testApplyError(){
+		
+		int saasclientID = 1;
+		String workloads = PropertiesTesting.VALID_WORKLOAD_3;
+		
+		SimulationInfo simInfo = new SimulationInfo(0, 0);
+		
+		Configuration config = EasyMock.createStrictMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config);
+		EasyMock.expect(config.getSimulationInfo()).andReturn(simInfo);
+		
+		PowerMock.replayAll(config);
+		
+		GEISTMultiFileWorkloadParser parser = new GEISTMultiFileWorkloadParser(workloads, saasclientID);
+		
+		parser.applyError(0.5);
+		
+		PowerMock.verifyAll();
+	}
 }

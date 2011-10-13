@@ -70,5 +70,6 @@ public class GEISTMultiFileWorkloadParser extends AbstractWorkloadParser{
 
 	@Override
 	public void applyError(double error) {
+		throw new RuntimeException("Not yet implemented!");
 	}
 }

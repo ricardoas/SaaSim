@@ -419,6 +419,43 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 	}
 	
 	@Test
+	public void testHandleEventReadWorkloadWithoutMoreRequests() {
+		WorkloadParser<List<Request>> workloadParser = EasyMock.createMock(WorkloadParser.class);
+		JEEventHandler handler = EasyMock.createMock(JEEventHandler.class);
+		JEEventScheduler scheduler = EasyMock.createMock(JEEventScheduler.class);
+		Monitor monitor = EasyMock.createMock(Monitor.class);
+		TimeSharedMachine timeSharedMachine = EasyMock.createMock(TimeSharedMachine.class);
+		Request request = EasyMock.createMock(Request.class);
+		
+		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(2);
+		EasyMock.expect(handler.getHandlerId()).andReturn(1);
+		
+		Capture<JEEvent> eventReadWorkload = new Capture<JEEvent>();
+		scheduler.queueEvent(EasyMock.capture(eventReadWorkload));
+		EasyMock.expectLastCall();
+		
+		EasyMock.expect(workloadParser.hasNext()).andReturn(true);
+		EasyMock.expect(workloadParser.hasNext()).andReturn(false);
+		List<Request> requests = new LinkedList<Request>();
+		requests.add(request);
+		EasyMock.expect(workloadParser.next()).andReturn(requests);
+		workloadParser.close();
+		EasyMock.expect(request.getArrivalTimeInMillis()).andReturn(0l);
+		
+		EasyMock.replay(monitor, scheduler, handler, workloadParser, timeSharedMachine, request);
+		
+		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
+		SimpleSimulator simulator =  new SimpleSimulator(scheduler, monitor, loadBalancer);
+		
+		simulator.setWorkloadParser(workloadParser);
+		JEEvent event = new JEEvent(JEEventType.READWORKLOAD, handler, 1L, timeSharedMachine);
+		simulator.handleEvent(event);
+		assertEquals(JEEventType.NEWREQUEST, eventReadWorkload.getValue().getType());
+		
+		EasyMock.verify(monitor, scheduler, handler, workloadParser, timeSharedMachine, request);
+	}
+	
+	@Test
 	public void testHandleEventCollectStatistics() {
 		WorkloadParser<List<Request>> workloadParser = EasyMock.createMock(WorkloadParser.class);
 		JEEventHandler handler = EasyMock.createMock(JEEventHandler.class);

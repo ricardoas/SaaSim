@@ -73,7 +73,6 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request> 
 		try {
 			line = reader.readLine();
 			if(line == null){
-				reader.close();
 				return null;
 			}
 			return parseRequest(line);
@@ -88,5 +87,12 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request> 
 	 */
 	protected abstract Request parseRequest(String line);
 
-
+	@Override
+	public void close(){
+		try {
+			this.reader.close();
+		} catch (IOException e) {
+			throw new RuntimeException("Problem closing workload file.");
+		}
+	}
 }

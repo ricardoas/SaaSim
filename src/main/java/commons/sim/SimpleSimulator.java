@@ -94,6 +94,8 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 						long newEventTime = getScheduler().now() + PARSER_PAGE_SIZE;
 						send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime, true));
 					}else{
+						workloadParser.close();
+						
 						//Persisting information in simulation info
 						Configuration.getInstance().getSimulationInfo().addSimulatedDay();
 					}

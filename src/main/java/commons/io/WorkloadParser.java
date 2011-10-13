@@ -18,16 +18,18 @@ public interface WorkloadParser<T> {
 	 * @return
 	 * @throws RuntimeException Encapsulation of {@link IOException}. 
 	 */
-	T next();
+	public T next();
 
 	/**
 	 * @return
 	 */
-	boolean hasNext();
+	public boolean hasNext();
 
-	void clear();
+	public void clear();
 
-	void setDaysAlreadyRead(int simulatedDays);
+	public void setDaysAlreadyRead(int simulatedDays);
 
-	void applyError(double error);
+	public void applyError(double error);
+
+	public void close();
 }

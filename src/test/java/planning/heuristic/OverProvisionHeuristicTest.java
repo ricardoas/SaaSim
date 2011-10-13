@@ -73,7 +73,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(9);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(10);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
 		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla).times(2);
@@ -81,6 +81,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		EasyMock.expect(config.getSimulationInfo()).andReturn(new SimulationInfo(1, 0));
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL").times(2);
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
 		Provider provider = EasyMock.createMock(Provider.class);
 		EasyMock.expect(provider.getName()).andReturn("p1");
@@ -88,6 +89,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
+		parser.applyError(0.0);
+		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(new ArrayList<Request>());
 		EasyMock.expect(parser.hasNext()).andReturn(false);
@@ -166,12 +169,13 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(7);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(8);
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL").times(2);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo).times(3);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(new SimulationInfo(1, 0));
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
 		Provider provider = EasyMock.createMock(Provider.class);
 		EasyMock.expect(provider.getName()).andReturn("p1");
@@ -179,6 +183,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
+		parser.applyError(0.0);
+		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -275,12 +281,13 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(7);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(8);
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL").times(2);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo).times(3);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(new SimulationInfo(1, 0));
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
 		Provider provider = EasyMock.createMock(Provider.class);
 		EasyMock.expect(provider.getName()).andReturn("p1");
@@ -288,6 +295,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
+		parser.applyError(0.0);
+		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -384,12 +393,13 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(7);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(8);
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL").times(2);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo).times(3);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(new SimulationInfo(1, 0));
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
 		Provider provider = EasyMock.createMock(Provider.class);
 		EasyMock.expect(provider.getName()).andReturn("p1");
@@ -397,6 +407,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
+		parser.applyError(0.0);
+		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -498,12 +510,13 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(7);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(8);
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL").times(2);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo).times(3);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(new SimulationInfo(1, 0));
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
 		Provider provider = EasyMock.createMock(Provider.class);
 		EasyMock.expect(provider.getName()).andReturn("p1");
@@ -511,6 +524,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
+		parser.applyError(0.0);
+		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -607,12 +622,13 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(7);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(8);
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL").times(2);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo).times(3);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(new SimulationInfo(1, 0));
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
 		Provider provider = EasyMock.createMock(Provider.class);
 		EasyMock.expect(provider.getName()).andReturn("p1");
@@ -620,6 +636,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
+		parser.applyError(0.0);
+		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -720,12 +738,13 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(7);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(8);
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL").times(2);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo).times(3);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(new SimulationInfo(1, 0));
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
 		Provider provider = EasyMock.createMock(Provider.class);
 		EasyMock.expect(provider.getName()).andReturn("p1");
@@ -733,6 +752,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
+		parser.applyError(0.0);
+		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(false);
@@ -866,13 +887,14 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(13);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(15);
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla).times(3);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(2l).times(4);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("SMALL").times(3);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(initialInfo).times(3);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(firstDayCompletedInfo).times(5);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(secondDayCompletedInfo);
+		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0).times(2);
 		
 		Provider provider = EasyMock.createMock(Provider.class);
 		EasyMock.expect(provider.getName()).andReturn("p1");
@@ -880,9 +902,13 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
+		parser.applyError(0.0);
+		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstDayRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(false);
+		parser.applyError(0.0);
+		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(secondDayRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(false);

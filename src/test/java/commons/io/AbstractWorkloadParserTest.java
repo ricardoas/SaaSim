@@ -474,4 +474,39 @@ public class AbstractWorkloadParserTest {
 		
 		PowerMock.verifyAll();
 	}
+	
+	@Test(expected=RuntimeException.class)
+	public void testClose() {
+		int saasclientID = 1;
+		String workload = PropertiesTesting.VALID_WORKLOAD_3;
+		
+		SimulationInfo simInfo = new SimulationInfo(0, 0);
+		
+		Configuration config = EasyMock.createStrictMock(Configuration.class);
+		PowerMock.mockStatic(Configuration.class);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config);
+		EasyMock.expect(config.getSimulationInfo()).andReturn(simInfo);
+		
+		PowerMock.replayAll(config);
+		
+		AbstractWorkloadParser parser = new GEISTMultiFileWorkloadParser(workload, saasclientID);
+		
+		Request request = parser.next();
+		assertNotNull(request);
+		assertEquals(1, request.getUserID());
+		assertEquals(1, request.getReqID());
+		assertEquals(160168, request.getArrivalTimeInMillis());
+		assertEquals(100, request.getRequestSizeInBytes());
+		assertEquals(500000, request.getResponseSizeInBytes());
+		assertEquals(10, request.getCpuDemandInMillis()[0]);
+		assertEquals(9, request.getCpuDemandInMillis()[1]);
+		assertEquals(8, request.getCpuDemandInMillis()[2]);
+		assertEquals(7, request.getCpuDemandInMillis()[3]);
+		
+		parser.close();
+		
+		parser.next();
+		
+		PowerMock.verifyAll();
+	}
 }

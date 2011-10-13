@@ -111,4 +111,11 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	public void setDaysAlreadyRead(int simulatedDays) {
 		throw new RuntimeException("Not yet implemented");
 	}
+
+	@Override
+	public void close() {
+		for(WorkloadParser<Request> parser : parsers){
+			parser.close();
+		}
+	}
 }

@@ -116,15 +116,6 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 					
 					totalProcessingTime += calcNumberOfMachines(requests, event.getScheduledTime());
 					evaluateMaximumNumber();
-//					Set<Integer> simultaneousUsers = new HashSet<Integer>();
-//
-//					for(Request request : requests){
-//						simultaneousUsers.add(request.getUserID());
-//					}
-//
-//					if(simultaneousUsers.size() > maximumNumberOfServers){
-//						maximumNumberOfServers = simultaneousUsers.size();
-//					}
 					
 					if(workloadParser.hasNext()){
 						long newEventTime = getScheduler().now() + PARSER_PAGE_SIZE;

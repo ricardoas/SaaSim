@@ -2,6 +2,7 @@ package commons.io;
 
 import static org.junit.Assert.assertEquals;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 import org.easymock.EasyMock;
@@ -253,5 +254,196 @@ public class TimeBasedWorkloadParserTest {
 		assertEquals(fourthRequest, requests.get(3));
 		
 		EasyMock.verify(parser1, parser2, firstRequest, secondRequest, thirdRequest);
+	}
+	
+	@Test
+	public void testClose(){
+		int tick = 5000;
+		
+		//Parsers
+		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		parser1.close();
+		EasyMock.expectLastCall();
+		
+		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		parser2.close();
+		EasyMock.expectLastCall();
+		
+		EasyMock.replay(parser1, parser2);
+		
+		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
+		
+		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(tick, parsers);
+		parser.close();
+		
+		EasyMock.verify(parser1, parser2);
+	}
+	
+	@Test
+	public void testApplyErrorWithoutError() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		int tick = 5000;
+		
+		//Parsers
+		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		
+		EasyMock.replay(parser1, parser2);
+		
+		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
+		
+		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(tick, parsers);
+		parser.applyError(0.0);
+		
+		Field field = TimeBasedWorkloadParser.class.getDeclaredField("parsers");
+		field.setAccessible(true);
+		GEISTMultiFileWorkloadParser[] objectParsers = (GEISTMultiFileWorkloadParser[]) field.get(parser);
+		assertEquals(2, objectParsers.length);
+		assertEquals(parser1, objectParsers[0]);
+		assertEquals(parser2, objectParsers[1]);
+		
+		EasyMock.verify(parser1, parser2);
+	}
+	
+	@Test
+	public void testApplyErrorWithPositiveError() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		int tick = 5000;
+		
+		//Parsers
+		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		
+		EasyMock.replay(parser1, parser2);
+		
+		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
+		
+		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(tick, parsers);
+		parser.applyError(0.5);
+		
+		Field field = TimeBasedWorkloadParser.class.getDeclaredField("parsers");
+		field.setAccessible(true);
+		WorkloadParser<Request>[] objectParsers = (WorkloadParser<Request>[]) field.get(parser);
+		assertEquals(3, objectParsers.length);
+		assertEquals(parser1, objectParsers[0]);
+		assertEquals(parser2, objectParsers[1]);
+		assertEquals(parser1, objectParsers[2]);
+		
+		EasyMock.verify(parser1, parser2);
+	}
+	
+	/**
+	 * This method is similar to {@link TimeBasedWorkloadParserTest#testApplyErrorWithPositiveError()}. The main difference is that the error
+	 * used returns a double number of parsers that should be rounded.
+	 * @throws SecurityException
+	 * @throws NoSuchFieldException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 */
+	@Test
+	public void testApplyErrorWithPositiveError2() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		int tick = 5000;
+		
+		//Parsers
+		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTMultiFileWorkloadParser parser3 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		
+		EasyMock.replay(parser1, parser2, parser3);
+		
+		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2, parser3};
+		
+		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(tick, parsers);
+		parser.applyError(0.333333333);
+		
+		Field field = TimeBasedWorkloadParser.class.getDeclaredField("parsers");
+		field.setAccessible(true);
+		WorkloadParser<Request>[] objectParsers = (WorkloadParser<Request>[]) field.get(parser);
+		assertEquals(4, objectParsers.length);
+		assertEquals(parser1, objectParsers[0]);
+		assertEquals(parser2, objectParsers[1]);
+		assertEquals(parser3, objectParsers[2]);
+		assertEquals(parser1, objectParsers[3]);
+		
+		EasyMock.verify(parser1, parser2);
+	}
+	
+	@Test
+	public void testApplyErrorWithNegativeError() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		int tick = 5000;
+		
+		//Parsers
+		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		
+		EasyMock.replay(parser1, parser2);
+		
+		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
+		
+		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(tick, parsers);
+		parser.applyError(-0.5);
+		
+		Field field = TimeBasedWorkloadParser.class.getDeclaredField("parsers");
+		field.setAccessible(true);
+		WorkloadParser<Request>[] objectParsers = (WorkloadParser<Request>[]) field.get(parser);
+		assertEquals(1, objectParsers.length);
+		assertEquals(parser1, objectParsers[0]);
+		
+		EasyMock.verify(parser1, parser2);
+	}
+	
+	/**
+	 * This method is similar to {@link TimeBasedWorkloadParserTest#testApplyErrorWithNegativeError()}. The main difference is that the error
+	 * used returns a double number of parsers that should be rounded.
+	 * @throws SecurityException
+	 * @throws NoSuchFieldException
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 */
+	@Test
+	public void testApplyErrorWithNegativeError2() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		int tick = 5000;
+		
+		//Parsers
+		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTMultiFileWorkloadParser parser3 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		
+		EasyMock.replay(parser1, parser2, parser3);
+		
+		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2, parser3};
+		
+		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(tick, parsers);
+		parser.applyError(-0.333333333);
+		
+		Field field = TimeBasedWorkloadParser.class.getDeclaredField("parsers");
+		field.setAccessible(true);
+		WorkloadParser<Request>[] objectParsers = (WorkloadParser<Request>[]) field.get(parser);
+		assertEquals(2, objectParsers.length);
+		assertEquals(parser1, objectParsers[0]);
+		assertEquals(parser2, objectParsers[1]);
+		
+		EasyMock.verify(parser1, parser2);
+	}
+	
+	@Test
+	public void testApplyErrorRemovingAllParsers() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		int tick = 5000;
+		
+		//Parsers
+		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		
+		EasyMock.replay(parser1, parser2);
+		
+		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
+		
+		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(tick, parsers);
+		parser.applyError(-1.0);
+		
+		Field field = TimeBasedWorkloadParser.class.getDeclaredField("parsers");
+		field.setAccessible(true);
+		WorkloadParser<Request>[] objectParsers = (WorkloadParser<Request>[]) field.get(parser);
+		assertEquals(0, objectParsers.length);
+		
+		EasyMock.verify(parser1, parser2);
 	}
 }
