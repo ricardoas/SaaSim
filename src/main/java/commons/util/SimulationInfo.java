@@ -32,4 +32,31 @@ public class SimulationInfo implements Serializable{
 	public void addSimulatedDay() {
 		this.simulatedDays++;
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + currentMonth;
+		result = prime * result + simulatedDays;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SimulationInfo other = (SimulationInfo) obj;
+		if (currentMonth != other.currentMonth)
+			return false;
+		if (simulatedDays != other.simulatedDays)
+			return false;
+		return true;
+	}
+	
+	
 }

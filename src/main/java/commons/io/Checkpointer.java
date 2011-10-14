@@ -21,6 +21,7 @@ public class Checkpointer {
 	public static final String USERS_DUMP = "users.txt";
 	public static final String PROVIDERS_DUMP = "providers.txt";
 	public static final String APPLICATION_DUMP = "application.txt";
+	public static final String MACHINES_DUMP = "application.txt";
 	public static final String SIMULATION_DUMP = "simulation.txt";
 	public static final String MACHINE_DATA_DUMP = "machineData.txt";
 	
