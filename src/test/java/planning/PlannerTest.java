@@ -23,7 +23,6 @@ import commons.cloud.Provider;
 import commons.cloud.User;
 import commons.config.Configuration;
 import commons.config.PropertiesTesting;
-import commons.io.HistoryBasedWorkloadParser;
 import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEEventScheduler;
 
