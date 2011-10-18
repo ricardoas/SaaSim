@@ -34,24 +34,15 @@ import commons.io.Checkpointer;
 @PrepareForTest(AccountingSystem.class)
 public class AccountingSystemTest extends ValidConfigurationTest {
 	
-	private void cleanDumpFiles() {
-		new File(Checkpointer.MACHINE_DATA_DUMP).delete();
-		new File(Checkpointer.MACHINES_DUMP).delete();
-		new File(Checkpointer.PROVIDERS_DUMP).delete();
-		new File(Checkpointer.SIMULATION_DUMP).delete();
-		new File(Checkpointer.USERS_DUMP).delete();
-		new File(PlanIOHandler.NUMBER_OF_MACHINES_FILE).delete();
-	}
-	
 	@After
 	public void tearDown(){
-		cleanDumpFiles();
+		Checkpointer.clear();
 	}
 
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		cleanDumpFiles();
+		Checkpointer.clear();
 		buildFullConfiguration();
 	}
 

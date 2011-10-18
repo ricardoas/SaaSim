@@ -14,9 +14,9 @@ public class ProfitDrivenProvisioningSystem extends DynamicProvisioningSystem{
 	
 	@Override
 	public void requestQueued(long timeMilliSeconds, Request request, int tier) {
-		List<Provider> providers = canBuyMachine(MachineType.SMALL, false);
+		List<Provider> providers = canBuyMachine(MachineType.M1_SMALL, false);
 		if(!providers.isEmpty()){
-			configurable.addServer(tier, buyMachine(providers.get(0), MachineType.SMALL, false), true);
+			configurable.addServer(tier, buyMachine(providers.get(0), MachineType.M1_SMALL, false), true);
 		}else{
 			reportLostRequest(request);
 		}

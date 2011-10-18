@@ -14,7 +14,7 @@ public class MachineTypeTest extends CleanConfigurationTest {
 
 	@Test
 	public void testValueOfWithExistentValue() {
-		assertEquals(MachineType.SMALL, MachineType.valueOf(MachineType.SMALL.name()));
+		assertEquals(MachineType.M1_SMALL, MachineType.valueOf(MachineType.M1_SMALL.name()));
 	}
 
 	@Test(expected=IllegalArgumentException.class)

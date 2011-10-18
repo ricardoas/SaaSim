@@ -46,11 +46,11 @@ public class SimulatorFactoryTest {
 		EasyMock.expect(ApplicationFactory.getInstance()).andReturn(factory);
 		LoadBalancer[] loadBalancers = new LoadBalancer[1];
 		loadBalancers[0] = lb1;
-		EasyMock.expect(factory.createNewApplication(EasyMock.isA(JEEventScheduler.class), EasyMock.isA(Monitor.class))).andReturn(loadBalancers);
+		EasyMock.expect(factory.buildApplication(EasyMock.isA(JEEventScheduler.class))).andReturn(loadBalancers);
 		
 		PowerMock.replayAll(config, factory, lb1, monitor, scheduler);
 		
-		Simulator simulator = SimulatorFactory.buildSimulator(scheduler, monitor);
+		Simulator simulator = SimulatorFactory.buildSimulator(scheduler);
 		assertNotNull(simulator);
 		assertEquals(loadBalancers, simulator.getTiers());
 		

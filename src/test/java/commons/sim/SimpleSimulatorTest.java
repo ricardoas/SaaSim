@@ -55,10 +55,10 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(monitor, scheduler, handler);
 		
-		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator = new SimpleSimulator(scheduler, monitor, loadBalancer);
+		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
+		SimpleSimulator simulator = new SimpleSimulator(scheduler, loadBalancer);
 		
-		simulator.addServer(4, new MachineDescriptor(0, false, MachineType.MEDIUM, 0), false);
+		simulator.addServer(4, new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0), false);
 		
 		EasyMock.verify(monitor, scheduler, handler);
 	}
@@ -74,8 +74,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(monitor, scheduler, handler);
 		
-		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator = new SimpleSimulator(scheduler, monitor, loadBalancer);
+		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
+		SimpleSimulator simulator = new SimpleSimulator(scheduler, loadBalancer);
 		
 		simulator.addServer(0, null, false);
 		
@@ -96,10 +96,10 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(monitor, scheduler, handler);
 		
-		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, monitor, loadBalancer);
+		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
+		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
-		simulator.addServer(0, new MachineDescriptor(0, false, MachineType.MEDIUM, 0), false);
+		simulator.addServer(0, new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0), false);
 		assertEquals(JEEventType.ADD_SERVER, event.getValue().getType());
 		
 		EasyMock.verify(monitor, scheduler, handler);
@@ -115,10 +115,10 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(monitor, scheduler, handler);
 		
-		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator = new SimpleSimulator(scheduler, monitor, loadBalancer);
+		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
+		SimpleSimulator simulator = new SimpleSimulator(scheduler, loadBalancer);
 		
-		simulator.removeServer(4, new MachineDescriptor(0, false, MachineType.MEDIUM, 0), false);
+		simulator.removeServer(4, new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0), false);
 		
 		EasyMock.verify(monitor, scheduler, handler);
 	}
@@ -133,20 +133,20 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(2);
 		EasyMock.expect(scheduler.now()).andReturn(0L);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1);
-		EasyMock.expect(timeSharedMachine.getDescriptor()).andReturn(new MachineDescriptor(0, false, MachineType.MEDIUM, 0)).times(2);
+		EasyMock.expect(timeSharedMachine.getDescriptor()).andReturn(new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0)).times(2);
 		timeSharedMachine.shutdownOnFinish();
 		EasyMock.expectLastCall().times(1);
 		
 		EasyMock.replay(monitor, scheduler, handler, timeSharedMachine);
 		
-		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, monitor, loadBalancer);
+		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
+		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
 		JEEvent event = new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine);
 		loadBalancer.handleEvent(event);
 		
 		assertTrue(loadBalancer.getServers().size() == 1);
-		simulator.removeServer(0, new MachineDescriptor(0, false, MachineType.MEDIUM, 0), false);
+		simulator.removeServer(0, new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0), false);
 		assertTrue(loadBalancer.getServers().size() == 0);
 		
 		EasyMock.verify(monitor, scheduler, handler, timeSharedMachine);
@@ -163,7 +163,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.expect(scheduler.now()).andReturn(0L).times(3);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1);
 		
-		EasyMock.expect(timeSharedMachine.getDescriptor()).andReturn(new MachineDescriptor(0, false, MachineType.MEDIUM, 0)).times(2);
+		EasyMock.expect(timeSharedMachine.getDescriptor()).andReturn(new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0)).times(2);
 		Queue<Request> queue = new LinkedList<Request>();
 		EasyMock.expect(timeSharedMachine.getProcessorQueue()).andReturn(queue);
 		timeSharedMachine.shutdownOnFinish();
@@ -175,14 +175,14 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(monitor, scheduler, handler, timeSharedMachine);
 		
-		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, monitor, loadBalancer);
+		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
+		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
 		JEEvent eventAddServer = new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine);
 		loadBalancer.handleEvent(eventAddServer);
 		
 		assertTrue(loadBalancer.getServers().size() == 1);
-		simulator.removeServer(0, new MachineDescriptor(0, false, MachineType.MEDIUM, 0), true);
+		simulator.removeServer(0, new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0), true);
 		assertTrue(loadBalancer.getServers().size() == 0);
 		assertEquals(JEEventType.MACHINE_TURNED_OFF, eventTurnedOff.getValue().getType());
 		
@@ -200,8 +200,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(monitor, scheduler, handler);
 		
-		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, monitor, loadBalancer);
+		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
+		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
 		simulator.removeServer(4, false);
 		
@@ -219,14 +219,14 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.expect(scheduler.now()).andReturn(0L);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1);
 		
-		EasyMock.expect(timeSharedMachine.getDescriptor()).andReturn(new MachineDescriptor(0, false, MachineType.MEDIUM, 0)).times(3);
+		EasyMock.expect(timeSharedMachine.getDescriptor()).andReturn(new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0)).times(3);
 		timeSharedMachine.shutdownOnFinish();
 		EasyMock.expectLastCall().times(1);
 		
 		EasyMock.replay(monitor, scheduler, handler, timeSharedMachine);
 		
-		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, monitor, loadBalancer);
+		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
+		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
 		JEEvent event = new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine);
 		loadBalancer.handleEvent(event);
@@ -259,7 +259,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		PowerMock.replayAll(config, scheduler, loadBalancer);
 		
-		new SimpleSimulator(scheduler, null, loadBalancer);
+		new SimpleSimulator(scheduler, loadBalancer);
 		
 		PowerMock.verifyAll();
 	}
@@ -275,7 +275,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.expect(scheduler.now()).andReturn(0L).times(3);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1);
 		
-		EasyMock.expect(timeSharedMachine.getDescriptor()).andReturn(new MachineDescriptor(0, true, MachineType.MEDIUM, 0)).times(4);
+		EasyMock.expect(timeSharedMachine.getDescriptor()).andReturn(new MachineDescriptor(0, true, MachineType.C1_MEDIUM, 0)).times(4);
 		Queue<Request> queue = new LinkedList<Request>();
 		EasyMock.expect(timeSharedMachine.getProcessorQueue()).andReturn(queue);
 		timeSharedMachine.shutdownOnFinish();
@@ -287,8 +287,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(monitor, scheduler, handler, timeSharedMachine);
 		
-		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, monitor, loadBalancer);
+		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
+		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
 		JEEvent eventAddServer = new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine);
 		loadBalancer.handleEvent(eventAddServer);
@@ -313,8 +313,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(monitor, scheduler, handler, workloadParser);
 		
-		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, monitor, loadBalancer);
+		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
+		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		simulator.setWorkloadParser(null);
 		
 		EasyMock.verify(monitor, scheduler, handler, workloadParser);
@@ -341,8 +341,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(monitor, scheduler, handler, workloadParser, timeSharedMachine);
 		
-		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, monitor, loadBalancer);
+		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
+		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
 		simulator.setWorkloadParser(workloadParser);
 		JEEvent event = new JEEvent(JEEventType.READWORKLOAD, handler, 1L, timeSharedMachine);
@@ -373,8 +373,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		PowerMock.replayAll(monitor, scheduler, handler, config);
 		
-		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, monitor, loadBalancer);
+		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
+		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
 		JEEvent event = new JEEvent(JEEventType.CHARGE_USERS, handler, 1L, 31);
 		simulator.handleEvent(event);
@@ -407,8 +407,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(monitor, scheduler, handler, workloadParser, timeSharedMachine, request);
 		
-		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, monitor, loadBalancer);
+		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
+		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
 		simulator.setWorkloadParser(workloadParser);
 		JEEvent event = new JEEvent(JEEventType.READWORKLOAD, handler, 1L, timeSharedMachine);
@@ -444,8 +444,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(monitor, scheduler, handler, workloadParser, timeSharedMachine, request);
 		
-		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, monitor, loadBalancer);
+		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
+		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
 		simulator.setWorkloadParser(workloadParser);
 		JEEvent event = new JEEvent(JEEventType.READWORKLOAD, handler, 1L, timeSharedMachine);
@@ -477,8 +477,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(monitor, scheduler, handler, workloadParser, timeSharedMachine);
 		
-		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator = new SimpleSimulator(scheduler, monitor, loadBalancer);
+		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
+		SimpleSimulator simulator = new SimpleSimulator(scheduler, loadBalancer);
 		
 		simulator.setWorkloadParser(workloadParser);
 		JEEvent event = new JEEvent(JEEventType.COLLECT_STATISTICS, handler, 1L, timeSharedMachine);
@@ -513,13 +513,12 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.expect(ApplicationFactory.getInstance()).andReturn(appFactory);
 		LoadBalancer[] loadBalancers = new LoadBalancer[1];
 		loadBalancers[0] = loadBalancer;
-		EasyMock.expect(appFactory.createNewApplication(EasyMock.isA(JEEventScheduler.class), 
-				EasyMock.anyObject(Monitor.class))).andReturn(loadBalancers);
+		EasyMock.expect(appFactory.buildApplication(EasyMock.isA(JEEventScheduler.class))).andReturn(loadBalancers);
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		PowerMock.replayAll(config, appFactory, monitor, loadBalancer, scheduler);
 		
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, monitor, loadBalancer);
+		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		simulator.start();
 		
 	}
@@ -550,13 +549,12 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.expect(ApplicationFactory.getInstance()).andReturn(appFactory);
 		LoadBalancer[] loadBalancers = new LoadBalancer[1];
 		loadBalancers[0] = loadBalancer;
-		EasyMock.expect(appFactory.createNewApplication(EasyMock.isA(JEEventScheduler.class), 
-				EasyMock.anyObject(Monitor.class))).andReturn(loadBalancers);
+		EasyMock.expect(appFactory.buildApplication(EasyMock.isA(JEEventScheduler.class))).andReturn(loadBalancers);
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		PowerMock.replayAll(config, appFactory, monitor, loadBalancer, scheduler);
 		
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, monitor, loadBalancer);
+		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		simulator.start();
 		
 	}
@@ -587,13 +585,12 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.expect(ApplicationFactory.getInstance()).andReturn(appFactory);
 		LoadBalancer[] loadBalancers = new LoadBalancer[1];
 		loadBalancers[0] = loadBalancer;
-		EasyMock.expect(appFactory.createNewApplication(EasyMock.isA(JEEventScheduler.class), 
-				EasyMock.anyObject(Monitor.class))).andReturn(loadBalancers);
+		EasyMock.expect(appFactory.buildApplication(EasyMock.isA(JEEventScheduler.class))).andReturn(loadBalancers);
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		PowerMock.replayAll(config, appFactory, monitor, loadBalancer, scheduler);
 		
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, monitor, loadBalancer);
+		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		simulator.start();
 		
 	}
@@ -618,15 +615,13 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.expect(ApplicationFactory.getInstance()).andReturn(appFactory);
 		LoadBalancer[] loadBalancers = new LoadBalancer[1];
 		loadBalancers[0] = loadBalancer;
-		EasyMock.expect(appFactory.createNewApplication(EasyMock.isA(JEEventScheduler.class), 
-				EasyMock.anyObject(Monitor.class))).andReturn(loadBalancers);
+		EasyMock.expect(appFactory.buildApplication(EasyMock.isA(JEEventScheduler.class))).andReturn(loadBalancers);
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		PowerMock.replayAll(config, appFactory, monitor, loadBalancer, scheduler);
 		
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, monitor, loadBalancer);
+		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		simulator.start();
-		
 	}
 	
 	@Test
@@ -653,9 +648,10 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		PowerMock.replayAll(config, monitor, loadBalancer, scheduler);
 		
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, monitor, loadBalancer);
+		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
-		Request request = new Request(1, 1222l, 0, 10000l, 101l, 5000l, new long[]{500});
+		Request request = new Request(1222l, 0, 1, 10000l, 101l, 5000l, new long[]{500});
+
 		JEEvent event = simulator.parseEvent(request);
 		assertNotNull(event);
 		assertEquals(JEEventType.NEWREQUEST, event.getType());

@@ -25,7 +25,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 	private double TARGET_UTILIZATION = 0.66;
 	public static long UTILIZATION_EVALUATION_PERIOD_IN_MILLIS = 1000 * 60 * 5;//in millis
 	
-	protected MachineType[] acceleratorTypes = {MachineType.SMALL};
+	protected MachineType[] acceleratorTypes = {MachineType.M1_SMALL};
 
 	public RanjanProvisioningSystemForHeterogeneousMachines() {
 		super();
@@ -76,9 +76,9 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 		for(MachineType machineType: typeList){//TODO test which order is the best
 			for (Provider provider : providers) {
 				while(provider.canBuyMachine(true, machineType) && 
-						serversAdded + config.getRelativePower(machineType) <= numberOfServersToAdd){
+						serversAdded + machineType.getPower() <= numberOfServersToAdd){
 					configurable.addServer(tier, provider.buyMachine(true, machineType), true);
-					serversAdded += config.getRelativePower(machineType);
+					serversAdded += machineType.getPower();
 				}
 				if(serversAdded == numberOfServersToAdd){
 					break;
@@ -94,9 +94,9 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 			for(MachineType machineType : this.acceleratorTypes){
 				for (Provider provider : providers) {
 					while(provider.canBuyMachine(false, machineType) && 
-							serversAdded + config.getRelativePower(machineType) <= numberOfServersToAdd){
+							serversAdded + machineType.getPower() <= numberOfServersToAdd){
 						configurable.addServer(tier, provider.buyMachine(false, machineType), true);
-						serversAdded += config.getRelativePower(machineType);
+						serversAdded += machineType.getPower();
 					}
 					if(serversAdded == numberOfServersToAdd){
 						break;

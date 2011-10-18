@@ -14,7 +14,7 @@ public class JEEventHandlerTest extends CleanConfigurationTest {
 
 	@Before
 	public void setUp(){
-		scheduler = new JEEventScheduler();
+		scheduler = JEEventScheduler.getInstance();
 	}
 
 	@Test

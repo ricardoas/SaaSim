@@ -57,9 +57,8 @@ public class PlanningFitnessFunction extends FitnessFunction{
 			Integer numberOfMachinesReserved = (Integer)gene.getAllele();
 			MachineType type = this.types.get(index);
 			
-			double relativePower = Configuration.getInstance().getRelativePower(type);
-			currentPowerPerMachineType.put(type, (int)Math.round(numberOfMachinesReserved * relativePower));
-			totalPower += Math.round(numberOfMachinesReserved * relativePower);
+			currentPowerPerMachineType.put(type, (int)Math.round(1.0 * numberOfMachinesReserved * type.getNumberOfCores()));
+			totalPower += Math.round(1.0 * numberOfMachinesReserved * type.getNumberOfCores());
 			index++;
 		}
 		
@@ -88,7 +87,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 			double missingThroughput = 0d;
 			for(MachineType type : arrivalRatesPerMachineType.keySet()){
 				Double currentArrivalRate = arrivalRatesPerMachineType.get(type);
-				double maximumThroughput = (1 / (meanServiceTimeInMillis/1000)) * Configuration.getInstance().getRelativePower(type);//Using all cores
+				double maximumThroughput = (1 / (meanServiceTimeInMillis/1000)) * type.getNumberOfCores();//Using all cores
 				if(currentArrivalRate > maximumThroughput){//Requests are missed
 					throughputPerMachineType.put(type, maximumThroughput);
 					missingThroughput += (currentArrivalRate - maximumThroughput);
@@ -230,7 +229,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		for(MachineType type : requestsFinishedPerMachineType.keySet()){
 			totalRequestsFinished += requestsFinishedPerMachineType.get(type);
 			double CPUHoursPerType = (requestsFinishedPerMachineType.get(type) * meanServiceTimeInMillis) / HOUR_IN_MILLIS;
-			cost += provider.getReservationOneYearFee(type) * ( currentPowerPerMachineType.get(type)/Configuration.getInstance().getRelativePower(type) ) 
+			cost += provider.getReservationOneYearFee(type) * ( currentPowerPerMachineType.get(type)/type.getNumberOfCores() ) 
 						+ provider.getReservedCpuCost(type) * CPUHoursPerType;
 		}
 		
@@ -246,7 +245,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 			totalRequestsFinished -= requestsThatCouldNotBeAttended; 
 		}
 		totalRequestsFinished += requestsLostDueToThroughput;
-		cost += provider.getOnDemandCpuCost(MachineType.SMALL) * onDemandCPUHours;
+		cost += provider.getOnDemandCpuCost(MachineType.M1_SMALL) * onDemandCPUHours;
 		
 		
 		//Penalties

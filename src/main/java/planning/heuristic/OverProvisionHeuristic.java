@@ -39,7 +39,7 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 	private long numberOfRequests;
 	
 	public OverProvisionHeuristic(JEEventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
-		super(scheduler, monitor, loadBalancers);
+		super(scheduler, loadBalancers);
 		try{
 			this.maximumNumberOfServers = PlanIOHandler.getNumberOfMachinesFromFile();
 		}catch(Exception e){
@@ -59,6 +59,7 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 		
 		this.totalProcessingTime = 0d;
 		this.numberOfRequests = 0l;
+		this.setMonitor(monitor);
 	}
 
 	@Override
@@ -97,7 +98,7 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 			}
 		}else{
 			try {
-				Checkpointer.dumpObjects(config.getSimulationInfo(), null, null, null);
+				Checkpointer.save(config.getSimulationInfo(), config.getUsers(), config.getProviders(), getTiers());
 				PlanIOHandler.createNumberOfMachinesFile(this.maximumNumberOfServers, this.nextRequestsCounter, this.requestsMeanDemand);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
@@ -118,7 +119,7 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 					evaluateMaximumNumber();
 					
 					if(workloadParser.hasNext()){
-						long newEventTime = getScheduler().now() + PARSER_PAGE_SIZE;
+						long newEventTime = getScheduler().now() + Configuration.getInstance().getParserPageSize().getTickInMillis();
 						send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime, true));
 					}else{
 						//Persisting information in simulation info

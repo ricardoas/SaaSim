@@ -139,7 +139,7 @@ public class UtilityResultEntryTest extends CleanConfigurationTest {
 		double onDemandCost = 1.23;
 		double reservedCost = 2.99;
 		double monitoringCost = 3.87;
-		entry.addUsageToCost(0, MachineType.SMALL, 55, onDemandCost, 99, reservedCost , monitoringCost);
+		entry.addUsageToCost(0, MachineType.M1_SMALL, 55, onDemandCost, 99, reservedCost , monitoringCost);
 		
 		assertEquals(0, entry.getReceipt(), 0.0001);
 		assertEquals(onDemandCost + reservedCost + monitoringCost, entry.getCost(), 0.00001);
@@ -173,7 +173,7 @@ public class UtilityResultEntryTest extends CleanConfigurationTest {
 		double onDemandCost = 99999;
 		double reservedCost = 7756.33234;
 		double monitoringCost = 77466;
-		entry.addUsageToCost(0, MachineType.SMALL, 55, onDemandCost, 99, reservedCost , monitoringCost);
+		entry.addUsageToCost(0, MachineType.M1_SMALL, 55, onDemandCost, 99, reservedCost , monitoringCost);
 		
 		//Adding transference cost
 		double inCost = 0.001;
@@ -223,7 +223,7 @@ public class UtilityResultEntryTest extends CleanConfigurationTest {
 	@Test
 	public void testEqualsConsistencyWithAnotherClassObject() {
 		UtilityResultEntry entry1 = new UtilityResultEntry(2, new User[]{}, new Provider[]{});
-		assertFalse(entry1.equals(new MachineDescriptor(0, false, MachineType.SMALL, 0)));
+		assertFalse(entry1.equals(new MachineDescriptor(0, false, MachineType.M1_SMALL, 0)));
 	}
 }
 

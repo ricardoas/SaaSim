@@ -2,45 +2,82 @@
  * Visit http://jode.sourceforge.net/
  */
 package commons.sim.jeevent;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import java.util.TreeSet;
+
+import commons.cloud.Request;
+import commons.io.Checkpointer;
 
 /**
  * TODO make doc
  *
  * @author thiago - thiago@lsd.ufcg.edu.br
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ * @version 2.0.0
  */
-public class JEEventScheduler {
+public class JEEventScheduler implements Serializable{
+	
+	/**
+	 * Version 2.0.0
+	 */
+	private static final long serialVersionUID = -5091449738303689646L;
 	
 	private long now;
 	private long simulationEnd;
-    private Map<Integer,JEEventHandler> handlerMap;
-    private TreeSet<JEEvent> eventSet;
-    
+    private HashMap<Integer,JEEventHandler> handlerMap;
+    public TreeSet<JEEvent> eventSet;
 	private Random random;
+	
+	private static JEEventScheduler INSTANCE;
 	
     /**
      * Default empty constructor.
+     * @throws IOException 
      */
-    public JEEventScheduler() {
-    	this(Long.MAX_VALUE);
+    private JEEventScheduler(){
+		reset();
     }
     
+	public void reset() {
+		reset(Long.MAX_VALUE);
+	}
+	
     /**
-     * Default empty constructor.
-     */
-    public JEEventScheduler(long simulationEnd) {
-    	this.now = 0;
-    	this.simulationEnd = simulationEnd;
+	 * @param l
+	 */
+	public void reset(long simulationEnd) {
+		this.simulationEnd = simulationEnd;
+		this.now = 0;
 		this.handlerMap = new HashMap<Integer, JEEventHandler>();
 		this.eventSet = new TreeSet<JEEvent>();
 		this.random = new Random();
-    }
-    
-    /**
+	}
+
+	/**
+	 * 
+	 */
+	public void prepare() {
+		this.now = 0;
+		JEEvent[] remainingEvents = new JEEvent[eventSet.size()];
+		eventSet.toArray(remainingEvents);
+		eventSet.clear();
+		for (JEEvent event : remainingEvents) {
+			switch (event.getType()) {
+			case PREEMPTION:
+				Request request = (Request) event.getValue()[1];
+				request.setArrivalTimeInMillis(request.getArrivalTimeInMillis() - Checkpointer.INTERVAL);
+				break;
+			default:
+				break;
+			}
+			eventSet.add(new JEEvent(event.getType(), handlerMap.get(event.getTargetHandlerId()), event.getScheduledTime() - Checkpointer.INTERVAL, event.getValue()));
+		}
+	}
+
+	/**
      * Add a new event to the queue. Duplicates are not allowed.
      * @param event A new event.
      */
@@ -72,7 +109,6 @@ public class JEEventScheduler {
      * @return The handler unique ID.
      */
     public int registerHandler(JEEventHandler handler) {
-    	
 		int id;
 		while((id = random.nextInt()) <= 0 || handlerMap.containsKey(id)){
 			// Loop until there's an available ID
@@ -86,12 +122,14 @@ public class JEEventScheduler {
      */
     public void start() {
     	
+    	simulationEnd = Checkpointer.INTERVAL;
+    	
 		if (!eventSet.isEmpty()) {
 			schedule();
 		}else{
 			this.now = simulationEnd;
 		}
-		dumpPostMortemEvents();
+//		dumpPostMortemEvents();
     }
 
 	private void dumpPostMortemEvents() {
@@ -141,5 +179,32 @@ public class JEEventScheduler {
 	@Deprecated
 	public JEEventHandler getHandler(int id){
 		return handlerMap.get(id);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return "JEEventScheduler [now=" + now + ", simulationEnd="
+				+ simulationEnd + ", handlerMap=" + handlerMap + ", eventSet="
+				+ eventSet + ", random=" + random + "]";
+	}
+
+	/**
+	 * @return the iNSTANCE
+	 */
+	public static JEEventScheduler getInstance() {
+		if(INSTANCE == null){
+			setInstance(Checkpointer.hasCheckpoint()? Checkpointer.loadScheduler():new JEEventScheduler());
+		}
+		return INSTANCE;
+	}
+
+	/**
+	 * @param iNSTANCE the iNSTANCE to set
+	 */
+	public static void setInstance(JEEventScheduler iNSTANCE) {
+		INSTANCE = iNSTANCE;
 	}
 }

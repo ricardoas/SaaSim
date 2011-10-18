@@ -85,7 +85,7 @@ public class MonitorTest extends ValidConfigurationTest {
 	 */
 	@Test(expected=AssertionError.class)
 	public void testMachineTurnedOffWithInexistentProvider() {
-		monitor.machineTurnedOff(new MachineDescriptor(111, true, MachineType.SMALL, 5));
+		monitor.machineTurnedOff(new MachineDescriptor(111, true, MachineType.M1_SMALL, 5));
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class MonitorTest extends ValidConfigurationTest {
 	 */
 	@Test
 	public void testMachineTurnedOffWithExistentMachine() {
-		MachineDescriptor machineDescriptor = Configuration.getInstance().getProviders()[0].buyMachine(false, MachineType.LARGE);
+		MachineDescriptor machineDescriptor = Configuration.getInstance().getProviders()[0].buyMachine(false, MachineType.M1_LARGE);
 		monitor.machineTurnedOff(machineDescriptor);
 	}
 
@@ -104,7 +104,7 @@ public class MonitorTest extends ValidConfigurationTest {
 	public void testChargeUsers() {
 		Provider provider = EasyMock.createStrictMock(Provider.class);
 		EasyMock.expect(provider.getName()).andReturn("amazon");
-		EasyMock.expect(provider.getAvailableTypes()).andReturn(new MachineType[]{MachineType.SMALL});
+		EasyMock.expect(provider.getAvailableTypes()).andReturn(new MachineType[]{MachineType.M1_SMALL});
 		provider.calculateCost(EasyMock.isA(UtilityResultEntry.class), EasyMock.anyLong());
 		
 		User user = EasyMock.createStrictMock(User.class);

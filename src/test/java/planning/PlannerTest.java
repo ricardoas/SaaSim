@@ -98,8 +98,8 @@ public class PlannerTest {
 	@Test
 	public void testPlan() {
 		Map<MachineType, Integer> plan = new HashMap<MachineType, Integer>();
-		plan.put(MachineType.MEDIUM, 3);
-		plan.put(MachineType.MEDIUM, 1);
+		plan.put(MachineType.C1_MEDIUM, 3);
+		plan.put(MachineType.C1_MEDIUM, 1);
 		
 		Provider prov1 = EasyMock.createStrictMock(Provider.class);
 		User user1 = EasyMock.createStrictMock(User.class);

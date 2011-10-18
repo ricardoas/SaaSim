@@ -17,9 +17,9 @@ import commons.cloud.MachineType;
  */
 public class MachineDescriptorTest extends CleanConfigurationTest {
 
-	private MachineDescriptor small = new MachineDescriptor(0, false, MachineType.SMALL, 0);
-	private MachineDescriptor otherSmall = new MachineDescriptor(1, false, MachineType.SMALL, 0);
-	private MachineDescriptor large = new MachineDescriptor(0, false, MachineType.LARGE, 0);
+	private MachineDescriptor small = new MachineDescriptor(0, false, MachineType.M1_SMALL, 0);
+	private MachineDescriptor otherSmall = new MachineDescriptor(1, false, MachineType.M1_SMALL, 0);
+	private MachineDescriptor large = new MachineDescriptor(0, false, MachineType.M1_LARGE, 0);
 	
 	/**
 	 * Test method for {@link commons.sim.components.MachineDescriptor#hashCode()}.
@@ -42,7 +42,7 @@ public class MachineDescriptorTest extends CleanConfigurationTest {
 	 */
 	@Test
 	public void testHashCodeForSameMachines() {
-		assertTrue(small.hashCode() == new MachineDescriptor(0, false, MachineType.SMALL, 0).hashCode());
+		assertTrue(small.hashCode() == new MachineDescriptor(0, false, MachineType.M1_SMALL, 0).hashCode());
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class MachineDescriptorTest extends CleanConfigurationTest {
 	 */
 	@Test
 	public void testEqualsSameMachines() {
-		assertEquals(small, new MachineDescriptor(0, false, MachineType.SMALL, 0));
+		assertEquals(small, new MachineDescriptor(0, false, MachineType.M1_SMALL, 0));
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class MachineDescriptorTest extends CleanConfigurationTest {
 	 */
 	@Test
 	public void testUpdateTransference() {
-		MachineDescriptor machine = new MachineDescriptor(0, false, MachineType.SMALL, 0);
+		MachineDescriptor machine = new MachineDescriptor(0, false, MachineType.M1_SMALL, 0);
 		assertEquals(0, machine.getInTransference());
 		assertEquals(0, machine.getOutTransference());
 		machine.updateTransference(1000, 0);
@@ -93,7 +93,7 @@ public class MachineDescriptorTest extends CleanConfigurationTest {
 	 */
 	@Test
 	public void testReset() {
-		MachineDescriptor machine = new MachineDescriptor(0, false, MachineType.SMALL, 0);
+		MachineDescriptor machine = new MachineDescriptor(0, false, MachineType.M1_SMALL, 0);
 		assertEquals(0, machine.getInTransference());
 		assertEquals(0, machine.getOutTransference());
 		assertEquals(0, machine.getStartTimeInMillis());

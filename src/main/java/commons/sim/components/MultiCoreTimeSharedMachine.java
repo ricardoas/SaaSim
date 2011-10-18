@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import commons.cloud.Request;
-import commons.config.Configuration;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
@@ -16,7 +15,7 @@ import commons.util.Triple;
  */
 public class MultiCoreTimeSharedMachine extends TimeSharedMachine{
 	
-	protected transient Semaphore semaphore;
+	protected Semaphore semaphore;
 	
 	/**
 	 * Default constructor
@@ -27,22 +26,7 @@ public class MultiCoreTimeSharedMachine extends TimeSharedMachine{
 	public MultiCoreTimeSharedMachine(JEEventScheduler scheduler, MachineDescriptor descriptor, 
 			LoadBalancer loadBalancer) {
 		super(scheduler, descriptor, loadBalancer);
-		this.NUMBER_OF_CORES = (int) Math.floor(Configuration.getInstance().getRelativePower(descriptor.getType()));
-		this.semaphore = new Semaphore(this.NUMBER_OF_CORES, true);
-	}
-	
-	public MultiCoreTimeSharedMachine(MachineDescriptor descriptor, List<Request> processorQueue, 
-			long cpuQuantumInMilis, long lastUtilisationCalcTime, long totalTimeUsed, 
-			long lastUpdate, long totalTimeUsedInLastPeriod){
-		super(descriptor, processorQueue, cpuQuantumInMilis, lastUtilisationCalcTime, totalTimeUsed, lastUpdate, totalTimeUsedInLastPeriod);
-		this.NUMBER_OF_CORES = (int) Math.floor(Configuration.getInstance().getRelativePower(descriptor.getType()));
-		this.semaphore = new Semaphore(this.NUMBER_OF_CORES, true);
-	}
-	
-	@Override
-	public void restart(LoadBalancer loadBalancer, JEEventScheduler scheduler) {
-		super.restart(loadBalancer, scheduler);
-		this.NUMBER_OF_CORES = (int) Math.floor(Configuration.getInstance().getRelativePower(descriptor.getType()));
+		this.NUMBER_OF_CORES = descriptor.getType().getNumberOfCores();
 		this.semaphore = new Semaphore(this.NUMBER_OF_CORES, true);
 	}
 	
@@ -64,7 +48,7 @@ public class MultiCoreTimeSharedMachine extends TimeSharedMachine{
 	 */
 	@Override
 	protected void tryToShutdown() {
-		if(processorQueue.isEmpty() && shutdownOnFinish && this.semaphore.availablePermits() == this.NUMBER_OF_CORES){
+		if( shutdownOnFinish && ! isBusy()){
 			long scheduledTime = getScheduler().now();
 			descriptor.setFinishTimeInMillis(scheduledTime);
 			send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, scheduledTime, descriptor));
@@ -119,8 +103,8 @@ public class MultiCoreTimeSharedMachine extends TimeSharedMachine{
 	
 	@Override
 	public boolean isBusy() {
-		return this.processorQueue.size() != 0 || this.semaphore.availablePermits() != this.NUMBER_OF_CORES;
-	}	
+		return !this.processorQueue.isEmpty() || this.semaphore.availablePermits() != this.NUMBER_OF_CORES;
+	}
 
 	/**
 	 * This method estimates CPU utilisation of current machine

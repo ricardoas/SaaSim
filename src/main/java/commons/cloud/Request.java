@@ -41,19 +41,6 @@ public class Request implements Serializable{
 		this.cpuDemandInMillis = cpuDemandInMillis;
 		this.totalProcessed = 0;
 	}
-	
-	public Request(int userID, long reqID, int saasClient,
-			long arrivalTimeInMillis, long requestSizeInBytes, long responseSizeInBytes,
-			long[] cpuDemandInMillis) {
-		this.saasClient = saasClient;
-		this.reqID = reqID;
-		this.userID = userID;
-		this.arrivalTimeInMillis = arrivalTimeInMillis;
-		this.requestSizeInBytes = requestSizeInBytes;
-		this.responseSizeInBytes = responseSizeInBytes;
-		this.cpuDemandInMillis = cpuDemandInMillis;
-		this.totalProcessed = 0;
-	}
 
 	public long getReqID() {
 		return reqID;

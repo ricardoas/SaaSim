@@ -60,9 +60,8 @@ public class GEISTMultiFileWorkloadParser extends AbstractWorkloadParser{
 //			demand[index++] = 200;
 		}
 		
-		return new Request(userID, reqID, saasClientID, 
-				arrivalTimeInMillis, requestSizeInBytes,
-				responseSizeInBytes, demand);
+		return new Request(reqID, saasClientID, userID, arrivalTimeInMillis,
+				requestSizeInBytes, responseSizeInBytes, demand);
 	}
 
 	@Override

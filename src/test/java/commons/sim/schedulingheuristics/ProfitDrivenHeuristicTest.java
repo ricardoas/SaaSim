@@ -70,9 +70,8 @@ public class ProfitDrivenHeuristicTest extends ValidConfigurationTest {
 		EasyMock.expect(eventScheduler.now()).andReturn(0L);
 		EasyMock.replay(eventScheduler);
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false, MachineType.SMALL, 0), null);
+		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine1);
-		
 		Request request = new Request(reqID, clientID, userID, time, size, response, demand);
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
@@ -102,9 +101,9 @@ public class ProfitDrivenHeuristicTest extends ValidConfigurationTest {
 		EasyMock.expect(eventScheduler.now()).andReturn(0L);
 		EasyMock.replay(eventScheduler);
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false, MachineType.SMALL, 0), null);
-		Machine machine2 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(2, false, MachineType.SMALL, 0), null);
-		Machine machine3 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(3, false, MachineType.SMALL, 0), null);
+		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
+		Machine machine3 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine1);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -148,10 +147,10 @@ public class ProfitDrivenHeuristicTest extends ValidConfigurationTest {
 		long [] demand = new long[]{1000 * 10};
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		JEEventScheduler eventScheduler = new JEEventScheduler();
+		JEEventScheduler eventScheduler = JEEventScheduler.getInstance();
 		
-		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false, MachineType.SMALL, 0), null);
-		Machine machine2 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(2, false, MachineType.SMALL, 0), null);
+		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine1);
 		servers.add(machine2);
 		
@@ -186,10 +185,10 @@ public class ProfitDrivenHeuristicTest extends ValidConfigurationTest {
 		long response = 1024;
 		long [] demand = new long[]{1000 * 10};
 		
-		JEEventScheduler eventScheduler = new JEEventScheduler();
+		JEEventScheduler eventScheduler = JEEventScheduler.getInstance();
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false, MachineType.SMALL, 0), null);
-		Machine machine2 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(2, false, MachineType.SMALL, 0), null);
+		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine1);
 		servers.add(machine2);
 		
@@ -228,10 +227,10 @@ public class ProfitDrivenHeuristicTest extends ValidConfigurationTest {
 		long response = 1024;
 		long [] demand = new long[]{1000 * 15};
 		
-		JEEventScheduler eventScheduler = new JEEventScheduler();
+		JEEventScheduler eventScheduler = JEEventScheduler.getInstance();
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false, MachineType.SMALL, 0), null);
-		Machine machine2 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(2, false, MachineType.SMALL, 0), null);
+		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine1);
 		servers.add(machine2);
 		

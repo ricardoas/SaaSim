@@ -1,6 +1,5 @@
 package commons.config;
 
-import static commons.io.Checkpointer.*;
 import static commons.sim.util.IaaSPlanProperties.*;
 import static commons.sim.util.IaaSProvidersProperties.*;
 import static commons.sim.util.SaaSAppProperties.*;
@@ -8,11 +7,7 @@ import static commons.sim.util.SaaSPlanProperties.*;
 import static commons.sim.util.SaaSUsersProperties.*;
 import static commons.sim.util.SimulatorProperties.*;
 
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,9 +34,9 @@ import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.TypeProvider;
 import commons.cloud.User;
+import commons.io.Checkpointer;
 import commons.io.ParserIdiom;
 import commons.io.TickSize;
-import commons.sim.components.Machine;
 import commons.sim.schedulingheuristics.ProfitDrivenHeuristic;
 import commons.sim.schedulingheuristics.RanjanHeuristic;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
@@ -53,7 +48,7 @@ import commons.util.SimulationInfo;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public class Configuration	extends PropertiesConfiguration{
+public class Configuration extends PropertiesConfiguration{
 	
 	public static final String ARRAY_SEPARATOR = "\\|";
 	
@@ -65,8 +60,6 @@ public class Configuration	extends PropertiesConfiguration{
 	private Provider[] providers;
 	
 	private User[] users;
-	
-	private List<Machine> previousMachines;
 	
 	private HashMap<MachineType, Double> relativePower;
 
@@ -166,7 +159,7 @@ public class Configuration	extends PropertiesConfiguration{
 	}
 
 	private static <T extends Enum<T>> T parseEnum(String value, Class<T> enumClass) {
-		return Enum.valueOf(enumClass, value);
+		return Enum.valueOf(enumClass, value.replace('.', '_'));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -250,7 +243,6 @@ public class Configuration	extends PropertiesConfiguration{
 	 */
 	private Configuration(String propertiesFileName) throws ConfigurationException {
 		super(propertiesFileName);
-		this.previousMachines = new ArrayList<Machine>();
 		verifyProperties();
 		parseProperties();
 	}
@@ -265,127 +257,17 @@ public class Configuration	extends PropertiesConfiguration{
 	}
 	
 	private void parseProperties() throws ConfigurationException{
-		if(new File(USERS_DUMP).exists()){
-			File usersDump = new File(USERS_DUMP);
-			try {
-				readUsersFromFile(usersDump);
-			} catch (Exception e) {
-				throw new ConfigurationException(e);
-			}
-		}else{
-			readUsers();
-		}
-		
-		if(new File(PROVIDERS_DUMP).exists()){
-			File providersDump = new File(PROVIDERS_DUMP);
-			try {
-				readProvidersFromFile(providersDump);
-			} catch (Exception e) {
-				throw new ConfigurationException(e);
-			}
-		}else{
-			readProviders();
-		}
-		
-		if(new File(MACHINES_DUMP).exists()){
-			File machinesDump = new File(MACHINES_DUMP);
-			try {
-				readMachinesFromFile(machinesDump);
-			} catch (Exception e) {
-				throw new ConfigurationException(e);
-			}
-		}
-		
-		if(new File(SIMULATION_DUMP).exists()){
-			File simulationDump = new File(SIMULATION_DUMP);
-			try{
-				readSimulationInfo(simulationDump);
-			}catch(Exception e){
-				throw new ConfigurationException(e);
-			}
-		}else{
+		if(!Checkpointer.hasCheckpoint()){
 			this.simulationInfo = new SimulationInfo(0, 0);
+			readUsers();
+			readProviders();
+		}else{
+			simulationInfo = Checkpointer.loadSimulationInfo();
+			users = Checkpointer.loadUsers();
+			providers = Checkpointer.loadProviders();
 		}
 	}
 	
-	private void readSimulationInfo(File simulationDump) throws IOException, ClassNotFoundException {
-		FileInputStream fin = new FileInputStream(simulationDump);
-		ObjectInputStream in = new ObjectInputStream(fin);
-		try{
-			simulationInfo = (SimulationInfo) in.readObject(); 
-		}catch(EOFException e){
-		}finally{
-			in.close();
-			fin.close();
-		}
-	}
-
-	private void readMachinesFromFile(File machinesDump) throws IOException, ClassNotFoundException {
-		previousMachines = new ArrayList<Machine>();
-		
-		FileInputStream fin = new FileInputStream(machinesDump);
-		ObjectInputStream in = new ObjectInputStream(fin);
-		try{
-			Machine machine = (Machine) in.readObject(); 
-			while(machine != null){
-				previousMachines.add(machine);
-				machine = (Machine) in.readObject();
-			}
-		}catch(EOFException e){
-		}finally{
-			in.close();
-			fin.close();
-		}
-
-	}
-
-	private void readProvidersFromFile(File providersDump) throws IOException, ClassNotFoundException {
-		int numberOfProviders = getInt(IAAS_NUMBER_OF_PROVIDERS);
-		providers = new Provider[numberOfProviders];
-		int index = 0;
-		
-		FileInputStream fin = new FileInputStream(providersDump);
-		ObjectInputStream in = new ObjectInputStream(fin);	
-		try{
-			Provider provider = (Provider) in.readObject(); 
-			while(provider != null && index < numberOfProviders){
-				providers[index++] = provider;
-				provider = (Provider) in.readObject();
-			}
-		}catch(EOFException e){
-		}finally{
-			in.close();
-			fin.close();
-		}
-		
-		relativePower = new HashMap<MachineType, Double>();
-		MachineType[] allTypes = getEnumArray(IAAS_TYPES, MachineType.class);
-		double[] power = getDoubleArray(IAAS_POWER);
-		for (int i = 0; i < allTypes.length; i++) {
-			relativePower.put(allTypes[i], power[i]);
-		}
-	}
-
-	private void readUsersFromFile(File usersDump) throws IOException, ClassNotFoundException {
-		int numberOfUsers = getInt(SAAS_NUMBER_OF_USERS);
-		users = new User[numberOfUsers];
-		int index = 0;
-		
-		FileInputStream fin = new FileInputStream(usersDump);
-		ObjectInputStream in = new ObjectInputStream(fin);	
-		try{
-			User user = (User) in.readObject(); 
-			while(user != null && index < numberOfUsers){
-				users[index++] = user;
-				user = (User) in.readObject();
-			}
-		}catch(EOFException e){
-		}finally{
-			in.close();
-			fin.close();
-		}
-
-	}
 
 	private void readUsers() throws ConfigurationException {
 		
@@ -433,13 +315,6 @@ public class Configuration	extends PropertiesConfiguration{
 	private void readProviders() throws ConfigurationException {
 		int numberOfProviders = getInt(IAAS_NUMBER_OF_PROVIDERS);
 		
-		relativePower = new HashMap<MachineType, Double>();
-		MachineType[] allTypes = getEnumArray(IAAS_TYPES, MachineType.class);
-		double[] power = getDoubleArray(IAAS_POWER);
-		for (int i = 0; i < allTypes.length; i++) {
-			relativePower.put(allTypes[i], power[i]);
-		}
-	
 		String[] names = getStringArray(IAAS_PROVIDER_NAME);
 		int[] onDemandLimits = getIntegerArray(IAAS_PROVIDER_ONDEMAND_LIMIT);
 		int[] reservedLimits = getIntegerArray(IAAS_PROVIDER_RESERVED_LIMIT);
@@ -513,10 +388,10 @@ public class Configuration	extends PropertiesConfiguration{
 		
 		
 	}
-	
-	public double getRelativePower(MachineType type){
-		return this.relativePower.get(type);
-	}
+
+//	public double getRelativePower(MachineType type){
+//		return type.getPower();
+//	}
 
 	// ************************************* SIMULATOR ************************************/
 	
@@ -720,13 +595,6 @@ public class Configuration	extends PropertiesConfiguration{
 		
 		Validator.checkPositive(IAAS_NUMBER_OF_PROVIDERS, getString(IAAS_NUMBER_OF_PROVIDERS));
 		
-		Validator.checkIsEnumArray(IAAS_TYPES, getStringArray(IAAS_TYPES), MachineType.class);
-		Validator.checkIsPositiveDoubleArray(IAAS_POWER, getStringArray(IAAS_POWER));
-		
-		if(getStringArray(IAAS_TYPES).length != getStringArray(IAAS_POWER).length){
-			throw new ConfigurationException(IAAS_TYPES + " must have the same size of " + IAAS_POWER);
-		}
-		
 		checkSize(IAAS_PROVIDER_NAME, IAAS_NUMBER_OF_PROVIDERS);
 		checkSize(IAAS_PROVIDER_ONDEMAND_CPU_COST, IAAS_NUMBER_OF_PROVIDERS);
 		checkSize(IAAS_PROVIDER_RESERVED_CPU_COST, IAAS_NUMBER_OF_PROVIDERS);
@@ -826,14 +694,6 @@ public class Configuration	extends PropertiesConfiguration{
 			return stringArray;
 		}
 		return new String[]{getString(SAAS_WORKLOAD)};
-	}
-
-	public boolean hasPreviousMachines() {
-		return this.previousMachines.size() != 0;
-	}
-
-	public List<Machine> getPreviousMachines() {
-		return this.previousMachines;
 	}
 
 	public SimulationInfo getSimulationInfo() {

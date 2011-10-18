@@ -16,4 +16,8 @@ public abstract class ValidConfigurationTest extends CleanConfigurationTest{
 	protected static void buildFullConfiguration() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
 	}
+
+	protected static void buildFullRanjanConfiguration() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.VALID_RANJAN_FILE);
+	}
 }

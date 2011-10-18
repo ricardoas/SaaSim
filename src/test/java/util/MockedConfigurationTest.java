@@ -1,5 +1,9 @@
 package util;
 
+import org.junit.Before;
+
+import commons.sim.jeevent.JEEventScheduler;
+
 /**
  * Super class of tests which need a mocked configuration. Such tests usually uses
  * PowerMock as mock engine. As this API has been proven to be quite slow this class
@@ -9,5 +13,10 @@ package util;
  *
  */
 public class MockedConfigurationTest {
+	
+	@Before
+	public void setUp(){
+		JEEventScheduler.getInstance().reset();
+	}
 
 }

@@ -68,7 +68,7 @@ public class UtilityResultTest extends CleanConfigurationTest {
 		UtilityResultEntry entry = new UtilityResultEntry(time, users, providers);
 		
 		//Adding usage to cost
-		entry.addUsageToCost(0, MachineType.SMALL, 55, onDemandCost, 99, reservedCost , monitoringCost);
+		entry.addUsageToCost(0, MachineType.M1_SMALL, 55, onDemandCost, 99, reservedCost , monitoringCost);
 		
 		//Adding transference cost
 		entry.addTransferenceToCost(0, 10000, inCost, 2000, outCost);
@@ -98,8 +98,8 @@ public class UtilityResultTest extends CleanConfigurationTest {
 		
 		double amazonCost = 1000.0;
 		double rackspaceCost = 3000.0;
-		result.addProviderUniqueCost(0, MachineType.MEDIUM, amazonCost);
-		result.addProviderUniqueCost(1, MachineType.MEDIUM, rackspaceCost);
+		result.addProviderUniqueCost(0, MachineType.C1_MEDIUM, amazonCost);
+		result.addProviderUniqueCost(1, MachineType.C1_MEDIUM, rackspaceCost);
 		
 		assertEquals(-(amazonCost + rackspaceCost), result.getUtility(), 0.00001);
 	}
@@ -131,7 +131,7 @@ public class UtilityResultTest extends CleanConfigurationTest {
 		
 		//Adding provider unique cost
 		double rackspaceCost = 3333.0;
-		result.addProviderUniqueCost(0, MachineType.MEDIUM, rackspaceCost);
+		result.addProviderUniqueCost(0, MachineType.C1_MEDIUM, rackspaceCost);
 		
 		double totalReceipt = firstUserFee + cpuCost + transferenceCost + storageCost;
 		double totalCost = rackspaceCost + onDemandCost + reservedCost + monitoringCost + inCost + outCost;

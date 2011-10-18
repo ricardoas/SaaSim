@@ -23,24 +23,30 @@ import commons.sim.util.SaaSAppProperties;
  */
 public class LoadBalancer extends JEAbstractEventHandler{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8572489707494357108L;
+	
 	private final int tier;
 	private final List<Machine> servers;
 	private final SchedulingHeuristic heuristic;
 	private final Queue<Request> requestsToBeProcessed;
-	private final Monitor monitor;
+	private final int maxServersAllowed;
+	private transient Monitor monitor;
+
 	
 	/**
 	 * Default constructor.
 	 * @param scheduler Event scheduler.
-	 * @param monitor Provisioning system monitor.
 	 * @param heuristic {@link SchedulingHeuristic}
 	 * @param maxServersAllowed Max number of servers to manage in this layer.
 	 * @param machines An initial collection of {@link Machine}s.
 	 */
-	public LoadBalancer(JEEventScheduler scheduler, Monitor monitor, SchedulingHeuristic heuristic, int maxServersAllowed, int tier) {
+	public LoadBalancer(JEEventScheduler scheduler, SchedulingHeuristic heuristic, int maxServersAllowed, int tier) {
 		super(scheduler);
-		this.monitor = monitor;
 		this.heuristic = heuristic;
+		this.maxServersAllowed = maxServersAllowed;
 		this.tier = tier;
 		this.servers = new ArrayList<Machine>();
 		this.requestsToBeProcessed = new LinkedList<Request>();
@@ -57,11 +63,6 @@ public class LoadBalancer extends JEAbstractEventHandler{
 			serverUpTime = serverUpTime + (Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SETUP_TIME));
 		}
 		send(new JEEvent(JEEventType.ADD_SERVER, this, serverUpTime, server));
-	}
-	
-	public void addServer(Machine machine) {
-		machine.restart(this, getScheduler());
-		servers.add(machine);
 	}
 	
 	private Machine buildMachine(MachineDescriptor machineDescriptor) {
@@ -191,6 +192,13 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		int result = super.hashCode();
 		result = prime * result + tier;
 		return result;
+	}
+
+	/**
+	 * @param monitor the monitor to set
+	 */
+	public void setMonitor(Monitor monitor) {
+		this.monitor = monitor;
 	}
 
 	@Override

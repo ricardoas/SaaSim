@@ -23,26 +23,26 @@ import commons.sim.util.SimulatorProperties;
  */
 public class SimpleSimulator extends JEAbstractEventHandler implements Simulator{
 	
-	protected static final long MONITOR_INTERVAL = Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL);
-	protected static final long PARSER_PAGE_SIZE = Configuration.getInstance().getParserPageSize().getTickInMillis();
-	public static int[] daysInMonths = {31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8028580648054904982L;
+	
+	public static int[] daysInMonths = {3, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
 	
 	protected int currentMonth;
-
-	protected WorkloadParser<List<Request>> workloadParser;
-	
 	private LoadBalancer tiers [];
 	
-	protected final Monitor monitor;
+	protected transient WorkloadParser<List<Request>> workloadParser;
+	protected transient Monitor monitor;
 
 	/**
 	 * Constructor
 	 * @param list 
 	 * @throws IOException 
 	 */
-	public SimpleSimulator(JEEventScheduler scheduler, Monitor monitor, LoadBalancer... tiers){
+	public SimpleSimulator(JEEventScheduler scheduler, LoadBalancer... tiers){
 		super(scheduler);
-		this.monitor = monitor;
 		this.tiers = tiers;
 		this.currentMonth = Configuration.getInstance().getSimulationInfo().getCurrentMonth();
 	}
@@ -70,7 +70,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 		int simulatedDays = Configuration.getInstance().getSimulationInfo().getSimulatedDays();
 		if(simulatedDays < Configuration.getInstance().getLong(SimulatorProperties.PLANNING_PERIOD)){
 			send(new JEEvent(JEEventType.READWORKLOAD, this, getScheduler().now()));
-			send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + MONITOR_INTERVAL));
+			send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)));
 			
 			if(simulatedDays + 1 == daysInMonths[currentMonth]){
 				send(new JEEvent(JEEventType.CHARGE_USERS, this, TickSize.DAY.getTickInMillis(), simulatedDays + 1 ));
@@ -91,11 +91,11 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 						send(parseEvent(request));
 					}
 					if(workloadParser.hasNext()){
-						long newEventTime = getScheduler().now() + PARSER_PAGE_SIZE;
+						long newEventTime = getScheduler().now() + Configuration.getInstance().getParserPageSize().getTickInMillis();
 						send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime, true));
 					}else{
 						workloadParser.close();
-						
+
 						//Persisting information in simulation info
 						Configuration.getInstance().getSimulationInfo().addSimulatedDay();
 					}
@@ -118,7 +118,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 					loadBalancer.collectStatistics(time);
 				}
 				if(workloadParser.hasNext()){
-					send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + MONITOR_INTERVAL));
+					send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)));
 				}
 				break;
 			default:
@@ -143,11 +143,6 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 		tiers[tier].addServer(machineDescriptor, useStartUpDelay);
 	}
 	
-	@Override
-	public void addServer(int tier, Machine machine) {
-		this.tiers[tier].addServer(machine);
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */
@@ -167,11 +162,23 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	/**
 	 * @return
 	 */
+	@Override
 	public LoadBalancer[] getTiers() {
 		return this.tiers;
 	}
 
 	public WorkloadParser<List<Request>> getParser() {
 		return this.workloadParser;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setMonitor(Monitor monitor) {
+		this.monitor = monitor;
+		for (LoadBalancer loadBalancers : tiers) {
+			loadBalancers.setMonitor(monitor);
+		}
 	}
 }

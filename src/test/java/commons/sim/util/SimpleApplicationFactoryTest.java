@@ -91,7 +91,7 @@ public class SimpleApplicationFactoryTest {
 		ApplicationFactory factory = ApplicationFactory.getInstance();
 		assertNotNull(factory);
 		
-		LoadBalancer[] loadBalancers = factory.createNewApplication(scheduler, monitor);
+		LoadBalancer[] loadBalancers = factory.buildApplication(scheduler);
 		assertNotNull(loadBalancers);
 		assertEquals(1, loadBalancers.length);
 		assertEquals(0, loadBalancers[0].getTier());
@@ -124,7 +124,7 @@ public class SimpleApplicationFactoryTest {
 		ApplicationFactory factory = ApplicationFactory.getInstance();
 		assertNotNull(factory);
 		
-		LoadBalancer[] loadBalancers = factory.createNewApplication(scheduler, monitor);
+		LoadBalancer[] loadBalancers = factory.buildApplication(scheduler);
 		assertNotNull(loadBalancers);
 		assertEquals(2, loadBalancers.length);
 		assertEquals(0, loadBalancers[0].getTier());

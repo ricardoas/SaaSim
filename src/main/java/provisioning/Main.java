@@ -1,10 +1,7 @@
 package provisioning;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.log4j.BasicConfigurator;
 
 import provisioning.util.DPSFactory;
 
@@ -15,10 +12,10 @@ import commons.config.Configuration;
 import commons.io.Checkpointer;
 import commons.sim.Simulator;
 import commons.sim.components.LoadBalancer;
-import commons.sim.components.Machine;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.SimulatorFactory;
 import commons.sim.util.SimulatorProperties;
+import commons.util.SimulationInfo;
 
 /**
  * Provisioning simulator execution entry point.
@@ -32,43 +29,37 @@ public class Main {
 	 * 
 	 * @param args Path to the configuration file.
 	 * @throws ConfigurationException Related to problems during configuration loading.
-	 * @throws IOException Related to checkpoint phase.
 	 */
-	public static void main(String[] args) throws ConfigurationException, IOException {
+	public static void main(String[] args) throws ConfigurationException {
 		
-		long currentTimeMillis = System.currentTimeMillis();
-		System.out.println(currentTimeMillis);
+		BasicConfigurator.configure();
+		
 		Configuration.buildInstance(args[0]);
 		
 		DPS dps = DPSFactory.createDPS();
 		
-		Simulator simulator = SimulatorFactory.buildSimulator(new JEEventScheduler(), dps);
+		Simulator simulator = SimulatorFactory.buildSimulator(JEEventScheduler.getInstance());
 		
 		dps.registerConfigurable(simulator);
 		
 		simulator.start();
 		
-		if(Configuration.getInstance().getSimulationInfo().getSimulatedDays() 
+		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
+		
+		System.out.println(info.getSimulatedDays());
+		if(info.getSimulatedDays() 
 				== Configuration.getInstance().getLong(SimulatorProperties.PLANNING_PERIOD)){
 			
 			UtilityResult utilityResult = dps.calculateUtility();
-			utilityResult.getUtility();
-			long diff = System.currentTimeMillis() - currentTimeMillis;
-			System.out.println("Time: " + diff);
-			System.out.println(diff < 78614? "Faster :)" : "Slower :(");
-			System.out.println(utilityResult);
-			
+			System.err.println(utilityResult);
+			System.out.println(utilityResult.getUtility());
+			Checkpointer.clear();
 		}else{//Persisting dump
 			User[] users = Configuration.getInstance().getUsers();
 			Provider[] providers = Configuration.getInstance().getProviders();
+			LoadBalancer[] application = simulator.getTiers();
 			
-			LoadBalancer[] loadBalancers = simulator.getTiers();
-			List<Machine> machines = new ArrayList<Machine>();
-			for(LoadBalancer balancer : loadBalancers){
-				machines.addAll(balancer.getServers());
-			}
-			
-			Checkpointer.dumpObjects(Configuration.getInstance().getSimulationInfo(), users, providers, machines);
+			Checkpointer.save(info, users, providers, application);
 		}
 	}
 }

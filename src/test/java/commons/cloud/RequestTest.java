@@ -43,11 +43,11 @@ public class RequestTest extends CleanConfigurationTest {
 	 */
 	@Test
 	public void testAssign() {
-		request.assignTo(MachineType.SMALL);
+		request.assignTo(MachineType.M1_SMALL);
 		assertEquals(SMALL_DEMAND, request.getTotalToProcess());
-		request.assignTo(MachineType.LARGE);
+		request.assignTo(MachineType.M1_LARGE);
 		assertEquals(LARGE_DEMAND, request.getTotalToProcess());
-		request.assignTo(MachineType.XLARGE);
+		request.assignTo(MachineType.M1_XLARGE);
 		assertEquals(XLARGE_DEMAND, request.getTotalToProcess());
 	}
 
@@ -56,7 +56,7 @@ public class RequestTest extends CleanConfigurationTest {
 	 */
 	@Test
 	public void testUpdate() {
-		request.assignTo(MachineType.SMALL);
+		request.assignTo(MachineType.M1_SMALL);
 		assertEquals(SMALL_DEMAND, request.getTotalToProcess());
 		assertEquals(0, request.getTotalProcessed());
 		request.update(100);
@@ -66,7 +66,7 @@ public class RequestTest extends CleanConfigurationTest {
 	
 	@Test
 	public void testUpdateWithReset() {
-		request.assignTo(MachineType.SMALL);
+		request.assignTo(MachineType.M1_SMALL);
 		request.update(100);
 		assertEquals(SMALL_DEMAND-100, request.getTotalToProcess());
 		assertEquals(100, request.getTotalProcessed());
@@ -74,7 +74,7 @@ public class RequestTest extends CleanConfigurationTest {
 		request.reset();
 		assertNull(request.getValue());
 		
-		request.assignTo(MachineType.SMALL);
+		request.assignTo(MachineType.M1_SMALL);
 		assertEquals(SMALL_DEMAND, request.getTotalToProcess());
 		assertEquals(0, request.getTotalProcessed());
 	}
@@ -84,7 +84,7 @@ public class RequestTest extends CleanConfigurationTest {
 	 */
 	@Test
 	public void testUpdateWithMoreThanRequiredToFinish() {
-		request.assignTo(MachineType.SMALL);
+		request.assignTo(MachineType.M1_SMALL);
 		assertEquals(SMALL_DEMAND, request.getTotalToProcess());
 		request.update(SMALL_DEMAND + 100);
 		assertEquals(0, request.getTotalToProcess());
@@ -95,7 +95,7 @@ public class RequestTest extends CleanConfigurationTest {
 	 */
 	@Test(expected=AssertionError.class)
 	public void testUpdateWithNegativeDemand() {
-		request.assignTo(MachineType.SMALL);
+		request.assignTo(MachineType.M1_SMALL);
 		assertEquals(SMALL_DEMAND, request.getTotalToProcess());
 		request.update(-100);
 	}
@@ -113,7 +113,7 @@ public class RequestTest extends CleanConfigurationTest {
 	 */
 	@Test
 	public void testIsFinishedWithAssignment() {
-		request.assignTo(MachineType.XLARGE);
+		request.assignTo(MachineType.M1_XLARGE);
 		assertFalse(request.isFinished());
 		while(!request.isFinished()){
 			request.update(100);
@@ -135,7 +135,7 @@ public class RequestTest extends CleanConfigurationTest {
 	 */
 	@Test(expected=NullPointerException.class)
 	public void testReset() {
-		request.assignTo(MachineType.XLARGE);
+		request.assignTo(MachineType.M1_XLARGE);
 		assertEquals(XLARGE_DEMAND, request.getTotalToProcess());
 		request.update(100);
 		assertEquals(XLARGE_DEMAND-100, request.getTotalToProcess());

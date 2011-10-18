@@ -37,8 +37,6 @@ public class RoundRobinHeuristicForHeterogenousMachines implements SchedulingHeu
 		Configuration config = Configuration.getInstance();
 		
 		Integer alreadyAllocated = this.allocationsPerServer.get(nextToUse);
-		double relativePower = config.getRelativePower(servers.get(nextToUse).getDescriptor().getType());
-		
 		//Retrieving server
 		Machine server = servers.get(nextToUse);
 		
@@ -46,7 +44,7 @@ public class RoundRobinHeuristicForHeterogenousMachines implements SchedulingHeu
 		alreadyAllocated++;
 		this.allocationsPerServer.set(nextToUse, alreadyAllocated);
 		
-		if(alreadyAllocated >= relativePower){//Limit reached for current machine type, next server will be used
+		if(alreadyAllocated >= servers.get(nextToUse).getDescriptor().getType().getNumberOfCores()){//Limit reached for current machine type, next server will be used
 			this.allocationsPerServer.set(nextToUse, 0);
 			nextToUse = (nextToUse + 1) % servers.size();
 		}

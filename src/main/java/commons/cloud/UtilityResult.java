@@ -51,11 +51,11 @@ public class UtilityResult{
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append(finalProfit+"\t"+uniqueReceipt+"\t"+uniqueCost+"\n");
+		sb.append(getUtility()+"\t"+uniqueReceipt+"\t"+uniqueCost);
 		
 		for (UtilityResultEntry entry : entries) {
-			sb.append(entry);
 			sb.append('\n');
+			sb.append(entry);
 		}
 		return sb.toString();
 	}

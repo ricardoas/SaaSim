@@ -2,8 +2,6 @@ package commons.config;
 
 import static org.junit.Assert.*;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,10 +23,7 @@ import commons.cloud.Provider;
 import commons.cloud.TypeProvider;
 import commons.cloud.User;
 import commons.io.Checkpointer;
-import commons.sim.components.Machine;
-import commons.sim.components.MachineDescriptor;
-import commons.sim.components.TimeSharedMachine;
-import commons.sim.jeevent.JEEventScheduler;
+import commons.sim.components.LoadBalancer;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
 import commons.util.SimulationInfo;
 
@@ -39,19 +34,12 @@ public class ConfigurationTest {
 		Field field = Configuration.class.getDeclaredField("instance");
 		field.setAccessible(true);
 		field.set(null, null);
-		deleteSimulationFiles();
+		Checkpointer.clear();
 	}
 	
 	@After
 	public void tearDown(){
-		deleteSimulationFiles();
-	}
-	
-	private void deleteSimulationFiles(){
-		new File(Checkpointer.MACHINES_DUMP).delete();
-		new File(Checkpointer.USERS_DUMP).delete();
-		new File(Checkpointer.SIMULATION_DUMP).delete();
-		new File(Checkpointer.PROVIDERS_DUMP).delete();
+		Checkpointer.clear();
 	}
 	
 	@Test(expected=ConfigurationException.class)
@@ -112,8 +100,8 @@ public class ConfigurationTest {
 		assertNotNull(Configuration.getInstance());
 	}
 	
-	private void savePreviousData() {
-		deleteSimulationFiles();
+	private static void savePreviousData() {
+		Checkpointer.clear();
 		
 		Contract contract = new Contract("p1", 1, 55.55, 101.10, 86400000, 0.1, new long[]{0}, new double[]{0.0, 0.0}, 
 				10000, 0.2);
@@ -122,8 +110,8 @@ public class ConfigurationTest {
 		SimulationInfo info = new SimulationInfo(100, 4);
 		
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.SMALL, 0.1, 0.01, 100, 160, 10));
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.25, 0.1, 240, 360, 10));
+		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.1, 0.01, 100, 160, 10));
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.25, 0.1, 240, 360, 10));
 		
 		Provider provider = new Provider(0, "prov1", 10, 20, 0.15, new long[]{0}, new double[]{0.0, 0.0}, new long[]{1000}, 
 				new double[]{0.0, 0.1}, types);
@@ -132,16 +120,9 @@ public class ConfigurationTest {
 		Provider provider3 = new Provider(2, "prov3", 10, 20, 0.15, new long[]{0}, new double[]{0.0, 0.0}, new long[]{1000}, 
 				new double[]{0.0, 0.1}, types);
 		
-		List<Machine> machines = new ArrayList<Machine>();
-		machines.add(new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(0, true, MachineType.MEDIUM, 0), null));
-		machines.add(new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(1, true, MachineType.SMALL, 0), null));
-		machines.add(new TimeSharedMachine(new JEEventScheduler(), new MachineDescriptor(2, false, MachineType.MEDIUM, 0), null));
-		
-		try {
-			Checkpointer.dumpObjects(info, new User[]{user, user2}, new Provider[]{provider, provider2, provider3}, machines);
-		} catch (IOException e) {
-		}
+		Checkpointer.save(info, new User[]{user, user2}, new Provider[]{provider, provider2, provider3}, new LoadBalancer[]{});
 	}
+	
 
 	@Test(expected=ConfigurationException.class)
 	public void testSaaSUsersWrongFile1() throws ConfigurationException{
@@ -224,21 +205,6 @@ public class ConfigurationTest {
 	}
 	
 	@Test(expected=ConfigurationException.class)
-	public void testIaaSProvidersWrongFile4() throws ConfigurationException{
-		Configuration.buildInstance(PropertiesTesting.WRONG_PROVIDERS_FILE_4);
-	}
-	
-	@Test(expected=ConfigurationException.class)
-	public void testIaaSProvidersWrongFile5() throws ConfigurationException{
-		Configuration.buildInstance(PropertiesTesting.WRONG_PROVIDERS_FILE_5);
-	}
-	
-	@Test(expected=ConfigurationException.class)
-	public void testIaaSProvidersWrongFile6() throws ConfigurationException{
-		Configuration.buildInstance(PropertiesTesting.WRONG_PROVIDERS_FILE_6);
-	}
-	
-	@Test(expected=ConfigurationException.class)
 	public void testIaaSProvidersWrongFile7() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.WRONG_PROVIDERS_FILE_7);
 	}
@@ -261,10 +227,10 @@ public class ConfigurationTest {
 		Provider[] providers = config.getProviders();
 		assertEquals(3, providers.length);
 		for(Provider provider : providers){
-			assertFalse(provider.canBuyMachine(true, MachineType.SMALL));
-			assertFalse(provider.canBuyMachine(true, MachineType.MEDIUM));
-			assertFalse(provider.canBuyMachine(true, MachineType.LARGE));
-			assertFalse(provider.canBuyMachine(true, MachineType.XLARGE));
+			assertFalse(provider.canBuyMachine(true, MachineType.M1_SMALL));
+			assertFalse(provider.canBuyMachine(true, MachineType.C1_MEDIUM));
+			assertFalse(provider.canBuyMachine(true, MachineType.M1_LARGE));
+			assertFalse(provider.canBuyMachine(true, MachineType.M1_XLARGE));
 		}
 	}
 	
@@ -285,12 +251,6 @@ public class ConfigurationTest {
 		assertEquals(RoundRobinHeuristic.class, config.getApplicationHeuristics()[0]);
 		assertEquals(DynamicProvisioningSystem.class, config.getDPSHeuristicClass());
 		assertEquals(AGHeuristic.class, config.getPlanningHeuristicClass());
-//		config.getProviders();
-		assertEquals(1, config.getRelativePower(MachineType.SMALL), 0.0);
-		assertEquals(4, config.getRelativePower(MachineType.MEDIUM), 0.0);
-		assertEquals(2, config.getRelativePower(MachineType.LARGE), 0.0);
-		assertEquals(4, config.getRelativePower(MachineType.XLARGE), 0.0);
-//		config.getUsers();
 	}
 	
 	@Test
@@ -302,8 +262,6 @@ public class ConfigurationTest {
 		assertEquals(RoundRobinHeuristic.class, config.getApplicationHeuristics()[0]);
 		assertEquals(DynamicProvisioningSystem.class, config.getDPSHeuristicClass());
 		assertEquals(AGHeuristic.class, config.getPlanningHeuristicClass());
-		assertEquals(1, config.getRelativePower(MachineType.SMALL), 0.0);
-		assertEquals(4, config.getRelativePower(MachineType.MEDIUM), 0.0);
 		
 		//Checking users
 		assertEquals(2, config.getUsers().length);
@@ -321,14 +279,8 @@ public class ConfigurationTest {
 		assertEquals(3, config.getProviders().length);
 		assertEquals(10, config.getProviders()[0].getOnDemandLimit());
 		assertEquals(20, config.getProviders()[0].getReservationLimit());
-		assertEquals(0.25, config.getProviders()[0].getOnDemandCpuCost(MachineType.MEDIUM), 0.00001);
-		assertEquals(0.01, config.getProviders()[0].getReservedCpuCost(MachineType.SMALL), 0.00001);
-		
-		//Checking machines
-		assertEquals(3, config.getPreviousMachines().size());
-		assertEquals(MachineType.MEDIUM, config.getPreviousMachines().get(0).getDescriptor().getType());
-		assertEquals(MachineType.SMALL, config.getPreviousMachines().get(1).getDescriptor().getType());
-		assertEquals(MachineType.MEDIUM, config.getPreviousMachines().get(2).getDescriptor().getType());
+		assertEquals(0.25, config.getProviders()[0].getOnDemandCpuCost(MachineType.C1_MEDIUM), 0.00001);
+		assertEquals(0.01, config.getProviders()[0].getReservedCpuCost(MachineType.M1_SMALL), 0.00001);
 	}
 
 	@Test
@@ -390,15 +342,15 @@ public class ConfigurationTest {
 		Assert.assertArrayEquals(new double[]{0.10,0.09}, provider2.getTransferOutCosts(), 0.0);
 		MachineType[] availableTypes2 = provider2.getAvailableTypes();
 		Arrays.sort(availableTypes2);
-		Assert.assertArrayEquals(new MachineType[]{MachineType.SMALL, MachineType.LARGE}, availableTypes2);
-		assertEquals(0.085, provider2.getOnDemandCpuCost(MachineType.SMALL), 0.0);
-		assertEquals(0.3, provider2.getReservedCpuCost(MachineType.SMALL), 0.0);
-		assertEquals(1000, provider2.getReservationOneYearFee(MachineType.SMALL), 0.0);
-		assertEquals(2500, provider2.getReservationThreeYearsFee(MachineType.SMALL), 0.0);
-		assertEquals(0.12, provider2.getOnDemandCpuCost(MachineType.LARGE), 0.0);
-		assertEquals(0.13, provider2.getReservedCpuCost(MachineType.LARGE), 0.0);
-		assertEquals(1500, provider2.getReservationOneYearFee(MachineType.LARGE), 0.0);
-		assertEquals(3500, provider2.getReservationThreeYearsFee(MachineType.LARGE), 0.0);
+		Assert.assertArrayEquals(new MachineType[]{MachineType.M1_SMALL, MachineType.M1_LARGE}, availableTypes2);
+		assertEquals(0.085, provider2.getOnDemandCpuCost(MachineType.M1_SMALL), 0.0);
+		assertEquals(0.3, provider2.getReservedCpuCost(MachineType.M1_SMALL), 0.0);
+		assertEquals(1000, provider2.getReservationOneYearFee(MachineType.M1_SMALL), 0.0);
+		assertEquals(2500, provider2.getReservationThreeYearsFee(MachineType.M1_SMALL), 0.0);
+		assertEquals(0.12, provider2.getOnDemandCpuCost(MachineType.M1_LARGE), 0.0);
+		assertEquals(0.13, provider2.getReservedCpuCost(MachineType.M1_LARGE), 0.0);
+		assertEquals(1500, provider2.getReservationOneYearFee(MachineType.M1_LARGE), 0.0);
+		assertEquals(3500, provider2.getReservationThreeYearsFee(MachineType.M1_LARGE), 0.0);
 
 		Provider provider = providers[1];
 		assertNotNull(provider);
@@ -412,19 +364,19 @@ public class ConfigurationTest {
 		Assert.assertArrayEquals(new double[]{0,0.12,0.09,0.07,0.05}, provider.getTransferOutCosts(), 0.0);
 		MachineType[] availableTypes = provider.getAvailableTypes();
 		Arrays.sort(availableTypes);
-		Assert.assertArrayEquals(new MachineType[]{MachineType.SMALL,MachineType.LARGE,MachineType.XLARGE}, availableTypes);
-		assertEquals(0.085, provider.getOnDemandCpuCost(MachineType.SMALL), 0.0);
-		assertEquals(0.3, provider.getReservedCpuCost(MachineType.SMALL), 0.0);
-		assertEquals(227.5, provider.getReservationOneYearFee(MachineType.SMALL), 0.0);
-		assertEquals(350, provider.getReservationThreeYearsFee(MachineType.SMALL), 0.0);
-		assertEquals(0.34, provider.getOnDemandCpuCost(MachineType.LARGE), 0.0);
-		assertEquals(0.12, provider.getReservedCpuCost(MachineType.LARGE), 0.0);
-		assertEquals(910, provider.getReservationOneYearFee(MachineType.LARGE), 0.0);
-		assertEquals(1400, provider.getReservationThreeYearsFee(MachineType.LARGE), 0.0);
-		assertEquals(0.68, provider.getOnDemandCpuCost(MachineType.XLARGE), 0.0);
-		assertEquals(0.24, provider.getReservedCpuCost(MachineType.XLARGE), 0.0);
-		assertEquals(1820, provider.getReservationOneYearFee(MachineType.XLARGE), 0.0);
-		assertEquals(2800, provider.getReservationThreeYearsFee(MachineType.XLARGE), 0.0);
+		Assert.assertArrayEquals(new MachineType[]{MachineType.M1_SMALL,MachineType.M1_LARGE,MachineType.M1_XLARGE}, availableTypes);
+		assertEquals(0.085, provider.getOnDemandCpuCost(MachineType.M1_SMALL), 0.0);
+		assertEquals(0.3, provider.getReservedCpuCost(MachineType.M1_SMALL), 0.0);
+		assertEquals(227.5, provider.getReservationOneYearFee(MachineType.M1_SMALL), 0.0);
+		assertEquals(350, provider.getReservationThreeYearsFee(MachineType.M1_SMALL), 0.0);
+		assertEquals(0.34, provider.getOnDemandCpuCost(MachineType.M1_LARGE), 0.0);
+		assertEquals(0.12, provider.getReservedCpuCost(MachineType.M1_LARGE), 0.0);
+		assertEquals(910, provider.getReservationOneYearFee(MachineType.M1_LARGE), 0.0);
+		assertEquals(1400, provider.getReservationThreeYearsFee(MachineType.M1_LARGE), 0.0);
+		assertEquals(0.68, provider.getOnDemandCpuCost(MachineType.M1_XLARGE), 0.0);
+		assertEquals(0.24, provider.getReservedCpuCost(MachineType.M1_XLARGE), 0.0);
+		assertEquals(1820, provider.getReservationOneYearFee(MachineType.M1_XLARGE), 0.0);
+		assertEquals(2800, provider.getReservationThreeYearsFee(MachineType.M1_XLARGE), 0.0);
 
 		Provider provider3 = providers[2];
 		assertNotNull(provider3);
@@ -438,14 +390,14 @@ public class ConfigurationTest {
 		Assert.assertArrayEquals(new double[]{0.1,0.0}, provider3.getTransferOutCosts(), 0.0);
 		MachineType[] availableTypes3 = provider3.getAvailableTypes();
 		Arrays.sort(availableTypes3);
-		Assert.assertArrayEquals(new MachineType[]{MachineType.LARGE,MachineType.MEDIUM}, availableTypes3);
-		assertEquals(0.085, provider3.getOnDemandCpuCost(MachineType.MEDIUM), 0.0);
-		assertEquals(0.3, provider3.getReservedCpuCost(MachineType.MEDIUM), 0.0);
-		assertEquals(1000, provider3.getReservationOneYearFee(MachineType.MEDIUM), 0.0);
-		assertEquals(2500, provider3.getReservationThreeYearsFee(MachineType.MEDIUM), 0.0);
-		assertEquals(0.12, provider3.getOnDemandCpuCost(MachineType.LARGE), 0.0);
-		assertEquals(0.13, provider3.getReservedCpuCost(MachineType.LARGE), 0.0);
-		assertEquals(1500, provider3.getReservationOneYearFee(MachineType.LARGE), 0.0);
-		assertEquals(3500, provider3.getReservationThreeYearsFee(MachineType.LARGE), 0.0);
+		Assert.assertArrayEquals(new MachineType[]{MachineType.M1_LARGE,MachineType.C1_MEDIUM}, availableTypes3);
+		assertEquals(0.085, provider3.getOnDemandCpuCost(MachineType.C1_MEDIUM), 0.0);
+		assertEquals(0.3, provider3.getReservedCpuCost(MachineType.C1_MEDIUM), 0.0);
+		assertEquals(1000, provider3.getReservationOneYearFee(MachineType.C1_MEDIUM), 0.0);
+		assertEquals(2500, provider3.getReservationThreeYearsFee(MachineType.C1_MEDIUM), 0.0);
+		assertEquals(0.12, provider3.getOnDemandCpuCost(MachineType.M1_LARGE), 0.0);
+		assertEquals(0.13, provider3.getReservedCpuCost(MachineType.M1_LARGE), 0.0);
+		assertEquals(1500, provider3.getReservationOneYearFee(MachineType.M1_LARGE), 0.0);
+		assertEquals(3500, provider3.getReservationThreeYearsFee(MachineType.M1_LARGE), 0.0);
 	}
 }

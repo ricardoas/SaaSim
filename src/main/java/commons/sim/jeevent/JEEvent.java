@@ -3,6 +3,7 @@
  */
 package commons.sim.jeevent;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 
@@ -13,8 +14,13 @@ import java.util.Arrays;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public class JEEvent implements Comparable<JEEvent>{
+public class JEEvent implements Comparable<JEEvent>, Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1977642650443631889L;
+
 	private static int eventIdSeed = 0;
 	
 	private final int eventId;
@@ -87,9 +93,8 @@ public class JEEvent implements Comparable<JEEvent>{
 		if(diff != 0){
 			if(diff < 0){
 				return -1;
-			}else{
-				return 1;
 			}
+			return 1;
 		}
 		
 		int result = type.compareTo(o.type);

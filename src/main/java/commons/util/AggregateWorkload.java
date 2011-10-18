@@ -167,9 +167,8 @@ public class AggregateWorkload {
 			demand[index++] = Long.parseLong(tokenizer.nextToken());
 		}
 		
-		return new Request(userID, reqID, saasClientID, 
-				arrivalTimeInMillis, requestSizeInBytes,
-				responseSizeInBytes, demand);
+		return new Request(reqID, saasClientID, userID, arrivalTimeInMillis,
+				requestSizeInBytes, responseSizeInBytes, demand);
 	}
 	
 

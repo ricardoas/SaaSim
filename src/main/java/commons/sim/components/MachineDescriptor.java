@@ -7,8 +7,14 @@ import commons.cloud.MachineType;
 /**
  * Machine information.
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ * @version 1.0
  */
 public class MachineDescriptor implements Serializable{
+	
+	/**
+	 * Version 1.0
+	 */
+	private static final long serialVersionUID = -548947493055431782L;
 	
 	private final long machineID;
 	private final MachineType type;
@@ -107,20 +113,13 @@ public class MachineDescriptor implements Serializable{
 	 */
 	@Override
 	public boolean equals(Object obj) {
+		assert (obj != null): "Comparing with null object";
+		assert (getClass() == obj.getClass()): "comparing with different class object";
+		
 		if (this == obj)
 			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
 		MachineDescriptor other = (MachineDescriptor) obj;
-		if (machineID != other.machineID)
-			return false;
-		if (reserved != other.reserved)
-			return false;
-		if (type != other.type)
-			return false;
-		return true;
+		return (machineID == other.machineID);
 	}
 
 	/**
@@ -154,7 +153,7 @@ public class MachineDescriptor implements Serializable{
 	 */
 	@Override
 	public String toString() {
-		return "MachineDescriptor [machineID=" + machineID + ", type=" + type
+		return "[machineID=" + machineID + ", type=" + type
 				+ ", reserved=" + reserved + "]";
 	}
 }

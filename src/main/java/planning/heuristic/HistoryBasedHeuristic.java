@@ -7,8 +7,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 
 import planning.util.MachineUsageData;
 import planning.util.PlanIOHandler;
@@ -65,7 +65,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 		//Simulating ...
 		DPS dps = (DPS) this.monitor;
 		
-		SimpleSimulator simulator = (SimpleSimulator) SimulatorFactory.buildSimulator(this.scheduler, dps);
+		SimpleSimulator simulator = (SimpleSimulator) SimulatorFactory.buildSimulator(this.scheduler);
 		
 		dps.registerConfigurable(simulator);
 		
@@ -127,7 +127,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 			typeUse.put(type, new ArrayList<Double>());
 			
 			for(long machineID : machines.keySet()){
-				double machineUsage = machines.get(machineID) / ( config.getRelativePower(type) * planningPeriod * 
+				double machineUsage = machines.get(machineID) / ( type.getNumberOfCores() * planningPeriod * 
 						TickSize.DAY.getTickInMillis());
 				
 				if( machineUsage >= limits.get(type) ){
@@ -169,16 +169,8 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 
 	private void persisDataToNextRound(LoadBalancer[] loadBalancers,
 			Configuration config) {
-		User[] users = config.getUsers();
-		Provider[] providers = config.getProviders();
-		
-		List<Machine> machines = new ArrayList<Machine>();
-		for(LoadBalancer balancer : loadBalancers){
-			machines.addAll(balancer.getServers());
-		}
-		
 		try {
-			Checkpointer.dumpObjects(config.getSimulationInfo(), users, providers, machines);
+			Checkpointer.save(config.getSimulationInfo(), config.getUsers(), config.getProviders(), loadBalancers);
 			Checkpointer.dumpMachineData(this.machineData);
 		} catch (IOException e) {
 			throw new RuntimeException(e);

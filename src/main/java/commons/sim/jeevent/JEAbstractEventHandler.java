@@ -3,7 +3,6 @@
  */
 package commons.sim.jeevent;
 
-import java.io.Serializable;
 
 
 /**
@@ -12,11 +11,16 @@ import java.io.Serializable;
  * @author thiago - thiago@lsd.ufcg.edu.br
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public abstract class JEAbstractEventHandler implements JEEventHandler, Serializable {
+public abstract class JEAbstractEventHandler implements JEEventHandler {
 	
-    private transient int id;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2572195285367262298L;
+
+	private int id;
     
-    private transient JEEventScheduler scheduler;
+    private JEEventScheduler scheduler;
     
     /**
      * Default empty constructor. Creates and registers a handler in the scheduler.

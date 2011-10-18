@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import org.junit.Before;
 
 import commons.config.Configuration;
+import commons.sim.jeevent.JEEventScheduler;
 
 /**
  * Super class of tests which do not need a configuration
@@ -20,6 +21,7 @@ public class CleanConfigurationTest {
 	 */
 	@Before
 	public void setUp() throws Exception{
+		JEEventScheduler.getInstance().reset();
 		Field field = Configuration.class.getDeclaredField("instance");
 		field.setAccessible(true);
 		field.set(null, null);

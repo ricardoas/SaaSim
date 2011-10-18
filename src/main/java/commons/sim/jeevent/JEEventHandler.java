@@ -1,6 +1,8 @@
 package commons.sim.jeevent;
 
-public interface JEEventHandler {
+import java.io.Serializable;
+
+public interface JEEventHandler extends Serializable{
 
 	/**
 	 * @param <T>

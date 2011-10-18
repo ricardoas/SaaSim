@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
@@ -272,7 +273,8 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		EasyMock.replay(scheduler);
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
-		configurable.addServer(0, new MachineDescriptor(0, true, MachineType.MEDIUM, 0), true);
+		configurable.addServer(0, new MachineDescriptor(0, true, MachineType.C1_MEDIUM, 0), true);
+		configurable.setMonitor(EasyMock.isA(Monitor.class));
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		
 		EasyMock.replay(configurable);
@@ -288,15 +290,14 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		
 		Provider[] providers = new Provider[1];
 		ArrayList<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.1, 0.05, 100, 180, reservationLimit));//Machine available
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.1, 0.05, 100, 180, reservationLimit));//Machine available
 		
 		Provider provider = new Provider(0, "1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		providers[0] = provider;
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
-		EasyMock.expect(config.hasPreviousMachines()).andReturn(false);
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(1d).times(2);
+		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(1d).times(2);
 		
 		PowerMock.replayAll(config, parser);
 		
@@ -306,7 +307,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		
 		PowerMock.verifyAll();
 		
-		assertFalse(provider.canBuyMachine(true, MachineType.MEDIUM));
+		assertFalse(provider.canBuyMachine(true, MachineType.C1_MEDIUM));
 	}
 	
 	/**
@@ -314,7 +315,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 	 * system creates a machine and adds it to simulator.
 	 * @throws ConfigurationException 
 	 */
-	@Test
+	@Ignore("method does now exists") @Test
 	public void testEvaluateUtilisationWithOneServerToBeAddedAndPreviousMachines() throws ConfigurationException{
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
@@ -339,10 +340,11 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		EasyMock.replay(scheduler);
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
-		configurable.addServer(0, machine1);
-		configurable.addServer(0, machine2);
-		configurable.addServer(0, machine3);
-		configurable.addServer(0, new MachineDescriptor(1, true, MachineType.MEDIUM, 0), true);
+//		configurable.addServer(0, machine1);
+//		configurable.addServer(0, machine2);
+//		configurable.addServer(0, machine3);
+		configurable.addServer(0, new MachineDescriptor(1, true, MachineType.C1_MEDIUM, 0), true);
+		configurable.setMonitor(EasyMock.isA(Monitor.class));
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		
 		EasyMock.replay(configurable);
@@ -358,16 +360,14 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		
 		Provider[] providers = new Provider[1];
 		ArrayList<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.1, 0.05, 100, 180, reservationLimit));//Machine available
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.1, 0.05, 100, 180, reservationLimit));//Machine available
 		
 		Provider provider = new Provider(0, "1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		providers[0] = provider;
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
-		EasyMock.expect(config.hasPreviousMachines()).andReturn(true);
-		EasyMock.expect(config.getPreviousMachines()).andReturn(machines);
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(1d).times(2);
+		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(1d).times(2);
 		
 		PowerMock.replayAll(config, parser);
 		
@@ -377,7 +377,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		
 		PowerMock.verifyAll();
 		
-		assertFalse(provider.canBuyMachine(true, MachineType.MEDIUM));
+		assertFalse(provider.canBuyMachine(true, MachineType.C1_MEDIUM));
 	}
 	
 	/**
@@ -415,6 +415,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		for (int i = 0; i < descriptor.length; i++) {
 			descriptor[i] = new Capture<MachineDescriptor>();
 		}
+		configurable.setMonitor(EasyMock.isA(Monitor.class));
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [0]), EasyMock.anyBoolean());
 		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [1]), EasyMock.anyBoolean());
@@ -429,17 +430,16 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		
 		Provider[] providers = new Provider[1];
 		ArrayList<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.1, 0.05, 100, 180, reservationLimit));//Reserved machines available
-		types.add(new TypeProvider(0, MachineType.SMALL, 0.1, 0.05, 100, 180, 0));//On-demand machines available
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.1, 0.05, 100, 180, reservationLimit));//Reserved machines available
+		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.1, 0.05, 100, 180, 0));//On-demand machines available
 		
 		Provider provider = new Provider(0, "1", onDemandLimit, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		providers[0] = provider;
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
-		EasyMock.expect(config.hasPreviousMachines()).andReturn(false);
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(10);
-		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d).times(10);
+		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(2d).times(10);
+		EasyMock.expect(config.getRelativePower(MachineType.M1_SMALL)).andReturn(1d).times(10);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -456,11 +456,11 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		this.dps.sendStatistics(0, statistics, 0);
 		
 		for (int i = 0; i < 5; i++) {
-			assertEquals(MachineType.MEDIUM, descriptor[i].getValue().getType());
+			assertEquals(MachineType.C1_MEDIUM, descriptor[i].getValue().getType());
 			assertTrue(descriptor[i].getValue().isReserved());
 		}
 		for (int i = 5; i < 9; i++) {
-			assertEquals(MachineType.SMALL, descriptor[i].getValue().getType());
+			assertEquals(MachineType.M1_SMALL, descriptor[i].getValue().getType());
 			assertFalse(descriptor[i].getValue().isReserved());
 		}
 		
@@ -501,6 +501,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		for (int i = 0; i < descriptor.length; i++) {
 			descriptor[i] = new Capture<MachineDescriptor>();
 		}
+		configurable.setMonitor(EasyMock.isA(Monitor.class));
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [0]), EasyMock.anyBoolean());
 		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [1]), EasyMock.anyBoolean());
@@ -509,15 +510,14 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		
 		Provider[] providers = new Provider[1];
 		ArrayList<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.1, 0.05, 100, 180, reservationLimit));//Reserved machines available
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.1, 0.05, 100, 180, reservationLimit));//Reserved machines available
 		
 		Provider provider = new Provider(0, "1", onDemandLimit, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		providers[0] = provider;
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
-		EasyMock.expect(config.hasPreviousMachines()).andReturn(false);
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(4d).times(8);
+		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(4d).times(8);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -534,7 +534,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		this.dps.sendStatistics(0, statistics, 0);
 		
 		for (int i = 0; i < 3; i++) {
-			assertEquals(MachineType.MEDIUM, descriptor[i].getValue().getType());
+			assertEquals(MachineType.C1_MEDIUM, descriptor[i].getValue().getType());
 			assertTrue(descriptor[i].getValue().isReserved());
 		}
 
@@ -575,6 +575,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		for (int i = 0; i < descriptor.length; i++) {
 			descriptor[i] = new Capture<MachineDescriptor>();
 		}
+		configurable.setMonitor(EasyMock.isA(Monitor.class));
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [0]), EasyMock.anyBoolean());
 		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [1]), EasyMock.anyBoolean());
@@ -585,17 +586,16 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		
 		Provider[] providers = new Provider[1];
 		ArrayList<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.1, 0.05, 100, 180, reservationLimit));//Reserved machines available
-		types.add(new TypeProvider(0, MachineType.SMALL, 0.1, 0.05, 100, 180, reservationLimit));//Reserved machines available
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.1, 0.05, 100, 180, reservationLimit));//Reserved machines available
+		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.1, 0.05, 100, 180, reservationLimit));//Reserved machines available
 		
 		Provider provider = new Provider(0, "1", 0, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		providers[0] = provider;
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
-		EasyMock.expect(config.hasPreviousMachines()).andReturn(false);
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(4d).times(7);
-		EasyMock.expect(config.getRelativePower(MachineType.SMALL)).andReturn(1d).times(5);
+		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(4d).times(7);
+		EasyMock.expect(config.getRelativePower(MachineType.M1_SMALL)).andReturn(1d).times(5);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -612,7 +612,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		this.dps.sendStatistics(0, statistics, 0);
 		
 		for (int i = 0; i < 3; i++) {
-			assertEquals(MachineType.MEDIUM, descriptor[i].getValue().getType());
+			assertEquals(MachineType.C1_MEDIUM, descriptor[i].getValue().getType());
 			assertTrue(descriptor[i].getValue().isReserved());
 		}
 
@@ -640,6 +640,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
+		configurable.setMonitor(EasyMock.isA(Monitor.class));
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		configurable.removeServer(0, false);
 		EasyMock.expectLastCall().times(19);
@@ -653,15 +654,14 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		
 		Provider[] providers = new Provider[1];
 		ArrayList<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.1, 0.05, 100, 180, 0));//Reserved machines available
-		types.add(new TypeProvider(0, MachineType.SMALL, 0.1, 0.05, 100, 180, 0));//On-demand machines available
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.1, 0.05, 100, 180, 0));//Reserved machines available
+		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.1, 0.05, 100, 180, 0));//On-demand machines available
 		
 		Provider provider = new Provider(0, "1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		providers[0] = provider;
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
-		EasyMock.expect(config.hasPreviousMachines()).andReturn(false);
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -677,16 +677,16 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		this.dps.registerConfigurable(configurable);
 		
 		//Buying some on-demand machines
-		this.dps.buyMachine(provider, MachineType.SMALL, false);
-		this.dps.buyMachine(provider, MachineType.SMALL, false);
-		this.dps.buyMachine(provider, MachineType.SMALL, false);
-		this.dps.buyMachine(provider, MachineType.SMALL, false);
-		this.dps.buyMachine(provider, MachineType.SMALL, false);
-		this.dps.buyMachine(provider, MachineType.SMALL, false);
-		this.dps.buyMachine(provider, MachineType.MEDIUM, false);
-		this.dps.buyMachine(provider, MachineType.MEDIUM, false);
-		this.dps.buyMachine(provider, MachineType.MEDIUM, false);
-		this.dps.buyMachine(provider, MachineType.MEDIUM, false);
+		this.dps.buyMachine(provider, MachineType.M1_SMALL, false);
+		this.dps.buyMachine(provider, MachineType.M1_SMALL, false);
+		this.dps.buyMachine(provider, MachineType.M1_SMALL, false);
+		this.dps.buyMachine(provider, MachineType.M1_SMALL, false);
+		this.dps.buyMachine(provider, MachineType.M1_SMALL, false);
+		this.dps.buyMachine(provider, MachineType.M1_SMALL, false);
+		this.dps.buyMachine(provider, MachineType.C1_MEDIUM, false);
+		this.dps.buyMachine(provider, MachineType.C1_MEDIUM, false);
+		this.dps.buyMachine(provider, MachineType.C1_MEDIUM, false);
+		this.dps.buyMachine(provider, MachineType.C1_MEDIUM, false);
 		
 		this.dps.sendStatistics(0, statistics, 0);
 		

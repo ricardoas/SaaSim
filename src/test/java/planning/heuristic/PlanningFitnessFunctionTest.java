@@ -177,9 +177,9 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 	@Test
 	public void testCalculateCostWith2MachineTypesAndNoOnDemandResources(){
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
-		types.add(new TypeProvider(0, MachineType.SMALL, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.6, 0.25, 99, 188, 5));
 		
 		User[] cloudUsers = new User[0];
 		
@@ -192,21 +192,19 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_INTERVAL_SIZE)).andReturn(60l * 60l);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_RISK)).andReturn(0d);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
-		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d);
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d);
 		
 		PowerMock.replayAll(config);
 		
 		PlanningFitnessFunction function = new PlanningFitnessFunction(null, cloudUsers, providers, null);
 		
 		Map<MachineType, Double> requestsFinishedPerMachineType = new HashMap<MachineType, Double>();
-		requestsFinishedPerMachineType.put(MachineType.LARGE, 10d * 31104000);
-		requestsFinishedPerMachineType.put(MachineType.MEDIUM, 6d * 31104000);
+		requestsFinishedPerMachineType.put(MachineType.M1_LARGE, 10d * 31104000);
+		requestsFinishedPerMachineType.put(MachineType.C1_MEDIUM, 6d * 31104000);
 		double meanServiceTimeInMillis = 500;
 		
 		Map<MachineType, Integer> currentPowerPerMachineType = new HashMap<MachineType, Integer>();
-		currentPowerPerMachineType.put(MachineType.LARGE, 30 );//10 machines with 3 cores
-		currentPowerPerMachineType.put(MachineType.MEDIUM, 16 );//8 machines with 2 cores
+		currentPowerPerMachineType.put(MachineType.M1_LARGE, 30 );//10 machines with 3 cores
+		currentPowerPerMachineType.put(MachineType.C1_MEDIUM, 16 );//8 machines with 2 cores
 		
 		double expectedCost = 100 * 10 + 99 * 8 + 432 + 6480;//One year fee for large + one year fee for medium + large usage + medium usage
 		assertEquals(expectedCost, function.calcCost(requestsFinishedPerMachineType, meanServiceTimeInMillis, 
@@ -218,9 +216,9 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 	@Test
 	public void testCalculateCostWith2MachineTypesAndOnDemandResources(){
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
-		types.add(new TypeProvider(0, MachineType.SMALL, 0.2, 0.1, 50, 70, 5));
+		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.2, 0.1, 50, 70, 5));
 		
 		User[] cloudUsers = new User[0];
 		Provider[] providers = new Provider[1];
@@ -232,21 +230,20 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_INTERVAL_SIZE)).andReturn(60l * 60l);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_RISK)).andReturn(0d);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
-		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d);
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d);
+		EasyMock.expect(config.getRelativePower(MachineType.M1_LARGE)).andReturn(3d);
 		
 		PowerMock.replayAll(config);
 		
 		PlanningFitnessFunction function = new PlanningFitnessFunction(null, cloudUsers, providers, null);
 		
 		Map<MachineType, Double> finishedRequestsPerMachineType = new HashMap<MachineType, Double>();
-		finishedRequestsPerMachineType.put(MachineType.LARGE, 5d * 31104000);
-		finishedRequestsPerMachineType.put(MachineType.MEDIUM, 3d * 31104000);
+		finishedRequestsPerMachineType.put(MachineType.M1_LARGE, 5d * 31104000);
+		finishedRequestsPerMachineType.put(MachineType.C1_MEDIUM, 3d * 31104000);
 		double meanServiceTimeInMillis = 500;
 		
 		Map<MachineType, Integer> currentPowerPerMachineType = new HashMap<MachineType, Integer>();
-		currentPowerPerMachineType.put(MachineType.LARGE, 30);//10 machines with 3 cores
-		currentPowerPerMachineType.put(MachineType.MEDIUM, 16);//8 machines with 2 cores
+		currentPowerPerMachineType.put(MachineType.M1_LARGE, 30);//10 machines with 3 cores
+		currentPowerPerMachineType.put(MachineType.C1_MEDIUM, 16);//8 machines with 2 cores
 		
 		double expectedCost = 100 * 10 + 99 * 8 + 216 + 3240 + 0.6;//One year fee for large + one year fee for medium + large usage + medium usage + on-demand cost
 		assertEquals(expectedCost, function.calcCost(finishedRequestsPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType, 
@@ -262,9 +259,9 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 	@Test
 	public void testCalculateCostWith2MachineTypesAndOnDemandResources2(){
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
-		types.add(new TypeProvider(0, MachineType.SMALL, 0.2, 0.1, 50, 70, 5));
+		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.2, 0.1, 50, 70, 5));
 		
 		User[] cloudUsers = new User[0];
 		Provider[] providers = new Provider[1];
@@ -276,21 +273,20 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_INTERVAL_SIZE)).andReturn(60l * 60l);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_RISK)).andReturn(0d);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
-		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d);
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d);
+		EasyMock.expect(config.getRelativePower(MachineType.M1_LARGE)).andReturn(3d);
 		
 		PowerMock.replayAll(config);
 		
 		PlanningFitnessFunction function = new PlanningFitnessFunction(null, cloudUsers, providers, null);
 		
 		Map<MachineType, Double> finishedRequestsPerMachineType = new HashMap<MachineType, Double>();
-		finishedRequestsPerMachineType.put(MachineType.LARGE, 5d * 31104000);
-		finishedRequestsPerMachineType.put(MachineType.MEDIUM, 3d * 31104000);
+		finishedRequestsPerMachineType.put(MachineType.M1_LARGE, 5d * 31104000);
+		finishedRequestsPerMachineType.put(MachineType.C1_MEDIUM, 3d * 31104000);
 		double meanServiceTimeInMillis = 500;
 		
 		Map<MachineType, Integer> currentPowerPerMachineType = new HashMap<MachineType, Integer>();
-		currentPowerPerMachineType.put(MachineType.LARGE, 30);//10 machines with 3 cores
-		currentPowerPerMachineType.put(MachineType.MEDIUM, 16);//8 machines with 2 cores
+		currentPowerPerMachineType.put(MachineType.M1_LARGE, 30);//10 machines with 3 cores
+		currentPowerPerMachineType.put(MachineType.C1_MEDIUM, 16);//8 machines with 2 cores
 		
 		double expectedCost = 100 * 10 + 99 * 8 + 216 + 3240 + 17280;//One year fee for large + one year fee for medium + large usage + medium usage + on-demand cost
 		assertEquals(expectedCost, function.calcCost(finishedRequestsPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType, 
@@ -302,9 +298,9 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 	@Test
 	public void testCalculateCostWithOnlyOneThroughput(){
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
-		types.add(new TypeProvider(0, MachineType.SMALL, 0.2, 0.1, 50, 70, 5));
+		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.2, 0.1, 50, 70, 5));
 		
 		User[] cloudUsers = new User[0];
 		Provider[] providers = new Provider[1];
@@ -316,21 +312,20 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_INTERVAL_SIZE)).andReturn(60l * 60l);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_RISK)).andReturn(0d);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
-		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d);
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d);
+		EasyMock.expect(config.getRelativePower(MachineType.M1_LARGE)).andReturn(3d);
 		
 		PowerMock.replayAll(config);
 		
 		PlanningFitnessFunction function = new PlanningFitnessFunction(null, cloudUsers, providers, null);
 		
 		Map<MachineType, Double> finishedRequestsPerMachineType = new HashMap<MachineType, Double>();
-		finishedRequestsPerMachineType.put(MachineType.LARGE, 3.3333d * 31104000);
-		finishedRequestsPerMachineType.put(MachineType.MEDIUM, 0d);//Machine reserved but not used
+		finishedRequestsPerMachineType.put(MachineType.M1_LARGE, 3.3333d * 31104000);
+		finishedRequestsPerMachineType.put(MachineType.C1_MEDIUM, 0d);//Machine reserved but not used
 		double meanServiceTimeInMillis = 500;
 		
 		Map<MachineType, Integer> currentPowerPerMachineType = new HashMap<MachineType, Integer>();
-		currentPowerPerMachineType.put(MachineType.LARGE, 30);//10 machines with 3 cores
-		currentPowerPerMachineType.put(MachineType.MEDIUM, 16);//8 machines with 2 cores
+		currentPowerPerMachineType.put(MachineType.M1_LARGE, 30);//10 machines with 3 cores
+		currentPowerPerMachineType.put(MachineType.C1_MEDIUM, 16);//8 machines with 2 cores
 		
 		double expectedCost = 100 * 10 + 99 *8 + 143.9986;//One year fee for large + one year fee for medium + large usage + medium usage
 		assertEquals(expectedCost, function.calcCost(finishedRequestsPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType, 
@@ -342,9 +337,9 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 	@Test
 	public void testCalculateCostWithOnlyOneThroughputAndOnDemandResources(){
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
-		types.add(new TypeProvider(0, MachineType.SMALL, 0.1, 0.05, 50, 70, 5));
+		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.1, 0.05, 50, 70, 5));
 		
 		User[] cloudUsers = new User[0];
 		Provider[] providers = new Provider[1];
@@ -356,21 +351,20 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_INTERVAL_SIZE)).andReturn(60l * 60l);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_RISK)).andReturn(0d);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
-		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d);
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d);
+		EasyMock.expect(config.getRelativePower(MachineType.M1_LARGE)).andReturn(3d);
 		
 		PowerMock.replayAll(config);
 		
 		PlanningFitnessFunction function = new PlanningFitnessFunction(null, cloudUsers, providers, null);
 		
 		Map<MachineType, Double> finishedRequestsPerMachineType = new HashMap<MachineType, Double>();
-		finishedRequestsPerMachineType.put(MachineType.LARGE, 3.3333d * 31104000);
-		finishedRequestsPerMachineType.put(MachineType.MEDIUM, 0d);//Machine reserved but not used
+		finishedRequestsPerMachineType.put(MachineType.M1_LARGE, 3.3333d * 31104000);
+		finishedRequestsPerMachineType.put(MachineType.C1_MEDIUM, 0d);//Machine reserved but not used
 		double meanServiceTimeInMillis = 500;
 		
 		Map<MachineType, Integer> currentPowerPerMachineType = new HashMap<MachineType, Integer>();
-		currentPowerPerMachineType.put(MachineType.LARGE, 30);//10 machines with 3 cores
-		currentPowerPerMachineType.put(MachineType.MEDIUM, 16);//8 machines with 2 cores
+		currentPowerPerMachineType.put(MachineType.M1_LARGE, 30);//10 machines with 3 cores
+		currentPowerPerMachineType.put(MachineType.C1_MEDIUM, 16);//8 machines with 2 cores
 		
 		double expectedCost = 100 * 10 + 99 *8 + 143.9986 + 2160;//One year fee for large + one year fee for medium + large usage + medium usage
 		assertEquals(expectedCost, function.calcCost(finishedRequestsPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType, 
@@ -382,9 +376,9 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 	@Test
 	public void testCalculateCostWithoutDemand(){
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
-		types.add(new TypeProvider(0, MachineType.SMALL, 0.1, 0.05, 50, 70, 5));
+		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.1, 0.05, 50, 70, 5));
 		
 		User[] cloudUsers = new User[0];
 		Provider[] providers = new Provider[1];
@@ -405,8 +399,8 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		double meanServiceTimeInMillis = 500;
 		
 		Map<MachineType, Integer> currentPowerPerMachineType = new HashMap<MachineType, Integer>();
-		currentPowerPerMachineType.put(MachineType.LARGE, 30);//10 machines with 3 cores
-		currentPowerPerMachineType.put(MachineType.MEDIUM, 16);//8 machines with 2 cores
+		currentPowerPerMachineType.put(MachineType.M1_LARGE, 30);//10 machines with 3 cores
+		currentPowerPerMachineType.put(MachineType.C1_MEDIUM, 16);//8 machines with 2 cores
 		
 		assertEquals(0, function.calcCost(finishedRequestsPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType, 
 				0, 0), 0.001);
@@ -417,9 +411,9 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 	@Test
 	public void testCalculateCostWithoutDemand2(){
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
-		types.add(new TypeProvider(0, MachineType.SMALL, 0.1, 0.05, 50, 70, 5));
+		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.1, 0.05, 50, 70, 5));
 		
 		User[] cloudUsers = new User[0];
 		Provider[] providers = new Provider[1];
@@ -431,21 +425,21 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_INTERVAL_SIZE)).andReturn(60l * 60l);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_RISK)).andReturn(0d);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(12l);
-		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d);
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d);
+		EasyMock.expect(config.getRelativePower(MachineType.M1_LARGE)).andReturn(3d);
+		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(2d);
 		
 		PowerMock.replayAll(config);
 		
 		PlanningFitnessFunction function = new PlanningFitnessFunction(null, cloudUsers, providers, null);
 		
 		Map<MachineType, Double> finishedRequestsPerMachineType = new HashMap<MachineType, Double>();
-		finishedRequestsPerMachineType.put(MachineType.LARGE, 10d);
-		finishedRequestsPerMachineType.put(MachineType.MEDIUM, 0d);//Machine reserved but not used
+		finishedRequestsPerMachineType.put(MachineType.M1_LARGE, 10d);
+		finishedRequestsPerMachineType.put(MachineType.C1_MEDIUM, 0d);//Machine reserved but not used
 		double meanServiceTimeInMillis = 0;
 		
 		Map<MachineType, Integer> currentPowerPerMachineType = new HashMap<MachineType, Integer>();
-		currentPowerPerMachineType.put(MachineType.LARGE, 30);//10 machines with 3 cores
-		currentPowerPerMachineType.put(MachineType.MEDIUM, 16);//8 machines with 2 cores
+		currentPowerPerMachineType.put(MachineType.M1_LARGE, 30);//10 machines with 3 cores
+		currentPowerPerMachineType.put(MachineType.C1_MEDIUM, 16);//8 machines with 2 cores
 		
 		double expectedCost = 100 * 10 + 99 *8;//One year fee for large + one year fee for medium + large usage + medium usage
 		assertEquals(expectedCost, function.calcCost(finishedRequestsPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType, 
@@ -457,9 +451,9 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 	@Test
 	public void testCalculateCostWithoutDemand2AndOnDemandResources(){
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
-		types.add(new TypeProvider(0, MachineType.SMALL, 0.1, 0.05, 50, 70, 5));
+		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.1, 0.05, 50, 70, 5));
 		
 		User[] cloudUsers = new User[0];
 		Provider[] providers = new Provider[1];
@@ -471,21 +465,21 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_INTERVAL_SIZE)).andReturn(60l * 60l);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_RISK)).andReturn(0d);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(12l);
-		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d);
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d);
+		EasyMock.expect(config.getRelativePower(MachineType.M1_LARGE)).andReturn(3d);
+		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(2d);
 		
 		PowerMock.replayAll(config);
 		
 		PlanningFitnessFunction function = new PlanningFitnessFunction(null, cloudUsers, providers, null);
 		
 		Map<MachineType, Double> finishedRequestsPerMachineType = new HashMap<MachineType, Double>();
-		finishedRequestsPerMachineType.put(MachineType.LARGE, 10d);
-		finishedRequestsPerMachineType.put(MachineType.MEDIUM, 0d);//Machine reserved but not used
+		finishedRequestsPerMachineType.put(MachineType.M1_LARGE, 10d);
+		finishedRequestsPerMachineType.put(MachineType.C1_MEDIUM, 0d);//Machine reserved but not used
 		double meanServiceTimeInMillis = 0;
 		
 		Map<MachineType, Integer> currentPowerPerMachineType = new HashMap<MachineType, Integer>();
-		currentPowerPerMachineType.put(MachineType.LARGE, 30);//10 machines with 3 cores
-		currentPowerPerMachineType.put(MachineType.MEDIUM, 16);//8 machines with 2 cores
+		currentPowerPerMachineType.put(MachineType.M1_LARGE, 30);//10 machines with 3 cores
+		currentPowerPerMachineType.put(MachineType.C1_MEDIUM, 16);//8 machines with 2 cores
 		
 		double expectedCost = 100 * 10 + 99 *8;//One year fee for large + one year fee for medium + large usage + medium usage
 		assertEquals(expectedCost, function.calcCost(finishedRequestsPerMachineType, meanServiceTimeInMillis, currentPowerPerMachineType, 
@@ -527,8 +521,8 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		summaries.put(cloudUsers[0], data);//320 extra cpu-hrs
 		
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
 		Provider[] providers = new Provider[1];
 		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		
@@ -572,8 +566,8 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		summaries.put(cloudUsers[1], data2);//0 cpu-hrs
 		
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
 		Provider[] providers = new Provider[1];
 		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		
@@ -648,8 +642,8 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		summaries.put(cloudUsers[1], data2);//530 cpu-hrs
 		
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
 		Provider[] providers = new Provider[1];
 		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		
@@ -753,8 +747,8 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		summaries.put(cloudUsers[1], data2);//530 cpu-hrs
 		
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
 		Provider[] providers = new Provider[1];
 		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		
@@ -881,8 +875,8 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		summaries.put(cloudUsers[1], data2);//50 extra cpu-hrs at first month, 8 cpu-hours at second 
 		
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
 		Provider[] providers = new Provider[1];
 		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		
@@ -1655,8 +1649,8 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(12);
-		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).times(4);
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).times(4);
+		EasyMock.expect(config.getRelativePower(MachineType.M1_LARGE)).andReturn(3d).times(4);
+		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(2d).times(4);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_INTERVAL_SIZE)).andReturn(60l * 60l);
 //		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(500l);
@@ -1669,9 +1663,9 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		int largeReservationFee = 1000;
 		int mediumReservationFee = 990;
 		int smallReservationFee = 300;
-		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, largeReservationFee, 170, 5));
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, mediumReservationFee, 188, 5));
-		types.add(new TypeProvider(0, MachineType.SMALL, 0.01, 0.0005, smallReservationFee, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, largeReservationFee, 170, 5));
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, mediumReservationFee, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.01, 0.0005, smallReservationFee, 188, 5));
 		
 		Provider[] providers = new Provider[1];
 		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
@@ -1690,7 +1684,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		data2.add(new Summary(20, 30, 500, 5, 100));//2 hours of first month
 		summaries.put(cloudUsers[1], data2);//20 req/s, 360 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
 		
-		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.LARGE, MachineType.MEDIUM));
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.M1_LARGE, MachineType.C1_MEDIUM));
 		
 		IChromosome chromosome = EasyMock.createStrictMock(IChromosome.class);
 		Gene[] genes = new Gene[2];
@@ -1724,8 +1718,8 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).anyTimes();
-		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).anyTimes();
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).anyTimes();
+		EasyMock.expect(config.getRelativePower(MachineType.M1_LARGE)).andReturn(3d).anyTimes();
+		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(2d).anyTimes();
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_INTERVAL_SIZE)).andReturn(60l * 60l);
 //		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(500l);
@@ -1738,9 +1732,9 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		int largeReservationFee = 1000;
 		int mediumReservationFee = 990;
 		int smallReservationFee = 300;
-		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, largeReservationFee, 170, 5));
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, mediumReservationFee, 188, 5));
-		types.add(new TypeProvider(0, MachineType.SMALL, 0.01, 0.0005, smallReservationFee, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, largeReservationFee, 170, 5));
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, mediumReservationFee, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.01, 0.0005, smallReservationFee, 188, 5));
 		
 		Provider[] providers = new Provider[1];
 		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
@@ -1761,7 +1755,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		}
 		summaries.put(cloudUsers[1], data2);//20 req/s, 360 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
 		
-		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.LARGE, MachineType.MEDIUM));
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.M1_LARGE, MachineType.C1_MEDIUM));
 		
 		IChromosome chromosome = EasyMock.createStrictMock(IChromosome.class);
 		Gene[] genes = new Gene[2];
@@ -1797,8 +1791,8 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).anyTimes();
-		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).anyTimes();
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).anyTimes();
+		EasyMock.expect(config.getRelativePower(MachineType.M1_LARGE)).andReturn(3d).anyTimes();
+		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(2d).anyTimes();
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_INTERVAL_SIZE)).andReturn(60l * 60l);
 //		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(500l);
@@ -1808,9 +1802,9 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		
 		//IaaS providers
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
-		types.add(new TypeProvider(0, MachineType.SMALL, 0.01, 0.0005, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.01, 0.0005, 99, 188, 5));
 		
 		Provider[] providers = new Provider[1];
 		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
@@ -1831,7 +1825,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		}
 		summaries.put(cloudUsers[1], data2);//20 req/s, 300 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
 		
-		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.LARGE, MachineType.MEDIUM));
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.M1_LARGE, MachineType.C1_MEDIUM));
 		
 		IChromosome chromosome = EasyMock.createStrictMock(IChromosome.class);
 		Gene[] genes = new Gene[2];
@@ -1870,8 +1864,8 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).anyTimes();
-		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).anyTimes();
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).anyTimes();
+		EasyMock.expect(config.getRelativePower(MachineType.M1_LARGE)).andReturn(3d).anyTimes();
+		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(2d).anyTimes();
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_INTERVAL_SIZE)).andReturn(60l * 60l);
 //		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(500l);
@@ -1881,9 +1875,9 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		
 		//IaaS providers
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
-		types.add(new TypeProvider(0, MachineType.SMALL, 0.01, 0.0005, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.01, 0.0005, 99, 188, 5));
 		
 		Provider[] providers = new Provider[1];
 		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
@@ -1904,7 +1898,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		}
 		summaries.put(cloudUsers[1], data2);//20 req/s, 300 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
 		
-		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.LARGE, MachineType.MEDIUM));
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.M1_LARGE, MachineType.C1_MEDIUM));
 		
 		IChromosome chromosome = EasyMock.createStrictMock(IChromosome.class);
 		Gene[] genes = new Gene[2];
@@ -1940,8 +1934,8 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).anyTimes();
-		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).anyTimes();
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).anyTimes();
+		EasyMock.expect(config.getRelativePower(MachineType.M1_LARGE)).andReturn(3d).anyTimes();
+		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(2d).anyTimes();
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_INTERVAL_SIZE)).andReturn(60l * 60l);
 //		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(500l);
@@ -1951,9 +1945,9 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		
 		//IaaS providers
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.LARGE, 0.1, 0.01, 100, 170, 5));
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.6, 0.25, 99, 188, 5));
-		types.add(new TypeProvider(0, MachineType.SMALL, 0.01, 0.0005, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.01, 0.0005, 99, 188, 5));
 		
 		Provider[] providers = new Provider[1];
 		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
@@ -1975,7 +1969,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		}
 		summaries.put(cloudUsers[1], data2);//20 req/s, 300 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
 		
-		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.LARGE, MachineType.MEDIUM));
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.M1_LARGE, MachineType.C1_MEDIUM));
 		
 		IChromosome chromosome = EasyMock.createStrictMock(IChromosome.class);
 		Gene[] genes = new Gene[2];
@@ -2014,8 +2008,8 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).anyTimes();
-		EasyMock.expect(config.getRelativePower(MachineType.LARGE)).andReturn(3d).anyTimes();
-		EasyMock.expect(config.getRelativePower(MachineType.MEDIUM)).andReturn(2d).anyTimes();
+		EasyMock.expect(config.getRelativePower(MachineType.M1_LARGE)).andReturn(3d).anyTimes();
+		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(2d).anyTimes();
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(360l);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_INTERVAL_SIZE)).andReturn(60l * 60l);
 //		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(500l);
@@ -2026,11 +2020,11 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		//IaaS providers
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
 		int largeReservation = 910;
-		types.add(new TypeProvider(0, MachineType.LARGE, 0.34, 0.12, largeReservation, 170, 5));
+		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.34, 0.12, largeReservation, 170, 5));
 		int mediumReservation = 455;
-		types.add(new TypeProvider(0, MachineType.MEDIUM, 0.17, 0.06, mediumReservation, 188, 5));
+		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.17, 0.06, mediumReservation, 188, 5));
 		double smallReservation = 227.5;
-		types.add(new TypeProvider(0, MachineType.SMALL, 0.085, 0.03, smallReservation, 188, 5));
+		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.085, 0.03, smallReservation, 188, 5));
 		
 		Provider[] providers = new Provider[1];
 		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
@@ -2051,7 +2045,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		}
 		summaries.put(cloudUsers[1], data2);//20 req/s, 300 cpu-hrs, Si = 500 ms, Z = 5 s, M = 100 users
 		
-		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.LARGE, MachineType.MEDIUM));
+		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, Arrays.asList(MachineType.M1_LARGE, MachineType.C1_MEDIUM));
 		
 		IChromosome chromosome = EasyMock.createStrictMock(IChromosome.class);
 		Gene[] genes = new Gene[2];

@@ -2,6 +2,8 @@ package commons.sim;
 
 import java.util.List;
 
+import provisioning.Monitor;
+
 import commons.cloud.Request;
 import commons.io.WorkloadParser;
 import commons.sim.components.Machine;
@@ -20,8 +22,6 @@ public interface DynamicConfigurable {
 	 */
 	void addServer(int tier, MachineDescriptor machineDescriptor, boolean useStartUpDelay);
 	
-	void addServer(int tier, Machine machine);
-	
 	/**
 	 * @param tier
 	 * @param serverID
@@ -33,5 +33,9 @@ public interface DynamicConfigurable {
 
 	void removeServer(int tier, boolean force);
 
+	/**
+	 * @param monitor
+	 */
+	void setMonitor(Monitor monitor);
 	
 }

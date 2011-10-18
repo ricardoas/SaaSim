@@ -185,7 +185,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		
 		SimpleSimulator configurable = EasyMock.createStrictMock(SimpleSimulator.class);
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
-		configurable.addServer(0, new MachineDescriptor(0, false, MachineType.SMALL, 0), true);
+		configurable.addServer(0, new MachineDescriptor(0, false, MachineType.M1_SMALL, 0), true);
 		
 		EasyMock.replay(configurable);
 		
@@ -196,7 +196,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		
 		Provider[] providers = new Provider[1];
 		ArrayList<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.SMALL, 1, 1, 100, 240, reservationLimit));
+		types.add(new TypeProvider(0, MachineType.M1_SMALL, 1, 1, 100, 240, reservationLimit));
 		Provider provider = new Provider(0, "1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		providers[0] = provider;
 		EasyMock.expect(config.getProviders()).andReturn(providers);

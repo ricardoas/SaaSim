@@ -1,5 +1,6 @@
 package commons.sim.schedulingheuristics;
 
+import java.io.Serializable;
 import java.util.List;
 
 import commons.cloud.Request;
@@ -9,7 +10,7 @@ import commons.sim.components.Machine;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public interface SchedulingHeuristic {
+public interface SchedulingHeuristic extends Serializable{
 
 	/**
 	 * Determine to which server should this request be redirected to.

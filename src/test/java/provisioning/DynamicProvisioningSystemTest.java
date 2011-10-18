@@ -73,13 +73,13 @@ public class DynamicProvisioningSystemTest extends ValidConfigurationTest {
 		DynamicProvisioningSystem dps = new DynamicProvisioningSystem();
 		dps.registerConfigurable(configurable);
 		
-		assertEquals(MachineType.MEDIUM, descriptor[0].getValue().getType());
-		assertEquals(MachineType.MEDIUM, descriptor[1].getValue().getType());
-		assertEquals(MachineType.MEDIUM, descriptor[2].getValue().getType());
-		assertEquals(MachineType.MEDIUM, descriptor[3].getValue().getType());
-		assertEquals(MachineType.LARGE, descriptor[4].getValue().getType());
-		assertEquals(MachineType.LARGE, descriptor[5].getValue().getType());
-		assertEquals(MachineType.LARGE, descriptor[6].getValue().getType());
+		assertEquals(MachineType.C1_MEDIUM, descriptor[0].getValue().getType());
+		assertEquals(MachineType.C1_MEDIUM, descriptor[1].getValue().getType());
+		assertEquals(MachineType.C1_MEDIUM, descriptor[2].getValue().getType());
+		assertEquals(MachineType.C1_MEDIUM, descriptor[3].getValue().getType());
+		assertEquals(MachineType.M1_LARGE, descriptor[4].getValue().getType());
+		assertEquals(MachineType.M1_LARGE, descriptor[5].getValue().getType());
+		assertEquals(MachineType.M1_LARGE, descriptor[6].getValue().getType());
 		
 		EasyMock.verify(configurable);
 	}

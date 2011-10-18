@@ -1,6 +1,5 @@
 package commons.sim.util;
 
-import provisioning.Monitor;
 
 import commons.config.Configuration;
 import commons.sim.components.LoadBalancer;
@@ -39,8 +38,7 @@ public abstract class ApplicationFactory {
 	/**
 	 * 
 	 * @param scheduler
-	 * @param monitor
 	 * @return
 	 */
-	public abstract LoadBalancer[] createNewApplication(JEEventScheduler scheduler, Monitor monitor);
+	public abstract LoadBalancer[] buildApplication(JEEventScheduler scheduler);
 }

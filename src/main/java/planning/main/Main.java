@@ -30,9 +30,9 @@ public class Main {
 			Configuration.buildInstance(args[0]);
 			Configuration config = Configuration.getInstance();
 			
-			JEEventScheduler scheduler = new JEEventScheduler();
+			JEEventScheduler scheduler = JEEventScheduler.getInstance();
 			DPS dps = DPSFactory.createDPS();
-			LoadBalancer[] loadBalancers = ApplicationFactory.getInstance().createNewApplication(scheduler, dps);
+			LoadBalancer[] loadBalancers = ApplicationFactory.getInstance().buildApplication(scheduler);
 			
 			//Creating planner
 			Planner planner = new Planner(scheduler, dps, loadBalancers, config.getProviders(), config.getUsers());

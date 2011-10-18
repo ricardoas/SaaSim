@@ -13,9 +13,9 @@ import commons.cloud.Request;
 import commons.cloud.User;
 import commons.cloud.UtilityResult;
 import commons.config.Configuration;
+import commons.io.Checkpointer;
 import commons.sim.AccountingSystem;
 import commons.sim.DynamicConfigurable;
-import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.util.SaaSAppProperties;
@@ -44,17 +44,18 @@ public class DynamicProvisioningSystem implements DPS{
 		this.accountingSystem = new AccountingSystem(users.length, providers.length);
 	}
 	
+	/**
+	 * FIXME checkpoint
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void registerConfigurable(DynamicConfigurable configurable) {
-		Configuration config = Configuration.getInstance();
 		
 		this.configurable = configurable;
-		int[] initialServersPerTier = config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER);
-		if(config.hasPreviousMachines()){
-			for (int tier = 0; tier < initialServersPerTier.length; tier++) {
-				addPreviousMachinesToTier(configurable, tier, config.getPreviousMachines());
-			}
-		}else{
+		
+		if(!Checkpointer.hasCheckpoint()){
+			int[] initialServersPerTier = Configuration.getInstance().getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER);
+			
 			List<MachineType> typeList = Arrays.asList(MachineType.values());
 			Collections.reverse(typeList);
 			//Looking for reserved instances!
@@ -64,14 +65,9 @@ public class DynamicProvisioningSystem implements DPS{
 		}
 		
 		configurable.setWorkloadParser(WorkloadParserFactory.getWorkloadParser());
+		configurable.setMonitor(this);
 	}
 	
-	private void addPreviousMachinesToTier(DynamicConfigurable configurable, int tier, List<Machine> previousMachines) {
-		for(Machine machine : previousMachines){
-			configurable.addServer(tier, machine);
-		}
-	}
-
 	private void addServersToTier(DynamicConfigurable configurable, int tier, int numberOfInitialServers, List<MachineType> typeList) {
 		int serversAdded = 0;
 		for(MachineType machineType : typeList){
@@ -130,7 +126,6 @@ public class DynamicProvisioningSystem implements DPS{
 	 */
 	protected void reportLostRequest(Request request) {
 		assert request.getSaasClient() < users.length: "Unregistered user with ID " + request.getSaasClient() + ". Check configuration files.";
-		
 		users[request.getSaasClient()].reportLostRequest(request);
 	}
 	
