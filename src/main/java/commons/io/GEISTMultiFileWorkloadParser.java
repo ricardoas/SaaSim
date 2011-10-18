@@ -19,9 +19,7 @@ import commons.cloud.Request;
  */
 public class GEISTMultiFileWorkloadParser extends AbstractWorkloadParser{
 	
-	private final int saasClientID;
 //	private static final Pattern pattern = Pattern.compile("( +|\t+)+");
-
 
 	/**
 	 * Default constructor
@@ -29,7 +27,6 @@ public class GEISTMultiFileWorkloadParser extends AbstractWorkloadParser{
 	 */
 	public GEISTMultiFileWorkloadParser(String workload, int saasclientID) {
 		super(workload, saasclientID);
-		this.saasClientID = saasclientID;
 	}
 
 	/**

@@ -8,20 +8,23 @@ import java.io.IOException;
 import commons.cloud.Request;
 import commons.config.Configuration;
 
-public abstract class AbstractWorkloadParser implements WorkloadParser<Request> {
+public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 	
 	private BufferedReader reader;
 	private int currentDay = 0;
 	
 	protected int periodsAlreadyRead = 0;
 	private Request next;
+	
+	protected final int saasClientID;
 
 	public AbstractWorkloadParser(String workload, int saasclientID) {
 		try {
+			this.saasClientID = saasclientID;
 			this.reader = new BufferedReader(new FileReader(readFileToUse(workload)));//Using normal load file
 			this.next = readNext();
 		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Problem reading workload file.", e);
+			throw new RuntimeException("Problem reading workload file. ", e);
 		}
 	}
 	
