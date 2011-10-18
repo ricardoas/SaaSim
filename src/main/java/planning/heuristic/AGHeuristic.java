@@ -30,7 +30,6 @@ import provisioning.Monitor;
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.User;
-import commons.io.HistoryBasedWorkloadParser;
 import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.SimulatorProperties;
