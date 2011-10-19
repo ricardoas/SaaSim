@@ -14,6 +14,7 @@ public class PropertiesTesting {
 	public static final String VALID_MULTI_WORKLOAD_FILE = "src/test/resources/config-multi-workload-file.properties";
 	public static final String VALID_RANJAN_FILE = "src/test/resources/config-ranjan.properties";
 	public static final String INVALID_IDIOM_FILE = "src/test/resources/idiom.properties";
+	public static final String INVALID_DPS_FILE = "src/test/resources/dps.properties";
 	
 	public static final String INEXISTENT_CONFIG_FILE = "src/test/resources/inexistent.config";
 	public static final String INEXISTENT_PLANS_FILE = "src/test/resources/inexistent1.properties";

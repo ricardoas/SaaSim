@@ -28,4 +28,10 @@ public abstract class ValidConfigurationTest extends CleanConfigurationTest{
 	protected void buildMultiFileGEISTFullConfiguration() throws ConfigurationException {
 		Configuration.buildInstance(PropertiesTesting.VALID_MULTI_WORKLOAD_FILE);
 	}
+	
+	protected void buildInvalidDPSConfiguration() throws ConfigurationException {
+		Configuration.buildInstance(PropertiesTesting.INVALID_DPS_FILE);
+	}
+	
+	
 }

@@ -56,7 +56,7 @@ public class AbstractWorkloadParserTest {
 		PowerMock.verifyAll();
 	}
 	
-	@Test(expected=NullPointerException.class)
+	@Test(expected=RuntimeException.class)
 	public void testAbstractWorkloadParserConstructorWithValidWorkloadsButInvalidDay() {
 		int saasclientID = 1;
 		String workload = PropertiesTesting.VALID_WORKLOAD_3;
