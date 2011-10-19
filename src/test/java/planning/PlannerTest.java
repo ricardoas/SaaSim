@@ -32,7 +32,7 @@ public class PlannerTest {
 
 	@Before
 	public void setUp() throws ConfigurationException{
-		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
+		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
 	}
 	
 	@Test

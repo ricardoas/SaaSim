@@ -32,4 +32,6 @@ public interface WorkloadParser<T> {
 	public void applyError(double error);
 
 	public void close();
+	
+	public int size();
 }

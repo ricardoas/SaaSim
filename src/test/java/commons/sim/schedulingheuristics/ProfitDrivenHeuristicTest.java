@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 
 import org.easymock.EasyMock;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import util.ValidConfigurationTest;
@@ -18,6 +19,7 @@ import commons.sim.components.TimeSharedMachine;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.SaaSAppProperties;
 
+@Ignore
 public class ProfitDrivenHeuristicTest extends ValidConfigurationTest {
 	
 	private double sla = 1000 * 50;//50 sec in millis

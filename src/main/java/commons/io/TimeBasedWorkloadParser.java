@@ -118,4 +118,12 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 			parser.close();
 		}
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int size() {
+		return parsers.length;
+	}
 }

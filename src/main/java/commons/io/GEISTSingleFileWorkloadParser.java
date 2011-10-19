@@ -57,5 +57,13 @@ public class GEISTSingleFileWorkloadParser extends AbstractWorkloadParser{
 	@Override
 	public void applyError(double error) {
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int size() {
+		return 1;
+	}
 }
 

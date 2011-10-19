@@ -169,7 +169,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 	@Ignore@Test
 	public void testEvaluateUtilisationWithOneServerToBeAdded() throws ConfigurationException{
 		
-		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
+		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
 		int reservationLimit = 1;
 		int onDemandLimit = 1;
 

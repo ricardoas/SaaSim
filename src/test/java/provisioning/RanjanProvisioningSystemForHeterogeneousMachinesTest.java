@@ -257,7 +257,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 	 */
 	@Test
 	public void testEvaluateUtilisationWithOneServerToBeAdded() throws ConfigurationException{
-		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
+		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
 		
 		int reservationLimit = 1;
 		int onDemandLimit = 1;
@@ -557,7 +557,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 	@Test
 	public void handleEvaluateUtilisationWithServersToRemove() throws ConfigurationException{
 
-		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
+		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
 
 		int reservationLimit = 3;
 		int onDemandLimit = 10;

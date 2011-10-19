@@ -67,6 +67,7 @@ public class DynamicProvisioningSystemTest extends ValidConfigurationTest {
 		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [5]), EasyMock.anyBoolean());
 		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [6]), EasyMock.anyBoolean());
 		configurable.setWorkloadParser(EasyMock.anyObject(WorkloadParser.class));
+		configurable.setMonitor(EasyMock.anyObject(Monitor.class));
 		
 		EasyMock.replay(configurable);
 		

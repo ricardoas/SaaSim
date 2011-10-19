@@ -12,7 +12,6 @@ import commons.io.GEISTSingleFileWorkloadParser;
 import commons.io.ParserIdiom;
 import commons.io.TimeBasedWorkloadParser;
 import commons.io.WorkloadParser;
-import commons.sim.util.SaaSUsersProperties;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -28,18 +27,23 @@ public class WorkloadParserFactory {
 
 	@SuppressWarnings("unchecked")
 	public static WorkloadParser<List<Request>> getWorkloadParser(long pageSize){
+		
+		assert pageSize > 0: "Invalid page size";
+		
 		Configuration config = Configuration.getInstance();
 		String[] workloads = config.getWorkloads();
 		ParserIdiom parserIdiom = config.getParserIdiom();
 		
 		switch (parserIdiom) {
 			case GEIST:
-				int numberOfUsers = config.getInt(SaaSUsersProperties.SAAS_NUMBER_OF_USERS);
-				WorkloadParser<Request>[] parsers = new WorkloadParser[numberOfUsers];
-				if(numberOfUsers == 1){
+				String[] workloadFiles = config.getWorkloads();
+				
+				WorkloadParser<Request>[] parsers = new WorkloadParser[workloadFiles.length];
+				if(workloadFiles.length == 1){
 					return new TimeBasedWorkloadParser(pageSize, new GEISTSingleFileWorkloadParser(workloads[0]));
 				}
-				for(int i =0; i < numberOfUsers; i++){
+				
+				for(int i =0; i < workloadFiles.length; i++){
 					parsers[i] = new GEISTMultiFileWorkloadParser(workloads[i], index++);
 				}
 				return new TimeBasedWorkloadParser(pageSize, parsers);

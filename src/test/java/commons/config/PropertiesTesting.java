@@ -2,12 +2,18 @@ package commons.config;
 
 public class PropertiesTesting {
 	
+	public static final String EMPTY_FILE = "src/test/resources/emptyfile.txt";
+	
+	public static final String INVALID_WORKLOAD = "src/test/resources/workload/invalid_workload.trc";
+	
 	public static final String VALID_WORKLOAD = "src/test/resources/workload/w1.dat";
 	public static final String VALID_WORKLOAD_2 = "src/test/resources/workload/w2.dat";
 	public static final String VALID_WORKLOAD_3 = "src/test/resources/workload/workload.trc";
 	
-	public static final String VALID_FILE = "src/test/resources/config.properties";
+	public static final String VALID_SINGLE_WORKLOAD_FILE = "src/test/resources/config-single-workload-file.properties";
+	public static final String VALID_MULTI_WORKLOAD_FILE = "src/test/resources/config-multi-workload-file.properties";
 	public static final String VALID_RANJAN_FILE = "src/test/resources/config-ranjan.properties";
+	public static final String INVALID_IDIOM_FILE = "src/test/resources/idiom.properties";
 	
 	public static final String INEXISTENT_CONFIG_FILE = "src/test/resources/inexistent.config";
 	public static final String INEXISTENT_PLANS_FILE = "src/test/resources/inexistent1.properties";

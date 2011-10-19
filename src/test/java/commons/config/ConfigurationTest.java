@@ -90,14 +90,14 @@ public class ConfigurationTest {
 	
 	@Test
 	public void testBuildInstanceWithValidConfiguration() throws ConfigurationException {
-		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
+		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
 		assertNotNull(Configuration.getInstance());
 	}
 	
 	@Test
 	public void testBuildInstanceWithValidConfigurationAndPreviousSimData() throws ConfigurationException {
 		savePreviousData();
-		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
+		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
 		assertNotNull(Configuration.getInstance());
 	}
 	
@@ -248,7 +248,7 @@ public class ConfigurationTest {
 	
 	@Test
 	public void testValidFile() throws ConfigurationException{
-		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
+		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
 		Configuration config = Configuration.getInstance();
 		assertEquals(RoundRobinHeuristic.class, config.getApplicationHeuristics()[0]);
 		assertEquals(DynamicProvisioningSystem.class, config.getDPSHeuristicClass());
@@ -259,7 +259,7 @@ public class ConfigurationTest {
 	public void testValidFileWithPreviousData() throws ConfigurationException{
 		savePreviousData();
 
-		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
+		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
 		Configuration config = Configuration.getInstance();
 		assertEquals(RoundRobinHeuristic.class, config.getApplicationHeuristics()[0]);
 		assertEquals(DynamicProvisioningSystem.class, config.getDPSHeuristicClass());
@@ -287,7 +287,7 @@ public class ConfigurationTest {
 
 	@Test
 	public void testSaaSUsersAndPlansValidFile() throws ConfigurationException{
-		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
+		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
 		Configuration config = Configuration.getInstance();
 		User[] users = config.getUsers();
 		assertNotNull(users);
@@ -326,7 +326,7 @@ public class ConfigurationTest {
 	 */
 	@Test
 	public void testIaaSValidFile() throws ConfigurationException{
-		Configuration.buildInstance(PropertiesTesting.VALID_FILE);
+		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
 		Configuration config = Configuration.getInstance();
 		Provider[] providers = config.getProviders();
 		assertNotNull(providers);

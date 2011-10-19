@@ -18,16 +18,33 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 	
 	protected final int saasClientID;
 
+	/**
+	 * Default constructor.
+	 * 
+	 * @param workload Workload file name.
+	 * @param saasclientID SaaS client ID.
+	 */
 	public AbstractWorkloadParser(String workload, int saasclientID) {
+		assert workload != null: "Null workload. Please check your configuration and trace files.";
+		
+		String workloadFile = readFileToUse(workload);
 		try {
 			this.saasClientID = saasclientID;
-			this.reader = new BufferedReader(new FileReader(readFileToUse(workload)));//Using normal load file
+			this.reader = new BufferedReader(new FileReader(workloadFile));//Using normal load file
 			this.next = readNext();
 		} catch (FileNotFoundException e) {
+			if(workloadFile.isEmpty()){
+				throw new RuntimeException("Blank line in " + workload + " file." , e);
+			}
 			throw new RuntimeException("Problem reading workload file. ", e);
 		}
 	}
 	
+	/**
+	 * 
+	 * @param workload
+	 * @return
+	 */
 	private String readFileToUse(String workload) {
 		this.currentDay = Configuration.getInstance().getSimulationInfo().getSimulatedDays();
 		try {
@@ -38,10 +55,8 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 				currentLine++;
 				file = reader.readLine();
 			}
-			return file;
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Problem reading workload file.", e);
-		} catch (IOException e) {
+			return file == null? "": file;
+		} catch (Exception e) {
 			throw new RuntimeException("Problem reading workload file.", e);
 		}
 	}
