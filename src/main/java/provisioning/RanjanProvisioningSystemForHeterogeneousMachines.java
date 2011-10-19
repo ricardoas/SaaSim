@@ -76,9 +76,9 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 		for(MachineType machineType: typeList){//TODO test which order is the best
 			for (Provider provider : providers) {
 				while(provider.canBuyMachine(true, machineType) && 
-						serversAdded + machineType.getPower() <= numberOfServersToAdd){
+						serversAdded + machineType.getNumberOfCores() <= numberOfServersToAdd){
 					configurable.addServer(tier, provider.buyMachine(true, machineType), true);
-					serversAdded += machineType.getPower();
+					serversAdded += machineType.getNumberOfCores();
 				}
 				if(serversAdded == numberOfServersToAdd){
 					break;
@@ -94,9 +94,9 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 			for(MachineType machineType : this.acceleratorTypes){
 				for (Provider provider : providers) {
 					while(provider.canBuyMachine(false, machineType) && 
-							serversAdded + machineType.getPower() <= numberOfServersToAdd){
+							serversAdded + machineType.getNumberOfCores() <= numberOfServersToAdd){
 						configurable.addServer(tier, provider.buyMachine(false, machineType), true);
-						serversAdded += machineType.getPower();
+						serversAdded += machineType.getNumberOfCores();
 					}
 					if(serversAdded == numberOfServersToAdd){
 						break;

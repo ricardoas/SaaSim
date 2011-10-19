@@ -2,18 +2,12 @@ package commons.sim.components;
 
 import static org.junit.Assert.*;
 
-import java.lang.reflect.Field;
 import java.util.Queue;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import util.MockedConfigurationTest;
 
@@ -495,13 +489,13 @@ public class MultiCoreTimeSharedMachineTest extends MockedConfigurationTest {
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
-		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50});
+		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50, 50, 50, 50});
 		
 		loadBalancer.reportRequestFinished(request);
 		
 		EasyMock.replay(loadBalancer);
 		
-		MultiCoreTimeSharedMachine machine = new MultiCoreTimeSharedMachine(scheduler, smallMachine, loadBalancer);
+		MultiCoreTimeSharedMachine machine = new MultiCoreTimeSharedMachine(scheduler, xLargeMachine, loadBalancer);
 		machine.sendRequest(request);
 
 		scheduler.start();
