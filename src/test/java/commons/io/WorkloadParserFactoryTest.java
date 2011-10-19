@@ -1,27 +1,17 @@
-package provisioning.util;
+package commons.io;
 
 import static org.junit.Assert.*;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 import util.ValidConfigurationTest;
 
 import commons.cloud.Request;
-import commons.config.Configuration;
-import commons.config.PropertiesTesting;
-import commons.io.GEISTMultiFileWorkloadParser;
-import commons.io.GEISTSingleFileWorkloadParser;
-import commons.io.ParserIdiom;
-import commons.io.TickSize;
-import commons.io.TimeBasedWorkloadParser;
 import commons.io.WorkloadParser;
-import commons.sim.util.SaaSUsersProperties;
-import commons.util.SimulationInfo;
+import commons.io.WorkloadParserFactory;
 
 public class WorkloadParserFactoryTest extends ValidConfigurationTest{
 	

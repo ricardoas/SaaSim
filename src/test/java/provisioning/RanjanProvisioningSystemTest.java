@@ -11,7 +11,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.powermock.api.easymock.PowerMock;
 
-import provisioning.util.WorkloadParserFactory;
 import util.ValidConfigurationTest;
 
 import commons.cloud.MachineType;
@@ -22,6 +21,7 @@ import commons.cloud.User;
 import commons.config.Configuration;
 import commons.config.PropertiesTesting;
 import commons.io.WorkloadParser;
+import commons.io.WorkloadParserFactory;
 import commons.sim.AccountingSystem;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.MachineDescriptor;

@@ -19,7 +19,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import planning.util.PlanIOHandler;
 import provisioning.DPS;
 import provisioning.util.DPSFactory;
-import provisioning.util.WorkloadParserFactory;
 import util.MockedConfigurationTest;
 
 import commons.cloud.MachineType;
@@ -31,6 +30,7 @@ import commons.io.Checkpointer;
 import commons.io.TickSize;
 import commons.io.TimeBasedWorkloadParser;
 import commons.io.WorkloadParser;
+import commons.io.WorkloadParserFactory;
 import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.ApplicationFactory;

@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.Semaphore;
 
 import commons.cloud.Request;
 import commons.sim.jeevent.JEAbstractEventHandler;
@@ -40,6 +41,8 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	protected long totalTimeUsed;
 	protected long lastUpdate;
 	
+	protected Semaphore semaphore;
+	
 	/**
 	 * Default constructor
 	 * @param scheduler Event scheduler.
@@ -57,6 +60,8 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		this.totalTimeUsed = 0;
 		this.totalTimeUsedInLastPeriod = 0;
 		this.lastUpdate = scheduler.now();
+		this.NUMBER_OF_CORES = descriptor.getType().getNumberOfCores();
+		this.semaphore = new Semaphore(this.NUMBER_OF_CORES, true);
 	}
 	
 	/**
@@ -102,7 +107,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		this.processorQueue.add(request);
 		request.assignTo(descriptor.getType());
 		
-		if(processorQueue.size() == 1){
+		if(!this.processorQueue.isEmpty() && this.semaphore.tryAcquire()){
 			scheduleNext();
 		}
 	}
@@ -120,7 +125,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 * 
 	 */
 	protected void tryToShutdown() {
-		if(processorQueue.isEmpty() && shutdownOnFinish){
+		if( shutdownOnFinish && ! isBusy()){
 			long scheduledTime = getScheduler().now();
 			descriptor.setFinishTimeInMillis(scheduledTime);
 			send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, scheduledTime, descriptor));
@@ -134,15 +139,16 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	public void handleEvent(JEEvent event) {
 		switch (event.getType()) {
 			case PREEMPTION:
-				Request request = processorQueue.poll();
+				Request request = (Request) event.getValue()[1];
+				this.semaphore.release();
 				
 				long processedDemand = (Long) event.getValue()[0];
 				totalTimeUsedInLastPeriod += processedDemand;
 				totalTimeUsed += processedDemand;
 				
-				request.update(processedDemand);
-				
 				lastUpdate = getScheduler().now();
+				
+				request.update(processedDemand);
 				
 				if(request.isFinished()){
 					descriptor.updateTransference(request.getRequestSizeInBytes(), request.getResponseSizeInBytes());
@@ -151,7 +157,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 					processorQueue.add(request);
 				}
 				
-				if(!processorQueue.isEmpty()){
+				if(!processorQueue.isEmpty() && this.semaphore.tryAcquire()){
 					scheduleNext();
 				}
 				
@@ -171,14 +177,15 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 * Schedule next {@link Request} on the processor queue.
 	 */
 	protected void scheduleNext() {
-		Request nextRequest = processorQueue.peek();
+		Request nextRequest = processorQueue.poll();
 		long nextQuantum = Math.min(nextRequest.getTotalToProcess(), cpuQuantumInMilis);
 		lastUpdate = getScheduler().now();
-		send(new JEEvent(JEEventType.PREEMPTION, this, nextQuantum + lastUpdate, nextQuantum));
+		send(new JEEvent(JEEventType.PREEMPTION, this, nextQuantum+lastUpdate, nextQuantum, nextRequest));
 	}
 	
 	public boolean isBusy() {
-		return this.processorQueue.size() != 0;
+		return !this.processorQueue.isEmpty() || this.semaphore.availablePermits() != this.NUMBER_OF_CORES;
+
 	}	
 
 	@Override
@@ -212,15 +219,17 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 */
 	@Override
 	public double computeUtilisation(long timeInMillis){
-		if(processorQueue.isEmpty()){
-			double utilisation = (1.0 * totalTimeUsedInLastPeriod)/(timeInMillis - lastUtilisationCalcTime);
+		if(processorQueue.isEmpty() && this.semaphore.availablePermits() == this.NUMBER_OF_CORES){
+			double utilisation = (1.0 * totalTimeUsedInLastPeriod)/((timeInMillis - lastUtilisationCalcTime) * this.NUMBER_OF_CORES);
 			totalTimeUsedInLastPeriod = 0;
 			lastUtilisationCalcTime = timeInMillis;
 			return utilisation;
 		}
 		
-		long totalBeingProcessedNow = timeInMillis - lastUpdate;
-		double utilisation = (1.0* (totalTimeUsedInLastPeriod + totalBeingProcessedNow) )/(timeInMillis-lastUtilisationCalcTime);
+		long totalBeingProcessedNow = (timeInMillis - lastUpdate);
+		totalBeingProcessedNow *= (this.NUMBER_OF_CORES - this.semaphore.availablePermits());
+		
+		double utilisation = (1.0* (totalTimeUsedInLastPeriod + totalBeingProcessedNow) )/((timeInMillis - lastUtilisationCalcTime) * this.NUMBER_OF_CORES);
 		totalTimeUsedInLastPeriod = -totalBeingProcessedNow;
 		lastUtilisationCalcTime = timeInMillis;
 		return utilisation;

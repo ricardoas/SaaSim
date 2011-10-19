@@ -1,17 +1,12 @@
 /**
  * 
  */
-package provisioning.util;
+package commons.io;
 
 import java.util.List;
 
 import commons.cloud.Request;
 import commons.config.Configuration;
-import commons.io.GEISTMultiFileWorkloadParser;
-import commons.io.GEISTSingleFileWorkloadParser;
-import commons.io.ParserIdiom;
-import commons.io.TimeBasedWorkloadParser;
-import commons.io.WorkloadParser;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br

@@ -123,9 +123,9 @@ public class LoadBalancerTest extends MockedConfigurationTest {
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(LoadBalancer.class))).andReturn(1);
-		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(MultiCoreTimeSharedMachine.class))).andReturn(2);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(TimeSharedMachine.class))).andReturn(2);
 		EasyMock.expect(scheduler.now()).andReturn(0l);
-		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(MultiCoreTimeSharedMachine.class))).andReturn(2);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(TimeSharedMachine.class))).andReturn(2);
 		
 		this.schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
 		
@@ -136,7 +136,7 @@ public class LoadBalancerTest extends MockedConfigurationTest {
 		PowerMock.replayAll(this.schedulingHeuristic, config, scheduler);
 		
 		lb = new LoadBalancer(scheduler, schedulingHeuristic, Integer.MAX_VALUE, 0);
-		MultiCoreTimeSharedMachine machine = new MultiCoreTimeSharedMachine(scheduler, descriptor, lb);
+		TimeSharedMachine machine = new TimeSharedMachine(scheduler, descriptor, lb);
 		machine.semaphore.acquire(2);
 		
 		assertEquals(0, lb.getServers().size());

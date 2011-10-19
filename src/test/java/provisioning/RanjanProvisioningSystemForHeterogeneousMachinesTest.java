@@ -14,7 +14,6 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import provisioning.util.WorkloadParserFactory;
 import util.MockedConfigurationTest;
 
 import commons.cloud.Contract;
@@ -26,6 +25,7 @@ import commons.cloud.User;
 import commons.config.Configuration;
 import commons.config.PropertiesTesting;
 import commons.io.WorkloadParser;
+import commons.io.WorkloadParserFactory;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEEventScheduler;

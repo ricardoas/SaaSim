@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import provisioning.util.WorkloadParserFactory;
 
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
@@ -14,6 +13,7 @@ import commons.cloud.User;
 import commons.cloud.UtilityResult;
 import commons.config.Configuration;
 import commons.io.Checkpointer;
+import commons.io.WorkloadParserFactory;
 import commons.sim.AccountingSystem;
 import commons.sim.DynamicConfigurable;
 import commons.sim.components.MachineDescriptor;

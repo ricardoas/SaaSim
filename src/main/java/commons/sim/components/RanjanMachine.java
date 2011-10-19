@@ -22,6 +22,11 @@ import commons.sim.jeevent.JEEventType;
  */
 public class RanjanMachine extends TimeSharedMachine {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7181645412704549035L;
+
 	private Queue<Request> backlog;
 	
 	protected long maximumNumberOfSimultaneousThreads;
@@ -37,6 +42,7 @@ public class RanjanMachine extends TimeSharedMachine {
 		this.backlogMaximumNumberOfRequests = Configuration.getInstance().getLong(RANJAN_HEURISTIC_BACKLOG_SIZE);
 	}
 	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -45,7 +51,6 @@ public class RanjanMachine extends TimeSharedMachine {
 		if(hasTokenLeft()){
 			super.sendRequest(request);
 		}else if(canWaitForToken()){
-			request.assignTo(this.descriptor.getType());
 			this.backlog.add(request);
 		}else{
 			send(new JEEvent(JEEventType.REQUESTQUEUED, getLoadBalancer(), getScheduler().now(), request));
@@ -53,8 +58,8 @@ public class RanjanMachine extends TimeSharedMachine {
 		}
 	}
 
-	protected boolean hasTokenLeft() {
-		return processorQueue.size() < maximumNumberOfSimultaneousThreads;
+	private boolean hasTokenLeft() {
+		return processorQueue.size() + (this.NUMBER_OF_CORES - this.semaphore.availablePermits()) < maximumNumberOfSimultaneousThreads;
 	}
 	
 	private boolean canWaitForToken() {
@@ -64,7 +69,9 @@ public class RanjanMachine extends TimeSharedMachine {
 	@Override
 	protected void requestFinished(Request request) {
 		if(!backlog.isEmpty()){
-			processorQueue.add(backlog.poll());
+			Request newRequestToAdd = backlog.poll();
+			newRequestToAdd.assignTo(this.descriptor.getType());
+			processorQueue.add(newRequestToAdd);
 		}
 		super.requestFinished(request);
 	}
