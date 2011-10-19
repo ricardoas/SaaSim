@@ -28,7 +28,6 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 		assert workload != null: "Null workload. Please check your configuration and trace files.";
 		
 		String workloadFile = readFileToUse(workload);
-		System.out.println(workloadFile);
 		try {
 			this.saasClientID = saasclientID;
 			this.reader = new BufferedReader(new FileReader(workloadFile));//Using normal load file
