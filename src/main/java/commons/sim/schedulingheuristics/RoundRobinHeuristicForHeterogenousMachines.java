@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import commons.cloud.Request;
-import commons.config.Configuration;
 import commons.sim.components.Machine;
 
 /**
@@ -20,12 +19,18 @@ public class RoundRobinHeuristicForHeterogenousMachines implements SchedulingHeu
 	private int nextToUse;
 	private List<Integer> allocationsPerServer;
 	
+	private long requestsArrivalCounter;
+	private long finishedRequestsCounter;
+	
 	/**
 	 * Default constructor
 	 */
 	public RoundRobinHeuristicForHeterogenousMachines() {
 		this.nextToUse = 0;
 		this.allocationsPerServer = new ArrayList<Integer>();
+		
+		this.requestsArrivalCounter = 0;
+		this.finishedRequestsCounter = 0;
 	}
 
 	/**
@@ -34,6 +39,7 @@ public class RoundRobinHeuristicForHeterogenousMachines implements SchedulingHeu
 	@Override
 	public Machine getNextServer(Request request, List<Machine> servers) {
 		initList(servers);
+		this.requestsArrivalCounter++;
 		
 		Integer alreadyAllocated = this.allocationsPerServer.get(nextToUse);
 		//Retrieving server
@@ -66,20 +72,23 @@ public class RoundRobinHeuristicForHeterogenousMachines implements SchedulingHeu
 
 	@Override
 	public long getRequestsArrivalCounter() {
-		return 0;
+		return this.requestsArrivalCounter;
 	}
 
 	@Override
 	public long getFinishedRequestsCounter() {
-		return 0;
+		return this.finishedRequestsCounter;
 	}
 
 	@Override
 	public void resetCounters() {
+		this.requestsArrivalCounter = 0;
+		this.finishedRequestsCounter = 0;
 	}
 
 	@Override
 	public void reportRequestFinished() {
+		this.finishedRequestsCounter++;
 	}
 
 	/**
@@ -87,6 +96,10 @@ public class RoundRobinHeuristicForHeterogenousMachines implements SchedulingHeu
 	 */
 	@Override
 	public void finishServer(Machine server, int index, List<Machine> servers) {
+		if(allocationsPerServer.size() == 0){
+			return;
+		}
+		
 		if(nextToUse > index){
 			nextToUse = nextToUse - 1;
 		}
