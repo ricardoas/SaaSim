@@ -3,6 +3,7 @@ package commons.sim.components;
 import static commons.sim.util.SimulatorProperties.*;
 import static org.junit.Assert.*;
 
+import java.lang.reflect.Field;
 import java.util.Queue;
 
 import org.easymock.Capture;
@@ -399,8 +400,6 @@ public class RanjanMachineTest extends MockedConfigurationTest {
 	 */
 	@Test
 	public void testComputeUtilisationWithThreadLimitReached() throws Exception{
-		System.out
-				.println("RanjanMachineTest.testComputeUtilisationWithThreadLimitReached()");
 		long localMaxNumberOfThreads = 1l;
 		long backlogSize = 1l;
 		
@@ -410,9 +409,7 @@ public class RanjanMachineTest extends MockedConfigurationTest {
 		EasyMock.expect(config.getLong(RANJAN_HEURISTIC_NUMBER_OF_TOKENS)).andReturn(localMaxNumberOfThreads);
 		EasyMock.expect(config.getLong(RANJAN_HEURISTIC_BACKLOG_SIZE)).andReturn(backlogSize);
 		
-		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
-		EasyMock.expect(scheduler.now()).andReturn(0l).times(2);
-		EasyMock.expect(scheduler.now()).andReturn(100l).times(2);
+		JEEventScheduler scheduler = JEEventScheduler.getInstance();
 
 		Request firstRequest = EasyMock.createStrictMock(Request.class);
 		firstRequest.assignTo(MachineType.M1_SMALL);
@@ -428,10 +425,11 @@ public class RanjanMachineTest extends MockedConfigurationTest {
 		
 		PowerMock.replayAll(firstRequest, secondRequest, config, loadBalancer);
 		
-		System.out.println(scheduler);
-		
 		Machine machine = new RanjanMachine(scheduler, descriptor, loadBalancer);
 		machine.sendRequest(firstRequest);
+		Field field = JEEventScheduler.class.getDeclaredField("now");
+		field.setAccessible(true);
+		field.set(scheduler, 100l);
 		machine.sendRequest(secondRequest);
 		
 		//Verifying utilization with one request in the queue, requests in backlog
@@ -445,10 +443,10 @@ public class RanjanMachineTest extends MockedConfigurationTest {
 
 		machine.handleEvent(event);
 		
-		PowerMock.verifyAll();
-		
 		//Verifying queue of requests that are being processed
 		assertEquals(1.0, machine.computeUtilisation(20l), 0.0);
+		
+		PowerMock.verifyAll();
 	}
 	
 	/**
@@ -461,13 +459,15 @@ public class RanjanMachineTest extends MockedConfigurationTest {
 	public void testComputeUtilisationWithThreadLimitNotReached() throws Exception{
 		Configuration config = mockConfiguration();
 		
-		JEEventScheduler scheduler = PowerMock.createPartialMockAndInvokeDefaultConstructor(JEEventScheduler.class, "now");
-		EasyMock.expect(scheduler.now()).andReturn(0L).times(2);
+		Field field = JEEventScheduler.class.getDeclaredField("INSTANCE");
+		field.setAccessible(true);
+		field.set(null, null);
+		JEEventScheduler scheduler = JEEventScheduler.getInstance();
 		
 		Request request = EasyMock.createStrictMock(Request.class);
 		request.assignTo(MachineType.M1_SMALL);
 		EasyMock.expect(request.getTotalToProcess()).andReturn(60000L);
-		PowerMock.replayAll(request, scheduler, config);
+		PowerMock.replayAll(request, config);
 		
 		Machine machine = new RanjanMachine(scheduler, descriptor, null);
 		machine.sendRequest(request);
@@ -486,6 +486,7 @@ public class RanjanMachineTest extends MockedConfigurationTest {
 		assertEquals(1.0, machine.computeUtilisation(100l), 0.0);
 		
 		PowerMock.verifyAll();
+		field.set(null, null);
 	}
 	
 	@Test

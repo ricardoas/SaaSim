@@ -34,7 +34,6 @@ public class RoundRobinHeuristicForHeterogenousMachines implements SchedulingHeu
 	@Override
 	public Machine getNextServer(Request request, List<Machine> servers) {
 		initList(servers);
-		Configuration config = Configuration.getInstance();
 		
 		Integer alreadyAllocated = this.allocationsPerServer.get(nextToUse);
 		//Retrieving server

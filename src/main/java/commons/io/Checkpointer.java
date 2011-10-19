@@ -103,6 +103,11 @@ public class Checkpointer {
 	public static void clear(){
 		new File(CHECKPOINT_FILE).delete();
 		new File(MACHINE_DATA_DUMP).delete();
+		scheduler = null;
+		simulationInfo = null;
+		application = null;
+		providers = null;
+		users = null;
 	}
 
 	/**

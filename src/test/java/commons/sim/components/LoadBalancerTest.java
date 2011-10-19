@@ -217,7 +217,6 @@ public class LoadBalancerTest extends MockedConfigurationTest {
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config);
 		EasyMock.expect(config.getApplicationHeuristics()).andReturn(new Class[] {ProfitDrivenHeuristic.class});
-		EasyMock.expect(Configuration.getInstance()).andReturn(config);
 		
 		EasyMock.expect(newRequestEvent.getType()).andReturn(JEEventType.NEWREQUEST).once();
 		EasyMock.expect(newRequestEvent.getValue()).andReturn(new Request [] {request}).once();

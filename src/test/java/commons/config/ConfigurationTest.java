@@ -24,6 +24,7 @@ import commons.cloud.TypeProvider;
 import commons.cloud.User;
 import commons.io.Checkpointer;
 import commons.sim.components.LoadBalancer;
+import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
 import commons.util.SimulationInfo;
 
@@ -120,6 +121,7 @@ public class ConfigurationTest {
 		Provider provider3 = new Provider(2, "prov3", 10, 20, 0.15, new long[]{0}, new double[]{0.0, 0.0}, new long[]{1000}, 
 				new double[]{0.0, 0.1}, types);
 		
+		JEEventScheduler.getInstance();
 		Checkpointer.save(info, new User[]{user, user2}, new Provider[]{provider, provider2, provider3}, new LoadBalancer[]{});
 	}
 	

@@ -7,6 +7,8 @@ import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.Test;
 
+import commons.io.Checkpointer;
+
 import util.CleanConfigurationTest;
 
 public class JEEventSchedulerTest extends CleanConfigurationTest {
@@ -24,7 +26,7 @@ public class JEEventSchedulerTest extends CleanConfigurationTest {
 	public void testStart() {
 		assertEquals(0L, getInstance().now());
 		getInstance().start();
-		assertEquals(Long.MAX_VALUE, getInstance().now());
+		assertEquals(Checkpointer.INTERVAL, getInstance().now());
 	}
 
 	@Test(expected=AssertionError.class)
@@ -111,7 +113,7 @@ public class JEEventSchedulerTest extends CleanConfigurationTest {
 		getInstance().queueEvent(event);
 		getInstance().cancelEvent(event);
 		getInstance().start();
-		assertEquals(Long.MAX_VALUE, getInstance().now());
+		assertEquals(Checkpointer.INTERVAL, getInstance().now());
 		
 		EasyMock.verify(handler);
 	}
@@ -121,7 +123,7 @@ public class JEEventSchedulerTest extends CleanConfigurationTest {
 		getInstance().reset(3600000L);
 		assertEquals(0L, getInstance().now());
 		getInstance().start();
-		assertEquals(3600000L, getInstance().now());
+		assertEquals(Checkpointer.INTERVAL, getInstance().now());
 	}
 	
 	@Test(expected=JEException.class)
@@ -140,7 +142,7 @@ public class JEEventSchedulerTest extends CleanConfigurationTest {
 		EasyMock.replay(handler);
 		
 		getInstance().start();
-		assertEquals(3600000L, getInstance().now());
+		assertEquals(Checkpointer.INTERVAL, getInstance().now());
 		
 		//Queuing past event
 		getInstance().queueEvent(new JEEvent(JEEventType.READWORKLOAD, handler, 1));

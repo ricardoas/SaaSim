@@ -12,7 +12,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import provisioning.Monitor;
 
 import commons.config.Configuration;
-import commons.io.TickSize;
 import commons.sim.SimpleSimulator;
 import commons.sim.Simulator;
 import commons.sim.components.LoadBalancer;
@@ -35,10 +34,7 @@ public class SimulatorFactoryTest {
 		
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
-		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
-		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
-		
+		EasyMock.expect(Configuration.getInstance()).andReturn(config);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(simInfo);
 		
 		ApplicationFactory factory = EasyMock.createStrictMock(ApplicationFactory.class);

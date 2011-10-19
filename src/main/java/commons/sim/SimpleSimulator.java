@@ -28,7 +28,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 */
 	private static final long serialVersionUID = -8028580648054904982L;
 	
-	public static int[] daysInMonths = {3, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
+	public static int[] daysInMonths = {31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
 	
 	protected int currentMonth;
 	private LoadBalancer tiers [];

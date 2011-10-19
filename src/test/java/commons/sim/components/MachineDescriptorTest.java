@@ -50,7 +50,7 @@ public class MachineDescriptorTest extends CleanConfigurationTest {
 	 */
 	@Test
 	public void testEqualsDifferentMachinesWithSameID() {
-		assertFalse(small.equals(large));
+		assertTrue(small.equals(large));
 	}
 
 	/**

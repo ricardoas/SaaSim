@@ -6,12 +6,12 @@ import java.util.ArrayList;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
+import org.powermock.api.easymock.PowerMock;
 
 import util.ValidConfigurationTest;
 
 import commons.cloud.MachineType;
 import commons.cloud.Request;
-import commons.config.Configuration;
 import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.components.TimeSharedMachine;
@@ -299,7 +299,7 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
 		
-		//Since first machine power is one, now the second machine should be retrieved
+		//Since first machine power is two, now the second machine should be retrieved
 		nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine2);
@@ -316,6 +316,8 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
+		
+		PowerMock.verifyAll();
 	}
 	
 	@Test
@@ -324,13 +326,10 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.C1_MEDIUM, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_LARGE, 0), null);
+		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_LARGE, 0), null);
+		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_XLARGE, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
-		
-		double machineRelativePower = 1.3333;
-		double machineRelativePower2 = 3;
 		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
@@ -341,7 +340,11 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
 		
-		//Since first machine power is one, now the second machine should be retrieved
+		//Since first machine power is two, now the second machine should be retrieved
+		nextServer = this.heuristic.getNextServer(request, servers);
+		assertNotNull(nextServer);
+		assertEquals(nextServer, machine2);
+		
 		nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine2);
@@ -370,13 +373,10 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.C1_MEDIUM, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_LARGE, 0), null);
+		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_LARGE, 0), null);
+		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_XLARGE, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
-		
-		double machineRelativePower = 1.3333;
-		double machineRelativePower2 = 3;
 		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
@@ -387,7 +387,11 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
 		
-		//Since first machine power is one, now the second machine should be retrieved
+		//Since first machine power is two, now the second machine should be retrieved
+		nextServer = this.heuristic.getNextServer(request, servers);
+		assertNotNull(nextServer);
+		assertEquals(nextServer, machine2);
+		
 		nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine2);
@@ -412,6 +416,8 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine2);
+		
+		PowerMock.verifyAll();
 	}
 	
 	@Test
@@ -420,13 +426,10 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.C1_MEDIUM, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_LARGE, 0), null);
+		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_LARGE, 0), null);
+		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M2_XLARGE, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
-		
-		double machineRelativePower = 1.3333;
-		double machineRelativePower2 = 2;
 		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
@@ -437,7 +440,7 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
 		
-		//Since first machine power is one, now the second machine should be retrieved
+		//Since first machine power is two, now the second machine should be retrieved
 		nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine2);
@@ -472,7 +475,7 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		servers.add(machine);
 		
 		//Retrieving for the first time
-		Machine nextServer = this.heuristic.getNextServer(request, servers);
+		this.heuristic.getNextServer(request, servers);
 		
 		assertEquals(0, this.heuristic.getRequestsArrivalCounter());
 	}

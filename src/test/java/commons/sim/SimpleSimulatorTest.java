@@ -239,7 +239,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 	}
 	
 	@Test
-	public void testConstructorWithNullMonitor(){
+	public void testConstructor(){
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(1);
@@ -375,6 +375,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
+		simulator.setMonitor(monitor);
 		
 		JEEvent event = new JEEvent(JEEventType.CHARGE_USERS, handler, 1L, 31);
 		simulator.handleEvent(event);
@@ -479,8 +480,9 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
 		SimpleSimulator simulator = new SimpleSimulator(scheduler, loadBalancer);
-		
+		simulator.setMonitor(monitor);
 		simulator.setWorkloadParser(workloadParser);
+		
 		JEEvent event = new JEEvent(JEEventType.COLLECT_STATISTICS, handler, 1L, timeSharedMachine);
 		simulator.handleEvent(event);
 		assertEquals(JEEventType.COLLECT_STATISTICS, eventCollectStatistics.getValue().getType());
@@ -492,9 +494,10 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 	public void testStartWithoutBeingLastSimulationDay() throws Exception{
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(4);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(new SimulationInfo(0, 0)).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(2l);
+		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleSimulator.class))).andReturn(1);
@@ -505,7 +508,10 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		scheduler.start();
 		PowerMock.expectNew(JEEventScheduler.class).andReturn(scheduler);
 		
+		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
+		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		loadBalancer.setMonitor(monitor);
 		EasyMock.expect(loadBalancer.getHandlerId()).andReturn(2);
 		
 		ApplicationFactory appFactory = EasyMock.createStrictMock(ApplicationFactory.class);
@@ -515,21 +521,21 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		loadBalancers[0] = loadBalancer;
 		EasyMock.expect(appFactory.buildApplication(EasyMock.isA(JEEventScheduler.class))).andReturn(loadBalancers);
 		
-		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		PowerMock.replayAll(config, appFactory, monitor, loadBalancer, scheduler);
 		
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
+		simulator.setMonitor(monitor);
 		simulator.start();
-		
 	}
 	
 	@Test
 	public void testStartInFirstChargeUsersDay() throws Exception{
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(4);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(new SimulationInfo(30, 0)).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(40l);
+		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleSimulator.class))).andReturn(1);
@@ -541,7 +547,10 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		scheduler.start();
 		PowerMock.expectNew(JEEventScheduler.class).andReturn(scheduler);
 		
+		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
+		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		loadBalancer.setMonitor(monitor);
 		EasyMock.expect(loadBalancer.getHandlerId()).andReturn(2);
 		
 		ApplicationFactory appFactory = EasyMock.createStrictMock(ApplicationFactory.class);
@@ -551,10 +560,10 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		loadBalancers[0] = loadBalancer;
 		EasyMock.expect(appFactory.buildApplication(EasyMock.isA(JEEventScheduler.class))).andReturn(loadBalancers);
 		
-		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		PowerMock.replayAll(config, appFactory, monitor, loadBalancer, scheduler);
 		
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
+		simulator.setMonitor(monitor);
 		simulator.start();
 		
 	}
@@ -563,9 +572,10 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 	public void testStartInOtherChargeUsersDay() throws Exception{
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(4);
 		EasyMock.expect(config.getSimulationInfo()).andReturn(new SimulationInfo(180, 5)).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(181l);
+		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleSimulator.class))).andReturn(1);
@@ -577,7 +587,10 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		scheduler.start();
 		PowerMock.expectNew(JEEventScheduler.class).andReturn(scheduler);
 		
+		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
+		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		loadBalancer.setMonitor(monitor);
 		EasyMock.expect(loadBalancer.getHandlerId()).andReturn(2);
 		
 		ApplicationFactory appFactory = EasyMock.createStrictMock(ApplicationFactory.class);
@@ -587,12 +600,11 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		loadBalancers[0] = loadBalancer;
 		EasyMock.expect(appFactory.buildApplication(EasyMock.isA(JEEventScheduler.class))).andReturn(loadBalancers);
 		
-		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		PowerMock.replayAll(config, appFactory, monitor, loadBalancer, scheduler);
 		
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
+		simulator.setMonitor(monitor);
 		simulator.start();
-		
 	}
 	
 	@Test
