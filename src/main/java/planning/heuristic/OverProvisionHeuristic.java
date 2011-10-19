@@ -90,6 +90,8 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 
 		if(config.getSimulationInfo().getSimulatedDays() == config.getLong(SimulatorProperties.PLANNING_PERIOD)){//Simulation finished!
 			
+			Checkpointer.clear();
+			PlanIOHandler.clear();
 			Map<MachineType, Integer> plan = this.getPlan(null);
 			try {
 				PlanIOHandler.createPlanFile(plan, config.getProviders());
@@ -191,7 +193,7 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 		( config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME) / this.requestsMeanDemand ) ) * FACTOR );
 		
 		Map<MachineType, Integer> plan = new HashMap<MachineType, Integer>();
-		MachineType machineType = MachineType.valueOf(config.getString(SimulatorProperties.PLANNING_TYPE).toUpperCase());
+		MachineType machineType = MachineType.valueOf(config.getString(SimulatorProperties.PLANNING_TYPE).toUpperCase().replace('.', '_'));
 		plan.put(machineType, machinesToReserve);
 		return plan;
 	}

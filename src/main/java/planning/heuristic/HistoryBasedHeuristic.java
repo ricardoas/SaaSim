@@ -85,11 +85,14 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 		if(config.getSimulationInfo().getSimulatedDays() == config.getLong(SimulatorProperties.PLANNING_PERIOD)){//Simulation finished!
 			
 			calculateMachinesToReserve(config);
+			Checkpointer.clear();
+			PlanIOHandler.clear();
 			try {
 				PlanIOHandler.createPlanFile(this.plan, config.getProviders());
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
+			
 			
 		}else{//Persist data to other round
 			
