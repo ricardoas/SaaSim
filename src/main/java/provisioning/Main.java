@@ -46,7 +46,6 @@ public class Main {
 		
 		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
 		
-		System.out.println(info.getSimulatedDays());
 		if(info.getSimulatedDays() 
 				== Configuration.getInstance().getLong(SimulatorProperties.PLANNING_PERIOD)){
 			
