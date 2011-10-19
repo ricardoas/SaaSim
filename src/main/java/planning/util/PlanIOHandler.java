@@ -21,6 +21,10 @@ public class PlanIOHandler {
 	private static final String OUTPUT_FILE = "output.plan";
 	public static final String NUMBER_OF_MACHINES_FILE = "maxServers.dat";
 	
+	public static void clear(){
+		new File(NUMBER_OF_MACHINES_FILE).delete();
+	}
+	
 	public static MachineUsageData getMachineData() throws IOException, ClassNotFoundException {
 		if(new File(MACHINE_DATA_DUMP).exists()){
 			File simulationDump = new File(MACHINE_DATA_DUMP);
