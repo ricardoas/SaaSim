@@ -6,10 +6,6 @@ import java.util.ArrayList;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.easymock.PowerMock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import util.ValidConfigurationTest;
 
@@ -21,8 +17,6 @@ import commons.sim.components.MachineDescriptor;
 import commons.sim.components.TimeSharedMachine;
 import commons.sim.jeevent.JEEventScheduler;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Configuration.class)
 public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigurationTest {
 	
 	private RoundRobinHeuristicForHeterogenousMachines heuristic;
@@ -123,14 +117,6 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		servers.add(machine2);
 		servers.add(machine3);
 		
-		double machineRelativePower = 1;
-		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(4);
-		EasyMock.expect(config.getRelativePower(MachineType.M1_SMALL)).andReturn(machineRelativePower).times(4);
-		PowerMock.replayAll(config);
-		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
@@ -153,8 +139,6 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
-		
-		PowerMock.verifyAll();
 	}
 	
 	@Test
@@ -169,14 +153,6 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
-		
-		double machineRelativePower = 1;
-		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(4);
-		EasyMock.expect(config.getRelativePower(MachineType.M1_SMALL)).andReturn(machineRelativePower).times(4);
-		PowerMock.replayAll(config);
 		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
@@ -201,8 +177,6 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine2, nextServer);
-		
-		PowerMock.verifyAll();
 	}
 	
 	@Test
@@ -217,14 +191,6 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
-		
-		double machineRelativePower = 1;
-		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(5);
-		EasyMock.expect(config.getRelativePower(MachineType.M1_SMALL)).andReturn(machineRelativePower).times(5);
-		PowerMock.replayAll(config);
 		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
@@ -253,8 +219,6 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(machine2, nextServer);
-		
-		PowerMock.verifyAll();
 	}
 	
 	@Test
@@ -265,24 +229,10 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		ArrayList<Machine> servers = new ArrayList<Machine>();
 		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
 		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.C1_MEDIUM, 0), null);
-		Machine machine3 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(3, false, MachineType.M1_LARGE, 0), null);
+		Machine machine3 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(3, false, MachineType.M1_XLARGE, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
-		
-		double machineRelativePower = 1;
-		double machineRelativePower2 = 2;
-		double machineRelativePower3 = 4;
-		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(10);
-		EasyMock.expect(config.getRelativePower(MachineType.M1_SMALL)).andReturn(machineRelativePower);
-		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(machineRelativePower2).times(2);
-		EasyMock.expect(config.getRelativePower(MachineType.M1_LARGE)).andReturn(machineRelativePower3).times(4);
-		EasyMock.expect(config.getRelativePower(MachineType.M1_SMALL)).andReturn(machineRelativePower);
-		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(machineRelativePower2).times(2);
-		PowerMock.replayAll(config);
 		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
@@ -327,8 +277,6 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine2);
-		
-		PowerMock.verifyAll();
 	}
 	
 	@Test
@@ -337,28 +285,13 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.C1_XLARGE, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_XLARGE, 0), null);
+		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.C1_MEDIUM, 0), null);
+		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_LARGE, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
 		
-		double machineRelativePower = 3;
-		double machineRelativePower2 = 3;
-	
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(9);
-		EasyMock.expect(config.getRelativePower(MachineType.C1_XLARGE)).andReturn(machineRelativePower).times(3);
-		EasyMock.expect(config.getRelativePower(MachineType.M1_XLARGE)).andReturn(machineRelativePower2).times(3);
-		EasyMock.expect(config.getRelativePower(MachineType.C1_XLARGE)).andReturn(machineRelativePower).times(3);
-		PowerMock.replayAll(config);
-		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
-		assertNotNull(nextServer);
-		assertEquals(nextServer, machine);
-		
-		nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
 		
@@ -375,10 +308,6 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine2);
 		
-		nextServer = this.heuristic.getNextServer(request, servers);
-		assertNotNull(nextServer);
-		assertEquals(nextServer, machine2);
-		
 		//Starting all over again!
 		nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
@@ -387,12 +316,6 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
-		
-		nextServer = this.heuristic.getNextServer(request, servers);
-		assertNotNull(nextServer);
-		assertEquals(nextServer, machine);
-		
-		PowerMock.verifyAll();
 	}
 	
 	@Test
@@ -409,14 +332,6 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		double machineRelativePower = 1.3333;
 		double machineRelativePower2 = 3;
 		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(7);
-		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(machineRelativePower).times(2);
-		EasyMock.expect(config.getRelativePower(MachineType.M1_LARGE)).andReturn(machineRelativePower2).times(3);
-		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(machineRelativePower).times(2);
-		PowerMock.replayAll(config);
-		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
@@ -447,8 +362,6 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
-		
-		PowerMock.verifyAll();
 	}
 	
 	@Test
@@ -464,13 +377,6 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		
 		double machineRelativePower = 1.3333;
 		double machineRelativePower2 = 3;
-		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(7);
-		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(machineRelativePower).times(2);
-		EasyMock.expect(config.getRelativePower(MachineType.M1_LARGE)).andReturn(machineRelativePower2).times(5);
-		PowerMock.replayAll(config);
 		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
@@ -506,8 +412,6 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine2);
-		
-		PowerMock.verifyAll();
 	}
 	
 	@Test
@@ -523,15 +427,6 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		
 		double machineRelativePower = 1.3333;
 		double machineRelativePower2 = 2;
-		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(7);
-		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(machineRelativePower).times(2);
-		EasyMock.expect(config.getRelativePower(MachineType.M1_LARGE)).andReturn(machineRelativePower2).times(2);
-		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(machineRelativePower).times(2);
-		EasyMock.expect(config.getRelativePower(MachineType.M1_LARGE)).andReturn(machineRelativePower2);
-		PowerMock.replayAll(config);
 		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
@@ -563,18 +458,10 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine2);
-		
-		PowerMock.verifyAll();
 	}
 	
 	@Test
 	public void testGetArrivalCounter(){
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config);
-		EasyMock.expect(config.getRelativePower(MachineType.M1_SMALL)).andReturn(1d);
-		PowerMock.replayAll(config);
-		
 		assertEquals(0, this.heuristic.getRequestsArrivalCounter());
 		
 		Request request = EasyMock.createStrictMock(Request.class);
@@ -588,8 +475,6 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
 		
 		assertEquals(0, this.heuristic.getRequestsArrivalCounter());
-		
-		PowerMock.verifyAll();
 	}
 	
 	@Test

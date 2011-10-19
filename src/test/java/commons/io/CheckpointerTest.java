@@ -3,6 +3,7 @@ package commons.io;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,8 +21,8 @@ import commons.util.SimulationInfo;
 public class CheckpointerTest {
 
 	@Test
-	public void testHasCheckpointTrue() throws Exception {
-		File simulationDump = new File(Checkpointer.SIMULATION_DUMP);
+	public void testHasCheckpointTrue() throws FileNotFoundException {
+		File simulationDump = new File(Checkpointer.CHECKPOINT_FILE);
 		new FileOutputStream(simulationDump);
 
 		assertTrue(Checkpointer.hasCheckpoint());
@@ -29,14 +30,14 @@ public class CheckpointerTest {
 	}
 
 	@Test
-	public void testHasCheckpointFalse() throws Exception {
+	public void testHasCheckpointFalse() {
 		// file does not exist
 		assertFalse(Checkpointer.hasCheckpoint());
 	}
 
 	@Test
-	public void testSaveForSimulationInfo() throws Exception {
-		File simulationInfo = new File(Checkpointer.SIMULATION_DUMP);
+	public void testSaveForSimulationInfo() {
+		File simulationInfo = new File(Checkpointer.CHECKPOINT_FILE);
 		simulationInfo.delete();
 		assertFalse(simulationInfo.exists());
 
@@ -46,8 +47,8 @@ public class CheckpointerTest {
 	}
 
 	@Test
-	public void testSaveForUsers() throws Exception {
-		File users = new File(Checkpointer.USERS_DUMP);
+	public void testSaveForUsers() {
+		File users = new File(Checkpointer.CHECKPOINT_FILE);
 		users.delete();
 		assertFalse(users.exists());
 
@@ -57,8 +58,8 @@ public class CheckpointerTest {
 	}
 
 	@Test
-	public void testSaveForProviders() throws Exception {
-		File providers = new File(Checkpointer.PROVIDERS_DUMP);
+	public void testSaveForProviders() {
+		File providers = new File(Checkpointer.CHECKPOINT_FILE);
 		providers.delete();
 		assertFalse(providers.exists());
 
@@ -68,8 +69,8 @@ public class CheckpointerTest {
 	}
 
 	@Test
-	public void testSaveForApplication() throws Exception {
-		File loadBalancerFile = new File(Checkpointer.APPLICATION_DUMP);
+	public void testSaveForApplication() {
+		File loadBalancerFile = new File(Checkpointer.CHECKPOINT_FILE);
 		loadBalancerFile.delete();
 		assertFalse(loadBalancerFile.exists());
 
@@ -79,7 +80,7 @@ public class CheckpointerTest {
 	}
 
 	@Test
-	public void testDumpMachineData() throws Exception {
+	public void testDumpMachineData() throws IOException {
 		File machineData = new File(Checkpointer.MACHINE_DATA_DUMP);
 		machineData.delete();
 		assertFalse(machineData.exists());
@@ -90,13 +91,13 @@ public class CheckpointerTest {
 	}
 
 	@Test(expected = IOException.class)
-	public void testLoadSimulationInfoWithoutFile() throws Exception {
+	public void testLoadSimulationInfoWithoutFile() {
 		Checkpointer.loadSimulationInfo();
 	}
 
 	@Test(expected = IOException.class)
-	public void testLoadSimulationInfoWithInvalidFile() throws Exception {
-		File simulationInfo = new File(Checkpointer.SIMULATION_DUMP);
+	public void testLoadSimulationInfoWithInvalidFile() throws IOException {
+		File simulationInfo = new File(Checkpointer.CHECKPOINT_FILE);
 
 		String invalid = "invalid content";
 		new FileWriter(simulationInfo).write(invalid);
@@ -105,7 +106,7 @@ public class CheckpointerTest {
 	}
 	
 	@Test
-	public void testLoadSimulationInfoWithValidFile() throws Exception {
+	public void testLoadSimulationInfoWithValidFile() {
 		SimulationInfo info = new SimulationInfo(2, 9);
 		Checkpointer.save(info, null, null, null);
 
@@ -113,8 +114,8 @@ public class CheckpointerTest {
 	}
 	
 	@Test(expected = IOException.class)
-	public void testLoadSimulationInfoPermissionDenied() throws Exception {
-		File simulationInfo = new File(Checkpointer.SIMULATION_DUMP);
+	public void testLoadSimulationInfoPermissionDenied() {
+		File simulationInfo = new File(Checkpointer.CHECKPOINT_FILE);
 		
 		Checkpointer.save(new SimulationInfo(2, 9), null, null, null);
 		simulationInfo.setReadable(false);
@@ -123,13 +124,13 @@ public class CheckpointerTest {
 	}
 
 	@Test(expected = IOException.class)
-	public void testLoadApplicationWithoutFile() throws Exception {
+	public void testLoadApplicationWithoutFile() {
 		Checkpointer.loadApplication();
 	}
 
 	@Test(expected = IOException.class)
-	public void testLoadApplicationWithInvalidFile() throws Exception {
-		File loadBalancerFile = new File(Checkpointer.APPLICATION_DUMP);
+	public void testLoadApplicationWithInvalidFile() throws IOException {
+		File loadBalancerFile = new File(Checkpointer.CHECKPOINT_FILE);
 
 		String invalid = "invalid content";
 		new FileWriter(loadBalancerFile).write(invalid);
@@ -139,8 +140,8 @@ public class CheckpointerTest {
 	}
 	
 	@Test
-	public void testLoadApplicationWithValidFile() throws Exception {
-		File loadBalancerFile = new File(Checkpointer.APPLICATION_DUMP);
+	public void testLoadApplicationWithValidFile() {
+		File loadBalancerFile = new File(Checkpointer.CHECKPOINT_FILE);
 		
 		LoadBalancer loadBalancer = EasyMock.createMock(LoadBalancer.class);
 		EasyMock.expect(loadBalancer.getTier()).andReturn(1).times(1);
@@ -156,8 +157,8 @@ public class CheckpointerTest {
 	}
 	
 	@Test(expected = IOException.class)
-	public void testLoadApplicationPermissionDenied() throws Exception {
-		File loadBalancerFile = new File(Checkpointer.APPLICATION_DUMP);
+	public void testLoadApplicationPermissionDenied() {
+		File loadBalancerFile = new File(Checkpointer.CHECKPOINT_FILE);
 		LoadBalancer[] loadBalancers = new LoadBalancer[]{};
 		
 		Checkpointer.save(null, null, null, loadBalancers);
@@ -168,13 +169,13 @@ public class CheckpointerTest {
 	}
 	
 	@Test(expected = IOException.class)
-	public void testLoadProvidersWithoutFile() throws Exception {
+	public void testLoadProvidersWithoutFile() {
 		Checkpointer.loadProviders();
 	}
 
 	@Test(expected = IOException.class)
-	public void testLoadProvidersWithInvalidFile() throws Exception {
-		File providersFile = new File(Checkpointer.PROVIDERS_DUMP);
+	public void testLoadProvidersWithInvalidFile() throws IOException {
+		File providersFile = new File(Checkpointer.CHECKPOINT_FILE);
 
 		String invalid = "invalid content";
 		new FileWriter(providersFile).write(invalid);
@@ -184,8 +185,8 @@ public class CheckpointerTest {
 	}
 	
 	@Test
-	public void testLoadProvidersWithValidFile() throws Exception {
-		File providerFile = new File(Checkpointer.PROVIDERS_DUMP);
+	public void testLoadProvidersWithValidFile() {
+		File providerFile = new File(Checkpointer.CHECKPOINT_FILE);
 		
 		Provider provider = EasyMock.createMock(Provider.class);
 		EasyMock.expect(provider.getId()).andReturn(1).times(1);
@@ -201,8 +202,8 @@ public class CheckpointerTest {
 	}
 	
 	@Test(expected = IOException.class)
-	public void testLoadProvidersPermissionDenied() throws Exception {
-		File providerFile = new File(Checkpointer.PROVIDERS_DUMP);
+	public void testLoadProvidersPermissionDenied() {
+		File providerFile = new File(Checkpointer.CHECKPOINT_FILE);
 		Provider[] providers = new Provider[]{};
 		
 		Checkpointer.save(null, null, providers, null);
@@ -213,13 +214,13 @@ public class CheckpointerTest {
 	}
 	
 	@Test(expected = IOException.class)
-	public void testLoadUsersWithoutFile() throws Exception {
+	public void testLoadUsersWithoutFile() {
 		Checkpointer.loadUsers();
 	}
 
 	@Test(expected = IOException.class)
-	public void testLoadUsersWithInvalidFile() throws Exception {
-		File usersFile = new File(Checkpointer.USERS_DUMP);
+	public void testLoadUsersWithInvalidFile() throws IOException {
+		File usersFile = new File(Checkpointer.CHECKPOINT_FILE);
 
 		String invalid = "invalid content";
 		new FileWriter(usersFile).write(invalid);
@@ -229,8 +230,8 @@ public class CheckpointerTest {
 	}
 	
 	@Test
-	public void testLoadUsersWithValidFile() throws Exception {
-		File usersFile = new File(Checkpointer.USERS_DUMP);
+	public void testLoadUsersWithValidFile() {
+		File usersFile = new File(Checkpointer.CHECKPOINT_FILE);
 		
 		User user = EasyMock.createMock(User.class);
 		EasyMock.expect(user.getId()).andReturn(1).times(1);
@@ -246,8 +247,8 @@ public class CheckpointerTest {
 	}
 	
 	@Test(expected = IOException.class)
-	public void testLoadUsersPermissionDenied() throws Exception {
-		File userFiles = new File(Checkpointer.USERS_DUMP);
+	public void testLoadUsersPermissionDenied() {
+		File userFiles = new File(Checkpointer.CHECKPOINT_FILE);
 		User[] users = new User[]{};
 		
 		Checkpointer.save(null, users, null, null);
@@ -258,7 +259,7 @@ public class CheckpointerTest {
 	}
 	
 	@Test
-	public void testClearAllFiles() throws Exception {
+	public void testClearAllFiles() throws IOException {
 		SimulationInfo info = new SimulationInfo(2, 9);
 		LoadBalancer[] application = new LoadBalancer[]{};
 		Provider[] providers = new Provider[]{};
@@ -267,17 +268,17 @@ public class CheckpointerTest {
 		Checkpointer.save(info, users, providers, application);
 		Checkpointer.dumpMachineData(new MachineUsageData());
 		
-		assertTrue(new File(Checkpointer.SIMULATION_DUMP).exists());
-		assertTrue(new File(Checkpointer.APPLICATION_DUMP).exists());
-		assertTrue(new File(Checkpointer.PROVIDERS_DUMP).exists());
-		assertTrue(new File(Checkpointer.USERS_DUMP).exists());
+		assertTrue(new File(Checkpointer.CHECKPOINT_FILE).exists());
+		assertTrue(new File(Checkpointer.CHECKPOINT_FILE).exists());
+		assertTrue(new File(Checkpointer.CHECKPOINT_FILE).exists());
+		assertTrue(new File(Checkpointer.CHECKPOINT_FILE).exists());
 		assertTrue(new File(Checkpointer.MACHINE_DATA_DUMP).exists());
 		
 		Checkpointer.clear();
-		assertFalse(new File(Checkpointer.SIMULATION_DUMP).exists());
-		assertFalse(new File(Checkpointer.APPLICATION_DUMP).exists());
-		assertFalse(new File(Checkpointer.PROVIDERS_DUMP).exists());
-		assertFalse(new File(Checkpointer.USERS_DUMP).exists());
+		assertFalse(new File(Checkpointer.CHECKPOINT_FILE).exists());
+		assertFalse(new File(Checkpointer.CHECKPOINT_FILE).exists());
+		assertFalse(new File(Checkpointer.CHECKPOINT_FILE).exists());
+		assertFalse(new File(Checkpointer.CHECKPOINT_FILE).exists());
 		assertFalse(new File(Checkpointer.MACHINE_DATA_DUMP).exists());
 	}
 
