@@ -10,7 +10,6 @@ import commons.config.Configuration;
 import commons.io.TickSize;
 import commons.io.WorkloadParser;
 import commons.sim.components.LoadBalancer;
-import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
