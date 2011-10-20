@@ -163,14 +163,14 @@ public class OptimalHeuristic implements PlanningHeuristic{
 	}
 
 	private long calcTotalDemand() {
-		long totalDemand = 0;
+		double totalDemand = 0;
 		for(List<Summary> summaries : this.summaries.values()){
 			for(Summary summary : summaries){
 				totalDemand += summary.getTotalCpuHrs();
 			}
 		}
 		
-		return totalDemand;
+		return (long)Math.ceil(totalDemand);
 	}
 
 	private PlanningFitnessFunction createFitnessFunction(User[] cloudUsers, Provider[] cloudProviders) {
@@ -191,8 +191,8 @@ public class OptimalHeuristic implements PlanningHeuristic{
 		for(MachineType type : this.types){
 			plan.put(type, (Integer) genes[index++].getAllele());
 		}
-		System.out.println("CONFIG: "+genes[0].getAllele()+" "+genes[1].getAllele()+" "+genes[2].getAllele());
-		System.out.println("BEST: "+bestChromosome.getFitnessValue());
+//		System.out.println("CONFIG: "+genes[0].getAllele()+" "+genes[1].getAllele()+" "+genes[2].getAllele());
+//		System.out.println("BEST: "+bestChromosome.getFitnessValue());
 
 		return plan;
 	}
