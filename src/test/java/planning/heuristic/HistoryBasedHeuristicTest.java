@@ -627,6 +627,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		map.put(MachineType.M1_XLARGE, 1);
 		map.put(MachineType.M1_LARGE, 1);
 		map.put(MachineType.M1_SMALL, 1);
+		PlanIOHandler.clear();
 		PlanIOHandler.createPlanFile(map, providers);
 		
 		//Configuration

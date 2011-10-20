@@ -53,7 +53,6 @@ public class RoundRobinHeuristicForHeterogenousMachines implements SchedulingHeu
 			this.allocationsPerServer.set(nextToUse, 0);
 			nextToUse = (nextToUse + 1) % servers.size();
 		}
-		
 		return server;
 	}
 
@@ -102,6 +101,8 @@ public class RoundRobinHeuristicForHeterogenousMachines implements SchedulingHeu
 		
 		if(nextToUse > index){
 			nextToUse = nextToUse - 1;
+		}else if(nextToUse == index && nextToUse == allocationsPerServer.size() -1){
+			nextToUse = (nextToUse + 1) % allocationsPerServer.size();
 		}
 		this.allocationsPerServer.remove(index);
 	}

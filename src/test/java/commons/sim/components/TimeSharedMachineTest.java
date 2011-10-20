@@ -48,7 +48,7 @@ public class TimeSharedMachineTest extends MockedConfigurationTest {
 		loadBalancer.reportRequestFinished(EasyMock.capture(captured));
 		EasyMock.replay(loadBalancer);
 		
-		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{50});
+		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{50, 50});
 		
 		TimeSharedMachine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), smallMachine, loadBalancer);
 		
@@ -78,7 +78,7 @@ public class TimeSharedMachineTest extends MockedConfigurationTest {
 		loadBalancer.reportRequestFinished(EasyMock.capture(captured));
 		EasyMock.replay(loadBalancer);
 		
-		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{2500});
+		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{2500, 2500});
 		
 		TimeSharedMachine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), smallMachine, loadBalancer);
 		
@@ -97,10 +97,10 @@ public class TimeSharedMachineTest extends MockedConfigurationTest {
 
 	@Test
 	public void testSendRequestsSingleCoreMachine() throws SecurityException, IllegalArgumentException{
-		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{5000});
-		Request request2 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000});
-		Request request3 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000});
-		Request request4 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000});
+		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000});
+		Request request2 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000});
+		Request request3 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000});
+		Request request4 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000});
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.reportRequestFinished(request);
@@ -132,10 +132,10 @@ public class TimeSharedMachineTest extends MockedConfigurationTest {
 	
 	@Test
 	public void testSendRequestsMultiCoreMachine() throws SecurityException, IllegalArgumentException{
-		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000});
-		Request request2 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000});
-		Request request3 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000});
-		Request request4 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000});
+		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000, 5000});
+		Request request2 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000, 5000});
+		Request request3 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000, 5000});
+		Request request4 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000, 5000});
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.reportRequestFinished(request);
@@ -192,7 +192,7 @@ public class TimeSharedMachineTest extends MockedConfigurationTest {
 	public void testShutdownWithNonEmptyMachine(){
 		JEEventScheduler scheduler = JEEventScheduler.getInstance();
 		
-		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{5000});
+		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000});
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.reportRequestFinished(request);
@@ -227,7 +227,7 @@ public class TimeSharedMachineTest extends MockedConfigurationTest {
 	public void testHandlePreemptionOfLastRequestOnQueueWithShutdown(){
 		JEEventScheduler scheduler = JEEventScheduler.getInstance();
 
-		Request request = new Request(0, 0, 0, 0, 100000L, 100000L, new long[]{450, 450, 450, 450});
+		Request request = new Request(0, 0, 0, 0, 100000L, 100000L, new long[]{450, 450, 450, 450, 450});
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.reportRequestFinished(request);
@@ -259,8 +259,8 @@ public class TimeSharedMachineTest extends MockedConfigurationTest {
 	public void testHandlePreemptionOfTwoRequestAndOneCore(){
 		JEEventScheduler scheduler = JEEventScheduler.getInstance();
 
-		Request firstRequest = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{500});
-		Request secondRequest = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{400});
+		Request firstRequest = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{500, 500});
+		Request secondRequest = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{400, 400});
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.reportRequestFinished(secondRequest);
@@ -334,7 +334,7 @@ public class TimeSharedMachineTest extends MockedConfigurationTest {
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
-		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{150});
+		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{150, 150});
 		
 		EasyMock.replay(loadBalancer, scheduler);
 		
@@ -367,7 +367,7 @@ public class TimeSharedMachineTest extends MockedConfigurationTest {
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.reportRequestFinished(EasyMock.isA(Request.class));
 		
-		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{150});
+		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{150, 150});
 		
 		EasyMock.replay(loadBalancer, scheduler);
 		
@@ -432,7 +432,7 @@ public class TimeSharedMachineTest extends MockedConfigurationTest {
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
-		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50, 50, 50, 50});
+		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50, 50, 50, 50, 50});
 		
 		EasyMock.replay(loadBalancer);
 		
@@ -452,7 +452,7 @@ public class TimeSharedMachineTest extends MockedConfigurationTest {
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
-		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50});
+		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50, 50});
 		
 		loadBalancer.reportRequestFinished(request);
 		
@@ -477,7 +477,7 @@ public class TimeSharedMachineTest extends MockedConfigurationTest {
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
-		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50, 50, 50, 50});
+		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50, 50, 50, 50, 50});
 		
 		loadBalancer.reportRequestFinished(request);
 		
@@ -502,7 +502,7 @@ public class TimeSharedMachineTest extends MockedConfigurationTest {
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
-		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50});
+		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50, 50});
 		
 		loadBalancer.reportRequestFinished(request);
 		
@@ -528,7 +528,7 @@ public class TimeSharedMachineTest extends MockedConfigurationTest {
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
-		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50, 50, 50, 50});
+		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50, 50, 50, 50, 50});
 		
 		loadBalancer.reportRequestFinished(request);
 		
@@ -554,7 +554,7 @@ public class TimeSharedMachineTest extends MockedConfigurationTest {
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
-		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50});
+		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50, 50});
 		
 		loadBalancer.reportRequestFinished(request);
 		

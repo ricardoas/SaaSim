@@ -51,7 +51,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		loadBalancer.reportRequestFinished(EasyMock.capture(captured));
 		EasyMock.replay(loadBalancer);
 		
-		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{50});
+		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{50, 50});
 		
 		RanjanMachine machine = new RanjanMachine(JEEventScheduler.getInstance(), descriptor, loadBalancer);
 		
@@ -79,7 +79,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		loadBalancer.reportRequestFinished(EasyMock.capture(captured));
 		EasyMock.replay(loadBalancer);
 		
-		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{2500});
+		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{2500, 2500});
 		
 		RanjanMachine machine = new RanjanMachine(JEEventScheduler.getInstance(), descriptor, loadBalancer);
 		
@@ -96,10 +96,10 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testSendRequestToBacklogSingleCoreMachine() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
-		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{5000});
-		Request request2 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000});
-		Request request3 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000});
-		Request request4 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000});
+		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000});
+		Request request2 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000});
+		Request request3 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000});
+		Request request4 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000});
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.reportRequestFinished(request);
@@ -144,10 +144,10 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testSendRequestToBacklogMultiCoreMachine() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
-		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000});
-		Request request2 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000});
-		Request request3 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000});
-		Request request4 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000});
+		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000, 5000});
+		Request request2 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000, 5000});
+		Request request3 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000, 5000});
+		Request request4 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000, 5000});
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.reportRequestFinished(request);
@@ -219,7 +219,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	public void testShutdownWithNonEmptyMachine(){
 		JEEventScheduler scheduler = JEEventScheduler.getInstance();
 		
-		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{5000});
+		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000});
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.reportRequestFinished(request);
@@ -326,12 +326,12 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 	
-		Request firstRequest = new Request(0, 0, 0, 0, 100, 100, new long[]{50});
-		Request secondRequest = new Request(1, 0, 0, 0, 100, 100, new long[]{100});
-		Request thirdRequest = new Request(2, 0, 0, 0, 100, 100, new long[]{100});
-		Request fourthRequest = new Request(3, 0, 0, 0, 100, 100, new long[]{100});
-		Request fifthRequest = new Request(4, 0, 0, 0, 100, 100, new long[]{100});
-		Request sixthRequest = new Request(5, 0, 0, 0, 100, 100, new long[]{50});
+		Request firstRequest = new Request(0, 0, 0, 0, 100, 100, new long[]{50, 50});
+		Request secondRequest = new Request(1, 0, 0, 0, 100, 100, new long[]{100, 100});
+		Request thirdRequest = new Request(2, 0, 0, 0, 100, 100, new long[]{100, 100});
+		Request fourthRequest = new Request(3, 0, 0, 0, 100, 100, new long[]{100, 100});
+		Request fifthRequest = new Request(4, 0, 0, 0, 100, 100, new long[]{100, 100});
+		Request sixthRequest = new Request(5, 0, 0, 0, 100, 100, new long[]{50, 50});
 
 		EasyMock.expect(loadBalancer.getHandlerId()).andReturn(JEEventScheduler.getInstance().registerHandler(loadBalancer));
 		
@@ -379,12 +379,12 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 	
-		Request firstRequest = new Request(0, 0, 0, 0, 100, 100, new long[]{50, 50, 50, 50});
-		Request secondRequest = new Request(1, 0, 0, 0, 100, 100, new long[]{100, 100, 100, 100});
-		Request thirdRequest = new Request(2, 0, 0, 0, 100, 100, new long[]{100, 100, 100, 100});
-		Request fourthRequest = new Request(3, 0, 0, 0, 100, 100, new long[]{100, 100, 100, 100});
-		Request fifthRequest = new Request(4, 0, 0, 0, 100, 100, new long[]{100, 100, 100, 100});
-		Request sixthRequest = new Request(5, 0, 0, 0, 100, 100, new long[]{50, 50, 50, 50});
+		Request firstRequest = new Request(0, 0, 0, 0, 100, 100, new long[]{50, 50, 50, 50, 50});
+		Request secondRequest = new Request(1, 0, 0, 0, 100, 100, new long[]{100, 100, 100, 100, 100});
+		Request thirdRequest = new Request(2, 0, 0, 0, 100, 100, new long[]{100, 100, 100, 100, 100});
+		Request fourthRequest = new Request(3, 0, 0, 0, 100, 100, new long[]{100, 100, 100, 100, 100});
+		Request fifthRequest = new Request(4, 0, 0, 0, 100, 100, new long[]{100, 100, 100, 100, 100});
+		Request sixthRequest = new Request(5, 0, 0, 0, 100, 100, new long[]{50, 50, 50, 50, 50});
 	
 		EasyMock.expect(loadBalancer.getHandlerId()).andReturn(JEEventScheduler.getInstance().registerHandler(loadBalancer));
 		

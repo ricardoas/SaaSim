@@ -142,6 +142,70 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 	}
 	
 	@Test
+	public void testWithMultipleMachinesWithSamePowerAndFinishingCurrentServer(){
+		Request request = EasyMock.createStrictMock(Request.class);
+		EasyMock.replay(request);
+		
+		ArrayList<Machine> servers = new ArrayList<Machine>();
+		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
+		Machine machine3 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
+		servers.add(machine);
+		servers.add(machine2);
+		servers.add(machine3);
+		
+		//Retrieving the first machine
+		Machine nextServer = this.heuristic.getNextServer(request, servers);
+		assertNotNull(nextServer);
+		assertEquals(nextServer, machine);
+		
+		//Since first machine power is one, now the second machine should be retrieved
+		nextServer = this.heuristic.getNextServer(request, servers);
+		assertNotNull(nextServer);
+		assertEquals(nextServer, machine2);
+		
+		servers.remove(machine3);
+		this.heuristic.finishServer(machine3, 2, servers);
+		
+		//After using all power of second machine, third machine is retrieved
+		nextServer = this.heuristic.getNextServer(request, servers);
+		assertNotNull(nextServer);
+		assertEquals(nextServer, machine);
+	}
+	
+	@Test
+	public void testWithMultipleMachinesWithSamePowerAndFinishingCurrentServer2(){
+		Request request = EasyMock.createStrictMock(Request.class);
+		EasyMock.replay(request);
+		
+		ArrayList<Machine> servers = new ArrayList<Machine>();
+		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
+		Machine machine3 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
+		servers.add(machine);
+		servers.add(machine2);
+		servers.add(machine3);
+		
+		//Retrieving the first machine
+		Machine nextServer = this.heuristic.getNextServer(request, servers);
+		assertNotNull(nextServer);
+		assertEquals(nextServer, machine);
+		
+		servers.remove(machine2);
+		this.heuristic.finishServer(machine2, 2, servers);
+		
+		//Since first machine power is one, now the second machine should be retrieved
+		nextServer = this.heuristic.getNextServer(request, servers);
+		assertNotNull(nextServer);
+		assertEquals(nextServer, machine3);
+		
+		//After using all power of second machine, third machine is retrieved
+		nextServer = this.heuristic.getNextServer(request, servers);
+		assertNotNull(nextServer);
+		assertEquals(nextServer, machine);
+	}
+	
+	@Test
 	public void testWithMultipleMachinesWithSamePowerAndFinishingPreviousServer(){
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.replay(request);
@@ -477,7 +541,7 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		//Retrieving for the first time
 		this.heuristic.getNextServer(request, servers);
 		
-		assertEquals(0, this.heuristic.getRequestsArrivalCounter());
+		assertEquals(1, this.heuristic.getRequestsArrivalCounter());
 	}
 	
 	@Test
@@ -486,7 +550,7 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		
 		this.heuristic.reportRequestFinished();
 		
-		assertEquals(0, this.heuristic.getFinishedRequestsCounter());
+		assertEquals(1, this.heuristic.getFinishedRequestsCounter());
 	}
 	
 	@Test

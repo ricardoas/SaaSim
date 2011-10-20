@@ -15,7 +15,8 @@ import util.CleanConfigurationTest;
  *
  */
 public class RequestTest extends CleanConfigurationTest {
-
+	
+	private static final int MICRO_DEMAND = 2000000;
 	private static final int SMALL_DEMAND = 1000000;
 	private static final int LARGE_DEMAND = 500000;
 	private static final int MEDIUM_DEMAND = 400000;
@@ -24,18 +25,18 @@ public class RequestTest extends CleanConfigurationTest {
 	
 	@Before
 	public void setUp(){
-		request = new Request(1l, 1, 17756636, 0, 100, 1024000, new long[]{SMALL_DEMAND, LARGE_DEMAND, MEDIUM_DEMAND, XLARGE_DEMAND});
+		request = new Request(1l, 1, 17756636, 0, 100, 1024000, new long[]{MICRO_DEMAND, SMALL_DEMAND, LARGE_DEMAND, MEDIUM_DEMAND, XLARGE_DEMAND});
 	}
 	
 	@Test
 	public void testConstructor() {
-		Request request = new Request(1l, 1, 17756636, 0, 100, 1024000, new long[]{SMALL_DEMAND, LARGE_DEMAND, MEDIUM_DEMAND, XLARGE_DEMAND});
+		Request request = new Request(1l, 1, 17756636, 0, 100, 1024000, new long[]{MICRO_DEMAND, SMALL_DEMAND, LARGE_DEMAND, MEDIUM_DEMAND, XLARGE_DEMAND});
 		assertEquals(1, request.getSaasClient());
 		assertEquals(17756636, request.getUserID());
 		assertEquals(0, request.getArrivalTimeInMillis());
 		assertEquals(100, request.getRequestSizeInBytes());
 		assertEquals(1024000, request.getResponseSizeInBytes());
-		assertEquals(4, request.getCpuDemandInMillis().length);
+		assertEquals(5, request.getCpuDemandInMillis().length);
 	}
 
 	/**
@@ -149,7 +150,7 @@ public class RequestTest extends CleanConfigurationTest {
 	 */
 	@Test
 	public void testEqualsHashCodeConsistencySameRequest() {
-		Request cloneRequest = new Request(1l, 1, 17756636, 0, 100, 1024000, new long[]{SMALL_DEMAND, LARGE_DEMAND, XLARGE_DEMAND});
+		Request cloneRequest = new Request(1l, 1, 17756636, 0, 100, 1024000, new long[]{MICRO_DEMAND, SMALL_DEMAND, LARGE_DEMAND, XLARGE_DEMAND});
 		assertEquals(request, cloneRequest);
 		assertEquals(request.hashCode(), cloneRequest.hashCode());
 	}
@@ -160,7 +161,7 @@ public class RequestTest extends CleanConfigurationTest {
 	 */
 	@Test
 	public void testEqualsHashCodeConsistencyWithRequestID() {
-		Request cloneRequest = new Request(2l, 1, 17756636, 1, 100, 1024000, new long[]{SMALL_DEMAND, LARGE_DEMAND, XLARGE_DEMAND});
+		Request cloneRequest = new Request(2l, 1, 17756636, 1, 100, 1024000, new long[]{MICRO_DEMAND, SMALL_DEMAND, LARGE_DEMAND, XLARGE_DEMAND});
 		assertTrue(!request.equals(cloneRequest));
 		assertTrue(request.hashCode() != cloneRequest.hashCode());
 	}
@@ -171,7 +172,7 @@ public class RequestTest extends CleanConfigurationTest {
 	 */
 	@Test
 	public void testEqualsHashCodeConsistencyWithDifferentSaaSClient() {
-		Request cloneRequest = new Request(1l, 2, 17756636, 0, 100, 1024000, new long[]{SMALL_DEMAND, LARGE_DEMAND, XLARGE_DEMAND});
+		Request cloneRequest = new Request(1l, 2, 17756636, 0, 100, 1024000, new long[]{MICRO_DEMAND, SMALL_DEMAND, LARGE_DEMAND, XLARGE_DEMAND});
 		assertTrue(!request.equals(cloneRequest));
 		assertTrue(request.hashCode() != cloneRequest.hashCode());
 	}

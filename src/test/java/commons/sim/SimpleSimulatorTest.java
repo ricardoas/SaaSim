@@ -214,13 +214,44 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		JEEventScheduler scheduler = EasyMock.createMock(JEEventScheduler.class);
 		Monitor monitor = EasyMock.createMock(Monitor.class);
 		TimeSharedMachine timeSharedMachine = EasyMock.createMock(TimeSharedMachine.class);
+		TimeSharedMachine timeSharedMachine2 = EasyMock.createMock(TimeSharedMachine.class);
+		
+		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(2);
+		EasyMock.expect(scheduler.now()).andReturn(0L).times(2);
+		EasyMock.expect(handler.getHandlerId()).andReturn(1).times(2);
+		
+		EasyMock.expect(timeSharedMachine.getDescriptor()).andReturn(new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0)).times(2);
+		EasyMock.expect(timeSharedMachine2.getDescriptor()).andReturn(new MachineDescriptor(1, false, MachineType.C1_MEDIUM, 0)).times(3);
+		timeSharedMachine2.shutdownOnFinish();
+		EasyMock.expectLastCall().times(1);
+		
+		EasyMock.replay(monitor, scheduler, handler, timeSharedMachine, timeSharedMachine2);
+		
+		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
+		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
+		
+		loadBalancer.handleEvent(new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine));
+		loadBalancer.handleEvent(new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine2));
+		
+		assertTrue(loadBalancer.getServers().size() == 2);
+		simulator.removeServer(0, false);
+		assertTrue(loadBalancer.getServers().size() == 1);
+		
+		EasyMock.verify(monitor, scheduler, handler, timeSharedMachine);
+	}
+	
+	@Test
+	public void testRemoveServerWithOneMachineAndNotUseForce() {
+		JEEventHandler handler = EasyMock.createMock(JEEventHandler.class);
+		JEEventScheduler scheduler = EasyMock.createMock(JEEventScheduler.class);
+		Monitor monitor = EasyMock.createMock(Monitor.class);
+		TimeSharedMachine timeSharedMachine = EasyMock.createMock(TimeSharedMachine.class);
 		
 		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(2);
 		EasyMock.expect(scheduler.now()).andReturn(0L);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1);
 		
-		EasyMock.expect(timeSharedMachine.getDescriptor()).andReturn(new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0)).times(3);
-		timeSharedMachine.shutdownOnFinish();
+		EasyMock.expect(timeSharedMachine.getDescriptor()).andReturn(new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0));
 		EasyMock.expectLastCall().times(1);
 		
 		EasyMock.replay(monitor, scheduler, handler, timeSharedMachine);
@@ -233,7 +264,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		assertTrue(loadBalancer.getServers().size() == 1);
 		simulator.removeServer(0, false);
-		assertTrue(loadBalancer.getServers().size() == 0);
+		assertTrue(loadBalancer.getServers().size() == 1);
 		
 		EasyMock.verify(monitor, scheduler, handler, timeSharedMachine);
 	}
@@ -270,32 +301,34 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		JEEventScheduler scheduler = EasyMock.createMock(JEEventScheduler.class);
 		Monitor monitor = EasyMock.createMock(Monitor.class);
 		TimeSharedMachine timeSharedMachine = EasyMock.createMock(TimeSharedMachine.class);
+		TimeSharedMachine timeSharedMachine2 = EasyMock.createMock(TimeSharedMachine.class);
 		
 		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(2);
-		EasyMock.expect(scheduler.now()).andReturn(0L).times(3);
-		EasyMock.expect(handler.getHandlerId()).andReturn(1);
+		EasyMock.expect(scheduler.now()).andReturn(0L).times(4);
+		EasyMock.expect(handler.getHandlerId()).andReturn(1).times(2);
 		
-		EasyMock.expect(timeSharedMachine.getDescriptor()).andReturn(new MachineDescriptor(0, true, MachineType.C1_MEDIUM, 0)).times(4);
+		EasyMock.expect(timeSharedMachine.getDescriptor()).andReturn(new MachineDescriptor(0, true, MachineType.C1_MEDIUM, 0)).times(3);
+		EasyMock.expect(timeSharedMachine2.getDescriptor()).andReturn(new MachineDescriptor(1, true, MachineType.C1_MEDIUM, 0)).times(4);
 		Queue<Request> queue = new LinkedList<Request>();
-		EasyMock.expect(timeSharedMachine.getProcessorQueue()).andReturn(queue);
-		timeSharedMachine.shutdownOnFinish();
+		EasyMock.expect(timeSharedMachine2.getProcessorQueue()).andReturn(queue);
+		timeSharedMachine2.shutdownOnFinish();
 		EasyMock.expectLastCall().times(1);
 		
 		Capture<JEEvent> eventTurnedOff = new Capture<JEEvent>();
 		scheduler.queueEvent(EasyMock.capture(eventTurnedOff));
 		EasyMock.expectLastCall().times(1);
 		
-		EasyMock.replay(monitor, scheduler, handler, timeSharedMachine);
+		EasyMock.replay(monitor, scheduler, handler, timeSharedMachine, timeSharedMachine2);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
-		JEEvent eventAddServer = new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine);
-		loadBalancer.handleEvent(eventAddServer);
+		loadBalancer.handleEvent(new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine));
+		loadBalancer.handleEvent(new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine2));
 		
-		assertTrue(loadBalancer.getServers().size() == 1);
+		assertTrue(loadBalancer.getServers().size() == 2);
 		simulator.removeServer(0, true);
-		assertTrue(loadBalancer.getServers().size() == 0);
+		assertTrue(loadBalancer.getServers().size() == 1);
 		assertEquals(JEEventType.MACHINE_TURNED_OFF, eventTurnedOff.getValue().getType());
 		
 		EasyMock.verify(monitor, scheduler, handler, timeSharedMachine);
