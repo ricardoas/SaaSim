@@ -47,8 +47,9 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 	 */
 	private String readFileToUse(String workload) {
 		this.currentDay = Configuration.getInstance().getSimulationInfo().getSimulatedDays();
+		BufferedReader reader = null;
 		try {
-			BufferedReader reader = new BufferedReader(new FileReader(workload));
+			reader = new BufferedReader(new FileReader(workload));
 			String file = reader.readLine();
 			int currentLine = 0;
 			while(currentLine < this.currentDay){
@@ -58,6 +59,10 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 			return file == null? "": file;
 		} catch (Exception e) {
 			throw new RuntimeException("Problem reading workload file.", e);
+		} finally{
+			try {
+				reader.close();
+			} catch (IOException e) {}
 		}
 	}
 

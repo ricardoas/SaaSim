@@ -154,7 +154,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 
 	@Override
 	public void removeServer(int tier, boolean force) {
-		assert tiers.length > tier : "This tier not exists!";
+		assert tiers.length >= tier : "This tier not exists!";
 		tiers[tier].removeServer(force);
 	}
 

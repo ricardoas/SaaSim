@@ -6,10 +6,17 @@ import commons.util.CostCalculus;
 
 
 /**
+ * SaaS client contract. Most frequent information, based on research.
+ *  
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ * @version 1.0
  */
 public class Contract implements Comparable<Contract>, Serializable{
 	
+	/**
+	 * Version 1.0
+	 */
+	private static final long serialVersionUID = 6035889541983334272L;
 	private static final long HOUR_IN_MILLIS = 3600000;
 	private static final long MB_IN_BYTES = 1024 * 1024;
 
@@ -24,6 +31,19 @@ public class Contract implements Comparable<Contract>, Serializable{
 	private long storageLimitInMB;
 	private double storageCostPerMB;
 	
+	/**
+	 * Default constructor.
+	 * @param planName
+	 * @param priority
+	 * @param setupCost
+	 * @param price
+	 * @param cpuLimitInMillis
+	 * @param extraCpuCost
+	 * @param transferenceLimitsInBytes
+	 * @param transferenceCosts
+	 * @param storageLimitInMB
+	 * @param storageCostPerMB
+	 */
 	public Contract(String planName, int priority, double setupCost, double price,
 			long cpuLimitInMillis, double extraCpuCost, long[] transferenceLimitsInBytes, double[] transferenceCosts,
 			long storageLimitInMB, double storageCostPerMB) {
@@ -39,46 +59,6 @@ public class Contract implements Comparable<Contract>, Serializable{
 		this.storageCostPerMB = storageCostPerMB;
 	}
 	
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setPriority(int priority) {
-		this.priority = priority;
-	}
-
-	public void setPrice(double price) {
-		this.price = price;
-	}
-
-	public void setSetupCost(double setupCost) {
-		this.setupCost = setupCost;
-	}
-
-	public void setCpuLimitInMillis(long cpuLimitInMillis) {
-		this.cpuLimitInMillis = cpuLimitInMillis;
-	}
-
-	public void setExtraCpuCost(double extraCpuCost) {
-		this.extraCpuCost = extraCpuCost;
-	}
-
-	public void setTransferenceLimitsInBytes(long[] transferenceLimitsInBytes) {
-		this.transferenceLimitsInBytes = transferenceLimitsInBytes;
-	}
-
-	public void setTransferenceCosts(double[] transferenceCosts) {
-		this.transferenceCosts = transferenceCosts;
-	}
-
-	public void setStorageLimitInMB(long storageLimitInMB) {
-		this.storageLimitInMB = storageLimitInMB;
-	}
-
-	public void setStorageCostPerMB(double storageCostPerMB) {
-		this.storageCostPerMB = storageCostPerMB;
-	}
-
 	/**
 	 * @return the name
 	 */
@@ -135,14 +115,23 @@ public class Contract implements Comparable<Contract>, Serializable{
 		return transferenceCosts;
 	}
 	
+	/**
+	 * @return the storageLimitInMB
+	 */
 	public long getStorageLimitInMB() {
 		return storageLimitInMB;
 	}
 
+	/**
+	 * @return storageStorageCostPerMB
+	 */
 	public double getStorageCostPerMB() {
 		return storageCostPerMB;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int hashCode() {
 		assert name != null: "Null names are not allowed! Check your code.";
@@ -152,6 +141,9 @@ public class Contract implements Comparable<Contract>, Serializable{
 		return result;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		assert obj != null: "Can't compare with a null object!";
@@ -162,6 +154,9 @@ public class Contract implements Comparable<Contract>, Serializable{
 		return name.equals(other.name);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		return "Contract [name=" + name + ", price=" + price + ", setupCost="
@@ -197,11 +192,18 @@ public class Contract implements Comparable<Contract>, Serializable{
 		entry.addToReceipt(userID, getName(), extraConsumedCPU, costOfCPU, consumedTransference, transferenceCost, storageCost);
 	}
 	
+	/**
+	 * @return
+	 */
 	public double calculateOneTimeFees() {
 		return setupCost;
 	}
 	
-	//According to https://signin.crm.dynamics.com/portal/static/1046/sla.htm
+	/**
+	 * According to https://signin.crm.dynamics.com/portal/static/1046/sla.htm
+	 * @param totalLoss
+	 * @return
+	 */
 	public double calculatePenalty(double totalLoss) {
 		if(totalLoss <= 0.001 || Double.isInfinite(totalLoss) || Double.isNaN(totalLoss)){
 			return 0;

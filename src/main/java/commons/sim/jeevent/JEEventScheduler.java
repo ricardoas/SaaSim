@@ -67,8 +67,9 @@ public class JEEventScheduler implements Serializable{
 		for (JEEvent event : remainingEvents) {
 			switch (event.getType()) {
 			case PREEMPTION:
-				Request request = (Request) event.getValue()[1];
-				request.setArrivalTimeInMillis(request.getArrivalTimeInMillis() - Checkpointer.INTERVAL);
+				Object[] value = event.getValue();
+				Request request = (Request) value[1];
+				value[1] = new Request(request.getReqID(), request.getSaasClient(), request.getUserID(), request.getArrivalTimeInMillis() - Checkpointer.INTERVAL, request.getRequestSizeInBytes(), request.getResponseSizeInBytes(), request.getCpuDemandInMillis());
 				break;
 			default:
 				break;

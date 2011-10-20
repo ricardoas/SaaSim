@@ -2,8 +2,17 @@ package commons.util;
 
 import java.io.Serializable;
 
+/**
+ * Information used by checkpoint service.
+ * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
+ * @version 1.0
+ */
 public class SimulationInfo implements Serializable{
 	
+	/**
+	 * Version 1.0
+	 */
+	private static final long serialVersionUID = 1062519431287118188L;
 	private int simulatedDays;
 	private int currentMonth;
 	
@@ -44,18 +53,14 @@ public class SimulationInfo implements Serializable{
 
 	@Override
 	public boolean equals(Object obj) {
+		assert (obj != null) && (getClass() == obj.getClass()): "Can't compare with different class object.";
+		
 		if (this == obj)
 			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
 		SimulationInfo other = (SimulationInfo) obj;
 		if (currentMonth != other.currentMonth)
 			return false;
-		if (simulatedDays != other.simulatedDays)
-			return false;
-		return true;
+		return simulatedDays == other.simulatedDays;
 	}
 	
 	

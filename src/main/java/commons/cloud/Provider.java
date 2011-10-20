@@ -11,12 +11,17 @@ import commons.sim.components.MachineDescriptor;
 import commons.util.CostCalculus;
 
 /**
- * IaaS {@link Machine} provider.
+ * IaaS {@link Machine} provider. Based on Amazon EC2 market model.
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ * @version 1.0
  */
 public class Provider implements Serializable{
 	
+	/**
+	 * Version 1.0
+	 */
+	private static final long serialVersionUID = -7947181988918043343L;
 	private final int id;
 	private final String name;
 	private final int onDemandLimit;
@@ -30,6 +35,19 @@ public class Provider implements Serializable{
 	
 	private int onDemandRunningMachines;
 	
+	/**
+	 * Default constructor.
+	 * @param id
+	 * @param name
+	 * @param onDemandLimit
+	 * @param reservationLimit
+	 * @param monitoringCost
+	 * @param transferInLimits
+	 * @param transferInCosts
+	 * @param transferOutLimits
+	 * @param transferOutCosts
+	 * @param types
+	 */
 	public Provider(int id, String name,
 			int onDemandLimit, int reservationLimit,
 			double monitoringCost,
@@ -235,16 +253,12 @@ public class Provider implements Serializable{
 
 	@Override
 	public boolean equals(Object obj) {
+		assert (obj != null) && (getClass() == obj.getClass()): "Can't compare with another class object.";
+		
 		if (this == obj)
 			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
 		Provider other = (Provider) obj;
-		if (id != other.id)
-			return false;
-		return true;
+		return (id == other.id);
 	}
 	
 }

@@ -199,7 +199,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 
 	@Override
 	public boolean equals(Object obj) {
-		assert getClass() == obj.getClass(): "Comparing with different class object";
+		assert obj != null && getClass() == obj.getClass(): "Comparing with different class object";
 
 		if (this == obj)
 			return true;

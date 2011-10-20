@@ -46,42 +46,6 @@ public class Request implements Serializable{
 		return reqID;
 	}
 
-	public void setReqID(long reqID) {
-		this.reqID = reqID;
-	}
-
-	public void setSaasClient(int saasClient) {
-		this.saasClient = saasClient;
-	}
-
-	public void setUserID(int userID) {
-		this.userID = userID;
-	}
-
-	public void setArrivalTimeInMillis(long arrivalTimeInMillis) {
-		this.arrivalTimeInMillis = arrivalTimeInMillis;
-	}
-
-	public void setCpuDemandInMillis(long[] cpuDemandInMillis) {
-		this.cpuDemandInMillis = cpuDemandInMillis;
-	}
-
-	public void setRequestSizeInBytes(long requestSizeInBytes) {
-		this.requestSizeInBytes = requestSizeInBytes;
-	}
-
-	public void setResponseSizeInBytes(long responseSizeInBytes) {
-		this.responseSizeInBytes = responseSizeInBytes;
-	}
-
-	public void setTotalProcessed(long totalProcessed) {
-		this.totalProcessed = totalProcessed;
-	}
-
-	public void setValue(MachineType value) {
-		this.value = value;
-	}
-
 	/**
 	 * @return the saasClient
 	 */
@@ -172,9 +136,7 @@ public class Request implements Serializable{
 		Request other = (Request) obj;
 		if (saasClient != other.saasClient)
 			return false;
-		if (reqID != other.reqID)
-			return false;
-		return true;
+		return reqID == other.reqID;
 	}
 
 	/**

@@ -69,7 +69,6 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 	
 	private void evaluateMachinesToBeAdded(int tier, long numberOfServersToAdd) {
 		int serversAdded = 0;
-		Configuration config = Configuration.getInstance();
 		
 		List<MachineType> typeList = Arrays.asList(MachineType.values());
 		Collections.reverse(typeList);

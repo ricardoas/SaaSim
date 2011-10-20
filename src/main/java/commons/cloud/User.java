@@ -31,41 +31,12 @@ public class User implements Comparable<User>, Serializable{
 		reset();
 	}
 	
-	
-	public User(int id, Contract contract, long numberOfLostRequests,
-			long consumedCpuInMillis, long consumedInTransferenceInBytes,
-			long consumedOutTransferenceInBytes, long consumedStorageInBytes) {
-		this.id = id;
-		this.contract = contract;
-		this.numberOfLostRequests = numberOfLostRequests;
-		this.consumedCpuInMillis = consumedCpuInMillis;
-		this.consumedInTransferenceInBytes = consumedInTransferenceInBytes;
-		this.consumedOutTransferenceInBytes = consumedOutTransferenceInBytes;
-		this.consumedStorageInBytes = consumedStorageInBytes;
-	}
-
 	public long getNumberOfLostRequests() {
 		return numberOfLostRequests;
 	}
 
-	public void setNumberOfLostRequests(long numberOfLostRequests) {
-		this.numberOfLostRequests = numberOfLostRequests;
-	}
-
 	public long getConsumedCpuInMillis() {
 		return consumedCpuInMillis;
-	}
-
-	public void setConsumedCpuInMillis(long consumedCpuInMillis) {
-		this.consumedCpuInMillis = consumedCpuInMillis;
-	}
-
-	public void setConsumedInTransferenceInBytes(long consumedInTransferenceInBytes) {
-		this.consumedInTransferenceInBytes = consumedInTransferenceInBytes;
-	}
-
-	public void setConsumedOutTransferenceInBytes(long consumedOutTransferenceInBytes) {
-		this.consumedOutTransferenceInBytes = consumedOutTransferenceInBytes;
 	}
 
 	/**
@@ -80,13 +51,6 @@ public class User implements Comparable<User>, Serializable{
 	 */
 	public Contract getContract() {
 		return contract;
-	}
-
-	/**
-	 * @return the consumedCpu
-	 */
-	public long getTotalConsumedCpuInMillis() {
-		return consumedCpuInMillis;
 	}
 
 	/**

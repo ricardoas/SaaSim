@@ -60,8 +60,6 @@ public class Configuration extends PropertiesConfiguration{
 	private Provider[] providers;
 	
 	private User[] users;
-	
-	private HashMap<MachineType, Double> relativePower;
 
 	private SimulationInfo simulationInfo;
 	

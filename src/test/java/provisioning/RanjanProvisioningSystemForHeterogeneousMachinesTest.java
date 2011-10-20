@@ -280,7 +280,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		//Mocks
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
@@ -321,7 +321,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		//Configuration mock
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 
 		int reservationLimit = 5;
 		int onDemandLimit = 10;
@@ -407,7 +407,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		//Configuration mock
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		int reservationLimit = 5;
 		int onDemandLimit = 10;
@@ -481,7 +481,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		//Configuration mock
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
 		
 		int reservationLimit = 5;
 		int onDemandLimit = 10;
