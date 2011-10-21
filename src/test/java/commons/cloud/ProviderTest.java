@@ -448,20 +448,17 @@ public class ProviderTest extends ValidConfigurationTest {
 		assertNotSame(provider1.hashCode(), provider2.hashCode());
 	}
 	
-	@Test
+	@Test(expected=AssertionError.class)
 	public void testEqualsWithNullObject() {
 		Provider provider1 = new Provider(1, "xpto", 0, 0, 0.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
-		Provider provider2 = null;
 		
-		assertTrue(provider1.equals(provider1));
-		assertFalse(provider1.equals(provider2));
+		assertFalse(provider1.equals(null));
 	}
 	
-	@Test
+	@Test(expected=AssertionError.class)
 	public void testEqualsWithAnotherClassObject() {
 		Provider provider1 = new Provider(1, "xpto", 0, 0, 0.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		
-		assertTrue(provider1.equals(provider1));
 		assertFalse(provider1.equals(new String("")));
 	}
 }

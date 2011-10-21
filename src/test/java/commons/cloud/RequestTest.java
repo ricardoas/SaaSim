@@ -133,7 +133,7 @@ public class RequestTest extends CleanConfigurationTest {
 	
 	@Test
 	public void testGetTotalMeanToProcess() {
-		long mean = (SMALL_DEMAND + LARGE_DEMAND + MEDIUM_DEMAND + XLARGE_DEMAND)/4;
+		long mean = (MICRO_DEMAND + SMALL_DEMAND + LARGE_DEMAND + MEDIUM_DEMAND + XLARGE_DEMAND)/5;
 		assertEquals(mean, request.getTotalMeanToProcess());
 	}
 
