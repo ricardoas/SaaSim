@@ -5,7 +5,7 @@ package commons.cloud;
 
 import static org.junit.Assert.*;
 
-import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.easymock.EasyMock;
@@ -426,5 +426,42 @@ public class ProviderTest extends ValidConfigurationTest {
 		provider.calculateUniqueCost(result);
 		
 		EasyMock.verify(result);
+	}
+	
+	@Test
+	public void testEqualsHashCodeConsistencyProviderWithSameID() {
+		Provider provider1 = new Provider(1, "xpto", 0, 0, 0.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
+		Provider provider2 = new Provider(1, "xpto2", 0, 0, 0.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
+		
+		assertTrue(provider1.equals(provider1));
+		assertTrue(provider1.equals(provider2));
+		assertEquals(provider1.hashCode(), provider2.hashCode());
+	}
+	
+	@Test
+	public void testEqualsHashCodeConsistencyWithDifferentID() {
+		Provider provider1 = new Provider(1, "xpto", 0, 0, 0.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
+		Provider provider2 = new Provider(2, "xpto2", 0, 0, 0.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
+		
+		assertTrue(provider1.equals(provider1));
+		assertFalse(provider1.equals(provider2));
+		assertNotSame(provider1.hashCode(), provider2.hashCode());
+	}
+	
+	@Test
+	public void testEqualsWithNullObject() {
+		Provider provider1 = new Provider(1, "xpto", 0, 0, 0.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
+		Provider provider2 = null;
+		
+		assertTrue(provider1.equals(provider1));
+		assertFalse(provider1.equals(provider2));
+	}
+	
+	@Test
+	public void testEqualsWithAnotherClassObject() {
+		Provider provider1 = new Provider(1, "xpto", 0, 0, 0.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
+		
+		assertTrue(provider1.equals(provider1));
+		assertFalse(provider1.equals(new String("")));
 	}
 }

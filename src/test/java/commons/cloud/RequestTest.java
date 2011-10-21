@@ -130,6 +130,12 @@ public class RequestTest extends CleanConfigurationTest {
 	public void testGetTotalToProcessWithoutAssigningBefore() {
 		request.getTotalToProcess();
 	}
+	
+	@Test
+	public void testGetTotalMeanToProcess() {
+		long mean = (SMALL_DEMAND + LARGE_DEMAND + MEDIUM_DEMAND + XLARGE_DEMAND)/4;
+		assertEquals(mean, request.getTotalMeanToProcess());
+	}
 
 	/**
 	 * Test method for {@link commons.cloud.Request#reset()}.

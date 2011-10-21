@@ -199,7 +199,7 @@ public class UtilityResultEntryTest extends CleanConfigurationTest {
 	public void testHashCodeEqualsConsistencyWithSameTime() {
 		UtilityResultEntry entry = new UtilityResultEntry(2, new User[]{}, new Provider[]{});
 		UtilityResultEntry entryClone = new UtilityResultEntry(2, new User[]{}, new Provider[]{});
-		assertTrue(entry.equals(entryClone));
+		assertTrue(entry.equals(entry));
 		assertTrue(entry.equals(entryClone));
 		assertTrue(entryClone.equals(entry));
 		assertTrue(entry.hashCode() == entryClone.hashCode());
