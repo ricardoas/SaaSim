@@ -15,7 +15,6 @@ import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
-import commons.sim.util.MachineFactory;
 import commons.sim.util.SaaSAppProperties;
 
 /**
@@ -65,8 +64,12 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		send(new JEEvent(JEEventType.ADD_SERVER, this, serverUpTime, server));
 	}
 	
+	/**
+	 * @param machineDescriptor
+	 * @return
+	 */
 	private Machine buildMachine(MachineDescriptor machineDescriptor) {
-		return MachineFactory.getInstance().createMachine(getScheduler(), machineDescriptor, this);
+		return new TimeSharedMachine(getScheduler(), machineDescriptor, this);
 	}
 	
 	/**
@@ -166,7 +169,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 			monitor.requestQueued(getScheduler().now(), requestFinished, tier);
 		}else{
 			heuristic.reportRequestFinished();
-			monitor.reportRequestFinished(requestFinished);
+			monitor.requestFinished(requestFinished);
 		}
 		
 	}

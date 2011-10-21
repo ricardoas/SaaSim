@@ -12,13 +12,6 @@ public class JEException extends RuntimeException {
 	private static final long serialVersionUID = -2468858394012204461L;
 
 	/**
-	 * 
-	 */
-	public JEException() {
-		super();
-	}
-
-	/**
 	 * @param message
 	 */
 	public JEException(String message) {

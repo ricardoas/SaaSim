@@ -31,16 +31,6 @@ public abstract class JEAbstractEventHandler implements JEEventHandler {
 		this.id = this.scheduler.registerHandler(this);
     }
     
-    public JEAbstractEventHandler(){
-    	this.scheduler = null;
-    	this.id = 0;
-    }
-    
-    public JEAbstractEventHandler(JEEventScheduler scheduler, int id){
-		this.scheduler = scheduler;
-		this.id = id;
-    }
-    
     /**
 	 * {@inheritDoc}
 	 */
@@ -60,11 +50,6 @@ public abstract class JEAbstractEventHandler implements JEEventHandler {
     @Override
 	public void forward(JEEvent event, JEEventHandler handler) {
     	getScheduler().queueEvent(new JEEvent(event, handler));
-    }
-    
-    protected void setScheduler(JEEventScheduler scheduler){
-    	this.scheduler = scheduler;
-    	this.id = this.scheduler.registerHandler(this);
     }
     
     /**

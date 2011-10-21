@@ -1,15 +1,15 @@
 package commons.sim.jeevent;
 
-import static org.junit.Assert.assertEquals;
 import static commons.sim.jeevent.JEEventScheduler.getInstance;
+import static org.junit.Assert.assertEquals;
 
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.Test;
 
-import commons.io.Checkpointer;
-
 import util.CleanConfigurationTest;
+
+import commons.io.Checkpointer;
 
 public class JEEventSchedulerTest extends CleanConfigurationTest {
 	

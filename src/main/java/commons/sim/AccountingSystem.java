@@ -4,29 +4,40 @@ import commons.cloud.Provider;
 import commons.cloud.User;
 import commons.cloud.UtilityResult;
 import commons.cloud.UtilityResultEntry;
+import commons.config.Configuration;
+import commons.io.Checkpointer;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public class AccountingSystem {
 	
-	private UtilityResult utilityResult;
-	
-	/**
-	 * Default constructor.
-	 * @param numberOfUsers 
-	 * @param numberOfProviders 
-	 */
-	public AccountingSystem(int numberOfUsers, int numberOfProviders){
-		this.utilityResult = new UtilityResult(numberOfUsers, numberOfProviders);
+	private static AccountingSystem instance;
+
+	public static AccountingSystem getInstance(){
+		if(instance == null){
+			instance = Checkpointer.hasCheckpoint()?
+					Checkpointer.loadAccountingSystem():
+					new AccountingSystem(Configuration.getInstance().getUsers(), 
+							Configuration.getInstance().getProviders());
+		}
+		return instance;
 	}
 	
+	private UtilityResult utilityResult;
+	private final User[] users;
+	private final Provider[] providers;
+	
+	private AccountingSystem(User[] users, Provider[] providers) {
+		this.users = users;
+		this.providers = providers;
+		this.utilityResult = new UtilityResult(users.length, providers.length);
+	}
+
 	/**
 	 * @param currentTimeInMillis
-	 * @param users
-	 * @param providers
 	 */
-	public void accountPartialUtility(long currentTimeInMillis, User[] users, Provider[] providers){
+	public void accountPartialUtility(long currentTimeInMillis){
 		UtilityResultEntry entry = new UtilityResultEntry(currentTimeInMillis, users, providers);
 		for (User user : users) {
 			user.calculatePartialReceipt(entry);
@@ -42,7 +53,7 @@ public class AccountingSystem {
 	 * during a whole year)  
 	 * @return
 	 */
-	public UtilityResult calculateUtility(User[] users, Provider[] providers){
+	public UtilityResult calculateUtility(){
 		for(Provider provider : providers){
 			provider.calculateUniqueCost(utilityResult);
 		}

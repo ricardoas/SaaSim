@@ -5,11 +5,13 @@ import commons.sim.components.MachineDescriptor;
 import commons.sim.provisioningheuristics.MachineStatistics;
 
 /**
+ * Application monitor. Interface for reporting information.
+ * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public interface Monitor{
 	
-	void reportRequestFinished(Request requestFinished);
+	void requestFinished(Request requestFinished);
 	
 	void requestQueued(long timeMilliSeconds, Request request, int tier);
 

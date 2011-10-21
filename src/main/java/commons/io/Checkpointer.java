@@ -11,6 +11,7 @@ import planning.util.MachineUsageData;
 
 import commons.cloud.Provider;
 import commons.cloud.User;
+import commons.sim.AccountingSystem;
 import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.util.SimulationInfo;
@@ -27,6 +28,7 @@ public class Checkpointer {
 	private static Provider[] providers;
 	private static User[] users;
 	private static SimulationInfo simulationInfo;
+	private static AccountingSystem accountingSystem;
 	
 	/**
 	 * Check if there's a previous checkpoint available to read. Such operation consists in check if there
@@ -134,5 +136,12 @@ public class Checkpointer {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static AccountingSystem loadAccountingSystem() {
+		if(hasCheckpoint() && accountingSystem == null){
+			loadData();
+		}
+		return accountingSystem;
 	}
 }

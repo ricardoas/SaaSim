@@ -4,11 +4,12 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
-import util.CleanConfigurationTest;
+import util.ValidConfigurationTest;
 
 import commons.cloud.MachineType;
 import commons.cloud.Request;
@@ -18,14 +19,15 @@ import commons.sim.components.TimeSharedMachine;
 import commons.sim.jeevent.JEEventScheduler;
 
 
-public class RanjanHeuristicTest extends CleanConfigurationTest {
+public class RanjanHeuristicTest extends ValidConfigurationTest {
 
 	private static final long ONE_MINUTE_IN_MILLIS = 1000 * 60;
 	
 	private RanjanHeuristic heuristic;
 	
 	@Before
-	public void setUp(){
+	public void setUp() throws ConfigurationException{
+		buildFullConfiguration();
 		heuristic = new RanjanHeuristic();
 	}
 	

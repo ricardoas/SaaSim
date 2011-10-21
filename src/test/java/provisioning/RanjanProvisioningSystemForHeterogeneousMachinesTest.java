@@ -671,7 +671,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		
 		//Creating dps
 		RanjanProvisioningSystemForHeterogeneousMachines dps = new RanjanProvisioningSystemForHeterogeneousMachines();
-		dps.reportRequestFinished(request);
+		dps.requestFinished(request);
 		
 		PowerMock.verifyAll();
 	}

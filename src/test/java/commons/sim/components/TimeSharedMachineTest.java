@@ -8,7 +8,7 @@ import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
-import util.MockedConfigurationTest;
+import util.ValidConfigurationTest;
 
 import commons.cloud.MachineType;
 import commons.cloud.Request;
@@ -16,15 +16,16 @@ import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 
-public class TimeSharedMachineTest extends MockedConfigurationTest {
+public class TimeSharedMachineTest extends ValidConfigurationTest {
 
 	private MachineDescriptor smallMachine;
 	private MachineDescriptor largeMachine;
 	private MachineDescriptor xLargeMachine;
 
 	@Override
-	public void setUp() {
+	public void setUp() throws Exception {
 		super.setUp();
+		buildFullConfiguration();
 		this.smallMachine = new MachineDescriptor(1, false, MachineType.M1_SMALL, 0);
 		this.largeMachine = new MachineDescriptor(1, false, MachineType.M1_LARGE, 0);
 		this.xLargeMachine = new MachineDescriptor(1, false, MachineType.M1_XLARGE, 0);

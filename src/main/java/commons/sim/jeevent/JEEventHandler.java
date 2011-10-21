@@ -2,6 +2,10 @@ package commons.sim.jeevent;
 
 import java.io.Serializable;
 
+/**
+ * 
+ * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
+ */
 public interface JEEventHandler extends Serializable{
 
 	/**
@@ -20,6 +24,10 @@ public interface JEEventHandler extends Serializable{
 	 */
 	int getHandlerId();
 
+	/**
+	 * @param event
+	 * @param handler
+	 */
 	void forward(JEEvent event, JEEventHandler handler);
 
 }

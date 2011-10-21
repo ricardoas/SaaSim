@@ -1,9 +1,5 @@
 package commons.sim.components;
 
-import static commons.sim.util.SimulatorProperties.RANJAN_HEURISTIC_BACKLOG_SIZE;
-import static commons.sim.util.SimulatorProperties.RANJAN_HEURISTIC_NUMBER_OF_TOKENS;
-
-import commons.config.Configuration;
 import commons.sim.jeevent.JEEventScheduler;
 
 /**
@@ -27,7 +23,5 @@ public class RanjanMachine extends TimeSharedMachine {
 	 */
 	public RanjanMachine(JEEventScheduler scheduler, MachineDescriptor descriptor, LoadBalancer loadBalancer){
 		super(scheduler, descriptor, loadBalancer);
-		this.maxThreads = Configuration.getInstance().getLong(RANJAN_HEURISTIC_NUMBER_OF_TOKENS);
-		this.maxBacklogSize = Configuration.getInstance().getLong(RANJAN_HEURISTIC_BACKLOG_SIZE);
 	}
 }

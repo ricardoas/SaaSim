@@ -5,11 +5,17 @@ import java.util.Arrays;
 
 
 /**
+ * 
+ * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
- *
+ * @version 1.0
  */
 public class Request implements Serializable{
 	
+	/**
+	 * Versino 1.0
+	 */
+	private static final long serialVersionUID = -6648523605288936095L;
 	private int saasClient;
 	private int userID;
 	private long reqID;
@@ -22,6 +28,7 @@ public class Request implements Serializable{
 	private MachineType value;
 	
 	/**
+	 * Default constructor.
 	 * @param reqID
 	 * @param saasClient
 	 * @param userID

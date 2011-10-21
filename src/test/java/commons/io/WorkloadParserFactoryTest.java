@@ -10,8 +10,6 @@ import org.junit.Test;
 import util.ValidConfigurationTest;
 
 import commons.cloud.Request;
-import commons.io.WorkloadParser;
-import commons.io.WorkloadParserFactory;
 
 public class WorkloadParserFactoryTest extends ValidConfigurationTest{
 	

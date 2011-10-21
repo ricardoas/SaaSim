@@ -36,7 +36,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testConstructor() {
 		
-		RanjanMachine machine = new RanjanMachine(JEEventScheduler.getInstance(), descriptor, null);
+		TimeSharedMachine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), descriptor, null);
 		assertEquals(descriptor, machine.getDescriptor());
 		assertNull(machine.getLoadBalancer());
 		assertNotNull(machine.getProcessorQueue());
@@ -53,7 +53,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{50, 50});
 		
-		RanjanMachine machine = new RanjanMachine(JEEventScheduler.getInstance(), descriptor, loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), descriptor, loadBalancer);
 		
 		machine.sendRequest(request);
 		Queue<Request> queue = machine.getProcessorQueue();
@@ -81,7 +81,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{2500, 2500});
 		
-		RanjanMachine machine = new RanjanMachine(JEEventScheduler.getInstance(), descriptor, loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), descriptor, loadBalancer);
 		
 		machine.sendRequest(request);
 		Queue<Request> queue = machine.getProcessorQueue();
@@ -117,7 +117,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		EasyMock.expect(queue.isEmpty()).andReturn(true).times(3);
 		EasyMock.replay(queue);
 		
-		RanjanMachine machine = new RanjanMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), loadBalancer);
 		
 		Field declaredField = TimeSharedMachine.class.getDeclaredField("backlog");
 		declaredField.setAccessible(true);
@@ -165,7 +165,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		EasyMock.expect(queue.isEmpty()).andReturn(true).times(3);
 		EasyMock.replay(queue);
 		
-		RanjanMachine machine = new RanjanMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_XLARGE, 0), loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_XLARGE, 0), loadBalancer);
 		
 		Field declaredField = TimeSharedMachine.class.getDeclaredField("backlog");
 		declaredField.setAccessible(true);
@@ -200,7 +200,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(loadBalancer);
 		
-		RanjanMachine machine = new RanjanMachine(scheduler, descriptor, loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(scheduler, descriptor, loadBalancer);
 		machine.shutdownOnFinish();
 		
 		scheduler.start();
@@ -229,7 +229,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		EasyMock.expectLastCall();
 		EasyMock.replay(loadBalancer);
 
-		RanjanMachine machine = new RanjanMachine(scheduler, descriptor, loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(scheduler, descriptor, loadBalancer);
 		machine.sendRequest(request);
 		
 		machine.shutdownOnFinish();
@@ -298,7 +298,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		JEEventScheduler scheduler = JEEventScheduler.getInstance();
 		
-		RanjanMachine machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(scheduler, new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), loadBalancer);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
 		machine.sendRequest(thirdRequest);
@@ -346,7 +346,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 
 		EasyMock.replay(loadBalancer);
 		
-		RanjanMachine machine = new RanjanMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), loadBalancer);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
 		machine.sendRequest(thirdRequest);
@@ -399,7 +399,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	
 		EasyMock.replay(loadBalancer);
 		
-		RanjanMachine machine = new RanjanMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_XLARGE, 0), loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_XLARGE, 0), loadBalancer);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
 		machine.sendRequest(thirdRequest);
@@ -432,7 +432,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		JEEventScheduler scheduler = JEEventScheduler.getInstance();
 		
-		RanjanMachine machine = new RanjanMachine(scheduler, descriptor, loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(scheduler, descriptor, loadBalancer);
 		assertEquals(Double.NaN, machine.computeUtilisation(scheduler.now()), 0.0001);
 		assertEquals(0, machine.computeUtilisation(scheduler.now() + 300000), 0.0001);
 		
@@ -464,7 +464,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(request, loadBalancer, scheduler);
 		
-		RanjanMachine machine = new RanjanMachine(scheduler, descriptor, loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(scheduler, descriptor, loadBalancer);
 		machine.sendRequest(request);
 		
 		assertEquals(Double.NaN, machine.computeUtilisation(0), 0.0001);
@@ -506,7 +506,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(request, loadBalancer, scheduler);
 		
-		RanjanMachine machine = new RanjanMachine(scheduler, descriptor, loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(scheduler, descriptor, loadBalancer);
 		machine.sendRequest(request);
 		
 		//Simulating a preemption event
@@ -545,7 +545,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(request, loadBalancer, scheduler);
 		
-		RanjanMachine machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, MachineType.M1_LARGE, 0), loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(scheduler, new MachineDescriptor(1, false, MachineType.M1_LARGE, 0), loadBalancer);
 		machine.sendRequest(request);
 		
 		assertEquals(Double.NaN, machine.computeUtilisation(0), 0.0001);
@@ -576,7 +576,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(request, loadBalancer);
 		
-		RanjanMachine machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, MachineType.M1_XLARGE, 0), loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(scheduler, new MachineDescriptor(1, false, MachineType.M1_XLARGE, 0), loadBalancer);
 		machine.sendRequest(request);
 		
 		assertEquals(Double.NaN, machine.computeUtilisation(scheduler.now()), 0.0001);
@@ -604,7 +604,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(request, loadBalancer);
 		
-		RanjanMachine machine = new RanjanMachine(scheduler, descriptor, loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(scheduler, descriptor, loadBalancer);
 		machine.sendRequest(request);
 		
 		scheduler.start();
@@ -635,7 +635,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(request, loadBalancer);
 		
-		RanjanMachine machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, MachineType.M1_XLARGE, 0), loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(scheduler, new MachineDescriptor(1, false, MachineType.M1_XLARGE, 0), loadBalancer);
 		machine.sendRequest(request);
 
 		scheduler.start();
@@ -666,7 +666,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(request, loadBalancer);
 		
-		RanjanMachine machine = new RanjanMachine(scheduler, descriptor, loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(scheduler, descriptor, loadBalancer);
 		machine.sendRequest(request);
 		
 		scheduler.start();
@@ -698,7 +698,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(request, loadBalancer);
 		
-		RanjanMachine machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, MachineType.M1_XLARGE, 0), loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(scheduler, new MachineDescriptor(1, false, MachineType.M1_XLARGE, 0), loadBalancer);
 		machine.sendRequest(request);
 		
 		scheduler.start();
@@ -730,7 +730,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(request, loadBalancer);
 		
-		RanjanMachine machine = new RanjanMachine(scheduler, descriptor, loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(scheduler, descriptor, loadBalancer);
 		machine.sendRequest(request);
 		
 		scheduler.start();
@@ -761,7 +761,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(request, loadBalancer);
 		
-		RanjanMachine machine = new RanjanMachine(scheduler, new MachineDescriptor(1, false, MachineType.M1_LARGE, 0), loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(scheduler, new MachineDescriptor(1, false, MachineType.M1_LARGE, 0), loadBalancer);
 		
 		machine.sendRequest(request);
 		
@@ -790,7 +790,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(loadBalancer, request);
 		
-		RanjanMachine machine = new RanjanMachine(JEEventScheduler.getInstance(), descriptor, loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), descriptor, loadBalancer);
 		
 		machine.sendRequest(request);
 		

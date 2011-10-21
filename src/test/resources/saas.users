@@ -4,9 +4,7 @@ saas.workload=src/test/resources/power.trc
 saas.user.id=client1
 saas.user.plan=bronze
 saas.user.storage=5120000
-#saas.user.workload=/local/ricardo/traces/power.trc
 
 saas.user.id=client2
 saas.user.plan=silver
 saas.user.storage=10240000
-#saas.user.workload=

@@ -24,10 +24,15 @@ import commons.sim.schedulingheuristics.SchedulingHeuristic;
 
 public class LoadBalancerTest extends ValidConfigurationTest {
 	
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+		buildFullConfiguration();
+	}
+	
 	
 	@Test
 	public void testAddServerWithSetupDelay() throws ConfigurationException{
-		buildFullConfiguration();
 		
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.M1_SMALL, 0);
 		
@@ -197,8 +202,8 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		MachineDescriptor descriptor = new MachineDescriptor(0, false, MachineType.M1_SMALL, 0);
 		MachineDescriptor descriptor2 = new MachineDescriptor(1, true, MachineType.C1_MEDIUM, 0);
 		
-		RanjanMachine machine1 = EasyMock.createStrictMock(RanjanMachine.class);
-		RanjanMachine machine2 = EasyMock.createStrictMock(RanjanMachine.class);
+		TimeSharedMachine machine1 = EasyMock.createStrictMock(TimeSharedMachine.class);
+		TimeSharedMachine machine2 = EasyMock.createStrictMock(TimeSharedMachine.class);
 		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
 		EasyMock.expect(machine1.computeUtilisation(evaluationTime)).andReturn(utilisation1);
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);

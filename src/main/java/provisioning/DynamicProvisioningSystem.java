@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.Request;
@@ -21,6 +20,8 @@ import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.util.SaaSAppProperties;
 
 /**
+ * Default implementation for {@link DPS}. It does static provisioning system ignoring all
+ * report information.
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
@@ -41,11 +42,10 @@ public class DynamicProvisioningSystem implements DPS{
 		Configuration config = Configuration.getInstance();
 		this.providers = config.getProviders();
 		this.users = config.getUsers();
-		this.accountingSystem = new AccountingSystem(users.length, providers.length);
+		this.accountingSystem = AccountingSystem.getInstance();
 	}
 	
 	/**
-	 * FIXME checkpoint
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -83,8 +83,11 @@ public class DynamicProvisioningSystem implements DPS{
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public void reportRequestFinished(Request request) {
+	public void requestFinished(Request request) {
 		assert request.getSaasClient() < users.length:"Unregistered user with ID " + request.getSaasClient() + ". Check configuration files.";
 		
 		try{
@@ -94,31 +97,45 @@ public class DynamicProvisioningSystem implements DPS{
 		}
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void requestQueued(long timeMilliSeconds, Request request, int tier) {
 		reportLostRequest(request);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void sendStatistics(long now, MachineStatistics statistics, int tier) {
 		// Nothing to do
-		
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void machineTurnedOff(MachineDescriptor machineDescriptor) {
 		assert machineDescriptor.getProviderID() < providers.length: "Inexistent provider, check configuration files.";
 		providers[machineDescriptor.getProviderID()].shutdownMachine(machineDescriptor);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public UtilityResult calculateUtility() {
-		return this.accountingSystem.calculateUtility(users, providers);
+		return this.accountingSystem.calculateUtility();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void chargeUsers(long currentTimeInMillis) {
-		this.accountingSystem.accountPartialUtility(currentTimeInMillis, users, providers);
+		this.accountingSystem.accountPartialUtility(currentTimeInMillis);
 	}
 
 	/**

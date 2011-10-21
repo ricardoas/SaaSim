@@ -258,7 +258,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		EasyMock.replay(config);
 		
 		this.dps = new RanjanProvisioningSystem();
-		AccountingSystem system = new AccountingSystem(0, 1);
+//		AccountingSystem system = new AccountingSystem(0, 1);
 //		system.buyMachine();
 //		system.buyMachine();
 //		this.dps.setAccountingSystem(system);
@@ -312,7 +312,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		EasyMock.replay(config);
 		
 		//Creating some machines to be removed
-		AccountingSystem accountingSystem = new AccountingSystem(0, 1);
+//		AccountingSystem accountingSystem = new AccountingSystem(0, 1);
 //		accountingSystem.buyMachine();
 //		accountingSystem.buyMachine();
 //		accountingSystem.buyMachine();

@@ -7,7 +7,6 @@ import java.util.List;
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.Request;
-import commons.config.Configuration;
 import commons.sim.provisioningheuristics.MachineStatistics;
 
 /**

@@ -6,7 +6,6 @@ import provisioning.Monitor;
 
 import commons.cloud.Request;
 import commons.io.WorkloadParser;
-import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 
 /**

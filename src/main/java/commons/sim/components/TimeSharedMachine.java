@@ -1,5 +1,7 @@
 package commons.sim.components;
 
+import static commons.sim.util.SimulatorProperties.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -9,6 +11,7 @@ import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
 import commons.cloud.Request;
+import commons.config.Configuration;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
@@ -68,6 +71,8 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		this.semaphore = new Semaphore(this.NUMBER_OF_CORES, true);
 		this.maxThreads = Long.MAX_VALUE;
 		this.maxBacklogSize = 0;
+		this.maxThreads = Configuration.getInstance().getLong(RANJAN_HEURISTIC_NUMBER_OF_TOKENS, Long.MAX_VALUE);
+		this.maxBacklogSize = Configuration.getInstance().getLong(RANJAN_HEURISTIC_BACKLOG_SIZE, 0);
 		this.backlog = new LinkedList<Request>();
 	}
 	

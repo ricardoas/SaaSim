@@ -11,7 +11,6 @@ import java.util.Map;
 import org.easymock.EasyMock;
 import org.jgap.Gene;
 import org.jgap.IChromosome;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
@@ -27,7 +26,6 @@ import commons.cloud.Provider;
 import commons.cloud.TypeProvider;
 import commons.cloud.User;
 import commons.config.Configuration;
-import commons.io.TickSize;
 import commons.sim.util.SaaSAppProperties;
 import commons.sim.util.SimulatorProperties;
 

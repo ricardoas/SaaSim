@@ -3,30 +3,24 @@
  */
 package provisioning;
 
+import static org.junit.Assert.assertEquals;
+
 import org.easymock.EasyMock;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.easymock.PowerMock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 import util.ValidConfigurationTest;
 
 import commons.cloud.MachineType;
-import commons.cloud.Provider;
 import commons.cloud.Request;
-import commons.cloud.User;
-import commons.cloud.UtilityResultEntry;
+import commons.cloud.UtilityResult;
 import commons.config.Configuration;
+import commons.sim.AccountingSystem;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.provisioningheuristics.MachineStatistics;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
- *
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Configuration.class)
 public class MonitorTest extends ValidConfigurationTest {
 
 	private Monitor monitor;
@@ -39,7 +33,7 @@ public class MonitorTest extends ValidConfigurationTest {
 	}
 	
 	/**
-	 * Test method for {@link provisioning.Monitor#reportRequestFinished(commons.cloud.Request)}.
+	 * Test method for {@link provisioning.Monitor#requestFinished(commons.cloud.Request)}.
 	 */
 	@Test(expected=AssertionError.class)
 	public void testReportRequestFinished() {
@@ -47,7 +41,7 @@ public class MonitorTest extends ValidConfigurationTest {
 		EasyMock.expect(request.getSaasClient()).andReturn(100).times(2);
 		EasyMock.replay(request);
 		
-		monitor.reportRequestFinished(request);
+		monitor.requestFinished(request);
 	}
 
 	/**
@@ -102,26 +96,13 @@ public class MonitorTest extends ValidConfigurationTest {
 	 */
 	@Test
 	public void testChargeUsers() {
-		Provider provider = EasyMock.createStrictMock(Provider.class);
-		EasyMock.expect(provider.getName()).andReturn("amazon");
-		EasyMock.expect(provider.getAvailableTypes()).andReturn(new MachineType[]{MachineType.M1_SMALL});
-		provider.calculateCost(EasyMock.isA(UtilityResultEntry.class), EasyMock.anyLong());
-		
-		User user = EasyMock.createStrictMock(User.class);
-		user.calculatePartialReceipt(EasyMock.isA(UtilityResultEntry.class));
-		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider});
-		EasyMock.expect(config.getUsers()).andReturn(new User[]{user});
-		
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config);
-		
-		PowerMock.replayAll(config, provider, user);
-		
+		UtilityResult utilityBefore = AccountingSystem.getInstance().calculateUtility();
 		new DynamicProvisioningSystem().chargeUsers(0);
+		UtilityResult utilityAfter = AccountingSystem.getInstance().calculateUtility();
 		
-		PowerMock.verifyAll();
+		double usersFee = 0;
+		double providersFee = 0;
+		assertEquals(utilityBefore.getUtility() + usersFee + providersFee, utilityAfter.getUtility(), 0.0001);
 	}
 
 }
