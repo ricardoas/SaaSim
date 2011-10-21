@@ -119,7 +119,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		RanjanMachine machine = new RanjanMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), loadBalancer);
 		
-		Field declaredField = RanjanMachine.class.getDeclaredField("backlog");
+		Field declaredField = TimeSharedMachine.class.getDeclaredField("backlog");
 		declaredField.setAccessible(true);
 		declaredField.set(machine, queue);
 		
@@ -167,7 +167,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		RanjanMachine machine = new RanjanMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_XLARGE, 0), loadBalancer);
 		
-		Field declaredField = RanjanMachine.class.getDeclaredField("backlog");
+		Field declaredField = TimeSharedMachine.class.getDeclaredField("backlog");
 		declaredField.setAccessible(true);
 		declaredField.set(machine, queue);
 		

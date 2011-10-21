@@ -42,6 +42,10 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	protected long lastUpdate;
 	
 	protected Semaphore semaphore;
+	protected long maxThreads;
+	protected long maxBacklogSize;
+	protected Queue<Request> backlog;
+
 	
 	/**
 	 * Default constructor
@@ -62,6 +66,9 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		this.lastUpdate = scheduler.now();
 		this.NUMBER_OF_CORES = descriptor.getType().getNumberOfCores();
 		this.semaphore = new Semaphore(this.NUMBER_OF_CORES, true);
+		this.maxThreads = Long.MAX_VALUE;
+		this.maxBacklogSize = 0;
+		this.backlog = new LinkedList<Request>();
 	}
 	
 	/**
@@ -104,12 +111,19 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 */
 	@Override
 	public void sendRequest(Request request) {
-		this.processorQueue.add(request);
-		request.assignTo(descriptor.getType());
-		
-		if(!this.processorQueue.isEmpty() && this.semaphore.tryAcquire()){
-			scheduleNext();
+		if(canRun()){
+			this.processorQueue.add(request);
+			request.assignTo(descriptor.getType());
+			
+			if(this.semaphore.tryAcquire()){
+				scheduleNext();
+			}
+		}else if(canQueue()){
+			this.backlog.add(request);
+		}else{
+			send(new JEEvent(JEEventType.REQUESTQUEUED, getLoadBalancer(), getScheduler().now(), request));
 		}
+
 	}
 
 	/**
@@ -169,8 +183,12 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	}
 
 	protected void requestFinished(Request request) {
+		if(!backlog.isEmpty()){
+			Request newRequestToAdd = backlog.poll();
+			newRequestToAdd.assignTo(this.descriptor.getType());
+			processorQueue.add(newRequestToAdd);
+		}
 		getLoadBalancer().reportRequestFinished(request);
-		request = null;
 	}
 
 	/**
@@ -316,4 +334,22 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		
 		return executionTimes;
 	}
+	
+	/**
+	 * @return <code>true</code> when there is an available thread to process this request, 
+	 * and <code>false</code> otherwise.
+	 */
+	protected boolean canRun() {
+		return processorQueue.size() + (this.NUMBER_OF_CORES - this.semaphore.availablePermits()) < maxThreads;
+	}
+	
+	/**
+	 * @return <code>true</code> if there is free space available at the backlog queue, 
+	 * and <code>false</code> otherwise.
+	 */
+	protected boolean canQueue() {
+		return this.backlog.size() < maxBacklogSize;
+	}
+	
+
 }

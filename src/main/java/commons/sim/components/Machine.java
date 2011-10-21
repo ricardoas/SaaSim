@@ -5,7 +5,6 @@ import java.util.Queue;
 
 import commons.cloud.Request;
 import commons.sim.jeevent.JEEventHandler;
-import commons.sim.jeevent.JEEventScheduler;
 import commons.util.Triple;
 
 /**
