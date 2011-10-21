@@ -31,14 +31,14 @@ public enum MachineType{
 	}
 
 	/**
-	 * @return the power
+	 * @return the relative power of each core.
 	 */
 	public double getPower() {
 		return power;
 	}
 
 	/**
-	 * @return the numberOfCores
+	 * @return the number of cores
 	 */
 	public int getNumberOfCores() {
 		return numberOfCores;

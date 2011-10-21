@@ -7,9 +7,14 @@ import java.io.Serializable;
  * {@link Request#getUserID()}.
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ * @version 1.0
  */
 public class User implements Comparable<User>, Serializable{
 	
+	/**
+	 * Version 1.0
+	 */
+	private static final long serialVersionUID = 7315070558750123127L;
 	private final int id;
 	private final Contract contract;
 	

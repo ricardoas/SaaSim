@@ -9,27 +9,36 @@ import commons.sim.components.MachineDescriptor;
 
 
 /**
+ * Abstraction for encapsulate a specific {@link MachineType} market of a {@link Provider}.
+ * An IaaS provider renting machines of three different types works like three providers renting
+ * each one a single type.
  * 
  * @author David Candeia - davidcmm@lsd.ufcg.edu.br
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ * @version 1.0
  */
 public class TypeProvider implements Serializable{
 	
+	/**
+	 * Version 1.0
+	 */
+	private static final long serialVersionUID = -2384651815453738053L;
+
 	private static final long HOUR_IN_MILLIS = 3600000;
 	
-	private int providerID;
-	private MachineType type;
-	private double onDemandCpuCost;
-	private double reservedCpuCost;
-	private double reservationOneYearFee;
-	private double reservationThreeYearsFee;
-	private long reservation;
+	private final int providerID;
+	private final MachineType type;
+	private final double onDemandCpuCost;
+	private final double reservedCpuCost;
+	private final double reservationOneYearFee;
+	private final double reservationThreeYearsFee;
+	private final long reservation;
 
-	private List<MachineDescriptor> reservedRunningMachines;
-	private List<MachineDescriptor> reservedFinishedMachines;
+	private final List<MachineDescriptor> reservedRunningMachines;
+	private final List<MachineDescriptor> reservedFinishedMachines;
 	
-	private List<MachineDescriptor> onDemandRunningMachines;
-	private List<MachineDescriptor> onDemandFinishedMachines;
+	private final List<MachineDescriptor> onDemandRunningMachines;
+	private final List<MachineDescriptor> onDemandFinishedMachines;
 	
 	/**
 	 * Default constructor.
@@ -83,6 +92,12 @@ public class TypeProvider implements Serializable{
 		return reservation;
 	}
 
+	/**
+	 * Reports that the machine represented by such {@link MachineDescriptor} has been turned off.
+	 * @param machineDescriptor The machine that has been turned off.
+	 * @return <code>true</code> if this provider is responsible for this machine and the report 
+	 * has been successfully done, and <code>false</code> otherwise.
+	 */
 	public boolean shutdownMachine(MachineDescriptor machineDescriptor) {
 		if(machineDescriptor.isReserved()){
 			if( reservedRunningMachines.remove(machineDescriptor) ){
@@ -96,6 +111,10 @@ public class TypeProvider implements Serializable{
 		return false;
 	}
 
+	/**
+	 * @param isReserved
+	 * @return
+	 */
 	public MachineDescriptor buyMachine(boolean isReserved) {
 		if(isReserved){
 			if(canBuy()){
@@ -111,6 +130,10 @@ public class TypeProvider implements Serializable{
 		return null;
 	}
 
+	/**
+	 * @return <code>true</code> if there are RESERVED machines available to be bought, 
+	 * and <code>false</code> otherwise..
+	 */
 	public boolean canBuy() {
 		return reservedRunningMachines.size() < reservation;
 	}

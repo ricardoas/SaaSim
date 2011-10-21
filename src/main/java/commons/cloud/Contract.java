@@ -20,16 +20,16 @@ public class Contract implements Comparable<Contract>, Serializable{
 	private static final long HOUR_IN_MILLIS = 3600000;
 	private static final long MB_IN_BYTES = 1024 * 1024;
 
-	private String name;
-	private int priority;
-	private double price;//in $
-	private double setupCost;//in $
-	private long cpuLimitInMillis;// in hours
-	private double extraCpuCost;// in $/hour
-	private long[] transferenceLimitsInBytes;
-	private double[] transferenceCosts;
-	private long storageLimitInMB;
-	private double storageCostPerMB;
+	private final String name;
+	private final int priority;
+	private final double price;//in $
+	private final double setupCost;//in $
+	private final long cpuLimitInMillis;// in hours
+	private final double extraCpuCost;// in $/hour
+	private final long[] transferenceLimitsInBytes;
+	private final double[] transferenceCosts;
+	private final long storageLimitInMB;
+	private final double storageCostPerMB;
 	
 	/**
 	 * Default constructor.
