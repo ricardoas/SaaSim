@@ -189,6 +189,13 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	public int getTier() {
 		return tier;
 	}
+
+	/**
+	 * @param monitor the monitor to set
+	 */
+	public void setMonitor(Monitor monitor) {
+		this.monitor = monitor;
+	}
 	
 	@Override
 	public int hashCode() {
@@ -198,24 +205,19 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		return result;
 	}
 
-	/**
-	 * @param monitor the monitor to set
-	 */
-	public void setMonitor(Monitor monitor) {
-		this.monitor = monitor;
-	}
-
 	@Override
 	public boolean equals(Object obj) {
+		assert (obj != null) && (getClass() == obj.getClass()): "Can't compare with another class object.";
+		
 		if (this == obj)
 			return true;
-		if (!super.equals(obj))
+		if (!super.equals(obj)) {
 			return false;
-		if (getClass() != obj.getClass())
+		} if (getClass() != obj.getClass())
 			return false;
 		LoadBalancer other = (LoadBalancer) obj;
-		if (tier != other.tier)
+		if (tier != other.tier) {
 			return false;
-		return true;
+		} return true;
 	}
 }

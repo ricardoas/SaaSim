@@ -1,6 +1,6 @@
 package commons.sim.components;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.util.List;
 
@@ -8,7 +8,6 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Test;
-import org.powermock.api.easymock.PowerMock;
 
 import provisioning.DPS;
 import provisioning.Monitor;
@@ -20,8 +19,8 @@ import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.provisioningheuristics.MachineStatistics;
+import commons.sim.schedulingheuristics.RoundRobinHeuristic;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
-import commons.sim.util.MachineFactory;
 
 public class LoadBalancerTest extends ValidConfigurationTest {
 	
@@ -290,5 +289,50 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		lb.handleEvent(new JEEvent(JEEventType.REQUESTQUEUED, lb, 0l, request));
 		
 		EasyMock.verify(monitor, schedulingHeuristic, request);
+	}
+	
+	@Test
+	public void testEqualsHashCodeConsistencyWithSameTierAndSameHandlerID() {
+		LoadBalancer lb = new LoadBalancer(JEEventScheduler.getInstance(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 0);
+
+		assertTrue(lb.equals(lb));
+		assertEquals(lb.hashCode(), lb.hashCode());
+	}
+	
+	@Test
+	public void testEqualsHashCodeConsistencyWithSameTierButDifferentHandlerID() {
+		LoadBalancer lb = new LoadBalancer(JEEventScheduler.getInstance(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 0);
+		LoadBalancer lbClone = new LoadBalancer(JEEventScheduler.getInstance(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 0);
+
+		assertFalse(lb.equals(lbClone));
+		assertFalse(lbClone.equals(lb));
+		assertNotSame(lb.hashCode(), lbClone.hashCode());
+	}
+	
+	@Test
+	public void testEqualsHashCodeConsistencyWithDifferentTier() {
+		LoadBalancer lb1 = new LoadBalancer(JEEventScheduler.getInstance(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 0);
+		LoadBalancer lb2 = new LoadBalancer(JEEventScheduler.getInstance(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 1);
+		
+		assertTrue(lb1.equals(lb1));
+		assertFalse(lb1.equals(lb2));
+		assertFalse(lb2.equals(lb1));
+		assertNotSame(lb1.hashCode(), lb2.hashCode());
+	}
+	
+	@Test(expected=AssertionError.class)
+	public void testEqualsWithNullObject() {
+		LoadBalancer lb = new LoadBalancer(JEEventScheduler.getInstance(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 0);
+		LoadBalancer lbNull = null;
+		
+		lb.equals(lbNull);
+	}
+	
+	@Test(expected=AssertionError.class)
+	public void testEqualsWithAnotherClassObject() {
+		LoadBalancer lb = new LoadBalancer(JEEventScheduler.getInstance(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 0);		
+		
+		assertTrue(lb.equals(lb));
+		lb.equals(new String(""));
 	}
 }

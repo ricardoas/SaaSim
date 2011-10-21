@@ -451,7 +451,7 @@ public class ProviderTest extends ValidConfigurationTest {
 	@Test(expected=AssertionError.class)
 	public void testEqualsWithNullObject() {
 		Provider provider1 = new Provider(1, "xpto", 0, 0, 0.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
-		
+
 		assertFalse(provider1.equals(null));
 	}
 	
@@ -459,6 +459,6 @@ public class ProviderTest extends ValidConfigurationTest {
 	public void testEqualsWithAnotherClassObject() {
 		Provider provider1 = new Provider(1, "xpto", 0, 0, 0.0, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		
-		assertFalse(provider1.equals(new String("")));
+		provider1.equals(new String(""));
 	}
 }
