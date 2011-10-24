@@ -11,7 +11,9 @@ import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
 import commons.cloud.Request;
+import commons.cloud.User;
 import commons.config.Configuration;
+import commons.io.Checkpointer;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
@@ -31,13 +33,11 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 */
 	private static final long serialVersionUID = 368994926091198804L;
 	
-	private static final long DEFAULT_QUANTUM = 100;
 	protected int NUMBER_OF_CORES = 1;
 
 	protected LoadBalancer loadBalancer;
 	protected final Queue<Request> processorQueue;
 	protected final MachineDescriptor descriptor;
-	protected final long cpuQuantumInMilis;
 	protected boolean shutdownOnFinish;
 	protected long lastUtilisationCalcTime;
 	protected long totalTimeUsedInLastPeriod;
@@ -62,7 +62,6 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		this.descriptor = descriptor;
 		this.loadBalancer = loadBalancer;
 		this.processorQueue = new LinkedList<Request>();
-		this.cpuQuantumInMilis = DEFAULT_QUANTUM;
 		this.lastUtilisationCalcTime = 0;
 		this.totalTimeUsed = 0;
 		this.totalTimeUsedInLastPeriod = 0;
@@ -201,7 +200,10 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 */
 	protected void scheduleNext() {
 		Request nextRequest = processorQueue.poll();
-		long nextQuantum = Math.min(nextRequest.getTotalToProcess(), cpuQuantumInMilis);
+		User client = Checkpointer.loadUsers()[nextRequest.getSaasClient()];
+		int priority = client.getContract().getPriority();
+		
+		long nextQuantum = Math.min(nextRequest.getTotalToProcess(), priority);
 		lastUpdate = getScheduler().now();
 		send(new JEEvent(JEEventType.PREEMPTION, this, nextQuantum+lastUpdate, nextQuantum, nextRequest));
 	}
@@ -326,8 +328,10 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		
 		while(!queue.isEmpty()){
 			Request request = queue.poll();
+			User client = Checkpointer.loadUsers()[request.getSaasClient()];
+			int priority = client.getContract().getPriority();
 			Info info = times.get(request);
-			long demand = Math.min(cpuQuantumInMilis, request.getTotalToProcess()-info.processedDemand);
+			long demand = Math.min(priority, request.getTotalToProcess()-info.processedDemand);
 			processedTime += demand;
 			info.processedDemand += demand;
 			if(request.getTotalToProcess() - info.processedDemand == 0){
