@@ -20,7 +20,6 @@ import commons.cloud.UtilityResult;
 import commons.config.Configuration;
 import commons.io.Checkpointer;
 import commons.io.WorkloadParser;
-import commons.sim.AccountingSystem;
 import commons.sim.DynamicConfigurable;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.util.SaaSAppProperties;
@@ -38,7 +37,6 @@ public class DynamicProvisioningSystemTest extends ValidConfigurationTest {
 	@Override
 	public void setUp() throws Exception{
 		super.setUp();
-		Checkpointer.clear();
 		buildFullConfiguration();
 	}
 	

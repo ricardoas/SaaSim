@@ -15,13 +15,19 @@ public class JEEventHandlerTest extends CleanConfigurationTest {
 	private JEEventScheduler scheduler;
 
 	@Before
-	public void setUp(){
-		scheduler = Checkpointer.loadScheduler();
+	public void setUp() throws Exception{
+		super.setUp();
+		scheduler = new JEEventScheduler(Checkpointer.INTERVAL);
 	}
 
 	@Test
 	public void testJEEventHandler(){
 		JEEventHandler handler = new JEAbstractEventHandler(scheduler){
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 8253763434426330037L;
+
 			@Override
 			public void handleEvent(JEEvent event) {/* Empty implementation. */}
 		};
