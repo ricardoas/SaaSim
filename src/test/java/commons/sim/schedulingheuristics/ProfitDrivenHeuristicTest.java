@@ -1,6 +1,8 @@
 package commons.sim.schedulingheuristics;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
 
@@ -13,6 +15,7 @@ import util.ValidConfigurationTest;
 import commons.cloud.MachineType;
 import commons.cloud.Request;
 import commons.config.Configuration;
+import commons.io.Checkpointer;
 import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.components.TimeSharedMachine;
@@ -149,7 +152,7 @@ public class ProfitDrivenHeuristicTest extends ValidConfigurationTest {
 		long [] demand = new long[]{1000 * 10};
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		JEEventScheduler eventScheduler = JEEventScheduler.getInstance();
+		JEEventScheduler eventScheduler = Checkpointer.loadScheduler();
 		
 		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
 		Machine machine2 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
@@ -187,7 +190,7 @@ public class ProfitDrivenHeuristicTest extends ValidConfigurationTest {
 		long response = 1024;
 		long [] demand = new long[]{1000 * 10};
 		
-		JEEventScheduler eventScheduler = JEEventScheduler.getInstance();
+		JEEventScheduler eventScheduler = Checkpointer.loadScheduler();
 		ArrayList<Machine> servers = new ArrayList<Machine>();
 		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
 		Machine machine2 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
@@ -229,7 +232,7 @@ public class ProfitDrivenHeuristicTest extends ValidConfigurationTest {
 		long response = 1024;
 		long [] demand = new long[]{1000 * 15};
 		
-		JEEventScheduler eventScheduler = JEEventScheduler.getInstance();
+		JEEventScheduler eventScheduler = Checkpointer.loadScheduler();
 		ArrayList<Machine> servers = new ArrayList<Machine>();
 		Machine machine1 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
 		Machine machine2 = new TimeSharedMachine(eventScheduler, new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);

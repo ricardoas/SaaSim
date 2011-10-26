@@ -120,16 +120,12 @@ public class JEEvent implements Comparable<JEEvent>, Serializable{
 	 */
 	@Override
 	public boolean equals(Object obj) {
+		assert (obj == null);
+		assert (getClass() != obj.getClass());
+		
 		if (this == obj)
 			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		JEEvent other = (JEEvent) obj;
-		if (eventId != other.eventId)
-			return false;
-		return true;
+		return (eventId == ((JEEvent) obj).eventId);
 	}
 
 	/**
@@ -142,8 +138,8 @@ public class JEEvent implements Comparable<JEEvent>, Serializable{
 
 	@Override
 	public String toString() {
-		return "JEEvent [eventId=" + eventId + ", targetHandlerId="
-				+ targetHandlerId + ", scheduledTime=" + scheduledTime
-				+ ", type=" + type + ", value=" + Arrays.toString(value) + "]";
+		return "[TIME=" + scheduledTime + ", ID="
+				+ eventId + ", Handler=" + targetHandlerId
+				+ ", TYPE=" + type + ", V=" + Arrays.toString(value) + "]";
 	}
 }

@@ -51,7 +51,7 @@ public interface Machine extends JEEventHandler{
 	long getTotalTimeUsed();
 	
 	/**
-	 * @return
+	 * @return The number of cores.
 	 */
 	int getNumberOfCores();
 

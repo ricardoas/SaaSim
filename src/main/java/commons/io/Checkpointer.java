@@ -7,13 +7,19 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import org.apache.commons.configuration.ConfigurationException;
+
 import planning.util.MachineUsageData;
 
 import commons.cloud.Provider;
 import commons.cloud.User;
+import commons.config.Configuration;
 import commons.sim.AccountingSystem;
+import commons.sim.Simulator;
 import commons.sim.components.LoadBalancer;
+import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
+import commons.sim.util.SimulatorFactory;
 import commons.util.SimulationInfo;
 
 public class Checkpointer {
@@ -24,10 +30,10 @@ public class Checkpointer {
 	public static final long INTERVAL = 24 * 60 * 60 * 1000;
 	
 	private static JEEventScheduler scheduler;
-	private static LoadBalancer[] application;
+	private static SimulationInfo simulationInfo;
+	private static Simulator application;
 	private static Provider[] providers;
 	private static User[] users;
-	private static SimulationInfo simulationInfo;
 	private static AccountingSystem accountingSystem;
 	
 	/**
@@ -39,17 +45,33 @@ public class Checkpointer {
 		return new File(CHECKPOINT_FILE).canWrite();
 	}
 	
+	public static void save() {
+		ObjectOutputStream out;
+		try {
+			out = new ObjectOutputStream(new FileOutputStream(CHECKPOINT_FILE));
+			out.writeObject(Checkpointer.loadScheduler());
+			out.writeObject(simulationInfo);
+			out.writeObject(application);
+			out.writeObject(providers);
+			out.writeObject(users);
+			out.writeObject(accountingSystem);
+			out.close();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 	public static void save(SimulationInfo info, User[] users, Provider[] providers,
 			LoadBalancer[] application){
 		
 		ObjectOutputStream out;
 		try {
 			out = new ObjectOutputStream(new FileOutputStream(CHECKPOINT_FILE));
-			out.writeObject(JEEventScheduler.getInstance());
+			out.writeObject(Checkpointer.loadScheduler());
 			out.writeObject(info);
 			out.writeObject(application);
 			out.writeObject(providers);
 			out.writeObject(users);
+			out.writeObject(accountingSystem);
 			out.close();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -72,30 +94,18 @@ public class Checkpointer {
 	
 	
 	public static SimulationInfo loadSimulationInfo() {
-		if(hasCheckpoint() && simulationInfo == null){
-			loadData();
-		}
 		return simulationInfo;
 	}
 
-	public static LoadBalancer[] loadApplication() {
-		if(hasCheckpoint() && application == null){
-			loadData();
-		}
+	public static Simulator loadApplication() {
 		return application;
 	}
 
 	public static Provider[] loadProviders() {
-		if(hasCheckpoint() && providers == null){
-			loadData();
-		}
 		return providers;
 	}
 
 	public static User[] loadUsers() {
-		if(hasCheckpoint() && users == null){
-			loadData();
-		}
 		return users;
 	}
 	
@@ -105,43 +115,49 @@ public class Checkpointer {
 	public static void clear(){
 		new File(CHECKPOINT_FILE).delete();
 		new File(MACHINE_DATA_DUMP).delete();
-		scheduler = null;
-		simulationInfo = null;
-		application = null;
-		providers = null;
-		users = null;
+//		scheduler = null;
+//		simulationInfo = null;
+//		application = null;
+//		providers = null;
+//		users = null;
 	}
 
 	/**
 	 * @return
 	 */
 	public static JEEventScheduler loadScheduler() {
-		if(hasCheckpoint() && scheduler == null){
-			loadData();
-		}
 		return scheduler;
 	}
 
-	private static void loadData(){
-		ObjectInputStream in;
-		try {
-			in = new ObjectInputStream(new FileInputStream(CHECKPOINT_FILE));
-			scheduler = (JEEventScheduler) in.readObject();
-			scheduler.prepare();
-			simulationInfo = (SimulationInfo) in.readObject(); 
-			application = (LoadBalancer[]) in.readObject();
-			providers = (Provider[]) in.readObject();
-			users = (User[]) in.readObject();
-			in.close();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+	public static void loadData() throws ConfigurationException{
+		if(hasCheckpoint()){
+			ObjectInputStream in;
+			try {
+				in = new ObjectInputStream(new FileInputStream(CHECKPOINT_FILE));
+				scheduler = (JEEventScheduler) in.readObject();
+				simulationInfo = (SimulationInfo) in.readObject(); 
+				simulationInfo.addDay();
+				scheduler.reset(simulationInfo.getCurrentDayInMillis(), simulationInfo.getCurrentDayInMillis() + INTERVAL);
+				application = (Simulator) in.readObject();
+				providers = (Provider[]) in.readObject();
+				users = (User[]) in.readObject();
+				accountingSystem = (AccountingSystem) in.readObject();
+				in.close();
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			Checkpointer.clear();
+		}else{
+			simulationInfo = new SimulationInfo();
+			scheduler = new JEEventScheduler(INTERVAL);
+			application = SimulatorFactory.buildSimulator(Checkpointer.loadScheduler());
+			providers = Configuration.getInstance().getProviders();
+			users = Configuration.getInstance().getUsers();
+			accountingSystem = new AccountingSystem(users, providers);
 		}
 	}
 
 	public static AccountingSystem loadAccountingSystem() {
-		if(hasCheckpoint() && accountingSystem == null){
-			loadData();
-		}
 		return accountingSystem;
 	}
 }

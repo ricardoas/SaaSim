@@ -1,34 +1,31 @@
 package commons.sim;
 
+import java.io.Serializable;
+
 import commons.cloud.Provider;
 import commons.cloud.User;
 import commons.cloud.UtilityResult;
 import commons.cloud.UtilityResultEntry;
-import commons.config.Configuration;
-import commons.io.Checkpointer;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class AccountingSystem {
+public class AccountingSystem implements Serializable{
 	
-	private static AccountingSystem instance;
-
-	public static AccountingSystem getInstance(){
-		if(instance == null){
-			instance = Checkpointer.hasCheckpoint()?
-					Checkpointer.loadAccountingSystem():
-					new AccountingSystem(Configuration.getInstance().getUsers(), 
-							Configuration.getInstance().getProviders());
-		}
-		return instance;
-	}
-	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4731959933590610261L;
 	private UtilityResult utilityResult;
 	private final User[] users;
 	private final Provider[] providers;
 	
-	private AccountingSystem(User[] users, Provider[] providers) {
+	/**
+	 * Default constructor.
+	 * @param users
+	 * @param providers
+	 */
+	public AccountingSystem(User[] users, Provider[] providers) {
 		this.users = users;
 		this.providers = providers;
 		this.utilityResult = new UtilityResult(users.length, providers.length);
@@ -62,5 +59,4 @@ public class AccountingSystem {
 		}
 		return utilityResult;
 	}
-
 }

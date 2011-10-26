@@ -13,7 +13,7 @@ import util.ValidConfigurationTest;
  *
  */
 public class DPSFactoryTest extends ValidConfigurationTest{
-
+	
 	/**
 	 * Test method for {@link provisioning.util.DPSFactory#createDPS(java.lang.Object[])}.
 	 * @throws ConfigurationException 

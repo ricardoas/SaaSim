@@ -1,7 +1,12 @@
 package commons.cloud;
 
+import static commons.cloud.MachineType.*;
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 import util.CleanConfigurationTest;
@@ -30,6 +35,36 @@ public class MachineTypeTest extends CleanConfigurationTest {
 	@Test(expected=NullPointerException.class)
 	public void testValueOfWithNullValue() {
 		MachineType.valueOf(null);
+	}
+	
+	@Test
+	public void testOrderByCores(){
+		MachineType[] values = MachineType.values();
+		Arrays.sort(values, new Comparator<MachineType>() {
+			@Override
+			public int compare(MachineType o1, MachineType o2) {
+				return o1.getNumberOfCores() - o2.getNumberOfCores();
+			}
+		});
+		
+		Assert.assertArrayEquals(new MachineType[] { T1_MICRO, M1_SMALL,
+				M1_LARGE, C1_MEDIUM, M2_XLARGE, M1_XLARGE, M2_2XLARGE,
+				M2_4XLARGE, C1_XLARGE }, values);
+	}
+
+	@Test
+	public void testOrderByPower(){
+		MachineType[] values = MachineType.values();
+		Arrays.sort(values, new Comparator<MachineType>() {
+			@Override
+			public int compare(MachineType o1, MachineType o2) {
+				return Double.compare(o1.getPower(), o2.getPower());
+			}
+		});
+		
+		Assert.assertArrayEquals(new MachineType[] { M1_SMALL,T1_MICRO, 
+				M1_LARGE, M1_XLARGE, C1_MEDIUM, C1_XLARGE, M2_XLARGE, M2_2XLARGE,
+				M2_4XLARGE}, values);
 	}
 
 }

@@ -39,10 +39,9 @@ public class DynamicProvisioningSystem implements DPS{
 	 * Default constructor.
 	 */
 	public DynamicProvisioningSystem() {
-		Configuration config = Configuration.getInstance();
-		this.providers = config.getProviders();
-		this.users = config.getUsers();
-		this.accountingSystem = AccountingSystem.getInstance();
+		this.providers = Checkpointer.loadProviders();
+		this.users = Checkpointer.loadUsers();
+		this.accountingSystem = Checkpointer.loadAccountingSystem();
 	}
 	
 	/**

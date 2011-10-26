@@ -1,6 +1,8 @@
 package commons.config;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -24,7 +26,6 @@ import commons.cloud.TypeProvider;
 import commons.cloud.User;
 import commons.io.Checkpointer;
 import commons.sim.components.LoadBalancer;
-import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
 import commons.util.SimulationInfo;
 
@@ -96,7 +97,9 @@ public class ConfigurationTest {
 	
 	@Test
 	public void testBuildInstanceWithValidConfigurationAndPreviousSimData() throws ConfigurationException {
-		savePreviousData();
+		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
+		Checkpointer.save();
+		
 		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
 		assertNotNull(Configuration.getInstance());
 	}
@@ -121,7 +124,7 @@ public class ConfigurationTest {
 		Provider provider3 = new Provider(2, "prov3", 10, 20, 0.15, new long[]{0}, new double[]{0.0, 0.0}, new long[]{1000}, 
 				new double[]{0.0, 0.1}, types);
 		
-		JEEventScheduler.getInstance();
+		Checkpointer.loadScheduler();
 		Checkpointer.save(info, new User[]{user, user2}, new Provider[]{provider, provider2, provider3}, new LoadBalancer[]{});
 	}
 	
@@ -226,7 +229,7 @@ public class ConfigurationTest {
 		Configuration.buildInstance(PropertiesTesting.EMPTY_IAAS_PLANS_FILE);
 		Configuration config = Configuration.getInstance();
 		
-		Provider[] providers = config.getProviders();
+		Provider[] providers = Checkpointer.loadProviders();
 		assertEquals(3, providers.length);
 		for(Provider provider : providers){
 			assertFalse(provider.canBuyMachine(true, MachineType.M1_SMALL));
@@ -254,40 +257,10 @@ public class ConfigurationTest {
 		assertEquals(DynamicProvisioningSystem.class, config.getDPSHeuristicClass());
 		assertEquals(AGHeuristic.class, config.getPlanningHeuristicClass());
 	}
-	
-	@Test
-	public void testValidFileWithPreviousData() throws ConfigurationException{
-		savePreviousData();
-
-		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
-		Configuration config = Configuration.getInstance();
-		assertEquals(RoundRobinHeuristic.class, config.getApplicationHeuristics()[0]);
-		assertEquals(DynamicProvisioningSystem.class, config.getDPSHeuristicClass());
-		assertEquals(AGHeuristic.class, config.getPlanningHeuristicClass());
-		
-		//Checking users
-		assertEquals(2, config.getUsers().length);
-		assertEquals(0, config.getUsers()[0].getId());
-		assertEquals(1, config.getUsers()[1].getId());
-		assertEquals(55.55, config.getUsers()[0].getContract().getSetupCost(), 0.00001);
-		assertEquals(86400000, config.getUsers()[0].getContract().getCpuLimitInMillis());
-		assertEquals(101.10, config.getUsers()[0].getContract().getPrice(), 0.000001);
-		
-		//Checking Simulation info
-		assertEquals(100, config.getSimulationInfo().getSimulatedDays());
-		assertEquals(4, config.getSimulationInfo().getCurrentMonth());
-		
-		//Checking providers
-		assertEquals(3, config.getProviders().length);
-		assertEquals(10, config.getProviders()[0].getOnDemandLimit());
-		assertEquals(20, config.getProviders()[0].getReservationLimit());
-		assertEquals(0.25, config.getProviders()[0].getOnDemandCpuCost(MachineType.C1_MEDIUM), 0.00001);
-		assertEquals(0.01, config.getProviders()[0].getReservedCpuCost(MachineType.M1_SMALL), 0.00001);
-	}
 
 	@Test
-	public void testSaaSUsersAndPlansValidFile() throws ConfigurationException{
-		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
+	public void testDifferentSaaSUsersAndPlansValidFile() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.VALID_DIFFERENT_USERS_FILE);
 		Configuration config = Configuration.getInstance();
 		User[] users = config.getUsers();
 		assertNotNull(users);
@@ -295,28 +268,63 @@ public class ConfigurationTest {
 		
 		Contract c1 = users[0].getContract();
 		assertNotNull(c1);
-		assertEquals("bronze", c1.getName());
-		assertEquals(4, c1.getPriority());
-		assertEquals(24.95, c1.getPrice(), 0.0);
+		assertEquals("diamond", c1.getName());
+		assertEquals(100, c1.getPriority());
+		assertEquals(299.95, c1.getPrice(), 0.0);
 		assertEquals(0.0, c1.getSetupCost(), 0.0);
 		assertEquals(10, c1.getCpuLimitInMillis(), 0.0);
 		assertEquals(1, c1.getExtraCpuCost(), 0.0);
-		Assert.assertArrayEquals(new long[]{2048}, c1.getTransferenceLimitsInBytes());
+		Assert.assertArrayEquals(new long[]{46080}, c1.getTransferenceLimitsInBytes());
 		Assert.assertArrayEquals(new double[]{0,0.005}, c1.getTransferenceCosts(), 0.0);
-		assertEquals(200, c1.getStorageLimitInMB(), 0.0);
+		assertEquals(3072, c1.getStorageLimitInMB(), 0.0);
 		assertEquals(0.1, c1.getStorageCostPerMB(), 0.0);
 
 		Contract c2 = users[1].getContract();
 		assertNotNull(c2);
-		assertEquals("silver", c2.getName());
-		assertEquals(3, c2.getPriority());
-		assertEquals(39.95, c2.getPrice(), 0.0);
+		assertEquals("platinum", c2.getName());
+		assertEquals(50, c2.getPriority());
+		assertEquals(149.95, c2.getPrice(), 0.0);
 		assertEquals(0, c2.getSetupCost(), 0.0);
 		assertEquals(10, c2.getCpuLimitInMillis(), 0.0);
 		assertEquals(1, c2.getExtraCpuCost(), 0.0);
-		Assert.assertArrayEquals(new long[]{4096}, c2.getTransferenceLimitsInBytes());
+		Assert.assertArrayEquals(new long[]{15360}, c2.getTransferenceLimitsInBytes());
 		Assert.assertArrayEquals(new double[]{0,0.005}, c2.getTransferenceCosts(), 0.0);
-		assertEquals(300, c2.getStorageLimitInMB(), 0.0);
+		assertEquals(1024, c2.getStorageLimitInMB(), 0.0);
+		assertEquals(0.1, c2.getStorageCostPerMB(), 0.0);
+	}
+	
+	@Test
+	public void testUniqueUserTypeSaaSUsersAndPlansValidFile() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
+		Configuration config = Configuration.getInstance();
+		User[] users = Checkpointer.loadUsers();
+		assertNotNull(users);
+		assertEquals(2, users.length);
+		
+		Contract c1 = users[0].getContract();
+		assertNotNull(c1);
+		assertEquals("diamond", c1.getName());
+		assertEquals(100, c1.getPriority());
+		assertEquals(299.95, c1.getPrice(), 0.0);
+		assertEquals(0.0, c1.getSetupCost(), 0.0);
+		assertEquals(10, c1.getCpuLimitInMillis(), 0.0);
+		assertEquals(1, c1.getExtraCpuCost(), 0.0);
+		Assert.assertArrayEquals(new long[]{46080}, c1.getTransferenceLimitsInBytes());
+		Assert.assertArrayEquals(new double[]{0,0.005}, c1.getTransferenceCosts(), 0.0);
+		assertEquals(3072, c1.getStorageLimitInMB(), 0.0);
+		assertEquals(0.1, c1.getStorageCostPerMB(), 0.0);
+
+		Contract c2 = users[1].getContract();
+		assertNotNull(c2);
+		assertEquals("diamond", c2.getName());
+		assertEquals(100, c2.getPriority());
+		assertEquals(299.95, c2.getPrice(), 0.0);
+		assertEquals(0.0, c2.getSetupCost(), 0.0);
+		assertEquals(10, c2.getCpuLimitInMillis(), 0.0);
+		assertEquals(1, c2.getExtraCpuCost(), 0.0);
+		Assert.assertArrayEquals(new long[]{46080}, c2.getTransferenceLimitsInBytes());
+		Assert.assertArrayEquals(new double[]{0,0.005}, c2.getTransferenceCosts(), 0.0);
+		assertEquals(3072, c2.getStorageLimitInMB(), 0.0);
 		assertEquals(0.1, c2.getStorageCostPerMB(), 0.0);
 	}
 	
@@ -328,7 +336,7 @@ public class ConfigurationTest {
 	public void testIaaSValidFile() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
 		Configuration config = Configuration.getInstance();
-		Provider[] providers = config.getProviders();
+		Provider[] providers = Checkpointer.loadProviders();
 		assertNotNull(providers);
 		assertEquals(3, providers.length);
 

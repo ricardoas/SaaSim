@@ -3,7 +3,8 @@
  */
 package commons.sim;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.AfterClass;
 import org.junit.Ignore;
@@ -39,7 +40,7 @@ public class AccountingSystemTest extends ValidConfigurationTest {
 	 */
 	@Test
 	public void testAccountPartialUtility() throws Exception {
-		AccountingSystem.getInstance().accountPartialUtility(0);
+		Checkpointer.loadAccountingSystem().accountPartialUtility(0);
 	}
 
 	/**
@@ -47,7 +48,7 @@ public class AccountingSystemTest extends ValidConfigurationTest {
 	 */
 	@Ignore@Test
 	public void testCalculateUtility() {
-		UtilityResult utility = AccountingSystem.getInstance().calculateUtility();
+		UtilityResult utility = Checkpointer.loadAccountingSystem().calculateUtility();
 		assertTrue(utility.iterator().hasNext());
 		UtilityResultEntry entry = utility.iterator().next();
 		assertEquals(0.0, utility.getUtility(), 0.0);

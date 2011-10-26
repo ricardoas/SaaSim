@@ -2,7 +2,6 @@ package commons.sim.util;
 
 
 import commons.config.Configuration;
-import commons.io.Checkpointer;
 import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
@@ -18,9 +17,6 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 	 */
 	@Override
 	public LoadBalancer[] buildApplication(JEEventScheduler scheduler) {
-		if(Checkpointer.hasCheckpoint()){
-			return Checkpointer.loadApplication();
-		}
 		
 		Configuration config = Configuration.getInstance();
 		int numOfTiers = config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS);

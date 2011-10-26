@@ -1,6 +1,8 @@
 package commons.config;
 
-import static commons.sim.util.IaaSPlanProperties.*;
+import static commons.sim.util.IaaSPlanProperties.IAAS_PLAN_PROVIDER_NAME;
+import static commons.sim.util.IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION;
+import static commons.sim.util.IaaSPlanProperties.IAAS_PLAN_PROVIDER_TYPES;
 import static commons.sim.util.IaaSProvidersProperties.*;
 import static commons.sim.util.SaaSAppProperties.*;
 import static commons.sim.util.SaaSPlanProperties.*;
@@ -42,7 +44,6 @@ import commons.sim.schedulingheuristics.RanjanHeuristic;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
 import commons.sim.schedulingheuristics.RoundRobinHeuristicForHeterogenousMachines;
 import commons.sim.util.SaaSUsersProperties;
-import commons.util.SimulationInfo;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -60,8 +61,6 @@ public class Configuration extends PropertiesConfiguration{
 	private Provider[] providers;
 	
 	private User[] users;
-
-	private SimulationInfo simulationInfo;
 	
 	/**
 	 * Builds the single instance of this configuration.
@@ -70,6 +69,7 @@ public class Configuration extends PropertiesConfiguration{
 	 */
 	public static void buildInstance(String propertiesFileName) throws ConfigurationException{
 		instance = new Configuration(propertiesFileName);
+		Checkpointer.loadData();
 	}
 
 	/**
@@ -208,10 +208,11 @@ public class Configuration extends PropertiesConfiguration{
 	 * This method is responsible for reading providers properties and creating the
 	 * cloud providers to be used in simulation.
 	 * @return
+	 * @throws ConfigurationException 
 	 * @throws IOException
 	 */
-	public Provider[] getProviders() {
-		return this.providers;
+	public Provider[] getProviders() throws ConfigurationException{
+		return readProviders();
 	}
 
 	public Class<?> getPlanningHeuristicClass(){
@@ -227,10 +228,11 @@ public class Configuration extends PropertiesConfiguration{
 	 * This method is responsible for reading contracts properties and creating the
 	 * associations between contracts and users that requested the services of each contract
 	 * @return A map containing each contract name and its characterization
+	 * @throws ConfigurationException 
 	 * @throws IOException
 	 */
-	public User[] getUsers() {
-		return this.users;
+	public User[] getUsers() throws ConfigurationException{
+		return readUsers();
 	}
 
 	/**
@@ -256,18 +258,16 @@ public class Configuration extends PropertiesConfiguration{
 	
 	private void parseProperties() throws ConfigurationException{
 		if(!Checkpointer.hasCheckpoint()){
-			this.simulationInfo = new SimulationInfo(0, 0);
-			readUsers();
-			readProviders();
+			users = readUsers();
+			providers = readProviders();
 		}else{
-			simulationInfo = Checkpointer.loadSimulationInfo();
 			users = Checkpointer.loadUsers();
 			providers = Checkpointer.loadProviders();
 		}
 	}
 	
 
-	private void readUsers() throws ConfigurationException {
+	private User[] readUsers() throws ConfigurationException {
 		
 		int numberOfPlans = getInt(NUMBER_OF_PLANS);
 		String[] planNames = getStringArray(PLAN_NAME);
@@ -308,9 +308,10 @@ public class Configuration extends PropertiesConfiguration{
 			
 			users[i] = new User(i, contractsPerName.get(plans[i]), storage[i]);
 		}
+		return users;
 	}
 
-	private void readProviders() throws ConfigurationException {
+	private Provider[] readProviders() throws ConfigurationException {
 		int numberOfProviders = getInt(IAAS_NUMBER_OF_PROVIDERS);
 		
 		String[] names = getStringArray(IAAS_PROVIDER_NAME);
@@ -384,7 +385,7 @@ public class Configuration extends PropertiesConfiguration{
 							transferInCosts[i], transferOutLimits[i], transferOutCosts[i], types);
 		}
 		
-		
+		return providers;
 	}
 
 //	public double getRelativePower(MachineType type){
@@ -498,8 +499,16 @@ public class Configuration extends PropertiesConfiguration{
 		
 		Validator.checkIsPositiveArray(APPLICATION_INITIAL_SERVER_PER_TIER, getStringArray(APPLICATION_INITIAL_SERVER_PER_TIER));
 
-//		checkSize(APPLICATION_MAX_SERVER_PER_TIER, APPLICATION_NUM_OF_TIERS);
-//		Validator.checkIsPositiveIntegerArray(getStringArray(APPLICATION_MAX_SERVER_PER_TIER));
+		checkSize(APPLICATION_MAX_SERVER_PER_TIER, APPLICATION_NUM_OF_TIERS);
+		String[] strings = getStringArray(APPLICATION_MAX_SERVER_PER_TIER);
+		for (int i = 0; i < strings.length; i++) {
+			if(strings[i].trim().isEmpty()){
+				strings[i] = Integer.toString(Integer.MAX_VALUE); 
+			}
+		}
+		setProperty(APPLICATION_MAX_SERVER_PER_TIER, strings);
+
+		Validator.checkIsPositiveArray(APPLICATION_MAX_SERVER_PER_TIER, getStringArray(APPLICATION_MAX_SERVER_PER_TIER));
 		
 		checkSchedulingHeuristicNames();
 		
@@ -692,9 +701,5 @@ public class Configuration extends PropertiesConfiguration{
 			return stringArray;
 		}
 		return new String[]{getString(SAAS_WORKLOAD)};
-	}
-
-	public SimulationInfo getSimulationInfo() {
-		return this.simulationInfo;
 	}
 }

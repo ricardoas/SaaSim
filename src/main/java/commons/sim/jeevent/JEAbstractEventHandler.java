@@ -84,15 +84,11 @@ public abstract class JEAbstractEventHandler implements JEEventHandler {
 	 */
 	@Override
 	public boolean equals(Object obj) {
+		assert (obj != null): "Can't compare with null object.";
+		assert  (getClass() == obj.getClass()): "Can't compare with another class object.";
+
 		if (this == obj)
 			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		JEAbstractEventHandler other = (JEAbstractEventHandler) obj;
-		if (id != other.id)
-			return false;
-		return true;
+		return id == ((JEAbstractEventHandler) obj).id;
 	}
 }

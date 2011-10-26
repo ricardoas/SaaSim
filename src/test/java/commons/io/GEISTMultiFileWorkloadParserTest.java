@@ -4,98 +4,107 @@ import static org.junit.Assert.*;
 
 import java.util.NoSuchElementException;
 
-import org.easymock.EasyMock;
+import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.powermock.api.easymock.PowerMock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+
+import util.ValidConfigurationTest;
 
 import commons.cloud.Request;
-import commons.config.Configuration;
 import commons.config.PropertiesTesting;
-import commons.util.SimulationInfo;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(Configuration.class)
-public class GEISTMultiFileWorkloadParserTest {
+public class GEISTMultiFileWorkloadParserTest extends ValidConfigurationTest{
+	
+	@Test
+	public void testTraceWithBlankLine() throws ConfigurationException{
+		buildFullConfiguration();
+		WorkloadParser<Request> parser = new GEISTMultiFileWorkloadParser(PropertiesTesting.TRACE_WITH_BLANK_LINE, 0);
+		assertTrue(parser.hasNext());
+		assertEquals(1, parser.next().getReqID());
+		assertTrue(parser.hasNext());
+		try{
+			parser.next();
+			fail("Should fail reading line.");
+		}catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+	
+	@Test
+	public void testTraceWithBlankEndLine() throws ConfigurationException{
+		buildFullConfiguration();
+		WorkloadParser<Request> parser = new GEISTMultiFileWorkloadParser(PropertiesTesting.TRACE_WITH_BLANK_END_LINE, 0);
+		assertTrue(parser.hasNext());
+		assertEquals(1, parser.next().getReqID());
+		assertTrue(parser.hasNext());
+		assertEquals(2, parser.next().getReqID());
+		assertTrue(parser.hasNext());
+		assertEquals(3, parser.next().getReqID());
+		assertTrue(parser.hasNext());
+		assertEquals(4, parser.next().getReqID());
+		assertTrue(parser.hasNext());
+		assertEquals(5, parser.next().getReqID());
+		assertFalse(parser.hasNext());
+		assertNull(parser.next());
+	}
+	
+	@Test
+	public void testValidTrace() throws ConfigurationException{
+		buildFullConfiguration();
+		WorkloadParser<Request> parser = new GEISTMultiFileWorkloadParser(PropertiesTesting.WORKLOAD, 0);
+		assertTrue(parser.hasNext());
+		assertEquals(1, parser.next().getReqID());
+		assertTrue(parser.hasNext());
+		assertEquals(2, parser.next().getReqID());
+		assertTrue(parser.hasNext());
+		assertEquals(3, parser.next().getReqID());
+		assertTrue(parser.hasNext());
+		assertEquals(4, parser.next().getReqID());
+		assertTrue(parser.hasNext());
+		assertEquals(5, parser.next().getReqID());
+		assertFalse(parser.hasNext());
+		assertNull(parser.next());
+	}
+	
+
 
 	@Test(expected=NoSuchElementException.class)
-	public void testParseRequestWithEmptyLine() {
+	public void testParseRequestWithEmptyLine() throws ConfigurationException {
+		buildFullConfiguration();
 		int saasclientID = 1;
-		String workload = PropertiesTesting.VALID_WORKLOAD_3;
-		
-		SimulationInfo simInfo = new SimulationInfo(0, 0);
-		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config);
-		EasyMock.expect(config.getSimulationInfo()).andReturn(simInfo);
-		
-		PowerMock.replayAll(config);
+		String workload = PropertiesTesting.WORKLOAD;
 		
 		GEISTMultiFileWorkloadParser parser = new GEISTMultiFileWorkloadParser(workload, saasclientID);
 		
 		parser.parseRequest("");
-		
-		PowerMock.verifyAll();
 	}
 	
 	@Test(expected=NullPointerException.class)
-	public void testParseRequestWithNullLine() {
+	public void testParseRequestWithNullLine() throws ConfigurationException {
+		buildFullConfiguration();
 		int saasclientID = 1;
-		String workload = PropertiesTesting.VALID_WORKLOAD_3;
-		
-		SimulationInfo simInfo = new SimulationInfo(0, 0);
-		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config);
-		EasyMock.expect(config.getSimulationInfo()).andReturn(simInfo);
-		
-		PowerMock.replayAll(config);
+		String workload = PropertiesTesting.WORKLOAD;
 		
 		GEISTMultiFileWorkloadParser parser = new GEISTMultiFileWorkloadParser(workload, saasclientID);
 		
 		parser.parseRequest(null);
-		
-		PowerMock.verifyAll();
 	}
 	
 	@Test(expected=NoSuchElementException.class)
-	public void testParseRequestWithInvalidLine() {
+	public void testParseRequestWithInvalidLine() throws ConfigurationException {
+		buildFullConfiguration();
 		int saasclientID = 1;
-		String workload = PropertiesTesting.VALID_WORKLOAD_3;
-		
-		SimulationInfo simInfo = new SimulationInfo(0, 0);
-		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config);
-		EasyMock.expect(config.getSimulationInfo()).andReturn(simInfo);
-		
-		PowerMock.replayAll(config);
+		String workload = PropertiesTesting.WORKLOAD;
 		
 		GEISTMultiFileWorkloadParser parser = new GEISTMultiFileWorkloadParser(workload, saasclientID);
 		
 		parser.parseRequest("10 10 8 7");
-		
-		PowerMock.verifyAll();
 	}
 	
 	@Test
-	public void testParseRequestWithValidLine() {
+	public void testParseRequestWithValidLine() throws ConfigurationException {
+		buildFullConfiguration();
 		int saasclientID = 1;
-		String workloads = PropertiesTesting.VALID_WORKLOAD_3;
-		
-		SimulationInfo simInfo = new SimulationInfo(0, 0);
-		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config);
-		EasyMock.expect(config.getSimulationInfo()).andReturn(simInfo);
-		
-		PowerMock.replayAll(config);
+		String workloads = PropertiesTesting.WORKLOAD;
 		
 		GEISTMultiFileWorkloadParser parser = new GEISTMultiFileWorkloadParser(workloads, saasclientID);
 		
@@ -121,32 +130,80 @@ public class GEISTMultiFileWorkloadParserTest {
 		assertEquals(1000000, request.getResponseSizeInBytes());
 		assertEquals(10, request.getCpuDemandInMillis()[0]);
 		assertEquals(2, request.getCpuDemandInMillis()[1]);
+	}
+	
+	@Test
+	public void testMultipleDaysWithValidWorkload() throws ConfigurationException{
+		// First Day
+		buildFullConfiguration();
+		GEISTMultiFileWorkloadParser parser = new GEISTMultiFileWorkloadParser(PropertiesTesting.WORKLOAD, 1);
 		
-		PowerMock.verifyAll();
+		assertEquals(160168, parser.next().getArrivalTimeInMillis());
+		assertEquals(160302, parser.next().getArrivalTimeInMillis());
+		assertEquals(160315, parser.next().getArrivalTimeInMillis());
+		assertEquals(160915, parser.next().getArrivalTimeInMillis());
+		assertEquals(161383, parser.next().getArrivalTimeInMillis());
+		
+		Checkpointer.save();
+		
+		// Second Day
+		buildFullConfiguration();
+		parser = new GEISTMultiFileWorkloadParser(PropertiesTesting.WORKLOAD, 1);
+
+		long dayInMillis = 86400000;
+		assertEquals(dayInMillis + 160168, parser.next().getArrivalTimeInMillis());
+		assertEquals(dayInMillis + 160302, parser.next().getArrivalTimeInMillis());
+		assertEquals(dayInMillis + 160315, parser.next().getArrivalTimeInMillis());
+		assertEquals(dayInMillis + 160915, parser.next().getArrivalTimeInMillis());
+		assertEquals(dayInMillis + 161383, parser.next().getArrivalTimeInMillis());
+		Checkpointer.save();
+		
+		// Third Day
+		buildFullConfiguration();
+		parser = new GEISTMultiFileWorkloadParser(PropertiesTesting.WORKLOAD, 1);
+
+		assertEquals(2*dayInMillis + 160168, parser.next().getArrivalTimeInMillis());
+		assertEquals(2*dayInMillis + 160302, parser.next().getArrivalTimeInMillis());
+		assertEquals(2*dayInMillis + 160315, parser.next().getArrivalTimeInMillis());
+		assertEquals(2*dayInMillis + 160915, parser.next().getArrivalTimeInMillis());
+		assertEquals(2*dayInMillis + 161383, parser.next().getArrivalTimeInMillis());
+		Checkpointer.save();
+		
+		// Fourth Day
+		buildFullConfiguration();
+		parser = new GEISTMultiFileWorkloadParser(PropertiesTesting.WORKLOAD, 1);
+
+		assertEquals(3*dayInMillis + 160168, parser.next().getArrivalTimeInMillis());
+		assertEquals(3*dayInMillis + 160302, parser.next().getArrivalTimeInMillis());
+		assertEquals(3*dayInMillis + 160315, parser.next().getArrivalTimeInMillis());
+		assertEquals(3*dayInMillis + 160915, parser.next().getArrivalTimeInMillis());
+		assertEquals(3*dayInMillis + 161383, parser.next().getArrivalTimeInMillis());
+		Checkpointer.save();
+		
+		// Fifth Day
+		buildFullConfiguration();
+
+		parser = new GEISTMultiFileWorkloadParser(PropertiesTesting.WORKLOAD, 1);
+		assertEquals(4*dayInMillis + 160168, parser.next().getArrivalTimeInMillis());
+		assertEquals(4*dayInMillis + 160302, parser.next().getArrivalTimeInMillis());
+		assertEquals(4*dayInMillis + 160315, parser.next().getArrivalTimeInMillis());
+		assertEquals(4*dayInMillis + 160915, parser.next().getArrivalTimeInMillis());
+		assertEquals(4*dayInMillis + 161383, parser.next().getArrivalTimeInMillis());
+		
+		assertTrue(Checkpointer.loadSimulationInfo().isFinished());
 	}
 	
 	/**
 	 * Not yet implemented!
+	 * @throws ConfigurationException 
 	 */
 	@Test(expected=RuntimeException.class)
-	public void testApplyError(){
-		
+	public void testApplyError() throws ConfigurationException{
+		buildFullConfiguration();
 		int saasclientID = 1;
-		String workloads = PropertiesTesting.VALID_WORKLOAD_3;
 		
-		SimulationInfo simInfo = new SimulationInfo(0, 0);
-		
-		Configuration config = EasyMock.createStrictMock(Configuration.class);
-		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config);
-		EasyMock.expect(config.getSimulationInfo()).andReturn(simInfo);
-		
-		PowerMock.replayAll(config);
-		
-		GEISTMultiFileWorkloadParser parser = new GEISTMultiFileWorkloadParser(workloads, saasclientID);
+		GEISTMultiFileWorkloadParser parser = new GEISTMultiFileWorkloadParser(PropertiesTesting.WORKLOAD, saasclientID);
 		
 		parser.applyError(0.5);
-		
-		PowerMock.verifyAll();
 	}
 }

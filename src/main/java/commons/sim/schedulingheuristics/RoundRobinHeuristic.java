@@ -15,6 +15,10 @@ import commons.sim.components.Machine;
  */
 public class RoundRobinHeuristic implements SchedulingHeuristic {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4279289006456262500L;
 	private int nextToUse;
 	
 	/**

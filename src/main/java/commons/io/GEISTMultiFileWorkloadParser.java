@@ -19,14 +19,12 @@ import commons.cloud.Request;
  */
 public class GEISTMultiFileWorkloadParser extends AbstractWorkloadParser{
 	
-//	private static final Pattern pattern = Pattern.compile("( +|\t+)+");
-
 	/**
 	 * Default constructor
 	 * @param workloads 
 	 */
 	public GEISTMultiFileWorkloadParser(String workload, int saasclientID) {
-		super(workload, saasclientID);
+		super(workload, saasclientID, Checkpointer.loadSimulationInfo().getCurrentDayInMillis());
 	}
 
 	/**
@@ -34,21 +32,11 @@ public class GEISTMultiFileWorkloadParser extends AbstractWorkloadParser{
 	 */
 	@Override
 	protected Request parseRequest(String line) {
-//		String[] eventData = pattern.split(line);
 		StringTokenizer tokenizer = new StringTokenizer(line, "( +|\t+)+");
 		
-//		long [] demand = new long[4];
-//		demand[0] = 10;
-//		demand[1] = 10;
-//		demand[2] = 10;
-//		demand[3] = 10;
-		
-//		return new Request(Long.valueOf(eventData[1]), saasClientID, Integer.valueOf(eventData[0]), Long
-//				.valueOf(eventData[2])+(periodsAlreadyRead * TickSize.DAY.getTickInMillis()), Long.valueOf(eventData[3]),
-//				Long.valueOf(eventData[4]), demand);
 		int userID = Integer.parseInt(tokenizer.nextToken());
 		long reqID = Long.parseLong(tokenizer.nextToken());
-		long arrivalTimeInMillis = Long.parseLong(tokenizer.nextToken());
+		long arrivalTimeInMillis = Long.parseLong(tokenizer.nextToken()) + shift;
 		long requestSizeInBytes = Long.parseLong(tokenizer.nextToken());
 		long responseSizeInBytes = Long.parseLong(tokenizer.nextToken());
 		
@@ -56,8 +44,6 @@ public class GEISTMultiFileWorkloadParser extends AbstractWorkloadParser{
 		int index = 0;
 		while(tokenizer.hasMoreTokens()){
 			demand[index++] = Long.parseLong(tokenizer.nextToken());
-//			tokenizer.nextToken();
-//			demand[index++] = 200;
 		}
 		
 		return new Request(reqID, saasClientID, userID, arrivalTimeInMillis,

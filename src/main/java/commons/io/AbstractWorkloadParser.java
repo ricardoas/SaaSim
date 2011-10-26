@@ -6,8 +6,11 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import commons.cloud.Request;
-import commons.config.Configuration;
 
+/**
+ * 
+ * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
+ */
 public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 	
 	private BufferedReader reader;
@@ -17,15 +20,19 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 	private Request next;
 	
 	protected final int saasClientID;
+	protected final long shift;
 
 	/**
 	 * Default constructor.
 	 * 
 	 * @param workload Workload file name.
 	 * @param saasclientID SaaS client ID.
+	 * @param shift TODO
 	 */
-	public AbstractWorkloadParser(String workload, int saasclientID) {
+	public AbstractWorkloadParser(String workload, int saasclientID, long shift) {
 		assert workload != null: "Null workload. Please check your configuration and trace files.";
+		
+		this.shift = shift;
 		
 		String workloadFile = readFileToUse(workload);
 		try {
@@ -46,7 +53,7 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 	 * @return
 	 */
 	private String readFileToUse(String workload) {
-		this.currentDay = Configuration.getInstance().getSimulationInfo().getSimulatedDays();
+		this.currentDay = Checkpointer.loadSimulationInfo().getCurrentDay();
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new FileReader(workload));
@@ -56,16 +63,16 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 				currentLine++;
 				file = reader.readLine();
 			}
+			reader.close();
 			return file == null? "": file;
 		} catch (Exception e) {
 			throw new RuntimeException("Problem reading workload file.", e);
-		} finally{
-			try {
-				reader.close();
-			} catch (IOException e) {}
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setDaysAlreadyRead(int simulatedDays){
 		throw new RuntimeException("not yet implemented");
@@ -96,7 +103,7 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 		try {
 			line = reader.readLine();
 			return line == null? null: parseRequest(line);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new RuntimeException("Problem reading workload file.", e);
 		}
 	}
@@ -112,7 +119,7 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 		try {
 			this.reader.close();
 		} catch (IOException e) {
-			throw new RuntimeException("Problem closing workload file.");
+			throw new RuntimeException("Problem closing workload file.", e);
 		}
 	}
 }

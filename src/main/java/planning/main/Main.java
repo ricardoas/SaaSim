@@ -7,6 +7,7 @@ import provisioning.DPS;
 import provisioning.util.DPSFactory;
 
 import commons.config.Configuration;
+import commons.io.Checkpointer;
 import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.ApplicationFactory;
@@ -30,12 +31,12 @@ public class Main {
 			Configuration.buildInstance(args[0]);
 			Configuration config = Configuration.getInstance();
 			
-			JEEventScheduler scheduler = JEEventScheduler.getInstance();
+			JEEventScheduler scheduler = Checkpointer.loadScheduler();
 			DPS dps = DPSFactory.createDPS();
 			LoadBalancer[] loadBalancers = ApplicationFactory.getInstance().buildApplication(scheduler);
 			
 			//Creating planner
-			Planner planner = new Planner(scheduler, dps, loadBalancers, config.getProviders(), config.getUsers());
+			Planner planner = new Planner(scheduler, dps, loadBalancers, Checkpointer.loadProviders(), Checkpointer.loadUsers());
 			planner.plan();
 			
 		} catch (ConfigurationException e) {

@@ -1,6 +1,7 @@
 package provisioning;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,9 +21,9 @@ import commons.cloud.TypeProvider;
 import commons.cloud.User;
 import commons.config.Configuration;
 import commons.config.PropertiesTesting;
+import commons.io.Checkpointer;
 import commons.io.WorkloadParser;
 import commons.io.WorkloadParserFactory;
-import commons.sim.AccountingSystem;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEEventScheduler;
@@ -199,8 +200,8 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		types.add(new TypeProvider(0, MachineType.M1_SMALL, 1, 1, 100, 240, reservationLimit));
 		Provider provider = new Provider(0, "1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		providers[0] = provider;
-		EasyMock.expect(config.getProviders()).andReturn(providers);
-		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
+		EasyMock.expect(Checkpointer.loadProviders()).andReturn(providers);
+		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{});
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
 		
 		PowerMock.replay(Configuration.class);
@@ -247,12 +248,12 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		Provider[] providers = new Provider[1];
 		Provider provider = new Provider(0, "1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers[0] = provider;
-		EasyMock.expect(config.getProviders()).andReturn(providers);
-		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
-		EasyMock.expect(config.getProviders()).andReturn(providers);
-		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
+		EasyMock.expect(Checkpointer.loadProviders()).andReturn(providers);
+		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{});
+		EasyMock.expect(Checkpointer.loadProviders()).andReturn(providers);
+		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{});
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
-		EasyMock.expect(config.getStringArray(SaaSUsersProperties.SAAS_USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
+		EasyMock.expect(config.getStringArray(SaaSUsersProperties.SAAS_USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.WORKLOAD});
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
@@ -301,12 +302,12 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		Provider[] providers = new Provider[1];
 		Provider provider = new Provider(0, "1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers[0] = provider;
-		EasyMock.expect(config.getProviders()).andReturn(providers);
-		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
-		EasyMock.expect(config.getProviders()).andReturn(providers);
-		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
+		EasyMock.expect(Checkpointer.loadProviders()).andReturn(providers);
+		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{});
+		EasyMock.expect(Checkpointer.loadProviders()).andReturn(providers);
+		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{});
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
-		EasyMock.expect(config.getStringArray(SaaSUsersProperties.SAAS_USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.VALID_WORKLOAD});
+		EasyMock.expect(config.getStringArray(SaaSUsersProperties.SAAS_USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.WORKLOAD});
 		
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);

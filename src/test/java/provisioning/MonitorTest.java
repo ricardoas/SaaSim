@@ -14,7 +14,7 @@ import commons.cloud.MachineType;
 import commons.cloud.Request;
 import commons.cloud.UtilityResult;
 import commons.config.Configuration;
-import commons.sim.AccountingSystem;
+import commons.io.Checkpointer;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.provisioningheuristics.MachineStatistics;
 
@@ -87,7 +87,8 @@ public class MonitorTest extends ValidConfigurationTest {
 	 */
 	@Test
 	public void testMachineTurnedOffWithExistentMachine() {
-		MachineDescriptor machineDescriptor = Configuration.getInstance().getProviders()[0].buyMachine(false, MachineType.M1_LARGE);
+		Configuration r = Configuration.getInstance();
+		MachineDescriptor machineDescriptor = Checkpointer.loadProviders()[0].buyMachine(false, MachineType.M1_LARGE);
 		monitor.machineTurnedOff(machineDescriptor);
 	}
 
@@ -96,9 +97,9 @@ public class MonitorTest extends ValidConfigurationTest {
 	 */
 	@Test
 	public void testChargeUsers() {
-		UtilityResult utilityBefore = AccountingSystem.getInstance().calculateUtility();
+		UtilityResult utilityBefore = Checkpointer.loadAccountingSystem().calculateUtility();
 		new DynamicProvisioningSystem().chargeUsers(0);
-		UtilityResult utilityAfter = AccountingSystem.getInstance().calculateUtility();
+		UtilityResult utilityAfter = Checkpointer.loadAccountingSystem().calculateUtility();
 		
 		double usersFee = 0;
 		double providersFee = 0;

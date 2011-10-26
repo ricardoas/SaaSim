@@ -6,6 +6,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
+import commons.io.Checkpointer;
+
 import util.CleanConfigurationTest;
 
 public class JEEventHandlerTest extends CleanConfigurationTest {
@@ -14,7 +16,7 @@ public class JEEventHandlerTest extends CleanConfigurationTest {
 
 	@Before
 	public void setUp(){
-		scheduler = JEEventScheduler.getInstance();
+		scheduler = Checkpointer.loadScheduler();
 	}
 
 	@Test

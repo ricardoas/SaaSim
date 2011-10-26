@@ -1,6 +1,7 @@
 package commons.sim.components;
 
-import static commons.sim.util.SimulatorProperties.*;
+import static commons.sim.util.SimulatorProperties.RANJAN_HEURISTIC_BACKLOG_SIZE;
+import static commons.sim.util.SimulatorProperties.RANJAN_HEURISTIC_NUMBER_OF_TOKENS;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -161,6 +162,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 				this.semaphore.release();
 				
 				long processedDemand = (Long) event.getValue()[0];
+				
 				totalTimeUsedInLastPeriod += processedDemand;
 				totalTimeUsed += processedDemand;
 				
@@ -215,21 +217,12 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result
-				+ ((descriptor == null) ? 0 : descriptor.hashCode());
-		return result;
+		return super.hashCode();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		assert obj != null && getClass() == obj.getClass(): "Comparing with different class object";
-
-		if (this == obj)
-			return true;
-		TimeSharedMachine other = (TimeSharedMachine) obj;
-		return descriptor.equals(other.descriptor);
+		return super.equals(obj);
 	}
 
 	@Override

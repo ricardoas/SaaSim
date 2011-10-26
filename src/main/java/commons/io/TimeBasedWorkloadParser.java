@@ -13,7 +13,7 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	private final long tick;
 	private long currentTick;
 
-	private List<Request> leftOver;
+	private Request[] leftOver;
 	private WorkloadParser<Request>[] parsers;
 	
 	/**
@@ -27,7 +27,7 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 		this.parsers = parser;
 		this.tick = tick;
 		this.currentTick = 0;
-		this.leftOver = new ArrayList<Request>();
+		this.leftOver = new Request[parsers.length];
 		
 	}
 	
@@ -67,25 +67,31 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	 */
 	@Override
 	public List<Request> next(){
-		List<Request> requests = new ArrayList<Request>(leftOver);
+		List<Request> requests = new ArrayList<Request>();
 		
 		long time = (currentTick + 1) * tick;
-		leftOver.clear();
-		for (Request request : requests) {
-			if(request.getArrivalTimeInMillis() >= time){
-				leftOver.add(request);
+		
+		for (int i = 0; i < leftOver.length; i++) {
+			Request left = leftOver[i];
+			if(left != null){
+				if(left.getArrivalTimeInMillis() < time){
+					requests.add(left);
+					leftOver[i] = null;
+				}
 			}
 		}
-		requests.removeAll(leftOver);
 		
-		for (WorkloadParser<Request> parser : parsers) {
-			while(parser.hasNext()){
-				Request request = parser.next();
-				if(request.getArrivalTimeInMillis() < time){
-					requests.add(request);
-				}else{
-					leftOver.add(request);
-					break;
+		for (int i = 0; i < parsers.length; i++) {
+			if(leftOver[i] == null){
+				WorkloadParser<Request> parser = parsers[i];
+				while(parser.hasNext()){
+					Request next = parser.next();
+					if(next.getArrivalTimeInMillis() < time){
+						requests.add(next);
+					}else{
+						leftOver[i] = next;
+						break;
+					}
 				}
 			}
 		}

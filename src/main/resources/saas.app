@@ -19,7 +19,7 @@ saas.application.numberoftiers=1
 saas.application.heuristic=ROUNDROBIN
 #saas.application.heuristicclass=
 saas.application.startreplicas=1
-#saas.application.maxreplicas=
+saas.application.maxreplicas=
 
 # Time in milliseconds between machine start and application becomes up and running.
 saas.setuptime=300000

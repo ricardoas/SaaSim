@@ -82,13 +82,13 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 		LoadBalancer[] loadBalancers = calculateMachinesUsage(simulator);
 		Configuration config = Configuration.getInstance();
 		
-		if(config.getSimulationInfo().getSimulatedDays() == config.getLong(SimulatorProperties.PLANNING_PERIOD)){//Simulation finished!
+		if(Checkpointer.loadSimulationInfo().getCurrentDay() == config.getLong(SimulatorProperties.PLANNING_PERIOD)){//Simulation finished!
 			
 			calculateMachinesToReserve(config);
 			Checkpointer.clear();
 			PlanIOHandler.clear();
 			try {
-				PlanIOHandler.createPlanFile(this.plan, config.getProviders());
+				PlanIOHandler.createPlanFile(this.plan, Checkpointer.loadProviders());
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -120,7 +120,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 
 	private void calculateMachinesToReserve(Configuration config) {
 		Map<MachineType, Map<Long, Double>> map = this.machineData.getMachineUsagePerType();
-		Map<MachineType, Double> limits = findReservationLimits(config.getProviders()[0]);
+		Map<MachineType, Double> limits = findReservationLimits(Checkpointer.loadProviders()[0]);
 		long planningPeriod = config.getLong(SimulatorProperties.PLANNING_PERIOD);
 	
 		Map<MachineType, List<Double>> typeUse = new HashMap<MachineType, List<Double>>();
@@ -173,7 +173,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 	private void persisDataToNextRound(LoadBalancer[] loadBalancers,
 			Configuration config) {
 		try {
-			Checkpointer.save(config.getSimulationInfo(), config.getUsers(), config.getProviders(), loadBalancers);
+			Checkpointer.save(Checkpointer.loadSimulationInfo(), Checkpointer.loadUsers(), Checkpointer.loadProviders(), loadBalancers);
 			Checkpointer.dumpMachineData(this.machineData);
 		} catch (IOException e) {
 			throw new RuntimeException(e);

@@ -19,6 +19,11 @@ import commons.sim.components.Machine;
  */
 public class RanjanHeuristic implements SchedulingHeuristic {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8376594311045424046L;
+
 	private final long SESSION_LIMIT_IN_MILLIS = 1000 * 60 * 15;
 	
 	private Map<Long, Long> lastRequestTimes;

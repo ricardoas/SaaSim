@@ -7,7 +7,7 @@ import provisioning.Monitor;
 
 import commons.cloud.Request;
 import commons.config.Configuration;
-import commons.io.TickSize;
+import commons.io.Checkpointer;
 import commons.io.WorkloadParser;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.MachineDescriptor;
@@ -16,6 +16,7 @@ import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.util.SimulatorProperties;
+import commons.util.SimulationInfo;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -27,9 +28,6 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 */
 	private static final long serialVersionUID = -8028580648054904982L;
 	
-	public static int[] daysInMonths = {31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
-	
-	protected int currentMonth;
 	private LoadBalancer tiers [];
 	
 	protected transient WorkloadParser<List<Request>> workloadParser;
@@ -43,7 +41,6 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	public SimpleSimulator(JEEventScheduler scheduler, LoadBalancer... tiers){
 		super(scheduler);
 		this.tiers = tiers;
-		this.currentMonth = Configuration.getInstance().getSimulationInfo().getCurrentMonth();
 	}
 	
 	/**
@@ -66,14 +63,12 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	
 	protected void prepareBeforeStart() {
 		
-		int simulatedDays = Configuration.getInstance().getSimulationInfo().getSimulatedDays();
-		if(simulatedDays < Configuration.getInstance().getLong(SimulatorProperties.PLANNING_PERIOD)){
-			send(new JEEvent(JEEventType.READWORKLOAD, this, getScheduler().now()));
-			send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)));
-			
-			if(simulatedDays + 1 == daysInMonths[currentMonth]){
-				send(new JEEvent(JEEventType.CHARGE_USERS, this, TickSize.DAY.getTickInMillis(), simulatedDays + 1 ));
-			}
+		send(new JEEvent(JEEventType.READWORKLOAD, this, getScheduler().now()));
+		send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)));
+
+		SimulationInfo info = Checkpointer.loadSimulationInfo();
+		if(info.isChargeDay()){
+			send(new JEEvent(JEEventType.CHARGE_USERS, this, info.getCurrentDayInMillis()));
 		}
 	}
 
@@ -89,29 +84,21 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 					for (Request request : list) {
 						send(parseEvent(request));
 					}
+					list.clear();
+					list = null;
 					if(workloadParser.hasNext()){
 						long newEventTime = getScheduler().now() + Configuration.getInstance().getParserPageSize().getTickInMillis();
 						send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime, true));
 					}else{
 						workloadParser.close();
-
-						//Persisting information in simulation info
-						Configuration.getInstance().getSimulationInfo().addSimulatedDay();
 					}
 				}
 				break;
 			case CHARGE_USERS:
-				int simulatedDays = (Integer) event.getValue()[0];
-				this.monitor.chargeUsers(simulatedDays * TickSize.DAY.getTickInMillis());
-				if( simulatedDays < Configuration.getInstance().getLong(SimulatorProperties.PLANNING_PERIOD) ){
-					currentMonth++;
-					currentMonth %= daysInMonths.length;
-					
-					//Persisting information in simulation info
-					Configuration.getInstance().getSimulationInfo().setCurrentMonth(currentMonth);
-				}
+				this.monitor.chargeUsers(Checkpointer.loadSimulationInfo().getCurrentDayInMillis());
 				break;
 			case COLLECT_STATISTICS:
+				//TODO schedule next collects
 				long time = event.getScheduledTime();
 				for (LoadBalancer loadBalancer : tiers) {
 					loadBalancer.collectStatistics(time);

@@ -1,65 +1,67 @@
 package commons.sim.schedulingheuristics;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 
 import org.easymock.EasyMock;
-import org.junit.Before;
 import org.junit.Test;
 
-import util.CleanConfigurationTest;
+import util.ValidConfigurationTest;
 
 import commons.cloud.MachineType;
 import commons.cloud.Request;
+import commons.io.Checkpointer;
 import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.components.TimeSharedMachine;
-import commons.sim.jeevent.JEEventScheduler;
 
-public class RoundRobinHeuristicTest extends CleanConfigurationTest {
+public class RoundRobinHeuristicTest extends ValidConfigurationTest {
 	
-	private RoundRobinHeuristic heuristic;
-	
-	@Before
-	public void setUp(){
-		this.heuristic = new RoundRobinHeuristic();
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+		buildFullConfiguration();
 	}
+	
 	
 	@Test(expected=ArithmeticException.class)
 	public void testWithoutMachines(){
+		RoundRobinHeuristic heuristic = new RoundRobinHeuristic();
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.replay(request);
 		
-		this.heuristic.getNextServer(request, new ArrayList<Machine>());
+		heuristic.getNextServer(request, new ArrayList<Machine>());
 		
 		EasyMock.verify(request);
 	}
 	
 	@Test
 	public void testWithOneMachine(){
+		RoundRobinHeuristic heuristic = new RoundRobinHeuristic();
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine);
 		
 		//Retrieving for the first time
-		Machine nextServer = this.heuristic.getNextServer(request, servers);
+		Machine nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
 		
 		//Asking for another machine
-		nextServer = this.heuristic.getNextServer(request, servers);
+		nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
 		
-		nextServer = this.heuristic.getNextServer(request, servers);
+		nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
 		
-		nextServer = this.heuristic.getNextServer(request, servers);
+		nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
 		
@@ -68,37 +70,38 @@ public class RoundRobinHeuristicTest extends CleanConfigurationTest {
 	
 	@Test
 	public void testWithMultipleMachines(){
+		RoundRobinHeuristic heuristic = new RoundRobinHeuristic();
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
-		Machine machine3 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
+		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
+		Machine machine3 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
 		
 		//Retrieving for the first time
-		Machine nextServer = this.heuristic.getNextServer(request, servers);
+		Machine nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
 		
 		//Asking for another machine
-		nextServer = this.heuristic.getNextServer(request, servers);
+		nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine2);
 		
-		nextServer = this.heuristic.getNextServer(request, servers);
+		nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine3);
 		
 		//After using all machines, it starts all over again
-		nextServer = this.heuristic.getNextServer(request, servers);
+		nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
 		
-		nextServer = this.heuristic.getNextServer(request, servers);
+		nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine2);
 		
@@ -107,146 +110,152 @@ public class RoundRobinHeuristicTest extends CleanConfigurationTest {
 	
 	@Test
 	public void testWithMultipleMachinesAndFinishingFutureServer(){
+		RoundRobinHeuristic heuristic = new RoundRobinHeuristic();
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
-		Machine machine3 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
+		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
+		Machine machine3 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
 		
 		//Retrieving for the first time
-		Machine nextServer = this.heuristic.getNextServer(request, servers);
+		Machine nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
 		
 		//Asking for another machine
-		nextServer = this.heuristic.getNextServer(request, servers);
+		nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine2);
 		
-		nextServer = this.heuristic.getNextServer(request, servers);
+		nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine3);
 		
 		//Removing server
 		servers.remove(machine3);
-		this.heuristic.finishServer(machine3, 2, servers);
+		heuristic.finishServer(machine3, 2, servers);
 		
-		nextServer = this.heuristic.getNextServer(request, servers);
+		nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
 	}
 	
 	@Test
 	public void testWithMultipleMachinesAndFinishingCurrentServerToUse(){
+		RoundRobinHeuristic heuristic = new RoundRobinHeuristic();
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
-		Machine machine3 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
+		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
+		Machine machine3 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
 		
 		//Retrieving for the first time
-		Machine nextServer = this.heuristic.getNextServer(request, servers);
+		Machine nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
 		
 		//Asking for another machine
-		nextServer = this.heuristic.getNextServer(request, servers);
+		nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine2);
 		
-		nextServer = this.heuristic.getNextServer(request, servers);
+		nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine3);
 		
 		//Removing server
 		servers.remove(machine);
-		this.heuristic.finishServer(machine, 0, servers);
+		heuristic.finishServer(machine, 0, servers);
 		
-		nextServer = this.heuristic.getNextServer(request, servers);
+		nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine2);
 	}
 	
 	@Test
 	public void testWithMultipleMachinesAndFinishingPreviousUsedServer(){
+		RoundRobinHeuristic heuristic = new RoundRobinHeuristic();
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
-		Machine machine3 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
+		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
+		Machine machine3 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
 		
 		//Retrieving for the first time
-		Machine nextServer = this.heuristic.getNextServer(request, servers);
+		Machine nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine);
 		
 		//Asking for another machine
-		nextServer = this.heuristic.getNextServer(request, servers);
+		nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine2);
 		
 		servers.remove(machine);
-		this.heuristic.finishServer(machine, 0, servers);
+		heuristic.finishServer(machine, 0, servers);
 		
-		nextServer = this.heuristic.getNextServer(request, servers);
+		nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine3);
 		
-		nextServer = this.heuristic.getNextServer(request, servers);
+		nextServer = heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
 		assertEquals(nextServer, machine2);
 	}
 	
 	@Test
 	public void testGetArrivalCounter(){
-		assertEquals(0, this.heuristic.getRequestsArrivalCounter());
+		RoundRobinHeuristic heuristic = new RoundRobinHeuristic();
+		assertEquals(0, heuristic.getRequestsArrivalCounter());
 		
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine);
 		
 		//Retrieving for the first time
-		Machine nextServer = this.heuristic.getNextServer(request, servers);
+		Machine nextServer = heuristic.getNextServer(request, servers);
 		
-		assertEquals(0, this.heuristic.getRequestsArrivalCounter());
+		assertEquals(0, heuristic.getRequestsArrivalCounter());
 	}
 	
 	@Test
 	public void testReportRequestFinished(){
-		assertEquals(0, this.heuristic.getFinishedRequestsCounter());
+		RoundRobinHeuristic heuristic = new RoundRobinHeuristic();
+		assertEquals(0, heuristic.getFinishedRequestsCounter());
 		
-		this.heuristic.reportRequestFinished();
+		heuristic.reportRequestFinished();
 		
-		assertEquals(0, this.heuristic.getFinishedRequestsCounter());
+		assertEquals(0, heuristic.getFinishedRequestsCounter());
 	}
 	
 	@Test
 	public void testResetCounters(){
-		assertEquals(0, this.heuristic.getFinishedRequestsCounter());
-		assertEquals(0, this.heuristic.getRequestsArrivalCounter());
+		RoundRobinHeuristic heuristic = new RoundRobinHeuristic();
+		assertEquals(0, heuristic.getFinishedRequestsCounter());
+		assertEquals(0, heuristic.getRequestsArrivalCounter());
 		
-		this.heuristic.resetCounters();
+		heuristic.resetCounters();
 		
-		assertEquals(0, this.heuristic.getFinishedRequestsCounter());
-		assertEquals(0, this.heuristic.getRequestsArrivalCounter());
+		assertEquals(0, heuristic.getFinishedRequestsCounter());
+		assertEquals(0, heuristic.getRequestsArrivalCounter());
 	}
 
 }

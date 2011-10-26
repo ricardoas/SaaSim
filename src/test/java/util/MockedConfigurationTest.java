@@ -1,8 +1,7 @@
 package util;
 
-import org.junit.Before;
+import org.junit.Ignore;
 
-import commons.sim.jeevent.JEEventScheduler;
 
 /**
  * Super class of tests which need a mocked configuration. Such tests usually uses
@@ -12,11 +11,8 @@ import commons.sim.jeevent.JEEventScheduler;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
+@Deprecated
+@Ignore
 public class MockedConfigurationTest {
-	
-	@Before
-	public void setUp(){
-		JEEventScheduler.getInstance().reset();
-	}
-
+	/* Mark up interface */
 }

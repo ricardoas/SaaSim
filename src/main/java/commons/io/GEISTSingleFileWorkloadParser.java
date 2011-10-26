@@ -28,7 +28,7 @@ public class GEISTSingleFileWorkloadParser extends AbstractWorkloadParser{
 	 */
 //	public GEISTSingleFileWorkloadParser(String[] workloads) {
 	public GEISTSingleFileWorkloadParser(String workload) {
-		super(workload, 1);
+		super(workload, 1, 0);
 	}
 
 	/**

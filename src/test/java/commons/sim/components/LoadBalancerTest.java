@@ -15,6 +15,7 @@ import util.ValidConfigurationTest;
 
 import commons.cloud.MachineType;
 import commons.cloud.Request;
+import commons.io.Checkpointer;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
@@ -95,10 +96,10 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(schedulingHeuristic);
 
-		LoadBalancer lb = new LoadBalancer(JEEventScheduler.getInstance(), schedulingHeuristic, Integer.MAX_VALUE, 1);
+		LoadBalancer lb = new LoadBalancer(Checkpointer.loadScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 1);
 		
 		lb.addServer(descriptor, false);
-		JEEventScheduler.getInstance().start();
+		Checkpointer.loadScheduler().start();
 		
 		//Removing a server
 		lb.removeServer(descriptor, false);
@@ -114,7 +115,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(schedulingHeuristic);
 
-		LoadBalancer lb = new LoadBalancer(JEEventScheduler.getInstance(), schedulingHeuristic, Integer.MAX_VALUE, 1);
+		LoadBalancer lb = new LoadBalancer(Checkpointer.loadScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 1);
 		
 		//Removing a server
 		lb.removeServer(descriptor, false);
@@ -145,7 +146,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(newRequestEvent, schedulingHeuristic, request, machine);
 		
-		LoadBalancer lb = new LoadBalancer(JEEventScheduler.getInstance(), schedulingHeuristic, Integer.MAX_VALUE, 1);
+		LoadBalancer lb = new LoadBalancer(Checkpointer.loadScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 1);
 		lb.addServer(descriptor, false);
 		JEEvent machineIsUpEvent = new JEEvent(JEEventType.ADD_SERVER, lb, 0l, machine);
 		lb.handleEvent(machineIsUpEvent);
@@ -179,7 +180,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		EasyMock.replay(event, schedulingHeuristic, request, dps);
 		
 		//Load balancer being constructed without machines!
-		LoadBalancer lb = new LoadBalancer(JEEventScheduler.getInstance(), schedulingHeuristic, Integer.MAX_VALUE, 1);
+		LoadBalancer lb = new LoadBalancer(Checkpointer.loadScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 1);
 		lb.setMonitor(dps);
 		
 		lb.handleEvent(event);
@@ -219,7 +220,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		monitor.sendStatistics(1000, new MachineStatistics((utilisation1+utilisation2)/2, totalArrivals, totalCompletions, 2), 0);
 		EasyMock.replay(machine1, machine2, schedulingHeuristic, monitor);
 		
-		LoadBalancer lb = new LoadBalancer(JEEventScheduler.getInstance(), schedulingHeuristic, Integer.MAX_VALUE, 0);
+		LoadBalancer lb = new LoadBalancer(Checkpointer.loadScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 0);
 		lb.setMonitor(monitor);
 		
 		lb.addServer(descriptor, true);
@@ -254,7 +255,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		monitor.sendStatistics(0, new MachineStatistics(0, totalArrivals, totalCompletions, 0), 0);
 		EasyMock.replay(monitor);
 		
-		LoadBalancer lb = new LoadBalancer(JEEventScheduler.getInstance(), schedulingHeuristic, Integer.MAX_VALUE, 0);
+		LoadBalancer lb = new LoadBalancer(Checkpointer.loadScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 0);
 		
 		//Calculating utilisation
 		lb.handleEvent(new JEEvent(JEEventType.COLLECT_STATISTICS, lb, 0l, evaluationTime));
@@ -270,7 +271,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		SchedulingHeuristic schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
 		EasyMock.replay(monitor, schedulingHeuristic);
 		
-		LoadBalancer lb = new LoadBalancer(JEEventScheduler.getInstance(), schedulingHeuristic, Integer.MAX_VALUE, 0);
+		LoadBalancer lb = new LoadBalancer(Checkpointer.loadScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 0);
 		lb.setMonitor(monitor);
 		
 		lb.handleEvent(new JEEvent(JEEventType.MACHINE_TURNED_OFF, lb, 0l, machineDescriptor));
@@ -288,7 +289,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		SchedulingHeuristic schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
 		EasyMock.replay(monitor, schedulingHeuristic, request);
 		
-		LoadBalancer lb = new LoadBalancer(JEEventScheduler.getInstance(), schedulingHeuristic, Integer.MAX_VALUE, 0);
+		LoadBalancer lb = new LoadBalancer(Checkpointer.loadScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 0);
 		lb.setMonitor(monitor);
 		
 		lb.handleEvent(new JEEvent(JEEventType.REQUESTQUEUED, lb, 0l, request));
@@ -298,7 +299,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testEqualsHashCodeConsistencyWithSameTierAndSameHandlerID() {
-		LoadBalancer lb = new LoadBalancer(JEEventScheduler.getInstance(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 0);
+		LoadBalancer lb = new LoadBalancer(Checkpointer.loadScheduler(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 0);
 
 		assertTrue(lb.equals(lb));
 		assertEquals(lb.hashCode(), lb.hashCode());
@@ -306,8 +307,8 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testEqualsHashCodeConsistencyWithSameTierButDifferentHandlerID() {
-		LoadBalancer lb = new LoadBalancer(JEEventScheduler.getInstance(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 0);
-		LoadBalancer lbClone = new LoadBalancer(JEEventScheduler.getInstance(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 0);
+		LoadBalancer lb = new LoadBalancer(Checkpointer.loadScheduler(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 0);
+		LoadBalancer lbClone = new LoadBalancer(Checkpointer.loadScheduler(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 0);
 
 		assertFalse(lb.equals(lbClone));
 		assertFalse(lbClone.equals(lb));
@@ -316,8 +317,8 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testEqualsHashCodeConsistencyWithDifferentTier() {
-		LoadBalancer lb1 = new LoadBalancer(JEEventScheduler.getInstance(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 0);
-		LoadBalancer lb2 = new LoadBalancer(JEEventScheduler.getInstance(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 1);
+		LoadBalancer lb1 = new LoadBalancer(Checkpointer.loadScheduler(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 0);
+		LoadBalancer lb2 = new LoadBalancer(Checkpointer.loadScheduler(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 1);
 		
 		assertTrue(lb1.equals(lb1));
 		assertFalse(lb1.equals(lb2));
@@ -327,7 +328,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 	
 	@Test(expected=AssertionError.class)
 	public void testEqualsWithNullObject() {
-		LoadBalancer lb = new LoadBalancer(JEEventScheduler.getInstance(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 0);
+		LoadBalancer lb = new LoadBalancer(Checkpointer.loadScheduler(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 0);
 		LoadBalancer lbNull = null;
 		
 		lb.equals(lbNull);
@@ -335,7 +336,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 	
 	@Test(expected=AssertionError.class)
 	public void testEqualsWithAnotherClassObject() {
-		LoadBalancer lb = new LoadBalancer(JEEventScheduler.getInstance(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 0);		
+		LoadBalancer lb = new LoadBalancer(Checkpointer.loadScheduler(), new RoundRobinHeuristic(), Integer.MAX_VALUE, 0);		
 		
 		assertTrue(lb.equals(lb));
 		lb.equals(new String(""));

@@ -34,7 +34,8 @@ public class ProviderTest extends ValidConfigurationTest {
 		Checkpointer.clear();
 		
 		buildFullConfiguration();
-		amazon = Configuration.getInstance().getProviders()[1];
+		Configuration r = Configuration.getInstance();
+		amazon = Checkpointer.loadProviders()[1];
 		assert amazon.getName().equals("amazon"): "Check providers order in iaas.providers file.";
 	}
 

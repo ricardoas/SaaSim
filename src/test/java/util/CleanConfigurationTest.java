@@ -2,9 +2,11 @@ package util;
 
 import java.lang.reflect.Field;
 
+import org.junit.AfterClass;
 import org.junit.Before;
 
 import commons.config.Configuration;
+import commons.io.Checkpointer;
 import commons.sim.jeevent.JEEventScheduler;
 
 /**
@@ -21,10 +23,16 @@ public class CleanConfigurationTest {
 	 */
 	@Before
 	public void setUp() throws Exception{
-		JEEventScheduler.getInstance().reset();
+		Checkpointer.clear();
+//		Checkpointer.loadScheduler().reset();
 		Field field = Configuration.class.getDeclaredField("instance");
 		field.setAccessible(true);
 		field.set(null, null);
+	}
+	
+	@AfterClass
+	public static void tearDownAfterClass(){
+		Checkpointer.clear();
 	}
 
 

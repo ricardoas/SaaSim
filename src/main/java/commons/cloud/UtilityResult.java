@@ -1,15 +1,19 @@
 package commons.cloud;
 
+import java.io.Serializable;
 import java.util.Iterator;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class UtilityResult{
+public class UtilityResult implements Serializable{
 	
-	private SortedSet<UtilityResultEntry> entries;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7954582098382863519L;
+	private TreeSet<UtilityResultEntry> entries;
 	private double[] usersUniqueFee;
 	private double[][] providersUniqueFee;
 	
@@ -51,7 +55,11 @@ public class UtilityResult{
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append(getUtility()+"\t"+uniqueReceipt+"\t"+uniqueCost);
+		sb.append(getUtility());
+		sb.append('\t');
+		sb.append(uniqueReceipt);
+		sb.append('\t');
+		sb.append(uniqueCost);
 		
 		for (UtilityResultEntry entry : entries) {
 			sb.append('\n');

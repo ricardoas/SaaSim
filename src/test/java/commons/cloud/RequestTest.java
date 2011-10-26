@@ -31,6 +31,7 @@ public class RequestTest extends CleanConfigurationTest {
 	@Test
 	public void testConstructor() {
 		Request request = new Request(1l, 1, 17756636, 0, 100, 1024000, new long[]{MICRO_DEMAND, SMALL_DEMAND, LARGE_DEMAND, MEDIUM_DEMAND, XLARGE_DEMAND});
+		assertEquals(1, request.getReqID());
 		assertEquals(1, request.getSaasClient());
 		assertEquals(17756636, request.getUserID());
 		assertEquals(0, request.getArrivalTimeInMillis());

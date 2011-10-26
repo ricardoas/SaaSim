@@ -8,11 +8,10 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.TreeSet;
 
-import commons.cloud.Request;
 import commons.io.Checkpointer;
 
 /**
- * TODO make doc
+ * Event scheduler. Events are ordered in time.
  *
  * @author thiago - thiago@lsd.ufcg.edu.br
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -31,51 +30,24 @@ public class JEEventScheduler implements Serializable{
     public TreeSet<JEEvent> eventSet;
 	private Random random;
 	
-	private static JEEventScheduler INSTANCE;
-	
     /**
      * Default empty constructor.
+     * @param simulationEnd TODO
      * @throws IOException 
      */
-    private JEEventScheduler(){
-		reset();
-    }
-    
-	public void reset() {
-		reset(Long.MAX_VALUE);
-	}
-	
-    /**
-	 * @param l
-	 */
-	public void reset(long simulationEnd) {
-		this.simulationEnd = simulationEnd;
-		this.now = 0;
+    public JEEventScheduler(long simulationEnd){
+		reset(0, simulationEnd);
 		this.handlerMap = new HashMap<Integer, JEEventHandler>();
 		this.eventSet = new TreeSet<JEEvent>();
 		this.random = new Random();
-	}
-
-	/**
-	 * 
+    }
+    
+    /**
+	 * @param l
 	 */
-	public void prepare() {
-		this.now = 0;
-		JEEvent[] remainingEvents = new JEEvent[eventSet.size()];
-		eventSet.toArray(remainingEvents);
-		eventSet.clear();
-		for (JEEvent event : remainingEvents) {
-			switch (event.getType()) {
-			case PREEMPTION:
-				Object[] value = event.getValue();
-				Request request = (Request) value[1];
-				value[1] = new Request(request.getReqID(), request.getSaasClient(), request.getUserID(), request.getArrivalTimeInMillis() - Checkpointer.INTERVAL, request.getRequestSizeInBytes(), request.getResponseSizeInBytes(), request.getCpuDemandInMillis());
-				break;
-			default:
-				break;
-			}
-			eventSet.add(new JEEvent(event.getType(), handlerMap.get(event.getTargetHandlerId()), event.getScheduledTime() - Checkpointer.INTERVAL, event.getValue()));
-		}
+	public void reset(long simulationStart, long simulationEnd) {
+		this.now = simulationStart;
+		this.simulationEnd = simulationEnd;
 	}
 
 	/**
@@ -123,23 +95,24 @@ public class JEEventScheduler implements Serializable{
      */
     public void start() {
     	
-    	simulationEnd = Checkpointer.INTERVAL;
+    	this.now = Checkpointer.loadSimulationInfo().getCurrentDayInMillis();
     	
 		if (!eventSet.isEmpty()) {
 			schedule();
 		}else{
 			this.now = simulationEnd;
 		}
-//		dumpPostMortemEvents();
     }
 
-	private void dumpPostMortemEvents() {
+	public String dumpPostMortemEvents() {
+		StringBuilder sb = new StringBuilder();
 		if(!eventSet.isEmpty()){
-			System.err.println("There were " + eventSet.size() + " events scheduled for times after simulation end (" + simulationEnd + ").");
 			while(!eventSet.isEmpty()){
-				System.err.println(eventSet.pollFirst());
+				sb.append(eventSet.pollFirst());
+				sb.append('\n');
 			}
 		}
+		return sb.toString();
 	}
     
     /**
@@ -147,7 +120,7 @@ public class JEEventScheduler implements Serializable{
      */
     private void schedule() {
     	
-    	while(!eventSet.isEmpty() && now <= simulationEnd){
+    	while(!eventSet.isEmpty() && eventSet.first().getScheduledTime() < simulationEnd){
     		JEEvent event = eventSet.pollFirst();
     		now = event.getScheduledTime();
     		processEvent(event);
@@ -193,19 +166,20 @@ public class JEEventScheduler implements Serializable{
 	}
 
 	/**
-	 * @return the iNSTANCE
+	 * {@inheritDoc}
 	 */
-	public static JEEventScheduler getInstance() {
-		if(INSTANCE == null){
-			setInstance(Checkpointer.hasCheckpoint()? Checkpointer.loadScheduler():new JEEventScheduler());
+	@Override
+	public boolean equals(Object obj) {
+		if(this == obj){
+			return true;
 		}
-		return INSTANCE;
+		JEEventScheduler other = (JEEventScheduler)obj;
+		return eventSet.equals(other.eventSet) && handlerMap.equals(other.handlerMap);
 	}
-
-	/**
-	 * @param iNSTANCE the iNSTANCE to set
-	 */
-	public static void setInstance(JEEventScheduler iNSTANCE) {
-		INSTANCE = iNSTANCE;
+	
+	public void printStatus(){
+    	for (JEEvent event : eventSet) {
+    		System.out.println(event);
+		}
 	}
 }

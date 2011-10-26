@@ -1,6 +1,8 @@
 package commons.sim.schedulingheuristics;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 
@@ -13,6 +15,7 @@ import util.ValidConfigurationTest;
 
 import commons.cloud.MachineType;
 import commons.cloud.Request;
+import commons.io.Checkpointer;
 import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.components.TimeSharedMachine;
@@ -69,7 +72,7 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine1 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine1);
 		
 		Machine nextServer = heuristic.getNextServer(request, servers);
@@ -96,11 +99,11 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 		long time = ONE_MINUTE_IN_MILLIS * 1;
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
-		Machine machine3 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
-		Machine machine4 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(4, false, MachineType.M1_SMALL, 0), null);
-		Machine machine5 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(5, false, MachineType.M1_SMALL, 0), null);
+		Machine machine1 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
+		Machine machine3 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
+		Machine machine4 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(4, false, MachineType.M1_SMALL, 0), null);
+		Machine machine5 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(5, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine1);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -183,11 +186,11 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 		int userID = 1;
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
-		Machine machine3 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
-		Machine machine4 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(4, false, MachineType.M1_SMALL, 0), null);
-		Machine machine5 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(5, false, MachineType.M1_SMALL, 0), null);
+		Machine machine1 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
+		Machine machine3 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
+		Machine machine4 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(4, false, MachineType.M1_SMALL, 0), null);
+		Machine machine5 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(5, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine1);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -275,11 +278,11 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 		int secondUserID = 888;
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
-		Machine machine3 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
-		Machine machine4 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(4, false, MachineType.M1_SMALL, 0), null);
-		Machine machine5 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(5, false, MachineType.M1_SMALL, 0), null);
+		Machine machine1 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
+		Machine machine3 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
+		Machine machine4 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(4, false, MachineType.M1_SMALL, 0), null);
+		Machine machine5 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(5, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine1);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -375,7 +378,7 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine1 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine1 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine1);
 		
 		heuristic.getNextServer(request, servers);

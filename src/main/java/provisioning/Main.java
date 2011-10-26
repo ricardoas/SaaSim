@@ -1,21 +1,17 @@
 package provisioning;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.log4j.BasicConfigurator;
 
 import provisioning.util.DPSFactory;
 
-import commons.cloud.Provider;
-import commons.cloud.User;
 import commons.cloud.UtilityResult;
 import commons.config.Configuration;
 import commons.io.Checkpointer;
 import commons.sim.Simulator;
-import commons.sim.components.LoadBalancer;
-import commons.sim.jeevent.JEEventScheduler;
-import commons.sim.util.SimulatorFactory;
-import commons.sim.util.SimulatorProperties;
-import commons.util.SimulationInfo;
 
 /**
  * Provisioning simulator execution entry point.
@@ -29,36 +25,39 @@ public class Main {
 	 * 
 	 * @param args Path to the configuration file.
 	 * @throws ConfigurationException Related to problems during configuration loading.
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) throws ConfigurationException {
+	public static void main(String[] args) throws ConfigurationException, IOException {
 		
-		BasicConfigurator.configure();
+		if(args.length != 1){
+			System.out.println("Usage: java -cp saasim.jar provisioning.Main <property file>");
+			System.exit(1);
+		}
 		
 		Configuration.buildInstance(args[0]);
 		
 		DPS dps = DPSFactory.createDPS();
 		
-		Simulator simulator = SimulatorFactory.buildSimulator(JEEventScheduler.getInstance());
+		Simulator simulator = Checkpointer.loadApplication();
 		
 		dps.registerConfigurable(simulator);
 		
 		simulator.start();
 		
-		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
-		
-		if(info.getSimulatedDays() 
-				== Configuration.getInstance().getLong(SimulatorProperties.PLANNING_PERIOD)){
+		if(Checkpointer.loadSimulationInfo().isFinished()){
 			
 			UtilityResult utilityResult = dps.calculateUtility();
 			System.err.println(utilityResult);
 			System.out.println(utilityResult.getUtility());
-			Checkpointer.clear();
-		}else{//Persisting dump
-			User[] users = Configuration.getInstance().getUsers();
-			Provider[] providers = Configuration.getInstance().getProviders();
-			LoadBalancer[] application = simulator.getTiers();
 			
-			Checkpointer.save(info, users, providers, application);
+			String events = Checkpointer.loadScheduler().dumpPostMortemEvents();
+			if(!events.isEmpty()){
+				FileWriter writer = new FileWriter(new File("events.dat"));
+				writer.write(events);
+				writer.close();
+			}
+		}else{//Persisting dump
+			Checkpointer.save();
 		}
 	}
 }

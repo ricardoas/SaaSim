@@ -3,7 +3,8 @@
  */
 package provisioning;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.Capture;
@@ -97,10 +98,10 @@ public class DynamicProvisioningSystemTest extends ValidConfigurationTest {
 		UtilityResult result = dps.calculateUtility();
 		
 		UtilityResult currentResult = new UtilityResult(2, 3);
-		for(User user : Configuration.getInstance().getUsers()){
+		for(User user : Checkpointer.loadUsers()){
 			user.calculateOneTimeFees(currentResult);
 		}
-		for(Provider provider : Configuration.getInstance().getProviders()){
+		for(Provider provider : Checkpointer.loadProviders()){
 			provider.calculateUniqueCost(currentResult);
 		}
 		

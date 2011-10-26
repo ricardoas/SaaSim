@@ -1,6 +1,7 @@
 package commons.sim.schedulingheuristics;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 
@@ -12,6 +13,7 @@ import util.ValidConfigurationTest;
 
 import commons.cloud.MachineType;
 import commons.cloud.Request;
+import commons.io.Checkpointer;
 import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.components.TimeSharedMachine;
@@ -44,7 +46,7 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine);
 	
 		//Retrieving for the first time
@@ -74,9 +76,9 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
-		Machine machine3 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
+		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
+		Machine machine3 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -110,9 +112,9 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
-		Machine machine3 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
+		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
+		Machine machine3 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -147,9 +149,9 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
-		Machine machine3 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
+		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
+		Machine machine3 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -179,9 +181,9 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
-		Machine machine3 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
+		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
+		Machine machine3 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -211,9 +213,9 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
-		Machine machine3 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
+		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
+		Machine machine3 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -249,9 +251,9 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
-		Machine machine3 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
+		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
+		Machine machine3 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -291,9 +293,9 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.C1_MEDIUM, 0), null);
-		Machine machine3 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(3, false, MachineType.M1_XLARGE, 0), null);
+		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.C1_MEDIUM, 0), null);
+		Machine machine3 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(3, false, MachineType.M1_XLARGE, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
@@ -349,8 +351,8 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.C1_MEDIUM, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_LARGE, 0), null);
+		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.C1_MEDIUM, 0), null);
+		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_LARGE, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
 		
@@ -390,8 +392,8 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_LARGE, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_XLARGE, 0), null);
+		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_LARGE, 0), null);
+		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_XLARGE, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
 		
@@ -437,8 +439,8 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_LARGE, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M1_XLARGE, 0), null);
+		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_LARGE, 0), null);
+		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_XLARGE, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
 		
@@ -490,8 +492,8 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_LARGE, 0), null);
-		Machine machine2 = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(2, false, MachineType.M2_XLARGE, 0), null);
+		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_LARGE, 0), null);
+		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M2_XLARGE, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
 		
@@ -535,7 +537,7 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		EasyMock.replay(request);
 		
 		ArrayList<Machine> servers = new ArrayList<Machine>();
-		Machine machine = new TimeSharedMachine(JEEventScheduler.getInstance(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
+		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine);
 		
 		//Retrieving for the first time

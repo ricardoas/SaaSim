@@ -4,17 +4,32 @@ public class PropertiesTesting {
 	
 	public static final String EMPTY_FILE = "src/test/resources/emptyfile.txt";
 	
-	public static final String INVALID_WORKLOAD = "src/test/resources/workload/invalid_workload.trc";
+//	public static final String INVALID_WORKLOAD = "src/test/resources/workload/invalid_workload.trc";
 	
-	public static final String VALID_WORKLOAD = "src/test/resources/workload/w1.dat";
-	public static final String VALID_WORKLOAD_2 = "src/test/resources/workload/w2.dat";
-	public static final String VALID_WORKLOAD_3 = "src/test/resources/workload/workload.trc";
+	
+	public static final String EMPTY_WORKLOAD = EMPTY_FILE;
+	public static final String WORKLOAD_WITH_BLANK_LINE = "src/test/resources/workload/workload_with_blank.trc";
+	public static final String WORKLOAD_WITH_BLANK_END_LINE = "src/test/resources/workload/workload_with_end_blank.trc";
+	public static final String WORKLOAD_WITH_MISSING_TRACE = "src/test/resources/workload/workload_with_missing_trace.trc";
+	public static final String WORKLOAD = "src/test/resources/workload/workload.trc";
+	public static final String WORKLOAD_WITH_EMPTY_TRACE = "src/test/resources/workload/workload_with_empty_trace.trc";
+	public static final String TRACE_WITH_BLANK_LINE = "src/test/resources/workload/workload_trace_with_blank.trc";
+	public static final String TRACE_WITH_BLANK_END_LINE = "src/test/resources/workload/workload_trace_with_end_blank.trc";
+	
+	
+//	public static final String VALID_WORKLOAD = "src/test/resources/workload/w1.dat";
+//	public static final String VALID_WORKLOAD_2 = "src/test/resources/workload/w2.dat";
+//	public static final String VALID_WORKLOAD_3 = "src/test/resources/workload/workload.trc";
 	
 	public static final String VALID_SINGLE_WORKLOAD_FILE = "src/test/resources/config-single-workload-file.properties";
 	public static final String VALID_MULTI_WORKLOAD_FILE = "src/test/resources/config-multi-workload-file.properties";
+	public static final String VALID_DIFFERENT_USERS_FILE = "src/test/resources/config-different-users-file.properties";
+	public static final String VALID_TWO_USERS_FILE = "src/test/resources/config-two-workload-disordered.properties";
 	public static final String VALID_RANJAN_FILE = "src/test/resources/config-ranjan.properties";
 	public static final String INVALID_IDIOM_FILE = "src/test/resources/idiom.properties";
 	public static final String INVALID_DPS_FILE = "src/test/resources/dps.properties";
+	public static final String INVALID_APP_FILE = "src/test/resources/app.properties";
+	public static final String VALID_MANY_TIERS_APP_FILE = "src/test/resources/many-tiers.properties";
 	
 	public static final String INEXISTENT_CONFIG_FILE = "src/test/resources/inexistent.config";
 	public static final String INEXISTENT_PLANS_FILE = "src/test/resources/inexistent1.properties";

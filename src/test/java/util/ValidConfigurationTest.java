@@ -17,6 +17,10 @@ public abstract class ValidConfigurationTest extends CleanConfigurationTest{
 		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
 	}
 
+	protected static void buildFullConfigurationWithDifferentUsers() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.VALID_DIFFERENT_USERS_FILE);
+	}
+
 	protected static void buildFullRanjanConfiguration() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.VALID_RANJAN_FILE);
 	}
@@ -31,6 +35,18 @@ public abstract class ValidConfigurationTest extends CleanConfigurationTest{
 	
 	protected void buildInvalidDPSConfiguration() throws ConfigurationException {
 		Configuration.buildInstance(PropertiesTesting.INVALID_DPS_FILE);
+	}
+	
+	protected void buildInvalidApplicationConfiguration() throws ConfigurationException {
+		Configuration.buildInstance(PropertiesTesting.INVALID_APP_FILE);
+	}
+	
+	protected void buildManyTiersApplicationConfiguration() throws ConfigurationException {
+		Configuration.buildInstance(PropertiesTesting.VALID_MANY_TIERS_APP_FILE);
+	}
+	
+	protected void buildTwoUsersConfiguration() throws ConfigurationException {
+		Configuration.buildInstance(PropertiesTesting.VALID_TWO_USERS_FILE);
 	}
 	
 	

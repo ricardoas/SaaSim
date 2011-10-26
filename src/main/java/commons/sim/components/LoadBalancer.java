@@ -18,12 +18,14 @@ import commons.sim.schedulingheuristics.SchedulingHeuristic;
 import commons.sim.util.SaaSAppProperties;
 
 /**
+ * Tier load balancer.
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ * @version 1.0
  */
 public class LoadBalancer extends JEAbstractEventHandler{
 	
 	/**
-	 * 
+	 * Version 1.0
 	 */
 	private static final long serialVersionUID = -8572489707494357108L;
 	
@@ -200,27 +202,19 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		this.monitor = monitor;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + tier;
-		return result;
+		return super.hashCode();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals(Object obj) {
-		assert (obj != null) && (getClass() == obj.getClass()): "Can't compare with another class object.";
-		
-		if (this == obj)
-			return true;
-		if (!super.equals(obj)) {
-			return false;
-		} if (getClass() != obj.getClass())
-			return false;
-		LoadBalancer other = (LoadBalancer) obj;
-		if (tier != other.tier) {
-			return false;
-		} return true;
+		return super.equals(obj);
 	}
 }

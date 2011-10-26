@@ -1,5 +1,6 @@
 package commons.cloud;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -7,14 +8,23 @@ import java.util.TreeMap;
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
+public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8251766726895786861L;
+
 	/**
 	 * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
 	 *
 	 */
-	private static class UserEntry{
+	private static class UserEntry implements Serializable{
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -6304129259620208175L;
 		private final int userID;
 		private String contractName;
 		private double totalReceipt;
@@ -71,8 +81,12 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	/**
 	 * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
 	 */
-	private static class TypeEntry{
+	private static class TypeEntry implements Serializable{
 		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -5699832152421322269L;
 		private final MachineType type;
 		private long onDemandCPUHours;
 		private double onDemandCost;
@@ -124,8 +138,12 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 	 * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
 	 *
 	 */
-	private static class ProviderEntry{
+	private static class ProviderEntry implements Serializable{
 		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -3831288060251941356L;
 		private final String name;
 		private double cost;
 		private double inCost;
@@ -355,8 +373,22 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>{
 
 	@Override
 	public String toString() {
-		return time + "\t" + getUtility() + "\t" + receipt	+ "\t" + cost + "\t" + penalty + "\t"
-				+ format(users) + "\t" + format(providers);
+		StringBuilder sb = new StringBuilder();
+		sb.append(time);
+		sb.append('\t');
+		sb.append(getUtility());
+		sb.append('\t');
+		sb.append(receipt);
+		sb.append('\t');
+		sb.append(cost);
+		sb.append('\t');
+		sb.append(penalty);
+		sb.append('\t');
+		sb.append(format(users));
+		sb.append('\t');
+		sb.append(format(providers));
+		return sb.toString();
+		
 	}
 
 	/**
