@@ -6,11 +6,17 @@ import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.Test;
 
-import util.CleanConfigurationTest;
+import util.ValidConfigurationTest;
 
 import commons.io.Checkpointer;
 
-public class JEEventSchedulerTest extends CleanConfigurationTest {
+public class JEEventSchedulerTest extends ValidConfigurationTest {
+	
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+		buildFullConfiguration();
+	}
 	
 	@Test
 	public void testRegisterHandler() {

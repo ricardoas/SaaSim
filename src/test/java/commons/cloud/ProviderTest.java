@@ -14,7 +14,6 @@ import org.junit.Test;
 
 import util.ValidConfigurationTest;
 
-import commons.config.Configuration;
 import commons.io.Checkpointer;
 import commons.sim.components.MachineDescriptor;
 import commons.util.CostCalculus;
@@ -34,7 +33,6 @@ public class ProviderTest extends ValidConfigurationTest {
 		Checkpointer.clear();
 		
 		buildFullConfiguration();
-		Configuration r = Configuration.getInstance();
 		amazon = Checkpointer.loadProviders()[1];
 		assert amazon.getName().equals("amazon"): "Check providers order in iaas.providers file.";
 	}
