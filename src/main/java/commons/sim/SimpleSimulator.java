@@ -68,6 +68,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 
 		SimulationInfo info = Checkpointer.loadSimulationInfo();
 		if(info.isChargeDay()){
+		//FIXME SUM ONE DAY
 			send(new JEEvent(JEEventType.CHARGE_USERS, this, info.getCurrentDayInMillis()));
 		}
 	}
@@ -80,12 +81,13 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 		switch (event.getType()) {
 			case READWORKLOAD:
 				if(workloadParser.hasNext()) {
+					System.gc();
 					List<Request> list = workloadParser.next();
 					for (Request request : list) {
 						send(parseEvent(request));
 					}
-					list.clear();
-					list = null;
+//					list.clear();
+//					list = null;
 					if(workloadParser.hasNext()){
 						long newEventTime = getScheduler().now() + Configuration.getInstance().getParserPageSize().getTickInMillis();
 						send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime, true));

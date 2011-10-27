@@ -45,6 +45,7 @@ public class Checkpointer {
 	}
 	
 	public static void save() {
+		long start = System.currentTimeMillis();
 		ObjectOutputStream out;
 		try {
 			out = new ObjectOutputStream(new FileOutputStream(CHECKPOINT_FILE));
@@ -58,6 +59,7 @@ public class Checkpointer {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+		System.out.println("Save: " + (System.currentTimeMillis()-start));
 	}
 	public static void save(SimulationInfo info, User[] users, Provider[] providers,
 			LoadBalancer[] application){
@@ -129,6 +131,7 @@ public class Checkpointer {
 	}
 
 	public static void loadData() throws ConfigurationException{
+		long start = System.currentTimeMillis();
 		if(hasCheckpoint()){
 			ObjectInputStream in;
 			try {
@@ -154,6 +157,7 @@ public class Checkpointer {
 			users = Configuration.getInstance().getUsers();
 			accountingSystem = new AccountingSystem(users, providers);
 		}
+		System.out.println("Load: " + (System.currentTimeMillis()-start));
 	}
 
 	public static AccountingSystem loadAccountingSystem() {

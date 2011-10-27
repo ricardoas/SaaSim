@@ -88,20 +88,15 @@ public class JEEvent implements Comparable<JEEvent>, Serializable{
 	 */
 	@Override
 	public int compareTo(JEEvent o) {
-		long diff = (this.scheduledTime - o.scheduledTime);
+		int result = (scheduledTime < o.scheduledTime ? -1 : (scheduledTime == o.scheduledTime ? 0 : 1));
 
-		if(diff != 0){
-			if(diff < 0){
-				return -1;
-			}
-			return 1;
-		}
-		
-		int result = type.compareTo(o.type);
 		if(result != 0){
 			return result;
 		}
-		return eventId - o.eventId;
+		
+		result = type.ordinal() - o.type.ordinal();
+		
+		return result != 0? result: eventId - o.eventId;
 	}
 	
 	/**
@@ -109,10 +104,7 @@ public class JEEvent implements Comparable<JEEvent>, Serializable{
 	 */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + eventId;
-		return result;
+		return eventId;
 	}
 
 	/**

@@ -19,6 +19,8 @@ import commons.cloud.Request;
  */
 public class GEISTMultiFileWorkloadParser extends AbstractWorkloadParser{
 	
+//	private static final Pattern pattern = Pattern.compile("( +|\t+)+");
+
 	/**
 	 * Default constructor
 	 * @param workloads 
@@ -32,7 +34,14 @@ public class GEISTMultiFileWorkloadParser extends AbstractWorkloadParser{
 	 */
 	@Override
 	protected Request parseRequest(String line) {
+//		String[] eventData = pattern.split(line);
 		StringTokenizer tokenizer = new StringTokenizer(line, "( +|\t+)+");
+		
+//		int userID = Integer.parseInt(eventData[0]);
+//		long reqID = Long.parseLong(eventData[1]);
+//		long arrivalTimeInMillis = Long.parseLong(eventData[2]) + shift;
+//		long requestSizeInBytes = Long.parseLong(eventData[3]);
+//		long responseSizeInBytes = Long.parseLong(eventData[4]);
 		
 		int userID = Integer.parseInt(tokenizer.nextToken());
 		long reqID = Long.parseLong(tokenizer.nextToken());
@@ -40,6 +49,11 @@ public class GEISTMultiFileWorkloadParser extends AbstractWorkloadParser{
 		long requestSizeInBytes = Long.parseLong(tokenizer.nextToken());
 		long responseSizeInBytes = Long.parseLong(tokenizer.nextToken());
 		
+//		long [] demand = new long[eventData.length - 5];
+//		for (int i = 5; i < eventData.length; i++) {
+//			demand[i-5] = Long.valueOf(eventData[i]);
+//		}
+
 		long [] demand = new long[tokenizer.countTokens()];
 		int index = 0;
 		while(tokenizer.hasMoreTokens()){

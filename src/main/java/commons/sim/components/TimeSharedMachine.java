@@ -8,7 +8,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.concurrent.Semaphore;
 
 import commons.cloud.Request;
 import commons.cloud.User;
@@ -18,6 +17,7 @@ import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
+import commons.sim.util.FastSemaphore;
 import commons.util.Triple;
 
 /**
@@ -44,10 +44,12 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	protected long totalTimeUsed;
 	protected long lastUpdate;
 	
-	protected Semaphore semaphore;
+	protected FastSemaphore semaphore;
 	protected long maxThreads;
 	protected long maxBacklogSize;
 	protected Queue<Request> backlog;
+
+	private long maxOnQueue;
 
 	
 	/**
@@ -67,12 +69,13 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		this.totalTimeUsedInLastPeriod = 0;
 		this.lastUpdate = scheduler.now();
 		this.NUMBER_OF_CORES = descriptor.getType().getNumberOfCores();
-		this.semaphore = new Semaphore(this.NUMBER_OF_CORES, true);
+		this.semaphore = new FastSemaphore(this.NUMBER_OF_CORES);
 		this.maxThreads = Long.MAX_VALUE;
 		this.maxBacklogSize = 0;
 		this.maxThreads = Configuration.getInstance().getLong(RANJAN_HEURISTIC_NUMBER_OF_TOKENS, Long.MAX_VALUE);
 		this.maxBacklogSize = Configuration.getInstance().getLong(RANJAN_HEURISTIC_BACKLOG_SIZE, 0);
 		this.backlog = new LinkedList<Request>();
+		this.maxOnQueue = maxThreads - NUMBER_OF_CORES;
 	}
 	
 	/**
@@ -115,7 +118,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 */
 	@Override
 	public void sendRequest(Request request) {
-		if(canRun()){
+		if(processorQueue.size() == maxOnQueue){
 			this.processorQueue.add(request);
 			request.assignTo(descriptor.getType());
 			
@@ -341,7 +344,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 * and <code>false</code> otherwise.
 	 */
 	protected boolean canRun() {
-		return processorQueue.size() + (this.NUMBER_OF_CORES - this.semaphore.availablePermits()) < maxThreads;
+		return semaphore.tryAcquire();//processorQueue.size() + (this.NUMBER_OF_CORES - this.semaphore.availablePermits()) < maxThreads;
 	}
 	
 	/**
