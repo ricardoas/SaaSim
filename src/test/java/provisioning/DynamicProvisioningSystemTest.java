@@ -3,8 +3,7 @@
  */
 package provisioning;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.Capture;

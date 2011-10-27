@@ -1,7 +1,6 @@
 package commons.sim.schedulingheuristics;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
@@ -17,7 +16,6 @@ import commons.io.Checkpointer;
 import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.components.TimeSharedMachine;
-import commons.sim.jeevent.JEEventScheduler;
 
 public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigurationTest {
 	

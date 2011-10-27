@@ -26,7 +26,7 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 		}
 		this.parsers = parser;
 		this.tick = tick;
-		this.currentTick = 0;
+		this.currentTick = Checkpointer.loadSimulationInfo().getCurrentDay() * 24 * 60;
 		this.leftOver = new Request[parsers.length];
 		
 	}

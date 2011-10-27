@@ -12,6 +12,7 @@ import commons.cloud.UtilityResult;
 import commons.config.Configuration;
 import commons.io.Checkpointer;
 import commons.sim.Simulator;
+import commons.sim.jeevent.JEEventScheduler;
 
 /**
  * Provisioning simulator execution entry point.

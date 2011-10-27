@@ -7,7 +7,6 @@ import org.junit.Before;
 
 import commons.config.Configuration;
 import commons.io.Checkpointer;
-import commons.sim.jeevent.JEEventScheduler;
 
 /**
  * Super class of tests which do not need a configuration

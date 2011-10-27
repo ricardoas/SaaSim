@@ -6,9 +6,9 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-import commons.io.Checkpointer;
-
 import util.CleanConfigurationTest;
+
+import commons.io.Checkpointer;
 
 public class JEEventHandlerTest extends CleanConfigurationTest {
 	

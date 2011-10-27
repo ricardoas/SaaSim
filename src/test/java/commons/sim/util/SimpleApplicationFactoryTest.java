@@ -1,7 +1,6 @@
 package commons.sim.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Test;
@@ -10,7 +9,6 @@ import util.ValidConfigurationTest;
 
 import commons.io.Checkpointer;
 import commons.sim.components.LoadBalancer;
-import commons.sim.jeevent.JEEventScheduler;
 
 public class SimpleApplicationFactoryTest extends ValidConfigurationTest{
 

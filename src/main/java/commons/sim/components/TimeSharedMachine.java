@@ -1,7 +1,6 @@
 package commons.sim.components;
 
-import static commons.sim.util.SimulatorProperties.RANJAN_HEURISTIC_BACKLOG_SIZE;
-import static commons.sim.util.SimulatorProperties.RANJAN_HEURISTIC_NUMBER_OF_TOKENS;
+import static commons.sim.util.SimulatorProperties.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;

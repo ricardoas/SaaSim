@@ -17,7 +17,6 @@ import commons.config.Configuration;
 import commons.sim.AccountingSystem;
 import commons.sim.Simulator;
 import commons.sim.components.LoadBalancer;
-import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.SimulatorFactory;
 import commons.util.SimulationInfo;

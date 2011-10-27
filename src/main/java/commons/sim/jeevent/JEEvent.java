@@ -120,8 +120,8 @@ public class JEEvent implements Comparable<JEEvent>, Serializable{
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		assert (obj == null);
-		assert (getClass() != obj.getClass());
+		assert (obj != null): "Can't compare with null object.";
+		assert (getClass() != obj.getClass()): "Can't compare with a different class object.";
 		
 		if (this == obj)
 			return true;

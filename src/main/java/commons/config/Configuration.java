@@ -1,8 +1,6 @@
 package commons.config;
 
-import static commons.sim.util.IaaSPlanProperties.IAAS_PLAN_PROVIDER_NAME;
-import static commons.sim.util.IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION;
-import static commons.sim.util.IaaSPlanProperties.IAAS_PLAN_PROVIDER_TYPES;
+import static commons.sim.util.IaaSPlanProperties.*;
 import static commons.sim.util.IaaSProvidersProperties.*;
 import static commons.sim.util.SaaSAppProperties.*;
 import static commons.sim.util.SaaSPlanProperties.*;
