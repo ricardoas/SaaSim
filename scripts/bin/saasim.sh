@@ -4,12 +4,17 @@ for lib in lib/*; do
 	CLASSPATH="$CLASSPATH:$lib"
 done
 
-echo "dia: 1"
-java -Xmx1024m -server -cp $CLASSPATH provisioning.Main $*
+if [ -f ".je.dat" ]; then
+	rm .je.dat
+fi 
 
-i=1
+echo "dia: 1"
+java -server -cp $CLASSPATH provisioning.Main $*
+
+i=2
+
 while [ -f ".je.dat" ] ; do
 	echo "dia: $i"
 	i=$(($i+1))
-	java -Xmx1024m -server -cp $CLASSPATH provisioning.Main $*
+	java -server -cp $CLASSPATH provisioning.Main $*
 done
