@@ -118,7 +118,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 */
 	@Override
 	public void sendRequest(Request request) {
-		if(processorQueue.size() == maxOnQueue){
+		if(canRun()){
 			this.processorQueue.add(request);
 			request.assignTo(descriptor.getType());
 			
@@ -204,10 +204,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 */
 	protected void scheduleNext() {
 		Request nextRequest = processorQueue.poll();
-		User client = Checkpointer.loadUsers()[nextRequest.getSaasClient()];
-		int priority = client.getContract().getPriority();
-		
-		long nextQuantum = Math.min(nextRequest.getTotalToProcess(), priority);
+		long nextQuantum = Math.min(nextRequest.getTotalToProcess(), Checkpointer.loadPriorities()[nextRequest.getSaasClient()]);
 		lastUpdate = getScheduler().now();
 		send(new JEEvent(JEEventType.PREEMPTION, this, nextQuantum+lastUpdate, nextQuantum, nextRequest));
 	}
@@ -344,7 +341,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 * and <code>false</code> otherwise.
 	 */
 	protected boolean canRun() {
-		return semaphore.tryAcquire();//processorQueue.size() + (this.NUMBER_OF_CORES - this.semaphore.availablePermits()) < maxThreads;
+		return processorQueue.size() != maxOnQueue;
 	}
 	
 	/**

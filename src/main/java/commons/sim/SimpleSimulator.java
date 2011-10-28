@@ -81,13 +81,10 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 		switch (event.getType()) {
 			case READWORKLOAD:
 				if(workloadParser.hasNext()) {
-					System.gc();
 					List<Request> list = workloadParser.next();
 					for (Request request : list) {
 						send(parseEvent(request));
 					}
-//					list.clear();
-//					list = null;
 					if(workloadParser.hasNext()){
 						long newEventTime = getScheduler().now() + Configuration.getInstance().getParserPageSize().getTickInMillis();
 						send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime, true));

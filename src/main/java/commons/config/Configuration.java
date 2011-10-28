@@ -59,6 +59,8 @@ public class Configuration extends PropertiesConfiguration{
 	private Provider[] providers;
 	
 	private User[] users;
+
+	private int[] priorities;
 	
 	/**
 	 * Builds the single instance of this configuration.
@@ -699,5 +701,9 @@ public class Configuration extends PropertiesConfiguration{
 			return stringArray;
 		}
 		return new String[]{getString(SAAS_WORKLOAD)};
+	}
+
+	public int[] getPriority() {
+		return priorities;
 	}
 }

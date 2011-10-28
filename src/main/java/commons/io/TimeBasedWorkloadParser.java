@@ -16,8 +16,6 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	private Request[] leftOver;
 	private WorkloadParser<Request>[] parsers;
 	
-	private int lastSize;
-	
 	/**
 	 * @param tick
 	 * @param parser
@@ -30,7 +28,6 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 		this.tick = tick;
 		this.currentTick = Checkpointer.loadSimulationInfo().getCurrentDayInMillis() + tick;
 		this.leftOver = new Request[parsers.length];
-		this.lastSize = 10;
 	}
 	
 	@Override
@@ -69,10 +66,8 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	 */
 	@Override
 	public List<Request> next(){
-//		System.err.println("TimeBasedWorkloadParser.next(): " + currentTick);
-		List<Request> requests = new ArrayList<Request>(lastSize);
-		
-//		long time = (currentTick + 1) * tick;
+//		System.err.println("TimeBasedWorkloadParser.next(): " + (currentTick/tick));
+		List<Request> requests = new ArrayList<Request>();
 		
 		for (int i = 0; i < leftOver.length; i++) {
 			Request left = leftOver[i];
@@ -99,7 +94,7 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 			}
 		}
 		
-		this.lastSize = Math.max(lastSize,requests.size());
+//		System.err.println("TimeBasedWorkloadParser.next(): " + (currentTick/tick));
 		this.currentTick += tick;
 		return requests;
 	}

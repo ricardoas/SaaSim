@@ -34,6 +34,7 @@ public class Checkpointer {
 	private static Provider[] providers;
 	private static User[] users;
 	private static AccountingSystem accountingSystem;
+	private static int[] priorities;
 	
 	/**
 	 * Check if there's a previous checkpoint available to read. Such operation consists in check if there
@@ -45,22 +46,25 @@ public class Checkpointer {
 	}
 	
 	public static void save() {
-		long start = System.currentTimeMillis();
+//		long start = System.currentTimeMillis();
 		ObjectOutputStream out;
 		try {
 			out = new ObjectOutputStream(new FileOutputStream(CHECKPOINT_FILE));
-			out.writeObject(Checkpointer.loadScheduler());
+			out.writeObject(scheduler);
 			out.writeObject(simulationInfo);
 			out.writeObject(application);
 			out.writeObject(providers);
 			out.writeObject(users);
 			out.writeObject(accountingSystem);
+			out.writeObject(priorities);
 			out.close();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		System.out.println("Save: " + (System.currentTimeMillis()-start));
+//		System.out.println("Save: " + (System.currentTimeMillis()-start));
 	}
+	
+	@Deprecated
 	public static void save(SimulationInfo info, User[] users, Provider[] providers,
 			LoadBalancer[] application){
 		
@@ -131,7 +135,7 @@ public class Checkpointer {
 	}
 
 	public static void loadData() throws ConfigurationException{
-		long start = System.currentTimeMillis();
+//		long start = System.currentTimeMillis();
 		if(hasCheckpoint()){
 			ObjectInputStream in;
 			try {
@@ -144,6 +148,7 @@ public class Checkpointer {
 				providers = (Provider[]) in.readObject();
 				users = (User[]) in.readObject();
 				accountingSystem = (AccountingSystem) in.readObject();
+				priorities = (int []) in.readObject();
 				in.close();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
@@ -156,11 +161,22 @@ public class Checkpointer {
 			providers = Configuration.getInstance().getProviders();
 			users = Configuration.getInstance().getUsers();
 			accountingSystem = new AccountingSystem(users, providers);
+			priorities = new int[users.length];
+			for (int i = 0; i < priorities.length; i++) {
+				priorities[i] = users[i].getContract().getPriority();
+			}
+
 		}
-		System.out.println("Load: " + (System.currentTimeMillis()-start));
+//		System.out.println("Load: " + (System.currentTimeMillis()-start));
 	}
 
 	public static AccountingSystem loadAccountingSystem() {
 		return accountingSystem;
 	}
+	
+	public static int[] loadPriorities() {
+		return priorities;
+	}
+	
+	
 }

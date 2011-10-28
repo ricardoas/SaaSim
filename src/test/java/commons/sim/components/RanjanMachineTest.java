@@ -145,10 +145,10 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testSendRequestToBacklogMultiCoreMachine() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
-		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000, 5000});
-		Request request2 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000, 5000});
-		Request request3 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000, 5000});
-		Request request4 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000, 5000});
+		Request request = new Request(1, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000, 5000});
+		Request request2 = new Request(2, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000, 5000});
+		Request request3 = new Request(3, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000, 5000});
+		Request request4 = new Request(4, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000, 5000});
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.reportRequestFinished(request);
@@ -166,7 +166,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		EasyMock.expect(queue.isEmpty()).andReturn(true).times(3);
 		EasyMock.replay(queue);
 		
-		TimeSharedMachine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_XLARGE, 0), loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_LARGE, 0), loadBalancer);
 		
 		Field declaredField = TimeSharedMachine.class.getDeclaredField("backlog");
 		declaredField.setAccessible(true);
@@ -178,13 +178,15 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		machine.sendRequest(request4);
 		
 		Queue<Request> processorQueue = machine.getProcessorQueue();
-		assertTrue(processorQueue.isEmpty());
+		assertFalse(processorQueue.isEmpty());
+		assertEquals(request3, processorQueue.poll());
+		
 		
 		assertEquals(request4, captured.getValue());
 		
 		Checkpointer.loadScheduler().start();
 		
-		assertEquals(10000, Checkpointer.loadScheduler().now());
+		assertEquals(12500, Checkpointer.loadScheduler().now());
 
 		EasyMock.verify(queue);
 	}
@@ -370,7 +372,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	
 		EasyMock.replay(loadBalancer);
 		
-		TimeSharedMachine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_XLARGE, 0), loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_LARGE, 0), loadBalancer);
 		machine.sendRequest(firstRequest);
 		machine.sendRequest(secondRequest);
 		machine.sendRequest(thirdRequest);
@@ -379,7 +381,9 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		machine.sendRequest(sixthRequest);
 		
 		Queue<Request> queue = machine.getProcessorQueue();
-		assertTrue(queue.isEmpty());
+		assertFalse(queue.isEmpty());
+		assertEquals(thirdRequest, queue.poll());
+		
 		
 		Checkpointer.loadScheduler().start();
 		
@@ -390,7 +394,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		assertTrue(machine.getProcessorQueue().isEmpty());
 		
-		assertEquals(200, Checkpointer.loadScheduler().now());
+		assertEquals(250, Checkpointer.loadScheduler().now());
 		
 		EasyMock.verify(loadBalancer);
 	}
