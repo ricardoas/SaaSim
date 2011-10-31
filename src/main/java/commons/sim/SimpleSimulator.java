@@ -68,8 +68,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 
 		SimulationInfo info = Checkpointer.loadSimulationInfo();
 		if(info.isChargeDay()){
-		//FIXME SUM ONE DAY
-			send(new JEEvent(JEEventType.CHARGE_USERS, this, info.getCurrentDayInMillis()));
+			send(new JEEvent(JEEventType.CHARGE_USERS, this, info.getCurrentDayInMillis() + Checkpointer.INTERVAL - 1));
 		}
 	}
 
@@ -94,7 +93,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 				}
 				break;
 			case CHARGE_USERS:
-				this.monitor.chargeUsers(Checkpointer.loadSimulationInfo().getCurrentDayInMillis());
+				this.monitor.chargeUsers(event.getScheduledTime());
 				break;
 			case COLLECT_STATISTICS:
 				//TODO schedule next collects
