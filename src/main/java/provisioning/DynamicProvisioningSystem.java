@@ -52,7 +52,7 @@ public class DynamicProvisioningSystem implements DPS{
 		
 		this.configurable = configurable;
 		
-		if(!Checkpointer.hasCheckpoint()){
+		if(Checkpointer.loadSimulationInfo().isFirstDay()){
 			int[] initialServersPerTier = Configuration.getInstance().getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER);
 			
 			List<MachineType> typeList = Arrays.asList(MachineType.values());

@@ -100,4 +100,8 @@ public class SimulationInfo implements Serializable{
 	public String toString() {
 		return Long.toString(currentDay);
 	}
+
+	public boolean isFirstDay() {
+		return currentDay == 0;
+	}
 }
