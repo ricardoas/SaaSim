@@ -29,11 +29,12 @@ public class Main {
 		try {
 			//Loading simulator configuration data
 			Configuration.buildInstance(args[0]);
-			Configuration config = Configuration.getInstance();
+//			Configuration config = Configuration.getInstance();
 			
 			JEEventScheduler scheduler = Checkpointer.loadScheduler();
 			DPS dps = DPSFactory.createDPS();
-			LoadBalancer[] loadBalancers = ApplicationFactory.getInstance().buildApplication(scheduler);
+//			LoadBalancer[] loadBalancers = ApplicationFactory.getInstance().buildApplication(scheduler);
+			LoadBalancer[] loadBalancers = Checkpointer.loadApplication().getTiers();
 			
 			//Creating planner
 			Planner planner = new Planner(scheduler, dps, loadBalancers, Checkpointer.loadProviders(), Checkpointer.loadUsers());
