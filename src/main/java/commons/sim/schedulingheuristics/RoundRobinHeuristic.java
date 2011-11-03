@@ -62,4 +62,8 @@ public class RoundRobinHeuristic implements SchedulingHeuristic {
 			nextToUse = nextToUse - 1;
 		}
 	}
+	
+	@Override
+	public void updateServers(List<Machine> servers) {
+	}
 }

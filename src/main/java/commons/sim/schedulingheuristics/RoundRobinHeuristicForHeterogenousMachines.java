@@ -42,7 +42,7 @@ public class RoundRobinHeuristicForHeterogenousMachines implements SchedulingHeu
 	 */
 	@Override
 	public Machine getNextServer(Request request, List<Machine> servers) {
-		initList(servers);
+
 		this.requestsArrivalCounter++;
 		
 		Integer alreadyAllocated = this.allocationsPerServer.get(nextToUse);
@@ -109,5 +109,10 @@ public class RoundRobinHeuristicForHeterogenousMachines implements SchedulingHeu
 			nextToUse = (nextToUse + 1) % allocationsPerServer.size();
 		}
 		this.allocationsPerServer.remove(index);
+	}
+	
+	@Override
+	public void updateServers(List<Machine> servers) {
+		initList(servers);
 	}
 }

@@ -41,4 +41,6 @@ public interface SchedulingHeuristic extends Serializable{
 	void reportRequestFinished();
 
 	void finishServer(Machine server, int index, List<Machine> servers);
+	
+	public void updateServers(List<Machine> servers);
 }

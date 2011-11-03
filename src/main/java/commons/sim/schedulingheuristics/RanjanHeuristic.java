@@ -112,4 +112,8 @@ public class RanjanHeuristic implements SchedulingHeuristic {
 	@Override
 	public void finishServer(Machine server, int index, List<Machine> servers) {
 	}
+	
+	@Override
+	public void updateServers(List<Machine> servers) {
+	}
 }
