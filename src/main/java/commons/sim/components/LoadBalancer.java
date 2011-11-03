@@ -28,6 +28,8 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	 * Version 1.0
 	 */
 	private static final long serialVersionUID = -8572489707494357108L;
+
+//	private long MINIMUM_NUMBER_OF_MACHINES = 1;
 	
 	private final int tier;
 	private final List<Machine> servers;
@@ -51,6 +53,12 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		this.tier = tier;
 		this.servers = new ArrayList<Machine>();
 		this.requestsToBeProcessed = new LinkedList<Request>();
+		
+		//Checking if there are reserved resources that should be up!
+//		long[][] totalReserved = Configuration.getInstance().getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION);
+//		if(totalReserved.length > 0){
+//		MINIMUM_NUMBER_OF_MACHINES = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER);
+//		}
 	}
 
 	/**
@@ -116,6 +124,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 				if(nextServer != null){//Reusing an existent machine
 					nextServer.sendRequest(request);
 				}else{
+//					System.out.println("Unavailable server!");
 					monitor.requestQueued(getScheduler().now(), request, tier);
 				}
 				break;
@@ -123,6 +132,9 @@ public class LoadBalancer extends JEAbstractEventHandler{
 				Machine machine = (Machine) event.getValue()[0];
 				machine.getDescriptor().setStartTimeInMillis(getScheduler().now());
 				servers.add(machine);
+				
+				this.heuristic.updateServers(servers);
+				
 				for (Request queuedRequest : requestsToBeProcessed) {
 					send(new JEEvent(JEEventType.NEWREQUEST, this, getScheduler().now(), queuedRequest));
 				}
@@ -168,6 +180,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		
 		if(getScheduler().now() - requestFinished.getArrivalTimeInMillis() > 
 				Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)){
+//			System.out.println("SLA!");
 			monitor.requestQueued(getScheduler().now(), requestFinished, tier);
 		}else{
 			heuristic.reportRequestFinished();
@@ -177,6 +190,9 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	}
 
 	public void removeServer(boolean force) {
+//		if(servers.size() <= MINIMUM_NUMBER_OF_MACHINES){
+//			return;
+//		}
 		if(servers.size() == 1){
 			return;
 		}
