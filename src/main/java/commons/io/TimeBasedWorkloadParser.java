@@ -105,7 +105,7 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	@Override
 	public boolean hasNext() {
 		for (int i = 0; i < parsers.length; i++) {
-			if(leftOver != null || parsers[i].hasNext()){
+			if(leftOver[i] != null || parsers[i].hasNext()){
 				return true;
 			}
 		}
