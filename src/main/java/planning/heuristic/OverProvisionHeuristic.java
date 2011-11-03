@@ -79,8 +79,6 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 		
 		this.start();
 		
-		Configuration config = Configuration.getInstance();
-		
 		//Calculating requests mean demand
 		if(this.requestsMeanDemand == 0d){//first day
 			this.requestsMeanDemand = this.totalProcessingTime / this.numberOfRequests;
@@ -88,7 +86,7 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 			this.requestsMeanDemand = (this.requestsMeanDemand + (this.totalProcessingTime / this.numberOfRequests)) / 2;
 		}
 
-		if(Checkpointer.loadSimulationInfo().getCurrentDay() == config.getLong(SimulatorProperties.PLANNING_PERIOD)){//Simulation finished!
+		if(Checkpointer.loadSimulationInfo().isFinished()){//Simulation finished!
 			
 			Checkpointer.clear();
 			PlanIOHandler.clear();
@@ -100,7 +98,7 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 			}
 		}else{
 			try {
-				Checkpointer.save(Checkpointer.loadSimulationInfo(), Checkpointer.loadUsers(), Checkpointer.loadProviders(), getTiers());
+				Checkpointer.save();
 				PlanIOHandler.createNumberOfMachinesFile(this.maximumNumberOfServers, this.nextRequestsCounter, this.requestsMeanDemand);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
@@ -124,9 +122,7 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 						long newEventTime = getScheduler().now() + Configuration.getInstance().getParserPageSize().getTickInMillis();
 						send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime, true));
 					}else{
-						//Persisting information in simulation info
-						Configuration r = Configuration.getInstance();
-						Checkpointer.loadSimulationInfo().addDay();
+						workloadParser.close();
 					}
 				}
 				break;

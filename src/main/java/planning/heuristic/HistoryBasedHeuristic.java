@@ -28,7 +28,6 @@ import commons.sim.components.LoadBalancer;
 import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEEventScheduler;
-import commons.sim.util.SimulatorFactory;
 import commons.sim.util.SimulatorProperties;
 
 public class HistoryBasedHeuristic implements PlanningHeuristic{
@@ -39,12 +38,9 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 	
 	private MachineUsageData machineData;
 
-	private final JEEventScheduler scheduler;
-
 	private final Monitor monitor;
 
 	public HistoryBasedHeuristic(JEEventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
-		this.scheduler = scheduler;
 		this.monitor = monitor;
 		
 		this.plan = new HashMap<MachineType, Integer>();
@@ -65,7 +61,8 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 		//Simulating ...
 		DPS dps = (DPS) this.monitor;
 		
-		SimpleSimulator simulator = (SimpleSimulator) SimulatorFactory.buildSimulator(this.scheduler);
+//		SimpleSimulator simulator = (SimpleSimulator) SimulatorFactory.buildSimulator(this.scheduler);
+		SimpleSimulator simulator = (SimpleSimulator) Checkpointer.loadApplication();
 		
 		dps.registerConfigurable(simulator);
 		
@@ -82,7 +79,9 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 		LoadBalancer[] loadBalancers = calculateMachinesUsage(simulator);
 		Configuration config = Configuration.getInstance();
 		
-		if(Checkpointer.loadSimulationInfo().getCurrentDay() == config.getLong(SimulatorProperties.PLANNING_PERIOD)){//Simulation finished!
+		System.out.println("DAy: "+Checkpointer.loadSimulationInfo().getCurrentDay());
+		
+		if(Checkpointer.loadSimulationInfo().isFinished()){//Simulation finished!
 			
 			calculateMachinesToReserve(config);
 			Checkpointer.clear();
@@ -173,7 +172,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 	private void persisDataToNextRound(LoadBalancer[] loadBalancers,
 			Configuration config) {
 		try {
-			Checkpointer.save(Checkpointer.loadSimulationInfo(), Checkpointer.loadUsers(), Checkpointer.loadProviders(), loadBalancers);
+			Checkpointer.save();
 			Checkpointer.dumpMachineData(this.machineData);
 		} catch (IOException e) {
 			throw new RuntimeException(e);

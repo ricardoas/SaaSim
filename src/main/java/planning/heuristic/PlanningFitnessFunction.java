@@ -20,10 +20,9 @@ import commons.cloud.UtilityResultEntry;
 import commons.config.Configuration;
 import commons.sim.util.SaaSAppProperties;
 import commons.sim.util.SimulatorProperties;
+import commons.util.SimulationInfo;
 
 public class PlanningFitnessFunction extends FitnessFunction{
-
-	public static int[] daysInMonths = {31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
 
 	public static final int HOUR_IN_MILLIS = 3600000;
 
@@ -121,7 +120,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 			//Calculating missing requests. This value is amortized by queue size!
 			long requestsMissed = Math.round(missingThroughput * SUMMARY_LENGTH_IN_SECONDS);
 			if(ratesDifference == 0 && reservedThroughput != 0){//Queue starts at this interval, so some requests are not really missed!
-				requestsMissed -= maxResponseTimeInMillis / meanServiceTimeInMillis;
+				requestsMissed -= (maxResponseTimeInMillis / meanServiceTimeInMillis) * totalPower;
 			}
 			ratesDifference = missingThroughput;
 			requestsLostDueToThroughput += requestsMissed;
@@ -268,7 +267,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 			for(Summary summary : entry.getValue()){
 				counter++;
 				totalCPUHrs += summary.getTotalCpuHrs();
-				if(counter == daysInMonths[index] * 24){//Calculate receipt for a complete month!
+				if(counter == (SimulationInfo.daysInMonths[index]+1) * 24){//Calculate receipt for a complete month!
 					contract.calculateReceipt(resultEntry, entry.getKey().getId(), (long)Math.ceil(totalCPUHrs * 60 * 60 * 1000), 0l, 0l, 0l);
 					index++;
 					totalCPUHrs = 0;
