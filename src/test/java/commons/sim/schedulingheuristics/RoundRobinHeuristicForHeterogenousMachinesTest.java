@@ -46,6 +46,8 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		ArrayList<Machine> servers = new ArrayList<Machine>();
 		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine);
+		
+		this.heuristic.updateServers(servers);
 	
 		//Retrieving for the first time
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
@@ -80,6 +82,8 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
+		
+		this.heuristic.updateServers(servers);
 		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
@@ -116,6 +120,8 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
+		
+		this.heuristic.updateServers(servers);
 		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
@@ -154,6 +160,8 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		servers.add(machine2);
 		servers.add(machine3);
 		
+		this.heuristic.updateServers(servers);
+		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
@@ -186,6 +194,8 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		servers.add(machine2);
 		servers.add(machine3);
 		
+		this.heuristic.updateServers(servers);
+		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
@@ -217,6 +227,8 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
+		
+		this.heuristic.updateServers(servers);
 		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
@@ -255,6 +267,8 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
+		
+		this.heuristic.updateServers(servers);
 		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
@@ -297,6 +311,8 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		servers.add(machine);
 		servers.add(machine2);
 		servers.add(machine3);
+		
+		this.heuristic.updateServers(servers);
 		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
@@ -354,6 +370,8 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		servers.add(machine);
 		servers.add(machine2);
 		
+		this.heuristic.updateServers(servers);
+		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
@@ -394,6 +412,8 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_XLARGE, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
+		
+		this.heuristic.updateServers(servers);
 		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
@@ -441,6 +461,8 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_XLARGE, 0), null);
 		servers.add(machine);
 		servers.add(machine2);
+		
+		this.heuristic.updateServers(servers);
 		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
@@ -495,6 +517,8 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		servers.add(machine);
 		servers.add(machine2);
 		
+		this.heuristic.updateServers(servers);
+		
 		//Retrieving the first machine
 		Machine nextServer = this.heuristic.getNextServer(request, servers);
 		assertNotNull(nextServer);
@@ -537,6 +561,8 @@ public class RoundRobinHeuristicForHeterogenousMachinesTest extends ValidConfigu
 		ArrayList<Machine> servers = new ArrayList<Machine>();
 		Machine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
 		servers.add(machine);
+		
+		this.heuristic.updateServers(servers);
 		
 		//Retrieving for the first time
 		this.heuristic.getNextServer(request, servers);
