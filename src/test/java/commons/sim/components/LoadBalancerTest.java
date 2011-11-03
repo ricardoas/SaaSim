@@ -31,7 +31,6 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		buildFullConfiguration();
 	}
 	
-	
 	@Test
 	public void testAddServerWithSetupDelay() throws ConfigurationException{
 		
@@ -40,7 +39,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(LoadBalancer.class))).andReturn(1);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(TimeSharedMachine.class))).andReturn(2);
-		EasyMock.expect(scheduler.now()).andReturn(0l).times(2);
+		EasyMock.expect(scheduler.now()).andReturn(0l).times(3);
 		Capture<JEEvent> captured = new Capture<JEEvent>();
 		scheduler.queueEvent(EasyMock.capture(captured));
 		
@@ -66,7 +65,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(LoadBalancer.class))).andReturn(1);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(TimeSharedMachine.class))).andReturn(2);
-		EasyMock.expect(scheduler.now()).andReturn(0l).times(2);
+		EasyMock.expect(scheduler.now()).andReturn(0l).times(3);
 		Capture<JEEvent> captured = new Capture<JEEvent>();
 		scheduler.queueEvent(EasyMock.capture(captured));
 		
@@ -91,8 +90,8 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.M1_SMALL, 0);
 		
 		SchedulingHeuristic schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
+		schedulingHeuristic.updateServers(EasyMock.isA(List.class));
 		schedulingHeuristic.finishServer(EasyMock.isA(Machine.class), EasyMock.anyInt(), EasyMock.isA(List.class));
-		
 		
 		EasyMock.replay(schedulingHeuristic);
 
@@ -140,6 +139,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		EasyMock.expect(newRequestEvent.getType()).andReturn(JEEventType.NEWREQUEST).once();
 		EasyMock.expect(newRequestEvent.getValue()).andReturn(new Request [] {request}).once();
 		
+		schedulingHeuristic.updateServers(EasyMock.isA(List.class));
 		EasyMock.expect(schedulingHeuristic.getNextServer(
 				EasyMock.isA(Request.class) , EasyMock.isA(List.class))).andReturn(machine);
 		machine.sendRequest(request);
@@ -212,6 +212,8 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		
 		//Mocking scheduling heuristic actions
 		SchedulingHeuristic schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
+		schedulingHeuristic.updateServers(EasyMock.isA(List.class));
+		EasyMock.expectLastCall().times(2);
 		EasyMock.expect(schedulingHeuristic.getRequestsArrivalCounter()).andReturn(totalArrivals);
 		EasyMock.expect(schedulingHeuristic.getFinishedRequestsCounter()).andReturn(totalCompletions);
 		schedulingHeuristic.resetCounters();

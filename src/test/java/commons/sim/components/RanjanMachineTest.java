@@ -423,7 +423,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(TimeSharedMachine.class))).andReturn(1);
-		EasyMock.expect(scheduler.now()).andReturn(0l).times(2);
+		EasyMock.expect(scheduler.now()).andReturn(0l).times(3);
 		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
 		EasyMock.expect(scheduler.now()).andReturn(100l).times(2);
 		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
@@ -454,7 +454,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(TimeSharedMachine.class))).andReturn(1);
-		EasyMock.expect(scheduler.now()).andReturn(0l).times(2);
+		EasyMock.expect(scheduler.now()).andReturn(0l).times(3);
 		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
 		EasyMock.expect(scheduler.now()).andReturn(100l).times(2);
 		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
@@ -491,7 +491,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(TimeSharedMachine.class))).andReturn(1);
-		EasyMock.expect(scheduler.now()).andReturn(0l).times(2);
+		EasyMock.expect(scheduler.now()).andReturn(0l).times(3);
 		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
 		EasyMock.expect(scheduler.now()).andReturn(100l).times(2);
 		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
