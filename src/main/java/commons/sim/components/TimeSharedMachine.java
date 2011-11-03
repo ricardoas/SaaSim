@@ -64,7 +64,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		this.descriptor = descriptor;
 		this.loadBalancer = loadBalancer;
 		this.processorQueue = new LinkedList<Request>();
-		this.lastUtilisationCalcTime = 0;
+		this.lastUtilisationCalcTime = scheduler.now();
 		this.totalTimeUsed = 0;
 		this.totalTimeUsedInLastPeriod = 0;
 		this.lastUpdate = scheduler.now();
@@ -128,6 +128,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		}else if(canQueue()){
 			this.backlog.add(request);
 		}else{
+//			System.out.println("Machine full!");
 			send(new JEEvent(JEEventType.REQUESTQUEUED, getLoadBalancer(), getScheduler().now(), request));
 		}
 
