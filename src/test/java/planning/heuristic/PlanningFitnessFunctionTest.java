@@ -1814,7 +1814,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 //		double cost = 100 * 15 + 8640 * 0.01 + 99 * 5 + 8640 * 0.25 + 864;//for each machine type: reservation fee + usage
 //		double penalties = 0;//Since loss is more than 5%, SaaS client does not pay the provider
 		double receipt = 555 + 10000 + 630 * 0.1 + 99.765 + 10000 + 320 * 0.1;//for each contract: price + setup + extra cpu
-		double cost = 100 * 15 + 1488 * 0.01 + 99 * 5 + 1488 * 0.25 + 8183.997777777778 * 0.37;//for each machine type: reservation fee + usage
+		double cost = 100 * 15 + 1488 * 0.01 + 99 * 5 + 1488 * 0.25 + (8183.9111111) * 0.37;//for each machine type: reservation fee + usage
 		double penalties = 0;//Since loss is more than 5%, SaaS client does not pay the provider
 		
 		assertEquals(receipt - cost - penalties, function.evaluate(chromosome), 0.0001);
@@ -1880,7 +1880,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		EasyMock.replay(chromosome, genes[0], genes[1]);
 		
 		double receipt = 3 * 555 + 10000 + (630 + 540 + 630) * 0.1 + 3 * 99.765 + 10000 + (320 + 260 + 320) * 0.1;//for each contract: price + setup + extra cpu
-		double cost = 100 * 15 + (1488 + 1344 + 1488) * 0.01 + 99 * 5 + (1488 + 1344 + 1488) * 0.25 + (8184 + 7392 + 8184) * 0.37;//for each machine type: reservation fee + usage
+		double cost = 100 * 15 + (1488 + 1344 + 1488) * 0.01 + 99 * 5 + (1488 + 1344 + 1488) * 0.25 + (23759.911111112) * 0.37;//for each machine type: reservation fee + usage
 		double penalties = 0;//Since loss is more than 5%, SaaS client does not pay the provider
 		
 		assertEquals(receipt - cost - penalties, function.evaluate(chromosome), 0.01);
