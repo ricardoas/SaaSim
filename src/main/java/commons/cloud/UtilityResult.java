@@ -61,6 +61,9 @@ public class UtilityResult implements Serializable{
 		sb.append('\t');
 		sb.append(uniqueCost);
 		
+		sb.append('\n');
+		sb.append(entries.first().getEntryDescriptor());
+		
 		for (UtilityResultEntry entry : entries) {
 			sb.append('\n');
 			sb.append(entry);

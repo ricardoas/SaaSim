@@ -235,6 +235,15 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 					+ "\t" + monitoringCost
 					+ "\t" + format(types);
 		}
+
+		public String getDescriptor() {
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < types.size(); i++) {
+				sb.append("type\tondCPU\tondCost\tresCPU\tresCost\t");
+			}
+			return sb.toString();
+
+		}
 	}
 
 	private final long time;
@@ -415,6 +424,19 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 			sb.append('\t');
 		}
 		sb.append(map[map.length-1]);
+		return sb.toString();
+	}
+
+	public String getEntryDescriptor() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("time\tutility\treceipt\tcost\tpenalty\t");
+		for (int i = 0; i < users.length; i++) {
+			sb.append("userID\tcontract\treceipt\textraCPU\tcpuCost\ttrans\ttransCost\tstorageCost\t");
+		}
+		for (ProviderEntry provider : providers) {
+			sb.append("name\tcost\tinCost\toutCost\tonDCost\tresCost\tinTrans\toutTrans\tonD\tres\tmon\t");
+			sb.append(provider.getDescriptor());
+		}
 		return sb.toString();
 	}
 
