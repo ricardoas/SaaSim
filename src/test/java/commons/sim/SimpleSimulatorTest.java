@@ -62,7 +62,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		
 		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(3);
-		EasyMock.expect(scheduler.now()).andReturn(0L);
+		EasyMock.expect(scheduler.now()).andReturn(0L).times(2);
 		
 		EasyMock.replay(monitor, scheduler, handler);
 		
@@ -81,7 +81,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		
 		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(3);
-		EasyMock.expect(scheduler.now()).andReturn(0L).times(2);
+		EasyMock.expect(scheduler.now()).andReturn(0L).times(3);
 		Capture<JEEvent> event = new Capture<JEEvent>();
 		scheduler.queueEvent(EasyMock.capture(event));
 		EasyMock.expectLastCall().times(1);
