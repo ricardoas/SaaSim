@@ -64,7 +64,13 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	protected void prepareBeforeStart() {
 		
 		send(new JEEvent(JEEventType.READWORKLOAD, this, getScheduler().now()));
-		send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)));
+		
+		
+		if(this.monitor.isOptimal()){
+			send(new JEEvent(JEEventType.ESTIMATE_SERVERS, this, getScheduler().now()));
+		}else{
+			send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + 2 * Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)));
+		}
 
 		SimulationInfo info = Checkpointer.loadSimulationInfo();
 		if(info.isChargeDay()){
@@ -96,13 +102,21 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 				this.monitor.chargeUsers(event.getScheduledTime());
 				break;
 			case COLLECT_STATISTICS:
-				//TODO schedule next collects
 				long time = event.getScheduledTime();
 				for (LoadBalancer loadBalancer : tiers) {
 					loadBalancer.collectStatistics(time);
 				}
 				if(workloadParser.hasNext()){
 					send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)));
+				}
+				break;
+			case ESTIMATE_SERVERS:
+				long currentTime = event.getScheduledTime();
+				for (LoadBalancer loadBalancer : tiers) {
+					loadBalancer.estimateServers(currentTime);
+				}
+				if(workloadParser.hasNext()){
+					send(new JEEvent(JEEventType.ESTIMATE_SERVERS, this, getScheduler().now() + 1000 * 60 * 60));//One hour later
 				}
 				break;
 			default:

@@ -29,7 +29,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	 */
 	private static final long serialVersionUID = -8572489707494357108L;
 
-//	private long MINIMUM_NUMBER_OF_MACHINES = 1;
+	private long MINIMUM_NUMBER_OF_MACHINES = 1;
 	
 	private final int tier;
 	private final List<Machine> servers;
@@ -149,7 +149,22 @@ public class LoadBalancer extends JEAbstractEventHandler{
 				break;
 		}
 	}
+	
+	/**
+	 * This method is called when the optimal provisioning system is used. It is used to collect current amount of servers being used
+	 * by each load balancer.
+	 * @param eventTime
+	 */
+	public void estimateServers(long eventTime) {
+		MachineStatistics statistics = new MachineStatistics(0, 0, 0, servers.size());
+		monitor.sendStatistics(eventTime, statistics, tier);
+	}
 
+	/**
+	 * This method is used to collect statistics of current running servers. Such statistics include: machine utilisation, number of
+	 * requests that arrived, number of finished requests and current number of servers. 
+	 * @param eventTime
+	 */
 	public void collectStatistics(long eventTime) {
 		double averageUtilisation = 0d;
 		for(Machine machine : servers){
@@ -190,12 +205,12 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	}
 
 	public void removeServer(boolean force) {
-//		if(servers.size() <= MINIMUM_NUMBER_OF_MACHINES){
-//			return;
-//		}
-		if(servers.size() == 1){
+		if(servers.size() <= MINIMUM_NUMBER_OF_MACHINES){
 			return;
 		}
+//		if(servers.size() == 1){
+//			return;
+//		}
 		
 		for (int i = servers.size()-1; i >= 0; i--) {
 			MachineDescriptor descriptor = servers.get(i).getDescriptor();
