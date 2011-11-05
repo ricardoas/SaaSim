@@ -2,6 +2,7 @@ package commons.sim.components;
 
 import static org.junit.Assert.*;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -297,6 +298,64 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		lb.handleEvent(new JEEvent(JEEventType.REQUESTQUEUED, lb, 0l, request));
 		
 		EasyMock.verify(monitor, schedulingHeuristic, request);
+	}
+	
+	@Test
+	public void testEstimateServersWithoutServers(){
+		
+		Capture<MachineStatistics> captured = new Capture<MachineStatistics>();
+		
+		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
+		monitor.sendStatistics(EasyMock.anyLong(), EasyMock.capture(captured), EasyMock.anyInt());
+		
+		SchedulingHeuristic schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
+		EasyMock.replay(monitor, schedulingHeuristic);
+		
+		LoadBalancer lb = new LoadBalancer(Checkpointer.loadScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 0);
+		lb.setMonitor(monitor);
+		lb.estimateServers(0);
+		
+		assertEquals(0, captured.getValue().averageUtilisation, 0.00001);
+		assertEquals(0, captured.getValue().numberOfRequestsArrivalInLastInterval, 0.00001);
+		assertEquals(0, captured.getValue().numberOfRequestsCompletionsInLastInterval, 0.00001);
+		assertEquals(0, captured.getValue().totalNumberOfServers, 0.00001);
+		
+		EasyMock.verify(monitor, schedulingHeuristic);
+	}
+	
+	@Test
+	public void testEstimateServersWithServers() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+		
+		Capture<MachineStatistics> captured = new Capture<MachineStatistics>();
+		
+		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
+		monitor.sendStatistics(EasyMock.anyLong(), EasyMock.capture(captured), EasyMock.anyInt());
+		
+		SchedulingHeuristic schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
+		Machine machine1 = EasyMock.createMock(Machine.class);
+		Machine machine2 = EasyMock.createMock(Machine.class);
+		Machine machine3 = EasyMock.createMock(Machine.class);
+		
+		EasyMock.replay(monitor, schedulingHeuristic, machine1, machine2, machine3);
+		
+		LoadBalancer lb = new LoadBalancer(Checkpointer.loadScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 0);
+		lb.setMonitor(monitor);
+		
+		Field field = LoadBalancer.class.getDeclaredField("servers");
+		field.setAccessible(true);
+		List<Machine> servers = (List<Machine>) field.get(lb);
+		servers.add(machine1);
+		servers.add(machine2);
+		servers.add(machine3);
+		
+		lb.estimateServers(100);
+		
+		assertEquals(0, captured.getValue().averageUtilisation, 0.00001);
+		assertEquals(0, captured.getValue().numberOfRequestsArrivalInLastInterval, 0.00001);
+		assertEquals(0, captured.getValue().numberOfRequestsCompletionsInLastInterval, 0.00001);
+		assertEquals(3, captured.getValue().totalNumberOfServers, 0.00001);
+		
+		EasyMock.verify(monitor, schedulingHeuristic);
 	}
 	
 	@Test
