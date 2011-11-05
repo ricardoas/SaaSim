@@ -13,6 +13,8 @@ public class PropertiesTesting {
 	public static final String WORKLOAD_WITH_MISSING_TRACE = "src/test/resources/workload/workload_with_missing_trace.trc";
 	public static final String WORKLOAD = "src/test/resources/workload/workload.trc";
 	public static final String WORKLOAD_WITH_EMPTY_TRACE = "src/test/resources/workload/workload_with_empty_trace.trc";
+	public static final String ONE_SERVER_WORKLOAD = "src/test/resources/workload/oneServerWorkloadPointer.trc";
+	public static final String FOUR_SERVERS_WORKLOAD = "src/test/resources/workload/fourServersWorkloadPointer.trc";
 	public static final String TRACE_WITH_BLANK_LINE = "src/test/resources/workload/workload_trace_with_blank.trc";
 	public static final String TRACE_WITH_BLANK_END_LINE = "src/test/resources/workload/workload_trace_with_end_blank.trc";
 	
