@@ -44,6 +44,11 @@ public class DynamicProvisioningSystem implements DPS{
 		this.accountingSystem = Checkpointer.loadAccountingSystem();
 	}
 	
+	@Override
+	public boolean isOptimal() {
+		return false;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -78,6 +83,17 @@ public class DynamicProvisioningSystem implements DPS{
 				if(serversAdded == numberOfInitialServers){
 					return;
 				}
+			}
+		}
+		
+		//Adding on-demand machines
+		for (Provider provider : this.providers) {
+			while(provider.canBuyMachine(false, MachineType.M1_XLARGE) && serversAdded < numberOfInitialServers){
+				configurable.addServer(tier, provider.buyMachine(false, MachineType.M1_XLARGE), false);
+				serversAdded++;
+			}
+			if(serversAdded == numberOfInitialServers){
+				return;
 			}
 		}
 	}
