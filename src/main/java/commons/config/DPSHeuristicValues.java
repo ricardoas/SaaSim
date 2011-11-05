@@ -32,5 +32,5 @@ public enum DPSHeuristicValues {
 	 * Indicates a custom {@link DPS} implementation is provided by you. 
 	 * @see SimulatorProperties#DPS_CUSTOM_HEURISTIC
 	 */
-	CUSTOM, 
+	CUSTOM, OPTIMAL, 
 }

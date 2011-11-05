@@ -25,6 +25,7 @@ import planning.heuristic.HistoryBasedHeuristic;
 import planning.heuristic.OptimalHeuristic;
 import planning.heuristic.OverProvisionHeuristic;
 import provisioning.DynamicProvisioningSystem;
+import provisioning.OptimalProvisioningSystemForHeterogeneousMachines;
 import provisioning.ProfitDrivenProvisioningSystem;
 import provisioning.RanjanProvisioningSystem;
 import provisioning.RanjanProvisioningSystemForHeterogeneousMachines;
@@ -333,6 +334,8 @@ public class Configuration extends PropertiesConfiguration{
 		MachineType[][] machines = getEnum2DArray(IAAS_PLAN_PROVIDER_TYPES, MachineType.class);
 		long[][] reservations = getLong2DArray(IAAS_PLAN_PROVIDER_RESERVATION);
 		
+//		changeNumberOfStartUpServers(reservations);
+		
 		providers = new Provider[numberOfProviders];
 		
 		for(int i = 0; i < numberOfProviders; i++){
@@ -436,6 +439,9 @@ public class Configuration extends PropertiesConfiguration{
 					heuristicName = RanjanProvisioningSystemForHeterogeneousMachines.class.getCanonicalName();
 					checkRanjanProperties();
 					break;
+				case OPTIMAL:
+					heuristicName = OptimalProvisioningSystemForHeterogeneousMachines.class.getCanonicalName();
+					break;
 				case PROFITDRIVEN:
 					heuristicName = ProfitDrivenProvisioningSystem.class.getCanonicalName();
 					break;
@@ -511,6 +517,26 @@ public class Configuration extends PropertiesConfiguration{
 		Validator.checkIsPositiveArray(APPLICATION_MAX_SERVER_PER_TIER, getStringArray(APPLICATION_MAX_SERVER_PER_TIER));
 		
 		checkSchedulingHeuristicNames();
+	}
+	
+	/**
+	 * Used for investigations ...
+	 */
+	private void changeNumberOfStartUpServers(long[][] reservations) {
+		long totalReserved = 0;
+		for(int providerID = 0; providerID < reservations.length; providerID++){
+			for(long reserved : reservations[providerID]){
+				totalReserved += reserved;
+			}
+		}
+		
+//		if(totalReserved > 1){
+//			setProperty(APPLICATION_INITIAL_SERVER_PER_TIER, totalReserved);
+//		}else{
+			if(getInt(APPLICATION_INITIAL_SERVER_PER_TIER) <= 0){
+				setProperty(APPLICATION_INITIAL_SERVER_PER_TIER, 1);
+			}
+//		}
 		
 	}
 	

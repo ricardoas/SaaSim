@@ -28,6 +28,11 @@ public class GEISTMultiFileWorkloadParser extends AbstractWorkloadParser{
 	public GEISTMultiFileWorkloadParser(String workload, int saasclientID) {
 		super(workload, saasclientID, Checkpointer.loadSimulationInfo().getCurrentDayInMillis());
 	}
+	
+	@Override
+	public WorkloadParser<Request> clone() {
+		return new GEISTMultiFileWorkloadParser(workload, saasClientID);
+	}
 
 	/**
 	 * {@inheritDoc}

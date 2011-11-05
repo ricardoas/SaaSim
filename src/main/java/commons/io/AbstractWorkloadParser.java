@@ -21,6 +21,7 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 	
 	protected final int saasClientID;
 	protected final long shift;
+	protected final String workload;
 
 	/**
 	 * Default constructor.
@@ -30,6 +31,7 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 	 * @param shift TODO
 	 */
 	public AbstractWorkloadParser(String workload, int saasclientID, long shift) {
+		this.workload = workload;
 		assert workload != null: "Null workload. Please check your configuration and trace files.";
 		
 		this.shift = shift;
@@ -45,6 +47,11 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 			}
 			throw new RuntimeException("Problem reading workload file. ", e);
 		}
+	}
+	
+	@Override
+	public commons.io.WorkloadParser<Request> clone() {
+		return null;
 	}
 	
 	/**

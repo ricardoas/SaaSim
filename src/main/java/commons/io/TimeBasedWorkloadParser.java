@@ -31,6 +31,11 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	}
 	
 	@Override
+	public WorkloadParser<Request> clone() {
+		return null;
+	}
+	
+	@Override
 	public void applyError(double error) {
 		if(error == 0.0){
 			return;
@@ -45,7 +50,7 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 			}
 			int index = this.parsers.length;
 			for(int i = 0; i < difference; i++){
-				newParsers[index++] = this.parsers[i];
+				newParsers[index++] = this.parsers[i].clone();
 			}
 		}else{//Removing some parsers
 			for(int i = 0; i < totalParsers; i++){
