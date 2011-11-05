@@ -28,8 +28,8 @@ public class JEEventTest extends CleanConfigurationTest {
 		EasyMock.replay(handler);
 		JEEvent eventA = new JEEvent(JEEventType.READWORKLOAD, handler, 1000);
 		JEEvent eventB = new JEEvent(JEEventType.NEWREQUEST, handler, 1000);
-		assertEquals(-5, eventA.compareTo(eventB));
-		assertEquals(5, eventB.compareTo(eventA));
+		assertEquals(-6, eventA.compareTo(eventB));
+		assertEquals(6, eventB.compareTo(eventA));
 		EasyMock.verify(handler);
 	}
 	
