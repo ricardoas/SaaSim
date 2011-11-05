@@ -1,9 +1,6 @@
 package planning.heuristic;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -40,7 +37,6 @@ import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
 import commons.sim.util.ApplicationFactory;
-import commons.sim.util.IaaSPlanProperties;
 import commons.sim.util.SaaSAppProperties;
 import commons.sim.util.SimulatorProperties;
 import commons.util.SimulationInfo;
@@ -70,6 +66,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		DPS monitor = EasyMock.createStrictMock(DPS.class);
 		monitor.registerConfigurable(EasyMock.isA(OverProvisionHeuristic.class));
+		EasyMock.expect(monitor.isOptimal()).andReturn(false);
 		
 		SimulationInfo simulationInfo = new SimulationInfo(0, 0, 1);
 		
@@ -82,10 +79,10 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		PowerMock.mockStaticPartial(Checkpointer.class, "loadSimulationInfo", "loadProviders");
 		
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(11);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(9);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
-		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
+//		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
+//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
 		EasyMock.expect(config.getString(SaaSAppProperties.APPLICATION_FACTORY)).andReturn("commons.sim.util.SimpleApplicationFactory");
 		EasyMock.expect(config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS)).andReturn(1);
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
@@ -182,6 +179,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		DPS monitor = EasyMock.createStrictMock(DPS.class);
 		monitor.registerConfigurable(EasyMock.isA(OverProvisionHeuristic.class));
+		EasyMock.expect(monitor.isOptimal()).andReturn(false);
 		
 		Provider provider = EasyMock.createMock(Provider.class);
 		EasyMock.expect(provider.getName()).andReturn("p1");
@@ -193,10 +191,10 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(12);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(10);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
-		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
+//		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
+//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
 		EasyMock.expect(config.getString(SaaSAppProperties.APPLICATION_FACTORY)).andReturn("commons.sim.util.SimpleApplicationFactory");
 		EasyMock.expect(config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS)).andReturn(1);
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
@@ -312,6 +310,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		DPS monitor = EasyMock.createStrictMock(DPS.class);
 		monitor.registerConfigurable(EasyMock.isA(OverProvisionHeuristic.class));
+		EasyMock.expect(monitor.isOptimal()).andReturn(false);
 		
 		Provider provider = EasyMock.createMock(Provider.class);
 		EasyMock.expect(provider.getName()).andReturn("p1");
@@ -323,10 +322,10 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(12);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(10);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
-		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
+//		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
+//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
 		EasyMock.expect(config.getString(SaaSAppProperties.APPLICATION_FACTORY)).andReturn("commons.sim.util.SimpleApplicationFactory");
 		EasyMock.expect(config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS)).andReturn(1);
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
@@ -442,6 +441,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		DPS monitor = EasyMock.createStrictMock(DPS.class);
 		monitor.registerConfigurable(EasyMock.isA(OverProvisionHeuristic.class));
+		EasyMock.expect(monitor.isOptimal()).andReturn(false);
 		
 		Provider provider = EasyMock.createMock(Provider.class);
 		EasyMock.expect(provider.getName()).andReturn("p1");
@@ -453,10 +453,10 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(12);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(10);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
-		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
+//		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
+//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
 		EasyMock.expect(config.getString(SaaSAppProperties.APPLICATION_FACTORY)).andReturn("commons.sim.util.SimpleApplicationFactory");
 		EasyMock.expect(config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS)).andReturn(1);
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
@@ -577,6 +577,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		DPS monitor = EasyMock.createStrictMock(DPS.class);
 		monitor.registerConfigurable(EasyMock.isA(OverProvisionHeuristic.class));
+		EasyMock.expect(monitor.isOptimal()).andReturn(false);
 		
 		Provider provider = EasyMock.createMock(Provider.class);
 		EasyMock.expect(provider.getName()).andReturn("p1");
@@ -588,10 +589,10 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(12);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(10);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
-		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
+//		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
+//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
 		EasyMock.expect(config.getString(SaaSAppProperties.APPLICATION_FACTORY)).andReturn("commons.sim.util.SimpleApplicationFactory");
 		EasyMock.expect(config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS)).andReturn(1);
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
@@ -707,6 +708,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		DPS monitor = EasyMock.createStrictMock(DPS.class);
 		monitor.registerConfigurable(EasyMock.isA(OverProvisionHeuristic.class));
+		EasyMock.expect(monitor.isOptimal()).andReturn(false);
 		
 		Provider provider = EasyMock.createMock(Provider.class);
 		EasyMock.expect(provider.getName()).andReturn("p1");
@@ -718,10 +720,10 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(12);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(10);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
-		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
+//		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
+//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
 		EasyMock.expect(config.getString(SaaSAppProperties.APPLICATION_FACTORY)).andReturn("commons.sim.util.SimpleApplicationFactory");
 		EasyMock.expect(config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS)).andReturn(1);
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
@@ -841,6 +843,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		DPS monitor = EasyMock.createStrictMock(DPS.class);
 		monitor.registerConfigurable(EasyMock.isA(OverProvisionHeuristic.class));
+		EasyMock.expect(monitor.isOptimal()).andReturn(false);
 		
 		Provider provider = EasyMock.createMock(Provider.class);
 		EasyMock.expect(provider.getName()).andReturn("p1");
@@ -852,10 +855,10 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(11);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(9);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
-		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
+//		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
+//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
 		EasyMock.expect(config.getString(SaaSAppProperties.APPLICATION_FACTORY)).andReturn("commons.sim.util.SimpleApplicationFactory");
 		EasyMock.expect(config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS)).andReturn(1);
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
@@ -1005,7 +1008,9 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		//Simulation components
 		DPS monitor = EasyMock.createStrictMock(DPS.class);
 		monitor.registerConfigurable(EasyMock.isA(OverProvisionHeuristic.class));
-		EasyMock.expectLastCall().times(2);
+		EasyMock.expect(monitor.isOptimal()).andReturn(false);
+		monitor.registerConfigurable(EasyMock.isA(OverProvisionHeuristic.class));
+		EasyMock.expect(monitor.isOptimal()).andReturn(false);
 		
 		Provider provider = EasyMock.createMock(Provider.class);
 		EasyMock.expect(provider.getName()).andReturn("p1");
@@ -1019,11 +1024,11 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(14);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(12);
 		EasyMock.expect(Checkpointer.loadProviders()).andReturn(providers);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l).times(2);
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
-		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
+//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
+//		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
 		EasyMock.expect(config.getString(SaaSAppProperties.APPLICATION_FACTORY)).andReturn("commons.sim.util.SimpleApplicationFactory");
 		EasyMock.expect(config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS)).andReturn(1);
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
