@@ -38,4 +38,4 @@ fi
 
 ./gera_entrada.sh -d ${SIM_PERIOD} -u ${NUM_USERS} -o users.properties -p ${PEAK_DAYS}
 
-./executaPlanning.sh users.properties ${SIM_PERIOD}
+./executaPlanning.sh ${NUM_USERS} ${SIM_PERIOD}
