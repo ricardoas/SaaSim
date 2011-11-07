@@ -2,13 +2,7 @@ package provisioning;
 
 import static org.junit.Assert.*;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.lang.reflect.Field;
-
-import javax.crypto.Mac;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -19,7 +13,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
-import commons.cloud.Request;
 import commons.cloud.User;
 import commons.config.Configuration;
 import commons.config.PropertiesTesting;
