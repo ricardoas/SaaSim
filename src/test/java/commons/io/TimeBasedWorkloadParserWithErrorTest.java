@@ -12,7 +12,7 @@ import util.ValidConfigurationTest;
 
 import commons.cloud.Request;
 
-public class TimeBasedWorkloadParserTest extends ValidConfigurationTest{
+public class TimeBasedWorkloadParserWithErrorTest extends ValidConfigurationTest{
 	
 	@Override
 	public void setUp() throws Exception {
@@ -27,7 +27,7 @@ public class TimeBasedWorkloadParserTest extends ValidConfigurationTest{
 		
 		EasyMock.replay(parser);
 		
-		new TimeBasedWorkloadParser(5000, parsers);
+		new TimeBasedWorkloadParserWithError(5000, parsers);
 		
 		EasyMock.verify(parser);
 	}
@@ -36,7 +36,7 @@ public class TimeBasedWorkloadParserTest extends ValidConfigurationTest{
 	public void testConstructorWithoutParsers(){
 		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{};
 		
-		new TimeBasedWorkloadParser(5000, parsers);
+		new TimeBasedWorkloadParserWithError(5000, parsers);
 	}
 	
 	@Test(expected=RuntimeException.class)
@@ -46,7 +46,7 @@ public class TimeBasedWorkloadParserTest extends ValidConfigurationTest{
 		
 		EasyMock.replay(geistParser);
 		
-		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(5000, parsers);
+		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(5000, parsers);
 		
 		parser.clear();
 		
@@ -60,7 +60,7 @@ public class TimeBasedWorkloadParserTest extends ValidConfigurationTest{
 		
 		EasyMock.replay(geistParser);
 		
-		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(5000, parsers);
+		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(5000, parsers);
 		
 		//Requesting changes
 		parser.setDaysAlreadyRead(120);
@@ -79,7 +79,7 @@ public class TimeBasedWorkloadParserTest extends ValidConfigurationTest{
 		
 		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
 		
-		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(5000, parsers);
+		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(5000, parsers);
 		
 		assertEquals(true, parser.hasNext());
 		
@@ -97,7 +97,7 @@ public class TimeBasedWorkloadParserTest extends ValidConfigurationTest{
 		
 		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
 		
-		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(5000, parsers);
+		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(5000, parsers);
 		
 		assertEquals(false, parser.hasNext());
 		
@@ -116,7 +116,7 @@ public class TimeBasedWorkloadParserTest extends ValidConfigurationTest{
 		
 		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
 		
-		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(5000, parsers);
+		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(5000, parsers);
 		parser.next();
 		
 		EasyMock.verify(parser1, parser2);
@@ -151,7 +151,7 @@ public class TimeBasedWorkloadParserTest extends ValidConfigurationTest{
 		
 		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
 		
-		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(tick, parsers);
+		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(tick, parsers);
 		List<Request> requests = parser.next();
 		assertEquals(1, requests.size());
 		assertEquals(firstRequest, requests.get(0));
@@ -194,7 +194,7 @@ public class TimeBasedWorkloadParserTest extends ValidConfigurationTest{
 		
 		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
 		
-		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(tick, parsers);
+		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(tick, parsers);
 		List<Request> requests = parser.next();
 		assertEquals(1, requests.size());
 		assertEquals(firstRequest, requests.get(0));
@@ -245,7 +245,7 @@ public class TimeBasedWorkloadParserTest extends ValidConfigurationTest{
 		
 		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
 		
-		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(tick, parsers);
+		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(tick, parsers);
 		List<Request> requests = parser.next();
 		assertEquals(4, requests.size());
 		assertEquals(firstRequest, requests.get(0));
@@ -273,7 +273,7 @@ public class TimeBasedWorkloadParserTest extends ValidConfigurationTest{
 		
 		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
 		
-		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(tick, parsers);
+		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(tick, parsers);
 		parser.close();
 		
 		EasyMock.verify(parser1, parser2);
@@ -291,7 +291,7 @@ public class TimeBasedWorkloadParserTest extends ValidConfigurationTest{
 		
 		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
 		
-		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(tick, parsers);
+		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(tick, parsers);
 		parser.applyError(0.0);
 		
 		Field field = TimeBasedWorkloadParser.class.getDeclaredField("parsers");
@@ -310,27 +310,29 @@ public class TimeBasedWorkloadParserTest extends ValidConfigurationTest{
 		
 		//Parsers
 		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		EasyMock.expect(parser1.clone()).andReturn(parser1);
 		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
 		
 		EasyMock.replay(parser1, parser2);
 		
 		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
 		
-		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(tick, parsers);
+		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(tick, parsers);
 		parser.applyError(0.5);
 		
 		Field field = TimeBasedWorkloadParser.class.getDeclaredField("parsers");
 		field.setAccessible(true);
 		WorkloadParser<Request>[] objectParsers = (WorkloadParser<Request>[]) field.get(parser);
-		assertEquals(2, objectParsers.length);
+		assertEquals(3, objectParsers.length);
 		assertEquals(parser1, objectParsers[0]);
 		assertEquals(parser2, objectParsers[1]);
+		assertEquals(parser1, objectParsers[2]);
 		
 		EasyMock.verify(parser1, parser2);
 	}
 	
 	/**
-	 * This method is similar to {@link TimeBasedWorkloadParserTest#testApplyErrorWithPositiveError()}. The main difference is that the error
+	 * This method is similar to {@link TimeBasedWorkloadParserWithErrorTest#testApplyErrorWithPositiveError()}. The main difference is that the error
 	 * used returns a double number of parsers that should be rounded.
 	 * @throws SecurityException
 	 * @throws NoSuchFieldException
@@ -343,6 +345,7 @@ public class TimeBasedWorkloadParserTest extends ValidConfigurationTest{
 		
 		//Parsers
 		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		EasyMock.expect(parser1.clone()).andReturn(parser1);
 		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
 		GEISTMultiFileWorkloadParser parser3 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
 		
@@ -350,16 +353,17 @@ public class TimeBasedWorkloadParserTest extends ValidConfigurationTest{
 		
 		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2, parser3};
 		
-		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(tick, parsers);
+		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(tick, parsers);
 		parser.applyError(0.333333333);
 		
 		Field field = TimeBasedWorkloadParser.class.getDeclaredField("parsers");
 		field.setAccessible(true);
 		WorkloadParser<Request>[] objectParsers = (WorkloadParser<Request>[]) field.get(parser);
-		assertEquals(3, objectParsers.length);
+		assertEquals(4, objectParsers.length);
 		assertEquals(parser1, objectParsers[0]);
 		assertEquals(parser2, objectParsers[1]);
 		assertEquals(parser3, objectParsers[2]);
+		assertEquals(parser1, objectParsers[3]);
 		
 		EasyMock.verify(parser1, parser2);
 	}
@@ -376,21 +380,20 @@ public class TimeBasedWorkloadParserTest extends ValidConfigurationTest{
 		
 		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
 		
-		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(tick, parsers);
+		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(tick, parsers);
 		parser.applyError(-0.5);
 		
 		Field field = TimeBasedWorkloadParser.class.getDeclaredField("parsers");
 		field.setAccessible(true);
 		WorkloadParser<Request>[] objectParsers = (WorkloadParser<Request>[]) field.get(parser);
-		assertEquals(2, objectParsers.length);
+		assertEquals(1, objectParsers.length);
 		assertEquals(parser1, objectParsers[0]);
-		assertEquals(parser2, objectParsers[1]);
 		
 		EasyMock.verify(parser1, parser2);
 	}
 	
 	/**
-	 * This method is similar to {@link TimeBasedWorkloadParserTest#testApplyErrorWithNegativeError()}. The main difference is that the error
+	 * This method is similar to {@link TimeBasedWorkloadParserWithErrorTest#testApplyErrorWithNegativeError()}. The main difference is that the error
 	 * used returns a double number of parsers that should be rounded.
 	 * @throws SecurityException
 	 * @throws NoSuchFieldException
@@ -410,16 +413,15 @@ public class TimeBasedWorkloadParserTest extends ValidConfigurationTest{
 		
 		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2, parser3};
 		
-		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(tick, parsers);
+		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(tick, parsers);
 		parser.applyError(-0.333333333);
 		
 		Field field = TimeBasedWorkloadParser.class.getDeclaredField("parsers");
 		field.setAccessible(true);
 		WorkloadParser<Request>[] objectParsers = (WorkloadParser<Request>[]) field.get(parser);
-		assertEquals(3, objectParsers.length);
+		assertEquals(2, objectParsers.length);
 		assertEquals(parser1, objectParsers[0]);
 		assertEquals(parser2, objectParsers[1]);
-		assertEquals(parser3, objectParsers[2]);
 		
 		EasyMock.verify(parser1, parser2);
 	}
@@ -436,15 +438,13 @@ public class TimeBasedWorkloadParserTest extends ValidConfigurationTest{
 		
 		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
 		
-		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(tick, parsers);
+		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(tick, parsers);
 		parser.applyError(-1.0);
 		
 		Field field = TimeBasedWorkloadParser.class.getDeclaredField("parsers");
 		field.setAccessible(true);
 		WorkloadParser<Request>[] objectParsers = (WorkloadParser<Request>[]) field.get(parser);
-		assertEquals(2, objectParsers.length);
-		assertEquals(parser1, objectParsers[0]);
-		assertEquals(parser2, objectParsers[1]);
+		assertEquals(0, objectParsers.length);
 		
 		EasyMock.verify(parser1, parser2);
 	}
