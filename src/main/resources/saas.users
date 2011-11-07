@@ -1,12 +1,10 @@
 saas.number=2
 #saas.workload= 
 
-saas.user.id=client1
 saas.user.plan=bronze
 saas.user.storage=5120000
 saas.user.workload=/local/liliars/saasim-properties/trace_user.trc
 
-saas.user.id=client2
 saas.user.plan=silver
 saas.user.storage=10240000
 saas.user.workload=/local/liliars/saasim-properties/trace_user.trc

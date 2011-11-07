@@ -13,6 +13,7 @@ saas.application.numberoftiers=1
 # Provide a list with saas.application.numberoftiers comma-separated values. Leave empty to load default.
 # Possible values are:
 # * ROUNDROBIN = loads commons.saas.schedulingheuristics.RoundRobinHeuristic (this is the default option)
+# * ROUNDROBIN_HET = loads commons.saas.schedulingheuristics.RoundRobinHeuristicForHeterogenousMachines
 # * RANJAN = loads commons.saas.schedulingheuristics.RanjanHeuristic
 # * PROFITDRIVEN = loads commons.saas.schedulingheuristics.ProfitDrivenHeuristic
 # * CUSTOM = please provide a value to saas.application.heuristicclass
