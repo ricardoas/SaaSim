@@ -41,4 +41,10 @@ public abstract class ApplicationFactory {
 	 * @return
 	 */
 	public abstract LoadBalancer[] buildApplication(JEEventScheduler scheduler);
+
+	@Deprecated
+	public static void reset() {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -14,24 +14,24 @@ import commons.util.CostCalculus;
  * IaaS {@link Machine} provider. Based on Amazon EC2 market model.
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
- * @version 1.0
+ * @version 1.1
  */
 public class Provider implements Serializable{
 	
 	/**
-	 * Version 1.0
+	 * Version 1.1
 	 */
-	private static final long serialVersionUID = -7947181988918043343L;
+	private static final long serialVersionUID = -746266289404954541L;
 	private final int id;
 	private final String name;
 	private final int onDemandLimit;
 	private final int reservationLimit;
 	private final Map<MachineType, TypeProvider> types;
 	private final double monitoringCost;
-	private final long[] transferInLimits;
-	private final double[] transferInCosts;
-	private final long[] transferOutLimits;
-	private final double[] transferOutCosts;
+	private final long[] transferInLimitsInBytes;
+	private final double[] transferInCostsPerByte;
+	private final long[] transferOutLimitsInBytes;
+	private final double[] transferOutCostsPerByte;
 	
 	private int onDemandRunningMachines;
 	
@@ -42,27 +42,27 @@ public class Provider implements Serializable{
 	 * @param onDemandLimit
 	 * @param reservationLimit
 	 * @param monitoringCost
-	 * @param transferInLimits
-	 * @param transferInCosts
-	 * @param transferOutLimits
-	 * @param transferOutCosts
+	 * @param transferInLimitsInBytes
+	 * @param transferInCostsPerByte
+	 * @param transferOutLimitsInBytes
+	 * @param transferOutCostsPerByte
 	 * @param types
 	 */
 	public Provider(int id, String name,
 			int onDemandLimit, int reservationLimit,
 			double monitoringCost,
-			long[] transferInLimits,
-			double[] transferInCosts, long[] transferOutLimits,
-			double[] transferOutCosts, List<TypeProvider> types) {
+			long[] transferInLimitsInBytes,
+			double[] transferInCostsPerByte, long[] transferOutLimitsInBytes,
+			double[] transferOutCostsPerByte, List<TypeProvider> types) {
 		this.id = id;
 		this.name = name;
 		this.onDemandLimit = onDemandLimit;
 		this.reservationLimit = reservationLimit;
 		this.monitoringCost = monitoringCost;
-		this.transferInLimits = transferInLimits;
-		this.transferInCosts = transferInCosts;
-		this.transferOutLimits = transferOutLimits;
-		this.transferOutCosts = transferOutCosts;
+		this.transferInLimitsInBytes = transferInLimitsInBytes;
+		this.transferInCostsPerByte = transferInCostsPerByte;
+		this.transferOutLimitsInBytes = transferOutLimitsInBytes;
+		this.transferOutCostsPerByte = transferOutCostsPerByte;
 		
 		this.types = new HashMap<MachineType, TypeProvider>();
 		for (TypeProvider machineType : types) {
@@ -75,14 +75,16 @@ public class Provider implements Serializable{
 		return onDemandRunningMachines;
 	}
 
-	public void setOnDemandRunningMachines(int onDemandRunningMachines) {
-		this.onDemandRunningMachines = onDemandRunningMachines;
-	}
-
 	public int getId() {
 		return id;
 	}
 
+	/**
+	 * Avoid using it. It breaks type encapsulation.
+	 * 
+	 * @return
+	 */
+	@Deprecated()
 	public Map<MachineType, TypeProvider> getTypes() {
 		return types;
 	}
@@ -147,28 +149,28 @@ public class Provider implements Serializable{
 	 * @return the transferInLimits
 	 */
 	public long[] getTransferInLimits() {
-		return transferInLimits;
+		return transferInLimitsInBytes;
 	}
 
 	/**
 	 * @return the transferInCosts
 	 */
 	public double[] getTransferInCosts() {
-		return transferInCosts;
+		return transferInCostsPerByte;
 	}
 
 	/**
 	 * @return the transferOutLimits
 	 */
 	public long[] getTransferOutLimits() {
-		return transferOutLimits;
+		return transferOutLimitsInBytes;
 	}
 
 	/**
 	 * @return the transferOutCosts
 	 */
 	public double[] getTransferOutCosts() {
-		return transferOutCosts;
+		return transferOutCostsPerByte;
 	}
 
 
@@ -229,8 +231,12 @@ public class Provider implements Serializable{
 			typeProvider.calculateMachinesCost(entry, currentTimeInMillis, monitoringCost);
 		}
 		
-		double inCost = CostCalculus.calcTransferenceCost(transferences[0], transferInLimits, transferInCosts, CostCalculus.GB_IN_BYTES);
-		double outCost = CostCalculus.calcTransferenceCost(transferences[1], transferOutLimits, transferOutCosts, CostCalculus.GB_IN_BYTES);
+		transferences[0] = transferences[0];
+		transferences[1] = transferences[1];
+		
+		
+		double inCost = CostCalculus.calcTransferenceCost(transferences[0], transferInLimitsInBytes, transferInCostsPerByte);
+		double outCost = CostCalculus.calcTransferenceCost(transferences[1], transferOutLimitsInBytes, transferOutCostsPerByte);
 		
 		entry.addTransferenceToCost(id, transferences[0], inCost, transferences[1], outCost);
 	}

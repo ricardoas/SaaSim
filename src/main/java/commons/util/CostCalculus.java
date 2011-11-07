@@ -18,10 +18,10 @@ public class CostCalculus {
 	 * @param costsInConvertedUnit
 	 * @return
 	 */
-	public static double calcTransferenceCost(long totalTransferedInBytes,
-			long[] limitsInConvertedUnit, double[] costsInConvertedUnit, long conversion) {
+	public static double calcTransferenceCost(double totalTransferedInBytes,
+			long[] limitsInConvertedUnit, double[] costsInConvertedUnit) {
 		
-		double transference = (1.0*totalTransferedInBytes)/conversion;
+		double transference = totalTransferedInBytes;
 		double total = Math.min(transference, limitsInConvertedUnit[0]) * costsInConvertedUnit[0];
 		
 		for (int i = 1; i < limitsInConvertedUnit.length; i++) {

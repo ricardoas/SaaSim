@@ -21,7 +21,6 @@ import commons.cloud.Request;
 import commons.cloud.User;
 import commons.config.Configuration;
 import commons.io.Checkpointer;
-import commons.io.TickSize;
 import commons.io.WorkloadParser;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.LoadBalancer;
@@ -29,6 +28,7 @@ import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.SimulatorProperties;
+import commons.util.TimeUnit;
 
 public class HistoryBasedHeuristic implements PlanningHeuristic{
 
@@ -130,7 +130,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 			
 			for(long machineID : machines.keySet()){
 				double machineUsage = machines.get(machineID) / ( type.getNumberOfCores() * planningPeriod * 
-						TickSize.DAY.getTickInMillis());
+						TimeUnit.DAY.getMillis());
 				
 				if( machineUsage >= limits.get(type) ){
 					Integer numberOfServers = this.plan.get(type);

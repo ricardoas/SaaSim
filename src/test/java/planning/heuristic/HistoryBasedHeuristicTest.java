@@ -32,7 +32,6 @@ import commons.cloud.TypeProvider;
 import commons.cloud.User;
 import commons.config.Configuration;
 import commons.io.Checkpointer;
-import commons.io.TickSize;
 import commons.io.WorkloadParser;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.LoadBalancer;
@@ -45,6 +44,7 @@ import commons.sim.util.SaaSAppProperties;
 import commons.sim.util.SimulatorFactory;
 import commons.sim.util.SimulatorProperties;
 import commons.util.SimulationInfo;
+import commons.util.TimeUnit;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore("org.apache.log4j.*")
@@ -91,7 +91,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(simulationInfo).times(2);
-		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
@@ -169,7 +169,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
-		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(2l);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
@@ -224,24 +224,24 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//First machine
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.M1_SMALL, 0);
-		descriptor.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
 		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
-		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis());
+		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis());
 		
 		//Second machine
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.M1_SMALL, 0);
-		descriptor2.setFinishTimeInMillis(TickSize.DAY.getTickInMillis() / 2);
+		descriptor2.setFinishTimeInMillis(TimeUnit.DAY.getMillis() / 2);
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
-		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() / 2);
+		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis() / 2);
 		
 		//Third machine
 		Machine machine3 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.M1_SMALL, 0);
-		descriptor3.setFinishTimeInMillis(TickSize.DAY.getTickInMillis() / 2);
+		descriptor3.setFinishTimeInMillis(TimeUnit.DAY.getMillis() / 2);
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
-		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() / 2);
+		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis() / 2);
 
 		ArrayList<Machine> machines = new ArrayList<Machine>();
 		machines.add(machine1);
@@ -271,7 +271,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
-		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
@@ -327,24 +327,24 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//First machine
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.M1_SMALL, 0);
-		descriptor.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
 		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
-		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() / 6);
+		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis() / 6);
 		
 		//Second machine
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.M1_SMALL, 0);
-		descriptor2.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor2.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
-		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() / 5);
+		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis() / 5);
 		
 		//Third machine
 		Machine machine3 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.M1_SMALL, 0);
-		descriptor3.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor3.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
-		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() / 10);
+		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis() / 10);
 
 		ArrayList<Machine> machines = new ArrayList<Machine>();
 		machines.add(machine1);
@@ -374,7 +374,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
-		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
@@ -429,24 +429,24 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//First machine
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.M1_SMALL, 0);
-		descriptor.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
 		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
-		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TickSize.HOUR.getTickInMillis() * 6);
+		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TimeUnit.HOUR.getMillis() * 6);
 		
 		//Second machine
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.M1_SMALL, 0);
-		descriptor2.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor2.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
-		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TickSize.HOUR.getTickInMillis() * 5);
+		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TimeUnit.HOUR.getMillis() * 5);
 		
 		//Third machine
 		Machine machine3 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.M1_SMALL, 0);
-		descriptor3.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor3.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
-		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TickSize.HOUR.getTickInMillis() * 8);
+		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TimeUnit.HOUR.getMillis() * 8);
 
 		ArrayList<Machine> machines = new ArrayList<Machine>();
 		machines.add(machine1);
@@ -478,7 +478,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
-		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
@@ -534,24 +534,24 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//First machine
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.C1_MEDIUM, 0);
-		descriptor.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
 		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
-		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() * 2);
+		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis() * 2);
 		
 		//Second machine
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.M1_SMALL, 0);
-		descriptor2.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor2.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
-		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() / 3);
+		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis() / 3);
 		
 		//Third machine
 		Machine machine3 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.M1_XLARGE, 0);
-		descriptor3.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor3.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
-		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() * 3);
+		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis() * 3);
 
 		ArrayList<Machine> machines = new ArrayList<Machine>();
 		machines.add(machine1);
@@ -583,7 +583,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
-		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 //		EasyMock.expect(config.getRelativePower(MachineType.M1_XLARGE)).andReturn(3d);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
@@ -642,30 +642,30 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//First machine
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.M1_LARGE, 0);
-		descriptor.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
 		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
-		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() * 2);
+		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis() * 2);
 		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
-		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() * 2);
+		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis() * 2);
 		
 		//Second machine
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.M1_XLARGE, 0);
-		descriptor2.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor2.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
-		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() * 4);
+		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis() * 4);
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
-		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() * 4);
+		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis() * 4);
 		
 		//Third machine
 		Machine machine3 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.M1_SMALL, 0);
-		descriptor3.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor3.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
-		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis());
+		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis());
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
-		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis());
+		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis());
 		
 		SimulationInfo simulationInfo = new SimulationInfo(1, 0, 2);
 		SimulationInfo simulationInfo2 = new SimulationInfo(2, 0, 2);
@@ -680,15 +680,15 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		//Machine usage data to be used in the second day
 		Map<MachineType, Map<Long, Double>> machineUsagePerType = new HashMap<MachineType, Map<Long,Double>>();
 		Map<Long, Double> value = new HashMap<Long, Double>();
-		value.put(1l, TickSize.DAY.getTickInMillis() * 2.0);
+		value.put(1l, TimeUnit.DAY.getMillis() * 2.0);
 		machineUsagePerType.put(MachineType.M1_LARGE, value);
 		
 		Map<Long, Double> value2 = new HashMap<Long, Double>();
-		value2.put(2l, TickSize.DAY.getTickInMillis() * 4.0);
+		value2.put(2l, TimeUnit.DAY.getMillis() * 4.0);
 		machineUsagePerType.put(MachineType.M1_XLARGE, value2);
 		
 		Map<Long, Double> value3 = new HashMap<Long, Double>();
-		value3.put(3l, TickSize.DAY.getTickInMillis() * 1.0);
+		value3.put(3l, TimeUnit.DAY.getMillis() * 1.0);
 		machineUsagePerType.put(MachineType.M1_SMALL, value3);
 		
 		MachineUsageData machineData = new MachineUsageData(machineUsagePerType);
@@ -721,7 +721,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(simulationInfo2).times(2);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
-		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(2l).times(3);
 //		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(1d);
 //		EasyMock.expect(config.getRelativePower(MachineType.M1_LARGE)).andReturn(3d);
@@ -805,24 +805,24 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//First machine
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.M1_LARGE, 0);
-		descriptor.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
 		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
-		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() * 3);
+		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis() * 3);
 		
 		//Second machine
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.M1_XLARGE, 0);
-		descriptor2.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor2.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
-		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() * 4);
+		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis() * 4);
 		
 		//Third machine
 		Machine machine3 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.M1_SMALL, 0);
-		descriptor3.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor3.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
-		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis());
+		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis());
 		
 		SimulationInfo simulationInfo = new SimulationInfo(1, 0, 1);
 		
@@ -851,7 +851,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 //		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(1d);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
-		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 //		EasyMock.expect(config.getRelativePower(MachineType.M1_LARGE)).andReturn(3d);
 //		EasyMock.expect(config.getRelativePower(MachineType.C1_XLARGE)).andReturn(2d);
@@ -914,24 +914,24 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//First machine
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.M1_SMALL, 0);
-		descriptor.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
 		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
-		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() / 10);
+		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis() / 10);
 		
 		//Second machine
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.M1_SMALL, 0);
-		descriptor2.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor2.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
-		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() / 9);
+		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis() / 9);
 		
 		//Third machine
 		Machine machine3 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.M1_SMALL, 0);
-		descriptor3.setFinishTimeInMillis(2 * TickSize.DAY.getTickInMillis());
+		descriptor3.setFinishTimeInMillis(2 * TimeUnit.DAY.getMillis());
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
-		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() / 6);
+		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis() / 6);
 		
 		SimulationInfo simulationInfo = new SimulationInfo(1, 0, 1);
 		
@@ -957,7 +957,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
-		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
@@ -1018,24 +1018,24 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//First machine
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.M1_SMALL, 0);
-		descriptor.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
 		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
-		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TickSize.HOUR.getTickInMillis() * 3);
+		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TimeUnit.HOUR.getMillis() * 3);
 		
 		//Second machine
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.M1_SMALL, 0);
-		descriptor2.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor2.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
-		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TickSize.HOUR.getTickInMillis() * 4);
+		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TimeUnit.HOUR.getMillis() * 4);
 		
 		//Third machine
 		Machine machine3 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.M1_SMALL, 0);
-		descriptor3.setFinishTimeInMillis(2 * TickSize.DAY.getTickInMillis());
+		descriptor3.setFinishTimeInMillis(2 * TimeUnit.DAY.getMillis());
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
-		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TickSize.HOUR.getTickInMillis() * 5);
+		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TimeUnit.HOUR.getMillis() * 5);
 		
 		SimulationInfo simulationInfo = new SimulationInfo(1, 0, 1);
 		
@@ -1061,7 +1061,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
-		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
 		
@@ -1124,36 +1124,36 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//First tier machines
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.M1_SMALL, 0);
-		descriptor.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		Machine machine1 = EasyMock.createStrictMock(Machine.class);
 		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
-		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TickSize.HOUR.getTickInMillis() * 20);
+		EasyMock.expect(machine1.getTotalTimeUsed()).andReturn(TimeUnit.HOUR.getMillis() * 20);
 		
 		MachineDescriptor descriptor4 = new MachineDescriptor(4, false, MachineType.M1_SMALL, 0);
-		descriptor4.setFinishTimeInMillis(3 * TickSize.DAY.getTickInMillis());
+		descriptor4.setFinishTimeInMillis(3 * TimeUnit.DAY.getMillis());
 		Machine machine4 = EasyMock.createStrictMock(Machine.class);
 		EasyMock.expect(machine4.getDescriptor()).andReturn(descriptor4);
-		EasyMock.expect(machine4.getTotalTimeUsed()).andReturn(TickSize.HOUR.getTickInMillis());
+		EasyMock.expect(machine4.getTotalTimeUsed()).andReturn(TimeUnit.HOUR.getMillis());
 		
 		//Second tier machine
 		Machine machine2 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.T1_MICRO, 0);
-		descriptor2.setFinishTimeInMillis(2 * TickSize.DAY.getTickInMillis());
+		descriptor2.setFinishTimeInMillis(2 * TimeUnit.DAY.getMillis());
 		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
-		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TickSize.HOUR.getTickInMillis() * 22);
+		EasyMock.expect(machine2.getTotalTimeUsed()).andReturn(TimeUnit.HOUR.getMillis() * 22);
 		
 		//Third tier machines
 		Machine machine3 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.M1_SMALL, 0);
-		descriptor3.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor3.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		EasyMock.expect(machine3.getDescriptor()).andReturn(descriptor3);
-		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis() / 5);
+		EasyMock.expect(machine3.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis() / 5);
 		
 		Machine machine5 = EasyMock.createStrictMock(Machine.class);
 		MachineDescriptor descriptor5 = new MachineDescriptor(5, false, MachineType.M1_SMALL, 0);
-		descriptor5.setFinishTimeInMillis(TickSize.DAY.getTickInMillis());
+		descriptor5.setFinishTimeInMillis(TimeUnit.DAY.getMillis());
 		EasyMock.expect(machine5.getDescriptor()).andReturn(descriptor5);
-		EasyMock.expect(machine5.getTotalTimeUsed()).andReturn(TickSize.DAY.getTickInMillis());
+		EasyMock.expect(machine5.getTotalTimeUsed()).andReturn(TimeUnit.DAY.getMillis());
 		
 		SimulationInfo simulationInfo = new SimulationInfo(1, 0, 1);
 		
@@ -1182,7 +1182,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(config.getProviders()).andReturn(providers);
 		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
-		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
+		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
 //		EasyMock.expect(config.getRelativePower(MachineType.C1_XLARGE)).andReturn(1d).times(2);
 //		EasyMock.expect(config.getRelativePower(MachineType.C1_MEDIUM)).andReturn(1d);

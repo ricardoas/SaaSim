@@ -66,11 +66,11 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 		send(new JEEvent(JEEventType.READWORKLOAD, this, getScheduler().now()));
 		
 		
-		if(this.monitor.isOptimal()){
-			send(new JEEvent(JEEventType.ESTIMATE_SERVERS, this, getScheduler().now()));
-		}else{
-			send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + 2 * Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)));
-		}
+//		if(this.monitor.isOptimal()){
+//			send(new JEEvent(JEEventType.ESTIMATE_SERVERS, this, getScheduler().now()));
+//		}else{
+			send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)));
+//		}
 
 		SimulationInfo info = Checkpointer.loadSimulationInfo();
 		if(info.isChargeDay()){
@@ -91,7 +91,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 						send(parseEvent(request));
 					}
 					if(workloadParser.hasNext()){
-						long newEventTime = getScheduler().now() + Configuration.getInstance().getParserPageSize().getTickInMillis();
+						long newEventTime = getScheduler().now() + Configuration.getInstance().getParserPageSize().getMillis();
 						send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime, true));
 					}else{
 						workloadParser.close();

@@ -1,6 +1,11 @@
 package commons.config;
 
 import provisioning.DPS;
+import provisioning.DynamicProvisioningSystem;
+import provisioning.OptimalProvisioningSystemForHeterogeneousMachines;
+import provisioning.ProfitDrivenProvisioningSystem;
+import provisioning.RanjanProvisioningSystem;
+import provisioning.RanjanProvisioningSystemForHeterogeneousMachines;
 
 import commons.cloud.MachineType;
 import commons.sim.util.SimulatorProperties;
@@ -14,23 +19,37 @@ public enum DPSHeuristicValues {
 	/**
 	 * Static provisioning. The initial machine allocation is used until the end of simulation time
 	 */
-	STATIC, 
+	STATIC(DynamicProvisioningSystem.class.getCanonicalName()), 
 	/**
 	 * Default Ranjan et all' algorithm implementation.
 	 */
-	RANJAN, 
+	RANJAN(RanjanProvisioningSystem.class.getCanonicalName()), 
 	/**
 	 * Modification of Ranjan et all'algorithm to allow provisioning using different {@link MachineType}
 	 */
-	RANJAN_HET, 
+	RANJAN_HET(RanjanProvisioningSystemForHeterogeneousMachines.class.getCanonicalName()), 
 	/**
 	 * Not fully implemented. We don't know a practical way of calculating information needed for decision making.
 	 */
 	@Deprecated
-	PROFITDRIVEN, 
+	PROFITDRIVEN(ProfitDrivenProvisioningSystem.class.getCanonicalName()), 
 	/**
 	 * Indicates a custom {@link DPS} implementation is provided by you. 
 	 * @see SimulatorProperties#DPS_CUSTOM_HEURISTIC
 	 */
-	CUSTOM, OPTIMAL, 
+	CUSTOM(""),
+	/**
+	 * 
+	 */
+	OPTIMAL(OptimalProvisioningSystemForHeterogeneousMachines.class.getCanonicalName());
+	
+	private final String className;
+
+	private DPSHeuristicValues(String className){
+		this.className = className;
+	}
+
+	public String getClassName() {
+		return className;
+	}
 }

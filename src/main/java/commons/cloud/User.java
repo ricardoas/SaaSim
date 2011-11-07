@@ -23,16 +23,16 @@ public class User implements Comparable<User>, Serializable{
 	private long consumedCpuInMillis;
 	private long consumedInTransferenceInBytes;
 	private long consumedOutTransferenceInBytes;
-	private final long storageInMB;
+	private final long storageInBytes;
 	
 	/**
 	 * Default constructor.
 	 * @param contract
 	 */
-	public User(int id, Contract contract, long storageInMB) {
+	public User(int id, Contract contract, long storageInBytes) {
 		this.id = id;
 		this.contract = contract;
-		this.storageInMB = storageInMB;
+		this.storageInBytes = storageInBytes;
 		reset();
 	}
 	
@@ -73,10 +73,10 @@ public class User implements Comparable<User>, Serializable{
 	}
 
 	/**
-	 * @return the consumedStorageInBytes
+	 * @return the storageInBytes
 	 */
-	public long getStorageInMB() {
-		return storageInMB;
+	public long getStorageInBytes() {
+		return storageInBytes;
 	}
 
 	private void reset(){
@@ -97,7 +97,7 @@ public class User implements Comparable<User>, Serializable{
 		double penalty = this.contract.calculatePenalty((1.0 * numberOfLostRequests) / (numberOfLostRequests+numberOfFinishedRequests));
 		entry.addPenalty(penalty);
 		
-		this.contract.calculateReceipt(entry, id, consumedCpuInMillis, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, storageInMB);
+		this.contract.calculateReceipt(entry, id, consumedCpuInMillis, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, storageInBytes);
 		this.reset();
 	}
 
@@ -131,13 +131,13 @@ public class User implements Comparable<User>, Serializable{
 	 */
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", contract=" + contract.getName()
+		return "User [id=" + id + ", contract=" + contract
 				+ ", consumedCpuInMillis=" + consumedCpuInMillis
 				+ ", consumedInTransferenceInBytes="
 				+ consumedInTransferenceInBytes
 				+ ", consumedOutTransferenceInBytes="
 				+ consumedOutTransferenceInBytes + ", consumedStorageInBytes="
-				+ storageInMB + "]";
+				+ storageInBytes + "]";
 	}
 
 	@Override

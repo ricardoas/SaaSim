@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import org.apache.log4j.Logger;
-
 import commons.cloud.Request;
 import commons.cloud.User;
 import commons.config.Configuration;
@@ -52,9 +50,6 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	protected Queue<Request> backlog;
 
 	private long maxOnQueue;
-	
-	private transient Logger LOG = Logger.getLogger(getClass());
-
 	
 	/**
 	 * Default constructor

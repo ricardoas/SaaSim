@@ -119,7 +119,7 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 					evaluateMaximumNumber();
 					
 					if(workloadParser.hasNext()){
-						long newEventTime = getScheduler().now() + Configuration.getInstance().getParserPageSize().getTickInMillis();
+						long newEventTime = getScheduler().now() + Configuration.getInstance().getParserPageSize().getMillis();
 						send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime, true));
 					}else{
 						workloadParser.close();

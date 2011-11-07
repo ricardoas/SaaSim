@@ -3,9 +3,7 @@ package commons.config;
 import static org.junit.Assert.*;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationRuntimeException;
@@ -20,12 +18,10 @@ import provisioning.DynamicProvisioningSystem;
 import commons.cloud.Contract;
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
-import commons.cloud.TypeProvider;
 import commons.cloud.User;
 import commons.io.Checkpointer;
-import commons.sim.components.LoadBalancer;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
-import commons.util.SimulationInfo;
+import commons.util.DataUnit;
 
 public class ConfigurationTest {
 	
@@ -102,31 +98,6 @@ public class ConfigurationTest {
 		assertNotNull(Configuration.getInstance());
 	}
 	
-	private static void savePreviousData() {
-		Checkpointer.clear();
-		
-		Contract contract = new Contract("p1", 1, 55.55, 101.10, 86400000, 0.1, new long[]{0}, new double[]{0.0, 0.0}, 
-				10000, 0.2);
-		User user = new User(0, contract, 1000);
-		User user2 = new User(1, contract, 1000);
-		SimulationInfo info = new SimulationInfo(100, 4);
-		
-		List<TypeProvider> types = new ArrayList<TypeProvider>();
-		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.1, 0.01, 100, 160, 10));
-		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.25, 0.1, 240, 360, 10));
-		
-		Provider provider = new Provider(0, "prov1", 10, 20, 0.15, new long[]{0}, new double[]{0.0, 0.0}, new long[]{1000}, 
-				new double[]{0.0, 0.1}, types);
-		Provider provider2 = new Provider(1, "prov2", 10, 20, 0.15, new long[]{0}, new double[]{0.0, 0.0}, new long[]{1000}, 
-				new double[]{0.0, 0.1}, types);
-		Provider provider3 = new Provider(2, "prov3", 10, 20, 0.15, new long[]{0}, new double[]{0.0, 0.0}, new long[]{1000}, 
-				new double[]{0.0, 0.1}, types);
-		
-		Checkpointer.loadScheduler();
-		Checkpointer.save(info, new User[]{user, user2}, new Provider[]{provider, provider2, provider3}, new LoadBalancer[]{});
-	}
-	
-
 	@Test(expected=ConfigurationException.class)
 	public void testSaaSUsersWrongFile1() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.WRONG_USERS_FILE_1);
@@ -225,7 +196,6 @@ public class ConfigurationTest {
 	@Test
 	public void testEmptyIaaSPlanFile() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.EMPTY_IAAS_PLANS_FILE);
-		Configuration config = Configuration.getInstance();
 		
 		Provider[] providers = Checkpointer.loadProviders();
 		assertEquals(3, providers.length);
@@ -272,10 +242,10 @@ public class ConfigurationTest {
 		assertEquals(0.0, c1.getSetupCost(), 0.0);
 		assertEquals(10, c1.getCpuLimitInMillis(), 0.0);
 		assertEquals(1, c1.getExtraCpuCostPerMillis(), 0.0);
-		Assert.assertArrayEquals(new long[]{46080}, c1.getTransferenceLimitsInMB());
-		Assert.assertArrayEquals(new double[]{0,0.005}, c1.getTransferenceCostsPerMB(), 0.0);
-		assertEquals(3072, c1.getStorageLimitInMB(), 0.0);
-		assertEquals(0.1, c1.getStorageCostPerMB(), 0.0);
+		Assert.assertArrayEquals(new long[]{46080 * DataUnit.MB.getBytes()}, c1.getTransferenceLimitsInBytes());
+		Assert.assertArrayEquals(new double[]{0,0.005/DataUnit.MB.getBytes()}, c1.getTransferenceCostsPerByte(), 0.0);
+		assertEquals(3072 * DataUnit.MB.getBytes(), c1.getStorageLimitInBytes(), 0.0);
+		assertEquals(0.1 / DataUnit.MB.getBytes(), c1.getExtraStorageCostPerByte(), 0.0);
 
 		Contract c2 = users[1].getContract();
 		assertNotNull(c2);
@@ -285,16 +255,15 @@ public class ConfigurationTest {
 		assertEquals(0, c2.getSetupCost(), 0.0);
 		assertEquals(10, c2.getCpuLimitInMillis(), 0.0);
 		assertEquals(1, c2.getExtraCpuCostPerMillis(), 0.0);
-		Assert.assertArrayEquals(new long[]{15360}, c2.getTransferenceLimitsInMB());
-		Assert.assertArrayEquals(new double[]{0,0.005}, c2.getTransferenceCostsPerMB(), 0.0);
-		assertEquals(1024, c2.getStorageLimitInMB(), 0.0);
-		assertEquals(0.1, c2.getStorageCostPerMB(), 0.0);
+		Assert.assertArrayEquals(new long[]{15360 * DataUnit.MB.getBytes()}, c2.getTransferenceLimitsInBytes());
+		Assert.assertArrayEquals(new double[]{0,0.005 / DataUnit.MB.getBytes()}, c2.getTransferenceCostsPerByte(), 0.0);
+		assertEquals(1024 * DataUnit.MB.getBytes(), c2.getStorageLimitInBytes(), 0.0);
+		assertEquals(0.1 / DataUnit.MB.getBytes(), c2.getExtraStorageCostPerByte(), 0.0);
 	}
 	
 	@Test
 	public void testUniqueUserTypeSaaSUsersAndPlansValidFile() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
-		Configuration config = Configuration.getInstance();
 		User[] users = Checkpointer.loadUsers();
 		assertNotNull(users);
 		assertEquals(2, users.length);
@@ -307,10 +276,10 @@ public class ConfigurationTest {
 		assertEquals(0.0, c1.getSetupCost(), 0.0);
 		assertEquals(10, c1.getCpuLimitInMillis(), 0.0);
 		assertEquals(1, c1.getExtraCpuCostPerMillis(), 0.0);
-		Assert.assertArrayEquals(new long[]{46080}, c1.getTransferenceLimitsInMB());
-		Assert.assertArrayEquals(new double[]{0,0.005}, c1.getTransferenceCostsPerMB(), 0.0);
-		assertEquals(3072, c1.getStorageLimitInMB(), 0.0);
-		assertEquals(0.1, c1.getStorageCostPerMB(), 0.0);
+		Assert.assertArrayEquals(new long[]{46080 * DataUnit.MB.getBytes()}, c1.getTransferenceLimitsInBytes());
+		Assert.assertArrayEquals(new double[]{0,0.005 / DataUnit.MB.getBytes()}, c1.getTransferenceCostsPerByte(), 0.0);
+		assertEquals(3072 * DataUnit.MB.getBytes(), c1.getStorageLimitInBytes(), 0.0);
+		assertEquals(0.1 / DataUnit.MB.getBytes(), c1.getExtraStorageCostPerByte(), 0.0);
 
 		Contract c2 = users[1].getContract();
 		assertNotNull(c2);
@@ -320,10 +289,10 @@ public class ConfigurationTest {
 		assertEquals(0.0, c2.getSetupCost(), 0.0);
 		assertEquals(10, c2.getCpuLimitInMillis(), 0.0);
 		assertEquals(1, c2.getExtraCpuCostPerMillis(), 0.0);
-		Assert.assertArrayEquals(new long[]{46080}, c2.getTransferenceLimitsInMB());
-		Assert.assertArrayEquals(new double[]{0,0.005}, c2.getTransferenceCostsPerMB(), 0.0);
-		assertEquals(3072, c2.getStorageLimitInMB(), 0.0);
-		assertEquals(0.1, c2.getStorageCostPerMB(), 0.0);
+		Assert.assertArrayEquals(new long[]{46080 * DataUnit.MB.getBytes()}, c2.getTransferenceLimitsInBytes());
+		Assert.assertArrayEquals(new double[]{0,0.005 / DataUnit.MB.getBytes()}, c2.getTransferenceCostsPerByte(), 0.0);
+		assertEquals(3072 * DataUnit.MB.getBytes(), c2.getStorageLimitInBytes(), 0.0);
+		assertEquals(0.1 / DataUnit.MB.getBytes(), c2.getExtraStorageCostPerByte(), 0.0);
 	}
 	
 	/**
@@ -333,7 +302,6 @@ public class ConfigurationTest {
 	@Test
 	public void testIaaSValidFile() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
-		Configuration config = Configuration.getInstance();
 		Provider[] providers = Checkpointer.loadProviders();
 		assertNotNull(providers);
 		assertEquals(3, providers.length);

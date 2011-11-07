@@ -19,7 +19,7 @@ public class WorkloadParserFactory {
 	private static int index = 0;
 	
 	public static WorkloadParser<List<Request>> getWorkloadParser(){
-		return getWorkloadParser(Configuration.getInstance().getParserPageSize().getTickInMillis());
+		return getWorkloadParser(Configuration.getInstance().getParserPageSize().getMillis());
 	}
 
 	@SuppressWarnings("unchecked")

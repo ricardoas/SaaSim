@@ -19,10 +19,6 @@ public class PropertiesTesting {
 	public static final String TRACE_WITH_BLANK_END_LINE = "src/test/resources/workload/workload_trace_with_end_blank.trc";
 	
 	
-//	public static final String VALID_WORKLOAD = "src/test/resources/workload/w1.dat";
-//	public static final String VALID_WORKLOAD_2 = "src/test/resources/workload/w2.dat";
-//	public static final String VALID_WORKLOAD_3 = "src/test/resources/workload/workload.trc";
-	
 	public static final String VALID_SINGLE_WORKLOAD_FILE = "src/test/resources/config-single-workload-file.properties";
 	public static final String VALID_MULTI_WORKLOAD_FILE = "src/test/resources/config-multi-workload-file.properties";
 	public static final String VALID_DIFFERENT_USERS_FILE = "src/test/resources/config-different-users-file.properties";

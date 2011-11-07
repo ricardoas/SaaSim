@@ -6,9 +6,9 @@ import static commons.sim.util.SaaSAppProperties.*;
 import static commons.sim.util.SaaSPlanProperties.*;
 import static commons.sim.util.SaaSUsersProperties.*;
 import static commons.sim.util.SimulatorProperties.*;
+import static commons.util.DataUnit.*;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,17 +18,6 @@ import java.util.Map;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationRuntimeException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-
-import planning.heuristic.AGHeuristic;
-import planning.heuristic.HistoryBasedHeuristic;
-import planning.heuristic.OptimalHeuristic;
-import planning.heuristic.OverProvisionHeuristic;
-import provisioning.DynamicProvisioningSystem;
-import provisioning.OptimalProvisioningSystemForHeterogeneousMachines;
-import provisioning.ProfitDrivenProvisioningSystem;
-import provisioning.RanjanProvisioningSystem;
-import provisioning.RanjanProvisioningSystemForHeterogeneousMachines;
 
 import commons.cloud.Contract;
 import commons.cloud.MachineType;
@@ -37,32 +26,33 @@ import commons.cloud.TypeProvider;
 import commons.cloud.User;
 import commons.io.Checkpointer;
 import commons.io.ParserIdiom;
-import commons.io.TickSize;
-import commons.sim.schedulingheuristics.ProfitDrivenHeuristic;
-import commons.sim.schedulingheuristics.RanjanHeuristic;
-import commons.sim.schedulingheuristics.RoundRobinHeuristic;
-import commons.sim.schedulingheuristics.RoundRobinHeuristicForHeterogenousMachines;
-import commons.sim.util.SaaSUsersProperties;
+import commons.util.DataUnit;
+import commons.util.TimeUnit;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public class Configuration extends PropertiesConfiguration{
-	
-	public static final String ARRAY_SEPARATOR = "\\|";
+public class Configuration extends ComplexPropertiesConfiguration{
 	
 	/**
 	 * Unique instance.
 	 */
 	private static Configuration instance;
 	
-	private Provider[] providers;
-	
-	private User[] users;
-
 	private int[] priorities;
 	
+	/**
+	 * Private constructor.
+	 * 
+	 * @param propertiesFileName
+	 * @throws ConfigurationException
+	 */
+	private Configuration(String propertiesFileName) throws ConfigurationException {
+		super(propertiesFileName);
+		verifyProperties();
+	}
+
 	/**
 	 * Builds the single instance of this configuration.
 	 * @param propertiesFileName
@@ -82,93 +72,6 @@ public class Configuration extends PropertiesConfiguration{
 			throw new ConfigurationRuntimeException();
 		}
 		return instance;
-	}
-	
-	public int[] getIntegerArray(String propertyName) {
-		String[] stringArray = getStringArray(propertyName);
-		int [] values = new int[stringArray.length];
-		for (int i = 0; i < values.length; i++) {
-			values[i] = Integer.valueOf(stringArray[i]);
-		}
-		return values;
-	}
-
-	public long[] getLongArray(String propertyName) {
-		return parseLongArray(getStringArray(propertyName));
-	}
-
-	public long[][] getLong2DArray(String propertyName) {
-		String[] stringArray = getStringArray(propertyName);
-		long [][] values = new long[stringArray.length][];
-		for (int i = 0; i < values.length; i++) {
-			values[i] = parseLongArray(stringArray[i].split(ARRAY_SEPARATOR));
-		}
-		return values;
-	}
-
-	public double[] getDoubleArray(String propertyName) {
-		return parseDoubleArray(getStringArray(propertyName));
-	}
-
-	public double[][] getDouble2DArray(String propertyName) {
-		String[] stringArray = getStringArray(propertyName);
-		double [][] values = new double[stringArray.length][];
-		for (int i = 0; i < values.length; i++) {
-			values[i] = parseDoubleArray(stringArray[i].split(ARRAY_SEPARATOR));
-		}
-		return values;
-	}
-
-	private static double[] parseDoubleArray(String[] stringValues) {
-		double [] doubleValues = new double[stringValues.length];
-		for (int j = 0; j < doubleValues.length; j++) {
-			doubleValues[j] = Double.valueOf(stringValues[j]);
-		}
-		return doubleValues;
-	}
-
-	private static long[] parseLongArray(String[] stringValues) {
-		long [] doubleValues = new long[stringValues.length];
-		for (int j = 0; j < doubleValues.length; j++) {
-			doubleValues[j] = Long.valueOf(stringValues[j]);
-		}
-		return doubleValues;
-	}
-
-	public <T extends Enum<T>> T[] getEnumArray(String propertyName, Class<T> enumClass) {
-		return parseArrayEnum(getStringArray(propertyName), enumClass);
-	}
-	
-	public String[][] getString2DArray(String propertyName) {
-		String[] stringArray = getStringArray(propertyName);
-		String[][] values = new String[stringArray.length][];
-		for (int i = 0; i < values.length; i++) {
-			values[i] = stringArray[i].split(ARRAY_SEPARATOR);
-		}
-		return values;
-	}
-
-	@SuppressWarnings("unchecked")
-	private static <T extends Enum<T>> T[] parseArrayEnum(String[] stringValues, Class<T> enumClass) {
-		T [] enumValues = (T[]) Array.newInstance(enumClass, stringValues.length);
-		for (int j = 0; j < enumValues.length; j++) {
-			enumValues[j] = parseEnum(stringValues[j].trim().toUpperCase(), enumClass);
-		}
-		return enumValues;
-	}
-
-	private static <T extends Enum<T>> T parseEnum(String value, Class<T> enumClass) {
-		return Enum.valueOf(enumClass, value.replace('.', '_'));
-	}
-	
-	@SuppressWarnings("unchecked")
-	public <T extends Enum<T>> T[][] getEnum2DArray(String propertyName, Class<T> enumClass) {
-		String[] machines = getStringArray(propertyName);
-		T[][] machineTypes = (T[][]) Array.newInstance(enumClass, machines.length, machines.length);
-		for(int i = 0; i < machines.length; i++){
-			machineTypes[i] = parseArrayEnum(machines[i].split(ARRAY_SEPARATOR), enumClass);
-		}
-		return machineTypes;
 	}
 
 	/**
@@ -201,8 +104,8 @@ public class Configuration extends PropertiesConfiguration{
 		return parseEnum(getString(PARSER_IDIOM), ParserIdiom.class);
 	}
 	
-	public TickSize getParserPageSize(){
-		return parseEnum(getString(PARSER_PAGE_SIZE), TickSize.class);
+	public TimeUnit getParserPageSize(){
+		return parseEnum(getString(PARSER_PAGE_SIZE), TimeUnit.class);
 	}
 
 	/**
@@ -213,7 +116,80 @@ public class Configuration extends PropertiesConfiguration{
 	 * @throws IOException
 	 */
 	public Provider[] getProviders() throws ConfigurationException{
-		return readProviders();
+		int numberOfProviders = getInt(IAAS_NUMBER_OF_PROVIDERS);
+		
+		String[] names = getStringArray(IAAS_PROVIDER_NAME);
+		int[] onDemandLimits = getIntegerArray(IAAS_PROVIDER_ONDEMAND_LIMIT);
+		int[] reservedLimits = getIntegerArray(IAAS_PROVIDER_RESERVED_LIMIT);
+		double[] monitoringCosts = getDoubleArray(IAAS_PROVIDER_MONITORING);
+		long[][] transferInLimits = getLong2DArray(IAAS_PROVIDER_TRANSFER_IN);
+		double[][] transferInCosts = getDouble2DArray(IAAS_PROVIDER_COST_TRANSFER_IN);
+		long[][] transferOutLimits = getLong2DArray(IAAS_PROVIDER_TRANSFER_OUT);
+		double[][] transferOutCosts = getDouble2DArray(IAAS_PROVIDER_COST_TRANSFER_OUT);
+		
+		MachineType[][] machinesType = getEnum2DArray(IAAS_PROVIDER_TYPES, MachineType.class);
+		double[][] onDemandCpuCosts = getDouble2DArray(IAAS_PROVIDER_ONDEMAND_CPU_COST);
+		double[][] reservedCpuCosts = getDouble2DArray(IAAS_PROVIDER_RESERVED_CPU_COST);
+		double[][] reservationOneYearFees = getDouble2DArray(IAAS_PROVIDER_ONE_YEAR_FEE);
+		double[][] reservationThreeYearsFees = getDouble2DArray(IAAS_PROVIDER_THREE_YEARS_FEE);
+		
+		List<String> providersWithPlan = Arrays.asList(getStringArray(IAAS_PLAN_PROVIDER_NAME));
+		MachineType[][] machines = getEnum2DArray(IAAS_PLAN_PROVIDER_TYPES, MachineType.class);
+		long[][] reservations = getLong2DArray(IAAS_PLAN_PROVIDER_RESERVATION);
+		
+		Provider[] providers = new Provider[numberOfProviders];
+		
+		for(int i = 0; i < numberOfProviders; i++){
+			
+			List<TypeProvider> types = new ArrayList<TypeProvider>();
+			
+			int providerIndex = providersWithPlan.indexOf(names[i]);
+			List<MachineType> typeList = null;
+			
+			if(providerIndex != -1){
+				typeList = Arrays.asList(machines[providerIndex]);
+			}
+			
+			if(machinesType[i].length != onDemandCpuCosts[i].length){
+				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TYPES + " and " + IAAS_PROVIDER_ONDEMAND_CPU_COST);
+			}
+		
+			if(machinesType[i].length != reservedCpuCosts[i].length){
+				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TYPES + " and " + IAAS_PROVIDER_RESERVED_CPU_COST);
+			}
+		
+			if(machinesType[i].length != reservationOneYearFees[i].length){
+				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TYPES + " and " + IAAS_PROVIDER_ONE_YEAR_FEE);
+			}
+		
+			if(machinesType[i].length != reservationThreeYearsFees[i].length){
+				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TYPES + " and " + IAAS_PROVIDER_THREE_YEARS_FEE);
+			}
+		
+			for (int j = 0; j < machinesType[i].length; j++) {
+				long reservation = 0;
+				if(typeList != null){
+					int index = typeList.indexOf(machinesType[i][j]);
+					reservation = (index == -1)? 0: reservations[providerIndex][index];
+				}
+				types.add(new TypeProvider(i, machinesType[i][j], onDemandCpuCosts[i][j], reservedCpuCosts[i][j], 
+						reservationOneYearFees[i][j], reservationThreeYearsFees[i][j], reservation));
+			}
+			
+			if(transferInLimits[i].length != transferInCosts[i].length - 1){
+				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TRANSFER_IN + " and " + IAAS_PROVIDER_COST_TRANSFER_IN);
+			}
+		
+			if(transferOutLimits[i].length != transferOutCosts[i].length - 1){
+				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TRANSFER_OUT + " and " + IAAS_PROVIDER_COST_TRANSFER_OUT);
+			}
+			
+			providers[i] = new Provider(i, names[i], onDemandLimits[i],
+							reservedLimits[i], monitoringCosts[i], transferInLimits[i], 
+							transferInCosts[i], transferOutLimits[i], transferOutCosts[i], types);
+		}
+		
+		return providers;
 	}
 
 	public Class<?> getPlanningHeuristicClass(){
@@ -233,21 +209,45 @@ public class Configuration extends PropertiesConfiguration{
 	 * @throws IOException
 	 */
 	public User[] getUsers() throws ConfigurationException{
-		return readUsers();
+		int numberOfPlans = getInt(NUMBER_OF_PLANS);
+		String[] planNames = getStringArray(PLAN_NAME);
+		int[] priorities = getIntegerArray(PLAN_PRIORITY);
+		double[] prices = getDoubleArray(PLAN_PRICE);
+		double[] setupCosts = getDoubleArray(PLAN_SETUP);
+		long[] cpuLimitsInHours = getLongArray(PLAN_CPU_LIMIT);
+		double[] extraCpuCostsPerHour = getDoubleArray(PLAN_EXTRA_CPU_COST);
+		long[][] planTransferLimitsInBytes = DataUnit.convert(getLong2DArray(PLAN_TRANSFER_LIMIT), MB, B);
+		double[][] transferCostsPerBytes = DataUnit.convert(getDouble2DArray(PLAN_EXTRA_TRANSFER_COST), B, MB);
+		long[] storageLimitsInBytes = DataUnit.convert(getLongArray(PLAN_STORAGE_LIMIT), MB, B);
+		double[] storageCostsPerBytes = DataUnit.convert(getDoubleArray(PLAN_EXTRA_STORAGE_COST), B, MB);
+		
+		Map<String, Contract> contractsPerName = new HashMap<String, Contract>();
+		for(int i = 0; i < numberOfPlans; i++){
+			if(planTransferLimitsInBytes[i].length != transferCostsPerBytes[i].length - 1){
+				throw new ConfigurationException("Check values of " + PLAN_TRANSFER_LIMIT + " and " + PLAN_EXTRA_TRANSFER_COST);
+			}
+			contractsPerName.put(planNames[i], 
+					new Contract(planNames[i], priorities[i], setupCosts[i], prices[i], 
+							cpuLimitsInHours[i], extraCpuCostsPerHour[i], planTransferLimitsInBytes[i], transferCostsPerBytes[i],
+							storageLimitsInBytes[i], storageCostsPerBytes[i]));
+		}
+		
+		int numberOfUsers = getInt(SAAS_NUMBER_OF_USERS);
+		
+		String[] plans = getStringArray(SAAS_USER_PLAN);
+		long[] storageInBytes = DataUnit.convert(getLongArray(SAAS_USER_STORAGE), MB, B);
+		
+		User[] users = new User[numberOfUsers];
+		for (int i = 0; i < numberOfUsers; i++) {
+			if(!contractsPerName.containsKey(plans[i])){
+				throw new ConfigurationException("Cannot find configuration for plan " + plans[i] + ". Check contracts file.");
+			}
+			
+			users[i] = new User(i, contractsPerName.get(plans[i]), storageInBytes[i]);
+		}
+		return users;
 	}
 
-	/**
-	 * Private constructor.
-	 * 
-	 * @param propertiesFileName
-	 * @throws ConfigurationException
-	 */
-	private Configuration(String propertiesFileName) throws ConfigurationException {
-		super(propertiesFileName);
-		verifyProperties();
-		parseProperties();
-	}
-	
 	private void verifyProperties() throws ConfigurationException{
 		verifySimulatorProperties();
 		verifySaaSAppProperties();
@@ -257,139 +257,6 @@ public class Configuration extends PropertiesConfiguration{
 		verifyIaaSPlanProperties();
 	}
 	
-	private void parseProperties() throws ConfigurationException{
-		if(!Checkpointer.hasCheckpoint()){
-			users = readUsers();
-			providers = readProviders();
-		}else{
-			users = Checkpointer.loadUsers();
-			providers = Checkpointer.loadProviders();
-		}
-	}
-	
-
-	private User[] readUsers() throws ConfigurationException {
-		
-		int numberOfPlans = getInt(NUMBER_OF_PLANS);
-		String[] planNames = getStringArray(PLAN_NAME);
-		int[] priorities = getIntegerArray(PLAN_PRIORITY);
-		double[] prices = getDoubleArray(PLAN_PRICE);
-		double[] setupCosts = getDoubleArray(PLAN_SETUP);
-		long[] cpuLimitsInHours = getLongArray(PLAN_CPU_LIMIT);
-		double[] extraCpuCostsPerHour = getDoubleArray(PLAN_EXTRA_CPU_COST);
-		long[][] planTransferLimitsInMB = getLong2DArray(PLAN_TRANSFER_LIMIT);
-		double[][] transferCostsPerMB = getDouble2DArray(PLAN_EXTRA_TRANSFER_COST);
-		long[] storageLimitsInMB = getLongArray(PLAN_STORAGE_LIMIT);
-		double[] storageCostsPerMB = getDoubleArray(PLAN_EXTRA_STORAGE_COST);
-		
-		Map<String, Contract> contractsPerName = new HashMap<String, Contract>();
-		for(int i = 0; i < numberOfPlans; i++){
-			if(planTransferLimitsInMB[i].length != transferCostsPerMB[i].length - 1){
-				throw new ConfigurationException("Check values of " + PLAN_TRANSFER_LIMIT + " and " + PLAN_EXTRA_TRANSFER_COST);
-			}
-			contractsPerName.put(planNames[i], 
-					new Contract(planNames[i], priorities[i], setupCosts[i], prices[i], 
-							cpuLimitsInHours[i], extraCpuCostsPerHour[i], planTransferLimitsInMB[i], transferCostsPerMB[i],
-							storageLimitsInMB[i], storageCostsPerMB[i]));
-		}
-		
-		int numberOfUsers = getInt(SAAS_NUMBER_OF_USERS);
-		
-		String[] plans = getStringArray(SAAS_USER_PLAN);
-		long[] storageInMB = getLongArray(SAAS_USER_STORAGE);
-		
-		users = new User[numberOfUsers];
-		for (int i = 0; i < numberOfUsers; i++) {
-			if(!contractsPerName.containsKey(plans[i])){
-				throw new ConfigurationException("Cannot find configuration for plan " + plans[i] + ". Check contracts file.");
-			}
-			
-			users[i] = new User(i, contractsPerName.get(plans[i]), storageInMB[i]);
-		}
-		return users;
-	}
-
-	private Provider[] readProviders() throws ConfigurationException {
-		int numberOfProviders = getInt(IAAS_NUMBER_OF_PROVIDERS);
-		
-		String[] names = getStringArray(IAAS_PROVIDER_NAME);
-		int[] onDemandLimits = getIntegerArray(IAAS_PROVIDER_ONDEMAND_LIMIT);
-		int[] reservedLimits = getIntegerArray(IAAS_PROVIDER_RESERVED_LIMIT);
-		double[] monitoringCosts = getDoubleArray(IAAS_PROVIDER_MONITORING);
-		long[][] transferInLimits = getLong2DArray(IAAS_PROVIDER_TRANSFER_IN);
-		double[][] transferInCosts = getDouble2DArray(IAAS_PROVIDER_COST_TRANSFER_IN);
-		long[][] transferOutLimits = getLong2DArray(IAAS_PROVIDER_TRANSFER_OUT);
-		double[][] transferOutCosts = getDouble2DArray(IAAS_PROVIDER_COST_TRANSFER_OUT);
-		
-		MachineType[][] machinesType = getEnum2DArray(IAAS_PROVIDER_TYPES, MachineType.class);
-		double[][] onDemandCpuCosts = getDouble2DArray(IAAS_PROVIDER_ONDEMAND_CPU_COST);
-		double[][] reservedCpuCosts = getDouble2DArray(IAAS_PROVIDER_RESERVED_CPU_COST);
-		double[][] reservationOneYearFees = getDouble2DArray(IAAS_PROVIDER_ONE_YEAR_FEE);
-		double[][] reservationThreeYearsFees = getDouble2DArray(IAAS_PROVIDER_THREE_YEARS_FEE);
-	
-		List<String> providersWithPlan = Arrays.asList(getStringArray(IAAS_PLAN_PROVIDER_NAME));
-		MachineType[][] machines = getEnum2DArray(IAAS_PLAN_PROVIDER_TYPES, MachineType.class);
-		long[][] reservations = getLong2DArray(IAAS_PLAN_PROVIDER_RESERVATION);
-		
-		providers = new Provider[numberOfProviders];
-		
-		for(int i = 0; i < numberOfProviders; i++){
-			
-			List<TypeProvider> types = new ArrayList<TypeProvider>();
-			
-			int providerIndex = providersWithPlan.indexOf(names[i]);
-			List<MachineType> typeList = null;
-			
-			if(providerIndex != -1){
-				typeList = Arrays.asList(machines[providerIndex]);
-			}
-			
-			if(machinesType[i].length != onDemandCpuCosts[i].length){
-				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TYPES + " and " + IAAS_PROVIDER_ONDEMAND_CPU_COST);
-			}
-
-			if(machinesType[i].length != reservedCpuCosts[i].length){
-				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TYPES + " and " + IAAS_PROVIDER_RESERVED_CPU_COST);
-			}
-
-			if(machinesType[i].length != reservationOneYearFees[i].length){
-				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TYPES + " and " + IAAS_PROVIDER_ONE_YEAR_FEE);
-			}
-
-			if(machinesType[i].length != reservationThreeYearsFees[i].length){
-				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TYPES + " and " + IAAS_PROVIDER_THREE_YEARS_FEE);
-			}
-
-			for (int j = 0; j < machinesType[i].length; j++) {
-				long reservation = 0;
-				if(typeList != null){
-					int index = typeList.indexOf(machinesType[i][j]);
-					reservation = (index == -1)? 0: reservations[providerIndex][index];
-				}
-				types.add(new TypeProvider(i, machinesType[i][j], onDemandCpuCosts[i][j], reservedCpuCosts[i][j], 
-						reservationOneYearFees[i][j], reservationThreeYearsFees[i][j], reservation));
-			}
-			
-			if(transferInLimits[i].length != transferInCosts[i].length - 1){
-				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TRANSFER_IN + " and " + IAAS_PROVIDER_COST_TRANSFER_IN);
-			}
-
-			if(transferOutLimits[i].length != transferOutCosts[i].length - 1){
-				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TRANSFER_OUT + " and " + IAAS_PROVIDER_COST_TRANSFER_OUT);
-			}
-			
-			providers[i] = new Provider(i, names[i], onDemandLimits[i],
-							reservedLimits[i], monitoringCosts[i], transferInLimits[i], 
-							transferInCosts[i], transferOutLimits[i], transferOutCosts[i], types);
-		}
-		
-		return providers;
-	}
-
-//	public double getRelativePower(MachineType type){
-//		return type.getPower();
-//	}
-
 	// ************************************* SIMULATOR ************************************/
 	
 	private void verifySimulatorProperties() throws ConfigurationException {
@@ -411,40 +278,25 @@ public class Configuration extends PropertiesConfiguration{
 		
 		Validator.checkPositive(PLANNING_PERIOD, getString(PLANNING_PERIOD));
 		Validator.checkEnum(PARSER_IDIOM, getString(PARSER_IDIOM), ParserIdiom.class);
-		Validator.checkEnum(PARSER_PAGE_SIZE, getString(PARSER_PAGE_SIZE), TickSize.class);
+		Validator.checkEnum(PARSER_PAGE_SIZE, getString(PARSER_PAGE_SIZE), TimeUnit.class);
 	}
 	
 	private void checkDPSHeuristic() throws ConfigurationException {
 		
-		String heuristicName = getString(DPS_HEURISTIC);
-		Validator.checkNotEmpty(DPS_HEURISTIC, getString(DPS_HEURISTIC));
+		String heuristicName = getNonEmptyString(DPS_HEURISTIC);
 		
 		String customHeuristicClass = getString(DPS_CUSTOM_HEURISTIC);
+		
 		try{
 			DPSHeuristicValues value = DPSHeuristicValues.valueOf(heuristicName.toUpperCase());
 			switch (value) {
-				case STATIC:
-					heuristicName = DynamicProvisioningSystem.class.getCanonicalName();
-					break;
-				case RANJAN:
-					heuristicName = RanjanProvisioningSystem.class.getCanonicalName();
-					checkRanjanProperties();
-					break;
-				case RANJAN_HET:
-					heuristicName = RanjanProvisioningSystemForHeterogeneousMachines.class.getCanonicalName();
-					checkRanjanProperties();
-					break;
-				case OPTIMAL:
-					heuristicName = OptimalProvisioningSystemForHeterogeneousMachines.class.getCanonicalName();
-					break;
-				case PROFITDRIVEN:
-					heuristicName = ProfitDrivenProvisioningSystem.class.getCanonicalName();
-					break;
+				// FIXME checkRanjanProperties();
 				case CUSTOM:
 					heuristicName = Class.forName(customHeuristicClass).getCanonicalName();
 					break;
 				default:
-					throw new ConfigurationException("Unsupported value: " + value + " for DPSHeuristicValues.");
+					heuristicName = value.getClassName();
+					break;
 			}
 			setProperty(DPS_HEURISTIC, heuristicName);
 		} catch (ClassNotFoundException e) {
@@ -453,26 +305,15 @@ public class Configuration extends PropertiesConfiguration{
 	}
 
 	private void checkPlanningHeuristic() throws ConfigurationException {
-		String heuristicName = getString(PLANNING_HEURISTIC);
-		Validator.checkNotEmpty(PLANNING_HEURISTIC, getString(PLANNING_HEURISTIC));
-		
+		String heuristicName = getNonEmptyString(PLANNING_HEURISTIC);
 		PlanningHeuristicValues value = PlanningHeuristicValues.valueOf(heuristicName.toUpperCase());
+		
 		switch (value) {
-			case EVOLUTIONARY:
-				heuristicName = AGHeuristic.class.getCanonicalName();
-				break;
 			case OVERPROVISIONING:
-				heuristicName = OverProvisionHeuristic.class.getCanonicalName();
 				checkPlanningType();
-				break;
-			case HISTORY:
-				heuristicName = HistoryBasedHeuristic.class.getCanonicalName();
-				break;
-			case OPTIMAL:
-				heuristicName = OptimalHeuristic.class.getCanonicalName();
-				break;
 			default:
-				throw new ConfigurationException("Unsupported value: " + value + " for PlanningHeuristicValues.");
+				heuristicName = value.getClassName();
+				break;
 		}
 		setProperty(PLANNING_HEURISTIC, heuristicName);
 	}
@@ -536,23 +377,11 @@ public class Configuration extends PropertiesConfiguration{
 	}
 	
 	private void checkSchedulingHeuristicNames() throws ConfigurationException {
-		String[] strings = getStringArray(APPLICATION_HEURISTIC);
+		String[] strings = getNonEmptyStringArray(APPLICATION_HEURISTIC);
 		String customHeuristic = getString(APPLICATION_CUSTOM_HEURISTIC);
 		for (int i = 0; i < strings.length; i++) {
 			AppHeuristicValues value = AppHeuristicValues.valueOf(strings[i]);
 			switch (value) {
-				case ROUNDROBIN:
-					strings[i] = RoundRobinHeuristic.class.getCanonicalName();
-					break;
-				case ROUNDROBIN_HET:
-					strings[i] = RoundRobinHeuristicForHeterogenousMachines.class.getCanonicalName();
-					break;
-				case RANJAN:
-					strings[i] = RanjanHeuristic.class.getCanonicalName();
-					break;
-				case PROFITDRIVEN:
-					strings[i] = ProfitDrivenHeuristic.class.getCanonicalName();
-					break;
 				case CUSTOM:
 					try {
 						strings[i] = Class.forName(customHeuristic).getCanonicalName();
@@ -561,7 +390,8 @@ public class Configuration extends PropertiesConfiguration{
 					}
 					break;
 				default:
-					throw new ConfigurationException("Unsupported value for " + APPLICATION_HEURISTIC + ": " + strings[i]);
+					strings[i] = value.getClassName();
+					break;
 			}
 		}
 		
@@ -603,19 +433,6 @@ public class Configuration extends PropertiesConfiguration{
 			}
 		}
 	}
-	
-	private void checkSize(String propertyName, String sizePropertyName) throws ConfigurationException {
-		String[] values = getStringArray(propertyName);
-		int size = getInt(sizePropertyName);
-		if (values.length != size){
-			throw new ConfigurationException("Check number of values in " + 
-					propertyName + ". It must be equals to what is specified at " + 
-					sizePropertyName);
-		}
-	}
-
-	
-	
 	
 	// ******************************** IAAS PROVIDERS ************************************/
 	
@@ -701,9 +518,6 @@ public class Configuration extends PropertiesConfiguration{
 			}
 		}
 		
-		Validator.checkIsNonEmptyStringArray(IAAS_PLAN_PROVIDER_NAME, providersWithPlan);
-		Validator.checkIsNonEmptyString2DArray(IAAS_PLAN_PROVIDER_TYPES, providersWithPlan, ARRAY_SEPARATOR);
-		
 		HashSet<String> set = new HashSet<String>(Arrays.asList(getStringArray(IAAS_PROVIDER_NAME)));
 		for (String provider : providersWithPlan) {
 			if(!set.contains(provider)){
@@ -714,12 +528,9 @@ public class Configuration extends PropertiesConfiguration{
 	}
 
 	public String[] getWorkloads() {
-//		String[] workloadsPath = new String[]{getString(SAAS_WORKLOAD_NORMAL), getString(SAAS_WORKLOAD_TRANSITION), 
-//				getString(SAAS_WORKLOAD_PEAK)};
-//		return workloadsPath;
-		String[] stringArray = this.getStringArray(SaaSUsersProperties.SAAS_USER_WORKLOAD);
-		if(stringArray != null && stringArray.length != 0){
-			return stringArray;
+		String[] workloads = getStringArray(SAAS_USER_WORKLOAD);
+		if(workloads != null && workloads.length != 0){
+			return workloads;
 		}
 		return new String[]{getString(SAAS_WORKLOAD)};
 	}

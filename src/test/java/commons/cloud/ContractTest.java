@@ -9,6 +9,8 @@ import org.junit.Test;
 import util.ValidConfigurationTest;
 
 import commons.config.Configuration;
+import commons.util.DataUnit;
+import commons.util.TimeUnit;
 
 /**
  * This class contains tests for the Contract entity between a SaaS user and a SaaS provider.
@@ -20,21 +22,18 @@ import commons.config.Configuration;
  */
 public class ContractTest extends ValidConfigurationTest {
 	
-	private static final long HOUR_IN_MILLIS = 3600000;
-	private static final long MB_IN_BYTES = 1024 * 1024;
-
 	private String plan1 = "bronze";
 	private String plan2 = "gold";
 	private static final int HIGH = 0;
 	private static final int LOW = 1;
 	private double setupCost = 1000.0;
 	private double price = 24.95;
-	private long cpuLimit = 10 * HOUR_IN_MILLIS;
-	private double extraCpuCost = 5.0;
-	private long [] transferenceLimits = {2048};
-	private double [] transferenceCosts = {0, 0.005};
-	private long storageLimits = 200;
-	private double storageCosts = 0.1;
+	private long cpuLimit = 10 * TimeUnit.HOUR.getMillis();
+	private double extraCpuCost = 5.0/TimeUnit.HOUR.getMillis();
+	private long [] transferenceLimits = {2048 * DataUnit.MB.getBytes()};
+	private double [] transferenceCosts = {0, 0.005/DataUnit.MB.getBytes()};
+	private long storageLimits = 200 * DataUnit.MB.getBytes();
+	private double storageCosts = 0.1 / DataUnit.MB.getBytes();
 
 	private Contract c1;
 	private Contract c2;
@@ -100,14 +99,14 @@ public class ContractTest extends ValidConfigurationTest {
 	 */
 	@Test
 	public void testCalculateReceiptWithConsumptionHigherThanCPULimit(){
-		long extraConsumedCpu = 50 * HOUR_IN_MILLIS;
+		long extraConsumedCpu = 50;
 		int userID = 1;
 		
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addToReceipt(userID , plan1, 50 * HOUR_IN_MILLIS, price + 50 * extraCpuCost, 0, 0, 0);
+		entry.addToReceipt(userID , plan1, 50 * TimeUnit.HOUR.getMillis(), price + 50 * TimeUnit.HOUR.getMillis() * extraCpuCost, 0, 0, 0);
 		EasyMock.replay(entry);
 
-		c1.calculateReceipt(entry, userID, cpuLimit + extraConsumedCpu, 0, 0, 0);
+		c1.calculateReceipt(entry, userID, cpuLimit + extraConsumedCpu * TimeUnit.HOUR.getMillis(), 0, 0, 0);
 		
 		EasyMock.verify(entry);
 	}
@@ -117,7 +116,7 @@ public class ContractTest extends ValidConfigurationTest {
 	 */
 	@Test
 	public void testCalculateReceiptWithTransferConsumptionBelowMinimum(){
-		long transferenceInBytes = (transferenceLimits[0] - 1024) * MB_IN_BYTES;
+		long transferenceInBytes = 1024 * DataUnit.MB.getBytes();
 		int userID = 1;
 		
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
@@ -134,16 +133,16 @@ public class ContractTest extends ValidConfigurationTest {
 	 */
 	@Test
 	public void testCalculateReceiptWithTransferConsumptionAboveMaximum(){
-		long transferenceInMB = (transferenceLimits[0] + 1024);
+		long transferenceInBytes = 3 * DataUnit.GB.getBytes();
 		double expectedCost = transferenceLimits[0] * transferenceCosts[0] + 
-				(transferenceInMB - transferenceLimits[0]) * transferenceCosts[1];
+				(transferenceInBytes - transferenceLimits[0]) * transferenceCosts[1];
 		int userID = 1;
 		
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addToReceipt(userID, plan1, 0, price, transferenceInMB * MB_IN_BYTES, expectedCost, 0);
+		entry.addToReceipt(userID, plan1, 0, price, transferenceInBytes, expectedCost, 0);
 		EasyMock.replay(entry);
 
-		c1.calculateReceipt(entry, userID, cpuLimit, transferenceInMB * MB_IN_BYTES, 0, 0);
+		c1.calculateReceipt(entry, userID, cpuLimit, transferenceInBytes, 0, 0);
 		
 		EasyMock.verify(entry);
 	}
@@ -159,7 +158,7 @@ public class ContractTest extends ValidConfigurationTest {
 		entry.addToReceipt(userID, plan1, 0, price, 0, 0, 0);
 		EasyMock.replay(entry);
 
-		c1.calculateReceipt(entry, userID, cpuLimit, 0, 0, storageLimits * MB_IN_BYTES);
+		c1.calculateReceipt(entry, userID, cpuLimit, 0, 0, storageLimits);
 		
 		EasyMock.verify(entry);
 	}
@@ -176,7 +175,7 @@ public class ContractTest extends ValidConfigurationTest {
 		entry.addToReceipt(userID, plan1, 0, price, 0, 0, extraStorageConsumedInMB * storageCosts);
 		EasyMock.replay(entry);
 
-		c1.calculateReceipt(entry, userID, cpuLimit, 0, 0, (storageLimits + extraStorageConsumedInMB) * MB_IN_BYTES);
+		c1.calculateReceipt(entry, userID, cpuLimit, 0, 0, (storageLimits + extraStorageConsumedInMB));
 		
 		EasyMock.verify(entry);
 	}

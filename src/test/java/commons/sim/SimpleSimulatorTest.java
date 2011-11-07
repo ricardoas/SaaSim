@@ -16,7 +16,6 @@ import util.ValidConfigurationTest;
 import commons.cloud.MachineType;
 import commons.cloud.Request;
 import commons.io.Checkpointer;
-import commons.io.TickSize;
 import commons.io.WorkloadParser;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.MachineDescriptor;
@@ -28,6 +27,7 @@ import commons.sim.jeevent.JEEventType;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
 import commons.util.SimulationInfo;
+import commons.util.TimeUnit;
 
 public class SimpleSimulatorTest extends ValidConfigurationTest {
 	
@@ -377,7 +377,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(2);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1);
 		
-		monitor.chargeUsers(31 * TickSize.DAY.getTickInMillis() - 1);
+		monitor.chargeUsers(31 * TimeUnit.DAY.getMillis() - 1);
 		EasyMock.expectLastCall().times(1);
 		
 		EasyMock.replay(monitor, scheduler, handler);
@@ -386,7 +386,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		simulator.setMonitor(monitor);
 		
-		JEEvent event = new JEEvent(JEEventType.CHARGE_USERS, handler, 31 * TickSize.DAY.getTickInMillis() - 1);
+		JEEvent event = new JEEvent(JEEventType.CHARGE_USERS, handler, 31 * TimeUnit.DAY.getMillis() - 1);
 		simulator.handleEvent(event);
 		
 		EasyMock.verify(monitor, scheduler, handler);
@@ -686,7 +686,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		assertEquals(JEEventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
 		assertEquals(JEEventType.CHARGE_USERS, thirdEvent.getValue().getType());
 		
-		assertEquals(31 * TickSize.DAY.getTickInMillis() - 1, thirdEvent.getValue().getScheduledTime());
+		assertEquals(31 * TimeUnit.DAY.getMillis() - 1, thirdEvent.getValue().getScheduledTime());
 		
 		EasyMock.verify(monitor, loadBalancer, scheduler);
 	}

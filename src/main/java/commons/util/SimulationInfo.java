@@ -42,6 +42,11 @@ public class SimulationInfo implements Serializable{
 		finishDay = Long.MAX_VALUE;
 	}
 
+	@Deprecated
+	public SimulationInfo(int i, int j, int k) {
+		finishDay = k;
+	}
+
 	public int getCurrentDay() {
 		return (int)(currentDay/DAY_IN_MILLIS);
 	}

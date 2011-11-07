@@ -119,7 +119,7 @@ public class UserTest extends CleanConfigurationTest {
 		user.reportFinishedRequest(request);
 		user.reportFinishedRequest(request);
 		
-		assertEquals(STORAGE_IN_BYTES, user.getStorageInMB());
+		assertEquals(STORAGE_IN_BYTES, user.getStorageInBytes());
 		assertEquals(totalProcessed * 2, user.getConsumedCpuInMillis());
 		assertEquals(requestSize * 2, user.getConsumedInTransferenceInBytes());
 		assertEquals(responseSize * 2, user.getConsumedOutTransferenceInBytes());
@@ -128,7 +128,7 @@ public class UserTest extends CleanConfigurationTest {
 		
 		EasyMock.verify(gold, request, entry);
 		
-		assertEquals(STORAGE_IN_BYTES, user.getStorageInMB());
+		assertEquals(STORAGE_IN_BYTES, user.getStorageInBytes());
 		assertEquals(0, user.getConsumedCpuInMillis());
 		assertEquals(0, user.getConsumedInTransferenceInBytes());
 		assertEquals(0, user.getConsumedOutTransferenceInBytes());

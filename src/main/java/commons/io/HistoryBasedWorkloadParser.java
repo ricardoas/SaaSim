@@ -5,6 +5,7 @@ import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import commons.cloud.Request;
+import commons.util.TimeUnit;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -21,7 +22,7 @@ public class HistoryBasedWorkloadParser extends TimeBasedWorkloadParser{
 	 * @param tick
 	 */
 	//FIXME!
-	public HistoryBasedWorkloadParser(WorkloadParser<Request> parser, TickSize tick) {
+	public HistoryBasedWorkloadParser(WorkloadParser<Request> parser, TimeUnit tick) {
 		this(parser, tick, DEFAULT_WINDOW_SIZE);
 	}
 	
@@ -31,8 +32,8 @@ public class HistoryBasedWorkloadParser extends TimeBasedWorkloadParser{
 	 * @param windowSize
 	 */
 	@SuppressWarnings("unchecked")
-	public HistoryBasedWorkloadParser(WorkloadParser<Request> parser, TickSize tick, int windowSize) {
-		super(tick.getTickInMillis(), parser);//FIXME remove null
+	public HistoryBasedWorkloadParser(WorkloadParser<Request> parser, TimeUnit tick, int windowSize) {
+		super(tick.getMillis(), parser);//FIXME remove null
 		this.history = new LinkedBlockingQueue<List<Request>>(windowSize);
 	}
 	
