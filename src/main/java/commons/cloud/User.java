@@ -23,16 +23,16 @@ public class User implements Comparable<User>, Serializable{
 	private long consumedCpuInMillis;
 	private long consumedInTransferenceInBytes;
 	private long consumedOutTransferenceInBytes;
-	private final long consumedStorageInBytes;
+	private final long storageInMB;
 	
 	/**
 	 * Default constructor.
 	 * @param contract
 	 */
-	public User(int id, Contract contract, long consumedStorageInBytes) {
+	public User(int id, Contract contract, long storageInMB) {
 		this.id = id;
 		this.contract = contract;
-		this.consumedStorageInBytes = consumedStorageInBytes;
+		this.storageInMB = storageInMB;
 		reset();
 	}
 	
@@ -75,8 +75,8 @@ public class User implements Comparable<User>, Serializable{
 	/**
 	 * @return the consumedStorageInBytes
 	 */
-	public long getConsumedStorageInBytes() {
-		return consumedStorageInBytes;
+	public long getStorageInMB() {
+		return storageInMB;
 	}
 
 	private void reset(){
@@ -97,7 +97,7 @@ public class User implements Comparable<User>, Serializable{
 		double penalty = this.contract.calculatePenalty((1.0 * numberOfLostRequests) / (numberOfLostRequests+numberOfFinishedRequests));
 		entry.addPenalty(penalty);
 		
-		this.contract.calculateReceipt(entry, id, consumedCpuInMillis, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, consumedStorageInBytes);
+		this.contract.calculateReceipt(entry, id, consumedCpuInMillis, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, storageInMB);
 		this.reset();
 	}
 
@@ -137,7 +137,7 @@ public class User implements Comparable<User>, Serializable{
 				+ consumedInTransferenceInBytes
 				+ ", consumedOutTransferenceInBytes="
 				+ consumedOutTransferenceInBytes + ", consumedStorageInBytes="
-				+ consumedStorageInBytes + "]";
+				+ storageInMB + "]";
 	}
 
 	@Override

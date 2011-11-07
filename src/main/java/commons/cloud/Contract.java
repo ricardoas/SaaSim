@@ -2,6 +2,7 @@ package commons.cloud;
 
 import java.io.Serializable;
 
+import commons.io.TickSize;
 import commons.util.CostCalculus;
 
 
@@ -17,19 +18,17 @@ public class Contract implements Comparable<Contract>, Serializable{
 	 * Version 1.0
 	 */
 	private static final long serialVersionUID = 6035889541983334272L;
-	private static final long HOUR_IN_MILLIS = 3600000;
-	private static final long MB_IN_BYTES = 1024 * 1024;
 
 	private final String name;
 	private final int priority;
-	private final double price;//in $
-	private final double setupCost;//in $
-	private final long cpuLimitInMillis;// in hours
-	private final double extraCpuCost;// in $/hour
-	private final long[] transferenceLimitsInBytes;
-	private final double[] transferenceCosts;
+	private final double price;
+	private final double setupCost;
+	private final long cpuLimitInMillis;
+	private final double extraCpuCostPerMillis;
+	private final long[] transferenceLimitsInMB;
+	private final double[] transferenceCostsPerMB;
 	private final long storageLimitInMB;
-	private final double storageCostPerMB;
+	private final double extraStorageCostPerMB;
 	
 	/**
 	 * Default constructor.
@@ -37,26 +36,26 @@ public class Contract implements Comparable<Contract>, Serializable{
 	 * @param priority
 	 * @param setupCost
 	 * @param price
-	 * @param cpuLimitInMillis
-	 * @param extraCpuCost
-	 * @param transferenceLimitsInBytes
-	 * @param transferenceCosts
+	 * @param cpuLimitInHours
+	 * @param extraCpuCostPerHour
+	 * @param transferenceLimitsInMB
+	 * @param transferenceCostsPerMB
 	 * @param storageLimitInMB
 	 * @param storageCostPerMB
 	 */
 	public Contract(String planName, int priority, double setupCost, double price,
-			long cpuLimitInMillis, double extraCpuCost, long[] transferenceLimitsInBytes, double[] transferenceCosts,
+			long cpuLimitInHours, double extraCpuCostPerHour, long[] transferenceLimitsInMB, double[] transferenceCostsPerMB,
 			long storageLimitInMB, double storageCostPerMB) {
 		this.name = planName;
 		this.priority = priority;
 		this.price = price;
 		this.setupCost = setupCost;
-		this.cpuLimitInMillis = cpuLimitInMillis;
-		this.extraCpuCost = extraCpuCost;
-		this.transferenceLimitsInBytes = transferenceLimitsInBytes;
-		this.transferenceCosts = transferenceCosts;
+		this.cpuLimitInMillis = cpuLimitInHours * TickSize.HOUR.getTickInMillis();
+		this.extraCpuCostPerMillis = extraCpuCostPerHour / TickSize.HOUR.getTickInMillis();
+		this.transferenceLimitsInMB = transferenceLimitsInMB;
+		this.transferenceCostsPerMB = transferenceCostsPerMB;
 		this.storageLimitInMB = storageLimitInMB;
-		this.storageCostPerMB = storageCostPerMB;
+		this.extraStorageCostPerMB = storageCostPerMB;
 	}
 	
 	/**
@@ -97,22 +96,22 @@ public class Contract implements Comparable<Contract>, Serializable{
 	/**
 	 * @return the extraCpuCost
 	 */
-	public double getExtraCpuCost() {
-		return extraCpuCost;
+	public double getExtraCpuCostPerMillis() {
+		return extraCpuCostPerMillis;
 	}
 	
 	/**
 	 * @return the transferenceLimits
 	 */
-	public long[] getTransferenceLimitsInBytes() {
-		return transferenceLimitsInBytes;
+	public long[] getTransferenceLimitsInMB() {
+		return transferenceLimitsInMB;
 	}
 
 	/**
 	 * @return the transferenceCosts
 	 */
-	public double[] getTransferenceCosts() {
-		return transferenceCosts;
+	public double[] getTransferenceCostsPerMB() {
+		return transferenceCostsPerMB;
 	}
 	
 	/**
@@ -126,7 +125,7 @@ public class Contract implements Comparable<Contract>, Serializable{
 	 * @return storageStorageCostPerMB
 	 */
 	public double getStorageCostPerMB() {
-		return storageCostPerMB;
+		return extraStorageCostPerMB;
 	}
 
 	/**
@@ -150,8 +149,7 @@ public class Contract implements Comparable<Contract>, Serializable{
 		assert obj.getClass() == getClass(): "Can't compare with another class objects!";
 		if (this == obj)
 			return true;
-		Contract other = (Contract) obj;
-		return name.equals(other.name);
+		return name.equals(((Contract) obj).name);
 	}
 
 	/**
@@ -161,7 +159,7 @@ public class Contract implements Comparable<Contract>, Serializable{
 	public String toString() {
 		return "Contract [name=" + name + ", price=" + price + ", setupCost="
 				+ setupCost + ", cpuLimit=" + cpuLimitInMillis + ", extraCpuCost="
-				+ extraCpuCost + "]";
+				+ extraCpuCostPerMillis + "]";
 	}
 
 	/**
@@ -177,17 +175,17 @@ public class Contract implements Comparable<Contract>, Serializable{
 	 * @param consumedCpu
 	 * @param consumedInTransferenceInBytes
 	 * @param consumedOutTransferenceInBytes
-	 * @param consumedStorageInBytes
+	 * @param consumedStorageInMB
 	 */
 	public void calculateReceipt(UtilityResultEntry entry, int userID, long consumedCpu, long consumedInTransferenceInBytes,
-			long consumedOutTransferenceInBytes, long consumedStorageInBytes) {
+			long consumedOutTransferenceInBytes, long consumedStorageInMB) {
 		long extraConsumedCPU = Math.max(0, consumedCpu - cpuLimitInMillis);
-		double costOfCPU = price + (1.0*extraConsumedCPU)/HOUR_IN_MILLIS * extraCpuCost;
+		double costOfCPU = price + (1.0*extraConsumedCPU)/TickSize.HOUR.getTickInMillis() * extraCpuCostPerMillis;
 		
 		long consumedTransference = consumedInTransferenceInBytes + consumedOutTransferenceInBytes;
-		double transferenceCost = CostCalculus.calcTransferenceCost(consumedTransference , transferenceLimitsInBytes, transferenceCosts, CostCalculus.MB_IN_BYTES);
+		double transferenceCost = CostCalculus.calcTransferenceCost(consumedTransference , transferenceLimitsInMB, transferenceCostsPerMB, CostCalculus.MB_IN_BYTES);
 		
-		double storageCost = Math.max(0, (1.0*consumedStorageInBytes)/MB_IN_BYTES - storageLimitInMB) * storageCostPerMB;
+		double storageCost = Math.max(0, consumedStorageInMB - storageLimitInMB) * extraStorageCostPerMB;
 		
 		entry.addToReceipt(userID, getName(), extraConsumedCPU, costOfCPU, consumedTransference, transferenceCost, storageCost);
 	}

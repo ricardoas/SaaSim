@@ -272,34 +272,31 @@ public class Configuration extends PropertiesConfiguration{
 		
 		int numberOfPlans = getInt(NUMBER_OF_PLANS);
 		String[] planNames = getStringArray(PLAN_NAME);
-		int[] planPriorities = getIntegerArray(PLAN_PRIORITY);
+		int[] priorities = getIntegerArray(PLAN_PRIORITY);
 		double[] prices = getDoubleArray(PLAN_PRICE);
 		double[] setupCosts = getDoubleArray(PLAN_SETUP);
-		long[] cpuLimits = getLongArray(PLAN_CPU_LIMIT);
-		double[] extraCpuCosts = getDoubleArray(PLAN_EXTRA_CPU_COST);
-		long[][] planTransferLimits = getLong2DArray(PLAN_TRANSFER_LIMIT);
-		double[][] planExtraTransferCost = getDouble2DArray(PLAN_EXTRA_TRANSFER_COST);
-		long[] planStorageLimits = getLongArray(PLAN_STORAGE_LIMIT);
-		double[] planExtraStorageCosts = getDoubleArray(PLAN_EXTRA_STORAGE_COST);
+		long[] cpuLimitsInHours = getLongArray(PLAN_CPU_LIMIT);
+		double[] extraCpuCostsPerHour = getDoubleArray(PLAN_EXTRA_CPU_COST);
+		long[][] planTransferLimitsInMB = getLong2DArray(PLAN_TRANSFER_LIMIT);
+		double[][] transferCostsPerMB = getDouble2DArray(PLAN_EXTRA_TRANSFER_COST);
+		long[] storageLimitsInMB = getLongArray(PLAN_STORAGE_LIMIT);
+		double[] storageCostsPerMB = getDoubleArray(PLAN_EXTRA_STORAGE_COST);
 		
 		Map<String, Contract> contractsPerName = new HashMap<String, Contract>();
 		for(int i = 0; i < numberOfPlans; i++){
-			if(planTransferLimits[i].length != planExtraTransferCost[i].length - 1){
+			if(planTransferLimitsInMB[i].length != transferCostsPerMB[i].length - 1){
 				throw new ConfigurationException("Check values of " + PLAN_TRANSFER_LIMIT + " and " + PLAN_EXTRA_TRANSFER_COST);
 			}
 			contractsPerName.put(planNames[i], 
-					new Contract(planNames[i], planPriorities[i], setupCosts[i], prices[i], 
-							cpuLimits[i], extraCpuCosts[i], planTransferLimits[i], planExtraTransferCost[i],
-							planStorageLimits[i], planExtraStorageCosts[i]));
+					new Contract(planNames[i], priorities[i], setupCosts[i], prices[i], 
+							cpuLimitsInHours[i], extraCpuCostsPerHour[i], planTransferLimitsInMB[i], transferCostsPerMB[i],
+							storageLimitsInMB[i], storageCostsPerMB[i]));
 		}
 		
-//		String[] ids = getStringArray(SAAS_USER_ID);
-//		String plan = getString(SAAS_USER_PLAN);
-//		long storage = getLong(SAAS_USER_STORAGE);
-		String[] plans = getStringArray(SAAS_USER_PLAN);
-		long[] storage = getLongArray(SAAS_USER_STORAGE);
-		
 		int numberOfUsers = getInt(SAAS_NUMBER_OF_USERS);
+		
+		String[] plans = getStringArray(SAAS_USER_PLAN);
+		long[] storageInMB = getLongArray(SAAS_USER_STORAGE);
 		
 		users = new User[numberOfUsers];
 		for (int i = 0; i < numberOfUsers; i++) {
@@ -307,7 +304,7 @@ public class Configuration extends PropertiesConfiguration{
 				throw new ConfigurationException("Cannot find configuration for plan " + plans[i] + ". Check contracts file.");
 			}
 			
-			users[i] = new User(i, contractsPerName.get(plans[i]), storage[i]);
+			users[i] = new User(i, contractsPerName.get(plans[i]), storageInMB[i]);
 		}
 		return users;
 	}
@@ -333,8 +330,6 @@ public class Configuration extends PropertiesConfiguration{
 		List<String> providersWithPlan = Arrays.asList(getStringArray(IAAS_PLAN_PROVIDER_NAME));
 		MachineType[][] machines = getEnum2DArray(IAAS_PLAN_PROVIDER_TYPES, MachineType.class);
 		long[][] reservations = getLong2DArray(IAAS_PLAN_PROVIDER_RESERVATION);
-		
-//		changeNumberOfStartUpServers(reservations);
 		
 		providers = new Provider[numberOfProviders];
 		

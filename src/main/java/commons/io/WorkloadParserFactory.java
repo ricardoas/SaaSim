@@ -35,7 +35,7 @@ public class WorkloadParserFactory {
 				
 				WorkloadParser<Request>[] parsers = new WorkloadParser[workloadFiles.length];
 				if(workloadFiles.length == 1){
-					return new TimeBasedWorkloadParser(pageSize, new GEISTSingleFileWorkloadParser(workloads[0]));
+					return new TimeBasedWorkloadParser(pageSize, new GEISTMultiFileWorkloadParser(workloads[0], 0));
 				}
 				
 				for(int i =0; i < workloadFiles.length; i++){

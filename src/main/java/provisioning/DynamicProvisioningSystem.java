@@ -87,13 +87,15 @@ public class DynamicProvisioningSystem implements DPS{
 		}
 		
 		//Adding on-demand machines
-		for (Provider provider : this.providers) {
-			while(provider.canBuyMachine(false, MachineType.M1_XLARGE) && serversAdded < numberOfInitialServers){
-				configurable.addServer(tier, provider.buyMachine(false, MachineType.M1_XLARGE), false);
-				serversAdded++;
-			}
-			if(serversAdded == numberOfInitialServers){
-				return;
+		for(MachineType machineType : typeList){
+			for (Provider provider : this.providers) {
+				while(provider.canBuyMachine(false, machineType) && serversAdded < numberOfInitialServers){
+					configurable.addServer(tier, provider.buyMachine(false, machineType), false);
+					serversAdded++;
+				}
+				if(serversAdded == numberOfInitialServers){
+					return;
+				}
 			}
 		}
 	}

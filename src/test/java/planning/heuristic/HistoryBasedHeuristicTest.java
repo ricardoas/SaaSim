@@ -56,13 +56,13 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		super.setUp();
 		buildFullConfiguration();
 		Checkpointer.clear();
-		ApplicationFactory.reset();
+//		ApplicationFactory.reset();
 	}
 	
 	@After
 	public void tearDown(){
 		Checkpointer.clear();
-		ApplicationFactory.reset();
+//		ApplicationFactory.reset();
 	}
 	
 	@Test

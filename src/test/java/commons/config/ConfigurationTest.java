@@ -271,9 +271,9 @@ public class ConfigurationTest {
 		assertEquals(299.95, c1.getPrice(), 0.0);
 		assertEquals(0.0, c1.getSetupCost(), 0.0);
 		assertEquals(10, c1.getCpuLimitInMillis(), 0.0);
-		assertEquals(1, c1.getExtraCpuCost(), 0.0);
-		Assert.assertArrayEquals(new long[]{46080}, c1.getTransferenceLimitsInBytes());
-		Assert.assertArrayEquals(new double[]{0,0.005}, c1.getTransferenceCosts(), 0.0);
+		assertEquals(1, c1.getExtraCpuCostPerMillis(), 0.0);
+		Assert.assertArrayEquals(new long[]{46080}, c1.getTransferenceLimitsInMB());
+		Assert.assertArrayEquals(new double[]{0,0.005}, c1.getTransferenceCostsPerMB(), 0.0);
 		assertEquals(3072, c1.getStorageLimitInMB(), 0.0);
 		assertEquals(0.1, c1.getStorageCostPerMB(), 0.0);
 
@@ -284,9 +284,9 @@ public class ConfigurationTest {
 		assertEquals(149.95, c2.getPrice(), 0.0);
 		assertEquals(0, c2.getSetupCost(), 0.0);
 		assertEquals(10, c2.getCpuLimitInMillis(), 0.0);
-		assertEquals(1, c2.getExtraCpuCost(), 0.0);
-		Assert.assertArrayEquals(new long[]{15360}, c2.getTransferenceLimitsInBytes());
-		Assert.assertArrayEquals(new double[]{0,0.005}, c2.getTransferenceCosts(), 0.0);
+		assertEquals(1, c2.getExtraCpuCostPerMillis(), 0.0);
+		Assert.assertArrayEquals(new long[]{15360}, c2.getTransferenceLimitsInMB());
+		Assert.assertArrayEquals(new double[]{0,0.005}, c2.getTransferenceCostsPerMB(), 0.0);
 		assertEquals(1024, c2.getStorageLimitInMB(), 0.0);
 		assertEquals(0.1, c2.getStorageCostPerMB(), 0.0);
 	}
@@ -306,9 +306,9 @@ public class ConfigurationTest {
 		assertEquals(299.95, c1.getPrice(), 0.0);
 		assertEquals(0.0, c1.getSetupCost(), 0.0);
 		assertEquals(10, c1.getCpuLimitInMillis(), 0.0);
-		assertEquals(1, c1.getExtraCpuCost(), 0.0);
-		Assert.assertArrayEquals(new long[]{46080}, c1.getTransferenceLimitsInBytes());
-		Assert.assertArrayEquals(new double[]{0,0.005}, c1.getTransferenceCosts(), 0.0);
+		assertEquals(1, c1.getExtraCpuCostPerMillis(), 0.0);
+		Assert.assertArrayEquals(new long[]{46080}, c1.getTransferenceLimitsInMB());
+		Assert.assertArrayEquals(new double[]{0,0.005}, c1.getTransferenceCostsPerMB(), 0.0);
 		assertEquals(3072, c1.getStorageLimitInMB(), 0.0);
 		assertEquals(0.1, c1.getStorageCostPerMB(), 0.0);
 
@@ -319,9 +319,9 @@ public class ConfigurationTest {
 		assertEquals(299.95, c2.getPrice(), 0.0);
 		assertEquals(0.0, c2.getSetupCost(), 0.0);
 		assertEquals(10, c2.getCpuLimitInMillis(), 0.0);
-		assertEquals(1, c2.getExtraCpuCost(), 0.0);
-		Assert.assertArrayEquals(new long[]{46080}, c2.getTransferenceLimitsInBytes());
-		Assert.assertArrayEquals(new double[]{0,0.005}, c2.getTransferenceCosts(), 0.0);
+		assertEquals(1, c2.getExtraCpuCostPerMillis(), 0.0);
+		Assert.assertArrayEquals(new long[]{46080}, c2.getTransferenceLimitsInMB());
+		Assert.assertArrayEquals(new double[]{0,0.005}, c2.getTransferenceCostsPerMB(), 0.0);
 		assertEquals(3072, c2.getStorageLimitInMB(), 0.0);
 		assertEquals(0.1, c2.getStorageCostPerMB(), 0.0);
 	}
