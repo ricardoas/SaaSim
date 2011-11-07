@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.log4j.Logger;
+
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.Request;
@@ -34,6 +37,8 @@ public class DynamicProvisioningSystem implements DPS{
 	protected final User[] users;
 	
 	protected final Provider[] providers;
+	
+	Logger log = Logger.getLogger(getClass());
 	
 	/**
 	 * Default constructor.
@@ -127,7 +132,7 @@ public class DynamicProvisioningSystem implements DPS{
 	 */
 	@Override
 	public void sendStatistics(long now, MachineStatistics statistics, int tier) {
-		// Nothing to do
+		log.info("STAT" + now + " " + tier + " " + statistics);
 	}
 
 	/**

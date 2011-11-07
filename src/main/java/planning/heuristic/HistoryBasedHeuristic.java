@@ -79,7 +79,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 		LoadBalancer[] loadBalancers = calculateMachinesUsage(simulator);
 		Configuration config = Configuration.getInstance();
 		
-		System.out.println("DAy: "+Checkpointer.loadSimulationInfo().getCurrentDay());
+//		System.out.println("DAy: "+Checkpointer.loadSimulationInfo().getCurrentDay());
 		
 		if(Checkpointer.loadSimulationInfo().isFinished()){//Simulation finished!
 			

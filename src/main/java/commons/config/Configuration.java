@@ -324,8 +324,8 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	}
 
 	private void checkRanjanProperties() throws ConfigurationException {
-		Validator.checkPositive(RANJAN_HEURISTIC_NUMBER_OF_TOKENS, getString(RANJAN_HEURISTIC_NUMBER_OF_TOKENS));
-		Validator.checkNonNegative(RANJAN_HEURISTIC_BACKLOG_SIZE, getString(RANJAN_HEURISTIC_BACKLOG_SIZE));
+		Validator.checkPositive(MACHINE_NUMBER_OF_TOKENS, getString(MACHINE_NUMBER_OF_TOKENS));
+		Validator.checkNonNegative(MACHINE_BACKLOG_SIZE, getString(MACHINE_BACKLOG_SIZE));
 	}
 
 	// ************************************* SaaS APP ************************************/

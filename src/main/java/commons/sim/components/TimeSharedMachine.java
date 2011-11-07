@@ -71,8 +71,8 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		this.semaphore = new FastSemaphore(this.NUMBER_OF_CORES);
 		this.maxThreads = Long.MAX_VALUE;
 		this.maxBacklogSize = 0;
-		this.maxThreads = Configuration.getInstance().getLong(RANJAN_HEURISTIC_NUMBER_OF_TOKENS, Long.MAX_VALUE);
-		this.maxBacklogSize = Configuration.getInstance().getLong(RANJAN_HEURISTIC_BACKLOG_SIZE, 0);
+		this.maxThreads = Configuration.getInstance().getLong(MACHINE_NUMBER_OF_TOKENS, Long.MAX_VALUE);
+		this.maxBacklogSize = Configuration.getInstance().getLong(MACHINE_BACKLOG_SIZE, 0);
 		this.backlog = new LinkedList<Request>();
 		this.maxOnQueue = maxThreads - NUMBER_OF_CORES;
 	}
