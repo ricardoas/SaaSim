@@ -10,7 +10,7 @@ import commons.config.Configuration;
 import commons.io.Checkpointer;
 import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEEventScheduler;
-import commons.sim.util.ApplicationFactory;
+import commons.sim.util.SimulatorProperties;
 
 /**
  * This class is responsible for obtaining input parameters, from a configuration file, such as: workload, cloud provider
@@ -29,11 +29,10 @@ public class Main {
 		try {
 			//Loading simulator configuration data
 			Configuration.buildInstance(args[0]);
-//			Configuration config = Configuration.getInstance();
+			Configuration.getInstance().setProperty(SimulatorProperties.USE_ERROR, true);
 			
 			JEEventScheduler scheduler = Checkpointer.loadScheduler();
 			DPS dps = DPSFactory.createDPS();
-//			LoadBalancer[] loadBalancers = ApplicationFactory.getInstance().buildApplication(scheduler);
 			LoadBalancer[] loadBalancers = Checkpointer.loadApplication().getTiers();
 			
 			//Creating planner
