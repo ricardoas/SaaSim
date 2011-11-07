@@ -10,11 +10,11 @@ import commons.cloud.Request;
  */
 public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	
-	private final long tick;
-	private long currentTick;
+	protected final long tick;
+	protected long currentTick;
 
-	private Request[] leftOver;
-	private WorkloadParser<Request>[] parsers;
+	protected Request[] leftOver;
+	protected WorkloadParser<Request>[] parsers;
 	
 	/**
 	 * @param tick
@@ -37,28 +37,6 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	
 	@Override
 	public void applyError(double error) {
-		if(error == 0.0){
-			return;
-		}
-		
-		int totalParsers = (int)Math.round(this.parsers.length * (1+error));
-		WorkloadParser<Request>[] newParsers = new WorkloadParser[totalParsers];
-		if(totalParsers > this.parsers.length){//Adding already existed parsers
-			int difference = totalParsers - this.parsers.length;
-			for(int i = 0; i < this.parsers.length; i++){
-				newParsers[i] = this.parsers[i];
-			}
-			int index = this.parsers.length;
-			for(int i = 0; i < difference; i++){
-				newParsers[index++] = this.parsers[i].clone();
-			}
-		}else{//Removing some parsers
-			for(int i = 0; i < totalParsers; i++){
-				newParsers[i] = this.parsers[i];
-			}
-		}
-		
-		this.parsers = newParsers;
 	}
 
 	@Override
@@ -71,7 +49,6 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	 */
 	@Override
 	public List<Request> next(){
-//		System.err.println("TimeBasedWorkloadParser.next(): " + (currentTick/tick));
 		List<Request> requests = new ArrayList<Request>();
 		
 		for (int i = 0; i < leftOver.length; i++) {
@@ -99,7 +76,6 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 			}
 		}
 		
-//		System.err.println("TimeBasedWorkloadParser.next(): " + (currentTick/tick));
 		this.currentTick += tick;
 		return requests;
 	}
