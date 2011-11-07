@@ -27,4 +27,6 @@ public class SimulatorProperties {
 	public static final String PARSER_IDIOM = "dps.workload.parser";
 	
 	public static final String PARSER_PAGE_SIZE = "dps.workload.pagesize";
+
+	public static final String USE_ERROR = "use.error";
 }
