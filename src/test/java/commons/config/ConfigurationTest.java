@@ -266,7 +266,7 @@ public class ConfigurationTest {
 		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
 		User[] users = Checkpointer.loadUsers();
 		assertNotNull(users);
-		assertEquals(2, users.length);
+		assertEquals(1, users.length);
 		
 		Contract c1 = users[0].getContract();
 		assertNotNull(c1);
@@ -280,19 +280,6 @@ public class ConfigurationTest {
 		Assert.assertArrayEquals(new double[]{0,0.005 / DataUnit.MB.getBytes()}, c1.getTransferenceCostsPerByte(), 0.0);
 		assertEquals(3072 * DataUnit.MB.getBytes(), c1.getStorageLimitInBytes(), 0.0);
 		assertEquals(0.1 / DataUnit.MB.getBytes(), c1.getExtraStorageCostPerByte(), 0.0);
-
-		Contract c2 = users[1].getContract();
-		assertNotNull(c2);
-		assertEquals("diamond", c2.getName());
-		assertEquals(100, c2.getPriority());
-		assertEquals(299.95, c2.getPrice(), 0.0);
-		assertEquals(0.0, c2.getSetupCost(), 0.0);
-		assertEquals(10, c2.getCpuLimitInMillis(), 0.0);
-		assertEquals(1, c2.getExtraCpuCostPerMillis(), 0.0);
-		Assert.assertArrayEquals(new long[]{46080 * DataUnit.MB.getBytes()}, c2.getTransferenceLimitsInBytes());
-		Assert.assertArrayEquals(new double[]{0,0.005 / DataUnit.MB.getBytes()}, c2.getTransferenceCostsPerByte(), 0.0);
-		assertEquals(3072 * DataUnit.MB.getBytes(), c2.getStorageLimitInBytes(), 0.0);
-		assertEquals(0.1 / DataUnit.MB.getBytes(), c2.getExtraStorageCostPerByte(), 0.0);
 	}
 	
 	/**

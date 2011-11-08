@@ -40,7 +40,7 @@ public class AbstractWorkloadParserTest extends ValidConfigurationTest{
 		 * @param saasclientID
 		 */
 		public TestParser(String workload, int saasclientID) {
-			super(workload, saasclientID, 0);
+			super(workload, 0);
 		}
 
 		/**

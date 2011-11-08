@@ -49,7 +49,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 		this.currentTick = Checkpointer.loadSimulationInfo().getCurrentDayInMillis() + tick;
 		this.leftOver = new Request[workloadFiles.length];
 		for(int i = 0; i < workloadFiles.length; i++){
-			this.parsers[i] = new GEISTWorkloadParser(workloadFiles[i], index++);
+			this.parsers[i] = new GEISTWorkloadParser(workloadFiles[i]);
 		}
 		this.SLA = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME);
 		this.nextRequestsCounter = new double[36000];
@@ -206,10 +206,5 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 				}
 			}
 		}
-	}
-	
-	@Override
-	public void requestQueued(long timeMilliSeconds, Request request, int tier) {
-		reportLostRequest(request);
 	}
 }

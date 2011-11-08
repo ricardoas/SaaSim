@@ -6,6 +6,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 
 import commons.config.Configuration;
+import commons.io.AbstractWorkloadParser;
 import commons.io.Checkpointer;
 
 /**
@@ -23,10 +24,14 @@ public class CleanConfigurationTest {
 	@Before
 	public void setUp() throws Exception{
 		Checkpointer.clear();
-//		Checkpointer.loadScheduler().reset();
+		
 		Field field = Configuration.class.getDeclaredField("instance");
 		field.setAccessible(true);
 		field.set(null, null);
+		
+		field = AbstractWorkloadParser.class.getDeclaredField("saasClientIDSeed");
+		field.setAccessible(true);
+		field.set(null, 0);
 	}
 	
 	@AfterClass

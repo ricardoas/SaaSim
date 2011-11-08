@@ -23,13 +23,13 @@ public class GEISTWorkloadParser extends AbstractWorkloadParser{
 	 * Default constructor
 	 * @param workloads 
 	 */
-	public GEISTWorkloadParser(String workload, int saasclientID) {
-		super(workload, saasclientID, Checkpointer.loadSimulationInfo().getCurrentDayInMillis());
+	public GEISTWorkloadParser(String workload) {
+		super(workload, Checkpointer.loadSimulationInfo().getCurrentDayInMillis());
 	}
 	
 	@Override
 	public WorkloadParser<Request> clone() {
-		return new GEISTWorkloadParser(workload, saasClientID);
+		return new GEISTWorkloadParser(workload);
 	}
 
 	/**

@@ -128,7 +128,6 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		}else if(canQueue()){
 			this.backlog.add(request);
 		}else{
-//			System.out.println("Machine full!");
 			send(new JEEvent(JEEventType.REQUESTQUEUED, getLoadBalancer(), getScheduler().now(), request));
 		}
 
@@ -352,6 +351,4 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	protected boolean canQueue() {
 		return this.backlog.size() < maxBacklogSize;
 	}
-	
-
 }

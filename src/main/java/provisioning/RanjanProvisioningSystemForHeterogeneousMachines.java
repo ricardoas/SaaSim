@@ -106,9 +106,4 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 			}
 		}
 	}
-	
-	@Override
-	public void requestQueued(long timeMilliSeconds, Request request, int tier) {
-		reportLostRequest(request);
-	}
 }

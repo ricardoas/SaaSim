@@ -6,8 +6,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream.GetField;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.log4j.Logger;
 
 import planning.util.MachineUsageData;
 
@@ -57,6 +59,7 @@ public class Checkpointer {
 			out.writeObject(accountingSystem);
 			out.writeObject(priorities);
 			out.close();
+			Logger.getLogger(Checkpointer.class).info("CHKP SAVE " + simulationInfo);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -157,8 +160,8 @@ public class Checkpointer {
 			for (int i = 0; i < priorities.length; i++) {
 				priorities[i] = users[i].getContract().getPriority();
 			}
-
 		}
+		Logger.getLogger(Checkpointer.class).info("CHKP LOAD " + simulationInfo);
 	}
 
 	public static AccountingSystem loadAccountingSystem() {

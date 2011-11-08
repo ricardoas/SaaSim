@@ -29,6 +29,7 @@ import commons.cloud.TypeProvider;
 import commons.cloud.User;
 import commons.io.Checkpointer;
 import commons.io.ParserIdiom;
+import commons.sim.util.SimulatorProperties;
 import commons.util.DataUnit;
 import commons.util.TimeUnit;
 
@@ -397,17 +398,8 @@ public class Configuration extends ComplexPropertiesConfiguration{
 		Validator.checkIsNonEmptyStringArray(SAAS_USER_PLAN, getStringArray(SAAS_USER_PLAN));
 		Validator.checkIsNonNegativeArray(SAAS_USER_STORAGE, getStringArray(SAAS_USER_STORAGE));
 		
-		String workload = getString(SAAS_WORKLOAD);
-		if(workload == null || workload.isEmpty()){
-			checkSize(SAAS_USER_WORKLOAD, SAAS_NUMBER_OF_USERS);
-			
-			Validator.checkIsNonEmptyStringArray(SAAS_USER_WORKLOAD, getStringArray(SAAS_USER_WORKLOAD));
-		}else{
-			if(getStringArray(SAAS_USER_WORKLOAD).length != 0){
-				throw new ConfigurationException("Cannot define user specific workload when " +
-						"an unique workload has been already specified.");
-			}
-		}
+		checkSize(SAAS_USER_WORKLOAD, SAAS_NUMBER_OF_USERS);
+		Validator.checkIsNonEmptyStringArray(SAAS_USER_WORKLOAD, getStringArray(SAAS_USER_WORKLOAD));
 	}
 	
 	// ******************************** IAAS PROVIDERS ************************************/
@@ -505,13 +497,25 @@ public class Configuration extends ComplexPropertiesConfiguration{
 
 	public String[] getWorkloads() {
 		String[] workloads = getStringArray(SAAS_USER_WORKLOAD);
-		if(workloads != null && workloads.length != 0){
-			return workloads;
+		
+		if(getBoolean(SimulatorProperties.PLANNIGN_USE_ERROR, false)){
+			int workloadSize = (int) Math.round(workloads.length * (1+getDouble(SimulatorProperties.PLANNING_ERROR, 0.0)));
+			String[] workloadFilesWithErrors = Arrays.copyOf(workloads, workloadSize);
+			for (int i = 0; i < workloadFilesWithErrors.length; i++) {
+				if(workloadFilesWithErrors[i] == null){
+					workloadFilesWithErrors[i] = workloads[(i%workloadSize) - 1];
+				}
+			}
+			workloads = workloadFilesWithErrors;
 		}
-		return new String[]{getString(SAAS_WORKLOAD)};
+		return workloads;
 	}
 
 	public int[] getPriority() {
 		return priorities;
+	}
+
+	public void enableParserError() {
+		setProperty(SimulatorProperties.PLANNIGN_USE_ERROR, true);
 	}
 }

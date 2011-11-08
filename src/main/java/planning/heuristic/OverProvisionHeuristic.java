@@ -86,7 +86,7 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 			this.requestsMeanDemand = (this.requestsMeanDemand + (this.totalProcessingTime / this.numberOfRequests)) / 2;
 		}
 
-		if(Checkpointer.loadSimulationInfo().isFinished()){//Simulation finished!
+		if(Checkpointer.loadSimulationInfo().isFinishDay()){//Simulation finished!
 			
 			Checkpointer.clear();
 			PlanIOHandler.clear();

@@ -15,7 +15,6 @@ public class WorkloadParserFactoryTest extends ValidConfigurationTest{
 	
 	private static final long PAGE_SIZE = 86400000;
 
-	@Test
 	public void testGetWorkloadParserWithSingleGEISTFile() throws ConfigurationException{
 		buildFullConfiguration();
 		WorkloadParser<List<Request>> workloadParser = WorkloadParserFactory.getWorkloadParser(PAGE_SIZE);

@@ -13,6 +13,10 @@ import commons.config.PropertiesTesting;
  */
 public abstract class ValidConfigurationTest extends CleanConfigurationTest{
 
+	protected static void buildConfiguration() throws ConfigurationException{
+		Configuration.buildInstance(PropertiesTesting.SIMPLE_CONFIGURATION);
+	}
+
 	protected static void buildFullConfiguration() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
 	}

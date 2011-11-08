@@ -66,9 +66,4 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 			configurable.addServer(tier, buyMachine(providers.get(0), MachineType.M1_SMALL, false), true);
 		}
 	}
-	
-	@Override
-	public void requestQueued(long timeMilliSeconds, Request request, int tier) {
-		reportLostRequest(request);
-	}
 }

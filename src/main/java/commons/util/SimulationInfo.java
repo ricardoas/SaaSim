@@ -86,7 +86,7 @@ public class SimulationInfo implements Serializable{
 	/**
 	 * @return <code>true</code> if this is the last simulation day.
 	 */
-	public boolean isFinished(){
+	public boolean isFinishDay(){
 		return currentDay == finishDay;
 	}
 
@@ -103,7 +103,7 @@ public class SimulationInfo implements Serializable{
 	
 	@Override
 	public String toString() {
-		return Long.toString(currentDay);
+		return String.format("%d %b %b %b", currentDay, isFirstDay(), isFinishDay(), isChargeDay());
 	}
 
 	public boolean isFirstDay() {

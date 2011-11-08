@@ -3,7 +3,6 @@ package commons.config;
 import provisioning.DPS;
 import provisioning.DynamicProvisioningSystem;
 import provisioning.OptimalProvisioningSystemForHeterogeneousMachines;
-import provisioning.ProfitDrivenProvisioningSystem;
 import provisioning.RanjanProvisioningSystem;
 import provisioning.RanjanProvisioningSystemForHeterogeneousMachines;
 
@@ -28,11 +27,6 @@ public enum DPSHeuristicValues {
 	 * Modification of Ranjan et all'algorithm to allow provisioning using different {@link MachineType}
 	 */
 	RANJAN_HET(RanjanProvisioningSystemForHeterogeneousMachines.class.getCanonicalName()), 
-	/**
-	 * Not fully implemented. We don't know a practical way of calculating information needed for decision making.
-	 */
-	@Deprecated
-	PROFITDRIVEN(ProfitDrivenProvisioningSystem.class.getCanonicalName()), 
 	/**
 	 * Indicates a custom {@link DPS} implementation is provided by you. 
 	 * @see SimulatorProperties#DPS_CUSTOM_HEURISTIC

@@ -623,11 +623,11 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		Capture<JEEvent> secondEvent = new Capture<JEEvent>();
 
 		SimulationInfo info = Checkpointer.loadSimulationInfo();
-		while(!info.isFinished()){
+		while(!info.isFinishDay()){
 			info.addDay();
 		}
 		
-		assert info.isFinished();
+		assert info.isFinishDay();
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleSimulator.class))).andReturn(1);

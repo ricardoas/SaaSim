@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
 import org.apache.log4j.Logger;
 
 import commons.cloud.MachineType;
@@ -58,7 +57,7 @@ public class DynamicProvisioningSystem implements DPS{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void registerConfigurable(DynamicConfigurable configurable) {
+	public final void registerConfigurable(DynamicConfigurable configurable) {
 		
 		this.configurable = configurable;
 		
@@ -77,7 +76,14 @@ public class DynamicProvisioningSystem implements DPS{
 		configurable.setMonitor(this);
 	}
 	
-	private void addServersToTier(DynamicConfigurable configurable, int tier, int numberOfInitialServers, List<MachineType> typeList) {
+	/**
+	 * 
+	 * @param configurable
+	 * @param tier
+	 * @param numberOfInitialServers
+	 * @param typeList
+	 */
+	protected void addServersToTier(DynamicConfigurable configurable, int tier, int numberOfInitialServers, List<MachineType> typeList) {
 		int serversAdded = 0;
 		for(MachineType machineType : typeList){
 			for (Provider provider : this.providers) {
@@ -109,7 +115,7 @@ public class DynamicProvisioningSystem implements DPS{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void requestFinished(Request request) {
+	public final void requestFinished(Request request) {
 		assert request.getSaasClient() < users.length:"Unregistered user with ID " + request.getSaasClient() + ". Check configuration files.";
 		
 		try{
@@ -123,7 +129,7 @@ public class DynamicProvisioningSystem implements DPS{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void requestQueued(long timeMilliSeconds, Request request, int tier) {
+	public final void requestQueued(long timeMilliSeconds, Request request, int tier) {
 		reportLostRequest(request);
 	}
 
@@ -132,7 +138,7 @@ public class DynamicProvisioningSystem implements DPS{
 	 */
 	@Override
 	public void sendStatistics(long now, MachineStatistics statistics, int tier) {
-		log.info("STAT" + now + " " + tier + " " + statistics);
+		log.info(String.format("STAT %d %d %s", now, tier, statistics));
 	}
 
 	/**

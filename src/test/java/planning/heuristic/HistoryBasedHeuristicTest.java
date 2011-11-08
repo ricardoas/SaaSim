@@ -51,20 +51,6 @@ import commons.util.TimeUnit;
 @PrepareForTest({SimulatorFactory.class, DPSFactory.class, Configuration.class, PlanIOHandler.class, Checkpointer.class})
 public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 	
-	@Override
-	public void setUp() throws Exception {
-		super.setUp();
-		buildFullConfiguration();
-		Checkpointer.clear();
-//		ApplicationFactory.reset();
-	}
-	
-	@After
-	public void tearDown(){
-		Checkpointer.clear();
-//		ApplicationFactory.reset();
-	}
-	
 	@Test
 	public void testFindPlanWithoutServersAndOneDayFinished() throws ConfigurationException, ClassNotFoundException{
 		SimulationInfo simulationInfo = new SimulationInfo(1, 0, 1);
@@ -105,13 +91,13 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		LoadBalancer[] loadBalancers = new LoadBalancer[1];
 		loadBalancers[0] = lb1;
 		
-		WorkloadParser parser = EasyMock.createStrictMock(WorkloadParser.class);
-		parser.applyError(0.0);
-		EasyMock.expectLastCall();
+//		WorkloadParser parser = EasyMock.createStrictMock(WorkloadParser.class);
+//		parser.applyError(0.0);
+//		EasyMock.expectLastCall();
 		
 		//Simulator
 		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
-		EasyMock.expect(simulator.getParser()).andReturn(parser);
+//		EasyMock.expect(simulator.getParser()).andReturn(parser);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -123,7 +109,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		dps.registerConfigurable(simulator);
 
 		PowerMock.replay(SimulatorFactory.class);
-		PowerMock.replayAll(lb1, simulator, dps, parser);
+		PowerMock.replayAll(lb1, simulator, dps);//, parser);
 		
 		Checkpointer.loadData();
 		

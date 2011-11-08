@@ -9,9 +9,6 @@ package commons.util;
  */
 public class CostCalculus {
 
-	public static final long GB_IN_BYTES = 1024 * 1024 * 1024;
-	public static final long MB_IN_BYTES = 1024 * 1024;
-
 	/**
 	 * @param totalTransferedInBytes
 	 * @param limitsInConvertedUnit

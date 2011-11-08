@@ -2,8 +2,6 @@ package commons.io;
 
 import java.io.IOException;
 
-import commons.cloud.Request;
-
 /**
  * Common set of features for workload parsers.
  * 

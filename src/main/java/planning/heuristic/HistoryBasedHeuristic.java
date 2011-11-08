@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.NoSuchElementException;
 
 import planning.util.MachineUsageData;
 import planning.util.PlanIOHandler;
@@ -17,11 +16,9 @@ import provisioning.Monitor;
 
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
-import commons.cloud.Request;
 import commons.cloud.User;
 import commons.config.Configuration;
 import commons.io.Checkpointer;
-import commons.io.WorkloadParser;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.Machine;
@@ -66,13 +63,6 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 		
 		dps.registerConfigurable(simulator);
 		
-		WorkloadParser<List<Request>> parser = simulator.getParser();
-		try{
-			double error = Configuration.getInstance().getDouble(SimulatorProperties.PLANNING_ERROR);
-			parser.applyError(error);
-		}catch(NoSuchElementException e){
-		}
-		
 		simulator.start();
 		
 		//Calculating machines use data
@@ -81,7 +71,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 		
 //		System.out.println("DAy: "+Checkpointer.loadSimulationInfo().getCurrentDay());
 		
-		if(Checkpointer.loadSimulationInfo().isFinished()){//Simulation finished!
+		if(Checkpointer.loadSimulationInfo().isFinishDay()){//Simulation finished!
 			
 			calculateMachinesToReserve(config);
 			Checkpointer.clear();

@@ -13,7 +13,6 @@ import util.ValidConfigurationTest;
 import commons.cloud.MachineType;
 import commons.cloud.Request;
 import commons.cloud.UtilityResult;
-import commons.config.Configuration;
 import commons.io.Checkpointer;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.provisioningheuristics.MachineStatistics;
@@ -87,7 +86,6 @@ public class MonitorTest extends ValidConfigurationTest {
 	 */
 	@Test
 	public void testMachineTurnedOffWithExistentMachine() {
-		Configuration r = Configuration.getInstance();
 		MachineDescriptor machineDescriptor = Checkpointer.loadProviders()[0].buyMachine(false, MachineType.M1_LARGE);
 		monitor.machineTurnedOff(machineDescriptor);
 	}

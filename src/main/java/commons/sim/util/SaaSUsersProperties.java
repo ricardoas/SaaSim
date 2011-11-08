@@ -4,8 +4,6 @@ public class SaaSUsersProperties {
 	
 	public static final String SAAS_NUMBER_OF_USERS = "saas.number";
 
-	public static final String SAAS_WORKLOAD = "saas.workload";
-	
 	public static final String SAAS_WORKLOAD_NORMAL = "saas.normal";
 	
 	public static final String SAAS_WORKLOAD_TRANSITION = "saas.transition";

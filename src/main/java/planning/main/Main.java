@@ -29,7 +29,7 @@ public class Main {
 		try {
 			//Loading simulator configuration data
 			Configuration.buildInstance(args[0]);
-			Configuration.getInstance().setProperty(SimulatorProperties.USE_ERROR, true);
+			Configuration.getInstance().enableParserError();
 			
 			JEEventScheduler scheduler = Checkpointer.loadScheduler();
 			DPS dps = DPSFactory.createDPS();

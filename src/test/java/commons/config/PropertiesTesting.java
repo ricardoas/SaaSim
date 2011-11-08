@@ -4,7 +4,7 @@ public class PropertiesTesting {
 	
 	public static final String EMPTY_FILE = "src/test/resources/emptyfile.txt";
 	
-//	public static final String INVALID_WORKLOAD = "src/test/resources/workload/invalid_workload.trc";
+	public static final String SIMPLE_CONFIGURATION = "src/test/resources/scenario_01/config.properties";
 	
 	
 	public static final String EMPTY_WORKLOAD = EMPTY_FILE;

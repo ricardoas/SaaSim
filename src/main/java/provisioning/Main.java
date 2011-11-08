@@ -5,6 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.log4j.Logger;
 
 import provisioning.util.DPSFactory;
 
@@ -29,7 +30,6 @@ public class Main {
 	 */
 	public static void main(String[] args) throws ConfigurationException, IOException {
 		
-		
 		if(args.length != 1){
 			System.out.println("Usage: java -cp saasim.jar provisioning.Main <property file>");
 			System.exit(1);
@@ -45,11 +45,13 @@ public class Main {
 		
 		simulator.start();
 		
-		if(Checkpointer.loadSimulationInfo().isFinished()){
+		if(Checkpointer.loadSimulationInfo().isFinishDay()){
 			
 			UtilityResult utilityResult = dps.calculateUtility();
+			
 			System.err.println(utilityResult);
-			System.out.println(utilityResult.getUtility());
+			
+			Logger.getLogger(Main.class).info("UTILITY " + utilityResult.getUtility());
 			
 			String events = Checkpointer.loadScheduler().dumpPostMortemEvents();
 			if(!events.isEmpty()){
