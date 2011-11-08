@@ -1,0 +1,11 @@
+# Reserved instances
+ 
+# provider 1 
+iaas.plan.name=#provider name#
+iaas.plan.types=#type1|type2#
+iaas.plan.reservation=#number|number#
+
+# provider 2 
+iaas.plan.name=#provider name#
+iaas.plan.types=#type1|type2#
+iaas.plan.reservation=#number|number#
