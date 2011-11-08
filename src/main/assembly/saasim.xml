@@ -12,26 +12,30 @@
 			<outputDirectory></outputDirectory>
 			<directory>src/main/resources</directory>
 			<includes>
-				<include>*</include>
+				<include>examples</include>
+				<include>planningtemplates</include>
 			</includes>
+			<excludes>
+				<exclude>scripts</exclude>
+			</excludes>
 		</fileSet>
 		<fileSet>
 			<outputDirectory></outputDirectory>
-			<directory>scripts/bin/</directory>
+			<directory>src/main/resources/scripts/bin</directory>
 			<includes>
 				<include>*</include>
 			</includes>
 		</fileSet>
 		<fileSet>
 			<outputDirectory></outputDirectory>
-			<directory>scripts/planning</directory>
+			<directory>src/main/resources/scripts/planning</directory>
 			<includes>
 				<include>*</include>
 			</includes>
 		</fileSet>
 		<fileSet>
 			<outputDirectory></outputDirectory>
-			<directory>scripts/provisioning</directory>
+			<directory>src/main/resources/scripts/provisioning</directory>
 			<includes>
 				<include>*</include>
 			</includes>
