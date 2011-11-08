@@ -73,7 +73,7 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 		WorkloadParser<List<Request>> parser = this.getParser();
 		try{
 			double error = Configuration.getInstance().getDouble(SimulatorProperties.PLANNING_ERROR);
-			parser.applyError(error);
+//			parser.applyError(error);
 		}catch(NoSuchElementException e){
 		}
 		
@@ -186,8 +186,9 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 	@Override
 	public Map<MachineType, Integer> getPlan(User[] cloudUsers) {
 		Configuration config = Configuration.getInstance();
-		int machinesToReserve = (int)Math.ceil( ( maximumNumberOfServers / 
-		( config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME) / this.requestsMeanDemand ) ) * FACTOR );
+//		int machinesToReserve = (int)Math.ceil( ( maximumNumberOfServers / 
+//		( config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME) / this.requestsMeanDemand ) ) * FACTOR );
+		int machinesToReserve = (int)Math.ceil( ( maximumNumberOfServers ) * FACTOR );
 		
 		Map<MachineType, Integer> plan = new HashMap<MachineType, Integer>();
 		MachineType machineType = MachineType.valueOf(config.getString(SimulatorProperties.PLANNING_TYPE).toUpperCase().replace('.', '_'));

@@ -101,8 +101,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-		parser.applyError(0.0);
-		EasyMock.expectLastCall();
+//		parser.applyError(0.0);
+//		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(new ArrayList<Request>());
 		EasyMock.expect(parser.hasNext()).andReturn(false);
@@ -214,8 +214,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-		parser.applyError(0.0);
-		EasyMock.expectLastCall();
+//		parser.applyError(0.0);
+//		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -345,8 +345,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-		parser.applyError(0.0);
-		EasyMock.expectLastCall();
+//		parser.applyError(0.0);
+//		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -476,8 +476,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-		parser.applyError(0.0);
-		EasyMock.expectLastCall();
+//		parser.applyError(0.0);
+//		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -612,8 +612,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-		parser.applyError(0.0);
-		EasyMock.expectLastCall();
+//		parser.applyError(0.0);
+//		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -743,8 +743,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-		parser.applyError(0.0);
-		EasyMock.expectLastCall();
+//		parser.applyError(0.0);
+//		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -878,8 +878,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-		parser.applyError(0.0);
-		EasyMock.expectLastCall();
+//		parser.applyError(0.0);
+//		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(false);
@@ -902,7 +902,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		assertNotNull(plan);
 		assertEquals(1, plan.size());
 		int value = plan.get(MachineType.M1_SMALL);
-		assertEquals(3, value, 0.0001);
+		assertEquals(2, value, 0.0001);
 		
 		//Checking some values ...
 		Field field = OverProvisionHeuristic.class.getDeclaredField("maximumNumberOfServers");
@@ -1047,13 +1047,13 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-		parser.applyError(0.0);
-		EasyMock.expectLastCall();
+//		parser.applyError(0.0);
+//		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstDayRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(false);
 		parser.close();
-		parser.applyError(0.0);
+//		parser.applyError(0.0);
 		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(secondDayRequests);
@@ -1079,7 +1079,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		assertNotNull(plan);
 		assertEquals(1, plan.size());
 		int value = plan.get(MachineType.M1_SMALL);
-		assertEquals(3, value, 0.0001);
+		assertEquals(2, value, 0.0001);
 		
 		Field field = OverProvisionHeuristic.class.getDeclaredField("maximumNumberOfServers");
 		field.setAccessible(true);
