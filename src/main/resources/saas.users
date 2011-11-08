@@ -1,9 +1,0 @@
-saas.number=2
-
-saas.user.plan=diamond
-saas.user.storage=512
-saas.user.workload=workloadFile_01.trc
-
-saas.user.plan=diamond
-saas.user.storage=1024
-saas.user.workload=workloadFile_02.trc
