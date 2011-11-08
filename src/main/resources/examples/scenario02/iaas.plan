@@ -1,0 +1,14 @@
+# provider 1 
+iaas.plan.name=amazon
+iaas.plan.types=m1.large|m1.xlarge
+iaas.plan.reservation=10|10
+
+# provider 2 
+#iaas.plan.name=rackspace
+#iaas.plan.types=small|medium
+#iaas.plan.reservation=0|2
+
+# provider 3 
+#iaas.plan.name=gogrid
+#iaas.plan.types=medium|large
+#iaas.plan.reservation=4|0
