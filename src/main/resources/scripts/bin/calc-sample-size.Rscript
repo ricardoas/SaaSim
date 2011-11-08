@@ -1,0 +1,14 @@
+#!/usr/bin/Rscript
+
+args <- commandArgs(TRUE)
+
+input_file=args[1]
+error=as.numeric(args[2])
+conf_level=as.numeric(args[3])
+
+conf_level=0.5+(conf_level/2)
+z=qnorm(conf_level)
+data <- read.table(input_file)$V1
+n=ceiling((sd(data)*z/error)^2)
+cat(n,n-length(data),'\n')
+
