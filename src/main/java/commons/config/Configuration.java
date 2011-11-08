@@ -1,12 +1,15 @@
 package commons.config;
 
-import static commons.sim.util.IaaSPlanProperties.*;
+import static commons.sim.util.IaaSPlanProperties.IAAS_PLAN_PROVIDER_NAME;
+import static commons.sim.util.IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION;
+import static commons.sim.util.IaaSPlanProperties.IAAS_PLAN_PROVIDER_TYPES;
 import static commons.sim.util.IaaSProvidersProperties.*;
 import static commons.sim.util.SaaSAppProperties.*;
 import static commons.sim.util.SaaSPlanProperties.*;
 import static commons.sim.util.SaaSUsersProperties.*;
 import static commons.sim.util.SimulatorProperties.*;
-import static commons.util.DataUnit.*;
+import static commons.util.DataUnit.B;
+import static commons.util.DataUnit.MB;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -290,13 +293,17 @@ public class Configuration extends ComplexPropertiesConfiguration{
 		try{
 			DPSHeuristicValues value = DPSHeuristicValues.valueOf(heuristicName.toUpperCase());
 			switch (value) {
-				// FIXME checkRanjanProperties();
-				case CUSTOM:
-					heuristicName = Class.forName(customHeuristicClass).getCanonicalName();
-					break;
-				default:
-					heuristicName = value.getClassName();
-					break;
+			case CUSTOM:
+				heuristicName = Class.forName(customHeuristicClass)
+						.getCanonicalName();
+				break;
+			case RANJAN:
+			case RANJAN_HET:
+				checkRanjanProperties();
+				//$FALL-THROUGH$
+			default:
+				heuristicName = value.getClassName();
+				break;
 			}
 			setProperty(DPS_HEURISTIC, heuristicName);
 		} catch (ClassNotFoundException e) {
@@ -309,11 +316,12 @@ public class Configuration extends ComplexPropertiesConfiguration{
 		PlanningHeuristicValues value = PlanningHeuristicValues.valueOf(heuristicName.toUpperCase());
 		
 		switch (value) {
-			case OVERPROVISIONING:
-				checkPlanningType();
-			default:
-				heuristicName = value.getClassName();
-				break;
+		case OVERPROVISIONING:
+			checkPlanningType();
+			//$FALL-THROUGH$
+		default:
+			heuristicName = value.getClassName();
+			break;
 		}
 		setProperty(PLANNING_HEURISTIC, heuristicName);
 	}
@@ -355,27 +363,6 @@ public class Configuration extends ComplexPropertiesConfiguration{
 		checkSchedulingHeuristicNames();
 	}
 	
-	/**
-	 * Used for investigations ...
-	 */
-	private void changeNumberOfStartUpServers(long[][] reservations) {
-		long totalReserved = 0;
-		for(int providerID = 0; providerID < reservations.length; providerID++){
-			for(long reserved : reservations[providerID]){
-				totalReserved += reserved;
-			}
-		}
-		
-//		if(totalReserved > 1){
-//			setProperty(APPLICATION_INITIAL_SERVER_PER_TIER, totalReserved);
-//		}else{
-			if(getInt(APPLICATION_INITIAL_SERVER_PER_TIER) <= 0){
-				setProperty(APPLICATION_INITIAL_SERVER_PER_TIER, 1);
-			}
-//		}
-		
-	}
-	
 	private void checkSchedulingHeuristicNames() throws ConfigurationException {
 		String[] strings = getNonEmptyStringArray(APPLICATION_HEURISTIC);
 		String customHeuristic = getString(APPLICATION_CUSTOM_HEURISTIC);
@@ -404,23 +391,12 @@ public class Configuration extends ComplexPropertiesConfiguration{
 		
 		Validator.checkPositive(SAAS_NUMBER_OF_USERS, getString(SAAS_NUMBER_OF_USERS));
 
-//		String[] peakPeriod = getStringArray(SAAS_PEAK_PERIOD);
-//		if(peakPeriod != null && peakPeriod.length != 0){
-//			Validator.checkIsPositiveArray(SAAS_PEAK_PERIOD, peakPeriod);
-//		}
-//		Validator.checkPositive(SAAS_USER_STORAGE, getString(SAAS_USER_STORAGE));
-		
-//		checkSize(SAAS_USER_ID, SAAS_NUMBER_OF_USERS);
 		checkSize(SAAS_USER_STORAGE, SAAS_NUMBER_OF_USERS);
 		checkSize(SAAS_USER_PLAN, SAAS_NUMBER_OF_USERS);
 		
-//		Validator.checkIsNonEmptyStringArray(SAAS_USER_ID, getStringArray(SAAS_USER_ID));
 		Validator.checkIsNonEmptyStringArray(SAAS_USER_PLAN, getStringArray(SAAS_USER_PLAN));
 		Validator.checkIsNonNegativeArray(SAAS_USER_STORAGE, getStringArray(SAAS_USER_STORAGE));
 		
-//		Validator.checkNotEmpty(SAAS_WORKLOAD_NORMAL, getString(SAAS_WORKLOAD_NORMAL));
-//		Validator.checkNotEmpty(SAAS_WORKLOAD_TRANSITION, getString(SAAS_WORKLOAD_TRANSITION));
-//		Validator.checkNotEmpty(SAAS_WORKLOAD_PEAK, getString(SAAS_WORKLOAD_PEAK));
 		String workload = getString(SAAS_WORKLOAD);
 		if(workload == null || workload.isEmpty()){
 			checkSize(SAAS_USER_WORKLOAD, SAAS_NUMBER_OF_USERS);

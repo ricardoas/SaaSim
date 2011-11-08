@@ -12,12 +12,12 @@ import util.ValidConfigurationTest;
 import commons.cloud.Request;
 import commons.config.PropertiesTesting;
 
-public class GEISTMultiFileWorkloadParserTest extends ValidConfigurationTest{
+public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 	
 	@Test
 	public void testTraceWithBlankLine() throws ConfigurationException{
 		buildFullConfiguration();
-		WorkloadParser<Request> parser = new GEISTMultiFileWorkloadParser(PropertiesTesting.TRACE_WITH_BLANK_LINE, 0);
+		WorkloadParser<Request> parser = new GEISTWorkloadParser(PropertiesTesting.TRACE_WITH_BLANK_LINE, 0);
 		assertTrue(parser.hasNext());
 		assertEquals(1, parser.next().getReqID());
 		assertTrue(parser.hasNext());
@@ -32,7 +32,7 @@ public class GEISTMultiFileWorkloadParserTest extends ValidConfigurationTest{
 	@Test
 	public void testTraceWithBlankEndLine() throws ConfigurationException{
 		buildFullConfiguration();
-		WorkloadParser<Request> parser = new GEISTMultiFileWorkloadParser(PropertiesTesting.TRACE_WITH_BLANK_END_LINE, 0);
+		WorkloadParser<Request> parser = new GEISTWorkloadParser(PropertiesTesting.TRACE_WITH_BLANK_END_LINE, 0);
 		assertTrue(parser.hasNext());
 		assertEquals(1, parser.next().getReqID());
 		assertTrue(parser.hasNext());
@@ -50,7 +50,7 @@ public class GEISTMultiFileWorkloadParserTest extends ValidConfigurationTest{
 	@Test
 	public void testValidTrace() throws ConfigurationException{
 		buildFullConfiguration();
-		WorkloadParser<Request> parser = new GEISTMultiFileWorkloadParser(PropertiesTesting.WORKLOAD, 0);
+		WorkloadParser<Request> parser = new GEISTWorkloadParser(PropertiesTesting.WORKLOAD, 0);
 		assertTrue(parser.hasNext());
 		assertEquals(1, parser.next().getReqID());
 		assertTrue(parser.hasNext());
@@ -73,7 +73,7 @@ public class GEISTMultiFileWorkloadParserTest extends ValidConfigurationTest{
 		int saasclientID = 1;
 		String workload = PropertiesTesting.WORKLOAD;
 		
-		GEISTMultiFileWorkloadParser parser = new GEISTMultiFileWorkloadParser(workload, saasclientID);
+		GEISTWorkloadParser parser = new GEISTWorkloadParser(workload, saasclientID);
 		
 		parser.parseRequest("");
 	}
@@ -84,7 +84,7 @@ public class GEISTMultiFileWorkloadParserTest extends ValidConfigurationTest{
 		int saasclientID = 1;
 		String workload = PropertiesTesting.WORKLOAD;
 		
-		GEISTMultiFileWorkloadParser parser = new GEISTMultiFileWorkloadParser(workload, saasclientID);
+		GEISTWorkloadParser parser = new GEISTWorkloadParser(workload, saasclientID);
 		
 		parser.parseRequest(null);
 	}
@@ -95,7 +95,7 @@ public class GEISTMultiFileWorkloadParserTest extends ValidConfigurationTest{
 		int saasclientID = 1;
 		String workload = PropertiesTesting.WORKLOAD;
 		
-		GEISTMultiFileWorkloadParser parser = new GEISTMultiFileWorkloadParser(workload, saasclientID);
+		GEISTWorkloadParser parser = new GEISTWorkloadParser(workload, saasclientID);
 		
 		parser.parseRequest("10 10 8 7");
 	}
@@ -106,7 +106,7 @@ public class GEISTMultiFileWorkloadParserTest extends ValidConfigurationTest{
 		int saasclientID = 1;
 		String workloads = PropertiesTesting.WORKLOAD;
 		
-		GEISTMultiFileWorkloadParser parser = new GEISTMultiFileWorkloadParser(workloads, saasclientID);
+		GEISTWorkloadParser parser = new GEISTWorkloadParser(workloads, saasclientID);
 		
 		Request request = parser.parseRequest("10 333 16031500 81 400000 10 5 8 1 2");
 		assertNotNull(request);
@@ -136,7 +136,7 @@ public class GEISTMultiFileWorkloadParserTest extends ValidConfigurationTest{
 	public void testMultipleDaysWithValidWorkload() throws ConfigurationException{
 		// First Day
 		buildFullConfiguration();
-		GEISTMultiFileWorkloadParser parser = new GEISTMultiFileWorkloadParser(PropertiesTesting.WORKLOAD, 1);
+		GEISTWorkloadParser parser = new GEISTWorkloadParser(PropertiesTesting.WORKLOAD, 1);
 		
 		assertEquals(160168, parser.next().getArrivalTimeInMillis());
 		assertEquals(160302, parser.next().getArrivalTimeInMillis());
@@ -148,7 +148,7 @@ public class GEISTMultiFileWorkloadParserTest extends ValidConfigurationTest{
 		
 		// Second Day
 		buildFullConfiguration();
-		parser = new GEISTMultiFileWorkloadParser(PropertiesTesting.WORKLOAD, 1);
+		parser = new GEISTWorkloadParser(PropertiesTesting.WORKLOAD, 1);
 
 		long dayInMillis = 86400000;
 		assertEquals(dayInMillis + 160168, parser.next().getArrivalTimeInMillis());
@@ -160,7 +160,7 @@ public class GEISTMultiFileWorkloadParserTest extends ValidConfigurationTest{
 		
 		// Third Day
 		buildFullConfiguration();
-		parser = new GEISTMultiFileWorkloadParser(PropertiesTesting.WORKLOAD, 1);
+		parser = new GEISTWorkloadParser(PropertiesTesting.WORKLOAD, 1);
 
 		assertEquals(2*dayInMillis + 160168, parser.next().getArrivalTimeInMillis());
 		assertEquals(2*dayInMillis + 160302, parser.next().getArrivalTimeInMillis());
@@ -171,7 +171,7 @@ public class GEISTMultiFileWorkloadParserTest extends ValidConfigurationTest{
 		
 		// Fourth Day
 		buildFullConfiguration();
-		parser = new GEISTMultiFileWorkloadParser(PropertiesTesting.WORKLOAD, 1);
+		parser = new GEISTWorkloadParser(PropertiesTesting.WORKLOAD, 1);
 
 		assertEquals(3*dayInMillis + 160168, parser.next().getArrivalTimeInMillis());
 		assertEquals(3*dayInMillis + 160302, parser.next().getArrivalTimeInMillis());
@@ -183,7 +183,7 @@ public class GEISTMultiFileWorkloadParserTest extends ValidConfigurationTest{
 		// Fifth Day
 		buildFullConfiguration();
 
-		parser = new GEISTMultiFileWorkloadParser(PropertiesTesting.WORKLOAD, 1);
+		parser = new GEISTWorkloadParser(PropertiesTesting.WORKLOAD, 1);
 		assertEquals(4*dayInMillis + 160168, parser.next().getArrivalTimeInMillis());
 		assertEquals(4*dayInMillis + 160302, parser.next().getArrivalTimeInMillis());
 		assertEquals(4*dayInMillis + 160315, parser.next().getArrivalTimeInMillis());
@@ -193,17 +193,4 @@ public class GEISTMultiFileWorkloadParserTest extends ValidConfigurationTest{
 		assertTrue(Checkpointer.loadSimulationInfo().isFinished());
 	}
 	
-	/**
-	 * Not yet implemented!
-	 * @throws ConfigurationException 
-	 */
-	@Test(expected=RuntimeException.class)
-	public void testApplyError() throws ConfigurationException{
-		buildFullConfiguration();
-		int saasclientID = 1;
-		
-		GEISTMultiFileWorkloadParser parser = new GEISTMultiFileWorkloadParser(PropertiesTesting.WORKLOAD, saasclientID);
-		
-		parser.applyError(0.5);
-	}
 }

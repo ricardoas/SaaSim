@@ -13,6 +13,8 @@ import commons.cloud.Request;
  */
 public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 	
+	protected static int saasClientIDSeed = 0;
+	
 	private BufferedReader reader;
 	private int currentDay = 0;
 	
@@ -47,11 +49,6 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 			}
 			throw new RuntimeException("Problem reading workload file. ", e);
 		}
-	}
-	
-	@Override
-	public commons.io.WorkloadParser<Request> clone() {
-		return null;
 	}
 	
 	/**

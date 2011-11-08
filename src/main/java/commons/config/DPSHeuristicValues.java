@@ -45,10 +45,17 @@ public enum DPSHeuristicValues {
 	
 	private final String className;
 
+	/**
+	 * Default private constructor
+	 * @param className
+	 */
 	private DPSHeuristicValues(String className){
 		this.className = className;
 	}
 
+	/**
+	 * @return Class canonical name to load.
+	 */
 	public String getClassName() {
 		return className;
 	}

@@ -11,7 +11,7 @@ import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.config.Configuration;
 import commons.io.Checkpointer;
-import commons.io.GEISTMultiFileWorkloadParser;
+import commons.io.GEISTWorkloadParser;
 import commons.io.WorkloadParser;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.util.SaaSAppProperties;
@@ -49,7 +49,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 		this.currentTick = Checkpointer.loadSimulationInfo().getCurrentDayInMillis() + tick;
 		this.leftOver = new Request[workloadFiles.length];
 		for(int i = 0; i < workloadFiles.length; i++){
-			this.parsers[i] = new GEISTMultiFileWorkloadParser(workloadFiles[i], index++);
+			this.parsers[i] = new GEISTWorkloadParser(workloadFiles[i], index++);
 		}
 		this.SLA = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME);
 		this.nextRequestsCounter = new double[36000];

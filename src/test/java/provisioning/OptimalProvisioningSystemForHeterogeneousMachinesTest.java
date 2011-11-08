@@ -17,7 +17,7 @@ import commons.cloud.User;
 import commons.config.Configuration;
 import commons.config.PropertiesTesting;
 import commons.io.Checkpointer;
-import commons.io.GEISTMultiFileWorkloadParser;
+import commons.io.GEISTWorkloadParser;
 import commons.io.WorkloadParser;
 import commons.sim.AccountingSystem;
 import commons.sim.SimpleSimulator;

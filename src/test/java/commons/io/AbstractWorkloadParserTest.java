@@ -47,14 +47,6 @@ public class AbstractWorkloadParserTest extends ValidConfigurationTest{
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void applyError(double error) {
-			/* No implementation */
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
 		public int size() {
 			return 1;
 		}

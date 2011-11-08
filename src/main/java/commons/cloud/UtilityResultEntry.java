@@ -14,6 +14,8 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 	 * 
 	 */
 	private static final long serialVersionUID = 8251766726895786861L;
+	private static final char STRING = '\t';
+	
 
 	/**
 	 * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -68,13 +70,13 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 		@Override
 		public String toString() {
 			return userID 
-					+ "\t" + contractName 
-					+ "\t" + totalReceipt
-					+ "\t" + extraConsumedCPU 
-					+ "\t" + cpuCost
-					+ "\t" + consumedTransference
-					+ "\t" + transferenceCost
-					+ "\t" + storageCost;
+					+ STRING + contractName 
+					+ STRING + totalReceipt
+					+ STRING + extraConsumedCPU 
+					+ STRING + cpuCost
+					+ STRING + consumedTransference
+					+ STRING + transferenceCost
+					+ STRING + storageCost;
 		}
 	}
 	
@@ -124,11 +126,11 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 		 */
 		@Override
 		public String toString() {
-			return type 
-					+ "\t" + onDemandCPUHours 
-					+ "\t" + onDemandCost
-					+ "\t" + reservedCPUHours
-					+ "\t" + reservedCost;
+			return type.toString() 
+					+ STRING + onDemandCPUHours 
+					+ STRING + onDemandCost
+					+ STRING + reservedCPUHours
+					+ STRING + reservedCost;
 		}
 		
 		
@@ -223,17 +225,17 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 		@Override
 		public String toString() {
 			return name 
-					+ "\t" + cost
-					+ "\t" + inCost 
-					+ "\t" + outCost
-					+ "\t" + onDemandCost 
-					+ "\t" + reservedCost 
-					+ "\t" + inTransference
-					+ "\t" + outTransference
-					+ "\t" + onDemandCPUHours
-					+ "\t" + reservedCPUHours 
-					+ "\t" + monitoringCost
-					+ "\t" + format(types);
+					+ STRING + cost
+					+ STRING + inCost 
+					+ STRING + outCost
+					+ STRING + onDemandCost 
+					+ STRING + reservedCost 
+					+ STRING + inTransference
+					+ STRING + outTransference
+					+ STRING + onDemandCPUHours
+					+ STRING + reservedCPUHours 
+					+ STRING + monitoringCost
+					+ STRING + format(types);
 		}
 
 		public String getDescriptor() {

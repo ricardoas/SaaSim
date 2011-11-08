@@ -22,8 +22,8 @@ public class TimeBasedWorkloadParserWithErrorTest extends ValidConfigurationTest
 		
 	@Test
 	public void testConstructor(){
-		GEISTMultiFileWorkloadParser parser = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
-		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser};
+		GEISTWorkloadParser parser = EasyMock.createStrictMock(GEISTWorkloadParser.class);
+		GEISTWorkloadParser[] parsers = new GEISTWorkloadParser[]{parser};
 		
 		EasyMock.replay(parser);
 		
@@ -34,15 +34,15 @@ public class TimeBasedWorkloadParserWithErrorTest extends ValidConfigurationTest
 	
 	@Test(expected=RuntimeException.class)
 	public void testConstructorWithoutParsers(){
-		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{};
+		GEISTWorkloadParser[] parsers = new GEISTWorkloadParser[]{};
 		
 		new TimeBasedWorkloadParserWithError(5000, parsers);
 	}
 	
 	@Test(expected=RuntimeException.class)
 	public void testClear() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
-		GEISTMultiFileWorkloadParser geistParser = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
-		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{geistParser};
+		GEISTWorkloadParser geistParser = EasyMock.createStrictMock(GEISTWorkloadParser.class);
+		GEISTWorkloadParser[] parsers = new GEISTWorkloadParser[]{geistParser};
 		
 		EasyMock.replay(geistParser);
 		
@@ -55,8 +55,8 @@ public class TimeBasedWorkloadParserWithErrorTest extends ValidConfigurationTest
 	
 	@Test(expected=RuntimeException.class)
 	public void testSetDaysAlreadyRead(){
-		GEISTMultiFileWorkloadParser geistParser = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
-		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{geistParser};
+		GEISTWorkloadParser geistParser = EasyMock.createStrictMock(GEISTWorkloadParser.class);
+		GEISTWorkloadParser[] parsers = new GEISTWorkloadParser[]{geistParser};
 		
 		EasyMock.replay(geistParser);
 		
@@ -70,14 +70,14 @@ public class TimeBasedWorkloadParserWithErrorTest extends ValidConfigurationTest
 	
 	@Test
 	public void testHasNextWithOneParserHavingEvents(){
-		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser1 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		EasyMock.expect(parser1.hasNext()).andReturn(false);
-		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser2 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		EasyMock.expect(parser2.hasNext()).andReturn(true);
 		
 		EasyMock.replay(parser1, parser2);
 		
-		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
+		GEISTWorkloadParser[] parsers = new GEISTWorkloadParser[]{parser1, parser2};
 		
 		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(5000, parsers);
 		
@@ -88,14 +88,14 @@ public class TimeBasedWorkloadParserWithErrorTest extends ValidConfigurationTest
 	
 	@Test
 	public void testHasNextWithAnyParserHavingEvents(){
-		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser1 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		EasyMock.expect(parser1.hasNext()).andReturn(false);
-		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser2 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		EasyMock.expect(parser2.hasNext()).andReturn(false);
 		
 		EasyMock.replay(parser1, parser2);
 		
-		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
+		GEISTWorkloadParser[] parsers = new GEISTWorkloadParser[]{parser1, parser2};
 		
 		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(5000, parsers);
 		
@@ -106,15 +106,15 @@ public class TimeBasedWorkloadParserWithErrorTest extends ValidConfigurationTest
 	
 	@Test(expected=NullPointerException.class)
 	public void testNextWithoutRequest(){
-		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser1 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		EasyMock.expect(parser1.hasNext()).andReturn(true);
 		EasyMock.expect(parser1.next()).andReturn(null);
-		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser2 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		EasyMock.expect(parser2.hasNext()).andReturn(true);
 		
 		EasyMock.replay(parser1, parser2);
 		
-		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
+		GEISTWorkloadParser[] parsers = new GEISTWorkloadParser[]{parser1, parser2};
 		
 		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(5000, parsers);
 		parser.next();
@@ -135,21 +135,21 @@ public class TimeBasedWorkloadParserWithErrorTest extends ValidConfigurationTest
 		EasyMock.expect(thirdRequest.getArrivalTimeInMillis()).andReturn(tick + 1l).times(2);
 		
 		//Parsers
-		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser1 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		EasyMock.expect(parser1.hasNext()).andReturn(true);
 		EasyMock.expect(parser1.next()).andReturn(firstRequest);
 		EasyMock.expect(parser1.hasNext()).andReturn(true);
 		EasyMock.expect(parser1.next()).andReturn(secondRequest);
 		EasyMock.expect(parser1.hasNext()).andReturn(false);
 		
-		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser2 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		EasyMock.expect(parser2.hasNext()).andReturn(true);
 		EasyMock.expect(parser2.next()).andReturn(thirdRequest);
 		EasyMock.expect(parser2.hasNext()).andReturn(false);
 		
 		EasyMock.replay(parser1, parser2, firstRequest, secondRequest, thirdRequest);
 		
-		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
+		GEISTWorkloadParser[] parsers = new GEISTWorkloadParser[]{parser1, parser2};
 		
 		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(tick, parsers);
 		List<Request> requests = parser.next();
@@ -178,21 +178,21 @@ public class TimeBasedWorkloadParserWithErrorTest extends ValidConfigurationTest
 		EasyMock.expect(thirdRequest.getArrivalTimeInMillis()).andReturn(2l * tick).times(3);
 		
 		//Parsers
-		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser1 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		EasyMock.expect(parser1.hasNext()).andReturn(true);
 		EasyMock.expect(parser1.next()).andReturn(firstRequest);
 		EasyMock.expect(parser1.hasNext()).andReturn(true);
 		EasyMock.expect(parser1.next()).andReturn(secondRequest);
 		EasyMock.expect(parser1.hasNext()).andReturn(false);
 		
-		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser2 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		EasyMock.expect(parser2.hasNext()).andReturn(true);
 		EasyMock.expect(parser2.next()).andReturn(thirdRequest);
 		EasyMock.expect(parser2.hasNext()).andReturn(false);
 		
 		EasyMock.replay(parser1, parser2, firstRequest, secondRequest, thirdRequest);
 		
-		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
+		GEISTWorkloadParser[] parsers = new GEISTWorkloadParser[]{parser1, parser2};
 		
 		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(tick, parsers);
 		List<Request> requests = parser.next();
@@ -227,14 +227,14 @@ public class TimeBasedWorkloadParserWithErrorTest extends ValidConfigurationTest
 		EasyMock.expect(fourthRequest.getArrivalTimeInMillis()).andReturn(tick - 1l);
 		
 		//Parsers
-		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser1 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		EasyMock.expect(parser1.hasNext()).andReturn(true);
 		EasyMock.expect(parser1.next()).andReturn(firstRequest);
 		EasyMock.expect(parser1.hasNext()).andReturn(true);
 		EasyMock.expect(parser1.next()).andReturn(secondRequest);
 		EasyMock.expect(parser1.hasNext()).andReturn(false);
 		
-		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser2 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		EasyMock.expect(parser2.hasNext()).andReturn(true);
 		EasyMock.expect(parser2.next()).andReturn(thirdRequest);
 		EasyMock.expect(parser2.hasNext()).andReturn(true);
@@ -243,7 +243,7 @@ public class TimeBasedWorkloadParserWithErrorTest extends ValidConfigurationTest
 		
 		EasyMock.replay(parser1, parser2, firstRequest, secondRequest, thirdRequest);
 		
-		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
+		GEISTWorkloadParser[] parsers = new GEISTWorkloadParser[]{parser1, parser2};
 		
 		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(tick, parsers);
 		List<Request> requests = parser.next();
@@ -261,17 +261,17 @@ public class TimeBasedWorkloadParserWithErrorTest extends ValidConfigurationTest
 		int tick = 5000;
 		
 		//Parsers
-		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser1 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		parser1.close();
 		EasyMock.expectLastCall();
 		
-		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser2 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		parser2.close();
 		EasyMock.expectLastCall();
 		
 		EasyMock.replay(parser1, parser2);
 		
-		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
+		GEISTWorkloadParser[] parsers = new GEISTWorkloadParser[]{parser1, parser2};
 		
 		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(tick, parsers);
 		parser.close();
@@ -284,19 +284,19 @@ public class TimeBasedWorkloadParserWithErrorTest extends ValidConfigurationTest
 		int tick = 5000;
 		
 		//Parsers
-		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
-		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser1 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
+		GEISTWorkloadParser parser2 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		
 		EasyMock.replay(parser1, parser2);
 		
-		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
+		GEISTWorkloadParser[] parsers = new GEISTWorkloadParser[]{parser1, parser2};
 		
 		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(tick, parsers);
 		parser.applyError(0.0);
 		
 		Field field = TimeBasedWorkloadParser.class.getDeclaredField("parsers");
 		field.setAccessible(true);
-		GEISTMultiFileWorkloadParser[] objectParsers = (GEISTMultiFileWorkloadParser[]) field.get(parser);
+		GEISTWorkloadParser[] objectParsers = (GEISTWorkloadParser[]) field.get(parser);
 		assertEquals(2, objectParsers.length);
 		assertEquals(parser1, objectParsers[0]);
 		assertEquals(parser2, objectParsers[1]);
@@ -309,13 +309,13 @@ public class TimeBasedWorkloadParserWithErrorTest extends ValidConfigurationTest
 		int tick = 5000;
 		
 		//Parsers
-		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser1 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		EasyMock.expect(parser1.clone()).andReturn(parser1);
-		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser2 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		
 		EasyMock.replay(parser1, parser2);
 		
-		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
+		GEISTWorkloadParser[] parsers = new GEISTWorkloadParser[]{parser1, parser2};
 		
 		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(tick, parsers);
 		parser.applyError(0.5);
@@ -344,14 +344,14 @@ public class TimeBasedWorkloadParserWithErrorTest extends ValidConfigurationTest
 		int tick = 5000;
 		
 		//Parsers
-		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser1 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		EasyMock.expect(parser1.clone()).andReturn(parser1);
-		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
-		GEISTMultiFileWorkloadParser parser3 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser2 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
+		GEISTWorkloadParser parser3 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		
 		EasyMock.replay(parser1, parser2, parser3);
 		
-		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2, parser3};
+		GEISTWorkloadParser[] parsers = new GEISTWorkloadParser[]{parser1, parser2, parser3};
 		
 		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(tick, parsers);
 		parser.applyError(0.333333333);
@@ -373,12 +373,12 @@ public class TimeBasedWorkloadParserWithErrorTest extends ValidConfigurationTest
 		int tick = 5000;
 		
 		//Parsers
-		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
-		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser1 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
+		GEISTWorkloadParser parser2 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		
 		EasyMock.replay(parser1, parser2);
 		
-		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
+		GEISTWorkloadParser[] parsers = new GEISTWorkloadParser[]{parser1, parser2};
 		
 		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(tick, parsers);
 		parser.applyError(-0.5);
@@ -405,13 +405,13 @@ public class TimeBasedWorkloadParserWithErrorTest extends ValidConfigurationTest
 		int tick = 5000;
 		
 		//Parsers
-		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
-		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
-		GEISTMultiFileWorkloadParser parser3 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser1 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
+		GEISTWorkloadParser parser2 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
+		GEISTWorkloadParser parser3 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		
 		EasyMock.replay(parser1, parser2, parser3);
 		
-		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2, parser3};
+		GEISTWorkloadParser[] parsers = new GEISTWorkloadParser[]{parser1, parser2, parser3};
 		
 		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(tick, parsers);
 		parser.applyError(-0.333333333);
@@ -431,12 +431,12 @@ public class TimeBasedWorkloadParserWithErrorTest extends ValidConfigurationTest
 		int tick = 5000;
 		
 		//Parsers
-		GEISTMultiFileWorkloadParser parser1 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
-		GEISTMultiFileWorkloadParser parser2 = EasyMock.createStrictMock(GEISTMultiFileWorkloadParser.class);
+		GEISTWorkloadParser parser1 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
+		GEISTWorkloadParser parser2 = EasyMock.createStrictMock(GEISTWorkloadParser.class);
 		
 		EasyMock.replay(parser1, parser2);
 		
-		GEISTMultiFileWorkloadParser[] parsers = new GEISTMultiFileWorkloadParser[]{parser1, parser2};
+		GEISTWorkloadParser[] parsers = new GEISTWorkloadParser[]{parser1, parser2};
 		
 		TimeBasedWorkloadParserWithError parser = new TimeBasedWorkloadParserWithError(tick, parsers);
 		parser.applyError(-1.0);

@@ -46,7 +46,6 @@ public class Checkpointer {
 	}
 	
 	public static void save() {
-//		long start = System.currentTimeMillis();
 		ObjectOutputStream out;
 		try {
 			out = new ObjectOutputStream(new FileOutputStream(CHECKPOINT_FILE));
@@ -61,7 +60,6 @@ public class Checkpointer {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-//		System.out.println("Save: " + (System.currentTimeMillis()-start));
 	}
 	
 	@Deprecated
@@ -120,11 +118,6 @@ public class Checkpointer {
 	public static void clear(){
 		new File(CHECKPOINT_FILE).delete();
 		new File(MACHINE_DATA_DUMP).delete();
-//		scheduler = null;
-//		simulationInfo = null;
-//		application = null;
-//		providers = null;
-//		users = null;
 	}
 
 	/**
@@ -135,7 +128,6 @@ public class Checkpointer {
 	}
 
 	public static void loadData() throws ConfigurationException{
-//		long start = System.currentTimeMillis();
 		if(hasCheckpoint()){
 			ObjectInputStream in;
 			try {
@@ -167,7 +159,6 @@ public class Checkpointer {
 			}
 
 		}
-//		System.out.println("Load: " + (System.currentTimeMillis()-start));
 	}
 
 	public static AccountingSystem loadAccountingSystem() {

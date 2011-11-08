@@ -31,11 +31,7 @@ public interface WorkloadParser<T> {
 
 	public void setDaysAlreadyRead(int simulatedDays);
 
-	public void applyError(double error);
-
 	public void close();
 	
 	public int size();
-
-	public WorkloadParser<Request> clone();
 }

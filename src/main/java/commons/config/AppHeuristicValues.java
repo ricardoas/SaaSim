@@ -5,7 +5,11 @@ import commons.sim.schedulingheuristics.RanjanHeuristic;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
 import commons.sim.schedulingheuristics.RoundRobinHeuristicForHeterogenousMachines;
 
+/**
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ */
 public enum AppHeuristicValues {
+	
 	ROUNDROBIN(RoundRobinHeuristic.class.getCanonicalName()), 
 	ROUNDROBIN_HET(RoundRobinHeuristicForHeterogenousMachines.class.getCanonicalName()),
 	RANJAN(RanjanHeuristic.class.getCanonicalName()), 

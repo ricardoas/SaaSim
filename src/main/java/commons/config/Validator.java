@@ -105,14 +105,16 @@ public class Validator {
 		}
 	}
 
-	public static void checkIsNonEmptyStringArray(String propertyName, String[][] values,
-			String separator) throws ConfigurationException {
+	public static void checkIsNonEmptyStringArray(String propertyName,
+			String[][] values) throws ConfigurationException {
 		for (String[] value : values) {
 			for (String string : value) {
-				try{
+				try {
 					checkNonNegative(propertyName, string);
-				}catch (ConfigurationException e) {
-					throw new ConfigurationException(propertyName + " must be an array of non negative integers. " + value + " value is invalid.", e);
+				} catch (ConfigurationException e) {
+					throw new ConfigurationException(propertyName
+							+ " must be an array of non negative integers. "
+							+ value + " value is invalid.", e);
 				}
 			}
 		}

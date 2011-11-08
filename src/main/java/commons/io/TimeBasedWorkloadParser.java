@@ -31,15 +31,6 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	}
 	
 	@Override
-	public WorkloadParser<Request> clone() {
-		return null;
-	}
-	
-	@Override
-	public void applyError(double error) {
-	}
-
-	@Override
 	public void clear() {
 		throw new RuntimeException("Not yet implemented");
 	}

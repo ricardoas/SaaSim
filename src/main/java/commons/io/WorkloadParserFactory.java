@@ -3,8 +3,10 @@
  */
 package commons.io;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Random;
 
 import commons.cloud.Request;
 import commons.config.Configuration;
@@ -31,37 +33,21 @@ public class WorkloadParserFactory {
 		String[] workloads = config.getWorkloads();
 		ParserIdiom parserIdiom = config.getParserIdiom();
 		
-		boolean useError;
-		try{
-			useError = config.getBoolean(SimulatorProperties.USE_ERROR);
-		}catch(NoSuchElementException e){
-			useError = false;
+		int workloadSize = (int) Math.round(workloads.length * (1+config.getDouble(SimulatorProperties.PLANNING_ERROR, 0.0)));
+		
+		String[] workloadFilesWithErrors = Arrays.copyOf(workloads, workloadSize);
+		
+		for (int i = 0; i < workloadFilesWithErrors.length; i++) {
+			if(workloadFilesWithErrors[i] == null){
+				workloadFilesWithErrors[i] = workloads[new Random().nextInt(workloads.length)];
+			}
 		}
 		
-		
-		switch (parserIdiom) {
-			case GEIST:
-				String[] workloadFiles = config.getWorkloads();
-				
-				WorkloadParser<Request>[] parsers = new WorkloadParser[workloadFiles.length];
-				if(workloadFiles.length == 1){
-					if(useError){
-						return new TimeBasedWorkloadParserWithError(pageSize, new GEISTMultiFileWorkloadParser(workloads[0], 0));
-					}else{
-						return new TimeBasedWorkloadParser(pageSize, new GEISTMultiFileWorkloadParser(workloads[0], index++));
-					}
-				}
-				
-				for(int i =0; i < workloadFiles.length; i++){
-					parsers[i] = new GEISTMultiFileWorkloadParser(workloads[i], index++);
-				}
-				if(useError){
-					return new TimeBasedWorkloadParserWithError(pageSize, parsers);
-				}else{
-					return new TimeBasedWorkloadParser(pageSize, parsers);
-				}
-			default:
-				throw new RuntimeException("No parser specified for value " + parserIdiom);
+		WorkloadParser<Request>[] parsers = new WorkloadParser[workloads.length];
+		for (int i = 0; i < workloadFilesWithErrors.length; i++) {
+			parsers[i] = parserIdiom.getInstance(workloadFilesWithErrors[0]);
 		}
+		
+		return new TimeBasedWorkloadParser(pageSize, parsers);
 	}
 }

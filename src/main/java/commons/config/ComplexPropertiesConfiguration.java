@@ -86,7 +86,7 @@ public abstract class ComplexPropertiesConfiguration extends PropertiesConfigura
 	public String[][] getNonEmptyString2DArray(String propertyName) {
 		try {
 			String[][] string2dArray = getString2DArray(propertyName);
-			Validator.checkIsNonEmptyStringArray(propertyName, string2dArray, ARRAY_SEPARATOR);
+			Validator.checkIsNonEmptyStringArray(propertyName, string2dArray);
 			return string2dArray;
 		} catch (ConfigurationException e) {
 			throw new ConfigurationRuntimeException(e);

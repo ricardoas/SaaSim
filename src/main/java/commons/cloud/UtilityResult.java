@@ -9,6 +9,7 @@ import java.util.TreeSet;
  */
 public class UtilityResult implements Serializable{
 	
+	private static final char FIELD_SEPARATOR = '\t';
 	/**
 	 * 
 	 */
@@ -56,9 +57,9 @@ public class UtilityResult implements Serializable{
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append(getUtility());
-		sb.append('\t');
+		sb.append(FIELD_SEPARATOR);
 		sb.append(uniqueReceipt);
-		sb.append('\t');
+		sb.append(FIELD_SEPARATOR);
 		sb.append(uniqueCost);
 		
 		sb.append('\n');
