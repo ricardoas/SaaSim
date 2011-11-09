@@ -3,13 +3,10 @@
  */
 package commons.io;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 import commons.cloud.Request;
 import commons.config.Configuration;
-import commons.sim.util.SimulatorProperties;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br

@@ -248,4 +248,8 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	public boolean equals(Object obj) {
 		return super.equals(obj);
 	}
+
+	public void cancelServerRemoval(int numberOfMachines) {
+		//FIXME code me, please!!!
+	}
 }

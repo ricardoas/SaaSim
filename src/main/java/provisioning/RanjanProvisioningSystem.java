@@ -1,11 +1,14 @@
 package provisioning;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
-import commons.cloud.Request;
+import commons.config.Configuration;
+import commons.sim.components.MachineDescriptor;
 import commons.sim.provisioningheuristics.MachineStatistics;
+import commons.sim.util.SaaSAppProperties;
 
 /**
  * This class represents the DPS business logic according to RANJAN. Here some statistics of current
@@ -15,21 +18,77 @@ import commons.sim.provisioningheuristics.MachineStatistics;
  *
  */
 public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
+	
+	private static String PROP_MACHINE_TYPE = "dps.ranjan.type";  
 
 	private double TARGET_UTILIZATION = 0.66;
+	private MachineType type;
+
 	public static long UTILIZATION_EVALUATION_PERIOD_IN_MILLIS = 1000 * 60 * 5;//in millis
 
+	@SuppressWarnings("unchecked")
 	public RanjanProvisioningSystem() {
 		super();
+		type = MachineType.valueOf(Configuration.getInstance().getString(PROP_MACHINE_TYPE).toUpperCase());
+	}
+	
+	@Override
+	protected void addServersToTier(int[] numberOfInitialServersPerTier) {
+		
+		int numberOfMachines = 0;
+		for (int i : numberOfInitialServersPerTier) {
+			numberOfMachines += i;
+		}
+		
+		List<MachineDescriptor> currentlyBought = buyMachines(numberOfMachines);
+		
+		while(currentlyBought.size() != 0){
+			for (int i = 0; i < numberOfInitialServersPerTier.length; i++) {
+				if(numberOfInitialServersPerTier[i] != 0){
+					numberOfInitialServersPerTier[i]--;
+					configurable.addServer(i, currentlyBought.remove(0), false);
+				}
+			}
+		}
+	}
+
+	private List<MachineDescriptor> buyMachines(int numberOfMachines) {
+		List<MachineDescriptor> currentlyBought = new ArrayList<MachineDescriptor>();
+		
+		while(currentlyBought.size() != numberOfMachines){
+			for (Provider provider : providers) {
+				if(provider.canBuyMachine(true, type)){
+					currentlyBought.add(provider.buyMachine(true, type));
+				}
+			}
+			for (Provider provider : providers) {
+				if(provider.canBuyMachine(false, type)){
+					currentlyBought.add(provider.buyMachine(false, type));
+				}
+			}
+		}
+		return currentlyBought;
 	}
 	
 	@Override
 	public void sendStatistics(long now, MachineStatistics statistics, int tier) {
-		long numberOfServersToAdd = evaluateNumberOfServersForNextInterval(statistics);
+		super.sendStatistics(now, statistics, tier);
+		int numberOfServersToAdd = evaluateNumberOfServersForNextInterval(statistics);
+		
 		if(numberOfServersToAdd > 0){
-			for(int i = 0; i < numberOfServersToAdd; i++){
-				evaluateMachinesToBeAdded(tier);
+			
+			if(numberOfServersToAdd > statistics.warmingDownMachines){
+				numberOfServersToAdd -= statistics.warmingDownMachines;
+				List<MachineDescriptor> machines = buyMachines(numberOfServersToAdd);
+				for (MachineDescriptor machineDescriptor : machines) {
+					configurable.addServer(tier, machineDescriptor, true);
+				}
+				
+				configurable.cancelMachineShutdown(tier, statistics.warmingDownMachines);
+			}else{
+				configurable.cancelMachineShutdown(tier, numberOfServersToAdd);
 			}
+			
 		}else if(numberOfServersToAdd < 0){
 			for (int i = 0; i < -numberOfServersToAdd; i++) {
 				configurable.removeServer(tier, false);
@@ -37,7 +96,7 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 		}
 	}
 
-	public long evaluateNumberOfServersForNextInterval(MachineStatistics statistics) {
+	public int evaluateNumberOfServersForNextInterval(MachineStatistics statistics) {
 		double averageUtilisation = statistics.averageUtilisation / statistics.totalNumberOfServers;
 		double d;
 		if(statistics.numberOfRequestsCompletionsInLastInterval == 0){
@@ -47,15 +106,18 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 		}
 		
 		double u_lign = Math.max(statistics.numberOfRequestsArrivalInLastInterval, statistics.numberOfRequestsCompletionsInLastInterval) * d;
-		long newNumberOfServers = (int)Math.ceil( statistics.totalNumberOfServers * u_lign / TARGET_UTILIZATION );
+		int newNumberOfServers = (int) Math.ceil( u_lign * statistics.totalNumberOfServers / TARGET_UTILIZATION );
 		
-		long numberOfServersToAdd = (newNumberOfServers - statistics.totalNumberOfServers);
+		int numberOfServersToAdd = (newNumberOfServers - statistics.totalNumberOfServers);
+		
+		if(newNumberOfServers == 0)
+		
 		if(numberOfServersToAdd != 0){
 			return numberOfServersToAdd;
 		}
 		if(statistics.numberOfRequestsArrivalInLastInterval > 0 && 
 				statistics.totalNumberOfServers == 0){
-			return 1l;
+			return 1;
 		}
 		return numberOfServersToAdd;
 	}

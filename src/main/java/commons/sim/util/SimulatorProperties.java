@@ -19,5 +19,5 @@ public class SimulatorProperties {
 	public static final String PLANNING_INTERVAL_SIZE = "planning.interval.size";
 	
 
-	public static final String PLANNIGN_USE_ERROR = "planning.enableerror";
+	public static final String PLANNING_USE_ERROR = "planning.enableerror";
 }

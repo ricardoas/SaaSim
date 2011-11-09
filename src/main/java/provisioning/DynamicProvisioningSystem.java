@@ -62,14 +62,7 @@ public class DynamicProvisioningSystem implements DPS{
 		this.configurable = configurable;
 		
 		if(Checkpointer.loadSimulationInfo().isFirstDay()){
-			int[] initialServersPerTier = Configuration.getInstance().getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER);
-			
-			List<MachineType> typeList = Arrays.asList(MachineType.values());
-			Collections.reverse(typeList);
-			//Looking for reserved instances!
-			for (int tier = 0; tier < initialServersPerTier.length; tier++) {
-				addServersToTier(configurable, tier, initialServersPerTier[tier], typeList);
-			}
+			addServersToTier(Configuration.getInstance().getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER));
 		}
 		
 		configurable.setWorkloadParser(WorkloadParserFactory.getWorkloadParser());
@@ -78,12 +71,12 @@ public class DynamicProvisioningSystem implements DPS{
 	
 	/**
 	 * 
-	 * @param configurable
-	 * @param tier
 	 * @param numberOfInitialServers
-	 * @param typeList
 	 */
-	protected void addServersToTier(DynamicConfigurable configurable, int tier, int numberOfInitialServers, List<MachineType> typeList) {
+	protected void addServersToTier(int[] numberOfInitialServersPerTier) {
+
+		List<MachineType> typeList = Arrays.asList(MachineType.values());
+		Collections.reverse(typeList);
 		int serversAdded = 0;
 		for(MachineType machineType : typeList){
 			for (Provider provider : this.providers) {

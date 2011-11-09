@@ -49,5 +49,7 @@ public interface DynamicConfigurable {
 	 * @param monitor Monitoring system to collect information needed by {@link DPS}.
 	 */
 	void setMonitor(Monitor monitor);
+
+	void cancelMachineShutdown(int tier, int numberOfMachines);
 	
 }

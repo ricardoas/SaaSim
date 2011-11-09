@@ -11,6 +11,10 @@ import commons.util.Triple;
 
 public class ProfitDrivenHeuristic implements SchedulingHeuristic{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3183321951475418991L;
 	private double sla;
 	
 	public ProfitDrivenHeuristic(){

@@ -179,4 +179,10 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 			loadBalancers.setMonitor(monitor);
 		}
 	}
+
+	@Override
+	public void cancelMachineShutdown(int tier, int numberOfMachines) {
+		tiers[tier].cancelServerRemoval(numberOfMachines);
+	}
+
 }

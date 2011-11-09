@@ -197,11 +197,18 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	}
 
 	public Class<?> getPlanningHeuristicClass(){
-		String heuristicName = getString(PLANNING_HEURISTIC);
-		try {
-			return Class.forName(heuristicName);
-		} catch (ClassNotFoundException e) {
-			throw new ConfigurationRuntimeException("Problem loading " + heuristicName, e);
+		PlanningHeuristicValues value = PlanningHeuristicValues.valueOf(getNonEmptyString(PLANNING_HEURISTIC).toUpperCase());
+		
+		switch (value) {
+		case OVERPROVISIONING:
+			try {
+				Validator.checkNotEmpty(PLANNING_TYPE, getString(PLANNING_TYPE));
+			} catch (ConfigurationException e) {
+				throw new ConfigurationRuntimeException(e);
+			}
+			//$FALL-THROUGH$
+		default:
+			return value.getClazz();
 		}
 	}
 
@@ -265,7 +272,6 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	
 	private void verifySimulatorProperties() throws ConfigurationException {
 		checkDPSHeuristic();
-		checkPlanningHeuristic();
 		
 		String value = getString(PLANNING_RISK);
 		if(value != null && value.length() > 0){
@@ -300,7 +306,8 @@ public class Configuration extends ComplexPropertiesConfiguration{
 				break;
 			case RANJAN:
 			case RANJAN_HET:
-				checkRanjanProperties();
+				Validator.checkPositive(MACHINE_NUMBER_OF_TOKENS, getString(MACHINE_NUMBER_OF_TOKENS));
+				Validator.checkNonNegative(MACHINE_BACKLOG_SIZE, getString(MACHINE_BACKLOG_SIZE));
 				//$FALL-THROUGH$
 			default:
 				heuristicName = value.getClassName();
@@ -310,31 +317,6 @@ public class Configuration extends ComplexPropertiesConfiguration{
 		} catch (ClassNotFoundException e) {
 			throw new ConfigurationException("Problem loading " + customHeuristicClass, e);
 		}
-	}
-
-	private void checkPlanningHeuristic() throws ConfigurationException {
-		String heuristicName = getNonEmptyString(PLANNING_HEURISTIC);
-		PlanningHeuristicValues value = PlanningHeuristicValues.valueOf(heuristicName.toUpperCase());
-		
-		switch (value) {
-		case OVERPROVISIONING:
-			checkPlanningType();
-			//$FALL-THROUGH$
-		default:
-			heuristicName = value.getClassName();
-			break;
-		}
-		setProperty(PLANNING_HEURISTIC, heuristicName);
-	}
-
-
-	private void checkPlanningType() throws ConfigurationException {
-		Validator.checkNotEmpty(PLANNING_TYPE, getString(PLANNING_TYPE));
-	}
-
-	private void checkRanjanProperties() throws ConfigurationException {
-		Validator.checkPositive(MACHINE_NUMBER_OF_TOKENS, getString(MACHINE_NUMBER_OF_TOKENS));
-		Validator.checkNonNegative(MACHINE_BACKLOG_SIZE, getString(MACHINE_BACKLOG_SIZE));
 	}
 
 	// ************************************* SaaS APP ************************************/
@@ -350,13 +332,22 @@ public class Configuration extends ComplexPropertiesConfiguration{
 		
 		Validator.checkIsPositiveArray(APPLICATION_INITIAL_SERVER_PER_TIER, getStringArray(APPLICATION_INITIAL_SERVER_PER_TIER));
 
-		checkSize(APPLICATION_MAX_SERVER_PER_TIER, APPLICATION_NUM_OF_TIERS);
 		String[] strings = getStringArray(APPLICATION_MAX_SERVER_PER_TIER);
+		
+		if(strings.length == 0){
+			strings = new String[getInt(APPLICATION_NUM_OF_TIERS)];
+			Arrays.fill(strings, "");
+			setProperty(APPLICATION_MAX_SERVER_PER_TIER, strings);
+		}
+		
+		checkSize(APPLICATION_MAX_SERVER_PER_TIER, APPLICATION_NUM_OF_TIERS);
+		
 		for (int i = 0; i < strings.length; i++) {
 			if(strings[i].trim().isEmpty()){
 				strings[i] = Integer.toString(Integer.MAX_VALUE); 
 			}
 		}
+		
 		setProperty(APPLICATION_MAX_SERVER_PER_TIER, strings);
 
 		Validator.checkIsPositiveArray(APPLICATION_MAX_SERVER_PER_TIER, getStringArray(APPLICATION_MAX_SERVER_PER_TIER));
@@ -498,7 +489,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	public String[] getWorkloads() {
 		String[] workloads = getStringArray(SAAS_USER_WORKLOAD);
 		
-		if(getBoolean(SimulatorProperties.PLANNIGN_USE_ERROR, false)){
+		if(getBoolean(SimulatorProperties.PLANNING_USE_ERROR, false)){
 			int workloadSize = (int) Math.round(workloads.length * (1+getDouble(SimulatorProperties.PLANNING_ERROR, 0.0)));
 			String[] workloadFilesWithErrors = Arrays.copyOf(workloads, workloadSize);
 			for (int i = 0; i < workloadFilesWithErrors.length; i++) {
@@ -516,6 +507,6 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	}
 
 	public void enableParserError() {
-		setProperty(SimulatorProperties.PLANNIGN_USE_ERROR, true);
+		setProperty(SimulatorProperties.PLANNING_USE_ERROR, true);
 	}
 }

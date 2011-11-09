@@ -5,7 +5,8 @@ public class MachineStatistics {
 	public double averageUtilisation;
 	public long numberOfRequestsArrivalInLastInterval;
 	public long numberOfRequestsCompletionsInLastInterval;
-	public long totalNumberOfServers;
+	public int totalNumberOfServers;
+	public int warmingDownMachines;
 
 	/**
 	 * @param averageUtilization
@@ -13,7 +14,7 @@ public class MachineStatistics {
 	 * @param totalRequestsCompletions
 	 * @param totalNumberOfServers
 	 */
-	public MachineStatistics(double averageUtilization, long totalRequestsArrivals, long totalRequestsCompletions, long totalNumberOfServers) {
+	public MachineStatistics(double averageUtilization, long totalRequestsArrivals, long totalRequestsCompletions, int totalNumberOfServers) {
 		this.averageUtilisation = averageUtilization;
 		this.numberOfRequestsArrivalInLastInterval = totalRequestsArrivals;
 		this.numberOfRequestsCompletionsInLastInterval = totalRequestsCompletions;
