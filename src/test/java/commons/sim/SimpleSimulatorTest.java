@@ -516,6 +516,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		scheduler.start();
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
+		EasyMock.expect(monitor.isOptimal()).andReturn(false);
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.setMonitor(monitor);
@@ -556,6 +557,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		scheduler.start();
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
+		EasyMock.expect(monitor.isOptimal()).andReturn(false);
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.setMonitor(monitor);
@@ -599,6 +601,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		scheduler.start();
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
+		EasyMock.expect(monitor.isOptimal()).andReturn(false);
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.setMonitor(monitor);
@@ -638,11 +641,15 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		scheduler.start();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		loadBalancer.setMonitor(EasyMock.isA(Monitor.class));
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
+		EasyMock.expect(monitor.isOptimal()).andReturn(false);
+		
 		EasyMock.replay(monitor, loadBalancer, scheduler);
 		
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
+		simulator.setMonitor(monitor);
 		simulator.start();
 		
 		assertEquals(JEEventType.READWORKLOAD, firstEvent.getValue().getType());
@@ -675,11 +682,14 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		scheduler.start();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		loadBalancer.setMonitor(EasyMock.isA(Monitor.class));
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
+		EasyMock.expect(monitor.isOptimal()).andReturn(false);
 		EasyMock.replay(monitor, loadBalancer, scheduler);
 		
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
+		simulator.setMonitor(monitor);
 		simulator.start();
 		
 		assertEquals(JEEventType.READWORKLOAD, firstEvent.getValue().getType());

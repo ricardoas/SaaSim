@@ -65,12 +65,12 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 		
 		send(new JEEvent(JEEventType.READWORKLOAD, this, getScheduler().now()));
 		
-		
-//		if(this.monitor.isOptimal()){
-//			send(new JEEvent(JEEventType.ESTIMATE_SERVERS, this, getScheduler().now()));
-//		}else{
+		//TODO:"Change this!
+		if(this.monitor.isOptimal()){
+			send(new JEEvent(JEEventType.ESTIMATE_SERVERS, this, getScheduler().now()));
+		}else{
 			send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)));
-//		}
+		}
 
 		SimulationInfo info = Checkpointer.loadSimulationInfo();
 		if(info.isChargeDay()){

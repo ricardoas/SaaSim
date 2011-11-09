@@ -36,11 +36,11 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest extends Valid
 		buildTwoUsersConfiguration();
 		
 		SimulationInfo info = Checkpointer.loadSimulationInfo();
-		while(!info.isFinished()){
+		while(!info.isFinishDay()){
 			info.addDay();
 		}
 		
-		assert info.isFinished();
+		assert info.isFinishDay();
 		
 		Configuration config = Configuration.getInstance();
 		config.setProperty(SimulatorProperties.PLANNING_ERROR, 0.0);

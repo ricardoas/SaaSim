@@ -44,6 +44,7 @@ public class SimulationInfo implements Serializable{
 
 	@Deprecated
 	public SimulationInfo(int i, int j, int k) {
+		currentDay = i;
 		finishDay = k;
 	}
 

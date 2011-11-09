@@ -58,7 +58,6 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 		//Simulating ...
 		DPS dps = (DPS) this.monitor;
 		
-//		SimpleSimulator simulator = (SimpleSimulator) SimulatorFactory.buildSimulator(this.scheduler);
 		SimpleSimulator simulator = (SimpleSimulator) Checkpointer.loadApplication();
 		
 		dps.registerConfigurable(simulator);

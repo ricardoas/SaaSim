@@ -191,16 +191,20 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		return new ArrayList<Machine>(servers);
 	}
 
+	public void reportRequestQueued(Request requestQueued){
+		monitor.requestQueued(getScheduler().now(), requestQueued, tier);
+	}
+	
 	public void reportRequestFinished(Request requestFinished) {
 		
-		if(getScheduler().now() - requestFinished.getArrivalTimeInMillis() > 
-				Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)){
-//			System.out.println("SLA!");
-			monitor.requestQueued(getScheduler().now(), requestFinished, tier);
-		}else{
-			heuristic.reportRequestFinished();
-			monitor.requestFinished(requestFinished);
-		}
+//		if(getScheduler().now() - requestFinished.getArrivalTimeInMillis() > 
+//				Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)){
+////			System.out.println("SLA!");
+//			monitor.requestQueued(getScheduler().now(), requestFinished, tier);
+//		}else{
+		heuristic.reportRequestFinished();
+		monitor.requestFinished(requestFinished);
+//		}
 		
 	}
 

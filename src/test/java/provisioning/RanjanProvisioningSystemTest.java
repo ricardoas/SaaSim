@@ -59,7 +59,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		double totalUtilization = 0.7;
 		long totalRequestsArrivals = 10;
 		long totalRequestsCompletions = 10;
-		long totalNumberOfServers = 1;
+		int totalNumberOfServers = 1;
 		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		this.dps = new RanjanProvisioningSystem();
@@ -78,7 +78,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		double totalUtilization = 3.0;
 		long totalRequestsArrivals = 55;
 		long totalRequestsCompletions = 15;
-		long totalNumberOfServers = 3;
+		int totalNumberOfServers = 3;
 		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		this.dps = new RanjanProvisioningSystem();
@@ -97,7 +97,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		double totalUtilization = 6;
 		long totalRequestsArrivals = 333;
 		long totalRequestsCompletions = 279;
-		long totalNumberOfServers = 20;
+		int totalNumberOfServers = 20;
 		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 
 		this.dps = new RanjanProvisioningSystem();
@@ -116,7 +116,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		double totalUtilization = 0.2;
 		long totalRequestsArrivals = 100;
 		long totalRequestsCompletions = 100;
-		long totalNumberOfServers = 20;
+		int totalNumberOfServers = 20;
 		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 
 		this.dps = new RanjanProvisioningSystem();
@@ -133,7 +133,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		double totalUtilization = 0.0;
 		long totalRequestsArrivals = 0;
 		long totalRequestsCompletions = 0;
-		long totalNumberOfServers = 20;
+		int totalNumberOfServers = 20;
 		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 
 		this.dps = new RanjanProvisioningSystem();
@@ -152,7 +152,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		double totalUtilization = 0.0;
 		long totalRequestsArrivals = 100;
 		long totalRequestsCompletions = 0;
-		long totalNumberOfServers = 0;
+		int totalNumberOfServers = 0;
 		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		this.dps = new RanjanProvisioningSystem();
@@ -176,7 +176,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		double totalUtilisation = 0.0;
 		long totalRequestsArrivals = 100;
 		long totalRequestsCompletions = 0;
-		long totalNumberOfServers = 0;
+		int totalNumberOfServers = 0;
 		MachineStatistics statistics = new MachineStatistics(totalUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
@@ -229,7 +229,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		double totalUtilization = 0.0;
 		long totalRequestsArrivals = 100;
 		long totalRequestsCompletions = 0;
-		long totalNumberOfServers = 0;
+		int totalNumberOfServers = 0;
 		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
@@ -283,7 +283,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		double totalUtilization = 0.2;
 		long totalRequestsArrivals = 100;
 		long totalRequestsCompletions = 100;
-		long totalNumberOfServers = 20;
+		int totalNumberOfServers = 20;
 		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);

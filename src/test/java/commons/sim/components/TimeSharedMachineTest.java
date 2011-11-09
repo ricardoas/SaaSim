@@ -106,10 +106,10 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 		Request request4 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000});
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
-		loadBalancer.reportRequestFinished(request);
-		loadBalancer.reportRequestFinished(request2);
-		loadBalancer.reportRequestFinished(request3);
-		loadBalancer.reportRequestFinished(request4);
+		loadBalancer.reportRequestQueued(request);
+		loadBalancer.reportRequestQueued(request2);
+		loadBalancer.reportRequestQueued(request3);
+		loadBalancer.reportRequestQueued(request4);
 		EasyMock.replay(loadBalancer);
 		
 		TimeSharedMachine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), loadBalancer);
@@ -143,10 +143,10 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 		Request request4 = new Request(4, 1, 0, 0, 10, 100, new long[]{5000, 5000});
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
-		loadBalancer.reportRequestFinished(request);
-		loadBalancer.reportRequestFinished(request2);
-		loadBalancer.reportRequestFinished(request3);
-		loadBalancer.reportRequestFinished(request4);
+		loadBalancer.reportRequestQueued(request);
+		loadBalancer.reportRequestQueued(request2);
+		loadBalancer.reportRequestQueued(request3);
+		loadBalancer.reportRequestQueued(request4);
 		EasyMock.replay(loadBalancer);
 		
 		TimeSharedMachine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), loadBalancer);
@@ -402,7 +402,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
 		EasyMock.expect(scheduler.now()).andReturn(100l).times(2);
 		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
-		EasyMock.expect(scheduler.now()).andReturn(150l);
+		EasyMock.expect(scheduler.now()).andReturn(150l).times(4);
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.reportRequestFinished(EasyMock.isA(Request.class));

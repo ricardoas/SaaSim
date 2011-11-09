@@ -494,8 +494,8 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		long cpuLimitInMillis = 300 * 60 * 60 * 1000l;
 		long cpuLimitInMillis2 = 500 * 60 * 60 * 1000l;
 		
-		Contract contract = new Contract("p1", 1, setupCost, price, cpuLimitInMillis, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
-		Contract contract2 = new Contract("p2", 1, setupCost, price2, cpuLimitInMillis2, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract = new Contract("p1", 1, setupCost, price, cpuLimitInMillis, 0.1/(1000*60*60), new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, cpuLimitInMillis2, 0.2/(1000*60*60), new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
 		
 		User[] cloudUsers = new User[2];
 		cloudUsers[0] = new User(0, contract, 100);
@@ -757,8 +757,8 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		long cpuLimitInMillis = 640 * 60 * 60 * 1000l;
 		long cpuLimitInMillis2 = 530 * 60 * 60 * 1000l;
 		
-		Contract contract = new Contract("p1", 1, setupCost, price, cpuLimitInMillis, 0.1, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
-		Contract contract2 = new Contract("p2", 1, setupCost, price2, cpuLimitInMillis2, 0.2, new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract = new Contract("p1", 1, setupCost, price, cpuLimitInMillis, 0.1/(1000 * 60 * 60), new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, cpuLimitInMillis2, 0.2/(1000 * 60 * 60), new long[]{100000}, new double[]{0.1, 0.2}, 1000, 5.12);
 		
 		User[] cloudUsers = new User[2];
 		cloudUsers[0] = new User(0, contract, 100);
@@ -1685,8 +1685,8 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 	@Test
 	public void testEvaluateWithNegativeFitnessNoLossAndReceipt(){
 		//SaaS clients contracts
-		Contract contract = new Contract("p1", 1, 100d, 555d, 700 * 60 * 60 * 1000l, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
-		Contract contract2 = new Contract("p1", 1, 100d, 99.765d, 700 * 60 * 60 * 1000l, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		Contract contract = new Contract("p1", 1, 100d, 555d, 700 * 60 * 60 * 1000l, 0.1/(1000 * 60 * 60), new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		Contract contract2 = new Contract("p1", 1, 100d, 99.765d, 700 * 60 * 60 * 1000l, 0.1/(1000 * 60 * 60), new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
 		
 		User[] cloudUsers = new User[2];
 		cloudUsers[0] = new User(0, contract, 100);
@@ -1758,8 +1758,8 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		long cpuLimitInMillis = 300 * 60 * 60 * 1000l;
 		
 		//SaaS clients contracts
-		Contract contract = new Contract("p1", 1, 10000d, 555d, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
-		Contract contract2 = new Contract("p1", 1, 10000d, 99.765d, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		Contract contract = new Contract("p1", 1, 10000d, 555d, cpuLimitInMillis, 0.1/(1000 * 60 * 60), new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		Contract contract2 = new Contract("p1", 1, 10000d, 99.765d, cpuLimitInMillis, 0.1/(1000 * 60 * 60), new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
 		
 		User[] cloudUsers = new User[2];
 		cloudUsers[0] = new User(0, contract, 100);
@@ -1827,8 +1827,8 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		long cpuLimitInMillis = 300 * 60 * 60 * 1000l;
 		
 		//SaaS clients contracts
-		Contract contract = new Contract("p1", 1, 10000d, 555d, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
-		Contract contract2 = new Contract("p1", 1, 10000d, 99.765d, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		Contract contract = new Contract("p1", 1, 10000d, 555d, cpuLimitInMillis, 0.1/(1000 * 60 * 60), new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		Contract contract2 = new Contract("p1", 1, 10000d, 99.765d, cpuLimitInMillis, 0.1/(1000 * 60 * 60), new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
 		
 		User[] cloudUsers = new User[2];
 		cloudUsers[0] = new User(0, contract, 100);
@@ -1893,8 +1893,8 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		long cpuLimitInMillis = 300 * 60 * 60 * 1000l;
 		
 		//SaaS clients contracts
-		Contract contract = new Contract("p1", 1, 10000d, 555d, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
-		Contract contract2 = new Contract("p1", 1, 10000d, 99.765d, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		Contract contract = new Contract("p1", 1, 10000d, 555d, cpuLimitInMillis, 0.1/(1000 * 60 * 60), new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		Contract contract2 = new Contract("p1", 1, 10000d, 99.765d, cpuLimitInMillis, 0.1/(1000 * 60 * 60), new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
 		
 		User[] cloudUsers = new User[2];
 		cloudUsers[0] = new User(0, contract, 100);
@@ -1962,9 +1962,9 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		
 		//SaaS clients contracts
 		double price = 18 * 150d;
-		Contract contract = new Contract("p1", 1, setupCost, price, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		Contract contract = new Contract("p1", 1, setupCost, price, cpuLimitInMillis, 0.1/(1000 * 60 * 60), new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
 		double price2 = 18 * 300d;
-		Contract contract2 = new Contract("p2", 1, setupCost, price2, cpuLimitInMillis, 0.1, new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
+		Contract contract2 = new Contract("p2", 1, setupCost, price2, cpuLimitInMillis, 0.1/(1000 * 60 * 60), new long[]{1000}, new double[]{0, 0}, 1000, 5.12);
 		
 		User[] cloudUsers = new User[2];
 		cloudUsers[0] = new User(0, contract, 100);

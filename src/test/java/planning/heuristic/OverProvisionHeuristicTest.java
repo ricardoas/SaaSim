@@ -49,21 +49,17 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 	public void setUp(){
 		Checkpointer.clear();
 		new File(PlanIOHandler.NUMBER_OF_MACHINES_FILE).delete();
-		ApplicationFactory.reset();
 	}
 	
 	@After
 	public void tearDown(){
 		Checkpointer.clear();
 		new File(PlanIOHandler.NUMBER_OF_MACHINES_FILE).delete();
-		ApplicationFactory.reset();
 	}
 	
 	@Test
 	public void testFindPlanWithWorkloadWithEmptyWorkload() throws ConfigurationException, ClassNotFoundException{
 
-		long sla = 8000l;
-		
 		DPS monitor = EasyMock.createStrictMock(DPS.class);
 		monitor.registerConfigurable(EasyMock.isA(OverProvisionHeuristic.class));
 		EasyMock.expect(monitor.isOptimal()).andReturn(false);
@@ -81,8 +77,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(9);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
-//		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
-//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
 		EasyMock.expect(config.getString(SaaSAppProperties.APPLICATION_FACTORY)).andReturn("commons.sim.util.SimpleApplicationFactory");
 		EasyMock.expect(config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS)).andReturn(1);
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
@@ -92,7 +86,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(new SimulationInfo(1, 0, 1));
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("M1_SMALL").times(2);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
@@ -101,8 +94,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-//		parser.applyError(0.0);
-//		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(new ArrayList<Request>());
 		EasyMock.expect(parser.hasNext()).andReturn(false);
@@ -134,7 +125,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 
 	@Test
 	public void testFindPlanWithRequestsThatDoNotOverlapAndDifferentArrivalTimes() throws Exception{
-		long sla = 8000l;
 		
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(request.getArrivalTimeInMillis()).andReturn(57l);
@@ -191,11 +181,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(10);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(9);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
-//		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
-//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
-		EasyMock.expect(config.getString(SaaSAppProperties.APPLICATION_FACTORY)).andReturn("commons.sim.util.SimpleApplicationFactory");
 		EasyMock.expect(config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS)).andReturn(1);
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
 		EasyMock.expect(config.getApplicationHeuristics()).andReturn(classes);
@@ -205,7 +192,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(new SimulationInfo(1, 0, 1));
 		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("M1_SMALL").times(2);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
@@ -214,8 +200,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-//		parser.applyError(0.0);
-//		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -265,8 +249,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 	
 	@Test
 	public void testFindPlanWithRequestsThatDoNotOverlapAndSameArrivalTimes() throws Exception{
-		long sla = 8000l;
-		
+
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(request.getArrivalTimeInMillis()).andReturn(57l);
 		EasyMock.expect(request.getTotalMeanToProcess()).andReturn(100l);
@@ -322,11 +305,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(10);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(9);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
-//		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
-//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
-		EasyMock.expect(config.getString(SaaSAppProperties.APPLICATION_FACTORY)).andReturn("commons.sim.util.SimpleApplicationFactory");
 		EasyMock.expect(config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS)).andReturn(1);
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
 		EasyMock.expect(config.getApplicationHeuristics()).andReturn(classes);
@@ -336,7 +316,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(new SimulationInfo(1, 0, 1));
 		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("M1_SMALL").times(2);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
@@ -345,8 +324,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-//		parser.applyError(0.0);
-//		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -396,7 +373,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 	
 	@Test
 	public void testFindPlanWithRequestsThatOverlapAndDifferentArrivalTimes() throws Exception{
-		long sla = 8000l;
 		
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(request.getArrivalTimeInMillis()).andReturn(57l);
@@ -453,11 +429,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(10);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(9);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
-//		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
-//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
-		EasyMock.expect(config.getString(SaaSAppProperties.APPLICATION_FACTORY)).andReturn("commons.sim.util.SimpleApplicationFactory");
 		EasyMock.expect(config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS)).andReturn(1);
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
 		EasyMock.expect(config.getApplicationHeuristics()).andReturn(classes);
@@ -467,7 +440,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(new SimulationInfo(1, 0, 1));
 		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("M1_SMALL").times(2);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
@@ -476,8 +448,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-//		parser.applyError(0.0);
-//		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -532,7 +502,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 	 */
 	@Test
 	public void testFindPlanWithRequestsThatOverlapAndDifferentArrivalTimes2() throws Exception{
-		long sla = 8000l;
 		
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(request.getArrivalTimeInMillis()).andReturn(57l);
@@ -589,11 +558,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(10);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(9);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
-//		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
-//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
-		EasyMock.expect(config.getString(SaaSAppProperties.APPLICATION_FACTORY)).andReturn("commons.sim.util.SimpleApplicationFactory");
 		EasyMock.expect(config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS)).andReturn(1);
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
 		EasyMock.expect(config.getApplicationHeuristics()).andReturn(classes);
@@ -603,7 +569,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(new SimulationInfo(1, 0, 1));
 		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("M1_SMALL").times(2);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
@@ -612,8 +577,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-//		parser.applyError(0.0);
-//		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -663,7 +626,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 	
 	@Test
 	public void testFindPlanWithRequestsThatOverlapAndSameArrivalTimes() throws Exception{
-		long sla = 8000l;
 		
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(request.getArrivalTimeInMillis()).andReturn(157l);
@@ -720,11 +682,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(10);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(9);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
-//		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
-//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
-		EasyMock.expect(config.getString(SaaSAppProperties.APPLICATION_FACTORY)).andReturn("commons.sim.util.SimpleApplicationFactory");
 		EasyMock.expect(config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS)).andReturn(1);
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
 		EasyMock.expect(config.getApplicationHeuristics()).andReturn(classes);
@@ -734,7 +693,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(new SimulationInfo(1, 0, 1));
 		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("M1_SMALL").times(2);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
@@ -743,8 +701,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-//		parser.applyError(0.0);
-//		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(true);
@@ -799,9 +755,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void testFindPlanWithRequestsThatOverlapAndSameArrivalTimesAndDifferentSLA() throws Exception{
-		long sla = 178l;//SLA is equals to mean request demand
-		
+	public void testFindPlanWithRequestsThatOverlapAndSameArrivalTimes2() throws Exception{
+
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(request.getArrivalTimeInMillis()).andReturn(157l);
 		EasyMock.expect(request.getTotalMeanToProcess()).andReturn(500l);
@@ -855,11 +810,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(9);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(8);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l);
-//		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
-//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
-		EasyMock.expect(config.getString(SaaSAppProperties.APPLICATION_FACTORY)).andReturn("commons.sim.util.SimpleApplicationFactory");
 		EasyMock.expect(config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS)).andReturn(1);
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
 		EasyMock.expect(config.getApplicationHeuristics()).andReturn(classes);
@@ -868,8 +820,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		EasyMock.expect(config.getUsers()).andReturn(new User[]{});
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(new SimulationInfo(1, 0, 1));
-//		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE);
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla).times(2);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("M1_SMALL").times(2);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0);
@@ -878,8 +828,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-//		parser.applyError(0.0);
-//		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(false);
@@ -931,7 +879,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 	 */
 	@Test
 	public void testFindPlanWithRequestsThatOverlapAndMoreThanOneDay() throws Exception{
-		long sla = 178l;//SLA is equals to mean request demand
 		
 		//First day requests
 		Request request = EasyMock.createStrictMock(Request.class);
@@ -1024,12 +971,9 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(12);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(11);
 		EasyMock.expect(Checkpointer.loadProviders()).andReturn(providers);
 		EasyMock.expect(config.getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)).andReturn(5000l).times(2);
-//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(1l);
-//		EasyMock.expect(config.getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION)).andReturn(new long[][]{{1, 2}});
-		EasyMock.expect(config.getString(SaaSAppProperties.APPLICATION_FACTORY)).andReturn("commons.sim.util.SimpleApplicationFactory");
 		EasyMock.expect(config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS)).andReturn(1);
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
 		EasyMock.expect(config.getApplicationHeuristics()).andReturn(classes);
@@ -1039,22 +983,16 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(initialInfo).times(2);
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(firstDayCompletedInfo).times(3);
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(secondDayCompletedInfo);
-//		EasyMock.expect(config.getParserPageSize()).andReturn(TickSize.MINUTE).times(2);
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla).times(3);
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(2l);
 		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("M1_SMALL").times(3);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_ERROR)).andReturn(0.0).times(2);
 		
 		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
 		PowerMock.mockStatic(WorkloadParserFactory.class);
-//		parser.applyError(0.0);
-//		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(firstDayRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(false);
 		parser.close();
-//		parser.applyError(0.0);
-		EasyMock.expectLastCall();
 		EasyMock.expect(parser.hasNext()).andReturn(true);
 		EasyMock.expect(parser.next()).andReturn(secondDayRequests);
 		EasyMock.expect(parser.hasNext()).andReturn(false);
@@ -1101,7 +1039,6 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		Checkpointer.loadData();
 		
 		scheduler = Checkpointer.loadScheduler();
-//		scheduler.prepare();
 		loadBalancers = new LoadBalancer[]{};
 		
 		heuristic = new OverProvisionHeuristic(scheduler, monitor, loadBalancers);
@@ -1112,7 +1049,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		assertNotNull(plan);
 		assertEquals(1, plan.size());
 		value = plan.get(MachineType.M1_SMALL);
-		assertEquals(3, value, 0.0001);
+		assertEquals(2, value, 0.0001);
 		
 		//Checking some values ...
 		field = OverProvisionHeuristic.class.getDeclaredField("maximumNumberOfServers");
@@ -1130,548 +1067,4 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		PowerMock.verifyAll();
 	}
-	
-//	@Test
-//	public void testFindPlanWithWorkloadWithUniqueUsersAndDifferentNumberOfRequestsForMoreThanOneDay() throws Exception{
-//		long sla = 8000l;
-//		
-//		Request request = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request.getUserID()).andReturn(1).times(2);
-//		Request request2 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request2.getUserID()).andReturn(2).times(2);
-//		Request request3 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request3.getUserID()).andReturn(3).times(2);
-//		Request request4 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request4.getUserID()).andReturn(4).times(2);
-//		Request request5 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request5.getUserID()).andReturn(5).times(2);
-//		Request request6 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request6.getUserID()).andReturn(6).times(2);
-//		Request request7 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request7.getUserID()).andReturn(7).times(2);
-//		Request request8 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request8.getUserID()).andReturn(8).times(2);
-//		Request request9 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request9.getUserID()).andReturn(9).times(2);
-//		
-//		List<Request> firstIntervalRequests = new ArrayList<Request>();
-//		firstIntervalRequests.add(request);
-//		firstIntervalRequests.add(request2);
-//		firstIntervalRequests.add(request3);
-//		firstIntervalRequests.add(request4);
-//		
-//		List<Request> secondIntervalRequests = new ArrayList<Request>();
-//		secondIntervalRequests.add(request5);
-//		secondIntervalRequests.add(request6);
-//		secondIntervalRequests.add(request7);
-//		secondIntervalRequests.add(request8);
-//		secondIntervalRequests.add(request9);
-//		
-//		DPS monitor = EasyMock.createStrictMock(DPS.class);
-//		monitor.registerConfigurable(EasyMock.isA(OverProvisionHeuristic.class));
-//		EasyMock.expectLastCall().times(2);
-//		
-//		SimulationInfo simulationInfo = new SimulationInfo(0, 0);
-//		SimulationInfo secondInfo = new SimulationInfo(1, 0);
-//		
-//		Configuration config = EasyMock.createMock(Configuration.class);
-//		PowerMock.mockStatic(Configuration.class);
-//		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(15);
-//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla).times(2);
-//		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
-//		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(2l).times(4);
-//		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("M1_SMALL").times(3);
-//		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo).times(4);
-//		EasyMock.expect(config.getSimulationInfo()).andReturn(secondInfo);
-//		EasyMock.expect(config.getSimulationInfo()).andReturn(secondInfo).times(3);
-//		
-//		Provider provider = EasyMock.createMock(Provider.class);
-//		EasyMock.expect(provider.getName()).andReturn("p1");
-//		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider});
-//		
-//		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
-//		PowerMock.mockStatic(WorkloadParserFactory.class);
-//		WorkloadParserFactory.setScheduler(EasyMock.isA(JEEventScheduler.class));
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
-//		EasyMock.expect(parser.hasNext()).andReturn(false);
-//		WorkloadParserFactory.setScheduler(EasyMock.isA(JEEventScheduler.class));
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
-//		EasyMock.expect(parser.hasNext()).andReturn(false);
-//		PowerMock.replay(TimeBasedWorkloadParser.class);
-//		
-//		PowerMock.replayAll(config, parser, monitor, request, request2, request3, request4, request5,
-//				request6, request7, request8, request9);
-//		
-//		JEEventScheduler scheduler = JEEventScheduler.INSTANCE;
-//		LoadBalancer[] loadBalancers = new LoadBalancer[]{};
-//		
-//		OverProvisionHeuristic heuristic = new OverProvisionHeuristic(scheduler, monitor, loadBalancers);
-//		heuristic.setWorkloadParser(parser);
-//		heuristic.findPlan(null, null);
-//		
-//		Map<MachineType, Integer> plan = heuristic.getPlan(null);
-//		assertNotNull(plan);
-//		assertEquals(1, plan.size());
-//		int value = plan.get(MachineType.SMALL);
-//		assertEquals(5 * OverProvisionHeuristic.FACTOR, value, 0.0001);
-//		
-//		File output = new File(Checkpointer.CHECKPOINT_FILE);
-//		assertTrue(output.exists());
-//		
-//		//Running other day in order to finish
-//		output.delete();
-//		heuristic = new OverProvisionHeuristic(JEEventScheduler.INSTANCE, monitor, loadBalancers);
-//		heuristic.setWorkloadParser(parser);
-//		heuristic.findPlan(null, null);
-//		
-//		plan = heuristic.getPlan(null);
-//		assertNotNull(plan);
-//		assertEquals(1, plan.size());
-//		value = plan.get(MachineType.SMALL);
-//		assertEquals(5 * OverProvisionHeuristic.FACTOR, value, 0.0001);
-//		
-//		output = new File(Checkpointer.CHECKPOINT_FILE);
-//		assertFalse(output.exists());
-//		
-//		PowerMock.verifyAll();
-//	}
-//	
-//	@Test
-//	public void testFindPlanWithWorkloadWithRepeatedUsersAndDifferentNumberOfRequests() throws Exception{
-//		long sla = 8000l;
-//		
-//		Request request = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request.getUserID()).andReturn(1);
-//		Request request2 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request2.getUserID()).andReturn(2);
-//		Request request3 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request3.getUserID()).andReturn(3);
-//		Request request4 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request4.getUserID()).andReturn(4);
-//		Request request5 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request5.getUserID()).andReturn(5);
-//		Request request6 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request6.getUserID()).andReturn(5);
-//		Request request7 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request7.getUserID()).andReturn(7);
-//		Request request8 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request8.getUserID()).andReturn(8);
-//		Request request9 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request9.getUserID()).andReturn(9);
-//		
-//		List<Request> firstIntervalRequests = new ArrayList<Request>();
-//		firstIntervalRequests.add(request);
-//		firstIntervalRequests.add(request2);
-//		firstIntervalRequests.add(request3);
-//		firstIntervalRequests.add(request4);
-//		
-//		List<Request> secondIntervalRequests = new ArrayList<Request>();
-//		secondIntervalRequests.add(request5);
-//		secondIntervalRequests.add(request6);
-//		secondIntervalRequests.add(request7);
-//		secondIntervalRequests.add(request8);
-//		secondIntervalRequests.add(request9);
-//		
-//		DPS monitor = EasyMock.createStrictMock(DPS.class);
-//		monitor.registerConfigurable(EasyMock.isA(OverProvisionHeuristic.class));
-//		EasyMock.expectLastCall();
-//		
-//		SimulationInfo simulationInfo = new SimulationInfo(0, 0);
-//		
-//		Configuration config = EasyMock.createMock(Configuration.class);
-//		PowerMock.mockStatic(Configuration.class);
-//		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(8);
-//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
-//		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
-//		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
-//		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("M1_SMALL").times(2);
-//		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo).times(3);
-//		
-//		Provider provider = EasyMock.createMock(Provider.class);
-//		EasyMock.expect(provider.getName()).andReturn("p1");
-//		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider});
-//	
-//		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
-//		PowerMock.mockStatic(WorkloadParserFactory.class);
-//		WorkloadParserFactory.setScheduler(EasyMock.isA(JEEventScheduler.class));
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
-//		EasyMock.expect(parser.hasNext()).andReturn(false);
-//		PowerMock.replay(TimeBasedWorkloadParser.class);
-//		
-//		PowerMock.replayAll(config, parser, monitor, request, request2, request3, request4, request5,
-//				request6, request7, request8, request9);
-//		
-//		JEEventScheduler scheduler = JEEventScheduler.INSTANCE;
-//		LoadBalancer[] loadBalancers = new LoadBalancer[]{};
-//		
-//		OverProvisionHeuristic heuristic = new OverProvisionHeuristic(scheduler, monitor, loadBalancers);
-//		heuristic.setWorkloadParser(parser);
-//		heuristic.findPlan(null, null);
-//		
-//		Map<MachineType, Integer> plan = heuristic.getPlan(null);
-//		assertNotNull(plan);
-//		assertEquals(1, plan.size());
-//		int value = plan.get(MachineType.SMALL);
-//		assertEquals(Math.ceil(4 * OverProvisionHeuristic.FACTOR), value, 0.0001);
-//		
-//		File output = new File(Checkpointer.CHECKPOINT_FILE);
-//		assertFalse(output.exists());
-//		
-//		PowerMock.verifyAll();
-//	}
-//	
-//	@Test
-//	public void testFindPlanWithWorkloadWithRepeatedUsersAndDifferentNumberOfRequests2() throws Exception{
-//		long sla = 8000l;
-//		
-//		Request request = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request.getUserID()).andReturn(1);
-//		Request request2 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request2.getUserID()).andReturn(1);
-//		Request request3 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request3.getUserID()).andReturn(1);
-//		Request request4 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request4.getUserID()).andReturn(1);
-//		Request request5 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request5.getUserID()).andReturn(5);
-//		Request request6 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request6.getUserID()).andReturn(5);
-//		Request request7 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request7.getUserID()).andReturn(5);
-//		Request request8 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request8.getUserID()).andReturn(9);
-//		Request request9 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request9.getUserID()).andReturn(9);
-//		
-//		List<Request> firstIntervalRequests = new ArrayList<Request>();
-//		firstIntervalRequests.add(request);
-//		firstIntervalRequests.add(request2);
-//		firstIntervalRequests.add(request3);
-//		firstIntervalRequests.add(request4);
-//		
-//		List<Request> secondIntervalRequests = new ArrayList<Request>();
-//		secondIntervalRequests.add(request5);
-//		secondIntervalRequests.add(request6);
-//		secondIntervalRequests.add(request7);
-//		secondIntervalRequests.add(request8);
-//		secondIntervalRequests.add(request9);
-//		
-//		DPS monitor = EasyMock.createStrictMock(DPS.class);
-//		monitor.registerConfigurable(EasyMock.isA(OverProvisionHeuristic.class));
-//		EasyMock.expectLastCall();
-//		
-//		SimulationInfo simulationInfo = new SimulationInfo(0, 0);
-//		
-//		Configuration config = EasyMock.createMock(Configuration.class);
-//		PowerMock.mockStatic(Configuration.class);
-//		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(8);
-//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
-//		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
-//		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
-//		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("M1_SMALL").times(2);
-//		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo).times(3);
-//		
-//		Provider provider = EasyMock.createMock(Provider.class);
-//		EasyMock.expect(provider.getName()).andReturn("p1");
-//		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider});
-//	
-//		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
-//		PowerMock.mockStatic(WorkloadParserFactory.class);
-//		WorkloadParserFactory.setScheduler(EasyMock.isA(JEEventScheduler.class));
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
-//		EasyMock.expect(parser.hasNext()).andReturn(false);
-//		PowerMock.replay(TimeBasedWorkloadParser.class);
-//		
-//		PowerMock.replayAll(config, parser, monitor, request, request2, request3, request4, request5,
-//				request6, request7, request8, request9);
-//		
-//		JEEventScheduler scheduler = JEEventScheduler.INSTANCE;
-//		LoadBalancer[] loadBalancers = new LoadBalancer[]{};
-//		
-//		OverProvisionHeuristic heuristic = new OverProvisionHeuristic(scheduler, monitor, loadBalancers);
-//		heuristic.setWorkloadParser(parser);
-//		heuristic.findPlan(null, null);
-//		
-//		Map<MachineType, Integer> plan = heuristic.getPlan(null);
-//		assertNotNull(plan);
-//		assertEquals(1, plan.size());
-//		int value = plan.get(MachineType.SMALL);
-//		assertEquals(Math.ceil(2 * OverProvisionHeuristic.FACTOR), value, 0.00001);
-//		
-//		File output = new File(Checkpointer.CHECKPOINT_FILE);
-//		assertFalse(output.exists());
-//		
-//		PowerMock.verifyAll();
-//	}
-//
-//	@Test
-//	public void testFindPlanWithWorkloadWithUniqueUsersAndSameNumberOfRequests() throws Exception{
-//		long sla = 8000l;
-//		
-//		Request request = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request.getUserID()).andReturn(1);
-//		Request request2 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request2.getUserID()).andReturn(2);
-//		Request request3 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request3.getUserID()).andReturn(3);
-//		Request request4 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request4.getUserID()).andReturn(4);
-//		Request request5 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request5.getUserID()).andReturn(5);
-//		Request request6 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request6.getUserID()).andReturn(6);
-//		Request request7 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request7.getUserID()).andReturn(7);
-//		Request request8 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request8.getUserID()).andReturn(8);
-//		
-//		List<Request> firstIntervalRequests = new ArrayList<Request>();
-//		firstIntervalRequests.add(request);
-//		firstIntervalRequests.add(request2);
-//		firstIntervalRequests.add(request3);
-//		firstIntervalRequests.add(request4);
-//		
-//		List<Request> secondIntervalRequests = new ArrayList<Request>();
-//		secondIntervalRequests.add(request5);
-//		secondIntervalRequests.add(request6);
-//		secondIntervalRequests.add(request7);
-//		secondIntervalRequests.add(request8);
-//		
-//		DPS monitor = EasyMock.createStrictMock(DPS.class);
-//		monitor.registerConfigurable(EasyMock.isA(OverProvisionHeuristic.class));
-//		EasyMock.expectLastCall();
-//		
-//		SimulationInfo simulationInfo = new SimulationInfo(0, 0);
-//		
-//		Configuration config = EasyMock.createMock(Configuration.class);
-//		PowerMock.mockStatic(Configuration.class);
-//		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(8);
-//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
-//		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
-//		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
-//		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("M1_SMALL").times(2);
-//		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo).times(3);
-//		
-//		Provider provider = EasyMock.createMock(Provider.class);
-//		EasyMock.expect(provider.getName()).andReturn("p1");
-//		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider});
-//	
-//		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
-//		PowerMock.mockStatic(WorkloadParserFactory.class);
-//		WorkloadParserFactory.setScheduler(EasyMock.isA(JEEventScheduler.class));
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
-//		EasyMock.expect(parser.hasNext()).andReturn(false);
-//		PowerMock.replay(TimeBasedWorkloadParser.class);
-//		
-//		PowerMock.replayAll(config, parser, monitor, request, request2, request3, request4, request5,
-//				request6, request7, request8);
-//		
-//		JEEventScheduler scheduler = JEEventScheduler.INSTANCE;
-//		LoadBalancer[] loadBalancers = new LoadBalancer[]{};
-//		
-//		OverProvisionHeuristic heuristic = new OverProvisionHeuristic(scheduler, monitor, loadBalancers);
-//		heuristic.setWorkloadParser(parser);
-//		heuristic.findPlan(null, null);
-//		
-//		Map<MachineType, Integer> plan = heuristic.getPlan(null);
-//		assertNotNull(plan);
-//		assertEquals(1, plan.size());
-//		int value = plan.get(MachineType.SMALL);
-//		assertEquals(Math.ceil(4 * OverProvisionHeuristic.FACTOR), value, 0.0001);
-//		
-//		File output = new File(Checkpointer.CHECKPOINT_FILE);
-//		assertFalse(output.exists());
-//		
-//		PowerMock.verifyAll();
-//	}
-//	
-//	@Test
-//	public void testFindPlanWithWorkloadWithRepeatedUsersAndSameNumberOfRequests() throws Exception{
-//		long sla = 8000l;
-//		
-//		Request request = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request.getUserID()).andReturn(1);
-//		Request request2 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request2.getUserID()).andReturn(2);
-//		Request request3 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request3.getUserID()).andReturn(3);
-//		Request request4 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request4.getUserID()).andReturn(4);
-//		Request request5 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request5.getUserID()).andReturn(5);
-//		Request request6 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request6.getUserID()).andReturn(6);
-//		Request request7 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request7.getUserID()).andReturn(6);
-//		Request request8 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request8.getUserID()).andReturn(8);
-//		
-//		List<Request> firstIntervalRequests = new ArrayList<Request>();
-//		firstIntervalRequests.add(request);
-//		firstIntervalRequests.add(request2);
-//		firstIntervalRequests.add(request3);
-//		firstIntervalRequests.add(request4);
-//		
-//		List<Request> secondIntervalRequests = new ArrayList<Request>();
-//		secondIntervalRequests.add(request5);
-//		secondIntervalRequests.add(request6);
-//		secondIntervalRequests.add(request7);
-//		secondIntervalRequests.add(request8);
-//		
-//		DPS monitor = EasyMock.createStrictMock(DPS.class);
-//		monitor.registerConfigurable(EasyMock.isA(OverProvisionHeuristic.class));
-//		EasyMock.expectLastCall();
-//		
-//		SimulationInfo simulationInfo = new SimulationInfo(0, 0);
-//		
-//		Configuration config = EasyMock.createMock(Configuration.class);
-//		PowerMock.mockStatic(Configuration.class);
-//		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(8);
-//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
-//		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
-//		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
-//		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("M1_SMALL").times(2);
-//		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo).times(3);
-//		
-//		Provider provider = EasyMock.createMock(Provider.class);
-//		EasyMock.expect(provider.getName()).andReturn("p1");
-//		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider});
-//	
-//		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
-//		PowerMock.mockStatic(WorkloadParserFactory.class);
-//		WorkloadParserFactory.setScheduler(EasyMock.isA(JEEventScheduler.class));
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
-//		EasyMock.expect(parser.hasNext()).andReturn(false);
-//		PowerMock.replay(TimeBasedWorkloadParser.class);
-//		
-//		PowerMock.replayAll(config, parser, monitor, request, request2, request3, request4, request5,
-//				request6, request7, request8);
-//		
-//		JEEventScheduler scheduler = JEEventScheduler.INSTANCE;
-//		LoadBalancer[] loadBalancers = new LoadBalancer[]{};
-//		
-//		OverProvisionHeuristic heuristic = new OverProvisionHeuristic(scheduler, monitor, loadBalancers);
-//		heuristic.setWorkloadParser(parser);
-//		heuristic.findPlan(null, null);
-//		
-//		Map<MachineType, Integer> plan = heuristic.getPlan(null);
-//		assertNotNull(plan);
-//		assertEquals(1, plan.size());
-//		int value = plan.get(MachineType.SMALL);
-//		assertEquals(Math.ceil(4 * OverProvisionHeuristic.FACTOR), value, 0.00001);
-//		
-//		File output = new File(Checkpointer.CHECKPOINT_FILE);
-//		assertFalse(output.exists());
-//		
-//		PowerMock.verifyAll();
-//	}
-//	
-//	@Test
-//	public void testFindPlanWithWorkloadWithRepeatedUsersAndSametNumberOfRequests2() throws Exception{
-//		long sla = 8000l;
-//		
-//		Request request = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request.getUserID()).andReturn(1);
-//		Request request2 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request2.getUserID()).andReturn(2);
-//		Request request3 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request3.getUserID()).andReturn(2);
-//		Request request4 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request4.getUserID()).andReturn(2);
-//		Request request5 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request5.getUserID()).andReturn(5);
-//		Request request6 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request6.getUserID()).andReturn(5);
-//		Request request7 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request7.getUserID()).andReturn(7);
-//		Request request8 = EasyMock.createStrictMock(Request.class);
-//		EasyMock.expect(request8.getUserID()).andReturn(8);
-//		
-//		List<Request> firstIntervalRequests = new ArrayList<Request>();
-//		firstIntervalRequests.add(request);
-//		firstIntervalRequests.add(request2);
-//		firstIntervalRequests.add(request3);
-//		firstIntervalRequests.add(request4);
-//		
-//		List<Request> secondIntervalRequests = new ArrayList<Request>();
-//		secondIntervalRequests.add(request5);
-//		secondIntervalRequests.add(request6);
-//		secondIntervalRequests.add(request7);
-//		secondIntervalRequests.add(request8);
-//		
-//		DPS monitor = EasyMock.createStrictMock(DPS.class);
-//		monitor.registerConfigurable(EasyMock.isA(OverProvisionHeuristic.class));
-//		EasyMock.expectLastCall();
-//		
-//		SimulationInfo simulationInfo = new SimulationInfo(0, 0);
-//		
-//		Configuration config = EasyMock.createMock(Configuration.class);
-//		PowerMock.mockStatic(Configuration.class);
-//		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(8);
-//		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(sla);
-//		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo);
-//		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l).times(2);
-//		EasyMock.expect(config.getString(SimulatorProperties.PLANNING_TYPE)).andReturn("M1_SMALL").times(2);
-//		EasyMock.expect(config.getSimulationInfo()).andReturn(simulationInfo).times(3);
-//		
-//		Provider provider = EasyMock.createMock(Provider.class);
-//		EasyMock.expect(provider.getName()).andReturn("p1");
-//		EasyMock.expect(config.getProviders()).andReturn(new Provider[]{provider});
-//	
-//		WorkloadParser<List<Request>> parser = EasyMock.createStrictMock(WorkloadParser.class);
-//		PowerMock.mockStatic(WorkloadParserFactory.class);
-//		WorkloadParserFactory.setScheduler(EasyMock.isA(JEEventScheduler.class));
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.next()).andReturn(firstIntervalRequests);
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.hasNext()).andReturn(true);
-//		EasyMock.expect(parser.next()).andReturn(secondIntervalRequests);
-//		EasyMock.expect(parser.hasNext()).andReturn(false);
-//		PowerMock.replay(TimeBasedWorkloadParser.class);
-//		
-//		PowerMock.replayAll(config, parser, monitor, request, request2, request3, request4, request5,
-//				request6, request7, request8);
-//		
-//		JEEventScheduler scheduler = JEEventScheduler.INSTANCE;
-//		LoadBalancer[] loadBalancers = new LoadBalancer[]{};
-//		
-//		OverProvisionHeuristic heuristic = new OverProvisionHeuristic(scheduler, monitor, loadBalancers);
-//		heuristic.setWorkloadParser(parser);
-//		heuristic.findPlan(null, null);
-//		
-//		Map<MachineType, Integer> plan = heuristic.getPlan(null);
-//		assertNotNull(plan);
-//		assertEquals(1, plan.size());
-//		int value = plan.get(MachineType.SMALL);
-//		assertEquals(Math.ceil(3 * OverProvisionHeuristic.FACTOR), value, 0.000001);
-//		
-//		File output = new File(Checkpointer.CHECKPOINT_FILE);
-//		assertFalse(output.exists());
-//		
-//		PowerMock.verifyAll();
-//	}
 }

@@ -18,6 +18,7 @@ import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.util.FastSemaphore;
+import commons.sim.util.SaaSAppProperties;
 import commons.util.Triple;
 
 /**
@@ -128,6 +129,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		}else if(canQueue()){
 			this.backlog.add(request);
 		}else{
+//			System.out.println("Machine full!");
 			send(new JEEvent(JEEventType.REQUESTQUEUED, getLoadBalancer(), getScheduler().now(), request));
 		}
 
@@ -173,7 +175,6 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 				request.update(processedDemand);
 				
 				if(request.isFinished()){
-					descriptor.updateTransference(request.getRequestSizeInBytes(), request.getResponseSizeInBytes());
 					requestFinished(request);
 				}else{
 					processorQueue.add(request);
@@ -196,7 +197,15 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 			newRequestToAdd.assignTo(this.descriptor.getType());
 			processorQueue.add(newRequestToAdd);
 		}
-		getLoadBalancer().reportRequestFinished(request);
+		
+		if(getScheduler().now() - request.getArrivalTimeInMillis() > 
+			Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)){
+			getLoadBalancer().reportRequestQueued(request);
+			descriptor.updateTransference(request.getRequestSizeInBytes(), 0);
+		}else{
+			descriptor.updateTransference(request.getRequestSizeInBytes(), request.getResponseSizeInBytes());
+			getLoadBalancer().reportRequestFinished(request);
+		}
 	}
 
 	/**
