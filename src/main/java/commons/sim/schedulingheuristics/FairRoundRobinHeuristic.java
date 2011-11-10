@@ -14,7 +14,7 @@ import commons.sim.components.Machine;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class HeterogenousRRHeuristic extends AbstractSchedulingHeuristic {
+public class FairRoundRobinHeuristic extends AbstractSchedulingHeuristic {
 	
 	/**
 	 * 
@@ -27,7 +27,7 @@ public class HeterogenousRRHeuristic extends AbstractSchedulingHeuristic {
 	/**
 	 * Default constructor
 	 */
-	public HeterogenousRRHeuristic() {
+	public FairRoundRobinHeuristic() {
 		super();
 		this.nextToUse = 0;
 		this.allocationsPerServer = new ArrayList<Integer>();
@@ -74,6 +74,7 @@ public class HeterogenousRRHeuristic extends AbstractSchedulingHeuristic {
 		}
 	}
 
+	// This works allocating for each machine before jumping to the next
 //	@Override
 //	protected Machine getNextAvailableMachine() {
 //		
