@@ -1,8 +1,6 @@
 package provisioning;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -75,33 +73,42 @@ public class DynamicProvisioningSystem implements DPS{
 	 */
 	protected void addServersToTier(int[] numberOfInitialServersPerTier) {
 
-		List<MachineType> typeList = Arrays.asList(MachineType.values());
-		Collections.reverse(typeList);
-		int serversAdded = 0;
-		for(MachineType machineType : typeList){
-			for (Provider provider : this.providers) {
-				while(provider.canBuyMachine(true, machineType) && serversAdded < numberOfInitialServers){
-					configurable.addServer(tier, provider.buyMachine(true, machineType), false);
-					serversAdded++;
+		int numberOfMachines = 0;
+		for (int i : numberOfInitialServersPerTier) {
+			numberOfMachines += i;
+		}
+		
+		List<MachineDescriptor> currentlyBought = buyMachines(numberOfMachines);
+		
+		while(currentlyBought.size() != 0){
+			for (int i = 0; i < numberOfInitialServersPerTier.length; i++) {
+				if(numberOfInitialServersPerTier[i] != 0){
+					numberOfInitialServersPerTier[i]--;
+					configurable.addMachine(i, currentlyBought.remove(0), false);
 				}
-				if(serversAdded == numberOfInitialServers){
-					return;
+			}
+		}
+	}
+
+	protected List<MachineDescriptor> buyMachines(int numberOfMachines) {
+		
+		List<MachineDescriptor> currentlyBought = new ArrayList<MachineDescriptor>();
+		MachineType[] values = MachineType.values();
+		for (int i = values.length - 1; i >= 0; i--) {
+			MachineType type = values[i]; 
+			for (Provider provider : providers) {
+				while(currentlyBought.size() != numberOfMachines && provider.canBuyMachine(true, type)){
+					currentlyBought.add(provider.buyMachine(true, type));
+				}
+			}
+			for (Provider provider : providers) {
+				while(currentlyBought.size() != numberOfMachines && provider.canBuyMachine(false, type)){
+					currentlyBought.add(provider.buyMachine(false, type));
 				}
 			}
 		}
 		
-		//Adding on-demand machines
-		for(MachineType machineType : typeList){
-			for (Provider provider : this.providers) {
-				while(provider.canBuyMachine(false, machineType) && serversAdded < numberOfInitialServers){
-					configurable.addServer(tier, provider.buyMachine(false, machineType), false);
-					serversAdded++;
-				}
-				if(serversAdded == numberOfInitialServers){
-					return;
-				}
-			}
-		}
+		return currentlyBought;
 	}
 
 	/**
@@ -131,7 +138,7 @@ public class DynamicProvisioningSystem implements DPS{
 	 */
 	@Override
 	public void sendStatistics(long now, MachineStatistics statistics, int tier) {
-		log.info(String.format("STAT %d %d %s", now, tier, statistics));
+		log.info(String.format("STAT-STATIC %d %d %s", now, tier, statistics));
 	}
 
 	/**

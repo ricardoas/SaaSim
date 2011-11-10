@@ -95,7 +95,7 @@ public class User implements Comparable<User>, Serializable{
 	
 	public void calculatePartialReceipt(UtilityResultEntry entry) {
 		double penalty = this.contract.calculatePenalty((1.0 * numberOfLostRequests) / (numberOfLostRequests+numberOfFinishedRequests));
-		entry.addPenalty(penalty);
+		entry.addPenalty(id, penalty, numberOfFinishedRequests, numberOfLostRequests+numberOfFinishedRequests);
 		
 		this.contract.calculateReceipt(entry, id, consumedCpuInMillis, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, storageInBytes);
 		this.reset();

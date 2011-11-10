@@ -43,6 +43,10 @@ public enum MachineType{
 	public int getNumberOfCores() {
 		return numberOfCores;
 	}
+
+	public int getRelativePower() {
+		return (int) Math.ceil(getPower());
+	}
 	
 	
 	

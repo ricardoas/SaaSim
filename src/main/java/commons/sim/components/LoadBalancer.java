@@ -1,8 +1,12 @@
 package commons.sim.components;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 
 import provisioning.Monitor;
@@ -29,14 +33,16 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	 */
 	private static final long serialVersionUID = -8572489707494357108L;
 
-	private long MINIMUM_NUMBER_OF_MACHINES = 1;
-	
 	private final int tier;
-	private final List<Machine> servers;
+
 	private final SchedulingHeuristic heuristic;
+	
 	private final Queue<Request> requestsToBeProcessed;
 	private final int maxServersAllowed;
 	private transient Monitor monitor;
+
+	private Map<MachineDescriptor, Machine> startingUp;
+	private Map<MachineDescriptor, Machine> warmingDown;
 
 	
 	/**
@@ -51,27 +57,25 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		this.heuristic = heuristic;
 		this.maxServersAllowed = maxServersAllowed;
 		this.tier = tier;
-		this.servers = new ArrayList<Machine>();
 		this.requestsToBeProcessed = new LinkedList<Request>();
+		startingUp = new HashMap<MachineDescriptor, Machine>();
+		warmingDown = new HashMap<MachineDescriptor, Machine>();
 		
-		//Checking if there are reserved resources that should be up!
-//		long[][] totalReserved = Configuration.getInstance().getLong2DArray(IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION);
-//		if(totalReserved.length > 0){
-//		MINIMUM_NUMBER_OF_MACHINES = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER);
-//		}
 	}
 
 	/**
-	 * @param useStartUpDelay 
 	 * 
+	 * @param useStartUpDelay 
 	 */
-	public void addServer(MachineDescriptor descriptor, boolean useStartUpDelay){
-		Machine server = buildMachine(descriptor);
-		long serverUpTime = getScheduler().now();
+	public void addMachine(MachineDescriptor descriptor, boolean useStartUpDelay){
+		Machine machine = buildMachine(descriptor);
+		long machineUpTime = getScheduler().now();
 		if(useStartUpDelay){
-			serverUpTime = serverUpTime + (Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SETUP_TIME));
+			machineUpTime = machineUpTime + (Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SETUP_TIME));
 		}
-		send(new JEEvent(JEEventType.ADD_SERVER, this, serverUpTime, server));
+		
+		startingUp.put(descriptor, machine);
+		send(new JEEvent(JEEventType.ADD_SERVER, this, machineUpTime, descriptor));
 	}
 	
 	/**
@@ -83,36 +87,6 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	}
 	
 	/**
-	 * 
-	 */
-	public void removeServer(MachineDescriptor descriptor, boolean force){
-		for (int i = 0; i < servers.size(); i++) {
-			Machine server = servers.get(i);
-			if(server.getDescriptor().equals(descriptor)){
-				if(force){
-					migrateRequests(server);
-					send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this, getScheduler().now(), server));
-				}
-				servers.remove(server);
-				server.shutdownOnFinish();
-				heuristic.finishServer(server, i, servers);
-				break;// not a concurrent modification because of "break" statement.
-			}
-		}
-	}
-
-	/**
-	 * @param server
-	 */
-	private void migrateRequests(Machine server) {
-		long now = getScheduler().now();
-		for (Request request : server.getProcessorQueue()) {
-			request.reset();
-			send(new JEEvent(JEEventType.NEWREQUEST, this, now, request));
-		}
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -120,27 +94,32 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		switch (event.getType()) {
 			case NEWREQUEST:
 				Request request = (Request) event.getValue()[0];
-				Machine nextServer = heuristic.getNextServer(request, getServers());
+				Machine nextServer = heuristic.next(request);
 				if(nextServer != null){//Reusing an existent machine
 					nextServer.sendRequest(request);
 				}else{
-//					System.out.println("Unavailable server!");
 					monitor.requestQueued(getScheduler().now(), request, tier);
 				}
 				break;
 			case ADD_SERVER:
-				Machine machine = (Machine) event.getValue()[0];
-				machine.getDescriptor().setStartTimeInMillis(getScheduler().now());
-				servers.add(machine);
+				MachineDescriptor descriptor = (MachineDescriptor) event.getValue()[0];
 				
-				this.heuristic.updateServers(servers);
-				
-				for (Request queuedRequest : requestsToBeProcessed) {
-					send(new JEEvent(JEEventType.NEWREQUEST, this, getScheduler().now(), queuedRequest));
+				Machine machine = startingUp.remove(descriptor);
+				if(machine != null){
+					descriptor.setStartTimeInMillis(getScheduler().now());
+					heuristic.addMachine(machine);
+					
+					for (Request queuedRequest : requestsToBeProcessed) {
+						send(new JEEvent(JEEventType.NEWREQUEST, this, getScheduler().now(), queuedRequest));
+					}
 				}
 				break;
 			case MACHINE_TURNED_OFF:
-				monitor.machineTurnedOff((MachineDescriptor)event.getValue()[0]);
+				Machine machineToTurnOff = warmingDown.remove(event.getValue()[0]);
+				if(machineToTurnOff != null){
+					monitor.machineTurnedOff((MachineDescriptor)event.getValue()[0]);
+				}
+				
 				break;
 			case REQUESTQUEUED:
 				monitor.requestQueued(getScheduler().now(), (Request)event.getValue()[0], tier);
@@ -156,7 +135,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	 * @param eventTime
 	 */
 	public void estimateServers(long eventTime) {
-		MachineStatistics statistics = new MachineStatistics(0, 0, 0, servers.size());
+		MachineStatistics statistics = new MachineStatistics(0, 0, 0, heuristic.getNumberOfMachines());
 		monitor.sendStatistics(eventTime, statistics, tier);
 	}
 
@@ -166,21 +145,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	 * @param eventTime
 	 */
 	public void collectStatistics(long eventTime) {
-		double averageUtilisation = 0d;
-		for(Machine machine : servers){
-			averageUtilisation += machine.computeUtilisation(eventTime);
-		}
-		
-		if(!servers.isEmpty()){
-			averageUtilisation /= servers.size();
-		}
-		
-		long requestsArrivalCounter = this.heuristic.getRequestsArrivalCounter();
-		long finishedRequestsCounter = this.heuristic.getFinishedRequestsCounter();
-		this.heuristic.resetCounters();
-		
-		MachineStatistics statistics = new MachineStatistics(averageUtilisation, requestsArrivalCounter, finishedRequestsCounter, servers.size());
-		monitor.sendStatistics(eventTime, statistics, tier);
+		monitor.sendStatistics(eventTime, heuristic.getStatistics(eventTime), tier);
 	}
 
 	/**
@@ -188,7 +153,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	 * @return the servers
 	 */
 	public List<Machine> getServers() {
-		return new ArrayList<Machine>(servers);
+		return new ArrayList<Machine>(heuristic.getMachines());
 	}
 
 	public void reportRequestQueued(Request requestQueued){
@@ -197,33 +162,33 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	
 	public void reportRequestFinished(Request requestFinished) {
 		
-//		if(getScheduler().now() - requestFinished.getArrivalTimeInMillis() > 
-//				Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)){
-////			System.out.println("SLA!");
-//			monitor.requestQueued(getScheduler().now(), requestFinished, tier);
-//		}else{
 		heuristic.reportRequestFinished();
 		monitor.requestFinished(requestFinished);
-//		}
-		
 	}
 
-	public void removeServer(boolean force) {
-		if(servers.size() <= MINIMUM_NUMBER_OF_MACHINES){
-			return;
-		}
-//		if(servers.size() == 1){
-//			return;
-//		}
+	public void removeMachine(boolean force) {
+		Machine machine = null;
 		
-		for (int i = servers.size()-1; i >= 0; i--) {
-			MachineDescriptor descriptor = servers.get(i).getDescriptor();
-			if(!descriptor.isReserved()){
-				removeServer(descriptor, force);
-				return;
+		if(startingUp.isEmpty()){
+			machine = heuristic.removeMachine();
+			warmingDown.put(machine.getDescriptor(), machine);
+			if(force){
+				//FIXME what can we do with running requests?
+//				send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this, getScheduler().now(), machine));
+				throw new RuntimeException("Not implemented");
+			}else{
+				machine.shutdownOnFinish();
 			}
+		}else{
+			Iterator<Entry<MachineDescriptor, Machine>> iterator = startingUp.entrySet().iterator();
+			Entry<MachineDescriptor, Machine> entry = iterator.next();
+			iterator.remove();
+			machine = entry.getValue();
+			
+			entry.getKey().setStartTimeInMillis(getScheduler().now());
+			warmingDown.put(machine.getDescriptor(), machine);
+			machine.shutdownOnFinish();
 		}
-		removeServer(servers.get(servers.size()-1).getDescriptor(), force);
 	}
 
 	public int getTier() {
@@ -253,7 +218,13 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		return super.equals(obj);
 	}
 
-	public void cancelServerRemoval(int numberOfMachines) {
-		//FIXME code me, please!!!
+	public void cancelMachineRemoval(int numberOfMachines) {
+		Iterator<Entry<MachineDescriptor, Machine>> iterator = warmingDown.entrySet().iterator();
+		for (int i = 0; i < numberOfMachines; i++) {
+			Entry<MachineDescriptor, Machine> entry = iterator.next();
+			iterator.remove();
+			entry.getValue().cancelShutdown();
+			heuristic.addMachine(entry.getValue());
+		}
 	}
 }

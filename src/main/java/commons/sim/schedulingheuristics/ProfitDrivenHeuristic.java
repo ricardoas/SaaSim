@@ -9,7 +9,7 @@ import commons.config.Configuration;
 import commons.sim.components.Machine;
 import commons.util.Triple;
 
-public class ProfitDrivenHeuristic implements SchedulingHeuristic{
+public class ProfitDrivenHeuristic extends AbstractSchedulingHeuristic{
 	
 	/**
 	 * 
@@ -26,11 +26,11 @@ public class ProfitDrivenHeuristic implements SchedulingHeuristic{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Machine getNextServer(Request request, List<Machine> servers) {
+	public Machine next(Request request) {
 		double max_diff = 0d;
 		Machine machineToSchedule = null;
 		
-		for(Machine machine : servers){//Evaluating if it is profitable to reuse existing machines
+		for(Machine machine : machines){//Evaluating if it is profitable to reuse existing machines
 			double pi = 0d;
 			double new_pi = 0d;
 			List<Triple<Long, Long, Long>> executionTimes = machine.estimateFinishTime(request);
@@ -68,31 +68,5 @@ public class ProfitDrivenHeuristic implements SchedulingHeuristic{
 		}
 		
 		return machineToSchedule;
-	}
-
-	@Override
-	public long getRequestsArrivalCounter() {
-		return 0;
-	}
-
-	@Override
-	public long getFinishedRequestsCounter() {
-		return 0;
-	}
-
-	@Override
-	public void resetCounters() {
-	}
-
-	@Override
-	public void reportRequestFinished() {
-	}
-
-	@Override
-	public void finishServer(Machine server, int index, List<Machine> servers) {
-	}
-	
-	@Override
-	public void updateServers(List<Machine> servers) {
 	}
 }

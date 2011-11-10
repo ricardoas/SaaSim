@@ -1,10 +1,11 @@
 package commons.sim.schedulingheuristics;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Collection;
 
 import commons.cloud.Request;
 import commons.sim.components.Machine;
+import commons.sim.provisioningheuristics.MachineStatistics;
 
 /**
  * 
@@ -18,29 +19,17 @@ public interface SchedulingHeuristic extends Serializable{
 	 * @param servers The collection of server from where the next server should be chosen.
 	 * @return
 	 */
-	Machine getNextServer(Request request, List<Machine> servers);
-	
-	/**
-	 * @return
-	 */
-	long getRequestsArrivalCounter();
-	
-	/**
-	 * @return
-	 */
-	long getFinishedRequestsCounter();
-	
-	/**
-	 * 
-	 */
-	void resetCounters();
+	Machine next(Request request);
 
-	/**
-	 * 
-	 */
 	void reportRequestFinished();
 
-	void finishServer(Machine server, int index, List<Machine> servers);
-	
-	public void updateServers(List<Machine> servers);
+	void addMachine(Machine machine);
+
+	Machine removeMachine();
+
+	int getNumberOfMachines();
+
+	MachineStatistics getStatistics(long eventTime);
+
+	Collection<? extends Machine> getMachines();
 }

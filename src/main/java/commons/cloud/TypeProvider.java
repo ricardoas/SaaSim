@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import commons.sim.components.MachineDescriptor;
+import commons.util.TimeUnit;
 
 
 /**
@@ -24,8 +25,6 @@ public class TypeProvider implements Serializable{
 	 */
 	private static final long serialVersionUID = -2384651815453738053L;
 
-	private static final long HOUR_IN_MILLIS = 3600000;
-	
 	private final int providerID;
 	private final MachineType type;
 	private final double onDemandCpuCost;
@@ -143,17 +142,17 @@ public class TypeProvider implements Serializable{
 		long reservedUpTimeInFullHours = 0;
 		
 		for (MachineDescriptor descriptor : onDemandFinishedMachines) {
-			onDemandUpTimeInFullHours += (long) Math.ceil(1.0*descriptor.getUpTimeInMillis()/HOUR_IN_MILLIS);
+			onDemandUpTimeInFullHours += (long) Math.ceil(Math.max(1.0,descriptor.getUpTimeInMillis())/TimeUnit.HOUR.getMillis());
 		}
 		for (MachineDescriptor descriptor : reservedFinishedMachines) {
-			reservedUpTimeInFullHours += (long) Math.ceil(1.0*descriptor.getUpTimeInMillis()/HOUR_IN_MILLIS);
+			reservedUpTimeInFullHours += (long) Math.ceil(Math.max(1.0,descriptor.getUpTimeInMillis())/TimeUnit.HOUR.getMillis());
 		}
 		for (MachineDescriptor descriptor : onDemandRunningMachines) {
-			onDemandUpTimeInFullHours += (long) Math.ceil(1.0*(currentTimeInMillis - descriptor.getStartTimeInMillis())/HOUR_IN_MILLIS);
+			onDemandUpTimeInFullHours += (long) Math.ceil(1.0*(currentTimeInMillis - descriptor.getStartTimeInMillis())/TimeUnit.HOUR.getMillis());
 			descriptor.reset(currentTimeInMillis);
 		}
 		for (MachineDescriptor descriptor : reservedRunningMachines) {
-			reservedUpTimeInFullHours += (long) Math.ceil(1.0*(currentTimeInMillis - descriptor.getStartTimeInMillis())/HOUR_IN_MILLIS);
+			reservedUpTimeInFullHours += (long) Math.ceil(1.0*(currentTimeInMillis - descriptor.getStartTimeInMillis())/TimeUnit.HOUR.getMillis());
 			descriptor.reset(currentTimeInMillis);
 		}
 		

@@ -17,7 +17,7 @@ import commons.sim.components.Machine;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class RanjanHeuristic implements SchedulingHeuristic {
+public class RanjanHeuristic extends AbstractSchedulingHeuristic {
 	
 	/**
 	 * 
@@ -30,35 +30,31 @@ public class RanjanHeuristic implements SchedulingHeuristic {
 	private Map<Long, Machine> serversOfLastRequests;
 	
 	private int lastUsed;
-	private long requestsArrivalCounter;
-	private long finishedRequestsCounter;
 
 	
 	/**
 	 * Default constructor
 	 */
 	public RanjanHeuristic() {
+		super();
 		this.lastUsed = -1;
 		this.lastRequestTimes = new HashMap<Long, Long>();
 		this.serversOfLastRequests = new LinkedHashMap<Long, Machine>();
-		
-		this.requestsArrivalCounter = 0;
-		this.finishedRequestsCounter = 0;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Machine getNextServer(Request request, List<Machine> servers) {
-		this.requestsArrivalCounter++;
+	public Machine next(Request request) {
+		super.next(request);
 		
 		Machine machine = getServerOfPreviousRequestInSession(request);
 		if(machine != null){//Allocates to server already serving the session
 			return machine;
 		}
-		lastUsed = (lastUsed + 1) % servers.size();
-		machine = servers.get(lastUsed);
+		lastUsed = (lastUsed + 1) % machines.size();
+		machine = machines.get(lastUsed);
 		
 		//Updating times
 		long userID = request.getUserID();
@@ -86,34 +82,5 @@ public class RanjanHeuristic implements SchedulingHeuristic {
 			return lastMachine;
 		}
 		return null;
-	}
-
-	@Override
-	public long getRequestsArrivalCounter() {
-		return this.requestsArrivalCounter;
-	}
-
-	@Override
-	public long getFinishedRequestsCounter() {
-		return this.finishedRequestsCounter;
-	}
-
-	@Override
-	public void resetCounters() {
-		this.requestsArrivalCounter = 0;
-		this.finishedRequestsCounter = 0;
-	}
-
-	@Override
-	public void reportRequestFinished() {
-		this.finishedRequestsCounter++;
-	}
-
-	@Override
-	public void finishServer(Machine server, int index, List<Machine> servers) {
-	}
-	
-	@Override
-	public void updateServers(List<Machine> servers) {
 	}
 }

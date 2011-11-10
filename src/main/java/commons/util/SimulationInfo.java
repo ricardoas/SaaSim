@@ -104,7 +104,7 @@ public class SimulationInfo implements Serializable{
 	
 	@Override
 	public String toString() {
-		return String.format("%d %b %b %b", currentDay, isFirstDay(), isFinishDay(), isChargeDay());
+		return String.format("%d %b %b %b", getCurrentDay(), isFirstDay(), isFinishDay(), isChargeDay());
 	}
 
 	public boolean isFirstDay() {

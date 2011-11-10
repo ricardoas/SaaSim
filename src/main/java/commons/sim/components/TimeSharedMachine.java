@@ -1,6 +1,7 @@
 package commons.sim.components;
 
-import static commons.sim.util.SimulatorProperties.*;
+import static commons.sim.util.SimulatorProperties.MACHINE_BACKLOG_SIZE;
+import static commons.sim.util.SimulatorProperties.MACHINE_NUMBER_OF_TOKENS;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -129,7 +130,6 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		}else if(canQueue()){
 			this.backlog.add(request);
 		}else{
-//			System.out.println("Machine full!");
 			send(new JEEvent(JEEventType.REQUESTQUEUED, getLoadBalancer(), getScheduler().now(), request));
 		}
 
@@ -359,5 +359,10 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 */
 	protected boolean canQueue() {
 		return this.backlog.size() < maxBacklogSize;
+	}
+	
+	@Override
+	public void cancelShutdown() {
+		shutdownOnFinish = false;
 	}
 }

@@ -14,7 +14,7 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 	 * 
 	 */
 	private static final long serialVersionUID = 8251766726895786861L;
-	private static final char STRING = '\t';
+	private static final String STRING = "\t";
 	
 
 	/**
@@ -35,6 +35,9 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 		private long consumedTransference;
 		private double transferenceCost;
 		private double storageCost;
+		private double penalty;
+		private long numberOfFinishedRequests;
+		private long totalNumberOfRequests;
 
 		/**
 		 * Default constructor.
@@ -70,6 +73,9 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 		@Override
 		public String toString() {
 			return userID 
+					+ STRING + penalty 
+					+ STRING + numberOfFinishedRequests 
+					+ STRING + totalNumberOfRequests 
 					+ STRING + contractName 
 					+ STRING + totalReceipt
 					+ STRING + extraConsumedCPU 
@@ -77,6 +83,13 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 					+ STRING + consumedTransference
 					+ STRING + transferenceCost
 					+ STRING + storageCost;
+		}
+
+		public void addPenalty(double penalty, long numberOfFinishedRequests,
+				long totalNumberOfRequests) {
+					this.numberOfFinishedRequests = numberOfFinishedRequests;
+					this.totalNumberOfRequests = totalNumberOfRequests;
+					this.penalty = penalty;
 		}
 	}
 	
@@ -343,8 +356,9 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 		this.cost += (onDemandCost + reservedCost + monitoringCost);
 	}
 	
-	public void addPenalty(double penalty){
+	public void addPenalty(int userID, double penalty, long numberOfFinishedRequests, long totalNumberOfRequests){
 		this.penalty += penalty;
+		users[userID].addPenalty(penalty, numberOfFinishedRequests, totalNumberOfRequests);
 	}
 
 	/**
@@ -433,7 +447,7 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 		StringBuilder sb = new StringBuilder();
 		sb.append("time\tutility\treceipt\tcost\tpenalty\t");
 		for (int i = 0; i < users.length; i++) {
-			sb.append("userID\tcontract\treceipt\textraCPU\tcpuCost\ttrans\ttransCost\tstorageCost\t");
+			sb.append("userID\tpenalty\tfinished\ttotal\tcontract\treceipt\textraCPU\tcpuCost\ttrans\ttransCost\tstorageCost\t");
 		}
 		for (ProviderEntry provider : providers) {
 			sb.append("name\tcost\tinCost\toutCost\tonDCost\tresCost\tinTrans\toutTrans\tonD\tres\tmon\t");

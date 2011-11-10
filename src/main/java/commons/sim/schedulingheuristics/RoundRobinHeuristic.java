@@ -3,9 +3,6 @@
  */
 package commons.sim.schedulingheuristics;
 
-import java.util.List;
-
-import commons.cloud.Request;
 import commons.sim.components.Machine;
 
 /**
@@ -13,7 +10,7 @@ import commons.sim.components.Machine;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class RoundRobinHeuristic implements SchedulingHeuristic {
+public class RoundRobinHeuristic extends AbstractSchedulingHeuristic {
 	
 	/**
 	 * 
@@ -25,6 +22,7 @@ public class RoundRobinHeuristic implements SchedulingHeuristic {
 	 * Default constructor
 	 */
 	public RoundRobinHeuristic() {
+		super();
 		this.nextToUse = 0;
 	}
 
@@ -32,38 +30,8 @@ public class RoundRobinHeuristic implements SchedulingHeuristic {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Machine getNextServer(Request request, List<Machine> servers) {
-		
-		nextToUse = (nextToUse) % servers.size();
-		return servers.get(nextToUse++);
-	}
-
-	@Override
-	public long getRequestsArrivalCounter() {
-		return 0;
-	}
-
-	@Override
-	public long getFinishedRequestsCounter() {
-		return 0;
-	}
-
-	@Override
-	public void resetCounters() {
-	}
-
-	@Override
-	public void reportRequestFinished() {
-	}
-
-	@Override
-	public void finishServer(Machine server, int index, List<Machine> servers){
-		if(nextToUse > index){
-			nextToUse = nextToUse - 1;
-		}
-	}
-	
-	@Override
-	public void updateServers(List<Machine> servers) {
+	protected Machine getNextAvailableMachine() {
+		int index = nextToUse++;
+		return machines.isEmpty()? null: machines.get(index % machines.size());
 	}
 }

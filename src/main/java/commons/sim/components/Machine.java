@@ -60,4 +60,6 @@ public interface Machine extends JEEventHandler{
 	 * @return
 	 */
 	List<Triple<Long, Long, Long>> estimateFinishTime(Request request);
+
+	void cancelShutdown();
 }

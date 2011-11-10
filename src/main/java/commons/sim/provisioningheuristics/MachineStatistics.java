@@ -1,5 +1,9 @@
 package commons.sim.provisioningheuristics;
 
+/**
+ * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
+ *
+ */
 public class MachineStatistics {
 	
 	public double averageUtilisation;
@@ -60,16 +64,14 @@ public class MachineStatistics {
 		return true;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public String toString() {
-		return "RanjanStatistics [averageUtilisation=" + averageUtilisation
+		return "MachineStatistics [averageUtilisation=" + averageUtilisation
 				+ ", numberOfRequestsArrivalInLastInterval="
 				+ numberOfRequestsArrivalInLastInterval
 				+ ", numberOfRequestsCompletionsInLastInterval="
 				+ numberOfRequestsCompletionsInLastInterval
-				+ ", totalNumberOfServers=" + totalNumberOfServers + "]";
+				+ ", totalNumberOfServers=" + totalNumberOfServers
+				+ ", warmingDownMachines=" + warmingDownMachines + "]";
 	}
 }

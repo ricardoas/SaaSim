@@ -166,7 +166,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 			evaluateMachinesToBeAdded(tier, numberOfServersToAdd);
 		}else if(numberOfServersToAdd < 0){
 			for (int i = 0; i < -numberOfServersToAdd; i++) {
-				configurable.removeServer(tier, false);
+				configurable.removeMachine(tier, false);
 			}
 		}
 		
@@ -181,7 +181,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 			for (Provider provider : providers) {
 				while(provider.canBuyMachine(true, machineType) && 
 						serversAdded + machineType.getNumberOfCores() <= numberOfServersToAdd){
-					configurable.addServer(tier, provider.buyMachine(true, machineType), true);
+					configurable.addMachine(tier, provider.buyMachine(true, machineType), true);
 					serversAdded += machineType.getNumberOfCores();
 				}
 				if(serversAdded == numberOfServersToAdd){
@@ -199,7 +199,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 				for (Provider provider : providers) {
 					while(provider.canBuyMachine(false, machineType) && 
 							serversAdded + machineType.getNumberOfCores() <= numberOfServersToAdd){
-						configurable.addServer(tier, provider.buyMachine(false, machineType), true);
+						configurable.addMachine(tier, provider.buyMachine(false, machineType), true);
 						serversAdded += machineType.getNumberOfCores();
 					}
 					if(serversAdded == numberOfServersToAdd){

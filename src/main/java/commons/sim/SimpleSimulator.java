@@ -136,25 +136,15 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void addServer(int tier, MachineDescriptor machineDescriptor, boolean useStartUpDelay) {
+	public void addMachine(int tier, MachineDescriptor machineDescriptor, boolean useStartUpDelay) {
 		assert tiers.length > tier : "This tier not exists!";
-		tiers[tier].addServer(machineDescriptor, useStartUpDelay);
+		tiers[tier].addMachine(machineDescriptor, useStartUpDelay);
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public void removeServer(int tier, MachineDescriptor machineDescriptor,
-			boolean force) {
-		assert tiers.length > tier : "This tier not exists!";
-		tiers[tier].removeServer(machineDescriptor, force);
-	}
-
-	@Override
-	public void removeServer(int tier, boolean force) {
+	public void removeMachine(int tier, boolean force) {
 		assert tiers.length >= tier : "This tier not exists!";
-		tiers[tier].removeServer(force);
+		tiers[tier].removeMachine(force);
 	}
 
 	/**
@@ -181,8 +171,8 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	}
 
 	@Override
-	public void cancelMachineShutdown(int tier, int numberOfMachines) {
-		tiers[tier].cancelServerRemoval(numberOfMachines);
+	public void cancelMachineRemoval(int tier, int numberOfMachines) {
+		tiers[tier].cancelMachineRemoval(numberOfMachines);
 	}
 
 }

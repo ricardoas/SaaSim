@@ -8,6 +8,7 @@ import provisioning.Monitor;
 import commons.cloud.Request;
 import commons.io.WorkloadParser;
 import commons.sim.components.MachineDescriptor;
+import commons.sim.schedulingheuristics.SchedulingHeuristic;
 
 /**
  * Interface for applications which underlying infrastructure can be dynamically configurable.
@@ -21,35 +22,32 @@ public interface DynamicConfigurable {
 	 * @param machineDescriptor {@link MachineDescriptor} of the new server.
 	 * @param useStartUpDelay <code>true</code> to use machine start up delay.
 	 */
-	void addServer(int tier, MachineDescriptor machineDescriptor, boolean useStartUpDelay);
+	void addMachine(int tier, MachineDescriptor machineDescriptor, boolean useStartUpDelay);
 	
-	/**
-	 * @param tier
-	 * @param serverID
-	 * @param force TODO
-	 */
-	@Deprecated
-	void removeServer(int tier, MachineDescriptor machineDescriptor, boolean force);
-
 	/**
 	 * @param parser {@link WorkloadParser} implementation for workload reading.
 	 */
 	void setWorkloadParser(WorkloadParser<List<Request>> parser);
 
 	/**
-	 * Removes a server from specified tier. The removal policy is determined by something we still don't know.
-	 * TODO Who is responsible for determine which machine is removed?
+	 * Removes a server from specified tier. The removal policy is determined {@link SchedulingHeuristic}.
+	 * 
 	 * @param tier The tier whose machine will be removed.
 	 * @param force <code>true</code> to remove immediatelly, and <code>false</code> to stop scheduling and wait
 	 * until machine becomes idle to remove.
 	 */
-	void removeServer(int tier, boolean force);
+	void removeMachine(int tier, boolean force);
 
 	/**
 	 * @param monitor Monitoring system to collect information needed by {@link DPS}.
 	 */
 	void setMonitor(Monitor monitor);
 
-	void cancelMachineShutdown(int tier, int numberOfMachines);
+	/**
+	 * 
+	 * @param tier
+	 * @param numberOfServers
+	 */
+	void cancelMachineRemoval(int tier, int numberOfServers);
 	
 }

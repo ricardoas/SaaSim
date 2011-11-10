@@ -1,15 +1,12 @@
 package commons.config;
 
-import static commons.sim.util.IaaSPlanProperties.IAAS_PLAN_PROVIDER_NAME;
-import static commons.sim.util.IaaSPlanProperties.IAAS_PLAN_PROVIDER_RESERVATION;
-import static commons.sim.util.IaaSPlanProperties.IAAS_PLAN_PROVIDER_TYPES;
+import static commons.sim.util.IaaSPlanProperties.*;
 import static commons.sim.util.IaaSProvidersProperties.*;
 import static commons.sim.util.SaaSAppProperties.*;
 import static commons.sim.util.SaaSPlanProperties.*;
 import static commons.sim.util.SaaSUsersProperties.*;
 import static commons.sim.util.SimulatorProperties.*;
-import static commons.util.DataUnit.B;
-import static commons.util.DataUnit.MB;
+import static commons.util.DataUnit.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -126,10 +123,10 @@ public class Configuration extends ComplexPropertiesConfiguration{
 		int[] onDemandLimits = getIntegerArray(IAAS_PROVIDER_ONDEMAND_LIMIT);
 		int[] reservedLimits = getIntegerArray(IAAS_PROVIDER_RESERVED_LIMIT);
 		double[] monitoringCosts = getDoubleArray(IAAS_PROVIDER_MONITORING);
-		long[][] transferInLimits = getLong2DArray(IAAS_PROVIDER_TRANSFER_IN);
-		double[][] transferInCosts = getDouble2DArray(IAAS_PROVIDER_COST_TRANSFER_IN);
-		long[][] transferOutLimits = getLong2DArray(IAAS_PROVIDER_TRANSFER_OUT);
-		double[][] transferOutCosts = getDouble2DArray(IAAS_PROVIDER_COST_TRANSFER_OUT);
+		long[][] transferInLimits = DataUnit.convert(getLong2DArray(IAAS_PROVIDER_TRANSFER_IN), GB, B);
+		double[][] transferInCosts = DataUnit.convert(getDouble2DArray(IAAS_PROVIDER_COST_TRANSFER_IN), B, GB);
+		long[][] transferOutLimits = DataUnit.convert(getLong2DArray(IAAS_PROVIDER_TRANSFER_OUT), GB, B);
+		double[][] transferOutCosts = DataUnit.convert(getDouble2DArray(IAAS_PROVIDER_COST_TRANSFER_OUT), B, GB);
 		
 		MachineType[][] machinesType = getEnum2DArray(IAAS_PROVIDER_TYPES, MachineType.class);
 		double[][] onDemandCpuCosts = getDouble2DArray(IAAS_PROVIDER_ONDEMAND_CPU_COST);
