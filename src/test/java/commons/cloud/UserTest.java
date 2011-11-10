@@ -27,7 +27,7 @@ public class UserTest extends CleanConfigurationTest {
 		double penalty = 0d;
 		
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addPenalty(penalty);
+		entry.addPenalty(1, penalty, 0, 0);
 		
 		Contract contract = EasyMock.createStrictMock(Contract.class);
 		
@@ -95,7 +95,7 @@ public class UserTest extends CleanConfigurationTest {
 		Double penalty = 0d;
 		
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addPenalty(penalty);
+		entry.addPenalty(1, penalty, 2, 2);
 		
 		Contract gold = EasyMock.createStrictMock(Contract.class);
 		
@@ -144,7 +144,7 @@ public class UserTest extends CleanConfigurationTest {
 		Double penalty = 100d;
 		
 		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addPenalty(penalty);
+		entry.addPenalty(1, penalty, 0, 2);
 		
 		Contract gold = EasyMock.createStrictMock(Contract.class);
 		

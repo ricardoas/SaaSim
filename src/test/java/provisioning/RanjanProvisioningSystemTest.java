@@ -1,6 +1,7 @@
 package provisioning;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -185,7 +186,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		
 		SimpleSimulator configurable = EasyMock.createStrictMock(SimpleSimulator.class);
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
-		configurable.addServer(0, new MachineDescriptor(0, false, MachineType.M1_SMALL, 0), true);
+		configurable.addMachine(0, new MachineDescriptor(0, false, MachineType.M1_SMALL, 0), true);
 		
 		EasyMock.replay(configurable);
 		
@@ -288,7 +289,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
-		configurable.removeServer(0, false);
+		configurable.removeMachine(0, false);
 		EasyMock.expectLastCall().times(19);
 		
 		EasyMock.replay(configurable);

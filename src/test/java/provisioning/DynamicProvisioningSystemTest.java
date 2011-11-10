@@ -60,13 +60,13 @@ public class DynamicProvisioningSystemTest extends ValidConfigurationTest {
 		for (int i = 0; i < descriptor.length; i++) {
 			descriptor[i] = new Capture<MachineDescriptor>();
 		}
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [0]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [1]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [2]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [3]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [4]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [5]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [6]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [0]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [1]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [2]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [3]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [4]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [5]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [6]), EasyMock.anyBoolean());
 		configurable.setWorkloadParser(EasyMock.anyObject(WorkloadParser.class));
 		configurable.setMonitor(EasyMock.anyObject(Monitor.class));
 		

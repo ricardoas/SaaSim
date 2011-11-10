@@ -243,7 +243,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		EasyMock.replay(scheduler);
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
-		configurable.addServer(0, new MachineDescriptor(0, true, MachineType.C1_MEDIUM, 0), true);
+		configurable.addMachine(0, new MachineDescriptor(0, true, MachineType.C1_MEDIUM, 0), true);
 		configurable.setMonitor(EasyMock.isA(Monitor.class));
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		
@@ -318,15 +318,15 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		}
 		configurable.setMonitor(EasyMock.isA(Monitor.class));
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [0]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [1]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [2]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [3]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [4]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [5]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [6]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [7]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [8]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [0]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [1]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [2]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [3]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [4]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [5]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [6]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [7]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [8]), EasyMock.anyBoolean());
 		EasyMock.replay(configurable);
 		
 		Provider[] providers = new Provider[1];
@@ -405,9 +405,9 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		}
 		configurable.setMonitor(EasyMock.isA(Monitor.class));
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [0]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [1]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [2]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [0]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [1]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [2]), EasyMock.anyBoolean());
 		EasyMock.replay(configurable);
 		
 		Provider[] providers = new Provider[1];
@@ -480,11 +480,11 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		}
 		configurable.setMonitor(EasyMock.isA(Monitor.class));
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [0]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [1]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [2]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [3]), EasyMock.anyBoolean());
-		configurable.addServer(EasyMock.anyInt(), EasyMock.capture(descriptor [4]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [0]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [1]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [2]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [3]), EasyMock.anyBoolean());
+		configurable.addMachine(EasyMock.anyInt(), EasyMock.capture(descriptor [4]), EasyMock.anyBoolean());
 		EasyMock.replay(configurable);
 		
 		Provider[] providers = new Provider[1];
@@ -546,7 +546,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends Mocked
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
 		configurable.setMonitor(EasyMock.isA(Monitor.class));
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
-		configurable.removeServer(0, false);
+		configurable.removeMachine(0, false);
 		EasyMock.expectLastCall().times(19);
 		
 		EasyMock.replay(configurable);

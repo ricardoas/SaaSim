@@ -50,7 +50,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
 		SimpleSimulator simulator = new SimpleSimulator(scheduler, loadBalancer);
 		
-		simulator.addServer(4, new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0), false);
+		simulator.addMachine(4, new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0), false);
 		
 		EasyMock.verify(monitor, scheduler, handler);
 	}
@@ -69,7 +69,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
 		SimpleSimulator simulator = new SimpleSimulator(scheduler, loadBalancer);
 		
-		simulator.addServer(0, null, false);
+		simulator.addMachine(0, null, false);
 		
 		EasyMock.verify(monitor, scheduler, handler);
 	}
@@ -91,7 +91,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
-		simulator.addServer(0, new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0), false);
+		simulator.addMachine(0, new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0), false);
 		assertEquals(JEEventType.ADD_SERVER, event.getValue().getType());
 		
 		EasyMock.verify(monitor, scheduler, handler);
@@ -110,7 +110,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
 		SimpleSimulator simulator = new SimpleSimulator(scheduler, loadBalancer);
 		
-		simulator.removeServer(4, new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0), false);
+		//, new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0)
+		simulator.removeMachine(4, false);
 		
 		EasyMock.verify(monitor, scheduler, handler);
 	}
@@ -138,7 +139,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		loadBalancer.handleEvent(event);
 		
 		assertTrue(loadBalancer.getServers().size() == 1);
-		simulator.removeServer(0, new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0), false);
+		// , new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0)
+		simulator.removeMachine(0, false);
 		assertTrue(loadBalancer.getServers().size() == 0);
 		
 		EasyMock.verify(monitor, scheduler, handler, timeSharedMachine);
@@ -174,7 +176,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		loadBalancer.handleEvent(eventAddServer);
 		
 		assertTrue(loadBalancer.getServers().size() == 1);
-		simulator.removeServer(0, new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0), true);
+		// , new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0)
+		simulator.removeMachine(0, true);
 		assertTrue(loadBalancer.getServers().size() == 0);
 		assertEquals(JEEventType.MACHINE_TURNED_OFF, eventTurnedOff.getValue().getType());
 		
@@ -195,7 +198,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
-		simulator.removeServer(4, false);
+		simulator.removeMachine(4, false);
 		
 		EasyMock.verify(monitor, scheduler, handler);
 	}
@@ -226,7 +229,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		loadBalancer.handleEvent(new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine2));
 		
 		assertTrue(loadBalancer.getServers().size() == 2);
-		simulator.removeServer(0, false);
+		simulator.removeMachine(0, false);
 		assertTrue(loadBalancer.getServers().size() == 1);
 		
 		EasyMock.verify(monitor, scheduler, handler, timeSharedMachine);
@@ -255,7 +258,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		loadBalancer.handleEvent(event);
 		
 		assertTrue(loadBalancer.getServers().size() == 1);
-		simulator.removeServer(0, false);
+		simulator.removeMachine(0, false);
 		assertTrue(loadBalancer.getServers().size() == 1);
 		
 		EasyMock.verify(monitor, scheduler, handler, timeSharedMachine);
@@ -304,7 +307,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		loadBalancer.handleEvent(new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine2));
 		
 		assertTrue(loadBalancer.getServers().size() == 2);
-		simulator.removeServer(0, true);
+		simulator.removeMachine(0, true);
 		assertTrue(loadBalancer.getServers().size() == 1);
 		assertEquals(JEEventType.MACHINE_TURNED_OFF, eventTurnedOff.getValue().getType());
 		
