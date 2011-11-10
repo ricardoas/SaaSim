@@ -11,6 +11,10 @@ public class MachineStatistics {
 	public long numberOfRequestsCompletionsInLastInterval;
 	public int totalNumberOfServers;
 	public int warmingDownMachines;
+	public int averageST;
+	public int varRT;
+	public int varIAT;
+	public double arrivalRate;
 
 	/**
 	 * @param averageUtilization

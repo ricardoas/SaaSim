@@ -1,5 +1,6 @@
 package commons.sim.schedulingheuristics;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -18,7 +19,11 @@ import commons.sim.util.SimulatorProperties;
  */
 public abstract class AbstractSchedulingHeuristic implements SchedulingHeuristic{
 	
-	private class Session{
+	private class Session implements Serializable{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1661232950273037116L;
 		public long lastInteraction;
 		public Machine allocatedServer;
 		
@@ -110,7 +115,7 @@ public abstract class AbstractSchedulingHeuristic implements SchedulingHeuristic
 	
 	private Machine recoverSession(int userID, long time) {
 		Session session = sessions.get(userID);
-		if(session == null || session.lastInteraction + sessionTimeOut > time){
+		if(session == null || session.lastInteraction + sessionTimeOut < time){
 			session = new Session(time, getNextAvailableMachine());
 			sessions.put(userID, session);
 		}else{

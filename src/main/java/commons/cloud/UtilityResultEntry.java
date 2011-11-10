@@ -239,14 +239,14 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 		public String toString() {
 			return name 
 					+ STRING + cost
-					+ STRING + inCost 
-					+ STRING + outCost
+					+ STRING + onDemandCPUHours
 					+ STRING + onDemandCost 
+					+ STRING + reservedCPUHours 
 					+ STRING + reservedCost 
 					+ STRING + inTransference
+					+ STRING + inCost 
 					+ STRING + outTransference
-					+ STRING + onDemandCPUHours
-					+ STRING + reservedCPUHours 
+					+ STRING + outCost
 					+ STRING + monitoringCost
 					+ STRING + format(types);
 		}
@@ -450,7 +450,7 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 			sb.append("userID\tpenalty\tfinished\ttotal\tcontract\treceipt\textraCPU\tcpuCost\ttrans\ttransCost\tstorageCost\t");
 		}
 		for (ProviderEntry provider : providers) {
-			sb.append("name\tcost\tinCost\toutCost\tonDCost\tresCost\tinTrans\toutTrans\tonD\tres\tmon\t");
+			sb.append("name\tcost\tonDemand\tonDCost\treserv\tresCost\tinTrans\tinCost\toutTrans\toutCost\tmon\t");
 			sb.append(provider.getDescriptor());
 		}
 		return sb.toString();
