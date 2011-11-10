@@ -3,7 +3,7 @@ iaas.number=1
 # Amazon EC2 (true values except for reservation costs which are amortized for a month period.)  
 iaas.provider.name=amazon
 iaas.provider.types=m1.small
-iaas.provider.ondemand_cpu_cost=0.3
+iaas.provider.reserved_cpu_cost=0.03
 iaas.provider.ondemandLimit=20
 iaas.provider.reserved_cpu_cost=0.085
 iaas.provider.reservationLimit=100
