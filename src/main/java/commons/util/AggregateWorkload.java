@@ -18,6 +18,7 @@ import planning.util.Summary;
 
 import commons.cloud.Request;
 import commons.config.Configuration;
+import commons.sim.util.SaaSUsersProperties;
 
 /**
  * This class reads a config.properties that is used in simulation and extracts user traces to be used. For each user trace
@@ -42,12 +43,15 @@ public class AggregateWorkload {
 		Configuration config = Configuration.getInstance();
 		
 		String[] workloads = config.getWorkloads();
+		String[] plans = config.getStringArray(SaaSUsersProperties.SAAS_USER_PLAN);
+		int[] clientsID = config.getIntegerArray(SaaSUsersProperties.SAAS_USER_ID);
+		
 		tick = PlanningFitnessFunction.HOUR_IN_MILLIS;
 		
-		int clientID = 0;
+//		int clientID = 0;
 		
-		for(String workload : workloads){//Each saas client
-			BufferedReader pointersReader = new BufferedReader(new FileReader(workload));
+		for(int i = 0; i < workloads.length; i++){	
+			BufferedReader pointersReader = new BufferedReader(new FileReader(workloads[i]));
 			List<Summary> currentSummaries = new ArrayList<Summary>();
 			
 			while(pointersReader.ready()){//Each saas client workload
@@ -57,31 +61,40 @@ public class AggregateWorkload {
 				currentTick = 0;
 				
 				while(workloadReader.ready()){
-					List<Request> requests = next(workloadReader, clientID);
+					List<Request> requests = next(workloadReader, clientsID[i]);
 					extractSummary(requests, currentSummaries);
 				}
 				
 				workloadReader.close();
 			}
-			clientID++;
 			pointersReader.close();
 			
-			persistSummary(workload, currentSummaries);
+			persistSummary(workloads[i], currentSummaries);
 		}
 		
-		persistProperties(workloads);
+		persistProperties(workloads, plans);
 	}
 	
-	private static void persistProperties(String[] workloads) throws IOException {
+	private static void persistProperties(String[] workloads, String[] plans) throws IOException {
 		BufferedWriter usersPropertiesWriter = new BufferedWriter(new FileWriter(DEFAULT_OUTPUT_FILE));
 		usersPropertiesWriter.write("saas.number="+workloads.length+"\n\n");
 		
 		int userID = 0;
-		for(String workload : workloads){
+		
+		for(int i = 0; i < workloads.length; i++){	
+			long storage = 0;
+			if(plans[i].equalsIgnoreCase("gold")){
+				storage = UserPropertiesGenerator.GOLD_STORAGE_IN_BYTES;
+			}else if(plans[i].equalsIgnoreCase("diamond")){
+				storage = UserPropertiesGenerator.DIAMOND_STORAGE_IN_BYTES;
+			}else{
+				storage = UserPropertiesGenerator.BRONZE_STORAGE_IN_BYTES;
+			}
+			
 			usersPropertiesWriter.write("saas.user.id="+(userID++)+"\n");
-			usersPropertiesWriter.write("saas.user.plan="+UserPropertiesGenerator.DEFAULT_PLAN+"\n");
-			usersPropertiesWriter.write("saas.user.storage="+UserPropertiesGenerator.DEFAULT_STORAGE_IN_BYTES+"\n");
-			usersPropertiesWriter.write("saas.user.workload=new"+workload+"\n");
+			usersPropertiesWriter.write("saas.user.plan="+plans[i]+"\n");
+			usersPropertiesWriter.write("saas.user.storage="+storage+"\n");
+			usersPropertiesWriter.write("saas.user.workload=new"+workloads[i]+"\n");
 			usersPropertiesWriter.write("\n");
 		}
 		
@@ -92,6 +105,7 @@ public class AggregateWorkload {
 	 * This method creates an output file containing statistics of workload instead of a file of pointers to real traces.
 	 * @param workload The name of the file containing the pointers to real traces
 	 * @param summaries Workload statistics
+	 * @param currentPlan 
 	 * @throws IOException
 	 */
 	private static void persistSummary(String workload, List<Summary> summaries) throws IOException {
