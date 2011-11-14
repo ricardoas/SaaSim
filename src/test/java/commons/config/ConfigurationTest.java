@@ -98,6 +98,31 @@ public class ConfigurationTest {
 		assertNotNull(Configuration.getInstance());
 	}
 	
+//	private static void savePreviousData() {
+//		Checkpointer.clear();
+//		
+//		Contract contract = new Contract("p1", 1, 55.55, 101.10, 86400000, 0.1, new long[]{0}, new double[]{0.0, 0.0}, 
+//				10000, 0.2);
+//		User user = new User(0, contract, 1000);
+//		User user2 = new User(1, contract, 1000);
+//		SimulationInfo info = new SimulationInfo(100, 4, 100);
+//		
+//		List<TypeProvider> types = new ArrayList<TypeProvider>();
+//		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.1, 0.01, 100, 160, 10));
+//		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.25, 0.1, 240, 360, 10));
+//		
+//		Provider provider = new Provider(0, "prov1", 10, 20, 0.15, new long[]{0}, new double[]{0.0, 0.0}, new long[]{1000}, 
+//				new double[]{0.0, 0.1}, types);
+//		Provider provider2 = new Provider(1, "prov2", 10, 20, 0.15, new long[]{0}, new double[]{0.0, 0.0}, new long[]{1000}, 
+//				new double[]{0.0, 0.1}, types);
+//		Provider provider3 = new Provider(2, "prov3", 10, 20, 0.15, new long[]{0}, new double[]{0.0, 0.0}, new long[]{1000}, 
+//				new double[]{0.0, 0.1}, types);
+//		
+//		Checkpointer.loadScheduler();
+//		Checkpointer.save(info, new User[]{user, user2}, new Provider[]{provider, provider2, provider3}, new LoadBalancer[]{});
+//	}
+	
+
 	@Test(expected=ConfigurationException.class)
 	public void testSaaSUsersWrongFile1() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.WRONG_USERS_FILE_1);
@@ -266,7 +291,7 @@ public class ConfigurationTest {
 		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
 		User[] users = Checkpointer.loadUsers();
 		assertNotNull(users);
-		assertEquals(2, users.length);
+		assertEquals(1, users.length);
 		
 		Contract c1 = users[0].getContract();
 		assertNotNull(c1);
@@ -280,19 +305,6 @@ public class ConfigurationTest {
 		Assert.assertArrayEquals(new double[]{0,0.005 / DataUnit.MB.getBytes()}, c1.getTransferenceCostsPerByte(), 0.0);
 		assertEquals(3072 * DataUnit.MB.getBytes(), c1.getStorageLimitInBytes(), 0.0);
 		assertEquals(0.1 / DataUnit.MB.getBytes(), c1.getExtraStorageCostPerByte(), 0.0);
-		
-		Contract c2 = users[1].getContract();
-		assertNotNull(c2);
-		assertEquals("diamond", c2.getName());
-		assertEquals(100, c2.getPriority());
-		assertEquals(299.95, c2.getPrice(), 0.0);
-		assertEquals(0.0, c2.getSetupCost(), 0.0);
-		assertEquals(10, c2.getCpuLimitInMillis(), 0.0);
-		assertEquals(1, c2.getExtraCpuCostPerMillis(), 0.0);
-		Assert.assertArrayEquals(new long[]{46080 * DataUnit.MB.getBytes()}, c2.getTransferenceLimitsInBytes());
-		Assert.assertArrayEquals(new double[]{0,0.005 / DataUnit.MB.getBytes()}, c2.getTransferenceCostsPerByte(), 0.0);
-		assertEquals(3072 * DataUnit.MB.getBytes(), c2.getStorageLimitInBytes(), 0.0);
-		assertEquals(0.1 / DataUnit.MB.getBytes(), c2.getExtraStorageCostPerByte(), 0.0);
 	}
 	
 	/**
@@ -306,21 +318,23 @@ public class ConfigurationTest {
 		assertNotNull(providers);
 		assertEquals(3, providers.length);
 
+		long conversionFactor = 1024 * 1024 * 1024;
+		
 		Provider provider2 = providers[0];
 		assertNotNull(provider2);
 		assertEquals("rackspace", provider2.getName());
 		assertEquals(20, provider2.getOnDemandLimit(), 0.0);
 		assertEquals(100, provider2.getReservationLimit(), 0.0);
 		assertEquals(0.15, provider2.getMonitoringCost(), 0.0);
-		Assert.assertArrayEquals( new long[]{100}, provider2.getTransferInLimits());
-		Assert.assertArrayEquals(new double[]{0.10,0.09}, provider2.getTransferInCosts(), 0.0);
-		Assert.assertArrayEquals( new long[]{200}, provider2.getTransferOutLimits());
-		Assert.assertArrayEquals(new double[]{0.10,0.09}, provider2.getTransferOutCosts(), 0.0);
+		Assert.assertArrayEquals( new long[]{100 * conversionFactor}, provider2.getTransferInLimits());
+		Assert.assertArrayEquals(new double[]{0.10/conversionFactor,0.09/conversionFactor}, provider2.getTransferInCosts(), 0.0);
+		Assert.assertArrayEquals( new long[]{214748364800l}, provider2.getTransferOutLimits());
+		Assert.assertArrayEquals(new double[]{0.10/conversionFactor,0.09/conversionFactor}, provider2.getTransferOutCosts(), 0.0);
 		MachineType[] availableTypes2 = provider2.getAvailableTypes();
 		Arrays.sort(availableTypes2);
 		Assert.assertArrayEquals(new MachineType[]{MachineType.M1_SMALL, MachineType.M1_LARGE}, availableTypes2);
 		assertEquals(0.085, provider2.getOnDemandCpuCost(MachineType.M1_SMALL), 0.0);
-		assertEquals(0.3, provider2.getReservedCpuCost(MachineType.M1_SMALL), 0.0);
+		assertEquals(0.03, provider2.getReservedCpuCost(MachineType.M1_SMALL), 0.0);
 		assertEquals(1000, provider2.getReservationOneYearFee(MachineType.M1_SMALL), 0.0);
 		assertEquals(2500, provider2.getReservationThreeYearsFee(MachineType.M1_SMALL), 0.0);
 		assertEquals(0.12, provider2.getOnDemandCpuCost(MachineType.M1_LARGE), 0.0);
@@ -336,13 +350,15 @@ public class ConfigurationTest {
 		assertEquals(0.15, provider.getMonitoringCost(), 0.0);
 		Assert.assertArrayEquals( new long[]{0}, provider.getTransferInLimits());
 		Assert.assertArrayEquals(new double[]{0,0}, provider.getTransferInCosts(), 0.0);
-		Assert.assertArrayEquals( new long[]{1,10240, 51200,153600}, provider.getTransferOutLimits());
-		Assert.assertArrayEquals(new double[]{0,0.12,0.09,0.07,0.05}, provider.getTransferOutCosts(), 0.0);
+		Assert.assertArrayEquals( new long[]{1 * conversionFactor, 10240 * conversionFactor, 
+				51200 * conversionFactor, 153600 * conversionFactor}, provider.getTransferOutLimits());
+		Assert.assertArrayEquals(new double[]{0 / conversionFactor, 0.12 / conversionFactor, 
+				0.09 / conversionFactor, 0.07 / conversionFactor, 0.05 / conversionFactor}, provider.getTransferOutCosts(), 0.0);
 		MachineType[] availableTypes = provider.getAvailableTypes();
 		Arrays.sort(availableTypes);
 		Assert.assertArrayEquals(new MachineType[]{MachineType.M1_SMALL,MachineType.M1_LARGE,MachineType.M1_XLARGE}, availableTypes);
 		assertEquals(0.085, provider.getOnDemandCpuCost(MachineType.M1_SMALL), 0.0);
-		assertEquals(0.3, provider.getReservedCpuCost(MachineType.M1_SMALL), 0.0);
+		assertEquals(0.03, provider.getReservedCpuCost(MachineType.M1_SMALL), 0.0);
 		assertEquals(227.5, provider.getReservationOneYearFee(MachineType.M1_SMALL), 0.0);
 		assertEquals(350, provider.getReservationThreeYearsFee(MachineType.M1_SMALL), 0.0);
 		assertEquals(0.34, provider.getOnDemandCpuCost(MachineType.M1_LARGE), 0.0);
@@ -360,15 +376,15 @@ public class ConfigurationTest {
 		assertEquals(5, provider3.getOnDemandLimit(), 0.0);
 		assertEquals(10, provider3.getReservationLimit(), 0.0);
 		assertEquals(0.1, provider3.getMonitoringCost(), 0.0);
-		Assert.assertArrayEquals( new long[]{10}, provider3.getTransferInLimits());
-		Assert.assertArrayEquals(new double[]{0.1,0.0}, provider3.getTransferInCosts(), 0.0);
-		Assert.assertArrayEquals( new long[]{20}, provider3.getTransferOutLimits());
-		Assert.assertArrayEquals(new double[]{0.1,0.0}, provider3.getTransferOutCosts(), 0.0);
+		Assert.assertArrayEquals( new long[]{10 * conversionFactor}, provider3.getTransferInLimits());
+		Assert.assertArrayEquals(new double[]{0.1 / conversionFactor, 0.0}, provider3.getTransferInCosts(), 0.0);
+		Assert.assertArrayEquals( new long[]{20 * conversionFactor}, provider3.getTransferOutLimits());
+		Assert.assertArrayEquals(new double[]{0.1 / conversionFactor, 0.0}, provider3.getTransferOutCosts(), 0.0);
 		MachineType[] availableTypes3 = provider3.getAvailableTypes();
 		Arrays.sort(availableTypes3);
 		Assert.assertArrayEquals(new MachineType[]{MachineType.M1_LARGE,MachineType.C1_MEDIUM}, availableTypes3);
 		assertEquals(0.085, provider3.getOnDemandCpuCost(MachineType.C1_MEDIUM), 0.0);
-		assertEquals(0.3, provider3.getReservedCpuCost(MachineType.C1_MEDIUM), 0.0);
+		assertEquals(0.03, provider3.getReservedCpuCost(MachineType.C1_MEDIUM), 0.0);
 		assertEquals(1000, provider3.getReservationOneYearFee(MachineType.C1_MEDIUM), 0.0);
 		assertEquals(2500, provider3.getReservationThreeYearsFee(MachineType.C1_MEDIUM), 0.0);
 		assertEquals(0.12, provider3.getOnDemandCpuCost(MachineType.M1_LARGE), 0.0);
