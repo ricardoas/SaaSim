@@ -10,6 +10,7 @@ import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
 import commons.cloud.UtilityResult;
+import commons.cloud.UtilityResultEntry;
 import commons.config.Configuration;
 import commons.io.Checkpointer;
 import commons.io.WorkloadParserFactory;
@@ -138,7 +139,7 @@ public class DynamicProvisioningSystem implements DPS{
 	 */
 	@Override
 	public void sendStatistics(long now, MachineStatistics statistics, int tier) {
-		log.info(String.format("STAT-STATIC %d %d %s", now, tier, statistics));
+		log.debug(String.format("STAT-STATIC %d %d %s", now, tier, statistics));
 	}
 
 	/**
@@ -155,7 +156,7 @@ public class DynamicProvisioningSystem implements DPS{
 	 */
 	@Override
 	public UtilityResult calculateUtility() {
-		return this.accountingSystem.calculateUtility();
+		return accountingSystem.calculateUtility();
 	}
 
 	/**
@@ -163,7 +164,9 @@ public class DynamicProvisioningSystem implements DPS{
 	 */
 	@Override
 	public void chargeUsers(long currentTimeInMillis) {
-		this.accountingSystem.accountPartialUtility(currentTimeInMillis);
+		
+		UtilityResultEntry entry = accountingSystem.accountPartialUtility(currentTimeInMillis, users, providers);
+		log.info(entry);		
 	}
 
 	/**

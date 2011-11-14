@@ -22,7 +22,6 @@ import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
-import commons.sim.util.SaaSAppProperties;
 import commons.sim.util.SimulatorProperties;
 
 public class OverProvisionHeuristic extends SimpleSimulator implements PlanningHeuristic {

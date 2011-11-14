@@ -140,7 +140,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(provider.canBuyMachine(true, MachineType.M2_4XLARGE)).andReturn(false);
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
-		configurable.addServer(0, machineDescriptor, true);
+		configurable.addMachine(0, machineDescriptor, true);
 		
 		User user = EasyMock.createMock(User.class);
 		AccountingSystem accounting = EasyMock.createMock(AccountingSystem.class);
@@ -189,7 +189,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(provider.buyMachine(false, MachineType.M1_SMALL)).andReturn(machineDescriptor);
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
-		configurable.addServer(0, machineDescriptor, true);
+		configurable.addMachine(0, machineDescriptor, true);
 		
 		User user = EasyMock.createMock(User.class);
 		AccountingSystem accounting = EasyMock.createMock(AccountingSystem.class);
@@ -285,7 +285,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(provider.buyMachine(false, MachineType.M1_SMALL)).andReturn(machineDescriptor);
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
-		configurable.addServer(0, machineDescriptor, true);
+		configurable.addMachine(0, machineDescriptor, true);
 		
 		User user = EasyMock.createMock(User.class);
 		AccountingSystem accounting = EasyMock.createMock(AccountingSystem.class);
@@ -331,7 +331,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(provider.canBuyMachine(true, MachineType.M2_4XLARGE)).andReturn(false);
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
-		configurable.addServer(0, machineDescriptor, true);
+		configurable.addMachine(0, machineDescriptor, true);
 		EasyMock.expectLastCall().times(4);
 		
 		User user = EasyMock.createMock(User.class);
@@ -381,7 +381,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(provider.buyMachine(false, MachineType.M1_SMALL)).andReturn(machineDescriptor).times(4);
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
-		configurable.addServer(0, machineDescriptor, true);
+		configurable.addMachine(0, machineDescriptor, true);
 		EasyMock.expectLastCall().times(4);
 		
 		User user = EasyMock.createMock(User.class);
@@ -431,7 +431,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(provider.buyMachine(false, MachineType.M1_SMALL)).andReturn(machineDescriptor).times(2);
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
-		configurable.addServer(0, machineDescriptor, true);
+		configurable.addMachine(0, machineDescriptor, true);
 		EasyMock.expectLastCall().times(2);
 		
 		User user = EasyMock.createMock(User.class);
@@ -483,7 +483,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(provider.buyMachine(false, MachineType.M1_SMALL)).andReturn(machineDescriptor);
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
-		configurable.addServer(0, machineDescriptor, true);
+		configurable.addMachine(0, machineDescriptor, true);
 		EasyMock.expectLastCall().times(4);
 		
 		User user = EasyMock.createMock(User.class);
@@ -535,7 +535,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(provider.buyMachine(false, MachineType.M1_SMALL)).andReturn(machineDescriptor);
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
-		configurable.addServer(0, machineDescriptor, true);
+		configurable.addMachine(0, machineDescriptor, true);
 		EasyMock.expectLastCall().times(4);
 		
 		User user = EasyMock.createMock(User.class);

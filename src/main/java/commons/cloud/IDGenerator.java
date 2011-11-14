@@ -1,5 +1,7 @@
 package commons.cloud;
 
+import commons.io.Checkpointer;
+
 /**
  * Singleton for ID generation.
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -17,7 +19,7 @@ public enum IDGenerator {
 	 * Private constructor
 	 */
 	private IDGenerator(){
-		nextID = 0;
+		nextID = Checkpointer.loadSimulationInfo().getCurrentDayInMillis();
 	}
 	
 	/**

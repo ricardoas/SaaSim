@@ -268,7 +268,7 @@ public class PlanningFitnessFunction extends FitnessFunction{
 				counter++;
 				totalCPUHrs += summary.getTotalCpuHrs();
 				if(counter == (SimulationInfo.daysInMonths[index]+1) * 24){//Calculate receipt for a complete month!
-					contract.calculateReceipt(resultEntry, entry.getKey().getId(), (long)Math.ceil(totalCPUHrs * 60 * 60 * 1000), 0l, 0l, 0l);
+					contract.calculateReceipt(entry.getKey().getId(), (long)Math.ceil(totalCPUHrs * 60 * 60 * 1000), 0l, 0l, 0l, 0, 0);
 					index++;
 					totalCPUHrs = 0;
 				}

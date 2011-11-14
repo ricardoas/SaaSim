@@ -2,6 +2,7 @@ package commons.cloud;
 
 import java.io.Serializable;
 
+
 /**
  * Class representing a SaaS client. For a user that generates request using an application see
  * {@link Request#getUserID()}.
@@ -93,16 +94,14 @@ public class User implements Comparable<User>, Serializable{
 		this.consumedOutTransferenceInBytes += outTransferenceInBytes;
 	}
 	
-	public void calculatePartialReceipt(UtilityResultEntry entry) {
-		double penalty = this.contract.calculatePenalty((1.0 * numberOfLostRequests) / (numberOfLostRequests+numberOfFinishedRequests));
-		entry.addPenalty(id, penalty, numberOfFinishedRequests, numberOfLostRequests+numberOfFinishedRequests);
-		
-		this.contract.calculateReceipt(entry, id, consumedCpuInMillis, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, storageInBytes);
-		this.reset();
+	public UserEntry calculatePartialReceipt() {
+		UserEntry userEntry = contract.calculateReceipt(id, consumedCpuInMillis, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, storageInBytes, numberOfFinishedRequests, numberOfLostRequests);
+		reset();
+		return userEntry;
 	}
 
-	public void calculateOneTimeFees(UtilityResult result) {
-		result.addUserUniqueFee(id, this.contract.calculateOneTimeFees());
+	public double calculateOneTimeFees() {
+		return contract.calculateOneTimeFees();
 	}
 	
 	@Override

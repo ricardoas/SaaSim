@@ -1,7 +1,7 @@
 package commons.sim.schedulingheuristics;
 
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.List;
 
 import commons.cloud.Request;
 import commons.sim.components.Machine;
@@ -31,5 +31,5 @@ public interface SchedulingHeuristic extends Serializable{
 
 	MachineStatistics getStatistics(long eventTime);
 
-	Collection<? extends Machine> getMachines();
+	List<Machine> getMachines();
 }

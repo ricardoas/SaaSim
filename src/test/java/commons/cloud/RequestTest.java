@@ -5,7 +5,6 @@ package commons.cloud;
 
 import static org.junit.Assert.*;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import util.CleanConfigurationTest;
@@ -23,8 +22,9 @@ public class RequestTest extends CleanConfigurationTest {
 	private static final int XLARGE_DEMAND = 300000;
 	private Request request;
 	
-	@Before
-	public void setUp(){
+	@Override
+	public void setUp() throws Exception{
+		super.setUp();
 		request = new Request(1l, 1, 17756636, 0, 100, 1024000, new long[]{MICRO_DEMAND, SMALL_DEMAND, LARGE_DEMAND, MEDIUM_DEMAND, XLARGE_DEMAND});
 	}
 	

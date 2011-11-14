@@ -75,13 +75,13 @@ public class DynamicProvisioningSystemTest extends ValidConfigurationTest {
 		DynamicProvisioningSystem dps = new DynamicProvisioningSystem();
 		dps.registerConfigurable(configurable);
 		
-		assertEquals(MachineType.C1_MEDIUM, descriptor[0].getValue().getType());
-		assertEquals(MachineType.C1_MEDIUM, descriptor[1].getValue().getType());
-		assertEquals(MachineType.C1_MEDIUM, descriptor[2].getValue().getType());
-		assertEquals(MachineType.C1_MEDIUM, descriptor[3].getValue().getType());
-		assertEquals(MachineType.M1_LARGE, descriptor[4].getValue().getType());
-		assertEquals(MachineType.M1_LARGE, descriptor[5].getValue().getType());
-		assertEquals(MachineType.M1_LARGE, descriptor[6].getValue().getType());
+		assertEquals(MachineType.M1_XLARGE, descriptor[0].getValue().getType());
+		assertEquals(MachineType.M1_XLARGE, descriptor[1].getValue().getType());
+		assertEquals(MachineType.M1_XLARGE, descriptor[2].getValue().getType());
+		assertEquals(MachineType.M1_XLARGE, descriptor[3].getValue().getType());
+		assertEquals(MachineType.M1_XLARGE, descriptor[4].getValue().getType());
+		assertEquals(MachineType.M1_XLARGE, descriptor[5].getValue().getType());
+		assertEquals(MachineType.M1_XLARGE, descriptor[6].getValue().getType());
 		
 		EasyMock.verify(configurable);
 	}
@@ -96,10 +96,10 @@ public class DynamicProvisioningSystemTest extends ValidConfigurationTest {
 		
 		UtilityResult currentResult = new UtilityResult(2, 3);
 		for(User user : Checkpointer.loadUsers()){
-			user.calculateOneTimeFees(currentResult);
+			user.calculateOneTimeFees();
 		}
 		for(Provider provider : Checkpointer.loadProviders()){
-			provider.calculateUniqueCost(currentResult);
+			provider.calculateUniqueCost();
 		}
 		
 		assertNotNull(result);

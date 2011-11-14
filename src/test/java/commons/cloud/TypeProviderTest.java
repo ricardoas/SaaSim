@@ -5,28 +5,27 @@ package commons.cloud;
 
 import static org.junit.Assert.*;
 
-import org.easymock.EasyMock;
+import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Test;
 
-import util.CleanConfigurationTest;
+import util.ValidConfigurationTest;
 
 import commons.sim.components.MachineDescriptor;
+import commons.util.TimeUnit;
 
 /**
  * Test class for {@link TypeProvider}. Construction is not tested as there is no validation here.
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class TypeProviderTest extends CleanConfigurationTest {
-
-	private static final long HOUR_IN_MILLIS = 3600000;
+public class TypeProviderTest extends ValidConfigurationTest {
 
 	private double onDemandCost = 0.085;
 	private double reservationCost = 0.3;
 	private double oneYearFee = 227.5;
 	private double threeYearsFee = 350;
 	private double monitoringCost = 1.5;
-
+	
 	/**
 	 * Test method for {@link commons.cloud.TypeProvider#getType()}.
 	 */
@@ -75,9 +74,12 @@ public class TypeProviderTest extends CleanConfigurationTest {
 
 	/**
 	 * Test method for {@link commons.cloud.TypeProvider#shutdownMachine(commons.sim.components.MachineDescriptor)}.
+	 * @throws ConfigurationException 
 	 */
 	@Test
-	public void testShutdownExistentReservedMachine() {
+	public void testShutdownExistentReservedMachine() throws ConfigurationException {
+		
+		buildFullConfiguration();
 		TypeProvider type = new TypeProvider(0, MachineType.M1_SMALL, 0, 0, 0, 0, 1);
 		MachineDescriptor descriptor = type.buyMachine(true);
 		assertTrue(type.shutdownMachine(descriptor));
@@ -85,9 +87,12 @@ public class TypeProviderTest extends CleanConfigurationTest {
 
 	/**
 	 * Test method for {@link commons.cloud.TypeProvider#shutdownMachine(commons.sim.components.MachineDescriptor)}.
+	 * @throws ConfigurationException 
 	 */
 	@Test
-	public void testShutdownExistentOnDemandMachine() {
+	public void testShutdownExistentOnDemandMachine() throws ConfigurationException {
+		buildFullConfiguration();
+
 		TypeProvider type = new TypeProvider(0, MachineType.M1_SMALL, 0, 0, 0, 0, 1);
 		MachineDescriptor descriptor = type.buyMachine(false);
 		assertTrue(type.shutdownMachine(descriptor));
@@ -95,9 +100,12 @@ public class TypeProviderTest extends CleanConfigurationTest {
 
 	/**
 	 * Test method for {@link commons.cloud.TypeProvider#buyMachine(boolean)}.
+	 * @throws ConfigurationException 
 	 */
 	@Test
-	public void testBuyOnDemandMachine() {
+	public void testBuyOnDemandMachine() throws ConfigurationException {
+		buildFullConfiguration();
+
 		TypeProvider type = new TypeProvider(0, MachineType.M1_SMALL, 0, 0, 0, 0, 0);
 		MachineDescriptor descriptor = type.buyMachine(false);
 		assertNotNull(descriptor);
@@ -171,77 +179,57 @@ public class TypeProviderTest extends CleanConfigurationTest {
 	@Test
 	public void testCalculateCostWithNoMachineUsed(){
 		TypeProvider type = new TypeProvider(0, MachineType.M1_SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
-		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addUsageToCost(0, MachineType.M1_SMALL, 0, 0, 0, 0, 0);
-		EasyMock.replay(entry);
 		
-		type.calculateMachinesCost(entry, 0, monitoringCost);
-		
-		EasyMock.verify(entry);
+		assertEquals(0, type.calculateMachinesCost(0, monitoringCost).cost, 0.0001);
 	}
 	
 	@Test
 	public void testCalculateCostWithOndemandRunningMachineUsed(){
 		TypeProvider type = new TypeProvider(0, MachineType.M1_SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
-		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addUsageToCost(0, MachineType.M1_SMALL, 1, 1 * onDemandCost, 0, 0, 1 * monitoringCost);
-		EasyMock.replay(entry);
 		
 		MachineDescriptor descriptor = type.buyMachine(false);
 		descriptor.setStartTimeInMillis(0);
 		
-		type.calculateMachinesCost(entry, HOUR_IN_MILLIS/2, monitoringCost);
-		
-		EasyMock.verify(entry);
+		TypeProviderEntry entry = type.calculateMachinesCost(TimeUnit.HALF_HOUR.getMillis(), monitoringCost);
+		assertEquals(1 * (monitoringCost + onDemandCost), entry.cost, 0.0001);
 	}
 	
 	@Test
 	public void testCalculateCostWithOndemandFinishedMachineUsed(){
 		TypeProvider type = new TypeProvider(0, MachineType.M1_SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
-		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addUsageToCost(0, MachineType.M1_SMALL, 1, 1 * onDemandCost, 0, 0, 1 * monitoringCost);
-		EasyMock.replay(entry);
 		
 		MachineDescriptor descriptor = type.buyMachine(false);
 		descriptor.setStartTimeInMillis(0);
-		descriptor.setFinishTimeInMillis(HOUR_IN_MILLIS/2);
+		descriptor.setFinishTimeInMillis(TimeUnit.HOUR.getMillis()/2);
 		type.shutdownMachine(descriptor);
 		
-		type.calculateMachinesCost(entry, HOUR_IN_MILLIS, monitoringCost);
-		
-		EasyMock.verify(entry);
+		TypeProviderEntry entry = type.calculateMachinesCost(TimeUnit.HOUR.getMillis(), monitoringCost);
+		assertEquals(1 * (monitoringCost + onDemandCost), entry.cost, 0.0001);
 	}
 	
 	@Test
 	public void testCalculateCostWithReservedRunningMachineUsed(){
 		TypeProvider type = new TypeProvider(0, MachineType.M1_SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
-		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addUsageToCost(0, MachineType.M1_SMALL, 0, 0, 1, 1 * reservationCost, 1 * monitoringCost);
-		EasyMock.replay(entry);
 		
 		MachineDescriptor descriptor = type.buyMachine(true);
 		descriptor.setStartTimeInMillis(0);
 		
-		type.calculateMachinesCost(entry, HOUR_IN_MILLIS/2, monitoringCost);
-		
-		EasyMock.verify(entry);
+		TypeProviderEntry entry = type.calculateMachinesCost(TimeUnit.HOUR.getMillis()/2, monitoringCost);
+		assertEquals(1 * (monitoringCost + reservationCost), entry.cost, 0.0001);
 	}
 
 	@Test
 	public void testCalculateCostWithReservedFinishedMachineUsed(){
 		TypeProvider type = new TypeProvider(0, MachineType.M1_SMALL, onDemandCost, reservationCost, oneYearFee, threeYearsFee, 5);
-		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addUsageToCost(0, MachineType.M1_SMALL, 0, 0, 1, 1 * reservationCost, 1 * monitoringCost);
-		EasyMock.replay(entry);
 		
 		MachineDescriptor descriptor = type.buyMachine(true);
 		descriptor.setStartTimeInMillis(0);
-		descriptor.setFinishTimeInMillis(HOUR_IN_MILLIS/2);
+		descriptor.setFinishTimeInMillis(TimeUnit.HOUR.getMillis()/2);
 		type.shutdownMachine(descriptor);
 		
-		type.calculateMachinesCost(entry, HOUR_IN_MILLIS, monitoringCost);
+		TypeProviderEntry entry = type.calculateMachinesCost(TimeUnit.HOUR.getMillis(), monitoringCost);
 		
-		EasyMock.verify(entry);
+		assertEquals(1 * (monitoringCost + reservationCost), entry.cost, 0.0001);
 	}
 
 	@Test

@@ -49,9 +49,7 @@ public class Main {
 			
 			UtilityResult utilityResult = dps.calculateUtility();
 			
-			System.err.println(utilityResult);
-			
-			Logger.getLogger(Main.class).info("UTILITY " + utilityResult.getUtility());
+			Logger.getLogger(Main.class).info(utilityResult);
 			
 			String events = Checkpointer.loadScheduler().dumpPostMortemEvents();
 			if(!events.isEmpty()){

@@ -85,7 +85,7 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 	public void sendStatistics(long now, MachineStatistics statistics, int tier) {
 		int numberOfServersToAdd = evaluateNumberOfServersForNextInterval(statistics);
 		
-		log.info(String.format("STAT-RANJAN %d %d %d %s", now, tier, numberOfServersToAdd, statistics));
+		log.debug(String.format("STAT-RANJAN %d %d %d %s", now, tier, numberOfServersToAdd, statistics));
 		
 		if(numberOfServersToAdd > 0){
 			

@@ -30,10 +30,6 @@ public enum DataUnit {
 		return dataInBytes;
 	}
 	
-	public DataUnit getUnit(String unit){
-		return DataUnit.valueOf((unit + "b").toUpperCase());
-	}
-	
 	public static double [][] convert(double values[][], DataUnit from, DataUnit to){
 		double rate = 1.0 * from.dataInBytes / to.dataInBytes;
 		for (int i = 0; i < values.length; i++) {

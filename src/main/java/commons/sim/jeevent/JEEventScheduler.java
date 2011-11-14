@@ -121,11 +121,13 @@ public class JEEventScheduler implements Serializable{
     private void schedule() {
     	
     	JEEvent event = eventSet.pollFirst();
-    	
     	while(event != null && event.getScheduledTime() < simulationEnd){
     		now = event.getScheduledTime();
     		processEvent(event);
     		event = eventSet.pollFirst();
+    	}
+    	if(event != null){
+    		eventSet.add(event);
     	}
     }
 

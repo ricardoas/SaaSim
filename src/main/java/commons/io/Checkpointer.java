@@ -58,7 +58,7 @@ public class Checkpointer {
 			out.writeObject(accountingSystem);
 			out.writeObject(priorities);
 			out.close();
-			Logger.getLogger(Checkpointer.class).info("CHKP SAVE " + simulationInfo);
+			Logger.getLogger(Checkpointer.class).debug("CHKP SAVE " + simulationInfo);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -157,10 +157,10 @@ public class Checkpointer {
 			accountingSystem = new AccountingSystem(users, providers);
 			priorities = new int[users.length];
 			for (int i = 0; i < priorities.length; i++) {
-				priorities[i] = users[i].getContract().getPriority();
+				priorities[i] = 100;//users[i].getContract().getPriority(); FIXME Ricardo: don't know if we need this anymore
 			}
 		}
-		Logger.getLogger(Checkpointer.class).info("CHKP LOAD " + simulationInfo);
+		Logger.getLogger(Checkpointer.class).debug("CHKP LOAD " + simulationInfo);
 	}
 
 	public static AccountingSystem loadAccountingSystem() {

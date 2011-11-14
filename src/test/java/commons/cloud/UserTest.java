@@ -3,63 +3,58 @@
  */
 package commons.cloud;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.easymock.EasyMock;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import util.CleanConfigurationTest;
+import util.ValidConfigurationTest;
+
+import commons.util.DataUnit;
+import commons.util.TimeUnit;
 
 /**
  * Test class for {@link User}
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class UserTest extends CleanConfigurationTest {
+public class UserTest extends ValidConfigurationTest {
 	
-	private static final int STORAGE_IN_BYTES = 1024000;
-	private static final double SETUP = 1000.0;
+	private String plan1 = "bronze";
+	private static final int HIGH = 100;
+	private double setupCost = 1000.0;
+	private double price = 24.95;
+	private long cpuLimit = 10 * TimeUnit.HOUR.getMillis();
+	private double extraCpuCost = 5.0/TimeUnit.HOUR.getMillis();
+	private long [] transferenceLimits = DataUnit.convert(new long[]{2048}, DataUnit.MB, DataUnit.B);
+	private double [] transferenceCosts = DataUnit.convert(new double[]{0, 0.005}, DataUnit.B, DataUnit.MB);
+	private long storageLimits = 200 * DataUnit.MB.getBytes();
+	private double storageCosts = 0.1 / DataUnit.MB.getBytes();
+
+	private Contract c1;
 	
-	/**
-	 * Test method for {@link commons.cloud.User#calculatePartialReceipt()}.
-	 */
-	@Test
-	public void testCalculateReceipt() {
-		double penalty = 0d;
-		
-		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addPenalty(1, penalty, 0, 0);
-		
-		Contract contract = EasyMock.createStrictMock(Contract.class);
-		
-		User user = new User(1, contract, STORAGE_IN_BYTES);
-		
-		EasyMock.expect(contract.calculatePenalty(Double.NaN)).andReturn(penalty);
-		contract.calculateReceipt(entry, user.getId(), 0, 0, 0, STORAGE_IN_BYTES);
-		EasyMock.replay(contract, entry);
-	
-		user.calculatePartialReceipt(entry);
-	
-		EasyMock.verify(contract, entry);
+	@Override
+	public void setUp() throws Exception{
+		super.setUp();
+		c1 = new Contract(plan1, HIGH, setupCost, price, cpuLimit, extraCpuCost, transferenceLimits, transferenceCosts, storageLimits, storageCosts);
 	}
 
+
+	
 	/**
 	 * Test method for {@link commons.cloud.User#calculateOneTimeFees()}.
 	 */
 	@Test
 	public void testCalculateOneTimeFees() {
-		Contract contract = EasyMock.createStrictMock(Contract.class);
-		EasyMock.expect(contract.calculateOneTimeFees()).andReturn(SETUP);
-		EasyMock.replay(contract);
-		
-		User user = new User(0, contract, STORAGE_IN_BYTES);
-		user.calculateOneTimeFees(new UtilityResult(1, 0));
-	
-		EasyMock.verify(contract);
+		User user = new User(0, c1, storageLimits);
+		assertEquals(setupCost, user.calculateOneTimeFees(), 0.0001);
 	}
 
 	/**
 	 * Test method for {@link commons.cloud.User#compareTo(User)}.
 	 */
+	@Ignore("Semantic of priority field changed!")
 	@Test
 	public void testCompareTo() {
 		Contract gold = EasyMock.createStrictMock(Contract.class);
@@ -71,9 +66,9 @@ public class UserTest extends CleanConfigurationTest {
 		
 		EasyMock.replay(gold, silver);
 		
-		User goldUser1 = new User(1, gold, STORAGE_IN_BYTES);
-		User goldUser2 = new User(2, gold, STORAGE_IN_BYTES);
-		User silverUser = new User(3, silver, STORAGE_IN_BYTES);
+		User goldUser1 = new User(1, gold, storageLimits);
+		User goldUser2 = new User(2, gold, storageLimits);
+		User silverUser = new User(3, silver, storageLimits);
 		
 		assertEquals(0, goldUser1.compareTo(goldUser2));
 		assertEquals(0, goldUser2.compareTo(goldUser1));
@@ -89,20 +84,12 @@ public class UserTest extends CleanConfigurationTest {
 	 */
 	@Test
 	public void testReportFinishedRequest(){
-		long totalProcessed = 250;
+		long totalProcessed = 6 * TimeUnit.HOUR.getMillis();
 		long requestSize = 1024 * 100;
 		long responseSize = 1024 * 1024 * 5;
-		Double penalty = 0d;
 		
-		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addPenalty(1, penalty, 2, 2);
 		
-		Contract gold = EasyMock.createStrictMock(Contract.class);
-		
-		User user = new User(1, gold , STORAGE_IN_BYTES);
-		
-		EasyMock.expect(gold.calculatePenalty(0.0)).andReturn(penalty);
-		gold.calculateReceipt(entry, user.getId(), 2*totalProcessed, 2*requestSize, 2*responseSize, STORAGE_IN_BYTES);
+		User user = new User(1, c1 , storageLimits);
 		
 		Request request = EasyMock.createStrictMock(Request.class);;
 		EasyMock.expect(request.getTotalProcessed()).andReturn(totalProcessed);
@@ -113,25 +100,16 @@ public class UserTest extends CleanConfigurationTest {
 		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(requestSize);
 		EasyMock.expect(request.getResponseSizeInBytes()).andReturn(responseSize);
 		
+		EasyMock.replay(request);
 		
-		EasyMock.replay(gold, request, entry);
+		assertEquals(price, user.calculatePartialReceipt().getReceipt(), 0.0001);
 		
 		user.reportFinishedRequest(request);
 		user.reportFinishedRequest(request);
 		
-		assertEquals(STORAGE_IN_BYTES, user.getStorageInBytes());
-		assertEquals(totalProcessed * 2, user.getConsumedCpuInMillis());
-		assertEquals(requestSize * 2, user.getConsumedInTransferenceInBytes());
-		assertEquals(responseSize * 2, user.getConsumedOutTransferenceInBytes());
+		assertEquals(price + 2 * 5.0 , user.calculatePartialReceipt().getReceipt(), 0.0001);
 		
-		user.calculatePartialReceipt(entry);
-		
-		EasyMock.verify(gold, request, entry);
-		
-		assertEquals(STORAGE_IN_BYTES, user.getStorageInBytes());
-		assertEquals(0, user.getConsumedCpuInMillis());
-		assertEquals(0, user.getConsumedInTransferenceInBytes());
-		assertEquals(0, user.getConsumedOutTransferenceInBytes());
+		EasyMock.verify(request);
 	}
 
 	/**
@@ -141,17 +119,8 @@ public class UserTest extends CleanConfigurationTest {
 	public void testReportLostRequest(){
 		long totalProcessed = 250;
 		long requestSize = 1024 * 100;
-		Double penalty = 100d;
 		
-		UtilityResultEntry entry = EasyMock.createStrictMock(UtilityResultEntry.class);
-		entry.addPenalty(1, penalty, 0, 2);
-		
-		Contract gold = EasyMock.createStrictMock(Contract.class);
-		
-		User user = new User(1, gold , STORAGE_IN_BYTES);
-		
-		EasyMock.expect(gold.calculatePenalty(1.0)).andReturn(penalty);
-		gold.calculateReceipt(entry, user.getId(), 2*totalProcessed, 2*requestSize, 0, STORAGE_IN_BYTES);
+		User user = new User(1, c1 , storageLimits);
 		
 		Request request = EasyMock.createStrictMock(Request.class);;
 		EasyMock.expect(request.getTotalProcessed()).andReturn(totalProcessed);
@@ -160,18 +129,16 @@ public class UserTest extends CleanConfigurationTest {
 		EasyMock.expect(request.getTotalProcessed()).andReturn(totalProcessed);
 		EasyMock.expect(request.getRequestSizeInBytes()).andReturn(requestSize);
 		
-		EasyMock.replay(gold, request, entry);
+		EasyMock.replay(request);
 		
-		user.reportLostRequest(request);
-		user.reportLostRequest(request);
-		
-		assertEquals(2, user.getNumberOfLostRequests());
+		assertEquals(0, user.calculatePartialReceipt().getPenalty(), 0.0001);
 
-		user.calculatePartialReceipt(entry);
+		user.reportLostRequest(request);
+		user.reportLostRequest(request);
 		
-		assertEquals(0, user.getNumberOfLostRequests());
+		assertEquals(price, user.calculatePartialReceipt().getPenalty(), 0.0001);
 		
-		EasyMock.verify(gold, request, entry);
+		EasyMock.verify(request);
 	}
 	
 	@Test
@@ -180,7 +147,7 @@ public class UserTest extends CleanConfigurationTest {
 		EasyMock.expect(gold.calculatePenalty(0)).andReturn(0d);
 		EasyMock.replay(gold);
 		
-		User user = new User(1, gold , STORAGE_IN_BYTES);
+		User user = new User(1, gold , storageLimits);
 		
 		assertEquals(0, user.calculatePenalty(0), 0.0);
 		
@@ -195,7 +162,7 @@ public class UserTest extends CleanConfigurationTest {
 		EasyMock.expect(gold.calculatePenalty(0.1)).andReturn(10d);
 		EasyMock.replay(gold);
 		
-		User user = new User(1, gold , STORAGE_IN_BYTES);
+		User user = new User(1, gold , storageLimits);
 		
 		assertEquals(10, user.calculatePenalty(0), 0.0);
 		assertEquals(10, user.calculatePenalty(0.0001), 0.0);
@@ -212,7 +179,7 @@ public class UserTest extends CleanConfigurationTest {
 		EasyMock.expect(gold.calculatePenalty(0.99999)).andReturn(10d);
 		EasyMock.replay(gold);
 		
-		User user = new User(1, gold , STORAGE_IN_BYTES);
+		User user = new User(1, gold , storageLimits);
 		
 		assertEquals(10, user.calculatePenalty(0.25), 0.0);
 		assertEquals(10, user.calculatePenalty(0.75), 0.0);
@@ -230,7 +197,7 @@ public class UserTest extends CleanConfigurationTest {
 		Contract gold = EasyMock.createStrictMock(Contract.class);
 		EasyMock.replay(gold);
 
-		User user = new User(1, gold , STORAGE_IN_BYTES);
+		User user = new User(1, gold , storageLimits);
 		assertEquals(user, user);
 		assertTrue(user.hashCode() == user.hashCode());
 		
@@ -246,8 +213,8 @@ public class UserTest extends CleanConfigurationTest {
 		Contract gold = EasyMock.createStrictMock(Contract.class);
 		EasyMock.replay(gold);
 		
-		User userA = new User(1, gold , STORAGE_IN_BYTES);
-		User cloneUserA = new User(1, gold , STORAGE_IN_BYTES);
+		User userA = new User(1, gold , storageLimits);
+		User cloneUserA = new User(1, gold , storageLimits);
 		
 		assertEquals(userA, cloneUserA);
 		assertTrue(userA.hashCode() == cloneUserA.hashCode());
@@ -264,8 +231,8 @@ public class UserTest extends CleanConfigurationTest {
 		Contract gold = EasyMock.createStrictMock(Contract.class);
 		EasyMock.replay(gold);
 		
-		User userA = new User(1, gold , STORAGE_IN_BYTES);
-		User userB = new User(2, gold , STORAGE_IN_BYTES);
+		User userA = new User(1, gold , storageLimits);
+		User userB = new User(2, gold , storageLimits);
 		
 		assertTrue(!userA.equals(userB));
 		assertTrue(userA.hashCode() != userB.hashCode());
@@ -281,7 +248,7 @@ public class UserTest extends CleanConfigurationTest {
 		Contract gold = EasyMock.createStrictMock(Contract.class);
 		EasyMock.replay(gold);
 		
-		new User(1, gold , STORAGE_IN_BYTES).equals(null);
+		new User(1, gold , storageLimits).equals(null);
 	}
 	
 	/**
@@ -293,7 +260,7 @@ public class UserTest extends CleanConfigurationTest {
 		Contract gold = EasyMock.createStrictMock(Contract.class);
 		EasyMock.replay(gold);
 		
-		new User(1, gold , STORAGE_IN_BYTES).equals(new String(""));
+		new User(1, gold , storageLimits).equals(new String(""));
 	}
 
 

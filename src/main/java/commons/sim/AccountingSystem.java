@@ -17,8 +17,6 @@ public class AccountingSystem implements Serializable{
 	 */
 	private static final long serialVersionUID = 4731959933590610261L;
 	private UtilityResult utilityResult;
-	private final User[] users;
-	private final Provider[] providers;
 	
 	/**
 	 * Default constructor.
@@ -26,23 +24,19 @@ public class AccountingSystem implements Serializable{
 	 * @param providers
 	 */
 	public AccountingSystem(User[] users, Provider[] providers) {
-		this.users = users;
-		this.providers = providers;
-		this.utilityResult = new UtilityResult(users.length, providers.length);
+		this.utilityResult = new UtilityResult(users, providers);
 	}
 
 	/**
 	 * @param currentTimeInMillis
+	 * @param users TODO
+	 * @param providers TODO
+	 * @return 
 	 */
-	public void accountPartialUtility(long currentTimeInMillis){
+	public UtilityResultEntry accountPartialUtility(long currentTimeInMillis, User[] users, Provider[] providers){
 		UtilityResultEntry entry = new UtilityResultEntry(currentTimeInMillis, users, providers);
-		for (User user : users) {
-			user.calculatePartialReceipt(entry);
-		}
-		for (Provider provider : providers) {
-			provider.calculateCost(entry, currentTimeInMillis);
-		}
-		this.utilityResult.addEntry(entry);
+		utilityResult.account(entry);
+		return entry;
 	}
 	
 	/**
@@ -51,12 +45,6 @@ public class AccountingSystem implements Serializable{
 	 * @return
 	 */
 	public UtilityResult calculateUtility(){
-		for(Provider provider : providers){
-			provider.calculateUniqueCost(utilityResult);
-		}
-		for(User user : users){
-			user.calculateOneTimeFees(utilityResult);
-		}
 		return utilityResult;
 	}
 }

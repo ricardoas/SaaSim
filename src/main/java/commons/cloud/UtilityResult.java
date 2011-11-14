@@ -1,8 +1,6 @@
 package commons.cloud;
 
 import java.io.Serializable;
-import java.util.Iterator;
-import java.util.TreeSet;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -14,13 +12,12 @@ public class UtilityResult implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = -7954582098382863519L;
-	private TreeSet<UtilityResultEntry> entries;
-	private double[] usersUniqueFee;
-	private double[][] providersUniqueFee;
 	
 	private double uniqueReceipt;
+	private double receipt;
 	private double uniqueCost;
-	private double finalProfit;
+	private double cost;
+	private double penalty;
 	
 	/**
 	 * Default constructor.
@@ -28,24 +25,37 @@ public class UtilityResult implements Serializable{
 	 * @param numberOfProviders 
 	 */
 	public UtilityResult(int numberOfUsers, int numberOfProviders) {
-		entries = new TreeSet<UtilityResultEntry>();
-		usersUniqueFee = new double[numberOfUsers];
-		providersUniqueFee = new double[numberOfProviders][MachineType.values().length];
 		uniqueCost = 0;
 		uniqueReceipt = 0;
-		finalProfit = 0;
+	}
+
+	public UtilityResult(User[] users, Provider[] providers) {
+		for (User user : users) {
+			uniqueReceipt += user.calculateOneTimeFees();
+		}
+		for (Provider provider : providers) {
+			uniqueCost += provider.calculateUniqueCost();
+		}
+		receipt = 0;
+		cost = 0;
+		penalty = 0;
+	}
+
+	/**
+	 * @param entry
+	 * @return 
+	 */
+	public void account(UtilityResultEntry entry) {
+		receipt += entry.getReceipt();
+		cost += entry.getCost();
+		penalty += entry.getPenalty();
 	}
 
 	/**
 	 * @return The total utility value.
 	 */
 	public double getUtility() {
-		finalProfit = 0d;
-		for ( UtilityResultEntry entry : entries) {
-			finalProfit += entry.getUtility();
-		}
-		finalProfit += (uniqueReceipt - uniqueCost);
-		return finalProfit;
+		return uniqueReceipt + receipt - uniqueCost - cost - penalty;
 	}
 	
 	/**
@@ -60,44 +70,14 @@ public class UtilityResult implements Serializable{
 		sb.append(FIELD_SEPARATOR);
 		sb.append(uniqueReceipt);
 		sb.append(FIELD_SEPARATOR);
-		sb.append(uniqueCost);
+		sb.append(receipt);
+		sb.append(FIELD_SEPARATOR);
+		sb.append(-uniqueCost);
+		sb.append(FIELD_SEPARATOR);
+		sb.append(-cost);
+		sb.append(FIELD_SEPARATOR);
+		sb.append(-penalty);
 		
-		sb.append('\n');
-		sb.append(entries.first().getEntryDescriptor());
-		
-		for (UtilityResultEntry entry : entries) {
-			sb.append('\n');
-			sb.append(entry);
-		}
 		return sb.toString();
-	}
-
-	/**
-	 * @param entry
-	 */
-	public void addEntry(UtilityResultEntry entry) {
-		entries.add(entry);
-	}
-	
-	/**
-	 * @param entry
-	 */
-	public void addUserUniqueFee(int userID, double fee) {
-		usersUniqueFee[userID] = fee;
-		uniqueReceipt += fee;
-	}
-
-	/**
-	 * @param providerID
-	 * @param type
-	 * @param cost
-	 */
-	public void addProviderUniqueCost(int providerID, MachineType type, double cost) {
-		providersUniqueFee[providerID][type.ordinal()] = cost;
-		uniqueCost += cost;
-	}
-
-	public Iterator<UtilityResultEntry> iterator() {
-		return entries.iterator();
 	}
 }

@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Queue;
 
 import commons.cloud.Request;
-import commons.cloud.User;
 import commons.config.Configuration;
 import commons.io.Checkpointer;
 import commons.sim.jeevent.JEAbstractEventHandler;
@@ -329,8 +328,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		
 		while(!queue.isEmpty()){
 			Request request = queue.poll();
-			User client = Checkpointer.loadUsers()[request.getSaasClient()];
-			int priority = client.getContract().getPriority();
+			int priority = Checkpointer.loadPriorities()[request.getSaasClient()];
 			Info info = times.get(request);
 			long demand = Math.min(priority, request.getTotalToProcess()-info.processedDemand);
 			processedTime += demand;

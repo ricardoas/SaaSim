@@ -151,16 +151,16 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 		
 		TimeSharedMachine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), loadBalancer);
 		
+		machine.sendRequest(request);
 		machine.sendRequest(request2);
 		machine.sendRequest(request3);
 		machine.sendRequest(request4);
-		machine.sendRequest(request);
 		
 		Queue<Request> processorQueue = machine.getProcessorQueue();
 		assertEquals(3, processorQueue.size());
+		assertEquals(request2, processorQueue.poll());
 		assertEquals(request3, processorQueue.poll());
 		assertEquals(request4, processorQueue.poll());
-		assertEquals(request, processorQueue.poll());
 		assertNull(processorQueue.poll());
 		
 		Checkpointer.loadScheduler().start();

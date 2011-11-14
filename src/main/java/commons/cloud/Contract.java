@@ -1,6 +1,7 @@
 package commons.cloud;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 import commons.util.CostCalculus;
 
@@ -9,14 +10,14 @@ import commons.util.CostCalculus;
  * SaaS client contract. Most frequent information, based on research.
  *  
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
- * @version 1.1
+ * @version 1.2
  */
 public class Contract implements Comparable<Contract>, Serializable{
 	
 	/**
-	 * Version 1.1 - limits in MB 
+	 * Version 1.2 - limits in Bytes 
 	 */
-	private static final long serialVersionUID = 5890271348794166938L;
+	private static final long serialVersionUID = -242235177646945721L;
 
 	private final String name;
 	private final int priority;
@@ -58,76 +59,6 @@ public class Contract implements Comparable<Contract>, Serializable{
 	}
 	
 	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * @return the priority
-	 */
-	public int getPriority() {
-		return priority;
-	}
-
-	/**
-	 * @return the price
-	 */
-	public double getPrice() {
-		return price;
-	}
-
-	/**
-	 * @return the setupCost
-	 */
-	public double getSetupCost() {
-		return setupCost;
-	}
-
-	/**
-	 * @return the cpuLimitInMillis
-	 */
-	public long getCpuLimitInMillis() {
-		return cpuLimitInMillis;
-	}
-
-	/**
-	 * @return the extraCpuCostPerMillis
-	 */
-	public double getExtraCpuCostPerMillis() {
-		return extraCpuCostPerMillis;
-	}
-
-	/**
-	 * @return the transferenceLimitsInBytes
-	 */
-	public long[] getTransferenceLimitsInBytes() {
-		return transferenceLimitsInBytes;
-	}
-
-	/**
-	 * @return the transferenceCostsInBytes
-	 */
-	public double[] getTransferenceCostsPerByte() {
-		return transferenceCostsInBytes;
-	}
-
-	/**
-	 * @return the storageLimitInBytes
-	 */
-	public long getStorageLimitInBytes() {
-		return storageLimitInBytes;
-	}
-
-	/**
-	 * @return the extraStorageCostPerByte
-	 */
-	public double getExtraStorageCostPerByte() {
-		return extraStorageCostPerByte;
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -150,15 +81,22 @@ public class Contract implements Comparable<Contract>, Serializable{
 			return true;
 		return name.equals(((Contract) obj).name);
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String toString() {
-		return "Contract [name=" + name + ", price=" + price + ", setupCost="
-				+ setupCost + ", cpuLimit=" + cpuLimitInMillis + ", extraCpuCost="
-				+ extraCpuCostPerMillis + "]";
+		// Extremely inefficient but used just for debugging purposes.
+		return "Contract [name=" + name + ", priority=" + priority + ", price="
+				+ price + ", setupCost=" + setupCost + ", cpuLimitInMillis="
+				+ cpuLimitInMillis + ", extraCpuCostPerMillis="
+				+ extraCpuCostPerMillis + ", transferenceLimitsInBytes="
+				+ Arrays.toString(transferenceLimitsInBytes)
+				+ ", transferenceCostsInBytes="
+				+ Arrays.toString(transferenceCostsInBytes)
+				+ ", storageLimitInBytes=" + storageLimitInBytes
+				+ ", extraStorageCostPerByte=" + extraStorageCostPerByte + "]";
 	}
 
 	/**
@@ -170,23 +108,25 @@ public class Contract implements Comparable<Contract>, Serializable{
 	}
 
 	/**
-	 * @param entry
 	 * @param consumedCpuInMillis
 	 * @param consumedInTransferenceInBytes
 	 * @param consumedOutTransferenceInBytes
 	 * @param consumedStorageInBytes
+	 * @param numOfFinishedRequests TODO
+	 * @param numOfLostRequests TODO
+	 * @return 
 	 */
-	public void calculateReceipt(UtilityResultEntry entry, int userID, long consumedCpuInMillis, long consumedInTransferenceInBytes,
-			long consumedOutTransferenceInBytes, long consumedStorageInBytes) {
+	public UserEntry calculateReceipt(int userID, long consumedCpuInMillis, long consumedInTransferenceInBytes, long consumedOutTransferenceInBytes,
+			long consumedStorageInBytes, long numOfFinishedRequests, long numOfLostRequests) {
 		
 		long extraConsumedCPUInMillis = Math.max(0, consumedCpuInMillis - cpuLimitInMillis);
 		long consumedTransferenceInBytes = consumedInTransferenceInBytes + consumedOutTransferenceInBytes;
 		
-		double CPUCost = price + extraConsumedCPUInMillis * extraCpuCostPerMillis;
+		double CPUCost = extraCpuCostPerMillis * extraConsumedCPUInMillis;
 		double transferenceCost = CostCalculus.calcTransferenceCost(consumedTransferenceInBytes , transferenceLimitsInBytes, transferenceCostsInBytes);
 		double storageCost = Math.max(0, consumedStorageInBytes - storageLimitInBytes) * extraStorageCostPerByte;
 		
-		entry.addToReceipt(userID, name, extraConsumedCPUInMillis, CPUCost, consumedTransferenceInBytes, transferenceCost, storageCost);
+		return new UserEntry(userID, name, price, extraConsumedCPUInMillis, CPUCost, consumedTransferenceInBytes, transferenceCost, storageCost, calculatePenalty((1.0 * numOfLostRequests) / (numOfLostRequests+numOfFinishedRequests)), numOfFinishedRequests, numOfLostRequests);
 	}
 	
 	/**

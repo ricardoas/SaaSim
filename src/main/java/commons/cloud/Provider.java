@@ -71,14 +71,6 @@ public class Provider implements Serializable{
 		this.onDemandRunningMachines = 0;
 	}
 
-	public int getOnDemandRunningMachines() {
-		return onDemandRunningMachines;
-	}
-
-	public int getId() {
-		return id;
-	}
-
 	/**
 	 * Avoid using it. It breaks type encapsulation.
 	 * 
@@ -220,33 +212,36 @@ public class Provider implements Serializable{
 	}
 	
 
-	public void calculateCost(UtilityResultEntry entry, long currentTimeInMillis) {
+	public ProviderEntry calculateCost(long currentTimeInMillis) {
 		
-		long [] transferences = new long[2];
+		long inputTransferences = 0;
+		long outputTransferences = 0;
 				
 		for (TypeProvider typeProvider : types.values()) {
 			long [] typeTransferences = typeProvider.getTotalTransferences();
-			transferences[0] += typeTransferences[0];
-			transferences[1] += typeTransferences[1];
-			typeProvider.calculateMachinesCost(entry, currentTimeInMillis, monitoringCost);
+			inputTransferences += typeTransferences[0];
+			outputTransferences += typeTransferences[1];
 		}
 		
-		transferences[0] = transferences[0];
-		transferences[1] = transferences[1];
+		double inCost = CostCalculus.calcTransferenceCost(inputTransferences, transferInLimitsInBytes, transferInCostsPerByte);
+		double outCost = CostCalculus.calcTransferenceCost(outputTransferences, transferOutLimitsInBytes, transferOutCostsPerByte);
 		
+		ProviderEntry providerEntry = new ProviderEntry(name, inputTransferences, inCost, outputTransferences, outCost);
 		
-		double inCost = CostCalculus.calcTransferenceCost(transferences[0], transferInLimitsInBytes, transferInCostsPerByte);
-		double outCost = CostCalculus.calcTransferenceCost(transferences[1], transferOutLimitsInBytes, transferOutCostsPerByte);
+		for (TypeProvider type : types.values()) {
+			providerEntry.account(type.calculateMachinesCost(currentTimeInMillis, monitoringCost));
+		}
 		
-		entry.addTransferenceToCost(id, transferences[0], inCost, transferences[1], outCost);
+		return providerEntry;
 	}
 	
-	public void calculateUniqueCost(UtilityResult result) {
+	public double calculateUniqueCost() {
 
+		double cost = 0;
 		for (TypeProvider typeProvider : types.values()) {
-			double cost = typeProvider.calculateUniqueCost();
-			result.addProviderUniqueCost(id, typeProvider.getType(), cost);
+			cost += typeProvider.calculateUniqueCost();
 		}
+		return cost;
 	}
 
 	@Override

@@ -137,7 +137,7 @@ public class TypeProvider implements Serializable{
 		return reservedRunningMachines.size() < reservation;
 	}
 
-	public void calculateMachinesCost(UtilityResultEntry entry, long currentTimeInMillis, double monitoringCostPerHour) {
+	public TypeProviderEntry calculateMachinesCost(long currentTimeInMillis, double monitoringCostPerHour) {
 		long onDemandUpTimeInFullHours = 0;
 		long reservedUpTimeInFullHours = 0;
 		
@@ -160,10 +160,10 @@ public class TypeProvider implements Serializable{
 		double reservedCost = reservedUpTimeInFullHours * reservedCpuCost;
 		double monitoringCost = (onDemandUpTimeInFullHours + reservedUpTimeInFullHours) * monitoringCostPerHour;
 		
-		entry.addUsageToCost(providerID, type, onDemandUpTimeInFullHours, onDemandCost, reservedUpTimeInFullHours, reservedCost, monitoringCost);
-		
+		TypeProviderEntry typeEntry = new TypeProviderEntry(type, onDemandUpTimeInFullHours, onDemandCost, reservedUpTimeInFullHours, reservedCost, monitoringCost);
 		onDemandFinishedMachines.clear();
 		reservedFinishedMachines.clear();
+		return typeEntry;
 	}
 
 	public long[] getTotalTransferences() {

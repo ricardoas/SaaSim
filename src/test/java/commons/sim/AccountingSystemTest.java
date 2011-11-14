@@ -3,16 +3,16 @@
  */
 package commons.sim;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.AfterClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import util.ValidConfigurationTest;
 
+import commons.cloud.Provider;
+import commons.cloud.User;
 import commons.cloud.UtilityResult;
-import commons.cloud.UtilityResultEntry;
 import commons.io.Checkpointer;
 
 /**
@@ -34,22 +34,19 @@ public class AccountingSystemTest extends ValidConfigurationTest {
 	}
 
 	/**
-	 * Test method for {@link commons.sim.AccountingSystem#accountPartialUtility(long)}.
-	 * @throws Exception 
+	 * Test method for {@link commons.sim.AccountingSystem#accountPartialUtility(long, User[], Provider[])}.
 	 */
-	@Test
-	public void testAccountPartialUtility() throws Exception {
-		Checkpointer.loadAccountingSystem().accountPartialUtility(0);
+	@Test(expected=AssertionError.class)
+	public void testAccountPartialUtility() {
+		Checkpointer.loadAccountingSystem().accountPartialUtility(0, null, null);
 	}
 
 	/**
 	 * Test method for {@link commons.sim.AccountingSystem#calculateUtility()}.
 	 */
-	@Ignore@Test
+	@Test
 	public void testCalculateUtility() {
 		UtilityResult utility = Checkpointer.loadAccountingSystem().calculateUtility();
-		assertTrue(utility.iterator().hasNext());
-		UtilityResultEntry entry = utility.iterator().next();
 		assertEquals(0.0, utility.getUtility(), 0.0);
 	}
 }

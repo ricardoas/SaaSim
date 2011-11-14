@@ -1,9 +1,9 @@
 package commons.sim.schedulingheuristics;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import commons.cloud.Request;
@@ -127,7 +127,7 @@ public abstract class AbstractSchedulingHeuristic implements SchedulingHeuristic
 	protected abstract Machine getNextAvailableMachine();
 
 	@Override
-	public Collection<? extends Machine> getMachines() {
+	public List<Machine> getMachines() {
 		return machines;
 	}
 
