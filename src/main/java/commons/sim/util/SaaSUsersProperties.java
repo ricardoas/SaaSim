@@ -18,4 +18,6 @@ public class SaaSUsersProperties {
 	
 	public static final String SAAS_PEAK_PERIOD = "saas.peak.period";
 
+	public static final String SAAS_USER_ID = "saas.user.id";
+
 }

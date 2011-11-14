@@ -9,7 +9,7 @@ package commons.util;
 public enum DataUnit {
 	
 	B(1), 
-	KB(1014 * B.getBytes()),
+	KB(1024 * B.getBytes()),
 	MB(1024 * KB.getBytes()),
 	GB(1024 * MB.getBytes()),
 	TB(1024 * GB.getBytes());
