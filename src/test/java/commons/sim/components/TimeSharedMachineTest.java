@@ -402,7 +402,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
 		EasyMock.expect(scheduler.now()).andReturn(100l).times(2);
 		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
-		EasyMock.expect(scheduler.now()).andReturn(150l).times(4);
+		EasyMock.expect(scheduler.now()).andReturn(150l).times(2);
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.reportRequestFinished(EasyMock.isA(Request.class));
