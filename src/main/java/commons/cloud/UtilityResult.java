@@ -64,8 +64,9 @@ public class UtilityResult implements Serializable{
 	
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder("UTILITY");
 		
+		sb.append(FIELD_SEPARATOR);
 		sb.append(getUtility());
 		sb.append(FIELD_SEPARATOR);
 		sb.append(uniqueReceipt);
