@@ -15,6 +15,7 @@ import commons.io.GEISTWorkloadParser;
 import commons.io.WorkloadParser;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.util.SaaSAppProperties;
+import commons.sim.util.SimulatorProperties;
 
 /**
  * This class represents the DPS business logic modified from original RANJAN. Here some statistics of current
@@ -28,6 +29,8 @@ import commons.sim.util.SaaSAppProperties;
  */
 public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicProvisioningSystem {
 
+	private static final int QUANTUM_SIZE = 100;
+
 	protected MachineType[] acceleratorTypes = {MachineType.M1_SMALL};
 	
 	private int tick;
@@ -37,6 +40,9 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 	private double[] currentRequestsCounter;
 	private double[] nextRequestsCounter;
 	private long SLA;
+	
+	private long totalMeanToProcess;
+	private int numberOfRequests;
 
 	public OptimalProvisioningSystemForHeterogeneousMachines() {
 		super();
@@ -52,42 +58,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 		this.SLA = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME);
 		this.nextRequestsCounter = new double[36000];
 		
-//		getParsers();
 	}
-	
-//	private void getParsers() {
-////		double error = Configuration.getInstance().getDouble(SimulatorProperties.PLANNING_ERROR);
-////		
-////		if(error == 0.0){
-////			return;
-////		}
-////		
-////		int totalParsers = (int)Math.round(this.parsers.length * (1+error));
-////		WorkloadParser<Request>[] newParsers = new WorkloadParser[totalParsers];
-////		if(totalParsers > this.parsers.length){//Adding already existed parsers
-////			int difference = totalParsers - this.parsers.length;
-////			for(int i = 0; i < this.parsers.length; i++){
-////				newParsers[i] = this.parsers[i];
-////			}
-////			int index = this.parsers.length;
-////			for(int i = 0; i < difference; i++){
-////				newParsers[index++] = this.parsers[i].clone();
-////			}
-////		}else{//Removing some parsers
-////			for(int i = 0; i < totalParsers; i++){
-////				newParsers[i] = this.parsers[i];
-////			}
-////		}
-//		WorkloadParser<List<Request>> workloadParser = WorkloadParserFactory.getWorkloadParser();
-//		Field field;
-//		try {
-//			field = TimeBasedWorkloadParser.class.getDeclaredField("parsers");
-//			field.setAccessible(true);
-//			this.parsers = (WorkloadParser[]) field.get(workloadParser);
-//		} catch (Exception e) {
-//			throw new RuntimeException(e);
-//		}
-//	}
 	
 	@Override
 	public boolean isOptimal() {
@@ -101,6 +72,8 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 			this.currentRequestsCounter = this.nextRequestsCounter;
 		}
 		this.nextRequestsCounter = new double[36000];
+		this.totalMeanToProcess = 0;
+		this.numberOfRequests = 0;
 		
 		for (int i = 0; i < leftOver.length; i++) {
 			Request left = leftOver[i];
@@ -134,15 +107,12 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 	}
 	
 	private void countData(Request request, long currentTime) {
-		int index = (int) ((request.getArrivalTimeInMillis() - currentTime) / 100);
+		this.numberOfRequests++;
+		
+		int index = (int) ((request.getArrivalTimeInMillis() - currentTime) / QUANTUM_SIZE);
 		this.currentRequestsCounter[index]++;//Adding demand in arrival interval
 		
-		long totalMeanToProcess = this.SLA;
-		
-		long intervalsToProcess = totalMeanToProcess / 100;
-		if(totalMeanToProcess == 100){
-			intervalsToProcess = 0;
-		}
+		long intervalsToProcess = request.getTotalMeanToProcess() / QUANTUM_SIZE;
 		
 		for(int i = index+1; i < index + intervalsToProcess; i++){//Adding demand to subsequent intervals
 			if(i >= this.currentRequestsCounter.length){
@@ -160,13 +130,19 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 		
 		//FIXME: Discutir se eh isso mesmo!
 		int numberOfServers = (int)Math.ceil(maximumDemand);
-		long numberOfServersToAdd = numberOfServers - totalNumberOfServers;
+//		if(this.numberOfRequests != 0){
+//			double requestsMeanDemand = (this.totalMeanToProcess / this.numberOfRequests);
+//			numberOfServers = (int)Math.ceil(maximumDemand / (SLA /  requestsMeanDemand));
+//		}else{
+//			numberOfServers = 0;
+//		}
 		
+		long numberOfServersToAdd = numberOfServers - totalNumberOfServers;
 		if(numberOfServersToAdd > 0){
 			evaluateMachinesToBeAdded(tier, numberOfServersToAdd);
 		}else if(numberOfServersToAdd < 0){
 			for (int i = 0; i < -numberOfServersToAdd; i++) {
-				configurable.removeMachine(tier, false);
+				configurable.removeServer(tier, false);
 			}
 		}
 		
@@ -181,7 +157,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 			for (Provider provider : providers) {
 				while(provider.canBuyMachine(true, machineType) && 
 						serversAdded + machineType.getNumberOfCores() <= numberOfServersToAdd){
-					configurable.addMachine(tier, provider.buyMachine(true, machineType), true);
+					configurable.addServer(tier, provider.buyMachine(true, machineType), true);
 					serversAdded += machineType.getNumberOfCores();
 				}
 				if(serversAdded == numberOfServersToAdd){
@@ -195,11 +171,18 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 		
 		//If servers are still needed ...
 		if(serversAdded < numberOfServersToAdd){
+			
+			//Applying on-demand market risk ...
+			numberOfServersToAdd = (numberOfServersToAdd - serversAdded);
+			serversAdded = 0;
+			double onDemandRisk = Configuration.getInstance().getDouble(SimulatorProperties.PLANNING_RISK);
+			numberOfServersToAdd = (int) Math.ceil(numberOfServersToAdd * (1-onDemandRisk));
+			
 			for(MachineType machineType : this.acceleratorTypes){
 				for (Provider provider : providers) {
 					while(provider.canBuyMachine(false, machineType) && 
 							serversAdded + machineType.getNumberOfCores() <= numberOfServersToAdd){
-						configurable.addMachine(tier, provider.buyMachine(false, machineType), true);
+						configurable.addServer(tier, provider.buyMachine(false, machineType), true);
 						serversAdded += machineType.getNumberOfCores();
 					}
 					if(serversAdded == numberOfServersToAdd){
@@ -211,5 +194,10 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 				}
 			}
 		}
+	}
+	
+	@Override
+	public void requestQueued(long timeMilliSeconds, Request request, int tier) {
+		reportLostRequest(request);
 	}
 }
