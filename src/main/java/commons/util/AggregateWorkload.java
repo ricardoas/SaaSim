@@ -48,8 +48,6 @@ public class AggregateWorkload {
 		
 		tick = PlanningFitnessFunction.HOUR_IN_MILLIS;
 		
-//		int clientID = 0;
-		
 		for(int i = 0; i < workloads.length; i++){	
 			BufferedReader pointersReader = new BufferedReader(new FileReader(workloads[i]));
 			List<Summary> currentSummaries = new ArrayList<Summary>();
@@ -59,6 +57,10 @@ public class AggregateWorkload {
 				BufferedReader workloadReader = new BufferedReader(new FileReader(pointersFile));
 				leftOver = new ArrayList<Request>();
 				currentTick = 0;
+				
+				if(clientsID[i] == 93){
+					System.out.println("cheguei!");
+				}
 				
 				while(workloadReader.ready()){
 					List<Request> requests = next(workloadReader, clientsID[i]);
@@ -132,7 +134,10 @@ public class AggregateWorkload {
 		}
 		double arrivalRate = requests.size() / (60.0 * 60.0);//arrival per second
 		double totalCpuHrs = totalServiceTime / PlanningFitnessFunction.HOUR_IN_MILLIS;
-		double serviceDemandInMillis = totalServiceTime / requests.size();
+		
+		int size = (requests.isEmpty()) ? 1 : requests.size();
+		double serviceDemandInMillis = totalServiceTime / size;
+
 		double userThinkTimeInSeconds = 5;
 		long numberOfUsers = Math.round(userThinkTimeInSeconds * arrivalRate);
 		
@@ -178,7 +183,7 @@ public class AggregateWorkload {
 		long [] demand = new long[tokenizer.countTokens()];
 		int index = 0;
 		while(tokenizer.hasMoreTokens()){
-			demand[index++] = Long.parseLong(tokenizer.nextToken());
+			demand[index++] = (long)Double.parseDouble(tokenizer.nextToken());
 		}
 		
 		return new Request(reqID, saasClientID, userID, arrivalTimeInMillis,
