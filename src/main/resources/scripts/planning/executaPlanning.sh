@@ -52,6 +52,7 @@ find_self && set_classpath
 #done
 
 plan_heur=$1
+mkdir result_${plan_heur}
 
 for value in `seq 1`; do
 
@@ -84,7 +85,6 @@ for value in `seq 1`; do
 		java -Xmx2024m -server -cp $CLASSPATH provisioning.Main david.properties > data_${value}.output
 	done
 
-	mkdir result_${plan_heur}
 	mv model.plan model_${value}.plan
 	mv model_${value}.plan data_${value}.output result_${plan_heur}
 	touch model.plan	
