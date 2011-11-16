@@ -35,8 +35,10 @@ modified$V4 <- trace$V3
 modified$V5 <- size[as.numeric(substring(trace$V6, 15, 18))]
 tmp <- array(dim=length(modified$V6))
 for(i in 1:length(trace$V1)){tmp[i]=cpu()}
-modified$V7 <- tmp
-modified$V8 <- modified$V6 <- 2*tmp
-modified$V9 <- round(2.5*tmp)
-modified$V10 <- modified$V8
+modified$V6 <- tmp
+modified$V8 <- modified$V7 <- round(tmp/2)
+# c1.*: modified$V10 <- modified$V9 <- round(tmp/2.5)
+# m2.*: modified$V13 <- modified$V12 <- modified$V11 <- round(tmp/3.25)
+# t1.*: modified$V14 <- round(tmp/2)
+
 write.table(modified, file=filename, append=FALSE, row.names=FALSE, col.names=FALSE)
