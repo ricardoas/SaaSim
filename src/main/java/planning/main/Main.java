@@ -10,7 +10,6 @@ import commons.config.Configuration;
 import commons.io.Checkpointer;
 import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEEventScheduler;
-import commons.sim.util.SimulatorProperties;
 
 /**
  * This class is responsible for obtaining input parameters, from a configuration file, such as: workload, cloud provider

@@ -1,0 +1,42 @@
+#!/usr/bin/Rscript
+
+args <- commandArgs(TRUE)
+
+filename=args[1]
+
+clientID = as.numeric(strsplit(filename, split='\\.|_')[[1]][2])
+
+size <- as.integer(c(100*1:9,1000*1:9,10000*1:9,100000*1:9))
+
+cpu <- function(){
+	if(rbinom(1,1,.405)){
+		if(rbinom(1,1,.187)){
+			if(rbinom(1,1,.174)){
+				if(!rbinom(1,1,.102)){
+					if(!rbinom(1,1,.0808)){
+						30
+					}else{ 170 }	
+				}else{ 50 }
+			}else{ 570 }
+		}else{ 10 }
+	}else{ 11 }
+}
+
+
+trace <- read.table(filename)
+
+modified = trace
+
+
+modified$V1 <- clientID
+modified$V2 <- trace$V1
+modified$V3 <- round(trace$V2 * 1000)
+modified$V4 <- trace$V3
+modified$V5 <- size[as.numeric(substring(trace$V6, 15, 18))]
+tmp <- array(dim=length(modified$V6))
+for(i in 1:length(trace$V1)){tmp[i]=cpu()}
+modified$V7 <- tmp
+modified$V8 <- modified$V6 <- 2*tmp
+modified$V9 <- round(2.5*tmp)
+modified$V10 <- modified$V8
+write.table(modified, file=filename, append=FALSE, row.names=FALSE, col.names=FALSE)
