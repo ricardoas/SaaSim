@@ -74,7 +74,7 @@ for value in `seq 1`; do
 			java -Xmx2024m -server -cp $CLASSPATH planning.main.Main david.properties
 		done
 		rm .je.dat
-		mv output.plan model_${value}.plan
+		mv output.plan model.plan
 		echo "Planned"
 	fi
 
