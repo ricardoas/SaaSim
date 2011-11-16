@@ -142,10 +142,12 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	/**
 	 * This method is used to collect statistics of current running servers. Such statistics include: machine utilisation, number of
 	 * requests that arrived, number of finished requests and current number of servers. 
-	 * @param eventTime
+	 * @param now
+	 * @param timeInterval TODO
+	 * @param numberOfRequests Total number of requests submitted to the system (A<sub>0</sub>)
 	 */
-	public void collectStatistics(long eventTime) {
-		monitor.sendStatistics(eventTime, heuristic.getStatistics(eventTime), tier);
+	public void collectStatistics(long now, long timeInterval, int numberOfRequests) {
+		monitor.sendStatistics(now, heuristic.getStatistics(now), tier);
 	}
 
 	/**

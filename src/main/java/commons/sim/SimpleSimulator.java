@@ -33,6 +33,10 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	protected transient WorkloadParser<List<Request>> workloadParser;
 	protected transient Monitor monitor;
 
+	private long monitoringInterval;
+
+	private int numberOfRequests;
+
 	/**
 	 * Constructor
 	 * @param list 
@@ -41,6 +45,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	public SimpleSimulator(JEEventScheduler scheduler, LoadBalancer... tiers){
 		super(scheduler);
 		this.tiers = tiers;
+		this.numberOfRequests = 0;
 	}
 	
 	/**
@@ -70,11 +75,13 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 			send(new JEEvent(JEEventType.CHARGE_USERS, this, info.getCurrentDayInMillis() + Checkpointer.INTERVAL - 1));
 		}
 		
+		monitoringInterval = Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL);
+		
 		if(info.isFirstDay()){
 			if(this.monitor.isOptimal()){ //TODO:"Change this!
 				send(new JEEvent(JEEventType.ESTIMATE_SERVERS, this, getScheduler().now()));
 			}else{
-				send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)));
+				send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + monitoringInterval));
 			}
 		}
 	}
@@ -88,6 +95,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 			case READWORKLOAD:
 				if(workloadParser.hasNext()) {
 					List<Request> list = workloadParser.next();
+					numberOfRequests += list.size(); 
 					for (Request request : list) {
 						send(parseEvent(request));
 					}
@@ -105,8 +113,9 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 			case COLLECT_STATISTICS:
 				long time = event.getScheduledTime();
 				for (LoadBalancer loadBalancer : tiers) {
-					loadBalancer.collectStatistics(time);
+					loadBalancer.collectStatistics(time, monitoringInterval, numberOfRequests);
 				}
+				numberOfRequests = 0;
 				send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)));
 				break;
 			case ESTIMATE_SERVERS:

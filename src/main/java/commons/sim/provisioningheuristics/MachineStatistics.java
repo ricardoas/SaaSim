@@ -7,14 +7,25 @@ package commons.sim.provisioningheuristics;
 public class MachineStatistics {
 	
 	public double averageUtilisation;
-	public long numberOfRequestsArrivalInLastInterval;
-	public long numberOfRequestsCompletionsInLastInterval;
 	public int totalNumberOfServers;
 	public int warmingDownMachines;
 	public int averageST;
 	public int varRT;
 	public int varIAT;
 	public double arrivalRate;
+	
+	public int tier;
+	
+	public long observationPeriod;
+	public long totalBusyTime;
+	
+	public long numberOfRequestsArrivalInLastInterval;
+	public long numberOfRequestsArrivalInLastIntervalInTier;
+	
+	public long numberOfRequestsCompletionsInLastInterval;
+	public long numberOfRequestsCompletionInLastIntervalInTier;
+	
+	
 
 	/**
 	 * @param averageUtilization

@@ -50,6 +50,6 @@ public enum MachineType{
 	 * @return Relative power of machine types
 	 */
 	public int getRelativePower() {
-		return (int) Math.ceil(getPower());
+		return (int) Math.ceil(getPower()*getNumberOfCores());
 	}
 };
