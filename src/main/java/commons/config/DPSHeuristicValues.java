@@ -5,6 +5,7 @@ import provisioning.DynamicProvisioningSystem;
 import provisioning.OptimalProvisioningSystemForHeterogeneousMachines;
 import provisioning.RanjanProvisioningSystem;
 import provisioning.RanjanProvisioningSystemForHeterogeneousMachines;
+import provisioning.UrgaonkarProvisioningSystem;
 
 import commons.cloud.MachineType;
 import commons.sim.util.SimulatorProperties;
@@ -20,11 +21,11 @@ public enum DPSHeuristicValues {
 	 */
 	STATIC(DynamicProvisioningSystem.class.getCanonicalName()), 
 	/**
-	 * Default Ranjan et all' algorithm implementation.
+	 * Default Ranjan et al' algorithm implementation.
 	 */
 	RANJAN(RanjanProvisioningSystem.class.getCanonicalName()), 
 	/**
-	 * Modification of Ranjan et all'algorithm to allow provisioning using different {@link MachineType}
+	 * Modification of Ranjan et al' algorithm to allow provisioning using different {@link MachineType}
 	 */
 	RANJAN_HET(RanjanProvisioningSystemForHeterogeneousMachines.class.getCanonicalName()), 
 	/**
@@ -35,7 +36,11 @@ public enum DPSHeuristicValues {
 	/**
 	 * 
 	 */
-	OPTIMAL(OptimalProvisioningSystemForHeterogeneousMachines.class.getCanonicalName());
+	OPTIMAL(OptimalProvisioningSystemForHeterogeneousMachines.class.getCanonicalName()),
+	/**
+	 * Default Urgaonkar's algorithm implementation.
+	 */
+	URGAONKAR(UrgaonkarProvisioningSystem.class.getCanonicalName());
 	
 	private final String className;
 

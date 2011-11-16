@@ -26,6 +26,7 @@ public class Checkpointer {
 
 	public static final String MACHINE_DATA_DUMP = "machineData.txt";
 	public static final String CHECKPOINT_FILE = ".je.dat";
+	public static final String PROVISIONING_FILE = ".prov.dat";
 	
 	public static final long INTERVAL = 24 * 60 * 60 * 1000;
 	
@@ -120,12 +121,20 @@ public class Checkpointer {
 	public static void clear(){
 		new File(CHECKPOINT_FILE).delete();
 		new File(MACHINE_DATA_DUMP).delete();
+		new File(PROVISIONING_FILE).delete();
 	}
 
 	/**
 	 * @return
 	 */
 	public static JEEventScheduler loadScheduler() {
+		return scheduler;
+	}
+
+	/**
+	 * @return
+	 */
+	public static Object loadProvisioningInfo() {
 		return scheduler;
 	}
 
