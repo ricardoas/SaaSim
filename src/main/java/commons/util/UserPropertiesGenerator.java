@@ -39,9 +39,9 @@ public class UserPropertiesGenerator {
 	
 	private static final int TRANSITION_PERIOD_IN_DAYS = 15;
 
-	public static final long DIAMOND_STORAGE_IN_BYTES = 700000000;//700 MB
-	public static final long GOLD_STORAGE_IN_BYTES = 500000000;//500 MB
-	public static final long BRONZE_STORAGE_IN_BYTES = 200000000;//200 MB
+	public static final long DIAMOND_STORAGE_IN_BYTES = 700;//700 MB
+	public static final long GOLD_STORAGE_IN_BYTES = 500;//500 MB
+	public static final long BRONZE_STORAGE_IN_BYTES = 200;//200 MB
 	
 	public static void main(String[] args) throws IOException {
 		
@@ -111,7 +111,6 @@ public class UserPropertiesGenerator {
 			int initialIndex, int endIndex,
 			Map<Integer, List<String>> workloadFilesPerUser) {
 		
-		int nextPeakIndex = 0;
 		
 		String[] normalTyp = new File(pool+"/norm/").list(new TraceFilter("typ"));
 		String[] normalUnder = new File(pool+"/norm/").list(new TraceFilter("under"));
@@ -128,6 +127,7 @@ public class UserPropertiesGenerator {
 		for(int user = initialIndex; user < endIndex; user++){
 			List<String> workloads = new ArrayList<String>();
 			int currentWeekDay = 0;
+			int nextPeakIndex = 0;
 			
 			for(int day = 0; day < simulationPeriod; day++){
 				
@@ -138,10 +138,10 @@ public class UserPropertiesGenerator {
 				if(day >= peakDays[nextPeakIndex] - TRANSITION_PERIOD_IN_DAYS && day < peakDays[nextPeakIndex]){//transition workload
 					verifyDayToAdd(pool+"/trans/", random, transTyp, transUnder,
 							transPeak, workloads, currentWeekDay);
-				}else if(day >= peakDays[nextPeakIndex] && day <= peakDays[nextPeakIndex] + TRANSITION_PERIOD_IN_DAYS){//peak workload
+				}else if(day >= peakDays[nextPeakIndex] && day < peakDays[nextPeakIndex] + TRANSITION_PERIOD_IN_DAYS){//peak workload
 					verifyDayToAdd(pool+"/peak/", random, peakTyp, peakUnder,
 							peakPeak, workloads, currentWeekDay);
-					if(day == peakDays[nextPeakIndex] + TRANSITION_PERIOD_IN_DAYS){
+					if(day == peakDays[nextPeakIndex] + TRANSITION_PERIOD_IN_DAYS && (nextPeakIndex+1) < peakDays.length){
 						nextPeakIndex++;
 					}
 				}else{//normal workload
