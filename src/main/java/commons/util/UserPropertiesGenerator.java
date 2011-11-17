@@ -111,18 +111,17 @@ public class UserPropertiesGenerator {
 			int initialIndex, int endIndex,
 			Map<Integer, List<String>> workloadFilesPerUser) {
 		
+		String[] normalTyp = new File(pool+"/norm/").list(new TraceFilter("typ_"));
+		String[] normalUnder = new File(pool+"/norm/").list(new TraceFilter("under_"));
+		String[] normalPeak = new File(pool+"/norm/").list(new TraceFilter("peak_"));
 		
-		String[] normalTyp = new File(pool+"/norm/").list(new TraceFilter("typ"));
-		String[] normalUnder = new File(pool+"/norm/").list(new TraceFilter("under"));
-		String[] normalPeak = new File(pool+"/norm/").list(new TraceFilter("peak"));
+		String[] peakTyp = new File(pool+"/peak/").list(new TraceFilter("typ_"));
+		String[] peakUnder = new File(pool+"/peak/").list(new TraceFilter("under_"));
+		String[] peakPeak = new File(pool+"/peak/").list(new TraceFilter("peak_"));
 		
-		String[] peakTyp = new File(pool+"/peak/").list(new TraceFilter("typ"));
-		String[] peakUnder = new File(pool+"/peak/").list(new TraceFilter("under"));
-		String[] peakPeak = new File(pool+"/peak/").list(new TraceFilter("peak"));
-		
-		String[] transTyp = new File(pool+"/trans/").list(new TraceFilter("typ"));
-		String[] transUnder = new File(pool+"/trans/").list(new TraceFilter("under"));
-		String[] transPeak = new File(pool+"/trans/").list(new TraceFilter("peak"));
+		String[] transTyp = new File(pool+"/trans/").list(new TraceFilter("typ_"));
+		String[] transUnder = new File(pool+"/trans/").list(new TraceFilter("under_"));
+		String[] transPeak = new File(pool+"/trans/").list(new TraceFilter("peak_"));
 		
 		for(int user = initialIndex; user < endIndex; user++){
 			List<String> workloads = new ArrayList<String>();
@@ -141,7 +140,7 @@ public class UserPropertiesGenerator {
 				}else if(day >= peakDays[nextPeakIndex] && day < peakDays[nextPeakIndex] + TRANSITION_PERIOD_IN_DAYS){//peak workload
 					verifyDayToAdd(pool+"/peak/", random, peakTyp, peakUnder,
 							peakPeak, workloads, currentWeekDay);
-					if(day == peakDays[nextPeakIndex] + TRANSITION_PERIOD_IN_DAYS && (nextPeakIndex+1) < peakDays.length){
+					if(day + 1 == peakDays[nextPeakIndex] + TRANSITION_PERIOD_IN_DAYS && (nextPeakIndex+1) < peakDays.length){
 						nextPeakIndex++;
 					}
 				}else{//normal workload
