@@ -6,8 +6,8 @@
 #        exit 1
 #fi
 
-if [ $# -lt 1 ]; then
-        echo "usage: $0 <planning heuristic: Optimal, Over, History or On-demand>"
+if [ $# -lt 2 ]; then
+        echo "usage: $0 <scenarios dir> <planning heuristic: Optimal, Over, History or On-demand>"
         exit 1
 fi
 
@@ -51,13 +51,15 @@ find_self && set_classpath
 #	touch model.plan
 #done
 
-plan_heur=$1
+dir=$1
+plan_heur=$2
+
 mkdir result_${plan_heur}
 
 for value in `seq 1`; do
 
-	cp ~/scenario_${value}/users.properties .
-	cp ~/scenario_${value}/*.trc .
+	cp ${dir}/scenario_${value}/users.properties .
+	cp ${dir}/scenario_${value}/*.trc .
 	rm .je.dat
 	
 	if [ ${plan_heur} = "Optimal" ] ; then
@@ -68,7 +70,7 @@ for value in `seq 1`; do
 		java -Xmx2024m -server -cp $CLASSPATH planning.main.Main ${plan_heur}.properties
 		mv output.plan model.plan
 		echo "Aggregated and planned"
-	elif [ ${plan_heur} = "Over" ] || [ ${plan_heur} = "History"] ; then
+	elif [ ${plan_heur} = "Over" ] || [ ${plan_heur} = "History" ] ; then
 		
 		#Running planning
 		for i in `seq 1 31`; do
