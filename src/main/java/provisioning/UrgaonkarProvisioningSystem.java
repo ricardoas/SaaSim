@@ -3,7 +3,6 @@ package provisioning;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.math.stat.descriptive.rank.Percentile;
@@ -23,7 +22,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 		 */
 		private static final long serialVersionUID = -3168788545374488566L;
 		private double[] averageST;
-		private double[] varRT;
+		private double[] varST;
 		private double[] varIAT;
 		private double[] arrivalRate;
 		
@@ -35,7 +34,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 		public UrgaonkarStatistics() {
 			index = 0;
 			averageST = new double[7];
-			varRT = new double[7];
+			varST = new double[7];
 			varIAT = new double[7];
 			arrivalRate = new double[7];
 			percentile = new Percentile(95);
@@ -47,9 +46,9 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 		 */
 		public void update(MachineStatistics statistics) {
 			averageST[index] += statistics.averageST;
-			varRT[index] += statistics.varRT;
-			varIAT[index] += statistics.varIAT;
-			arrivalRate[index] += statistics.arrivalRate;
+			varST[index] += statistics.calcVarST();
+			varIAT[index] += statistics.calcVarIAT();
+			arrivalRate[index] += statistics.getArrivalRateInTier();
 		}
 		
 		/**
@@ -59,7 +58,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 		public void add(MachineStatistics statistics) {
 			update(statistics);
 			
-			lambda_pred = 1.0/(getAverageST() + (getVarRT() + getVarIAT())/(2 * (averageRT - getAverageST())));
+			lambda_pred = 1.0/(getAverageST() + (getVarST() + getVarIAT())/(2 * (averageRT - getAverageST())));
 
 			index = ++index % averageST.length;
 		}
@@ -68,8 +67,8 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 			return percentile.evaluate(averageST);
 		}
 
-		public double getVarRT() {
-			return percentile.evaluate(varRT);
+		public double getVarST() {
+			return percentile.evaluate(varST);
 		}
 
 		public double getVarIAT() {
@@ -146,7 +145,6 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 		int numberOfServersToAdd = 0;
 		
 		if(predictiveRound){
-			
 			int index = (int)((now%TimeUnit.DAY.getMillis())/TimeUnit.HOUR.getMillis());
 			UrgaonkarStatistics currentStat = stat[index];
 			currentStat.add(statistics);
@@ -158,16 +156,16 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 			
 			numberOfServersToAdd = (int) Math.ceil(currentStat.getArrivalRate()/lambda_pred) - statistics.totalNumberOfServers;
 			
-			log.info(String.format("STAT-URGAONKAR PRED %d %d %d %s", now, tier, numberOfServersToAdd, statistics));
+			log.info(String.format("STAT-URGAONKAR PRED %d %d %d %f %s", now, tier, numberOfServersToAdd, lambda_pred, statistics));
 		}else{
 
-			int index = (int)((now%TimeUnit.DAY.getMillis())/TimeUnit.HOUR.getMillis());
-			UrgaonkarStatistics currentStat = stat[index];
-			currentStat.update(statistics);
+//			int index = (int)((now%TimeUnit.DAY.getMillis())/TimeUnit.HOUR.getMillis());
+//			UrgaonkarStatistics currentStat = stat[index];
+//			currentStat.update(statistics);
 			
 			//FIXME complete with peak handling
 
-			log.info(String.format("STAT-URGAONKAR REAC %d %d %d %s", now, tier, numberOfServersToAdd, statistics));
+//			log.info(String.format("STAT-URGAONKAR REAC %d %d %d %s", now, tier, numberOfServersToAdd, statistics));
 		}
 		
 		if(numberOfServersToAdd > 0){

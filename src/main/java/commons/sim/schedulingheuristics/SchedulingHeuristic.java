@@ -21,7 +21,7 @@ public interface SchedulingHeuristic extends Serializable{
 	 */
 	Machine next(Request request);
 
-	void reportRequestFinished();
+	void reportFinishedRequest(Request requestFinished);
 
 	void addMachine(Machine machine);
 

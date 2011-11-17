@@ -147,7 +147,10 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	 * @param numberOfRequests Total number of requests submitted to the system (A<sub>0</sub>)
 	 */
 	public void collectStatistics(long now, long timeInterval, int numberOfRequests) {
-		monitor.sendStatistics(now, heuristic.getStatistics(now), tier);
+		MachineStatistics statistics = heuristic.getStatistics(now);
+		statistics.numberOfRequestsArrivalInLastInterval = numberOfRequests;
+		statistics.observationPeriod = timeInterval;
+		monitor.sendStatistics(now, statistics, tier);
 	}
 
 	/**
@@ -164,7 +167,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	
 	public void reportRequestFinished(Request requestFinished) {
 		
-		heuristic.reportRequestFinished();
+		heuristic.reportFinishedRequest(requestFinished);
 		monitor.requestFinished(requestFinished);
 	}
 

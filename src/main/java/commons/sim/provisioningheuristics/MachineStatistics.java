@@ -1,17 +1,23 @@
 package commons.sim.provisioningheuristics;
 
+import java.io.Serializable;
+
+import commons.util.TimeUnit;
+
 /**
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public class MachineStatistics {
+public class MachineStatistics implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5595741138385801795L;
 	public double averageUtilisation;
 	public int totalNumberOfServers;
 	public int warmingDownMachines;
-	public int averageST;
-	public int varRT;
-	public int varIAT;
+	
 	public double arrivalRate;
 	
 	public int tier;
@@ -24,6 +30,14 @@ public class MachineStatistics {
 	
 	public long numberOfRequestsCompletionsInLastInterval;
 	public long numberOfRequestsCompletionInLastIntervalInTier;
+	
+	private long lastArrivalTime;
+	private double averageIAT;
+	private double SSD_IAT;
+	
+	public double averageST;
+	private double SSD_ST;
+	
 	
 	
 
@@ -38,6 +52,11 @@ public class MachineStatistics {
 		this.numberOfRequestsArrivalInLastInterval = totalRequestsArrivals;
 		this.numberOfRequestsCompletionsInLastInterval = totalRequestsCompletions;
 		this.totalNumberOfServers = totalNumberOfServers;
+		this.lastArrivalTime = 0;
+	}
+
+	public MachineStatistics() {
+		
 	}
 
 	@Override
@@ -79,14 +98,78 @@ public class MachineStatistics {
 		return true;
 	}
 
+//	@Override
+//	public String toString() {
+//		return "MachineStatistics [averageUtilisation=" + averageUtilisation
+//				+ ", numberOfRequestsArrivalInLastInterval="
+//				+ numberOfRequestsArrivalInLastInterval
+//				+ ", numberOfRequestsCompletionsInLastInterval="
+//				+ numberOfRequestsCompletionsInLastInterval
+//				+ ", totalNumberOfServers=" + totalNumberOfServers
+//				+ ", warmingDownMachines=" + warmingDownMachines + "]";
+//	}
+	
+	
+
+	/**
+	 * Knuth's algorithm
+	 * @param arrivalTimeInMillis
+	 */
+	public void updateInterarrivalTime(long arrivalTimeInMillis) {
+		numberOfRequestsArrivalInLastIntervalInTier++;
+		long iat = arrivalTimeInMillis - lastArrivalTime;
+		
+		double delta = iat - averageIAT;
+		averageIAT += delta/numberOfRequestsArrivalInLastIntervalInTier;
+		SSD_IAT += delta*(iat - averageIAT);
+	}
+	
 	@Override
 	public String toString() {
-		return "MachineStatistics [averageUtilisation=" + averageUtilisation
-				+ ", numberOfRequestsArrivalInLastInterval="
+		return "MachineStatistics [U=" + averageUtilisation
+				+ ", N=" + totalNumberOfServers
+				+ ", N_warmingDown=" + warmingDownMachines
+				+ ", A_0=" + arrivalRate + ", tier=" + tier
+				+ ", T=" + observationPeriod
+				+ ", B=" + totalBusyTime
+				+ ", A_0="
 				+ numberOfRequestsArrivalInLastInterval
-				+ ", numberOfRequestsCompletionsInLastInterval="
+				+ ", A_i="
+				+ numberOfRequestsArrivalInLastIntervalInTier
+				+ ", C_0="
 				+ numberOfRequestsCompletionsInLastInterval
-				+ ", totalNumberOfServers=" + totalNumberOfServers
-				+ ", warmingDownMachines=" + warmingDownMachines + "]";
+				+ ", C_i="
+				+ numberOfRequestsCompletionInLastIntervalInTier
+				+ ", averageIAT="
+				+ averageIAT + ", var_IAT=" + calcVarIAT() + ", averageST="
+				+ averageST + ", var_ST=" + calcVarST() + "]";
+	}
+
+	/**
+	 * Knuth's algorithm
+	 * @param serviceTime
+	 */
+	public void updateServiceTime(long serviceTime) {
+		numberOfRequestsCompletionInLastIntervalInTier++;
+		
+		double delta = serviceTime - averageST;
+		averageST += delta/numberOfRequestsCompletionInLastIntervalInTier;
+		SSD_ST += delta*(serviceTime - averageST);
+	}
+
+	public double calcVarST() {
+		return SSD_ST/numberOfRequestsCompletionInLastIntervalInTier;
+	}
+
+	public double calcVarIAT() {
+		return SSD_IAT/numberOfRequestsArrivalInLastIntervalInTier;
+	}
+	
+	public double getArrivalRate(){
+		return numberOfRequestsArrivalInLastInterval/observationPeriod;
+	}
+
+	public double getArrivalRateInTier(){
+		return numberOfRequestsArrivalInLastIntervalInTier/(observationPeriod/TimeUnit.SECOND.getMillis());
 	}
 }

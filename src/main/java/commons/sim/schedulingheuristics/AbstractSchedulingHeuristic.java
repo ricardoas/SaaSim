@@ -49,6 +49,8 @@ public abstract class AbstractSchedulingHeuristic implements SchedulingHeuristic
 	private Map<Integer, Session> sessions;
 	
 	private final boolean enableSessionAffinity;
+	
+	protected MachineStatistics tierStatistics;
 
 	/**
 	 * Default constructor
@@ -63,13 +65,16 @@ public abstract class AbstractSchedulingHeuristic implements SchedulingHeuristic
 		resetCounters();
 	}
 
-	private void resetCounters() {
+	protected void resetCounters() {
 		arrivalCounter = 0;
 		finishedCounter = 0;
+		tierStatistics = new MachineStatistics();
 	}
 
 	@Override
-	public void reportRequestFinished() {
+	public void reportFinishedRequest(Request finishedRequest) {
+		tierStatistics.numberOfRequestsCompletionInLastIntervalInTier++;
+		tierStatistics.updateServiceTime(finishedRequest.getTotalProcessed());
 		finishedCounter++;
 	}
 
@@ -102,14 +107,22 @@ public abstract class AbstractSchedulingHeuristic implements SchedulingHeuristic
 		
 		long requestsArrivalCounter = arrivalCounter;
 		long finishedRequestsCounter = finishedCounter;
-		resetCounters();
+		tierStatistics.averageUtilisation = averageUtilisation;
+		tierStatistics.numberOfRequestsArrivalInLastInterval = requestsArrivalCounter;
+		tierStatistics.numberOfRequestsCompletionsInLastInterval = finishedRequestsCounter;
+		tierStatistics.totalNumberOfServers = machines.size();
 		
-		return new MachineStatistics(averageUtilisation, requestsArrivalCounter, finishedRequestsCounter, machines.size());
+		MachineStatistics stat = tierStatistics;
+
+		resetCounters();
+
+		return stat;
 	}
 	
 	@Override
 	public Machine next(Request request){
 		arrivalCounter++;
+		tierStatistics.updateInterarrivalTime(request.getArrivalTimeInMillis());
 		return enableSessionAffinity? recoverSession(request.getUserID(), request.getArrivalTimeInMillis()) :getNextAvailableMachine();
 	}
 	

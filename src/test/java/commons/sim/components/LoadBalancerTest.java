@@ -240,7 +240,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		lb.handleEvent(machineIsUpEvent2);
 		
 		//Calculating utilisation
-		lb.collectStatistics(evaluationTime, 300000);
+		lb.collectStatistics(evaluationTime, 300000, 0);
 		
 		EasyMock.verify(machine1, machine2, schedulingHeuristic, monitor);
 	}
