@@ -13,7 +13,7 @@ public class UserEntry implements Serializable{
 	 */
 	private static final long serialVersionUID = -6304129259620208175L;
 	private final int userID;
-	private String contractName;
+	public String contractName;
 	private long extraConsumedCPU;
 	private double cpuCost;
 	private long consumedTransference;
@@ -71,4 +71,17 @@ public class UserEntry implements Serializable{
 	public double getPenalty() {
 		return penalty;
 	}
+
+	public void add(UserEntry entry) {
+		this.price += entry.price;
+		this.penalty += entry.penalty;
+		this.numberOfFinishedRequests += entry.numberOfFinishedRequests;
+		this.totalNumberOfRequests += entry.totalNumberOfRequests;
+		this.extraConsumedCPU += entry.extraConsumedCPU;
+		this.cpuCost += entry.cpuCost;
+		this.consumedTransference += entry.consumedTransference;
+		this.transferenceCost += entry.transferenceCost;
+		this.storageCost += entry.storageCost;
+	}
+	
 }
