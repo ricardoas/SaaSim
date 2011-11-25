@@ -11,6 +11,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 
 import planning.util.MachineUsageData;
+import provisioning.util.DPSInfo;
 
 import commons.cloud.Provider;
 import commons.cloud.User;
@@ -37,6 +38,7 @@ public class Checkpointer {
 	private static User[] users;
 	private static AccountingSystem accountingSystem;
 	private static int[] priorities;
+	private static DPSInfo dpsInfo;
 	
 	/**
 	 * Check if there's a previous checkpoint available to read. Such operation consists in check if there
@@ -58,6 +60,7 @@ public class Checkpointer {
 			out.writeObject(users);
 			out.writeObject(accountingSystem);
 			out.writeObject(priorities);
+			out.writeObject(dpsInfo);
 			out.close();
 			Logger.getLogger(Checkpointer.class).debug("CHKP SAVE " + simulationInfo);
 		} catch (Exception e) {
@@ -134,8 +137,8 @@ public class Checkpointer {
 	/**
 	 * @return
 	 */
-	public static Object loadProvisioningInfo() {
-		return scheduler;
+	public static DPSInfo loadProvisioningInfo() {
+		return dpsInfo;
 	}
 
 	public static void loadData() throws ConfigurationException{
@@ -152,6 +155,7 @@ public class Checkpointer {
 				users = (User[]) in.readObject();
 				accountingSystem = (AccountingSystem) in.readObject();
 				priorities = (int []) in.readObject();
+				dpsInfo = (DPSInfo) in.readObject();
 				in.close();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
@@ -168,6 +172,7 @@ public class Checkpointer {
 			for (int i = 0; i < priorities.length; i++) {
 				priorities[i] = 100;//users[i].getContract().getPriority(); FIXME Ricardo: don't know if we need this anymore
 			}
+			dpsInfo = new DPSInfo();
 		}
 		Logger.getLogger(Checkpointer.class).debug("CHKP LOAD " + simulationInfo);
 	}

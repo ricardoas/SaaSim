@@ -26,6 +26,7 @@ public class Request implements Serializable{
 	
 	private long totalProcessed;
 	private MachineType value;
+	private long finishTimeInMillis;
 	
 	/**
 	 * Default constructor.
@@ -203,5 +204,11 @@ public class Request implements Serializable{
 				+ "]";
 	}
 
+	public void setFinishTime(long finishTimeInMillis) {
+		this.finishTimeInMillis = finishTimeInMillis;
+	}
 	
+	public long getResponseTimeInMillis(){
+		return finishTimeInMillis - arrivalTimeInMillis;
+	}
 }

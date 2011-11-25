@@ -59,6 +59,10 @@ public class MachineStatistics implements Serializable{
 		
 	}
 
+	public MachineStatistics(MachineStatistics statistics) {
+		this.lastArrivalTime = statistics.lastArrivalTime;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -98,26 +102,17 @@ public class MachineStatistics implements Serializable{
 		return true;
 	}
 
-//	@Override
-//	public String toString() {
-//		return "MachineStatistics [averageUtilisation=" + averageUtilisation
-//				+ ", numberOfRequestsArrivalInLastInterval="
-//				+ numberOfRequestsArrivalInLastInterval
-//				+ ", numberOfRequestsCompletionsInLastInterval="
-//				+ numberOfRequestsCompletionsInLastInterval
-//				+ ", totalNumberOfServers=" + totalNumberOfServers
-//				+ ", warmingDownMachines=" + warmingDownMachines + "]";
-//	}
-	
-	
-
 	/**
 	 * Knuth's algorithm
 	 * @param arrivalTimeInMillis
 	 */
 	public void updateInterarrivalTime(long arrivalTimeInMillis) {
+		
 		numberOfRequestsArrivalInLastIntervalInTier++;
-		long iat = arrivalTimeInMillis - lastArrivalTime;
+		
+		double iat = 1.0*(arrivalTimeInMillis - (lastArrivalTime==0?arrivalTimeInMillis:lastArrivalTime))/TimeUnit.SECOND.getMillis();
+		lastArrivalTime = arrivalTimeInMillis;
+		
 		
 		double delta = iat - averageIAT;
 		averageIAT += delta/numberOfRequestsArrivalInLastIntervalInTier;
@@ -126,30 +121,32 @@ public class MachineStatistics implements Serializable{
 	
 	@Override
 	public String toString() {
-		return "MachineStatistics [U=" + averageUtilisation
-				+ ", N=" + totalNumberOfServers
-				+ ", N_warmingDown=" + warmingDownMachines
-				+ ", A_0=" + arrivalRate + ", tier=" + tier
-				+ ", T=" + observationPeriod
-				+ ", B=" + totalBusyTime
-				+ ", A_0="
+		return "MachineStatistics [U= " + averageUtilisation
+				+ " , N= " + totalNumberOfServers
+				+ " , N_warmingDown= " + warmingDownMachines
+				+ " , A_0= " + arrivalRate + " , tier= " + tier
+				+ " , T= " + observationPeriod
+				+ " , B= " + totalBusyTime
+				+ " , A_0= "
 				+ numberOfRequestsArrivalInLastInterval
-				+ ", A_i="
+				+ " , A_i= "
 				+ numberOfRequestsArrivalInLastIntervalInTier
-				+ ", C_0="
+				+ " , C_0= "
 				+ numberOfRequestsCompletionsInLastInterval
-				+ ", C_i="
+				+ " , C_i= "
 				+ numberOfRequestsCompletionInLastIntervalInTier
-				+ ", averageIAT="
-				+ averageIAT + ", var_IAT=" + calcVarIAT() + ", averageST="
-				+ averageST + ", var_ST=" + calcVarST() + "]";
+				+ " , averageIAT= "
+				+ averageIAT + " , var_IAT= " + calcVarIAT() + " , averageST= "
+				+ averageST + " , var_ST= " + calcVarST() + " ]";
 	}
 
 	/**
 	 * Knuth's algorithm
-	 * @param serviceTime
+	 * @param serviceTimeInMillis
 	 */
-	public void updateServiceTime(long serviceTime) {
+	public void updateServiceTime(long serviceTimeInMillis) {
+		double serviceTime = (1.0*serviceTimeInMillis) / TimeUnit.SECOND.getMillis();
+
 		numberOfRequestsCompletionInLastIntervalInTier++;
 		
 		double delta = serviceTime - averageST;
@@ -165,11 +162,11 @@ public class MachineStatistics implements Serializable{
 		return SSD_IAT/numberOfRequestsArrivalInLastIntervalInTier;
 	}
 	
-	public double getArrivalRate(){
-		return numberOfRequestsArrivalInLastInterval/observationPeriod;
+	public double getArrivalRate(long timeIntervalInSeconds){
+		return 1.0*numberOfRequestsArrivalInLastInterval/timeIntervalInSeconds;
 	}
 
-	public double getArrivalRateInTier(){
-		return numberOfRequestsArrivalInLastIntervalInTier/(observationPeriod/TimeUnit.SECOND.getMillis());
+	public double getArrivalRateInTier(long timeIntervalInSeconds){
+		return 1.0*numberOfRequestsArrivalInLastIntervalInTier/timeIntervalInSeconds;
 	}
 }

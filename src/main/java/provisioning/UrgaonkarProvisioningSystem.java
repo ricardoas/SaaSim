@@ -1,201 +1,178 @@
 package provisioning;
 
-import java.io.Serializable;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.math.stat.descriptive.rank.Percentile;
+import provisioning.util.DPSInfo;
 
+import commons.cloud.MachineType;
+import commons.cloud.Provider;
 import commons.config.Configuration;
+import commons.io.Checkpointer;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.util.SaaSAppProperties;
+import commons.sim.util.SimulatorProperties;
 import commons.util.TimeUnit;
 
 public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 	
-	private class UrgaonkarStatistics implements Serializable{
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -3168788545374488566L;
-		private double[] averageST;
-		private double[] varST;
-		private double[] varIAT;
-		private double[] arrivalRate;
-		
-		private Percentile percentile;
-		
-		private int index;
-		private double lambda_pred;
-		
-		public UrgaonkarStatistics() {
-			index = 0;
-			averageST = new double[7];
-			varST = new double[7];
-			varIAT = new double[7];
-			arrivalRate = new double[7];
-			percentile = new Percentile(95);
-		}
-		
-		/**
-		 * reactive tick statistics
-		 * @param statistics
-		 */
-		public void update(MachineStatistics statistics) {
-			averageST[index] += statistics.averageST;
-			varST[index] += statistics.calcVarST();
-			varIAT[index] += statistics.calcVarIAT();
-			arrivalRate[index] += statistics.getArrivalRateInTier();
-		}
-		
-		/**
-		 * Predictive tick statistics
-		 * @param statistics
-		 */
-		public void add(MachineStatistics statistics) {
-			update(statistics);
-			
-			lambda_pred = 1.0/(getAverageST() + (getVarST() + getVarIAT())/(2 * (averageRT - getAverageST())));
-
-			index = ++index % averageST.length;
-		}
-
-		public double getAverageST() {
-			return percentile.evaluate(averageST);
-		}
-
-		public double getVarST() {
-			return percentile.evaluate(varST);
-		}
-
-		public double getVarIAT() {
-			return percentile.evaluate(varIAT);
-		}
-
-		public double getArrivalRate() {
-			return percentile.evaluate(arrivalRate);
-		}
-		
-		public double getCurrentArrivalRate() {
-			return arrivalRate[index - 1];
-		}
-		
-		public double calcLambdaPred() {
-			return lambda_pred;
-		}
-	}
-	
-	private class UrgaonkarHistory implements Serializable{
-
-		private static final int HISTORY_SIZE = 5;
-		
-		private double [] predLambda;
-		private double [] readLambda;
-		private int index;
-		
-		public UrgaonkarHistory() {
-			predLambda = new double[HISTORY_SIZE];
-			readLambda = new double[HISTORY_SIZE];
-			index = 0;
-		}
-		
-		public double applyError(double lambdaPred){
-			double error = 0;
-			for (int i = 0; i < predLambda.length; i++) {
-				error += Math.max(0, readLambda[i]-predLambda[i])/HISTORY_SIZE;
-			}
-			return lambdaPred * (1+error);
-		}
-
-		public void update(double arrivalRate) {
-			readLambda[index] = arrivalRate;
-		}
-		
-	}
-	
 	private static final String PROP_ENABLE_PREDICTIVE = "dps.urgaonkar.predictive";
 	private static final String PROP_ENABLE_REACTIVE = "dps.urgaonkar.reactive";
+	private static final String PROP_MACHINE_TYPE = "dps.urgaonkar.type";
+	private static final String PROP_REACTIVE_TRESHOLD = "dps.urgaonkar.reactive.threashold";
+	
+	private static final long predictiveTick = TimeUnit.HOUR.getMillis()/TimeUnit.SECOND.getMillis();
+	private static final long predictiveTickInMillis = TimeUnit.HOUR.getMillis();
+	private long reactiveTick;
 	
 	private boolean enablePredictive;
 	private boolean enableReactive;
-	private long averageRT;
+	private double threshold;
+	private long maxRT;
 	
 	private UrgaonkarStatistics [] stat;
 	private UrgaonkarHistory last;
+	private MachineType type;
 
 	public UrgaonkarProvisioningSystem() {
 		super();
 		enablePredictive = Configuration.getInstance().getBoolean(PROP_ENABLE_PREDICTIVE, true);
 		enableReactive = Configuration.getInstance().getBoolean(PROP_ENABLE_REACTIVE, true);
-		averageRT = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME);
-		stat = new UrgaonkarStatistics[24];
-		for (int i = 0; i < stat.length; i++) {
-			stat[i] = new UrgaonkarStatistics();
+		type = MachineType.valueOf(Configuration.getInstance().getString(PROP_MACHINE_TYPE).toUpperCase());
+		threshold = Configuration.getInstance().getDouble(PROP_REACTIVE_TRESHOLD, 2.0);
+		maxRT = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)/TimeUnit.SECOND.getMillis();
+		reactiveTick = Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)/TimeUnit.SECOND.getMillis();
+		DPSInfo info = Checkpointer.loadProvisioningInfo();
+		if(info.stat == null && info.history == null){
+			info.stat = new UrgaonkarStatistics[24];
+			for (int i = 0; i < info.stat.length; i++) {
+				info.stat[i] = new UrgaonkarStatistics(maxRT, predictiveTick);
+			}
+			info.history = new UrgaonkarHistory();
 		}
-		last = new UrgaonkarHistory();
+		stat = info.stat;
+		last = info.history;
 	}
 	
 	@Override
 	public void sendStatistics(long now, MachineStatistics statistics, int tier) {
-		boolean predictiveRound = now % TimeUnit.HOUR.getMillis() == 0;
+
+		boolean predictiveRound = now % predictiveTickInMillis == 0;
 		
 		int numberOfServersToAdd = 0;
 		
-		if(predictiveRound){
+		if(predictiveRound && enablePredictive){
 			int index = (int)((now%TimeUnit.DAY.getMillis())/TimeUnit.HOUR.getMillis());
-			UrgaonkarStatistics currentStat = stat[index];
-			currentStat.add(statistics);
 			
-			last.update(currentStat.getCurrentArrivalRate());
+			UrgaonkarStatistics lastTick = stat[index];
+			UrgaonkarStatistics nextTick = stat[(index+1)%stat.length];
 			
-			double lambda_pred = currentStat.calcLambdaPred();
-			lambda_pred = last.applyError(lambda_pred);
+			lastTick.add(statistics);
 			
-			numberOfServersToAdd = (int) Math.ceil(currentStat.getArrivalRate()/lambda_pred) - statistics.totalNumberOfServers;
+			last.update(lastTick.getCurrentArrivalRate());
 			
-			log.info(String.format("STAT-URGAONKAR PRED %d %d %d %f %s", now, tier, numberOfServersToAdd, lambda_pred, statistics));
-		}else{
-
-//			int index = (int)((now%TimeUnit.DAY.getMillis())/TimeUnit.HOUR.getMillis());
-//			UrgaonkarStatistics currentStat = stat[index];
-//			currentStat.update(statistics);
+			double lambdaPeak = lastTick.calcLambdaPeak();
 			
-			//FIXME complete with peak handling
-
-//			log.info(String.format("STAT-URGAONKAR REAC %d %d %d %s", now, tier, numberOfServersToAdd, statistics));
-		}
-		
-		if(numberOfServersToAdd > 0){
+			double lambdaPred = nextTick.getPredArrivalRate();
 			
-			if(numberOfServersToAdd > statistics.warmingDownMachines){
-				numberOfServersToAdd -= statistics.warmingDownMachines;
-				List<MachineDescriptor> machines = buyMachines(numberOfServersToAdd);
-				for (MachineDescriptor machineDescriptor : machines) {
-					configurable.addMachine(tier, machineDescriptor, true);
+			double lambdaPredFromPercentile = lambdaPred;
+			
+			lambdaPred = last.applyError(lambdaPred);
+			
+			numberOfServersToAdd = (int) Math.ceil(lambdaPred/lambdaPeak) - statistics.totalNumberOfServers*type.getNumberOfCores();
+			
+			int antes = numberOfServersToAdd;
+			if(numberOfServersToAdd > 0){
+				
+				numberOfServersToAdd = (int) Math.ceil(1.0*numberOfServersToAdd/type.getNumberOfCores());
+				
+				if(numberOfServersToAdd > statistics.warmingDownMachines){
+					numberOfServersToAdd -= statistics.warmingDownMachines;
+					List<MachineDescriptor> machines = buyMachines(numberOfServersToAdd);
+					for (MachineDescriptor machineDescriptor : machines) {
+						configurable.addMachine(tier, machineDescriptor, true);
+					}
+					
+					configurable.cancelMachineRemoval(tier, statistics.warmingDownMachines);
+				}else{
+					configurable.cancelMachineRemoval(tier, numberOfServersToAdd);
 				}
 				
-				configurable.cancelMachineRemoval(tier, statistics.warmingDownMachines);
-			}else{
-				configurable.cancelMachineRemoval(tier, numberOfServersToAdd);
+			}else if(numberOfServersToAdd < 0){
+				numberOfServersToAdd = (int) Math.ceil(1.0*numberOfServersToAdd/type.getNumberOfCores());
+				for (int i = 0; i < -numberOfServersToAdd; i++) {
+					configurable.removeMachine(tier, false);
+				}
 			}
+			log.info(String.format("STAT-URGAONKAR PRED %d %d %d %f %f %f %f %s", now, antes, numberOfServersToAdd, lambdaPeak, statistics.getArrivalRate(predictiveTick), lambdaPredFromPercentile, lambdaPred, statistics));
+		}else if(!predictiveRound && enableReactive){
 			
-		}else if(numberOfServersToAdd < 0){
-			for (int i = 0; i < -numberOfServersToAdd; i++) {
-				configurable.removeMachine(tier, false);
-			}
-		}
+			long interval = (now % TimeUnit.HOUR.getMillis())/1000;
 
-		
+			int index = (int)((now%TimeUnit.DAY.getMillis())/TimeUnit.HOUR.getMillis());
+			UrgaonkarStatistics currentStat = stat[index];
+			double pred = currentStat.calcLambdaPeak();
+			double observed = statistics.getArrivalRate(interval)/(statistics.totalNumberOfServers*type.getNumberOfCores());
+			
+			if (observed/pred > threshold){
+				numberOfServersToAdd = (int) Math.ceil(currentStat.getPredArrivalRate()/pred) - (statistics.totalNumberOfServers*type.getNumberOfCores());
+				
+				
+//				antes = numberOfServersToAdd;
+//				if(numberOfServersToAdd > 0){
+//					
+//					numberOfServersToAdd = (int) Math.ceil(1.0*numberOfServersToAdd/type.getNumberOfCores());
+//					
+//					if(numberOfServersToAdd > statistics.warmingDownMachines){
+//						numberOfServersToAdd -= statistics.warmingDownMachines;
+//						List<MachineDescriptor> machines = buyMachines(numberOfServersToAdd);
+//						for (MachineDescriptor machineDescriptor : machines) {
+//							configurable.addMachine(tier, machineDescriptor, true);
+//						}
+//						
+//						configurable.cancelMachineRemoval(tier, statistics.warmingDownMachines);
+//					}else{
+//						configurable.cancelMachineRemoval(tier, numberOfServersToAdd);
+//					}
+//					
+//				}
+				
+			}
+//			log.info(String.format("STAT-URGAONKAR READ %d %d %d %f %f %s", now, antes, numberOfServersToAdd, lambda_pred, statistics.getArrivalRate(predictiveTick), statistics));
+			log.info(String.format("STAT-URGAONKAR REAC %d %d %d %s", now, tier, numberOfServersToAdd, statistics));
+		}
 	}
 	
-	private Calendar getTime(long now){
-		Calendar instance = new GregorianCalendar(2009, 0, 0, (int)((now%TimeUnit.DAY.getMillis())/TimeUnit.HOUR.getMillis()), 0, 0);
-		instance.add(Calendar.DAY_OF_YEAR, (int)(now/TimeUnit.DAY.getMillis()));
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected List<MachineDescriptor> buyMachines(int numberOfMachines) {
 		
-		return instance;
+		List<MachineDescriptor> currentlyBought = new ArrayList<MachineDescriptor>();
+		
+		for (Provider provider : providers) {
+			while(currentlyBought.size() != numberOfMachines && provider.canBuyMachine(true, type)){
+				currentlyBought.add(provider.buyMachine(true, type));
+			}
+		}
+		for (Provider provider : providers) {
+			while(currentlyBought.size() != numberOfMachines && provider.canBuyMachine(false, type)){
+				currentlyBought.add(provider.buyMachine(false, type));
+			}
+		}
+		
+		return currentlyBought;
+	}
+	
+	
+	@Override
+	public DPSInfo getDPSInfo() {
+		DPSInfo info = new DPSInfo();
+		info.history = last;
+		info.stat = stat;
+		return info;
 	}
 	
 

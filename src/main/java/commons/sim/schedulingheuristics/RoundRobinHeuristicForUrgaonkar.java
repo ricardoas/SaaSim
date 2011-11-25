@@ -30,10 +30,13 @@ public class RoundRobinHeuristicForUrgaonkar extends RoundRobinHeuristic {
 	public MachineStatistics getStatistics(long eventTime) {
 		
 		MachineStatistics statistics = tierStatistics;
+		tierStatistics.totalNumberOfServers = getNumberOfMachines();
 		
 		if( eventTime % TimeUnit.HOUR.getMillis() == 0 ){
 			resetCounters();
+			tierStatistics = new MachineStatistics();//statistics);
 		}
+		
 		
 		return statistics;
 	}

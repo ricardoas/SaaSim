@@ -21,17 +21,20 @@ public class UserEntry implements Serializable{
 	private double storageCost;
 	private double penalty;
 	private long numberOfFinishedRequests;
+	private long numberOfFinishedRequestsAfterSLA;
 	private long totalNumberOfRequests;
 	private double price;
+	private long numberOfLostRequests;
 
 	/**
 	 * Default constructor.
 	 * @param price TODO
+	 * @param numOfFinishedRequestsAfterSLA TODO
 	 */
 	public UserEntry(int userID, String contractName,
 			double price, long extraConsumedCPU,
 			double cpuCost, long consumedTransference,
-			double transferenceCost, double storageCost, double penalty, long numOfFinishedRequests, long numOfLostRequests) {
+			double transferenceCost, double storageCost, double penalty, long numOfFinishedRequests, long numOfLostRequests, long numOfFinishedRequestsAfterSLA) {
 		this.userID = userID;
 		this.contractName = contractName;
 		this.price = price;
@@ -42,7 +45,9 @@ public class UserEntry implements Serializable{
 		this.storageCost = storageCost;
 		this.penalty = penalty;
 		this.numberOfFinishedRequests = numOfFinishedRequests;
-		this.totalNumberOfRequests = numOfLostRequests + numOfFinishedRequests;
+		this.numberOfFinishedRequestsAfterSLA = numOfFinishedRequestsAfterSLA;
+		this.numberOfLostRequests = numOfLostRequests;
+		this.totalNumberOfRequests = numOfLostRequests + numOfFinishedRequests + numOfFinishedRequestsAfterSLA;
 	}
 
 	/**
@@ -55,6 +60,8 @@ public class UserEntry implements Serializable{
 				+ UtilityResultEntry.STRING + contractName 
 				+ UtilityResultEntry.STRING + getPenalty() 
 				+ UtilityResultEntry.STRING + numberOfFinishedRequests 
+				+ UtilityResultEntry.STRING + numberOfFinishedRequestsAfterSLA 
+				+ UtilityResultEntry.STRING + numberOfLostRequests 
 				+ UtilityResultEntry.STRING + totalNumberOfRequests 
 				+ UtilityResultEntry.STRING + getReceipt()
 				+ UtilityResultEntry.STRING + extraConsumedCPU 
@@ -74,14 +81,16 @@ public class UserEntry implements Serializable{
 
 	public void add(UserEntry entry) {
 		this.price += entry.price;
-		this.penalty += entry.penalty;
-		this.numberOfFinishedRequests += entry.numberOfFinishedRequests;
-		this.totalNumberOfRequests += entry.totalNumberOfRequests;
 		this.extraConsumedCPU += entry.extraConsumedCPU;
 		this.cpuCost += entry.cpuCost;
 		this.consumedTransference += entry.consumedTransference;
 		this.transferenceCost += entry.transferenceCost;
 		this.storageCost += entry.storageCost;
+		this.penalty += entry.penalty;
+		this.numberOfFinishedRequests += entry.numberOfFinishedRequests;
+		this.numberOfFinishedRequestsAfterSLA += entry.numberOfFinishedRequestsAfterSLA;
+		this.numberOfLostRequests += entry.numberOfLostRequests;
+		this.totalNumberOfRequests += entry.totalNumberOfRequests;
 	}
 	
 }

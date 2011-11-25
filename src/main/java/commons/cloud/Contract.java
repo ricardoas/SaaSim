@@ -104,7 +104,7 @@ public class Contract implements Comparable<Contract>, Serializable{
 	 */
 	@Override
 	public int compareTo(Contract o) {
-		return o.priority - this.priority;
+		return this.name.compareTo(o.name);
 	}
 
 	/**
@@ -114,10 +114,11 @@ public class Contract implements Comparable<Contract>, Serializable{
 	 * @param consumedStorageInBytes
 	 * @param numOfFinishedRequests TODO
 	 * @param numOfLostRequests TODO
+	 * @param numOfFinishedRequestsAfterSLA TODO
 	 * @return 
 	 */
 	public UserEntry calculateReceipt(int userID, long consumedCpuInMillis, long consumedInTransferenceInBytes, long consumedOutTransferenceInBytes,
-			long consumedStorageInBytes, long numOfFinishedRequests, long numOfLostRequests) {
+			long consumedStorageInBytes, long numOfFinishedRequests, long numOfLostRequests, long numOfFinishedRequestsAfterSLA) {
 		
 		long extraConsumedCPUInMillis = Math.max(0, consumedCpuInMillis - cpuLimitInMillis);
 		long consumedTransferenceInBytes = consumedInTransferenceInBytes + consumedOutTransferenceInBytes;
@@ -126,7 +127,9 @@ public class Contract implements Comparable<Contract>, Serializable{
 		double transferenceCost = CostCalculus.calcTransferenceCost(consumedTransferenceInBytes , transferenceLimitsInBytes, transferenceCostsInBytes);
 		double storageCost = Math.max(0, consumedStorageInBytes - storageLimitInBytes) * extraStorageCostPerByte;
 		
-		return new UserEntry(userID, name, price, extraConsumedCPUInMillis, CPUCost, consumedTransferenceInBytes, transferenceCost, storageCost, calculatePenalty((1.0 * numOfLostRequests) / (numOfLostRequests+numOfFinishedRequests)), numOfFinishedRequests, numOfLostRequests);
+		double percentageLost = (1.0*numOfLostRequests + numOfFinishedRequestsAfterSLA)/(numOfFinishedRequests + numOfFinishedRequestsAfterSLA + numOfLostRequests);
+		
+		return new UserEntry(userID, name, price, extraConsumedCPUInMillis, CPUCost, consumedTransferenceInBytes, transferenceCost, storageCost, calculatePenalty(percentageLost), numOfFinishedRequests, numOfLostRequests, numOfFinishedRequestsAfterSLA);
 	}
 	
 	/**

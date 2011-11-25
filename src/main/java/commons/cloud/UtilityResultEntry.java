@@ -1,20 +1,16 @@
 package commons.cloud;
 
 import java.io.Serializable;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
+public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Serializable {
 
-/**
- * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
- */
-public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Serializable{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 8251766726895786861L;
+	private static final long serialVersionUID = -4927865959874743247L;
+
 	static final String STRING = "\t";
 	
-
 	private final long time;
 	private double receipt;
 	private double cost;
@@ -25,12 +21,8 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 	private int numberOfUsers;
 	private int numberOfProviders;
 	
-	/**
-	 * Default constructor
-	 * @param time 
-	 * @param providers2 
-	 * @param users 
-	 */
+	private Map<String, UserEntry> contractEntries;
+	
 	public UtilityResultEntry(long time, User[] users, Provider[] providers) {
 		assert users != null;
 		assert providers != null;
@@ -46,11 +38,23 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 		usersBuilder = new StringBuilder();
 		providersBuilder = new StringBuilder();
 		
+		contractEntries = new TreeMap<String, UserEntry>();
+		
 		for (int i = 0; i < numberOfUsers; i++) {
 			UserEntry entry = users[i].calculatePartialReceipt();
 			receipt += entry.getReceipt();
 			penalty += entry.getPenalty();
-			usersBuilder.append(entry);
+			
+			if(!contractEntries.containsKey(entry.contractName)) {
+				contractEntries.put(entry.contractName, entry);
+			} else {
+				UserEntry contractEntry = contractEntries.get(entry.contractName);
+				contractEntry.add(entry);
+			}
+		}
+		
+		for (Entry<String, UserEntry> entry : contractEntries.entrySet()) {
+			usersBuilder.append(entry.getValue());
 			usersBuilder.append(STRING);
 		}
 		
@@ -60,47 +64,8 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 			providersBuilder.append(entry);
 			providersBuilder.append(STRING);
 		}
-
 	}
 	
-	/**
-	 * {@inheritDoc}
-	 */
-	
-	@Override
-	public int compareTo(UtilityResultEntry o) {
-		return this.time < o.time? -1: (this.time == o.time? 0: 1);
-	}
-	
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (time ^ (time >>> 32));
-		return result;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	
-	@Override
-	public boolean equals(Object obj) {
-		assert (obj != null);
-		assert (getClass() == obj.getClass());
-		
-		if (this == obj)
-			return true;
-		UtilityResultEntry other = (UtilityResultEntry) obj;
-		if (time != other.time)
-			return false;
-		return true;
-	}
-
 	/**
 	 * @return The utility value of this entry.
 	 */
@@ -156,16 +121,57 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 		
 	}
 
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int compareTo(UtilityResultEntry o) {
+		return this.time < o.time? -1: (this.time == o.time? 0: 1);
+	}
+	
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (time ^ (time >>> 32));
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	
+	@Override
+	public boolean equals(Object obj) {
+		assert (obj != null);
+		assert (getClass() == obj.getClass());
+		
+		if (this == obj)
+			return true;
+		UtilityResultEntry other = (UtilityResultEntry) obj;
+		if (time != other.time)
+			return false;
+		return true;
+	}
+
 	public String getEntryDescriptor() {
 		StringBuilder sb = new StringBuilder();
-//		sb.append("time\tutility\treceipt\tcost\tpenalty\t");
-//		for (int i = 0; i < numberOfUsers; i++) {
-//			sb.append("userID\tpenalty\tfinished\ttotal\tcontract\treceipt\textraCPU\tcpuCost\ttrans\ttransCost\tstorageCost\t");
-//		}
-//		for (ProviderEntry provider : providers) {
-//			sb.append("name\tcost\tonDemand\tonDCost\treserv\tresCost\tinTrans\tinCost\toutTrans\toutCost\tmon\t");
-//			sb.append(provider.getDescriptor());
+//	sb.append("time\tutility\treceipt\tcost\tpenalty\t");
+//	for (int i = 0; i < numberOfUsers; i++) {
+//		sb.append("userID\tpenalty\tfinished\ttotal\tcontract\treceipt\textraCPU\tcpuCost\ttrans\ttransCost\tstorageCost\t");
+//	}
+//	for (ProviderEntry provider : providers) {
+//		sb.append("name\tcost\tonDemand\tonDCost\treserv\tresCost\tinTrans\tinCost\toutTrans\toutCost\tmon\t");
+//		sb.append(provider.getDescriptor());
 //		}
 		return sb.toString();
 	}
+	
 }
+	
+	

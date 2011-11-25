@@ -1,6 +1,7 @@
 package provisioning;
 
 
+import provisioning.util.DPSInfo;
 import commons.cloud.UtilityResult;
 import commons.sim.DynamicConfigurable;
 
@@ -20,5 +21,7 @@ public interface DPS extends Monitor{
 	 * @return Compute application total utility.
 	 */
 	UtilityResult calculateUtility();
+	
+	DPSInfo getDPSInfo();
 
 }

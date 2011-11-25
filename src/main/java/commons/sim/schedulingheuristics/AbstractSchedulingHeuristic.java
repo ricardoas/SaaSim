@@ -73,7 +73,6 @@ public abstract class AbstractSchedulingHeuristic implements SchedulingHeuristic
 
 	@Override
 	public void reportFinishedRequest(Request finishedRequest) {
-		tierStatistics.numberOfRequestsCompletionInLastIntervalInTier++;
 		tierStatistics.updateServiceTime(finishedRequest.getTotalProcessed());
 		finishedCounter++;
 	}
@@ -113,6 +112,7 @@ public abstract class AbstractSchedulingHeuristic implements SchedulingHeuristic
 		tierStatistics.totalNumberOfServers = machines.size();
 		
 		MachineStatistics stat = tierStatistics;
+		stat.totalNumberOfServers = getNumberOfMachines();
 
 		resetCounters();
 

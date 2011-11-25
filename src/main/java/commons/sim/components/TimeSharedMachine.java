@@ -197,14 +197,15 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 			processorQueue.add(newRequestToAdd);
 		}
 		
-		if(getScheduler().now() - request.getArrivalTimeInMillis() > 
-			Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)){
-			getLoadBalancer().reportRequestQueued(request);
-			descriptor.updateTransference(request.getRequestSizeInBytes(), 0);
-		}else{
+//		if(getScheduler().now() - request.getArrivalTimeInMillis() > 
+//			Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)){
+//			getLoadBalancer().reportRequestQueued(request);
+//			descriptor.updateTransference(request.getRequestSizeInBytes(), 0);
+//		}else{
+			request.setFinishTime(getScheduler().now());
 			descriptor.updateTransference(request.getRequestSizeInBytes(), request.getResponseSizeInBytes());
 			getLoadBalancer().reportRequestFinished(request);
-		}
+//		}
 	}
 
 	/**

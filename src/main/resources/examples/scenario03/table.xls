@@ -1,1 +1,1 @@
-RUN	time	utility	receipt	cost	penalty	userID	contract	penalty	finished	total	receipt	extraCPU	cpuCost	trans	transCost	storageCost	name	cost	onDemand	onDCost	reserv	resCost	inTrans	inCost	outTrans	outCost	mon	type	ondCPU	ondCost	resCPU	resCost	type	ondCPU	ondCost	resCPU	resCost	type	ondCPU	ondCost	resCPU	resCost	
+RUN	T	U	R	C	P	#	PLAN	PLAN_P	REQ_FIN	REQ_SLA	REQ_DROP	REQ_TOTAL	PLAN_R	CPU_EXTRA	C_CPU	TRANS	C_TRANS	C_STORAGE	PROV	C	ON_D	C_ON_D	RES	C_RES	T_IN	C_T_IN	T_OUT	C_T_OUT	MON	TYPE	ON_D	C_ON_D	RES	C_RES	TYPE	ON_D	C_ON_D	RES	C_RES	TYPE	ON_D	C_ON_D	RES	C_RES	

@@ -68,7 +68,7 @@ public class ContractTest extends ValidConfigurationTest {
 	@Test
 	public void testCalculateReceiptWithoutConsumption(){
 		int userID = 1;
-		UserEntry entry = c1.calculateReceipt(userID, 0, 0, 0, 0, 0, 0);
+		UserEntry entry = c1.calculateReceipt(userID, 0, 0, 0, 0, 0, 0, 0);
 		assertEquals(price, entry.getReceipt(), 0.0001);
 		assertEquals(0, entry.getPenalty(), 0.0001);
 	}
@@ -80,7 +80,7 @@ public class ContractTest extends ValidConfigurationTest {
 	public void testCalculateReceiptWithConsumptionLowerThanCPULimit(){
 		int userID = 1;
 		
-		UserEntry entry = c1.calculateReceipt(userID, 10, 0, 0, 0, 0, 0);
+		UserEntry entry = c1.calculateReceipt(userID, 10, 0, 0, 0, 0, 0, 0);
 
 		assertEquals(price, entry.getReceipt(), 0.0001);
 		assertEquals(0, entry.getPenalty(), 0.0001);
@@ -94,7 +94,7 @@ public class ContractTest extends ValidConfigurationTest {
 		long extraConsumedCpu = 5 * TimeUnit.HOUR.getMillis();
 		int userID = 1;
 		
-		UserEntry entry = c1.calculateReceipt(userID, cpuLimit + extraConsumedCpu, 0, 0, 0, 0, 0);
+		UserEntry entry = c1.calculateReceipt(userID, cpuLimit + extraConsumedCpu, 0, 0, 0, 0, 0, 0);
 		
 		assertEquals(price + extraConsumedCpu * extraCpuCost, entry.getReceipt(), 0.0001);
 		assertEquals(0, entry.getPenalty(), 0.0001);
@@ -108,7 +108,7 @@ public class ContractTest extends ValidConfigurationTest {
 		long transferenceInBytes = 1024 * DataUnit.MB.getBytes();
 		int userID = 1;
 		
-		UserEntry entry = c1.calculateReceipt(userID, cpuLimit, transferenceInBytes, 0, 0, 0, 0);
+		UserEntry entry = c1.calculateReceipt(userID, cpuLimit, transferenceInBytes, 0, 0, 0, 0, 0);
 		
 		assertEquals(price, entry.getReceipt(), 0.0001);
 		assertEquals(0, entry.getPenalty(), 0.0001);
@@ -124,7 +124,7 @@ public class ContractTest extends ValidConfigurationTest {
 				(transferenceInBytes - transferenceLimits[0]) * transferenceCosts[1];
 		int userID = 1;
 		
-		UserEntry entry = c1.calculateReceipt(userID, cpuLimit, transferenceInBytes, 0, 0, 0, 0);
+		UserEntry entry = c1.calculateReceipt(userID, cpuLimit, transferenceInBytes, 0, 0, 0, 0, 0);
 		assertEquals(price + expectedCost, entry.getReceipt(), 0.0001);
 		assertEquals(0, entry.getPenalty(), 0.0001);
 	}
@@ -136,7 +136,7 @@ public class ContractTest extends ValidConfigurationTest {
 	public void testCalculateReceiptWithStorageConsumptionBelowMinimum(){
 		int userID = 1;
 
-		UserEntry entry = c1.calculateReceipt(userID, cpuLimit, 0, 0, storageLimits, 0, 0);
+		UserEntry entry = c1.calculateReceipt(userID, cpuLimit, 0, 0, storageLimits, 0, 0, 0);
 		assertEquals(price, entry.getReceipt(), 0.0001);
 		assertEquals(0, entry.getPenalty(), 0.0001);
 	}
@@ -149,7 +149,7 @@ public class ContractTest extends ValidConfigurationTest {
 		long extraStorageConsumedInBytes = 10 * DataUnit.MB.getBytes();
 		int userID = 1;
 
-		UserEntry entry = c1.calculateReceipt(userID, cpuLimit, 0, 0, (storageLimits + extraStorageConsumedInBytes), 0, 0);
+		UserEntry entry = c1.calculateReceipt(userID, cpuLimit, 0, 0, (storageLimits + extraStorageConsumedInBytes), 0, 0, 0);
 		assertEquals(price + extraStorageConsumedInBytes * storageCosts, entry.getReceipt(), 0.0001);
 		assertEquals(0, entry.getPenalty(), 0.0001);
 	}

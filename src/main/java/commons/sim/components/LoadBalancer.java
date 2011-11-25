@@ -20,6 +20,7 @@ import commons.sim.jeevent.JEEventType;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
 import commons.sim.util.SaaSAppProperties;
+import commons.util.TimeUnit;
 
 /**
  * Tier load balancer.
@@ -148,8 +149,8 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	 */
 	public void collectStatistics(long now, long timeInterval, int numberOfRequests) {
 		MachineStatistics statistics = heuristic.getStatistics(now);
-		statistics.numberOfRequestsArrivalInLastInterval = numberOfRequests;
-		statistics.observationPeriod = timeInterval;
+		statistics.numberOfRequestsArrivalInLastInterval += numberOfRequests;
+		statistics.observationPeriod = timeInterval / TimeUnit.SECOND.getMillis();
 		monitor.sendStatistics(now, statistics, tier);
 	}
 
@@ -162,6 +163,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	}
 
 	public void reportRequestQueued(Request requestQueued){
+//		heuristic.reportFinishedRequest(requestQueued);
 		monitor.requestQueued(getScheduler().now(), requestQueued, tier);
 	}
 	
@@ -176,13 +178,15 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		
 		if(startingUp.isEmpty()){
 			machine = heuristic.removeMachine();
-			warmingDown.put(machine.getDescriptor(), machine);
-			if(force){
-				//FIXME what can we do with running requests?
-//				send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this, getScheduler().now(), machine));
-				throw new RuntimeException("Not implemented");
-			}else{
-				machine.shutdownOnFinish();
+			if(machine != null){
+				warmingDown.put(machine.getDescriptor(), machine);
+				if(force){
+					//FIXME what can we do with running requests?
+	//				send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this, getScheduler().now(), machine));
+					throw new RuntimeException("Not implemented");
+				}else{
+					machine.shutdownOnFinish();
+				}
 			}
 		}else{
 			Iterator<Entry<MachineDescriptor, Machine>> iterator = startingUp.entrySet().iterator();

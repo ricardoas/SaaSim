@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import provisioning.util.DPSInfo;
+
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.Request;
@@ -37,6 +39,8 @@ public class DynamicProvisioningSystem implements DPS{
 	protected final Provider[] providers;
 	
 	Logger log = Logger.getLogger(getClass());
+
+	private long maxRT;
 	
 	/**
 	 * Default constructor.
@@ -45,6 +49,7 @@ public class DynamicProvisioningSystem implements DPS{
 		this.providers = Checkpointer.loadProviders();
 		this.users = Checkpointer.loadUsers();
 		this.accountingSystem = Checkpointer.loadAccountingSystem();
+		this.maxRT = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME);
 	}
 	
 	@Override
@@ -119,13 +124,21 @@ public class DynamicProvisioningSystem implements DPS{
 	public final void requestFinished(Request request) {
 		assert request.getSaasClient() < users.length:"Unregistered user with ID " + request.getSaasClient() + ". Check configuration files.";
 		
-		try{
-			users[request.getSaasClient()].reportFinishedRequest(request);
-		}catch(NullPointerException e){
-			throw e;
+		if(request.getResponseTimeInMillis() < maxRT){
+			reportFinishedRequest(request);
+		}else{
+			reportFinishedRequestAfterSLA(request);
 		}
 	}
 	
+	protected void reportFinishedRequestAfterSLA(Request request) {
+		users[request.getSaasClient()].reportFinishedRequestAfterSLA(request);
+	}
+
+	protected void reportFinishedRequest(Request request) {
+		users[request.getSaasClient()].reportFinishedRequest(request);
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -189,5 +202,10 @@ public class DynamicProvisioningSystem implements DPS{
 
 	protected MachineDescriptor buyMachine(Provider provider, MachineType instanceType, boolean isReserved){
 		return provider.buyMachine(isReserved, instanceType);
+	}
+
+	@Override
+	public DPSInfo getDPSInfo() {
+		return null;
 	}
 }

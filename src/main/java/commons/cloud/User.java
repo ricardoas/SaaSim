@@ -25,6 +25,7 @@ public class User implements Comparable<User>, Serializable{
 	private long consumedInTransferenceInBytes;
 	private long consumedOutTransferenceInBytes;
 	private final long storageInBytes;
+	private int numberOfFinishedRequestsAfterSLA;
 	
 	/**
 	 * Default constructor.
@@ -86,6 +87,7 @@ public class User implements Comparable<User>, Serializable{
 		this.consumedOutTransferenceInBytes = 0;
 		this.numberOfLostRequests = 0;
 		this.numberOfFinishedRequests = 0;
+		this.numberOfFinishedRequestsAfterSLA = 0;
 	}
 	
 	private void update(long consumedCpuInMillis, long inTransferenceInBytes, long outTransferenceInBytes){
@@ -95,7 +97,7 @@ public class User implements Comparable<User>, Serializable{
 	}
 	
 	public UserEntry calculatePartialReceipt() {
-		UserEntry userEntry = contract.calculateReceipt(id, consumedCpuInMillis, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, storageInBytes, numberOfFinishedRequests, numberOfLostRequests);
+		UserEntry userEntry = contract.calculateReceipt(id, consumedCpuInMillis, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, storageInBytes, numberOfFinishedRequests, numberOfLostRequests, numberOfFinishedRequestsAfterSLA);
 		reset();
 		return userEntry;
 	}
@@ -162,5 +164,10 @@ public class User implements Comparable<User>, Serializable{
 
 	public double calculatePenalty(double totalLoss) {
 		return this.contract.calculatePenalty(totalLoss);
+	}
+
+	public void reportFinishedRequestAfterSLA(Request request) {
+		this.numberOfFinishedRequestsAfterSLA++;
+		update(request.getTotalProcessed(), request.getRequestSizeInBytes(), request.getResponseSizeInBytes());
 	}
 }
