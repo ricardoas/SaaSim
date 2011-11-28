@@ -4,8 +4,9 @@ import java.io.Serializable;
 
 
 /**
+ * 
+ * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
- *
  */
 public class ProviderEntry implements Serializable{
 	

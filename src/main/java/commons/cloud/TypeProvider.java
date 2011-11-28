@@ -41,13 +41,13 @@ public class TypeProvider implements Serializable{
 	
 	/**
 	 * Default constructor.
-	 * @param providerID TODO
-	 * @param value
-	 * @param onDemandCpuCost
-	 * @param reservedCpuCost
-	 * @param reservationOneYearFee
-	 * @param reservationThreeYearsFee
-	 * @param reservation TODO
+	 * @param providerID TODO an integer to represent a provider
+	 * @param value a value represents the type of provider, see {@link MachineType} 
+	 * @param onDemandCpuCost the cost of on demand utilization
+	 * @param reservedCpuCost the cost of reserved utilization
+	 * @param reservationOneYearFee the value of fee reservation for one year
+	 * @param reservationThreeYearsFee the value of fee reservation for three year
+	 * @param reservation TODO the reservation of this {@link TypeProvider}
 	 */
 	public TypeProvider(int providerID, MachineType value,
 			double onDemandCpuCost, double reservedCpuCost,
@@ -67,26 +67,50 @@ public class TypeProvider implements Serializable{
 		this.onDemandFinishedMachines = new ArrayList<MachineDescriptor>();
 	}
 
+	/**
+	 * Gets the type of this {@link TypeProvider}.
+	 * @return the type see {@link MachineType}
+	 */
 	public MachineType getType() {
 		return type;
 	}
 
+	/**
+	 * Gets the cpu cost of on demand utilization.
+	 * @return the onDemandCpuCost the cpu cost of on demand utilization
+	 */
 	public double getOnDemandCpuCost() {
 		return onDemandCpuCost;
 	}
 
+	/**
+	 * Gets the cpu cost of on reserved utilization.
+	 * @return the reservedCpuCost the cpu cost of reserved utilization 
+	 */
 	public double getReservedCpuCost() {
 		return reservedCpuCost;
 	}
 
+	/**
+	 * Gets the fee of reservation for one year.
+	 * @return the reservationOneYearFee the fee of reservation for one year
+	 */
 	public double getReservationOneYearFee() {
 		return reservationOneYearFee;
 	}
 
+	/**
+	 * Gets the fee of reservation for three year.
+	 * @return the reservationThreeYearsFee the fee of reservation for three year.
+	 */
 	public double getReservationThreeYearsFee() {
 		return reservationThreeYearsFee;
 	}
 
+	/**
+	 * Gets the reservation of this {@link TypeProvider}.
+	 * @return the reservation 
+	 */
 	public long getReservation() {
 		return reservation;
 	}
@@ -111,8 +135,9 @@ public class TypeProvider implements Serializable{
 	}
 
 	/**
-	 * @param isReserved
-	 * @return
+	 * Buy a new machine with this {@link TypeProvider}.
+	 * @param isReserved <code>true</code> if the new machine is a previously reserved one, <code>false</code> otherwise.
+	 * @return A new {@link MachineDescriptor} if the machine was created with sucess, or <code>null</code> otherwise
 	 */
 	public MachineDescriptor buyMachine(boolean isReserved) {
 		if(isReserved){
@@ -130,8 +155,9 @@ public class TypeProvider implements Serializable{
 	}
 
 	/**
+	 * Returns a value about the possibility of buy a new machine.
 	 * @return <code>true</code> if there are RESERVED machines available to be bought, 
-	 * and <code>false</code> otherwise..
+	 * and <code>false</code> otherwise
 	 */
 	public boolean canBuy() {
 		return reservedRunningMachines.size() < reservation;
@@ -189,7 +215,9 @@ public class TypeProvider implements Serializable{
 	}
 
 	/**
-	 * @return
+	 * Calculate the cost based on the value of reservation and the value of the fee of reservation 
+	 * for one year.
+	 * @return The cost.
 	 */
 	public double calculateUniqueCost() {
 		return reservation * reservationOneYearFee;

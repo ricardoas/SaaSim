@@ -37,16 +37,16 @@ public class Provider implements Serializable{
 	
 	/**
 	 * Default constructor.
-	 * @param id
-	 * @param name
-	 * @param onDemandLimit
-	 * @param reservationLimit
-	 * @param monitoringCost
-	 * @param transferInLimitsInBytes
-	 * @param transferInCostsPerByte
-	 * @param transferOutLimitsInBytes
-	 * @param transferOutCostsPerByte
-	 * @param types
+	 * @param id an integer to represent each provider
+	 * @param name a name of provider
+	 * @param onDemandLimit a limit of on demand utilization 
+	 * @param reservationLimit a limit of reservation utilization 
+	 * @param monitoringCost a double representing the monitoring cost
+	 * @param transferInLimitsInBytes an array of long containing values of transfer in limits in bytes
+	 * @param transferInCostsPerByte an array of double containing values of transfer in cost per bytes
+	 * @param transferOutLimitsInBytes an array of long containing values of transfer out limits in bytes
+	 * @param transferOutCosof transfer intsPerByte an array of double containing values of transfer out cost in bytes
+	 * @param types a list containing {@link TypeProvider} values  
 	 */
 	public Provider(int id, String name,
 			int onDemandLimit, int reservationLimit,
@@ -73,7 +73,6 @@ public class Provider implements Serializable{
 
 	/**
 	 * Avoid using it. It breaks type encapsulation.
-	 * 
 	 * @return
 	 */
 	@Deprecated()
@@ -82,95 +81,111 @@ public class Provider implements Serializable{
 	}
 
 	/**
-	 * @return the name
+	 * Gets the name of this {@link Provider}.
+	 * @return The name of provider
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/**
-	 * @return the onDemandCpuCost
+	 * Gets the cpu cost of on demand utilization.
+	 * @param type see {@link MachineType}.
+	 * @return The cpu cost of on demand utilization 
 	 */
 	public double getOnDemandCpuCost(MachineType type) {
 		return types.get(type).getOnDemandCpuCost();
 	}
 
 	/**
-	 * @return the onDemandLimit
+	 * Gets the limit of on demand utilization.
+	 * @return The limit of on demand utilization 
 	 */
 	public int getOnDemandLimit() {
 		return onDemandLimit;
 	}
 
 	/**
-	 * @return the reservationLimit
+	 * Gets the limit of reservation utilization.
+	 * @return the reservationLimit the limit of reservation utilization
 	 */
 	public int getReservationLimit() {
 		return reservationLimit;
 	}
 
 	/**
-	 * @return the reservedCpuCost
+	 * Gets the cpu cost of reserved utilization.
+	 * @param type see {@link MachineType}.
+	 * @return The cpu cost of reserved utilization
 	 */
 	public double getReservedCpuCost(MachineType type) {
 		return types.get(type).getReservedCpuCost();
 	}
 
 	/**
-	 * @return the reservationOneYearFee
+	 * Gets the fee of reservation for one year.
+	 * @param type see {@link MachineType}.
+	 * @return The fee of reservation for one year
 	 */
 	public double getReservationOneYearFee(MachineType type) {
 		return types.get(type).getReservationOneYearFee();
 	}
 
 	/**
-	 * @return the reservationThreeYearsFee
+	 * Gets the fee of reservation for three year.
+	 * @param type see {@link MachineType}.
+	 * @return The fee of reservation for three year
 	 */
 	public double getReservationThreeYearsFee(MachineType type) {
 		return types.get(type).getReservationThreeYearsFee();
 	}
 
 	/**
-	 * @return the monitoringCost
+	 * Gets the cost of monitoring.
+	 * @return The cost of monitoring
 	 */
 	public double getMonitoringCost() {
 		return monitoringCost;
 	}
 
 	/**
-	 * @return the transferInLimits
+	 * Gets the limits of transfer in bytes.
+	 * @return An array containing the limits of transfer 
 	 */
 	public long[] getTransferInLimits() {
 		return transferInLimitsInBytes;
 	}
 
 	/**
-	 * @return the transferInCosts
+	 * Gets the costs of transfer per byte.
+	 * @return Array containing the costs of transfer
 	 */
 	public double[] getTransferInCosts() {
 		return transferInCostsPerByte;
 	}
 
 	/**
-	 * @return the transferOutLimits
+	 * Gets the out limits of transfer in bytes. 
+	 * @return An array containing the out limits of transfer
 	 */
 	public long[] getTransferOutLimits() {
 		return transferOutLimitsInBytes;
 	}
 
 	/**
-	 * @return the transferOutCosts
+	 * Gets the out costs of transfer per byte.
+	 * @return An array containing the out costs of transfer
 	 */
 	public double[] getTransferOutCosts() {
 		return transferOutCostsPerByte;
 	}
 
-
+	
 	public MachineType[] getAvailableTypes() {
 		Set<MachineType> set = types.keySet();
 		return set.toArray(new MachineType[set.size()]);
 	}
-
+	
 	public boolean canBuyMachine(boolean reserved, MachineType type) {
 		if(!reserved){
 			return types.containsKey(type) && onDemandRunningMachines < getOnDemandLimit();
@@ -197,8 +212,10 @@ public class Provider implements Serializable{
 
 	/**
 	 * TODO test removed false of an on demand machine.
-	 * @param machineDescriptor
-	 * @return
+	 * Shut a {@link MachineDescriptor} removing it the list of running machines 
+	 * @param machineDescriptor The machine that has been turned off, see {@link MachineDescriptor}. 
+	 * @return <code>true</code> if machine was removed with sucess, or <code>false</code> if the type of machine don't
+	 * 		   exists in this {@link Provider} or the machine wasn't removed with sucess
 	 */
 	public boolean shutdownMachine(MachineDescriptor machineDescriptor) {
 		if(!types.containsKey(machineDescriptor.getType())){
