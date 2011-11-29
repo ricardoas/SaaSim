@@ -4,17 +4,17 @@ import java.io.Serializable;
 
 
 /**
- * 
+ * Abstraction used to represent a entry of one {@link Provider}.
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public class ProviderEntry implements Serializable{
 	
-	private static final String STRING = "\t";
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -3831288060251941356L;
+	private static final String STRING = "\t";
 	private final String name;
 	private double cost;
 	private double inCost;
@@ -33,6 +33,14 @@ public class ProviderEntry implements Serializable{
 	
 	private int numberOfTypes;
 	
+	/**
+	 * Default constructor.
+	 * @param name the name of specific {@link Provider}.
+	 * @param inTransference a long represent the input transference.
+	 * @param inCost a double represent the input cost.
+	 * @param outTransference a long represent the output transference.
+	 * @param outCost a double represent the output cost.
+	 */
 	public ProviderEntry(String name, long inTransference, double inCost,
 			long outTransference, double outCost) {
 		this.name = name;
@@ -51,6 +59,11 @@ public class ProviderEntry implements Serializable{
 		this.numberOfTypes = 0;
 	}
 
+	/**
+	 * Update the values of this {@link ProviderEntry} based on the values of the {@link TypeProviderEntry} in parameter,
+	 * and increment the number of types.
+	 * @param typeEntry the entry represents a {@link TypeProvider}, see {@link TypeProviderEntry}.
+	 */
 	public void account(TypeProviderEntry typeEntry) {
 		this.onDemandCPUHours += typeEntry.onDemandCPUHours;
 		this.onDemandCost += typeEntry.onDemandCost;
@@ -63,6 +76,10 @@ public class ProviderEntry implements Serializable{
 		this.numberOfTypes++;
 	}
 
+	/**
+	 * Gets the descriptor's values of this {@link ProviderEntry}. 
+	 * @return A String containing the descriptor's values. 
+	 */
 	public String getDescriptor() {
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < numberOfTypes; i++) {
@@ -71,10 +88,15 @@ public class ProviderEntry implements Serializable{
 		return sb.toString();
 	
 	}
-
+	
 	/**
-	 * {@inheritDoc}
+	 * Gets the cost of {@link Provider} represents for this {@link ProviderEntry}.
+	 * @return The calculated cost, represented for the input cost added to output cost.
 	 */
+	public double getCost() {
+		return cost;
+	}
+	
 	@Override
 	public String toString() {
 		return name 
@@ -89,9 +111,5 @@ public class ProviderEntry implements Serializable{
 				+ STRING + outCost
 				+ STRING + monitoringCost
 				+ STRING + builder.toString();
-	}
-
-	public double getCost() {
-		return cost;
 	}
 }

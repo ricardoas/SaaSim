@@ -3,16 +3,17 @@ package commons.cloud;
 import java.io.Serializable;
 
 /**
+ * Abstraction to represent a calculated utility for the application. 
+ * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public class UtilityResult implements Serializable{
 	
-	private static final char FIELD_SEPARATOR = '\t';
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -7954582098382863519L;
-	
+	private static final char FIELD_SEPARATOR = '\t';
 	private double uniqueReceipt;
 	private double receipt;
 	private double uniqueCost;
@@ -21,14 +22,19 @@ public class UtilityResult implements Serializable{
 	
 	/**
 	 * Default constructor.
-	 * @param numberOfUsers 
-	 * @param numberOfProviders 
+	 * @param numberOfUsers the number of users in the application 
+	 * @param numberOfProviders the number of provides in the application
 	 */
 	public UtilityResult(int numberOfUsers, int numberOfProviders) {
 		uniqueCost = 0;
 		uniqueReceipt = 0;
 	}
 
+	/**
+	 * Another constructor.
+	 * @param users an array containing the users in the application
+	 * @param providers an array containing the providers in the application
+	 */
 	public UtilityResult(User[] users, Provider[] providers) {
 		for (User user : users) {
 			uniqueReceipt += user.calculateOneTimeFees();
@@ -42,8 +48,8 @@ public class UtilityResult implements Serializable{
 	}
 
 	/**
-	 * @param entry
-	 * @return 
+	 * Update the values of receipt, cost and penalty in this {@link UtilityResul} with entry in the parameter.
+	 * @param entry the entry to be added to values of receipt, cost and penalty, see {@link UtilityResultEntry}.
 	 */
 	public void account(UtilityResultEntry entry) {
 		receipt += entry.getReceipt();
@@ -52,15 +58,12 @@ public class UtilityResult implements Serializable{
 	}
 
 	/**
+	 * Gets the value of utility.
 	 * @return The total utility value.
 	 */
 	public double getUtility() {
 		return uniqueReceipt + receipt - uniqueCost - cost - penalty;
 	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
 	
 	@Override
 	public String toString() {

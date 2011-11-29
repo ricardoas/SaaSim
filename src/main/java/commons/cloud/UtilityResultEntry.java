@@ -5,6 +5,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+/**
+ * Abstraction used to represent a entry of {@link UtilityResult}.
+ * 
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ * @author Lilia Rodrigues Sampio - liliars@lsd.ufcg.edu.br
+ */
 public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Serializable {
 
 	private static final long serialVersionUID = -4927865959874743247L;
@@ -23,6 +29,12 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 	
 	private Map<String, UserEntry> contractEntries;
 	
+	/**
+	 * Default constructor.
+	 * @param time value of current time in millis
+	 * @param users an array containing the users in the application
+	 * @param providers an array containing the providers in the application
+	 */
 	public UtilityResultEntry(long time, User[] users, Provider[] providers) {
 		assert users != null;
 		assert providers != null;
@@ -67,6 +79,7 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 	}
 	
 	/**
+	 * Gets the utility value of this entry.
 	 * @return The utility value of this entry.
 	 */
 	public double getUtility() {
@@ -74,28 +87,32 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 	}
 
 	/**
-	 * @return the time
+	 * Gets the value of current time in millis.
+	 * @return The value of current time in millis.
 	 */
 	public long getTime() {
 		return time;
 	}
 
 	/**
-	 * @return the receipt
+	 * Gets the total receipt calculated based on values of each {@link UserEntry}.
+	 * @return The total receipt of this entry.
 	 */
 	public double getReceipt() {
 		return receipt;
 	}
 
 	/**
-	 * @return the cost
+	 * Gets the total cost calculated based on values of each {@link ProviderEntry}.
+	 * @return The total cost of this entry.
 	 */
 	public double getCost() {
 		return cost;
 	}
 
 	/**
-	 * @return the penalty
+	 * Gets the total penalty calculated based on values of each {@link UserEntry}.
+	 * @return The total penalty.
 	 */
 	public double getPenalty() {
 		return penalty;
@@ -121,19 +138,11 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 		
 	}
 
-	
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public int compareTo(UtilityResultEntry o) {
 		return this.time < o.time? -1: (this.time == o.time? 0: 1);
 	}
 	
-
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -143,9 +152,9 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Compare two {@link UtilityResultEntry}. 
+	 * <code>true</code> if them times are equals, <code>false</code> otherwise. 
 	 */
-	
 	@Override
 	public boolean equals(Object obj) {
 		assert (obj != null);

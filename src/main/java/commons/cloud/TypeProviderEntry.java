@@ -3,15 +3,15 @@ package commons.cloud;
 import java.io.Serializable;
 
 /**
+ * Abstraction used to represent a entry of one {@link TypeProvider}.
+ * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public class TypeProviderEntry implements Serializable{
-	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -5699832152421322269L;
-	
 	final MachineType type;
 	long onDemandCPUHours;
 	double onDemandCost;
@@ -22,12 +22,12 @@ public class TypeProviderEntry implements Serializable{
 
 	/**
 	 * Default constructor.
-	 * @param type
-	 * @param onDemandCPUHours
-	 * @param onDemandCost
-	 * @param reservedCPUHours
-	 * @param reservedCost
-	 * @param monitoringCost
+	 * @param type a {@link MachineType} value of specific {@link TypeProvider}.
+	 * @param onDemandCPUHours the time in hours spent by the cpu in on demand utilization
+	 * @param onDemandCost the cost for on demand utilization
+	 * @param reservedCPUHours the time in hours spent by the cpu in reserved utilization
+	 * @param reservedCost the cost for reserved utilization
+	 * @param monitoringCost a double representing the monitoring cost
 	 */
 	public TypeProviderEntry(MachineType type, long onDemandCPUHours,
 			double onDemandCost, long reservedCPUHours, double reservedCost, double monitoringCost) {
@@ -40,9 +40,6 @@ public class TypeProviderEntry implements Serializable{
 		this.cost = onDemandCost + reservedCost + monitoringCost;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public String toString() {
 		return type.toString() 
