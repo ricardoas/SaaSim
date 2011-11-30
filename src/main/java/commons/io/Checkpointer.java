@@ -23,6 +23,10 @@ import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.SimulatorFactory;
 import commons.util.SimulationInfo;
 
+/**
+ * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
+ *
+ */
 public class Checkpointer {
 
 	public static final String MACHINE_DATA_DUMP = "machineData.txt";
@@ -49,6 +53,9 @@ public class Checkpointer {
 		return new File(CHECKPOINT_FILE).canWrite();
 	}
 	
+	/**
+	 * 
+	 */
 	public static void save() {
 		ObjectOutputStream out;
 		try {

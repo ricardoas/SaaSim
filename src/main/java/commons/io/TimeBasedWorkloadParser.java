@@ -30,6 +30,9 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 		this.leftOver = new Request[parsers.length];
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void clear() {
 		throw new RuntimeException("Not yet implemented");
@@ -84,11 +87,17 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setDaysAlreadyRead(int simulatedDays) {
 		throw new RuntimeException("Not yet implemented");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void close() {
 		for(WorkloadParser<Request> parser : parsers){

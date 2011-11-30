@@ -60,6 +60,9 @@ public class HistoryBasedWorkloadParser extends TimeBasedWorkloadParser{
 		return this.history.peek();
 	}
 	
+	/**
+	 * @param readNextPeriod
+	 */
 	public void setReadNextPeriod(boolean readNextPeriod){
 		this.readNexPeriod = readNextPeriod;
 	}

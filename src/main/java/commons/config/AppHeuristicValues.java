@@ -22,6 +22,9 @@ public enum AppHeuristicValues {
 	
 	private final String className;
 
+	/**
+	 * @param className
+	 */
 	private AppHeuristicValues(String className){
 		this.className = className;
 	}

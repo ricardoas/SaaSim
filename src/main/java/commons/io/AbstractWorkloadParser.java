@@ -82,11 +82,17 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 		throw new RuntimeException("not yet implemented");
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void clear() {
 		throw new RuntimeException("not yet implemented");
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Request next() {
 		Request toReturn = this.next;
@@ -94,6 +100,9 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 		return toReturn;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean hasNext() {
 		return next != null;
@@ -118,6 +127,9 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 	 */
 	protected abstract Request parseRequest(String line);
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void close(){
 		try {

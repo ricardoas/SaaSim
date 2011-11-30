@@ -27,6 +27,9 @@ public class GEISTWorkloadParser extends AbstractWorkloadParser{
 		super(workload, Checkpointer.loadSimulationInfo().getCurrentDayInMillis());
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public WorkloadParser<Request> clone() {
 		return new GEISTWorkloadParser(workload);
