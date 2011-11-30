@@ -15,13 +15,21 @@ import commons.sim.util.SaaSAppProperties;
 import commons.sim.util.SimulatorProperties;
 import commons.util.TimeUnit;
 
+/**
+ * 
+ * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
+ */
 public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 	
+	private static final String PROP_PREDICTION_WINDOW_SIZE= "dps.urgaonkar.windowsize";
+	private static final String PROP_PERCENTILE = "dps.urgaonkar.percentile";
 	private static final String PROP_ENABLE_PREDICTIVE = "dps.urgaonkar.predictive";
 	private static final String PROP_ENABLE_REACTIVE = "dps.urgaonkar.reactive";
 	private static final String PROP_MACHINE_TYPE = "dps.urgaonkar.type";
 	private static final String PROP_REACTIVE_TRESHOLD = "dps.urgaonkar.reactive.threashold";
 	
+	private static int DEFAULT_PREDICTION_WINDOW_SIZE = 5;
+	private static final double DEFAULT_PERCENTILE = 95.0;
 	private static final long predictiveTick = TimeUnit.HOUR.getMillis()/TimeUnit.SECOND.getMillis();
 	private static final long predictiveTickInMillis = TimeUnit.HOUR.getMillis();
 	private long reactiveTick;
@@ -34,7 +42,12 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 	private UrgaonkarStatistics [] stat;
 	private UrgaonkarHistory last;
 	private MachineType type;
+	private int windowSize;
+	private double percentile;
 
+	/**
+	 * Default constructor 
+	 */
 	public UrgaonkarProvisioningSystem() {
 		super();
 		enablePredictive = Configuration.getInstance().getBoolean(PROP_ENABLE_PREDICTIVE, true);
@@ -43,18 +56,33 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 		threshold = Configuration.getInstance().getDouble(PROP_REACTIVE_TRESHOLD, 2.0);
 		maxRT = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)/TimeUnit.SECOND.getMillis();
 		reactiveTick = Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)/TimeUnit.SECOND.getMillis();
+		windowSize = Configuration.getInstance().getInt(PROP_PREDICTION_WINDOW_SIZE, DEFAULT_PREDICTION_WINDOW_SIZE);
+		percentile = Configuration.getInstance().getDouble(PROP_PERCENTILE, DEFAULT_PERCENTILE);
+		
+		DPSInfo info = loadDPSInfo();
+		
+		stat = info.stat;
+		last = info.history;
+	}
+
+	/**
+	 * @return {@link DPSInfo}
+	 */
+	private DPSInfo loadDPSInfo() {
 		DPSInfo info = Checkpointer.loadProvisioningInfo();
 		if(info.stat == null && info.history == null){
 			info.stat = new UrgaonkarStatistics[24];
 			for (int i = 0; i < info.stat.length; i++) {
-				info.stat[i] = new UrgaonkarStatistics(maxRT, predictiveTick);
+				info.stat[i] = new UrgaonkarStatistics(maxRT, predictiveTick, percentile, windowSize);
 			}
 			info.history = new UrgaonkarHistory();
 		}
-		stat = info.stat;
-		last = info.history;
+		return info;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void sendStatistics(long now, MachineStatistics statistics, int tier) {
 
@@ -72,7 +100,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 			
 			last.update(lastTick.getCurrentArrivalRate());
 			
-			double lambdaPeak = lastTick.calcLambdaPeak();
+			double lambdaPeak = getPeakArrivalRatePerServer(statistics);
 			
 			double lambdaPred = nextTick.getPredArrivalRate();
 			
@@ -112,7 +140,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 
 			int index = (int)((now%TimeUnit.DAY.getMillis())/TimeUnit.HOUR.getMillis());
 			UrgaonkarStatistics currentStat = stat[index];
-			double pred = currentStat.calcLambdaPeak();
+			double pred = currentStat.getPeakArrivalRatePerServer();
 			double observed = statistics.getArrivalRate(interval)/(statistics.totalNumberOfServers*type.getNumberOfCores());
 			
 			if (observed/pred > threshold){
@@ -166,15 +194,15 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 		return currentlyBought;
 	}
 	
-	
-	@Override
-	public DPSInfo getDPSInfo() {
-		DPSInfo info = new DPSInfo();
-		info.history = last;
-		info.stat = stat;
-		return info;
+	/**
+	 * Calculate peak arrival rate a single server can handle.
+	 * @param statistics {@link MachineStatistics}
+	 */
+	private double getPeakArrivalRatePerServer(MachineStatistics statistics) {
+		
+		double lambdaPeak = (statistics.averageST + (statistics.calcVarST() + statistics.calcVarIAT())/(2 * (1.0*maxRT - statistics.averageST)));
+		
+		return 1.0/lambdaPeak;
 	}
-	
-
 
 }

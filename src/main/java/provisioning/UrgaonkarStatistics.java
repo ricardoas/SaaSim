@@ -1,8 +1,7 @@
 package provisioning;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 
 import org.apache.commons.math.stat.descriptive.rank.Percentile;
 
@@ -14,11 +13,9 @@ public class UrgaonkarStatistics implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = -3168788545374488566L;
-	private double averageST;
-	private double varST;
-	private double varIAT;
+
+	
 	private double[] arrivalRate;
-	private static int PREDICTION_WINDOW_SIZE = 100;
 	
 	private Percentile percentile;
 	
@@ -27,15 +24,18 @@ public class UrgaonkarStatistics implements Serializable{
 	private double maxRT;
 	private long predictionTick;
 	
-	public UrgaonkarStatistics(double maxRT, long predictionTick) {
+	/**
+	 * Default constructor
+	 * @param maxRT
+	 * @param predictionTick
+	 * @param windowSize 
+	 */
+	public UrgaonkarStatistics(double maxRT, long predictionTick, double p, int windowSize) {
 		this.maxRT = maxRT;
 		this.predictionTick = predictionTick;
 		index = 0;
-		averageST = 0;//new double[PREDICTION_WINDOW_SIZE];
-		varST = 0;//new double[PREDICTION_WINDOW_SIZE];
-		varIAT = 0;//new double[PREDICTION_WINDOW_SIZE];
-		arrivalRate = new double[PREDICTION_WINDOW_SIZE];
-		percentile = new Percentile(60);
+		arrivalRate = new double[windowSize];
+		percentile = new Percentile(p);
 	}
 	
 	/**
@@ -43,42 +43,25 @@ public class UrgaonkarStatistics implements Serializable{
 	 * @param statistics
 	 */
 	public void add(MachineStatistics statistics) {
-		averageST = statistics.averageST;
-		varST = statistics.calcVarST();
-		varIAT = statistics.calcVarIAT();
-//		averageST[index] += statistics.averageST;
-//		varST[index] += statistics.calcVarST();
-//		varIAT[index] += statistics.calcVarIAT();
+		
 		arrivalRate[index] += statistics.getArrivalRateInTier(predictionTick);
 		index = ++index % arrivalRate.length;
 		
-		lambdaPeak = (getAverageST() + (getVarST() + getVarIAT())/(2 * (1.0*maxRT - getAverageST())));
+		lambdaPeak = (statistics.averageST + (statistics.calcVarST() + statistics.calcVarIAT())/(2 * (1.0*maxRT - statistics.averageST)));
 		
 		lambdaPeak = 1.0/lambdaPeak;
 
 	}
 
-	public double getAverageST() {
-		return averageST;//percentile.evaluate(averageST);
-	}
-
-	public double getVarST() {
-		return varST;// percentile.evaluate(varST);
-	}
-
-	public double getVarIAT() {
-		return varIAT;//percentile.evaluate(varIAT);
-	}
-
 	public double getPredArrivalRate() {
-		return percentile.evaluate(arrivalRate);
+		return percentile.evaluate(index < arrivalRate.length? Arrays.copyOf(arrivalRate, index): arrivalRate);
 	}
 	
 	public double getCurrentArrivalRate() {
 		return arrivalRate[(arrivalRate.length + index - 1) % arrivalRate.length];
 	}
 	
-	public double calcLambdaPeak() {
+	public double getPeakArrivalRatePerServer() {
 		return lambdaPeak;
 	}
 }

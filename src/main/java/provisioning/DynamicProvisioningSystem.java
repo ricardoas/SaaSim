@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import provisioning.util.DPSInfo;
-
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.Request;
@@ -202,10 +200,5 @@ public class DynamicProvisioningSystem implements DPS{
 
 	protected MachineDescriptor buyMachine(Provider provider, MachineType instanceType, boolean isReserved){
 		return provider.buyMachine(isReserved, instanceType);
-	}
-
-	@Override
-	public DPSInfo getDPSInfo() {
-		return null;
 	}
 }
