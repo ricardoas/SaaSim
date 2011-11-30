@@ -180,12 +180,21 @@ public class Provider implements Serializable{
 		return transferOutCostsPerByte;
 	}
 
-	
+	/**
+	 * Gets the available types of machine in this {@link Provider}. 
+	 * @return An array containing the available types of machine in this {@link Provider}, see {@link MachineType}.
+	 */
 	public MachineType[] getAvailableTypes() {
 		Set<MachineType> set = types.keySet();
 		return set.toArray(new MachineType[set.size()]);
 	}
 	
+	/**
+	 * Determines if this {@link Provider} can buy a new machine.
+	 * @param reserved <code>true</code> if the new machine is a previously reserved one, <code>false</code> otherwise.
+	 * @param type the type of new machine, see {@link MachineType}.
+	 * @return <code>true</code> if can buy, <code>false</code> otherwise.
+	 */
 	public boolean canBuyMachine(boolean reserved, MachineType type) {
 		if(!reserved){
 			return types.containsKey(type) && onDemandRunningMachines < getOnDemandLimit();
@@ -228,9 +237,12 @@ public class Provider implements Serializable{
 		return removed;
 	}
 	
-
+	/**
+	 * Calculate cost of this {@link Provider} in current time.
+	 * @param currentTimeInMillis the current time in millis
+	 * @return A {@link ProviderEntry} encapsulating the calculated cost.
+	 */
 	public ProviderEntry calculateCost(long currentTimeInMillis) {
-		
 		long inputTransferences = 0;
 		long outputTransferences = 0;
 				
@@ -248,17 +260,33 @@ public class Provider implements Serializable{
 		for (TypeProvider type : types.values()) {
 			providerEntry.account(type.calculateMachinesCost(currentTimeInMillis, monitoringCost));
 		}
-		
 		return providerEntry;
 	}
 	
+	/**
+	 * Calculate the unique cost of this {@link Provider} based on its types, see {@link TypeProvider}.
+	 * @return A double represents the unique cost of this {@link Provider}.
+	 */
 	public double calculateUniqueCost() {
-
 		double cost = 0;
 		for (TypeProvider typeProvider : types.values()) {
 			cost += typeProvider.calculateUniqueCost();
 		}
 		return cost;
+	}
+	
+	/**
+	 * Compare two {@link Provider}.
+	 * <code>true</code> if them identifiers are equals, <code>false</code> otherwise.
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		assert (obj != null) && (getClass() == obj.getClass()): "Can't compare with another class object.";
+		
+		if (this == obj)
+			return true;
+		Provider other = (Provider) obj;
+		return (id == other.id);
 	}
 
 	@Override
@@ -269,14 +297,4 @@ public class Provider implements Serializable{
 		return result;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		assert (obj != null) && (getClass() == obj.getClass()): "Can't compare with another class object.";
-		
-		if (this == obj)
-			return true;
-		Provider other = (Provider) obj;
-		return (id == other.id);
-	}
-	
 }

@@ -32,16 +32,16 @@ public class Contract implements Comparable<Contract>, Serializable{
 	
 	/**
 	 * Default constructor.
-	 * @param planName
-	 * @param priority
-	 * @param setupCost
-	 * @param price
-	 * @param cpuLimitInMillis
-	 * @param extraCpuCostPerMillis
-	 * @param transferenceLimitsInBytes
-	 * @param transferenceCostsPerBytes
-	 * @param storageLimitInBytes
-	 * @param storageCostPerBytes
+	 * @param planName the name of plan for this {@link Contract}.
+	 * @param priority the priority 
+	 * @param setupCost the setup cost
+	 * @param price the price defined for this {@link Contract}.
+	 * @param cpuLimitInMillis the limit of cpu
+	 * @param extraCpuCostPerMillis the extra cost of cpu per millis
+	 * @param transferenceLimitsInBytes the transference limits in bytes
+	 * @param transferenceCostsPerBytes the transference costs per bytes
+	 * @param storageLimitInBytes the storage limit in bytes
+	 * @param storageCostPerBytes the storage cost per bytes
 	 */
 	public Contract(String planName, int priority, double setupCost, double price,
 			long cpuLimitInMillis, double extraCpuCostPerMillis, long[] transferenceLimitsInBytes, double[] transferenceCostsPerBytes,
@@ -57,65 +57,18 @@ public class Contract implements Comparable<Contract>, Serializable{
 		this.storageLimitInBytes = storageLimitInBytes;
 		this.extraStorageCostPerByte = storageCostPerBytes;
 	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int hashCode() {
-		assert name != null: "Null names are not allowed! Check your code.";
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + name.hashCode();
-		return result;
-	}
 
 	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		assert obj != null: "Can't compare with a null object!";
-		assert obj.getClass() == getClass(): "Can't compare with another class objects!";
-		if (this == obj)
-			return true;
-		return name.equals(((Contract) obj).name);
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		// Extremely inefficient but used just for debugging purposes.
-		return "Contract [name=" + name + ", priority=" + priority + ", price="
-				+ price + ", setupCost=" + setupCost + ", cpuLimitInMillis="
-				+ cpuLimitInMillis + ", extraCpuCostPerMillis="
-				+ extraCpuCostPerMillis + ", transferenceLimitsInBytes="
-				+ Arrays.toString(transferenceLimitsInBytes)
-				+ ", transferenceCostsInBytes="
-				+ Arrays.toString(transferenceCostsInBytes)
-				+ ", storageLimitInBytes=" + storageLimitInBytes
-				+ ", extraStorageCostPerByte=" + extraStorageCostPerByte + "]";
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int compareTo(Contract o) {
-		return this.name.compareTo(o.name);
-	}
-
-	/**
-	 * @param consumedCpuInMillis
-	 * @param consumedInTransferenceInBytes
-	 * @param consumedOutTransferenceInBytes
-	 * @param consumedStorageInBytes
-	 * @param numOfFinishedRequests TODO
-	 * @param numOfLostRequests TODO
-	 * @param numOfFinishedRequestsAfterSLA TODO
-	 * @return 
+	 * Calculate the receipt for this {@link Contract}. 
+	 * @param userID the id of user assign to this {@link Contract}.
+	 * @param consumedCpuInMillis the consumed cpu in millis 
+	 * @param consumedInTransferenceInBytes the consumed input transference in bytes
+	 * @param consumedOutTransferenceInBytes the consumed output transference in bytes
+	 * @param consumedStorageInBytes the consumed storage in bytes
+	 * @param numOfFinishedRequests TODO number represents a finished requests
+	 * @param numOfLostRequests TODO number represents a lost requests
+	 * @param numOfFinishedRequestsAfterSLA TODO number represents a finished requests after SLA defines.
+	 * @return A {@link UserEntry} encapsulating the calculated receipt.
 	 */
 	public UserEntry calculateReceipt(int userID, long consumedCpuInMillis, long consumedInTransferenceInBytes, long consumedOutTransferenceInBytes,
 			long consumedStorageInBytes, long numOfFinishedRequests, long numOfLostRequests, long numOfFinishedRequestsAfterSLA) {
@@ -133,7 +86,8 @@ public class Contract implements Comparable<Contract>, Serializable{
 	}
 	
 	/**
-	 * @return
+	 * Gets the value of setup cost for this {@link Contract}.
+	 * @return The value of setup cost. 
 	 */
 	public double calculateOneTimeFees() {
 		return setupCost;
@@ -141,8 +95,8 @@ public class Contract implements Comparable<Contract>, Serializable{
 	
 	/**
 	 * According to https://signin.crm.dynamics.com/portal/static/1046/sla.htm
-	 * @param totalLoss
-	 * @return
+	 * @param totalLoss a double represents the total percent of requests loss.
+	 * @return The calculated penalty.
 	 */
 	public double calculatePenalty(double totalLoss) {
 		if(totalLoss <= 0.001 || Double.isInfinite(totalLoss) || Double.isNaN(totalLoss)){
@@ -154,6 +108,47 @@ public class Contract implements Comparable<Contract>, Serializable{
 		}else{
 			return price  * 1;
 		}
+	}
+
+	/**
+	 * Compare two {@link Contract}.
+	 * <code>true</code> if them name are equals, <code>false</code> otherwise.
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		assert obj != null: "Can't compare with a null object!";
+		assert obj.getClass() == getClass(): "Can't compare with another class objects!";
+		if (this == obj)
+			return true;
+		return name.equals(((Contract) obj).name);
+	}
+	
+	@Override
+	public int compareTo(Contract o) {
+		return this.name.compareTo(o.name);
+	}
+	
+	@Override
+	public String toString() {
+		// Extremely inefficient but used just for debugging purposes.
+		return "Contract [name=" + name + ", priority=" + priority + ", price="
+				+ price + ", setupCost=" + setupCost + ", cpuLimitInMillis="
+				+ cpuLimitInMillis + ", extraCpuCostPerMillis="
+				+ extraCpuCostPerMillis + ", transferenceLimitsInBytes="
+				+ Arrays.toString(transferenceLimitsInBytes)
+				+ ", transferenceCostsInBytes="
+				+ Arrays.toString(transferenceCostsInBytes)
+				+ ", storageLimitInBytes=" + storageLimitInBytes
+				+ ", extraStorageCostPerByte=" + extraStorageCostPerByte + "]";
+	}
+	
+	@Override
+	public int hashCode() {
+		assert name != null: "Null names are not allowed! Check your code.";
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + name.hashCode();
+		return result;
 	}
 	
 }

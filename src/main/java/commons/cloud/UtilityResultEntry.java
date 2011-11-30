@@ -9,7 +9,7 @@ import java.util.TreeMap;
  * Abstraction used to represent a entry of {@link UtilityResult}.
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
- * @author Lilia Rodrigues Sampio - liliars@lsd.ufcg.edu.br
+ * @author Lilia Rodrigues Sampaio - liliars@lsd.ufcg.edu.br
  */
 public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Serializable {
 
@@ -142,14 +142,6 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 	public int compareTo(UtilityResultEntry o) {
 		return this.time < o.time? -1: (this.time == o.time? 0: 1);
 	}
-	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (time ^ (time >>> 32));
-		return result;
-	}
 
 	/**
 	 * Compare two {@link UtilityResultEntry}. 
@@ -166,6 +158,14 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 		if (time != other.time)
 			return false;
 		return true;
+	}
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (time ^ (time >>> 32));
+		return result;
 	}
 
 	public String getEntryDescriptor() {

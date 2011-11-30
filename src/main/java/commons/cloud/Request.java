@@ -73,6 +73,14 @@ public class Request implements Serializable{
 	public int getUserID() {
 		return userID;
 	}
+	
+	/**
+	 * Gets the value represents for {@link MachineType}
+	 * @return The type of the machine this {@link Request} was assigned.
+	 */
+	public MachineType getValue() {
+		return value;
+	}
 
 	/**
 	 * Gets the arrival time in millis of this {@link Request}.
@@ -105,13 +113,57 @@ public class Request implements Serializable{
 	public long getResponseSizeInBytes() {
 		return responseSizeInBytes;
 	}
-
+	
 	/**
-	 * Gets the value represents for {@link MachineType}
-	 * @return The type of the machine this {@link Request} was assigned.
+	 * Gets the value of demand for this {@link Request}.
+	 * @return The value of demand for this {@link Request}.
 	 */
-	public MachineType getValue() {
-		return value;
+	private long getDemand(){
+		return cpuDemandInMillis[value.ordinal()];
+	}
+	
+	/**
+	 * Gets the value of total to process for this {@link Request}, based in the values of demand and total processed.
+	 * @return The value of total to process for this {@link Request}.
+	 */
+	public long getTotalToProcess() {
+		return getDemand() - this.totalProcessed;
+	}
+	
+	/**
+	 * Gets the value of total mean to process for this {@link Request}.
+	 * @return The value of total mean to process for this {@link Request}.
+	 */
+	public long getTotalMeanToProcess() {
+		long total = 0;
+		for(long demand : this.cpuDemandInMillis){
+			total += demand;
+		}
+		return total / this.cpuDemandInMillis.length;
+	}
+	
+	/**
+	 * Gets the total processed for this {@link Request}.
+	 * @return The total processed for this {@link Request}
+	 */
+	public long getTotalProcessed() {
+		return totalProcessed;
+	}
+	
+	/**
+	 * Gets the response time in millis. 
+	 * @return The response time in millis.
+	 */
+	public long getResponseTimeInMillis(){
+		return finishTimeInMillis - arrivalTimeInMillis;
+	}
+	
+	/**
+	 * Set the finish time to a new value.
+	 * @param finishTimeInMillis The value set the actual finish time.
+	 */
+	public void setFinishTime(long finishTimeInMillis) {
+		this.finishTimeInMillis = finishTimeInMillis;
 	}
 
 	/**
@@ -133,47 +185,11 @@ public class Request implements Serializable{
 	}
 
 	/**
-	 * Gets the value of total to process for this {@link Request}, based in the values of demand and total processed.
-	 * @return The value of total to process for this {@link Request}.
-	 */
-	public long getTotalToProcess() {
-		return getDemand() - this.totalProcessed;
-	}
-
-	/**
 	 * Returns a value about the status of this {@link Request}, in this case, if it's finished.
 	 * @return <code>true</code> if the total to process of this {@link Request} is equals zero, <code>false</code> otherwise.
 	 */
 	public boolean isFinished(){
 		return getTotalToProcess() == 0;
-	}
-
-	/**
-	 * Gets the value of total mean to process for this {@link Request}.
-	 * @return The value of total mean to process for this {@link Request}.
-	 */
-	public long getTotalMeanToProcess() {
-		long total = 0;
-		for(long demand : this.cpuDemandInMillis){
-			total += demand;
-		}
-		return total / this.cpuDemandInMillis.length;
-	}
-	
-	/**
-	 * Gets the value of demand for this {@link Request}.
-	 * @return The value of demand for this {@link Request}.
-	 */
-	private long getDemand(){
-		return cpuDemandInMillis[value.ordinal()];
-	}
-	
-	/**
-	 * Gets the total processed for this {@link Request}.
-	 * @return The total processed for this {@link Request}
-	 */
-	public long getTotalProcessed() {
-		return totalProcessed;
 	}
 
 	/**
@@ -184,15 +200,22 @@ public class Request implements Serializable{
 		this.totalProcessed = 0;
 		this.value = null;
 	}	
-
-	public void setFinishTime(long finishTimeInMillis) {
-		this.finishTimeInMillis = finishTimeInMillis;
+	
+	/**
+	 * Compare two requests.
+	 * Return <code>true</code> if them saasClient and id are equals, <code>false</code> otherwise. 
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		assert obj != null: "Comparing with a null object, check code.";
+		assert obj.getClass() == getClass(): "Comparing with an object of another class, check code."; 
+		
+		Request other = (Request) obj;
+		if (saasClient != other.saasClient)
+			return false;
+		return reqID == other.reqID;
 	}
 	
-	public long getResponseTimeInMillis(){
-		return finishTimeInMillis - arrivalTimeInMillis;
-	}
-
 	@Override
 	public String toString() {
 		return "Request [saasClient=" + saasClient + ", reqID=" + reqID
@@ -211,20 +234,5 @@ public class Request implements Serializable{
 		result = prime * result + (int) (reqID ^ (reqID >>> 32));
 		result = prime * result + saasClient;
 		return result;
-	}
-	
-	/**
-	 * Compare two requests.
-	 * Return <code>true</code> if them saasClient and id are equals, <code>false</code> otherwise. 
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		assert obj != null: "Comparing with a null object, check code.";
-		assert obj.getClass() == getClass(): "Comparing with an object of another class, check code."; 
-		
-		Request other = (Request) obj;
-		if (saasClient != other.saasClient)
-			return false;
-		return reqID == other.reqID;
 	}
 }

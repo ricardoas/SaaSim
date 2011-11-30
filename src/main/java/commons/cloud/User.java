@@ -41,18 +41,6 @@ public class User implements Comparable<User>, Serializable{
 	}
 	
 	/**
-	 * Gets the number of lost requests of this {@link User}.
-	 * @return The number of lost requests of this {@link User}
-	 */
-	public long getNumberOfLostRequests() {
-		return numberOfLostRequests;
-	}
-
-	public long getConsumedCpuInMillis() {
-		return consumedCpuInMillis;
-	}
-
-	/**
 	 * Gets the user's id.
 	 * @return The user's id
 	 */
@@ -66,6 +54,22 @@ public class User implements Comparable<User>, Serializable{
 	 */
 	public Contract getContract() {
 		return contract;
+	}
+	
+	/**
+	 * Gets the number of lost requests of this {@link User}.
+	 * @return The number of lost requests of this {@link User}
+	 */
+	public long getNumberOfLostRequests() {
+		return numberOfLostRequests;
+	}
+
+	/**
+	 * Gets the consumed of cpu in millis.
+	 * @return A long represents the consumed of cpu in millis.
+	 */
+	public long getConsumedCpuInMillis() {
+		return consumedCpuInMillis;
 	}
 
 	/**
@@ -92,6 +96,9 @@ public class User implements Comparable<User>, Serializable{
 		return storageInBytes;
 	}
 
+	/**
+	 * Reset the values about this {@link User}.
+	 */
 	private void reset(){
 		this.consumedCpuInMillis = 0;
 		this.consumedInTransferenceInBytes = 0;
@@ -101,20 +108,43 @@ public class User implements Comparable<User>, Serializable{
 		this.numberOfFinishedRequestsAfterSLA = 0;
 	}
 	
+	/**
+	 * Update the values of consumed cpu, input and output transference.
+	 * @param consumedCpuInMillis the consumed cpu in millis to be added to actual consumed cpu. 
+	 * @param inTransferenceInBytes the input transference in bytes to be added to actual input transference.
+	 * @param outTransferenceInBytes the output transference in bytes to be added to actual output transference.
+	 */
 	private void update(long consumedCpuInMillis, long inTransferenceInBytes, long outTransferenceInBytes){
 		this.consumedCpuInMillis += consumedCpuInMillis;
 		this.consumedInTransferenceInBytes += inTransferenceInBytes;
 		this.consumedOutTransferenceInBytes += outTransferenceInBytes;
 	}
 	
+	/**
+	 * Gets the value of setup cost for the {@link Contract} of this {@link User}.
+	 * @return The value of setup cost. 
+	 */
+	public double calculateOneTimeFees() {
+		return contract.calculateOneTimeFees();
+	}
+	
+	/**
+	 * Calculate the penalty of this {@link User}.
+	 * @param totalLoss a double represents the total percent of requests loss.
+	 * @return The penalty calculated.
+	 */
+	public double calculatePenalty(double totalLoss) {
+		return this.contract.calculatePenalty(totalLoss);
+	}
+	
+	/**
+	 * Calculate the partial receipt of this {@link User}.
+	 * @return A {@link UserEntry} encapsulating the calculated receipt.
+	 */
 	public UserEntry calculatePartialReceipt() {
 		UserEntry userEntry = contract.calculateReceipt(id, consumedCpuInMillis, consumedInTransferenceInBytes, consumedOutTransferenceInBytes, storageInBytes, numberOfFinishedRequests, numberOfLostRequests, numberOfFinishedRequestsAfterSLA);
 		reset();
 		return userEntry;
-	}
-
-	public double calculateOneTimeFees() {
-		return contract.calculateOneTimeFees();
 	}
 
 	/**
@@ -135,10 +165,6 @@ public class User implements Comparable<User>, Serializable{
 		update(request.getTotalProcessed(), request.getRequestSizeInBytes(), 0);
 	}
 
-	public double calculatePenalty(double totalLoss) {
-		return this.contract.calculatePenalty(totalLoss);
-	}
-
 	/**
 	 * Report when a specific request has been finished after SLA defines.
 	 * @param request The {@link Request} finished.
@@ -146,14 +172,6 @@ public class User implements Comparable<User>, Serializable{
 	public void reportFinishedRequestAfterSLA(Request request) {
 		this.numberOfFinishedRequestsAfterSLA++;
 		update(request.getTotalProcessed(), request.getRequestSizeInBytes(), request.getResponseSizeInBytes());
-	}
-	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + id;
-		return result;//TODO return id;
 	}
 
 	/**
@@ -172,7 +190,12 @@ public class User implements Comparable<User>, Serializable{
 			return false;
 		return true;
 	}
-
+	
+	@Override
+	public int compareTo(User o) {
+		return this.contract.compareTo(o.contract);
+	}
+	
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", contract=" + contract
@@ -183,9 +206,13 @@ public class User implements Comparable<User>, Serializable{
 				+ consumedOutTransferenceInBytes + ", consumedStorageInBytes="
 				+ storageInBytes + "]";
 	}
-
+	
 	@Override
-	public int compareTo(User o) {
-		return this.contract.compareTo(o.contract);
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		return result;//TODO return id;
 	}
+
 }

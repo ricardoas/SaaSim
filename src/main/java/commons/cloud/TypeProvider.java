@@ -162,7 +162,13 @@ public class TypeProvider implements Serializable{
 	public boolean canBuy() {
 		return reservedRunningMachines.size() < reservation;
 	}
-
+	
+	/**
+	 * Calculate the cost of machines in this {@link TypeProvider}.
+	 * @param currentTimeInMillis a long represents the current time in millis
+	 * @param monitoringCostPerHour a double represents the monitoring cost per hour
+	 * @return A {@link TypeProviderEntry} encapsulating the calculated machines cost.
+	 */
 	public TypeProviderEntry calculateMachinesCost(long currentTimeInMillis, double monitoringCostPerHour) {
 		long onDemandUpTimeInFullHours = 0;
 		long reservedUpTimeInFullHours = 0;
@@ -191,7 +197,20 @@ public class TypeProvider implements Serializable{
 		reservedFinishedMachines.clear();
 		return typeEntry;
 	}
+	
+	/**
+	 * Calculate the cost based on the value of reservation and the value of the fee of reservation 
+	 * for one year.
+	 * @return The cost.
+	 */
+	public double calculateUniqueCost() {
+		return reservation * reservationOneYearFee;
+	}
 
+	/**
+	 * Gets the total transferences in this {@link TypeProvider} based on reserved and on demand, finished and running machines.
+	 * @return An array containing two values: total input transference and total output transference, in this order.
+	 */
 	public long[] getTotalTransferences() {
 		long [] transferences = new long[2];
 		Arrays.fill(transferences, 0);
@@ -212,15 +231,6 @@ public class TypeProvider implements Serializable{
 			transferences[1] += descriptor.getOutTransference();
 		}
 		return transferences;
-	}
-
-	/**
-	 * Calculate the cost based on the value of reservation and the value of the fee of reservation 
-	 * for one year.
-	 * @return The cost.
-	 */
-	public double calculateUniqueCost() {
-		return reservation * reservationOneYearFee;
 	}
 	
 }
