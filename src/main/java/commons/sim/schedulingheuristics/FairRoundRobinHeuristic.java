@@ -91,6 +91,9 @@ public class FairRoundRobinHeuristic extends AbstractSchedulingHeuristic {
 //		return machines.get(index % machines.size());
 //	}
 //
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected Machine getNextAvailableMachine() {
 		

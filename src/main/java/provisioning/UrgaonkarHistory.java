@@ -23,7 +23,7 @@ public class UrgaonkarHistory implements Serializable{
 		predLambda = new double[HISTORY_SIZE];
 		realLambda = new double[HISTORY_SIZE];
 		index = 0;
-		setUp = new FastSemaphore(6);
+		setUp = new FastSemaphore(29);
 	}
 	
 	public double applyError(double lambdaPred){

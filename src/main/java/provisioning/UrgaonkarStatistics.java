@@ -44,8 +44,7 @@ public class UrgaonkarStatistics implements Serializable{
 	 */
 	public void add(MachineStatistics statistics) {
 		
-		arrivalRate[index] += statistics.getArrivalRateInTier(predictionTick);
-		index = ++index % arrivalRate.length;
+		arrivalRate[index++ % arrivalRate.length] = statistics.getArrivalRateInTier(predictionTick);
 		
 		lambdaPeak = (statistics.averageST + (statistics.calcVarST() + statistics.calcVarIAT())/(2 * (1.0*maxRT - statistics.averageST)));
 		
@@ -54,11 +53,14 @@ public class UrgaonkarStatistics implements Serializable{
 	}
 
 	public double getPredArrivalRate() {
+		if(index == 0){
+			return 0;
+		}
 		return percentile.evaluate(index < arrivalRate.length? Arrays.copyOf(arrivalRate, index): arrivalRate);
 	}
 	
 	public double getCurrentArrivalRate() {
-		return arrivalRate[(arrivalRate.length + index - 1) % arrivalRate.length];
+		return arrivalRate[(arrivalRate.length + (index % arrivalRate.length) - 1) % arrivalRate.length];
 	}
 	
 	public double getPeakArrivalRatePerServer() {

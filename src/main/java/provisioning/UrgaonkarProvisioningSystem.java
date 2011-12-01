@@ -88,7 +88,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 
 		boolean predictiveRound = now % predictiveTickInMillis == 0;
 		
-		int numberOfServersToAdd = 0;
+		int normalizedServersToAdd = 0;
 		
 		if(predictiveRound && enablePredictive){
 			int index = (int)((now%TimeUnit.DAY.getMillis())/TimeUnit.HOUR.getMillis());
@@ -102,38 +102,35 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 			
 			double lambdaPeak = getPeakArrivalRatePerServer(statistics);
 			
-			double lambdaPred = nextTick.getPredArrivalRate();
+			double predictedArrivalRate = nextTick.getPredArrivalRate();
 			
-			double lambdaPredFromPercentile = lambdaPred;
+			double correctedPredictedArrivalRate = last.applyError(predictedArrivalRate);
 			
-			lambdaPred = last.applyError(lambdaPred);
+			int serversToAdd = (int) Math.ceil(correctedPredictedArrivalRate/lambdaPeak) - statistics.totalNumberOfServers*type.getNumberOfCores();
 			
-			numberOfServersToAdd = (int) Math.ceil(lambdaPred/lambdaPeak) - statistics.totalNumberOfServers*type.getNumberOfCores();
-			
-			int antes = numberOfServersToAdd;
-			if(numberOfServersToAdd > 0){
+			if(serversToAdd > 0){
 				
-				numberOfServersToAdd = (int) Math.ceil(1.0*numberOfServersToAdd/type.getNumberOfCores());
+				normalizedServersToAdd = (int) Math.ceil(1.0*serversToAdd/type.getNumberOfCores());
 				
-				if(numberOfServersToAdd > statistics.warmingDownMachines){
-					numberOfServersToAdd -= statistics.warmingDownMachines;
-					List<MachineDescriptor> machines = buyMachines(numberOfServersToAdd);
+				if(normalizedServersToAdd > statistics.warmingDownMachines){
+					normalizedServersToAdd -= statistics.warmingDownMachines;
+					List<MachineDescriptor> machines = buyMachines(normalizedServersToAdd);
 					for (MachineDescriptor machineDescriptor : machines) {
 						configurable.addMachine(tier, machineDescriptor, true);
 					}
 					
 					configurable.cancelMachineRemoval(tier, statistics.warmingDownMachines);
 				}else{
-					configurable.cancelMachineRemoval(tier, numberOfServersToAdd);
+					configurable.cancelMachineRemoval(tier, normalizedServersToAdd);
 				}
 				
-			}else if(numberOfServersToAdd < 0){
-				numberOfServersToAdd = (int) Math.ceil(1.0*numberOfServersToAdd/type.getNumberOfCores());
-				for (int i = 0; i < -numberOfServersToAdd; i++) {
+			}else if(serversToAdd < 0){
+				normalizedServersToAdd = (int) Math.ceil(1.0*serversToAdd/type.getNumberOfCores());
+				for (int i = 0; i < -normalizedServersToAdd; i++) {
 					configurable.removeMachine(tier, false);
 				}
 			}
-			log.info(String.format("STAT-URGAONKAR PRED %d %d %d %f %f %f %f %s", now, antes, numberOfServersToAdd, lambdaPeak, statistics.getArrivalRate(predictiveTick), lambdaPredFromPercentile, lambdaPred, statistics));
+			log.info(String.format("STAT-URGAONKAR PRED %d %d %d %f %f %f %f %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRate(predictiveTick), predictedArrivalRate, correctedPredictedArrivalRate, statistics));
 		}else if(!predictiveRound && enableReactive){
 			
 			long interval = (now % TimeUnit.HOUR.getMillis())/1000;
@@ -144,7 +141,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 			double observed = statistics.getArrivalRate(interval)/(statistics.totalNumberOfServers*type.getNumberOfCores());
 			
 			if (observed/pred > threshold){
-				numberOfServersToAdd = (int) Math.ceil(currentStat.getPredArrivalRate()/pred) - (statistics.totalNumberOfServers*type.getNumberOfCores());
+				normalizedServersToAdd = (int) Math.ceil(currentStat.getPredArrivalRate()/pred) - (statistics.totalNumberOfServers*type.getNumberOfCores());
 				
 				
 //				antes = numberOfServersToAdd;
@@ -168,7 +165,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 				
 			}
 //			log.info(String.format("STAT-URGAONKAR READ %d %d %d %f %f %s", now, antes, numberOfServersToAdd, lambda_pred, statistics.getArrivalRate(predictiveTick), statistics));
-			log.info(String.format("STAT-URGAONKAR REAC %d %d %d %s", now, tier, numberOfServersToAdd, statistics));
+			log.info(String.format("STAT-URGAONKAR REAC %d %d %d %s", now, tier, normalizedServersToAdd, statistics));
 		}
 	}
 	
@@ -204,5 +201,4 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 		
 		return 1.0/lambdaPeak;
 	}
-
 }

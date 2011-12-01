@@ -12,12 +12,15 @@ import commons.sim.DynamicConfigurable;
 public interface DPS extends Monitor{
 	
 	/**
-	 * @param configurable The new application to provide infrastructure.
+	 * Resisters a new {@link DynamicConfigurable} instance to dynamically 
+	 * provide infrastructure.
+	 * @param configurable {@link DynamicConfigurable} instance.
 	 */
 	void registerConfigurable(DynamicConfigurable configurable);
 	
 	/**
-	 * @return Compute application total utility.
+	 * Compute application total utility.
+	 * @return {@link UtilityResult} object.
 	 */
 	UtilityResult calculateUtility();
 }

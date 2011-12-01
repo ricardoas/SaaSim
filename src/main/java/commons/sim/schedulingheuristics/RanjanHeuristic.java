@@ -84,6 +84,9 @@ public class RanjanHeuristic extends AbstractSchedulingHeuristic {
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected Machine getNextAvailableMachine() {
 		// TODO Auto-generated method stub

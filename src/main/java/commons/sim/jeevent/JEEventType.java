@@ -1,6 +1,7 @@
 package commons.sim.jeevent;
 
 /**
+ * Event type
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
