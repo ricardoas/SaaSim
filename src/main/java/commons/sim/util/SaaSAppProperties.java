@@ -1,5 +1,10 @@
 package commons.sim.util;
 
+/**
+ * This class containing the properties to use in SaaS's application.
+ * 
+ * @author David Candeia - davidcmm@lsd.ufcg.edu.br
+ */
 public class SaaSAppProperties {
 
 	public static final String APPLICATION_FACTORY="saas.application.factoryclass";

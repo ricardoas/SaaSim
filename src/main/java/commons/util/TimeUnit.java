@@ -1,9 +1,9 @@
-/**
- * 
- */
 package commons.util;
 
 /**
+ * This class containing representation for the unit of time in the application and
+ * them values. 
+ * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public enum TimeUnit {
@@ -21,14 +21,16 @@ public enum TimeUnit {
 	private final long timeInMillis;
 	
 	/**
-	 * Default constructor.
+	 * Default constructor. 
+	 * @param timeInMillis value of time in milliseconds
 	 */
 	private TimeUnit(long timeInMillis) {
 		this.timeInMillis = timeInMillis;
 	}
 
 	/**
-	 * @return the tickInMillis
+	 * Gets the value of time in milliseconds
+	 * @return the tickInMillis 
 	 */
 	public long getMillis() {
 		return timeInMillis;

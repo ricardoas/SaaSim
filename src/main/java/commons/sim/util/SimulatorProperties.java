@@ -1,5 +1,10 @@
 package commons.sim.util;
 
+/**
+ * This class containing the properties to use in {@link Simulator}.
+ *  
+ * @author David Candeia - davidcmm@lsd.ufcg.edu.br
+ */
 public class SimulatorProperties {
 	
 	public static final String DPS_HEURISTIC = "dps.heuristic";
@@ -20,6 +25,5 @@ public class SimulatorProperties {
 	public static final String PLANNING_ERROR = "planning.error";
 	public static final String PLANNING_INTERVAL_SIZE = "planning.interval.size";
 	
-
 	public static final String PLANNING_USE_ERROR = "planning.enableerror";
 }

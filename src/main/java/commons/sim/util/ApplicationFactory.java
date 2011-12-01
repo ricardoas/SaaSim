@@ -1,6 +1,5 @@
 package commons.sim.util;
 
-
 import commons.config.Configuration;
 import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEEventScheduler;
@@ -19,11 +18,10 @@ public abstract class ApplicationFactory {
 	private static ApplicationFactory instance;
 	
 	/**
-	 * Builds and gets the single instance of thsi factory.
-	 * @return
+	 * Builds and gets the single instance of this factory.
+	 * @return the single instance of {@link ApplicationFactory}.
 	 */
-	public static ApplicationFactory getInstance(){
-		
+	public static ApplicationFactory getInstance() {
 		if(instance == null){
 			String className = Configuration.getInstance().getString(SaaSAppProperties.APPLICATION_FACTORY);
 			try {
@@ -36,15 +34,14 @@ public abstract class ApplicationFactory {
 	}
 
 	/**
-	 * 
-	 * @param scheduler
-	 * @return
+	 * Build the application.
+	 * @param scheduler {@link JEEventScheduler} to represent an event scheduler
+	 * @return An array containing the {@link LoadBalancer}s in the builded application.
 	 */
 	public abstract LoadBalancer[] buildApplication(JEEventScheduler scheduler);
 
 	@Deprecated
 	public static void reset() {
 		// TODO Auto-generated method stub
-		
 	}
 }

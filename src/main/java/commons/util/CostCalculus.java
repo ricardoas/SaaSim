@@ -1,19 +1,18 @@
-/**
- * 
- */
 package commons.util;
 
 /**
+ * An abstraction to calculate cost of operations in the application.
+ * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
- *
  */
 public class CostCalculus {
 
 	/**
-	 * @param totalTransferedInBytes
-	 * @param limitsInConvertedUnit
-	 * @param costsInConvertedUnit
-	 * @return
+	 * Calculates cost of transference in the application.
+	 * @param totalTransferedInBytes a double represents the total consumed transference in bytes
+	 * @param limitsInConvertedUnit an array containing the limits of transference in bytes
+	 * @param costsInConvertedUnit an array containing the costs of transference per byte
+	 * @return A value of transference cost.
 	 */
 	public static double calcTransferenceCost(double totalTransferedInBytes,
 			long[] limitsInConvertedUnit, double[] costsInConvertedUnit) {

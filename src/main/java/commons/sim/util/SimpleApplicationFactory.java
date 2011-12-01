@@ -1,14 +1,14 @@
 package commons.sim.util;
 
-
 import commons.config.Configuration;
 import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
 
 /**
+ * This factory builds a simple application based on {@link ApplicationFactory}.  
+ * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
- *
  */
 public class SimpleApplicationFactory extends ApplicationFactory {
 	
@@ -17,7 +17,6 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 	 */
 	@Override
 	public LoadBalancer[] buildApplication(JEEventScheduler scheduler) {
-		
 		Configuration config = Configuration.getInstance();
 		int numOfTiers = config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS);
 		
@@ -29,23 +28,22 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 		for (int i = 0; i < numOfTiers; i++) {
 			loadBalancers[i] = buildLoadBalancer(scheduler, heuristicClasses[i], maxServerPerTier[i], i);
 		}
-		
 		return loadBalancers;
 	}
 
 	/**
-	 * @param scheduler
-	 * @param heuristic
-	 * @param maxServerPerTier 
-	 * @param tier 
-	 * @return
+	 * Build a {@link LoadBalancer}.
+	 * @param scheduler {@link JEEventScheduler} represent a event scheduler
+	 * @param heuristic a {@link SchedulingHeuristic} for this {@link LoadBalancer} 
+	 * @param maxServerPerTier the maximum number of servers per tier 
+	 * @param tier the tier of {@link LoadBalancer}
+	 * @return A builded {@link LoadBalancer}.
 	 */
 	private static LoadBalancer buildLoadBalancer(JEEventScheduler scheduler, Class<?> heuristic,
 			int maxServerPerTier, int tier) {
 		try {
 			return new LoadBalancer(scheduler, (SchedulingHeuristic) heuristic.newInstance(), 
-					maxServerPerTier, 
-					tier);
+					   maxServerPerTier, tier);
 		} catch (Exception e) {
 			throw new RuntimeException("Something went wrong when loading "+ heuristic, e);
 		}

@@ -1,5 +1,10 @@
 package commons.sim.util;
 
+/**
+ * This class containing the properties to use in SaaS's plan.
+ *  
+ * @author David Candeia - davidcmm@lsd.ufcg.edu.br
+ */
 public class SaaSPlanProperties {
 	
 	public static final String NUMBER_OF_PLANS = "saas.plan.number";

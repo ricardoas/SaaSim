@@ -1,5 +1,10 @@
 package commons.sim.util;
 
+/**
+ * This class containing the properties to use in SaaS's users. 
+ * 
+ * @author David Candeia - davidcmm@lsd.ufcg.edu.br
+ */
 public class SaaSUsersProperties {
 	
 	public static final String SAAS_NUMBER_OF_USERS = "saas.number";

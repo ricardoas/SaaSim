@@ -24,8 +24,8 @@ import commons.sim.util.SaaSUsersProperties;
  * This class reads a config.properties that is used in simulation and extracts user traces to be used. For each user trace
  * it calculates some statistics per fixed intervals (e.g. per hour) and creates new "user traces" to be used by {@link AGHeuristic} and
  * {@link OptimalHeuristic} during capacity planning.
+ * 
  * @author David Candeia
- *
  */
 public class AggregateWorkload {
 	
@@ -66,17 +66,21 @@ public class AggregateWorkload {
 					List<Request> requests = next(workloadReader, clientsID[i]);
 					extractSummary(requests, currentSummaries);
 				}
-				
 				workloadReader.close();
 			}
 			pointersReader.close();
 			
 			persistSummary(workloads[i], currentSummaries);
 		}
-		
 		persistProperties(workloads, plans);
 	}
 	
+	/**
+	 * Creates a new configuration file for users in the simulation (newUser.properties).
+	 * @param workloads an array containing workloads's names
+	 * @param plans an array containing plans's names
+	 * @throws IOException
+	 */
 	private static void persistProperties(String[] workloads, String[] plans) throws IOException {
 		BufferedWriter usersPropertiesWriter = new BufferedWriter(new FileWriter(DEFAULT_OUTPUT_FILE));
 		usersPropertiesWriter.write("saas.number="+workloads.length+"\n\n");
@@ -105,9 +109,8 @@ public class AggregateWorkload {
 	
 	/**
 	 * This method creates an output file containing statistics of workload instead of a file of pointers to real traces.
-	 * @param workload The name of the file containing the pointers to real traces
-	 * @param summaries Workload statistics
-	 * @param currentPlan 
+	 * @param workload the name of the file containing the pointers to real traces
+	 * @param summaries workload statistics
 	 * @throws IOException
 	 */
 	private static void persistSummary(String workload, List<Summary> summaries) throws IOException {
@@ -124,8 +127,8 @@ public class AggregateWorkload {
 	
 	/**
 	 * This method collects statistics for a set of requests.
-	 * @param requests
-	 * @param data
+	 * @param requests a list of {@link Request}s to be collect statistics
+	 * @param data workload statistics
 	 */
 	private static void extractSummary(List<Request> requests, List<Summary> data) {
 		double totalServiceTime = 0d;
@@ -145,6 +148,13 @@ public class AggregateWorkload {
 		data.add(summary);
 	}
 
+	/**
+	 * Gets the next quantity of {@link Request}s to be read.
+	 * @param workloadReader a {@link BufferedReader} to represent a workload reader.
+	 * @param clientID id of client
+	 * @return A list containing the next quantity of {@link Request}s to be read.
+	 * @throws IOException
+	 */
 	public static List<Request> next(BufferedReader workloadReader, int clientID) throws IOException{
 		List<Request> requests = new ArrayList<Request>(leftOver);
 		
@@ -166,11 +176,16 @@ public class AggregateWorkload {
 				break;
 			}
 		}
-		
 		currentTick++;
 		return requests;
 	}
 	
+	/**
+	 * Parse a line of workload file in a {@link Request}.
+	 * @param line line to be parse in a new {@link Request}
+	 * @param saasClientID id of client
+	 * @return A new {@link Request}.
+	 */
 	protected static Request parseRequest(String line, int saasClientID) {
 		StringTokenizer tokenizer = new StringTokenizer(line, "( +|\t+)+");
 
@@ -190,5 +205,4 @@ public class AggregateWorkload {
 				requestSizeInBytes, responseSizeInBytes, demand);
 	}
 	
-
 }

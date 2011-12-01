@@ -48,6 +48,10 @@ public class SimulationInfo implements Serializable{
 		finishDay = k;
 	}
 
+	/**
+	 * Gets the current day in the simulation.
+	 * @return the current day
+	 */
 	public int getCurrentDay() {
 		return (int)(currentDay/DAY_IN_MILLIS);
 	}
@@ -62,19 +66,49 @@ public class SimulationInfo implements Serializable{
 		this.currentMonth = currentMonth;
 	}
 
+	/**
+	 * Adds a one day to current day in the simulation.
+	 */
 	public void addDay() {
 		this.currentDay += DAY_IN_MILLIS;
 	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + currentMonth;
-		result = prime * result + (int)currentDay;
-		return result;
+	
+	/**
+	 * @return <code>true</code> if this is the last simulation day.
+	 */
+	public boolean isFinishDay(){
+		return currentDay == finishDay;
+	}
+	
+	/**
+	 * @return <code>true</code> if this is the first day in the simulation.
+	 */
+	public boolean isFirstDay() {
+		return currentDay == 0;
 	}
 
+	/**
+	 * Gets the value of current day in milliseconds.
+	 * @return the value of current day in milliseconds.
+	 */
+	public long getCurrentDayInMillis() {
+		return currentDay;
+	}
+
+	/**
+	 * @return <code>true</code> if is day of charge in the simulation. 
+	 */
+	public boolean isChargeDay() {
+		Calendar instance = GregorianCalendar.getInstance();
+		instance.set(Calendar.YEAR, 2009);
+		instance.set(Calendar.DAY_OF_YEAR, getCurrentDay()+2);
+		return instance.get(Calendar.DAY_OF_MONTH) == 1;// && getCurrentDay() != 0;
+	}
+
+	/**
+	 * Compare two {@link SimulationInfo}.
+	 * <code>true</code> if them current day are equals.
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		assert (obj != null) && (getClass() == obj.getClass()): "Can't compare with different class object.";
@@ -85,29 +119,22 @@ public class SimulationInfo implements Serializable{
 	}
 	
 	/**
-	 * @return <code>true</code> if this is the last simulation day.
+	 * {@inheritDoc}
 	 */
-	public boolean isFinishDay(){
-		return currentDay == finishDay;
-	}
-
-	public long getCurrentDayInMillis() {
-		return currentDay;
-	}
-
-	public boolean isChargeDay() {
-		Calendar instance = GregorianCalendar.getInstance();
-		instance.set(Calendar.YEAR, 2009);
-		instance.set(Calendar.DAY_OF_YEAR, getCurrentDay()+2);
-		return instance.get(Calendar.DAY_OF_MONTH) == 1;// && getCurrentDay() != 0;
-	}
-	
 	@Override
 	public String toString() {
 		return String.format("%d %b %b %b", getCurrentDay(), isFirstDay(), isFinishDay(), isChargeDay());
 	}
-
-	public boolean isFirstDay() {
-		return currentDay == 0;
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + currentMonth;
+		result = prime * result + (int)currentDay;
+		return result;
 	}
 }

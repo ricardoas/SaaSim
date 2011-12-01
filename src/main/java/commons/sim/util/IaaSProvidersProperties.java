@@ -1,5 +1,10 @@
 package commons.sim.util;
 
+/**
+ * This class containing the properties to use in IaaS's providers.
+ * 
+ * @author David Candeia - davidcmm@lsd.ufcg.edu.br 
+ */
 public class IaaSProvidersProperties {
 
 	public static final String IAAS_NUMBER_OF_PROVIDERS = "iaas.number";
