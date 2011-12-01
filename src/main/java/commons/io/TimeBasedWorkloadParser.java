@@ -6,6 +6,8 @@ import java.util.List;
 import commons.cloud.Request;
 
 /**
+* A different implementation of {@link WorkloadParser}, based on time.
+ * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
@@ -17,8 +19,9 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	protected WorkloadParser<Request>[] parsers;
 	
 	/**
-	 * @param tick
-	 * @param parser
+	 * Default constructor.
+	 * @param tick a long represent a moment in time
+	 * @param parser an array without specific size, containing {@link WorkloadParser}.
 	 */
 	public TimeBasedWorkloadParser(long tick, WorkloadParser<Request>... parser) {
 		if(parser.length == 0){
@@ -39,7 +42,9 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Returns a list containing {@link Request}s have been read. If the arrival time of next request in {@link WorkloadParser}
+	 * is less than current time, it's added in the list, otherwise, it's going to an array where it's stored while doesn't
+	 * satisfies the condition.
 	 */
 	@Override
 	public List<Request> next(){
@@ -69,7 +74,6 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 				}
 			}
 		}
-		
 		this.currentTick += tick;
 		return requests;
 	}

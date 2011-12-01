@@ -1,6 +1,5 @@
 package commons.sim;
 
-import java.io.IOException;
 import java.util.List;
 
 import provisioning.Monitor;
@@ -19,6 +18,8 @@ import commons.sim.util.SimulatorProperties;
 import commons.util.SimulationInfo;
 
 /**
+ * This class represents a simulator of SaaSim, it features and basic operations.
+ * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public class SimpleSimulator extends JEAbstractEventHandler implements Simulator{
@@ -38,9 +39,9 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	private int numberOfRequests;
 
 	/**
-	 * Constructor
-	 * @param list 
-	 * @throws IOException 
+	 * Default constructor.
+	 * @param scheduler A {@link JEEventScheduler} to represent a scheduler of {@link SimpleSimulator}.
+	 * @param tiers An array containing the tiers of application, see {@link LoadBalancer}.
 	 */
 	public SimpleSimulator(JEEventScheduler scheduler, LoadBalancer... tiers){
 		super(scheduler);
@@ -66,8 +67,11 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 		this.workloadParser = workloadParser;
 	}
 	
+	/**
+	 * Prepare the simulator before it start up, starting events like 
+	 * {@link JEEventType#READWORKLOAD#CHARGE_USERS#ESTIMATE_SERVERS#COLLECT_STATISTICS}. 
+	 */
 	protected void prepareBeforeStart() {
-		
 		send(new JEEvent(JEEventType.READWORKLOAD, this, getScheduler().now()));
 		
 		SimulationInfo info = Checkpointer.loadSimulationInfo();
@@ -131,11 +135,20 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	}
 
 	/**
-	 * @param request
+	 * Parse a {@link Request} in a {@link JEEvent}.
+	 * @param request {@link Request} to be parsed in a event.
 	 * @return
 	 */
 	protected JEEvent parseEvent(Request request) {
 		return new JEEvent(JEEventType.NEWREQUEST, tiers[0], request.getArrivalTimeInMillis(), request);
+	}
+	
+	/**
+	 * Gets the {@link WorkloadParser} of this {@link SimpleSimulator}.
+	 * @return the {@link WorkloadParser}
+	 */
+	public WorkloadParser<List<Request>> getParser() {
+		return this.workloadParser;
 	}
 
 	/**
@@ -147,6 +160,9 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 		tiers[tier].addMachine(machineDescriptor, useStartUpDelay);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void removeMachine(int tier, boolean force) {
 		assert tiers.length >= tier : "This tier not exists!";
@@ -154,15 +170,11 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	}
 
 	/**
-	 * @return
+	 * {@inheritDoc}
 	 */
 	@Override
 	public LoadBalancer[] getTiers() {
 		return this.tiers;
-	}
-
-	public WorkloadParser<List<Request>> getParser() {
-		return this.workloadParser;
 	}
 
 	/**
@@ -176,6 +188,9 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void cancelMachineRemoval(int tier, int numberOfMachines) {
 		tiers[tier].cancelMachineRemoval(numberOfMachines);

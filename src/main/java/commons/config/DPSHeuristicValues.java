@@ -45,14 +45,15 @@ public enum DPSHeuristicValues {
 	private final String className;
 
 	/**
-	 * Default private constructor
-	 * @param className
+	 * Default private constructor.
+	 * @param className the name of heuristic class
 	 */
 	private DPSHeuristicValues(String className){
 		this.className = className;
 	}
 
 	/**
+	 * Gets the name of heuristic class.
 	 * @return Class canonical name to load.
 	 */
 	public String getClassName() {

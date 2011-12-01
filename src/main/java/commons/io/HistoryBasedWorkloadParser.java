@@ -8,9 +8,11 @@ import commons.cloud.Request;
 import commons.util.TimeUnit;
 
 /**
+ * A different implementation of {@link WorkloadParser}, based on history.
+ * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class HistoryBasedWorkloadParser extends TimeBasedWorkloadParser{
+public class HistoryBasedWorkloadParser extends TimeBasedWorkloadParser {
 
 	private static final int DEFAULT_WINDOW_SIZE = 2;
 	
@@ -18,18 +20,20 @@ public class HistoryBasedWorkloadParser extends TimeBasedWorkloadParser{
 	private boolean readNexPeriod = true;
 
 	/**
-	 * @param parser
-	 * @param tick
+	 * FIXME!
+	 * Default constructor.
+	 * @param parser a {@link WorkloadParser} of {@link Request}.
+	 * @param tick a {@link TimeUnit} represents an actual time
 	 */
-	//FIXME!
 	public HistoryBasedWorkloadParser(WorkloadParser<Request> parser, TimeUnit tick) {
 		this(parser, tick, DEFAULT_WINDOW_SIZE);
 	}
 	
 	/**
-	 * @param parser
-	 * @param tick
-	 * @param windowSize
+	 * Another constructor receiving a size of window.
+	 * @param parser a {@link WorkloadParser} of {@link Request}.
+	 * @param tick a {@link TimeUnit} represents an actual time
+	 * @param windowSize a size of window
 	 */
 	@SuppressWarnings("unchecked")
 	public HistoryBasedWorkloadParser(WorkloadParser<Request> parser, TimeUnit tick, int windowSize) {
@@ -38,14 +42,15 @@ public class HistoryBasedWorkloadParser extends TimeBasedWorkloadParser{
 	}
 	
 	/**
-	 * @return
+	 * Gets the history of requests in this {@link HistoryBasedWorkloadParser}
+	 * @return a queue containing lists of {@link Request} like a historic. 
 	 */
 	public Queue<List<Request>> getHistory(){
 		return new LinkedBlockingQueue<List<Request>>(history);
 	}
 	
 	/**
-	 * {@inheritDoc}
+	 * Read a next period in the workload, and return a list of {@link Request} equivalent a this period.
 	 */
 	@Override
 	public List<Request> next(){
@@ -59,7 +64,11 @@ public class HistoryBasedWorkloadParser extends TimeBasedWorkloadParser{
 		}
 		return this.history.peek();
 	}
-	
+
+	/**
+	 * Set the next period to read.
+	 * @param readNextPeriod the next period to read.
+	 */
 	/**
 	 * @param readNextPeriod
 	 */
@@ -67,5 +76,4 @@ public class HistoryBasedWorkloadParser extends TimeBasedWorkloadParser{
 		this.readNexPeriod = readNextPeriod;
 	}
 	
-
 }

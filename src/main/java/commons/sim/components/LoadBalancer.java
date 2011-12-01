@@ -51,7 +51,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	 * @param scheduler Event scheduler.
 	 * @param heuristic {@link SchedulingHeuristic}
 	 * @param maxServersAllowed Max number of servers to manage in this layer.
-	 * @param machines An initial collection of {@link Machine}s.
+	 * @param tier the tier of this {@link LoadBalancer} represents
 	 */
 	public LoadBalancer(JEEventScheduler scheduler, SchedulingHeuristic heuristic, int maxServersAllowed, int tier) {
 		super(scheduler);
@@ -65,8 +65,8 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	}
 
 	/**
-	 * 
-	 * @param useStartUpDelay 
+	 * Add a new {@link MachineDescriptor} to this tier.
+	 * @param useStartUpDelay <code>true</code> if use start up delay
 	 */
 	public void addMachine(MachineDescriptor descriptor, boolean useStartUpDelay){
 		Machine machine = buildMachine(descriptor);
@@ -80,8 +80,9 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	}
 	
 	/**
-	 * @param machineDescriptor
-	 * @return
+	 * Builds a {@link MachineDescriptor} creating new {@link TimeSharedMachine}. 
+	 * @param machineDescriptor the machine to be build
+	 * @return a {@link Machine}
 	 */
 	private Machine buildMachine(MachineDescriptor machineDescriptor) {
 		return new TimeSharedMachine(getScheduler(), machineDescriptor, this);
@@ -133,7 +134,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	/**
 	 * This method is called when the optimal provisioning system is used. It is used to collect current amount of servers being used
 	 * by each load balancer.
-	 * @param eventTime
+	 * @param eventTime the time of event
 	 */
 	public void estimateServers(long eventTime) {
 		MachineStatistics statistics = new MachineStatistics(0, 0, 0, heuristic.getNumberOfMachines());
@@ -143,9 +144,9 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	/**
 	 * This method is used to collect statistics of current running servers. Such statistics include: machine utilisation, number of
 	 * requests that arrived, number of finished requests and current number of servers. 
-	 * @param now
-	 * @param timeInterval TODO
-	 * @param numberOfRequests Total number of requests submitted to the system (A<sub>0</sub>)
+	 * @param now the actual time
+	 * @param timeInterval TODO the interval to collect statistics
+	 * @param numberOfRequests total number of requests submitted to the system (A<sub>0</sub>)
 	 */
 	public void collectStatistics(long now, long timeInterval, int numberOfRequests) {
 		MachineStatistics statistics = heuristic.getStatistics(now);
@@ -161,18 +162,45 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	public List<Machine> getServers() {
 		return new ArrayList<Machine>(heuristic.getMachines());
 	}
+	
+	/**
+	 * Gets the equivalent tier of this {@link LoadBalancer}.
+	 * @return the tier
+	 */
+	public int getTier() {
+		return tier;
+	}
 
+	/**
+	 * Sets the monitor of the application
+	 * @param monitor the monitor to set
+	 */
+	public void setMonitor(Monitor monitor) {
+		this.monitor = monitor;
+	}
+
+	/**
+	 * Report when a specific {@link Request} goes to queue.
+	 * @param requestQueued {@link Request} queued
+	 */
 	public void reportRequestQueued(Request requestQueued){
-//		heuristic.reportFinishedRequest(requestQueued);
+		//heuristic.reportFinishedRequest(requestQueued);
 		monitor.requestQueued(getScheduler().now(), requestQueued, tier);
 	}
-	
+
+	/**
+	 * Report when a specific {@link Request} has been finished.
+	 * @param requestFinished the {@link Request} has been finished
+	 */
 	public void reportRequestFinished(Request requestFinished) {
-		
 		heuristic.reportFinishedRequest(requestFinished);
 		monitor.requestFinished(requestFinished);
 	}
 
+	/**
+	 * Remove a specific {@link Machine} to this tier.
+	 * @param force <code>true</code> if use force
+	 */
 	public void removeMachine(boolean force) {
 		Machine machine = null;
 		
@@ -182,7 +210,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 				warmingDown.put(machine.getDescriptor(), machine);
 				if(force){
 					//FIXME what can we do with running requests?
-	//				send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this, getScheduler().now(), machine));
+					//send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this, getScheduler().now(), machine));
 					throw new RuntimeException("Not implemented");
 				}else{
 					machine.shutdownOnFinish();
@@ -199,16 +227,27 @@ public class LoadBalancer extends JEAbstractEventHandler{
 			machine.shutdownOnFinish();
 		}
 	}
-
-	public int getTier() {
-		return tier;
+	
+	/**
+	 * Cancels machine's removal.
+	 * @param numberOfMachines number of machines to be recovered
+	 */
+	public void cancelMachineRemoval(int numberOfMachines) {
+		Iterator<Entry<MachineDescriptor, Machine>> iterator = warmingDown.entrySet().iterator();
+		for (int i = 0; i < numberOfMachines; i++) {
+			Entry<MachineDescriptor, Machine> entry = iterator.next();
+			iterator.remove();
+			entry.getValue().cancelShutdown();
+			heuristic.addMachine(entry.getValue());
+		}
 	}
 
 	/**
-	 * @param monitor the monitor to set
+	 * {@inheritDoc}
 	 */
-	public void setMonitor(Monitor monitor) {
-		this.monitor = monitor;
+	@Override
+	public boolean equals(Object obj) {
+		return super.equals(obj);
 	}
 	
 	/**
@@ -219,21 +258,4 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		return super.hashCode();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		return super.equals(obj);
-	}
-
-	public void cancelMachineRemoval(int numberOfMachines) {
-		Iterator<Entry<MachineDescriptor, Machine>> iterator = warmingDown.entrySet().iterator();
-		for (int i = 0; i < numberOfMachines; i++) {
-			Entry<MachineDescriptor, Machine> entry = iterator.next();
-			iterator.remove();
-			entry.getValue().cancelShutdown();
-			heuristic.addMachine(entry.getValue());
-		}
-	}
 }

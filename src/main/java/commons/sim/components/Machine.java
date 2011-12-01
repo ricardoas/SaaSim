@@ -30,7 +30,8 @@ public interface Machine extends JEEventHandler{
 	MachineDescriptor getDescriptor();
 
 	/**
-	 * @param request Send a new {@link Request} to be processed by this machine.
+	 * Send a new {@link Request} to be processed by this machine.
+	 * @param request a new {@link Request} to be processed by this machine.
 	 */
 	void sendRequest(Request request);
 
@@ -40,26 +41,28 @@ public interface Machine extends JEEventHandler{
 	void shutdownOnFinish();
 
 	/**
-	 * @param timeInMillis
-	 * @return
+	 * Compute the utilisation of the machine.
+	 * @param timeInMillis current time in milliseconds
+	 * @return the result of the computed utilisation
 	 */
 	double computeUtilisation(long timeInMillis);
 	
 	/**
-	 * @return
+	 * Gets the total time used per this {@link Machine}.
+	 * @return the total time used
 	 */
 	long getTotalTimeUsed();
 	
 	/**
-	 * @return The number of cores.
+	 * @return The number of cores of this {@link Machine}.
 	 */
 	int getNumberOfCores();
 
-	/**
-	 * @param request
-	 * @return
-	 */
+	@Deprecated
 	List<Triple<Long, Long, Long>> estimateFinishTime(Request request);
-
+	
+	/**
+	 * Cancels the shutdown of {@link Machine}.
+	 */
 	void cancelShutdown();
 }

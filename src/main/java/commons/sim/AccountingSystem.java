@@ -8,6 +8,8 @@ import commons.cloud.UtilityResult;
 import commons.cloud.UtilityResultEntry;
 
 /**
+ * Calculates values of {@link UtilityResult}.
+ * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public class AccountingSystem implements Serializable{
@@ -20,18 +22,19 @@ public class AccountingSystem implements Serializable{
 	
 	/**
 	 * Default constructor.
-	 * @param users
-	 * @param providers
+	 * @param users an array of {@link User} containing the users of application
+	 * @param providers an array of {@link Provider} containing the providers of application
 	 */
 	public AccountingSystem(User[] users, Provider[] providers) {
 		this.utilityResult = new UtilityResult(users, providers);
 	}
 
 	/**
-	 * @param currentTimeInMillis
-	 * @param users TODO
-	 * @param providers TODO
-	 * @return 
+	 * Calculates the partial utility of application.
+	 * @param currentTimeInMillis the current time in millis
+	 * @param users TODO an array of {@link User} containing the users of application
+	 * @param providers TODO an array of {@link Provider} containing the providers of application
+	 * @return A {@link UtilityResultEntry} encapsulating the utility calculated.
 	 */
 	public UtilityResultEntry accountPartialUtility(long currentTimeInMillis, User[] users, Provider[] providers){
 		UtilityResultEntry entry = new UtilityResultEntry(currentTimeInMillis, users, providers);
@@ -42,7 +45,7 @@ public class AccountingSystem implements Serializable{
 	/**
 	 * This method calculates the costs incurred by IaaS providers in a unique period. (e.g, one time
 	 * during a whole year)  
-	 * @return
+	 * @return A {@link UtilityResult}.
 	 */
 	public UtilityResult calculateUtility(){
 		return utilityResult;

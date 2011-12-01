@@ -1,7 +1,6 @@
 package commons.sim.components;
 
-import static commons.sim.util.SimulatorProperties.MACHINE_BACKLOG_SIZE;
-import static commons.sim.util.SimulatorProperties.MACHINE_NUMBER_OF_TOKENS;
+import static commons.sim.util.SimulatorProperties.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +17,6 @@ import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.util.FastSemaphore;
-import commons.sim.util.SaaSAppProperties;
 import commons.util.Triple;
 
 /**
@@ -53,7 +51,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	private long maxOnQueue;
 	
 	/**
-	 * Default constructor
+	 * Default constructor.
 	 * @param scheduler Event scheduler.
 	 * @param descriptor Machine descriptor.
 	 * @param loadBalancer {@link LoadBalancer} responsible for this machine.
@@ -81,7 +79,6 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	/**
 	 * {@inheritDoc}
 	 */
-	
 	@Override
 	public LoadBalancer getLoadBalancer() {
 		return loadBalancer;
@@ -102,12 +99,18 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	public MachineDescriptor getDescriptor() {
 		return descriptor;
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public long getTotalTimeUsed(){
 		return this.totalTimeUsed;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int getNumberOfCores() {
 		return this.NUMBER_OF_CORES;
@@ -118,7 +121,6 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 */
 	@Override
 	public void sendRequest(Request request) {
-		
 		if(canRun()){
 			this.processorQueue.add(request);
 			request.assignTo(descriptor.getType());
@@ -131,7 +133,6 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		}else{
 			send(new JEEvent(JEEventType.REQUESTQUEUED, getLoadBalancer(), getScheduler().now(), request));
 		}
-
 	}
 
 	/**
@@ -144,10 +145,10 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	}
 
 	/**
-	 * 
+	 * Try to shutdown this {@link Machine}, creating an event {@link JEEventType#MACHINE_TURNED_OFF}.
 	 */
 	protected void tryToShutdown() {
-		if( shutdownOnFinish && ! isBusy()){
+		if(shutdownOnFinish && !isBusy()){
 			long scheduledTime = getScheduler().now();
 			descriptor.setFinishTimeInMillis(scheduledTime);
 			send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, scheduledTime, descriptor));
@@ -184,28 +185,30 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 				}
 				
 				tryToShutdown();
-				
 				break;
 		}
 		event = null;
 	}
-
+	
+	/**
+	 * Finishes a specific {@link Request} and adds a new request coming from backlog in processor queue, if it exists. 
+	 * @param request {@link Request} to be finish.
+	 */
 	protected void requestFinished(Request request) {
 		if(!backlog.isEmpty()){
 			Request newRequestToAdd = backlog.poll();
 			newRequestToAdd.assignTo(this.descriptor.getType());
 			processorQueue.add(newRequestToAdd);
 		}
-		
-//		if(getScheduler().now() - request.getArrivalTimeInMillis() > 
-//			Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)){
-//			getLoadBalancer().reportRequestQueued(request);
-//			descriptor.updateTransference(request.getRequestSizeInBytes(), 0);
-//		}else{
+		//if(getScheduler().now() - request.getArrivalTimeInMillis() > 
+		//Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)){
+		//getLoadBalancer().reportRequestQueued(request);
+		//descriptor.updateTransference(request.getRequestSizeInBytes(), 0);
+		//}else{
 			request.setFinishTime(getScheduler().now());
 			descriptor.updateTransference(request.getRequestSizeInBytes(), request.getResponseSizeInBytes());
 			getLoadBalancer().reportRequestFinished(request);
-//		}
+		//}
 	}
 
 	/**
@@ -218,30 +221,43 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		send(new JEEvent(JEEventType.PREEMPTION, this, nextQuantum+lastUpdate, nextQuantum, nextRequest));
 	}
 	
+	/**
+	 * Verifies if this {@link TimeSharedMachine} is busy, based on the conditions about processor queue and permission of semaphore.
+	 * @return <code>true</code> if the machine is busy, <code>false</code> otherwise.
+	 */
 	public boolean isBusy() {
 		return !this.processorQueue.isEmpty() || this.semaphore.availablePermits() != this.NUMBER_OF_CORES;
 
-	}	
-
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return super.equals(obj);
-	}
-
-	@Override
-	public String toString(){
-		return getClass().getName() + ": " + descriptor;
 	}
 	
 	/**
-	 * This method estimates CPU utilisation of current machine
-	 * @param timeInMillis
-	 * @return
+	 * Verifies if exists an available thread to process a new {@link Request}.
+	 * @return <code>true</code> when there is an available thread to process this request, 
+	 * and <code>false</code> otherwise.
+	 */
+	protected boolean canRun() {
+		return processorQueue.size() != maxOnQueue;
+	}
+	
+	/**
+	 * Verifies if exists space available on the backlog.
+	 * @return <code>true</code> if there is free space available at the backlog queue, 
+	 * and <code>false</code> otherwise.
+	 */
+	protected boolean canQueue() {
+		return this.backlog.size() < maxBacklogSize;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void cancelShutdown() {
+		shutdownOnFinish = false;
+	}
+	
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
 	public double computeUtilisation(long timeInMillis){
@@ -262,12 +278,10 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	}
 	
 	private class Info{
-
 		private final Request request;
 		private long finishTimeBefore;
 		private long finishTimeAfter;
 		private long processedDemand;
-		
 
 		public Info(Request request) {
 			this.request = request;
@@ -314,8 +328,32 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 			return "Info [finishTimeBefore=" + finishTimeBefore + "]";
 		}
 	}
-
+	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		return super.equals(obj);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString(){
+		return getClass().getName() + ": " + descriptor;
+	}
+	
+	@Deprecated
 	public List<Triple<Long, Long, Long>> estimateFinishTime(Request newRequest) {
 		
 		List<Triple<Long, Long, Long>> executionTimes = new ArrayList<Triple<Long, Long, Long>>();
@@ -340,28 +378,6 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 				queue.add(request);
 			}
 		}
-		
 		return executionTimes;
-	}
-	
-	/**
-	 * @return <code>true</code> when there is an available thread to process this request, 
-	 * and <code>false</code> otherwise.
-	 */
-	protected boolean canRun() {
-		return processorQueue.size() != maxOnQueue;
-	}
-	
-	/**
-	 * @return <code>true</code> if there is free space available at the backlog queue, 
-	 * and <code>false</code> otherwise.
-	 */
-	protected boolean canQueue() {
-		return this.backlog.size() < maxBacklogSize;
-	}
-	
-	@Override
-	public void cancelShutdown() {
-		shutdownOnFinish = false;
 	}
 }

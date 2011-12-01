@@ -8,6 +8,7 @@ import java.io.IOException;
 import commons.cloud.Request;
 
 /**
+ * Represents a abstract {@link WorkloadParser}.
  * 
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
  */
@@ -28,9 +29,8 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 	/**
 	 * Default constructor.
 	 * 
-	 * @param workload Workload file name.
-	 * @param saasclientID SaaS client ID.
-	 * @param shift TODO
+	 * @param workload workload file name
+	 * @param shift TODO 
 	 */
 	public AbstractWorkloadParser(String workload, long shift) {
 		this.workload = workload;
@@ -52,9 +52,9 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 	}
 	
 	/**
-	 * 
-	 * @param workload
-	 * @return
+	 * Read file to be used for this {@link AbstractWorkloadParser}.
+	 * @param workload The file to read.
+	 * @return The content of file.
 	 */
 	private String readFileToUse(String workload) {
 		this.currentDay = Checkpointer.loadSimulationInfo().getCurrentDay();
@@ -109,7 +109,8 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 	}
 	
 	/**
-	 * @return
+	 * Read the next {@link Request} in the file, using {@link #parseRequest(String)}.
+	 * @return the {@link Request}
 	 */
 	private Request readNext() {
 		String line;
@@ -122,8 +123,9 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 	}
 
 	/**
-	 * @param line
-	 * @return
+	 * Parse a line of file from workload in a {@link Request}.
+	 * @param line line to be parsed in a {@link Request}
+	 * @return the {@link Request}
 	 */
 	protected abstract Request parseRequest(String line);
 
