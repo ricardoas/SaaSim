@@ -12,16 +12,31 @@ import planning.util.Summary;
 
 import commons.config.Validator;
 
+/**
+ * This class represents a workload parser adapted for planning. 
+ * 
+ * @author David Candeia - davidcmm@lsd.ufcg.edu.br
+ */
 public class PlanningWorkloadParser extends PropertiesConfiguration{
 	
 	private List<Summary> summariesPerInterval;
 
+	/**
+	 * Default constructor.
+	 * @param workloadPath the path workload's file
+	 * @throws ConfigurationException 
+	 */
 	public PlanningWorkloadParser(String workloadPath) throws ConfigurationException{
 		super(workloadPath);
 		this.summariesPerInterval = new ArrayList<Summary>();
 		checkProperties();
 	}
 	
+	/**
+	 * Check properties about the {@link PlanningWorkloadParser}'s properties.
+	 * 
+	 * @throws ConfigurationException
+	 */
 	private void checkProperties() throws ConfigurationException {
 		String[] arrivalRates = getStringArray(ARRIVAL_RATE);
 		if(arrivalRates != null && arrivalRates.length != 0){
@@ -59,12 +74,16 @@ public class PlanningWorkloadParser extends PropertiesConfiguration{
 		}
 	}
 
+	/**
+	 * Gets a statistics of workloads.
+	 * @return A list containing {@link Summary}s of the workloads.  
+	 */
 	public List<Summary> getSummaries(){
 		return this.summariesPerInterval;
 	}
 
 	/**
-	 * @return
+	 * Read data to adds in list of {@link Summary} of this {@link PlanningWorkloadParser}.
 	 */
 	public void readData() {
 		String[] arrivalRates = getStringArray(ARRIVAL_RATE);
@@ -73,18 +92,19 @@ public class PlanningWorkloadParser extends PropertiesConfiguration{
 		String[] userThinkTimeInSeconds = getStringArray(USER_THINK_TIME);
 		String[] numberOfUsers = getStringArray(NUMBER_OF_USERS);
 		for(int i = 0; i < arrivalRates.length; i++){
-			this.summariesPerInterval.add(parseSummaryInterval(arrivalRates[i], cpuDemandInHours[i], requestServiceDemandInMillis[i],
-							userThinkTimeInSeconds[i], numberOfUsers[i]));
-		}
+			this.summariesPerInterval.add(parseSummaryInterval(arrivalRates[i], cpuDemandInHours[i], 
+				 requestServiceDemandInMillis[i], userThinkTimeInSeconds[i], numberOfUsers[i]));
+		} 
 	}
 
 	/**
-	 * @param line
-	 * @param numberOfUsers 
-	 * @param userThinkTime2 
-	 * @param requestServiceDemand2 
-	 * @param cpuDemandInHours 
-	 * @return
+	 * Parse the information in a {@link Summary}.
+	 * @param monthArrivalRate the arrival fee per month
+	 * @param monthCpuDemandInHours the cpu demand per month in hours
+	 * @param monthRequestServiceDemand the demand of request per month
+	 * @param monthUserThinkTime the user think time per month
+	 * @param monthNumberOfUsers the numbers of users per month
+	 * @return A {@link Summary} encapsulating this information read from workload.
 	 */
 	protected Summary parseSummaryInterval(String monthArrivalRate, String monthCpuDemandInHours, String monthRequestServiceDemand, String monthUserThinkTime, String monthNumberOfUsers){
 		double arrivalRate = Double.parseDouble(monthArrivalRate);
@@ -95,6 +115,5 @@ public class PlanningWorkloadParser extends PropertiesConfiguration{
 		
 		return new Summary(arrivalRate, totalCpuHrs, serviceDemandInMillis,
 				userThinkTimeInSeconds, numberOfUsers);
-		
 	}
 }

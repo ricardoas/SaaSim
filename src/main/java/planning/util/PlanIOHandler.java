@@ -13,18 +13,34 @@ import java.io.ObjectInputStream;
 import java.util.Iterator;
 import java.util.Map;
 
+import planning.heuristic.PlanningHeuristic;
+
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 
+/**
+ * This class represents a manager of the files used in {@link PlanningHeuristic}s.
+ * 
+ * @author David Candeia - davidcmm@lsd.ufcg.edu.br 
+ */
 public class PlanIOHandler {
 	
 	private static final String OUTPUT_FILE = "output.plan";
 	public static final String NUMBER_OF_MACHINES_FILE = "maxServers.dat";
 	
+	/**
+	 * Delete the file who represents a number of machines.
+	 */
 	public static void clear(){
 		new File(NUMBER_OF_MACHINES_FILE).delete();
 	}
 	
+	/**
+	 * Gets the machine of data, see {@link MachineUsageData}. 
+	 * @return The recovered {@link MachineUsageData}.
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
 	public static MachineUsageData getMachineData() throws IOException, ClassNotFoundException {
 		if(new File(MACHINE_DATA_DUMP).exists()){
 			File simulationDump = new File(MACHINE_DATA_DUMP);
@@ -42,6 +58,13 @@ public class PlanIOHandler {
 		return null;
 	}
 	
+	/**
+	 * Create the file who represents a number of machines.
+	 * @param maximumNumberOfServers the maximum number of serves
+	 * @param nextRequestsCounter the next request counter
+	 * @param requestsMeanDemand the mean demand of requests
+	 * @throws IOException
+	 */
 	public static void createNumberOfMachinesFile(int maximumNumberOfServers, int[] nextRequestsCounter, double requestsMeanDemand) throws IOException{
 		FileWriter writer = new FileWriter(new File(NUMBER_OF_MACHINES_FILE));
 		writer.write(maximumNumberOfServers+"\n");
@@ -52,6 +75,11 @@ public class PlanIOHandler {
 		writer.close();
 	}
 	
+	/**
+	 * Gets the number of machine recovered from {@link PlanIOHandler#NUMBER_OF_MACHINES_FILE}.
+	 * @return An integer to represent the number of machines.
+	 * @throws IOException
+	 */
 	public static int getNumberOfMachinesFromFile() throws IOException{
 		BufferedReader reader = new BufferedReader(new FileReader(new File(NUMBER_OF_MACHINES_FILE)));
 		int numberOfServers = Integer.parseInt(reader.readLine());
@@ -59,6 +87,11 @@ public class PlanIOHandler {
 		return numberOfServers;
 	}
 	
+	/**
+	 * Gets the mean demand of requests recovered from {@link PlanIOHandler#NUMBER_OF_MACHINES_FILE}.
+	 * @return A double represents the mean demand of requests.
+	 * @throws IOException
+	 */
 	public static double getRequestsMeanDemandFromFile() throws IOException{
 		BufferedReader reader = new BufferedReader(new FileReader(new File(NUMBER_OF_MACHINES_FILE)));
 		reader.readLine();
@@ -67,6 +100,12 @@ public class PlanIOHandler {
 		return requestsMeanDemand;
 	}
 	
+	/**
+	 * Gets the number of machines recovered from {@link PlanIOHandler#NUMBER_OF_MACHINES_FILE} and put them 
+	 * in an array of integers.
+	 * @return An array of integers containing the number of machines.
+	 * @throws IOException
+	 */
 	public static int[] getNumberOfMachinesArray() throws IOException{
 		BufferedReader reader = new BufferedReader(new FileReader(new File(NUMBER_OF_MACHINES_FILE)));
 		reader.readLine();
@@ -83,6 +122,12 @@ public class PlanIOHandler {
 		return values;
 	}
 	
+	/**
+	 * Creates a plan file.
+	 * @param plan a {@link Map} represents features of plan
+	 * @param providers the {@link Provider}s of application
+	 * @throws IOException
+	 */
 	public static void createPlanFile(Map<MachineType, Integer> plan, Provider[] providers) throws IOException {
 		if(plan.size() == 0){
 			return;

@@ -1,5 +1,10 @@
 package planning.io;
 
+/**
+ * This class containing the information about properties of workloads adapted for planning.
+ * 
+ * @author David Candeia - davidcmm@lsd.ufcg.edu.br
+ */
 public class PlanningWorkloadProperties {
 	
 	public static final String ARRIVAL_RATE = "arrival.rate";
