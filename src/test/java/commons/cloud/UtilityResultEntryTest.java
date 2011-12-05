@@ -2,7 +2,6 @@ package commons.cloud;
 
 import static org.junit.Assert.*;
 
-import org.easymock.EasyMock;
 import org.junit.Test;
 
 import util.CleanConfigurationTest;
@@ -214,16 +213,16 @@ public class UtilityResultEntryTest extends CleanConfigurationTest {
 		assertFalse(entry1.hashCode() == entry2.hashCode());
 	}
 	
-	@Test
+	@Test(expected=AssertionError.class)
 	public void testEqualsConsistencyWithNullObject() {
 		UtilityResultEntry entry1 = new UtilityResultEntry(2, new User[]{}, new Provider[]{});
-		assertFalse(entry1.equals(null));
+		entry1.equals(null);
 	}
 	
-	@Test
+	@Test(expected=AssertionError.class)
 	public void testEqualsConsistencyWithAnotherClassObject() {
 		UtilityResultEntry entry1 = new UtilityResultEntry(2, new User[]{}, new Provider[]{});
-		assertFalse(entry1.equals(new MachineDescriptor(0, false, MachineType.M1_SMALL, 0)));
+		entry1.equals(new MachineDescriptor(0, false, MachineType.M1_SMALL, 0));
 	}
 }
 

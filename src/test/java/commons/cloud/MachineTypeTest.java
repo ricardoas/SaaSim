@@ -47,8 +47,8 @@ public class MachineTypeTest extends CleanConfigurationTest {
 			}
 		});
 		
-		Assert.assertArrayEquals(new MachineType[] { T1_MICRO, M1_SMALL,
-				M1_LARGE, C1_MEDIUM, M2_XLARGE, M1_XLARGE, M2_2XLARGE,
+		Assert.assertArrayEquals(new MachineType[] { M1_SMALL, T1_MICRO,
+				M1_LARGE, C1_MEDIUM, M2_XLARGE, M1_XLARGE, M2_2XLARGE, 
 				M2_4XLARGE, C1_XLARGE }, values);
 	}
 
@@ -62,9 +62,9 @@ public class MachineTypeTest extends CleanConfigurationTest {
 			}
 		});
 		
-		Assert.assertArrayEquals(new MachineType[] { M1_SMALL,T1_MICRO, 
-				M1_LARGE, M1_XLARGE, C1_MEDIUM, C1_XLARGE, M2_XLARGE, M2_2XLARGE,
-				M2_4XLARGE}, values);
+		Assert.assertArrayEquals(new MachineType[] { M1_SMALL, M1_LARGE, 
+				M1_XLARGE, T1_MICRO, C1_MEDIUM, C1_XLARGE, M2_XLARGE, 
+				M2_2XLARGE, M2_4XLARGE}, values);
 	}
 
 }

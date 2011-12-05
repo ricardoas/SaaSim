@@ -1,7 +1,6 @@
 package commons.cloud;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.junit.Test;
 
@@ -52,12 +51,16 @@ public class ContractTest extends ValidConfigurationTest {
 	@Test
 	public void testCompareTo(){
 		assertEquals(0, c1.compareTo(c1));
-		assertEquals(1, c1.compareTo(c2));
-		assertEquals(1, c1.compareTo(c3));
-		assertEquals(-1, c2.compareTo(c1));
+		assertTrue(c1.compareTo(c2) < 0);
+		assertTrue(c1.compareTo(c3) < 0 );
+		
+		assertTrue(c2.compareTo(c1) > 0);
+		assertFalse(c2.compareTo(c1) < 0);
 		assertEquals(0, c2.compareTo(c2));
 		assertEquals(0, c2.compareTo(c3));
-		assertEquals(-1, c3.compareTo(c1));
+		
+		assertTrue(c3.compareTo(c1) > 0);
+		assertFalse(c3.compareTo(c1) < 0);
 		assertEquals(0, c3.compareTo(c2));
 		assertEquals(0, c3.compareTo(c3));
 	}

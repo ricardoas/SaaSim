@@ -25,7 +25,7 @@ public class RequestTest extends CleanConfigurationTest {
 	@Override
 	public void setUp() throws Exception{
 		super.setUp();
-		request = new Request(1l, 1, 17756636, 0, 100, 1024000, new long[]{MICRO_DEMAND, SMALL_DEMAND, LARGE_DEMAND, MEDIUM_DEMAND, XLARGE_DEMAND});
+		request = new Request(1l, 1, 17756636, 0, 100, 1024000, new long[]{SMALL_DEMAND, LARGE_DEMAND,  XLARGE_DEMAND, MEDIUM_DEMAND, MICRO_DEMAND});
 	}
 	
 	@Test
