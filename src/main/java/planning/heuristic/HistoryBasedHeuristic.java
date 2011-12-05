@@ -27,19 +27,28 @@ import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.SimulatorProperties;
 import commons.util.TimeUnit;
 
-public class HistoryBasedHeuristic implements PlanningHeuristic{
+/**
+ * This {@link PlanningHeuristic} makes capacity planning based on historical planning application. 
+ * For example, exists a statistic that is based on the use of machines for one year ago, which calculates 
+ * the planning for Y years ahead.
+ * 
+ * @author David Candeia - davidcmm@lsd.ufcg.edu.br
+ */
+public class HistoryBasedHeuristic implements PlanningHeuristic {
 
 	private Map<MachineType, Integer> plan;
-	
 	private static final long YEAR_IN_HOURS = 8640;
-	
 	private MachineUsageData machineData;
-
 	private final Monitor monitor;
 
+	/**
+	 * Default constructor.
+	 * @param scheduler {@link JEEventScheduler} event scheduler
+	 * @param monitor {@link Monitor} for reporting information
+	 * @param loadBalancers a set of {@link LoadBalancer}s of the application
+	 */
 	public HistoryBasedHeuristic(JEEventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
 		this.monitor = monitor;
-		
 		this.plan = new HashMap<MachineType, Integer>();
 		
 		try {
@@ -52,16 +61,15 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 		}
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void findPlan(Provider[] cloudProviders, User[] cloudUsers) {
-		
 		//Simulating ...
 		DPS dps = (DPS) this.monitor;
-		
 		SimpleSimulator simulator = (SimpleSimulator) Checkpointer.loadApplication();
-		
 		dps.registerConfigurable(simulator);
-		
 		simulator.start();
 		
 		//Calculating machines use data
@@ -71,7 +79,6 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 //		System.out.println("DAy: "+Checkpointer.loadSimulationInfo().getCurrentDay());
 		
 		if(Checkpointer.loadSimulationInfo().isFinishDay()){//Simulation finished!
-			
 			calculateMachinesToReserve(config);
 			Checkpointer.clear();
 			PlanIOHandler.clear();
@@ -80,17 +87,18 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-			
-			
-		}else{//Persist data to other round
-			
+		}else{ //Persist data to other round
 			persisDataToNextRound(loadBalancers, config);
 		}
 	}
-	
+
+	/**
+	 * Finds the reservation limits through the {@link Provider} of application.
+	 * @param cloudProvider {@link Provider} of application
+	 * @return A {@link Map} containing the {@link MachineType}s and the several reservation limits.
+	 */
 	private Map<MachineType, Double> findReservationLimits(Provider cloudProvider) {
 		Map<MachineType, Double> typesLimits = new HashMap<MachineType, Double>();
-		
 		MachineType[] machineTypes = cloudProvider.getAvailableTypes();
 		
 		for(MachineType type : machineTypes){
@@ -102,10 +110,14 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 			double usageProportion = 1.0 * minimumHoursToBeUsed / YEAR_IN_HOURS;
 			typesLimits.put(type, usageProportion);
 		}
-		
 		return typesLimits;
 	}
 
+	/**
+	 * Calculates the quantity of machines to reserve in the current planning. For this, verifies if any machine
+	 * was very used and if the machines could be reserved.
+	 * @param config represents the {@link Configuration} of this application 
+	 */
 	private void calculateMachinesToReserve(Configuration config) {
 		Map<MachineType, Map<Long, Double>> map = this.machineData.getMachineUsagePerType();
 		Map<MachineType, Double> limits = findReservationLimits(Checkpointer.loadProviders()[0]);
@@ -113,7 +125,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 	
 		Map<MachineType, List<Double>> typeUse = new HashMap<MachineType, List<Double>>();
 		
-		for(MachineType type : map.keySet()	){//Checking if any machine was very used!
+		for(MachineType type : map.keySet()	){ //Checking if any machine was very used!
 			Map<Long, Double> machines = map.get(type);
 			typeUse.put(type, new ArrayList<Double>());
 			
@@ -154,12 +166,10 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 					}
 				}
 			}
-			
 		}
 	}
 
-	private void persisDataToNextRound(LoadBalancer[] loadBalancers,
-			Configuration config) {
+	private void persisDataToNextRound(LoadBalancer[] loadBalancers, Configuration config) {
 		try {
 			Checkpointer.save();
 			Checkpointer.dumpMachineData(this.machineData);
@@ -168,6 +178,12 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 		}
 	}
 
+	/**
+	 * Calculates the usage of machines to make the planning, and for this, updating the usage of the {@link MachineUsageData}
+	 * in this {@link HistoryBasedHeuristic}.
+	 * @param simulator {@link SimpleSimulator} to use for recovered the tiers of application.
+	 * @return A set of {@link LoadBalancer}s of the application.
+	 */
 	private LoadBalancer[] calculateMachinesUsage(SimpleSimulator simulator) {
 		LoadBalancer[] loadBalancers = simulator.getTiers();
 		
@@ -176,17 +192,23 @@ public class HistoryBasedHeuristic implements PlanningHeuristic{
 			for(Machine server : servers){
 				MachineDescriptor descriptor = server.getDescriptor();
 				this.machineData.addUsage(descriptor.getType(),
-						descriptor.getMachineID(), server.getTotalTimeUsed());
+					 descriptor.getMachineID(), server.getTotalTimeUsed());
 			}
 		}
 		return loadBalancers;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public double getEstimatedProfit(int period) {
 		return 0;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Map<MachineType, Integer> getPlan(User[] cloudUsers) {
 		return this.plan;

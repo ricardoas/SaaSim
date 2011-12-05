@@ -34,6 +34,12 @@ import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.SimulatorProperties;
 
+/**
+ *  This {@link PlanningHeuristic} makes capacity planning based on the concepts of 
+ *  genetic combination and it algorithms.
+ * 
+ * @author David Candeia - davidcmm@lsd.ufcg.edu.br 
+ */
 public class AGHeuristic implements PlanningHeuristic{
 	
 	private static final long YEAR_IN_HOURS = 8640;
@@ -49,14 +55,22 @@ public class AGHeuristic implements PlanningHeuristic{
 
 	private IChromosome fittestChromosome;
 	
+	/**
+	 * Default constructor.
+	 * @param scheduler {@link JEEventScheduler} event scheduler
+	 * @param monitor {@link Monitor} for reporting information
+	 * @param loadBalancers a set of {@link LoadBalancer}s of the application
+	 */
 	public AGHeuristic(JEEventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
 		this.types = new ArrayList<MachineType>();
 		this.summaries = new HashMap<User, List<Summary>>();
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void findPlan(Provider[] cloudProviders, User[] cloudUsers){
-		
 		//Reading workload data
 		readWorkloadData(cloudUsers);
 	
@@ -120,9 +134,14 @@ public class AGHeuristic implements PlanningHeuristic{
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		
 	}
 	
+	/**
+	 * Verifies if the 'evolution' was completed.
+	 * @param previousFittestChromosome
+	 * @param lastFittestChromosome
+	 * @return <code>true</code> is completed, <code>false</code> otherwise.
+	 */
 	private boolean isEvolutionComplete(IChromosome previousFittestChromosome, IChromosome lastFittestChromosome) {
 		double previousFitnessValue = previousFittestChromosome.getFitnessValue();
 		double difference = lastFittestChromosome.getFitnessValue() - previousFitnessValue;
@@ -132,6 +151,10 @@ public class AGHeuristic implements PlanningHeuristic{
 		return false;
 	}
 
+	/**
+	 * Reads the workload data through the {@link User}s of application.  
+	 * @param cloudUsers the {@link User}s
+	 */
 	private void readWorkloadData(User[] cloudUsers) {
 		commons.config.Configuration simConfig = commons.config.Configuration.getInstance();
 		String[] workloads = simConfig.getWorkloads();
@@ -176,7 +199,13 @@ public class AGHeuristic implements PlanningHeuristic{
 		}
 	}
 
-
+	/**
+	 * Creates a sample {@link IChromosome} to be used in the {@link AGHeuristic}. 
+	 * @param config {@link Configuration} of the application
+	 * @param cloudProvider {@link Provider} of application
+	 * @return A new {@link IChromosome}.
+	 * @throws InvalidConfigurationException
+	 */
 	private IChromosome createSampleChromosome(Configuration config, Provider cloudProvider) throws InvalidConfigurationException {
 		Gene[] genes = new IntegerGene[cloudProvider.getAvailableTypes().length];
 		
@@ -191,6 +220,11 @@ public class AGHeuristic implements PlanningHeuristic{
 		return sampleChromosome;
 	}
 
+	/**
+	 * Finds the reservation limits through the {@link Provider} of application.
+	 * @param cloudProvider {@link Provider} of application
+	 * @return A {@link Map} containing the {@link MachineType}s and the several maximum number of machines.
+	 */
 	private Map<MachineType, Integer> findReservationLimits(Provider cloudProvider) {
 		Map<MachineType, Integer> typesLimits = new HashMap<MachineType, Integer>();
 		
@@ -208,10 +242,13 @@ public class AGHeuristic implements PlanningHeuristic{
 			int maximumNumberOfMachines = (int)Math.round(totalDemand / (usageProportion * YEAR_IN_HOURS));
 			typesLimits.put(type, maximumNumberOfMachines);
 		}
-		
 		return typesLimits;
 	}
 
+	/**
+	 * Calculates the total demand in this {@link AGHeuristic}.
+	 * @return The total demand.
+	 */
 	private long calcTotalDemand() {
 		double totalDemand = 0;
 		for(List<Summary> summaries : this.summaries.values()){
@@ -219,19 +256,30 @@ public class AGHeuristic implements PlanningHeuristic{
 				totalDemand += summary.getTotalCpuHrs();
 			}
 		}
-		
 		return (long)Math.ceil(totalDemand);
 	}
 
+	/**
+	 * Create a new {@link PlanningFitnessFunction}.
+	 * @param cloudUsers the {@link User}s of application
+	 * @param cloudProviders the {@link Provider}s of application
+	 * @return A new {@link PlanningFitnessFunction}.
+	 */
 	private PlanningFitnessFunction createFitnessFunction(User[] cloudUsers, Provider[] cloudProviders) {
 		return new PlanningFitnessFunction(this.summaries, cloudUsers, cloudProviders, this.types);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public double getEstimatedProfit(int period) {
 		return 0;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Map<MachineType, Integer> getPlan(User[] cloudUsers) {
 		Map<MachineType, Integer> plan = new HashMap<MachineType, Integer>();

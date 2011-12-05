@@ -22,6 +22,13 @@ import commons.sim.util.SaaSAppProperties;
 import commons.sim.util.SimulatorProperties;
 import commons.util.SimulationInfo;
 
+/**
+ * This class represents a {@link FitnessFunction} adapted for the planning. One {@link FitnessFunction} is used to
+ * makes algorithms based on genetic combination, and in this application, {@link PlanningFitnessFunction} is used to
+ * makes the planning in the heuristics {@link AGHeuristic} and {@link OptimalHeuristic}.
+ * 
+ * @author David Candeia - davidcmm@lsd.ufcg.edu.br
+ */
 public class PlanningFitnessFunction extends FitnessFunction{
 
 	public static final int HOUR_IN_MILLIS = 3600000;
@@ -33,6 +40,13 @@ public class PlanningFitnessFunction extends FitnessFunction{
 	private final Map<User, List<Summary>> summaries;
 	private final List<MachineType> types;
 
+	/**
+	 * Deafult constructor.
+	 * @param summaries 
+	 * @param cloudUsers the {@link User}s of application
+	 * @param cloudProviders the {@link Provider}s of application
+	 * @param types a list containing {@link MachineType}s
+	 */
 	public PlanningFitnessFunction(Map<User, List<Summary>> summaries, User[] cloudUsers, Provider[] cloudProviders, List<MachineType> types) {
 		this.summaries = summaries;
 		this.cloudProviders = cloudProviders;
@@ -46,9 +60,11 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected double evaluate(IChromosome arg0) {
-		
 		//Since round-robin is used, the total arrival rate is splitted among reserved servers according to each server power
 		Map<MachineType, Integer> currentPowerPerMachineType = new HashMap<MachineType, Integer>();
 		int index = 0;
@@ -146,17 +162,15 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		if(fitness < 1){
 			return (1/Math.abs(fitness))+1;
 		}
-		
 		return fitness;
-		
 	}
 	
 	/**
 	 * This method distributes a certain arrival rate to existing reserved machine according to their processing power
-	 * @param currentPowerPerMachineType
-	 * @param totalPower
-	 * @param arrivalRate
-	 * @return
+	 * @param currentPowerPerMachineType a {@link Map} containing the {@link Machine}s and them several power
+	 * @param totalPower the total power
+	 * @param arrivalRate the arrival rate
+	 * @return A {@link Map} containing the {@link MachineType}s and them several arrivals
 	 */
 	protected Map<MachineType, Double> extractArrivalsPerMachineType(Map<MachineType, Integer> currentPowerPerMachineType,
 			double totalPower, double arrivalRate) {
@@ -175,32 +189,36 @@ public class PlanningFitnessFunction extends FitnessFunction{
 	 * This method gets the total amount of requests finished at a certain interval and applies a certain loss according to a percent
 	 * of requests that finish after the SLA.
 	 * @param responseTimeLoss
-	 * @param totalRequestsFinished
-	 * @return
+	 * @param totalRequestsFinished 
+	 * @return the calculate response time loss 
 	 */
 	protected double calcResponseTimeLoss(double responseTimeLoss, Map<MachineType, Double> totalRequestsFinished) {
 		double totalFinished = 0d;
 		for(Double value : totalRequestsFinished.values()){
 			totalFinished += value;
 		}
-		
 		return totalFinished * responseTimeLoss;
 	}
 	
 	/**
-	 * This method calculates the number of intervals to be evaluated
-	 * @return
+	 * This method calculates the number of intervals to be evaluated.
+	 * @return The number of intervals to be evaluated.
 	 */
 	protected int calcNumberOfIntervals() {
 		for(List<Summary> data : this.summaries.values()){
 			return data.size();
 		}
-		
 		return 0;
 	}
 
+	/**
+	 * Calculates the penalties of the lost {@link Request}s. 
+	 * @param responseTimeRequestsLost
+	 * @param requestsThatCouldNotBeAttended
+	 * @param totalRequestsFinished
+	 * @return The penalty calculated.
+	 */
 	protected double calcPenalties(double responseTimeRequestsLost, double requestsThatCouldNotBeAttended, double totalRequestsFinished){
-		
 		double lossPerUser = (responseTimeRequestsLost + requestsThatCouldNotBeAttended) / (requestsThatCouldNotBeAttended + responseTimeRequestsLost +
 				totalRequestsFinished) / this.cloudUsers.length;
 		if(totalRequestsFinished == 0){
@@ -214,6 +232,15 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		return penalty;
 	}
 
+	/**
+	 * Calculate the costs for this application added the penalty.
+	 * @param requestsFinishedPerMachineType
+	 * @param meanServiceTimeInMillis
+	 * @param currentPowerPerMachineType
+	 * @param requestsLostDueToResponseTime
+	 * @param requestsLostDueToThroughput
+	 * @return The costs for this application.
+	 */
 	protected double calcCost(Map<MachineType, Double> requestsFinishedPerMachineType, double meanServiceTimeInMillis, 
 			Map<MachineType, Integer> currentPowerPerMachineType, double requestsLostDueToResponseTime, double requestsLostDueToThroughput) {
 		
@@ -247,13 +274,16 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		totalRequestsFinished += requestsLostDueToThroughput;
 		cost += provider.getOnDemandCpuCost(MachineType.M1_SMALL) * onDemandCPUHours;
 		
-		
 		//Penalties
 		double penalties = calcPenalties(requestsLostDueToResponseTime, requestsThatCouldNotBeAttended, totalRequestsFinished);
 		
 		return cost + penalties;
 	}
 
+	/**
+	 * Calculates the receipt for this application. 
+	 * @return The receipt.
+	 */
 	protected double calcReceipt() {
 		UtilityResultEntry resultEntry = new UtilityResultEntry(0, this.cloudUsers, this.cloudProviders);
 
@@ -273,13 +303,16 @@ public class PlanningFitnessFunction extends FitnessFunction{
 					totalCPUHrs = 0;
 				}
 			}
-			
 			oneTimeFees += contract.calculateOneTimeFees();//Setup fees
 		}
-		
 		return resultEntry.getReceipt() + oneTimeFees;
 	}
 
+	/**
+	 * Aggregates think time.
+	 * @param currentSummaryInterval
+	 * @return The value of aggregated think time.
+	 */
 	protected double aggregateThinkTime(int currentSummaryInterval) {
 		double thinkTime = 0d;
 		int totalNumberOfValues = 0;
@@ -288,20 +321,28 @@ public class PlanningFitnessFunction extends FitnessFunction{
 			thinkTime += entry.getValue().get(currentSummaryInterval).getUserThinkTimeInSeconds();
 			totalNumberOfValues++;
 		}
-		
 		return thinkTime / totalNumberOfValues;
 	}
 
+	/**
+	 * Aggregates the number of users.
+	 * @param currentSummaryInterval
+	 * @return The value of aggregated number of users. 
+	 */
 	protected double aggregateNumberOfUsers(int currentSummaryInterval) {
 		int totalNumberOfUsers = 0;
 		
 		for(Entry<User, List<Summary>> entry : this.summaries.entrySet()){
 			totalNumberOfUsers += entry.getValue().get(currentSummaryInterval).getNumberOfUsers();
 		}
-		
 		return totalNumberOfUsers;
 	}
 
+	/**
+	 * Aggregates the service demand.
+	 * @param currentSummaryInterval
+	 * @return The value of the aggregated service time. 
+	 */
 	protected double aggregateServiceDemand(int currentSummaryInterval) {
 		double serviceTime = 0d;
 		int totalNumberOfValues = 0;
@@ -310,16 +351,19 @@ public class PlanningFitnessFunction extends FitnessFunction{
 			serviceTime += entry.getValue().get(currentSummaryInterval).getRequestServiceDemandInMillis();
 			totalNumberOfValues++;
 		}
-		
 		return serviceTime / totalNumberOfValues;
 	}
 
+	/**
+	 * Aggregated the arrivals.
+	 * @param currentSummaryInterval
+	 * @return The value of the aggregated arrival rate.
+	 */
 	protected double aggregateArrivals(int currentSummaryInterval) {
 		double totalArrivalRate = 0;
 		for(Entry<User, List<Summary>> entry : this.summaries.entrySet()){
 			totalArrivalRate += entry.getValue().get(currentSummaryInterval).getArrivalRate();
 		}
-		
 		return totalArrivalRate;
 	}
 	
@@ -348,7 +392,6 @@ public class PlanningFitnessFunction extends FitnessFunction{
 				}
 			}
 		}
-		
 		System.out.println(lostCounter);
 	}
 

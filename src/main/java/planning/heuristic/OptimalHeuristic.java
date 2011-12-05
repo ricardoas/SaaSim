@@ -28,6 +28,11 @@ import commons.sim.components.LoadBalancer;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.SimulatorProperties;
 
+/**
+ * This {@link PlanningHeuristic} makes capacity planning based on search for the best planning's configuration.
+ * 
+ * @author David Candeia - davidcmm@lsd.ufcg.edu.br
+ */
 public class OptimalHeuristic implements PlanningHeuristic{
 	
 	private static final long YEAR_IN_HOURS = 8640;
@@ -37,22 +42,29 @@ public class OptimalHeuristic implements PlanningHeuristic{
 	
 	private IChromosome bestChromosome; 
 	
+	/**
+	 * Default constructor.
+	 * @param scheduler {@link JEEventScheduler} event scheduler
+	 * @param monitor {@link Monitor} for reporting information
+	 * @param loadBalancers a set of {@link LoadBalancer}s of the application
+	 */
 	public OptimalHeuristic(JEEventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
 		this.types = new ArrayList<MachineType>();
 		this.summaries = new HashMap<User, List<Summary>>();
 		this.bestChromosome = null;
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void findPlan(Provider[] cloudProviders, User[] cloudUsers){
-		
 		//Reading workload data
 		readWorkloadData(cloudUsers);
 	
 		//Configuring genetic algorithm
 		Configuration config = new DefaultConfiguration();
 		try {
-
 			PlanningFitnessFunction myFunc = createFitnessFunction(cloudUsers, cloudProviders);
 			
 			Map<MachineType, Integer> limits = findReservationLimits(cloudProviders[0]);
@@ -73,7 +85,17 @@ public class OptimalHeuristic implements PlanningHeuristic{
 			throw new RuntimeException(e);
 		}
 	}
-	
+
+	/**
+	 * Searches the best configuration for the planning.
+	 * @param config {@link Configuration} of the application
+	 * @param function the {@link PlanningFitnessFunction}
+	 * @param provider the {@link Provider} of application
+	 * @param limits the limits of reservation for this {@link OptimalHeuristic}
+	 * @param typesIndex the index of types
+	 * @param currentValues the current values based on the limits of reservation
+	 * @throws InvalidConfigurationException
+	 */
 	private void evaluateGenes(Configuration config, PlanningFitnessFunction function, Provider provider, Map<MachineType, Integer> limits, int typesIndex, int[] currentValues) throws InvalidConfigurationException {
 		if(typesIndex < this.types.size()){
 			MachineType machineType = this.types.get(typesIndex);
@@ -96,6 +118,10 @@ public class OptimalHeuristic implements PlanningHeuristic{
 		}
 	}
 
+	/**
+	 * Reads the workload data through the {@link User}s of application.  
+	 * @param cloudUsers the {@link User}s
+	 */
 	private void readWorkloadData(User[] cloudUsers) {
 		commons.config.Configuration simConfig = commons.config.Configuration.getInstance();
 		String[] workloads = simConfig.getWorkloads();
@@ -140,7 +166,11 @@ public class OptimalHeuristic implements PlanningHeuristic{
 		}
 	}
 
-
+	/**
+	 * Finds the reservation limits through the {@link Provider} of application.
+	 * @param cloudProvider {@link Provider} of application
+	 * @return A {@link Map} containing the {@link MachineType}s and the several maximum number of machines.
+	 */
 	private Map<MachineType, Integer> findReservationLimits(Provider cloudProvider) {
 		Map<MachineType, Integer> typesLimits = new HashMap<MachineType, Integer>();
 		
@@ -158,10 +188,13 @@ public class OptimalHeuristic implements PlanningHeuristic{
 			int maximumNumberOfMachines = (int)Math.round(totalDemand / (usageProportion * YEAR_IN_HOURS));
 			typesLimits.put(type, maximumNumberOfMachines);
 		}
-		
 		return typesLimits;
 	}
 
+	/**
+	 * Calculates the total demand in this {@link OptimalHeuristic}.
+	 * @return The total demand.
+	 */
 	private long calcTotalDemand() {
 		double totalDemand = 0;
 		for(List<Summary> summaries : this.summaries.values()){
@@ -169,19 +202,30 @@ public class OptimalHeuristic implements PlanningHeuristic{
 				totalDemand += summary.getTotalCpuHrs();
 			}
 		}
-		
 		return (long)Math.ceil(totalDemand);
 	}
 
+	/**
+	 * Create a new {@link PlanningFitnessFunction}.
+	 * @param cloudUsers the {@link User}s of application
+	 * @param cloudProviders the {@link Provider}s of application
+	 * @return A new {@link PlanningFitnessFunction}.
+	 */
 	private PlanningFitnessFunction createFitnessFunction(User[] cloudUsers, Provider[] cloudProviders) {
 		return new PlanningFitnessFunction(this.summaries, cloudUsers, cloudProviders, this.types);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public double getEstimatedProfit(int period) {
 		return 0;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Map<MachineType, Integer> getPlan(User[] cloudUsers) {
 		Map<MachineType, Integer> plan = new HashMap<MachineType, Integer>();
@@ -193,7 +237,6 @@ public class OptimalHeuristic implements PlanningHeuristic{
 		}
 //		System.out.println("CONFIG: "+genes[0].getAllele()+" "+genes[1].getAllele()+" "+genes[2].getAllele());
 //		System.out.println("BEST: "+bestChromosome.getFitnessValue());
-
 		return plan;
 	}
 }

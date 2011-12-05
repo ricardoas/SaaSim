@@ -24,6 +24,12 @@ import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.util.SimulatorProperties;
 
+/**
+ * This {@link PlanningHeuristic} makes capacity planning based on over provisioning, in other words, occurs the reservation
+ * of more machines than can be necessary.
+ * 
+ * @author David Candeia - davidcmm@lsd.ufcg.edu.br
+ */
 public class OverProvisionHeuristic extends SimpleSimulator implements PlanningHeuristic {
 
 	public static final double FACTOR = 0.2;//Utilisation factor according to Above the Clouds: ...
@@ -37,6 +43,12 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 	private double totalProcessingTime;
 	private long numberOfRequests;
 	
+	/**
+	 * Default constructor.
+	 * @param scheduler {@link JEEventScheduler} event scheduler
+	 * @param monitor {@link Monitor} for reporting information
+	 * @param loadBalancers a set of {@link LoadBalancer}s of the application
+	 */
 	public OverProvisionHeuristic(JEEventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
 		super(scheduler, loadBalancers);
 		try{
@@ -49,7 +61,6 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 		}catch(Exception e){
 			this.currentRequestsCounter = new int[600];
 		}
-		
 		try{
 			this.requestsMeanDemand = PlanIOHandler.getRequestsMeanDemandFromFile();
 		}catch(Exception e){
@@ -61,15 +72,16 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 		this.setMonitor(monitor);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void findPlan(Provider[] cloudProviders, User[] cloudUsers) {
-		
 		//Simulating ...
 		DPS dps = (DPS) this.monitor;
-		
 		dps.registerConfigurable(this);
-		
 		WorkloadParser<List<Request>> parser = this.getParser();
+		
 		try{
 			double error = Configuration.getInstance().getDouble(SimulatorProperties.PLANNING_ERROR);
 //			parser.applyError(error);
@@ -86,7 +98,6 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 		}
 
 		if(Checkpointer.loadSimulationInfo().isFinishDay()){//Simulation finished!
-			
 			Checkpointer.clear();
 			PlanIOHandler.clear();
 			Map<MachineType, Integer> plan = this.getPlan(null);
@@ -105,32 +116,35 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 		}
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void handleEvent(JEEvent event) {
-		
 		switch (event.getType()) {
-			case READWORKLOAD:
-				if(workloadParser.hasNext()) {
-					List<Request> requests = workloadParser.next();
-					numberOfRequests += requests.size();
-					
-					totalProcessingTime += calcNumberOfMachines(requests, event.getScheduledTime());
-					evaluateMaximumNumber();
-					
-					if(workloadParser.hasNext()){
-						long newEventTime = getScheduler().now() + Configuration.getInstance().getParserPageSize().getMillis();
-						send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime, true));
-					}else{
-						workloadParser.close();
-					}
+		case READWORKLOAD:
+			if(workloadParser.hasNext()) {
+				List<Request> requests = workloadParser.next();
+				numberOfRequests += requests.size();
+
+				totalProcessingTime += calcNumberOfMachines(requests, event.getScheduledTime());
+				evaluateMaximumNumber();
+				if(workloadParser.hasNext()){
+					long newEventTime = getScheduler().now() + Configuration.getInstance().getParserPageSize().getMillis();
+					send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime, true));
+				}else{
+					workloadParser.close();
 				}
-				break;
-			default:
-				break;
+			}
+			break;
+		default:
+			break;
 		}	
-		
 	}
 	
+	/**
+	 * Estimates the maximum number of servers using this {@link OverProvisionHeuristic}.
+	 */
 	private void evaluateMaximumNumber() {
 		for(int value : this.currentRequestsCounter){
 			if(value > this.maximumNumberOfServers){
@@ -145,6 +159,12 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 		}
 	}
 
+	/**
+	 * Calculate the number of machines should be reserved using this {@link OverProvisionHeuristic}.
+	 * @param requests a list of {@link Request}s used to adding demand in the processing of them. 
+	 * @param currentTime the actual time
+	 * @return The total processing time of the {@link Request}s.
+	 */
 	private double calcNumberOfMachines(List<Request> requests, long currentTime) {
 		double totalProcessingTime = 0d;
 		
@@ -158,7 +178,7 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 			this.currentRequestsCounter[index]++;//Adding demand in arrival interval
 			
 			long totalMeanToProcess = request.getTotalMeanToProcess();
-			totalProcessingTime+= totalMeanToProcess;
+			totalProcessingTime += totalMeanToProcess;
 			
 			long intervalsToProcess = totalMeanToProcess / this.COUNTING_PAGE_SIZE;
 			if(totalMeanToProcess == this.COUNTING_PAGE_SIZE){
@@ -173,20 +193,25 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 				}
 			}
 		}
-		
 		return totalProcessingTime;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public double getEstimatedProfit(int period) {
 		return 0;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Map<MachineType, Integer> getPlan(User[] cloudUsers) {
 		Configuration config = Configuration.getInstance();
-//		int machinesToReserve = (int)Math.ceil( ( maximumNumberOfServers / 
-//		( config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME) / this.requestsMeanDemand ) ) * FACTOR );
+		//int machinesToReserve = (int)Math.ceil( ( maximumNumberOfServers / 
+		//(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME) / this.requestsMeanDemand ) ) * FACTOR );
 		int machinesToReserve = (int)Math.ceil( ( maximumNumberOfServers ) * FACTOR );
 		
 		Map<MachineType, Integer> plan = new HashMap<MachineType, Integer>();
@@ -194,4 +219,5 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 		plan.put(machineType, machinesToReserve);
 		return plan;
 	}
+
 }
