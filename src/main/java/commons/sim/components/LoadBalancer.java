@@ -150,7 +150,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	 */
 	public void collectStatistics(long now, long timeInterval, int numberOfRequests) {
 		MachineStatistics statistics = heuristic.getStatistics(now);
-		statistics.numberOfRequestsArrivalInLastInterval += numberOfRequests;
+		statistics.requestArrivals += numberOfRequests;
 		statistics.observationPeriod = timeInterval / TimeUnit.SECOND.getMillis();
 		monitor.sendStatistics(now, statistics, tier);
 	}

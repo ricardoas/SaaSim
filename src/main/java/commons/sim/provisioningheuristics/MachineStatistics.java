@@ -25,11 +25,14 @@ public class MachineStatistics implements Serializable{
 	public long observationPeriod;
 	public long totalBusyTime;
 	
-	public long numberOfRequestsArrivalInLastInterval;
-	public long numberOfRequestsArrivalInLastIntervalInTier;
+	public long requestArrivals;
+	public long requestArrivalsPerTier;
 	
-	public long numberOfRequestsCompletionsInLastInterval;
-	public long numberOfRequestsCompletionInLastIntervalInTier;
+	public long requestsArrivalInLastInterval;
+	public long requestsArrivalInLastIntervalPerTier;
+	
+	public long requestCompletions;
+	public long requestsCompletionsPerTier;
 	
 	private long lastArrivalTime;
 	private double averageIAT;
@@ -49,8 +52,8 @@ public class MachineStatistics implements Serializable{
 	 */
 	public MachineStatistics(double averageUtilization, long totalRequestsArrivals, long totalRequestsCompletions, int totalNumberOfServers) {
 		this.averageUtilisation = averageUtilization;
-		this.numberOfRequestsArrivalInLastInterval = totalRequestsArrivals;
-		this.numberOfRequestsCompletionsInLastInterval = totalRequestsCompletions;
+		this.requestArrivals = totalRequestsArrivals;
+		this.requestCompletions = totalRequestsCompletions;
 		this.totalNumberOfServers = totalNumberOfServers;
 		this.lastArrivalTime = 0;
 	}
@@ -58,9 +61,26 @@ public class MachineStatistics implements Serializable{
 	public MachineStatistics() {
 		
 	}
-
+	
 	public MachineStatistics(MachineStatistics statistics) {
+		this.averageUtilisation = statistics.averageUtilisation;
+		this.totalNumberOfServers = statistics.totalNumberOfServers;
+		this.warmingDownMachines = statistics.warmingDownMachines;
+		this.arrivalRate = statistics.arrivalRate;
+		this.tier = statistics.tier;
+		this.observationPeriod = statistics.observationPeriod;
+		this.totalBusyTime = statistics.totalBusyTime;
+		this.requestArrivals = statistics.requestArrivals;
+		this.requestArrivalsPerTier = statistics.requestArrivalsPerTier;
+		this.requestCompletions = statistics.requestCompletions;
+		this.requestsCompletionsPerTier = statistics.requestsCompletionsPerTier;
 		this.lastArrivalTime = statistics.lastArrivalTime;
+		this.averageIAT = statistics.averageIAT;
+		this.averageST = statistics.averageST;
+		
+		// Not reusable statistics
+		this.requestsArrivalInLastInterval = 0;
+		this.requestsArrivalInLastIntervalPerTier = 0;
 	}
 
 	@Override
@@ -69,10 +89,10 @@ public class MachineStatistics implements Serializable{
 		int result = 1;
 		result = prime
 				* result
-				+ (int) (numberOfRequestsArrivalInLastInterval ^ (numberOfRequestsArrivalInLastInterval >>> 32));
+				+ (int) (requestArrivals ^ (requestArrivals >>> 32));
 		result = prime
 				* result
-				+ (int) (numberOfRequestsCompletionsInLastInterval ^ (numberOfRequestsCompletionsInLastInterval >>> 32));
+				+ (int) (requestCompletions ^ (requestCompletions >>> 32));
 		result = prime * result
 				+ (int) (totalNumberOfServers ^ (totalNumberOfServers >>> 32));
 		long temp;
@@ -90,9 +110,9 @@ public class MachineStatistics implements Serializable{
 		if (getClass() != obj.getClass())
 			return false;
 		MachineStatistics other = (MachineStatistics) obj;
-		if (numberOfRequestsArrivalInLastInterval != other.numberOfRequestsArrivalInLastInterval)
+		if (requestArrivals != other.requestArrivals)
 			return false;
-		if (numberOfRequestsCompletionsInLastInterval != other.numberOfRequestsCompletionsInLastInterval)
+		if (requestCompletions != other.requestCompletions)
 			return false;
 		if (totalNumberOfServers != other.totalNumberOfServers)
 			return false;
@@ -108,14 +128,14 @@ public class MachineStatistics implements Serializable{
 	 */
 	public void updateInterarrivalTime(long arrivalTimeInMillis) {
 		
-		numberOfRequestsArrivalInLastIntervalInTier++;
+		requestArrivalsPerTier++;
 		
 		double iat = 1.0*(arrivalTimeInMillis - (lastArrivalTime==0?arrivalTimeInMillis:lastArrivalTime))/TimeUnit.SECOND.getMillis();
 		lastArrivalTime = arrivalTimeInMillis;
 		
 		
 		double delta = iat - averageIAT;
-		averageIAT += delta/numberOfRequestsArrivalInLastIntervalInTier;
+		averageIAT += delta/requestArrivalsPerTier;
 		SSD_IAT += delta*(iat - averageIAT);
 	}
 	
@@ -128,13 +148,13 @@ public class MachineStatistics implements Serializable{
 				+ " , T= " + observationPeriod
 				+ " , B= " + totalBusyTime
 				+ " , A_0= "
-				+ numberOfRequestsArrivalInLastInterval
+				+ requestArrivals
 				+ " , A_i= "
-				+ numberOfRequestsArrivalInLastIntervalInTier
+				+ requestArrivalsPerTier
 				+ " , C_0= "
-				+ numberOfRequestsCompletionsInLastInterval
+				+ requestCompletions
 				+ " , C_i= "
-				+ numberOfRequestsCompletionInLastIntervalInTier
+				+ requestsCompletionsPerTier
 				+ " , averageIAT= "
 				+ averageIAT + " , var_IAT= " + calcVarIAT() + " , averageST= "
 				+ averageST + " , var_ST= " + calcVarST() + " ]";
@@ -147,26 +167,31 @@ public class MachineStatistics implements Serializable{
 	public void updateServiceTime(long serviceTimeInMillis) {
 		double serviceTime = (1.0*serviceTimeInMillis) / TimeUnit.SECOND.getMillis();
 
-		numberOfRequestsCompletionInLastIntervalInTier++;
+		requestsCompletionsPerTier++;
 		
 		double delta = serviceTime - averageST;
-		averageST += delta/numberOfRequestsCompletionInLastIntervalInTier;
+		averageST += delta/requestsCompletionsPerTier;
 		SSD_ST += delta*(serviceTime - averageST);
 	}
 
 	public double calcVarST() {
-		return SSD_ST/numberOfRequestsCompletionInLastIntervalInTier;
+		return SSD_ST/requestsCompletionsPerTier;
 	}
 
 	public double calcVarIAT() {
-		return SSD_IAT/numberOfRequestsArrivalInLastIntervalInTier;
+		return SSD_IAT/requestArrivalsPerTier;
 	}
 	
 	public double getArrivalRate(long timeIntervalInSeconds){
-		return 1.0*numberOfRequestsArrivalInLastInterval/timeIntervalInSeconds;
+		return 1.0*requestArrivals/timeIntervalInSeconds;
 	}
 
 	public double getArrivalRateInTier(long timeIntervalInSeconds){
-		return 1.0*numberOfRequestsArrivalInLastIntervalInTier/timeIntervalInSeconds;
+		return 1.0*requestArrivalsPerTier/timeIntervalInSeconds;
+	}
+
+	public void resetPerTickStatistics() {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -317,8 +317,8 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		lb.estimateServers(0);
 		
 		assertEquals(0, captured.getValue().averageUtilisation, 0.00001);
-		assertEquals(0, captured.getValue().numberOfRequestsArrivalInLastInterval, 0.00001);
-		assertEquals(0, captured.getValue().numberOfRequestsCompletionsInLastInterval, 0.00001);
+		assertEquals(0, captured.getValue().requestArrivals, 0.00001);
+		assertEquals(0, captured.getValue().requestCompletions, 0.00001);
 		assertEquals(0, captured.getValue().totalNumberOfServers, 0.00001);
 		
 		EasyMock.verify(monitor, schedulingHeuristic);
@@ -352,8 +352,8 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		lb.estimateServers(100);
 		
 		assertEquals(0, captured.getValue().averageUtilisation, 0.00001);
-		assertEquals(0, captured.getValue().numberOfRequestsArrivalInLastInterval, 0.00001);
-		assertEquals(0, captured.getValue().numberOfRequestsCompletionsInLastInterval, 0.00001);
+		assertEquals(0, captured.getValue().requestArrivals, 0.00001);
+		assertEquals(0, captured.getValue().requestCompletions, 0.00001);
 		assertEquals(3, captured.getValue().totalNumberOfServers, 0.00001);
 		
 		EasyMock.verify(monitor, schedulingHeuristic);

@@ -46,20 +46,20 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 	public long evaluateNumberOfServersForNextInterval(MachineStatistics statistics) {
 		double averageUtilisation = statistics.averageUtilisation;
 		double d;
-		if(statistics.numberOfRequestsCompletionsInLastInterval == 0){
+		if(statistics.requestCompletions == 0){
 			d = averageUtilisation;
 		}else{
-			d = averageUtilisation / statistics.numberOfRequestsCompletionsInLastInterval;
+			d = averageUtilisation / statistics.requestCompletions;
 		}
 		
-		double u_lign = Math.max(statistics.numberOfRequestsArrivalInLastInterval, statistics.numberOfRequestsCompletionsInLastInterval) * d;
+		double u_lign = Math.max(statistics.requestArrivals, statistics.requestCompletions) * d;
 		long newNumberOfServers = (int)Math.ceil( statistics.totalNumberOfServers * u_lign / TARGET_UTILIZATION );
 		
 		long numberOfServersToAdd = (newNumberOfServers - statistics.totalNumberOfServers);
 		if(numberOfServersToAdd != 0){
 			return numberOfServersToAdd;
 		}
-		if(statistics.numberOfRequestsArrivalInLastInterval > 0 && 
+		if(statistics.requestArrivals > 0 && 
 				statistics.totalNumberOfServers == 0){
 			return 1l;
 		}

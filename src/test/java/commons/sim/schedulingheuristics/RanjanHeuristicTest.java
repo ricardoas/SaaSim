@@ -35,8 +35,8 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 	@Test
 	public void testConstruction(){
 		MachineStatistics statistics = heuristic.getStatistics(0);
-		assertEquals(0, statistics.numberOfRequestsArrivalInLastInterval);
-		assertEquals(0, statistics.numberOfRequestsCompletionsInLastInterval);
+		assertEquals(0, statistics.requestArrivals);
+		assertEquals(0, statistics.requestCompletions);
 	}
 	
 	/**
@@ -77,7 +77,7 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 		Machine nextServer = heuristic.next(request);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
-		assertEquals(1, heuristic.getStatistics(time).numberOfRequestsArrivalInLastInterval);
+		assertEquals(1, heuristic.getStatistics(time).requestArrivals);
 		
 		EasyMock.verify(request);
 	}
@@ -115,7 +115,7 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 		EasyMock.expect(request.getUserID()).andReturn(userID).times(2);
 		EasyMock.replay(request);
 		Machine nextServer = heuristic.next(request);
-		assertEquals(1, heuristic.getStatistics(time).numberOfRequestsArrivalInLastInterval);
+		assertEquals(1, heuristic.getStatistics(time).requestArrivals);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		EasyMock.verify(request);
@@ -126,7 +126,7 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 		EasyMock.expect(request2.getUserID()).andReturn(secondUserID).times(2);
 		EasyMock.replay(request2);
 		nextServer = heuristic.next(request2);
-		assertEquals(2, heuristic.getStatistics(time).numberOfRequestsArrivalInLastInterval);
+		assertEquals(2, heuristic.getStatistics(time).requestArrivals);
 		assertNotNull(nextServer);
 		assertEquals(machine2, nextServer);
 		EasyMock.verify(request2);
@@ -137,7 +137,7 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 		EasyMock.expect(request3.getUserID()).andReturn(thirdUserID).times(2);
 		EasyMock.replay(request3);
 		nextServer = heuristic.next(request3);
-		assertEquals(3, heuristic.getStatistics(time).numberOfRequestsArrivalInLastInterval);
+		assertEquals(3, heuristic.getStatistics(time).requestArrivals);
 		assertNotNull(nextServer);
 		assertEquals(machine3, nextServer);
 		EasyMock.verify(request3);
@@ -148,7 +148,7 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 		EasyMock.expect(request4.getUserID()).andReturn(fourthUserID).times(2);
 		EasyMock.replay(request4);
 		nextServer = heuristic.next(request4);
-		assertEquals(4, heuristic.getStatistics(time).numberOfRequestsArrivalInLastInterval);
+		assertEquals(4, heuristic.getStatistics(time).requestArrivals);
 		assertNotNull(nextServer);
 		assertEquals(machine4, nextServer);
 		EasyMock.verify(request4);
@@ -159,7 +159,7 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 		EasyMock.expect(request5.getUserID()).andReturn(fifthUserID).times(2);
 		EasyMock.replay(request5);
 		nextServer = heuristic.next(request5);
-		assertEquals(5, heuristic.getStatistics(time).numberOfRequestsArrivalInLastInterval);
+		assertEquals(5, heuristic.getStatistics(time).requestArrivals);
 		assertNotNull(nextServer);
 		assertEquals(machine5, nextServer);
 		EasyMock.verify(request5);
@@ -170,7 +170,7 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 		EasyMock.expect(request6.getUserID()).andReturn(sixthUserID).times(2);
 		EasyMock.replay(request6);
 		nextServer = heuristic.next(request6);
-		assertEquals(6, heuristic.getStatistics(time).numberOfRequestsArrivalInLastInterval);
+		assertEquals(6, heuristic.getStatistics(time).requestArrivals);
 		assertNotNull(nextServer);
 		assertEquals(machine1, nextServer);
 		EasyMock.verify(request6);
@@ -381,14 +381,14 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 		servers.add(machine1);
 		
 		heuristic.next(request);
-		assertEquals(1, heuristic.getStatistics(time).numberOfRequestsArrivalInLastInterval);
+		assertEquals(1, heuristic.getStatistics(time).requestArrivals);
 		
 		EasyMock.verify(request);
 		
 		//Resetting counters
 		MachineStatistics statistics = heuristic.getStatistics(time);
-		assertEquals(0, statistics.numberOfRequestsArrivalInLastInterval);
-		assertEquals(0, statistics.numberOfRequestsCompletionsInLastInterval);
+		assertEquals(0, statistics.requestArrivals);
+		assertEquals(0, statistics.requestCompletions);
 	}
 }
 

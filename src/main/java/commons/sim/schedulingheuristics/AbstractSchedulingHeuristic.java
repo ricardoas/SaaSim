@@ -107,8 +107,8 @@ public abstract class AbstractSchedulingHeuristic implements SchedulingHeuristic
 		long requestsArrivalCounter = arrivalCounter;
 		long finishedRequestsCounter = finishedCounter;
 		tierStatistics.averageUtilisation = averageUtilisation;
-		tierStatistics.numberOfRequestsArrivalInLastInterval = requestsArrivalCounter;
-		tierStatistics.numberOfRequestsCompletionsInLastInterval = finishedRequestsCounter;
+		tierStatistics.requestArrivals = requestsArrivalCounter;
+		tierStatistics.requestCompletions = finishedRequestsCounter;
 		tierStatistics.totalNumberOfServers = machines.size();
 		
 		MachineStatistics stat = tierStatistics;

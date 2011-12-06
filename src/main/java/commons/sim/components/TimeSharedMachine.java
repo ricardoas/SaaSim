@@ -17,6 +17,7 @@ import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.util.FastSemaphore;
+import commons.sim.util.SaaSAppProperties;
 import commons.util.Triple;
 
 /**
@@ -200,10 +201,10 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 			newRequestToAdd.assignTo(this.descriptor.getType());
 			processorQueue.add(newRequestToAdd);
 		}
-		//if(getScheduler().now() - request.getArrivalTimeInMillis() > 
-		//Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)){
-		//getLoadBalancer().reportRequestQueued(request);
-		//descriptor.updateTransference(request.getRequestSizeInBytes(), 0);
+		if(getScheduler().now() - request.getArrivalTimeInMillis() > 
+		Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)){
+			System.out.println("TimeSharedMachine.requestFinished()");
+		}
 		//}else{
 			request.setFinishTime(getScheduler().now());
 			descriptor.updateTransference(request.getRequestSizeInBytes(), request.getResponseSizeInBytes());

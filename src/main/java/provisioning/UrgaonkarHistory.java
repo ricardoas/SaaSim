@@ -6,6 +6,8 @@ import commons.sim.util.FastSemaphore;
 
 public class UrgaonkarHistory implements Serializable{
 
+	private static final int SETUP_TICKS = 29;
+
 	/**
 	 * 
 	 */
@@ -23,7 +25,7 @@ public class UrgaonkarHistory implements Serializable{
 		predLambda = new double[HISTORY_SIZE];
 		realLambda = new double[HISTORY_SIZE];
 		index = 0;
-		setUp = new FastSemaphore(29);
+		setUp = new FastSemaphore(SETUP_TICKS);
 	}
 	
 	public double applyError(double lambdaPred){

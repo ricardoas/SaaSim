@@ -116,11 +116,11 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 	 */
 	protected int evaluateNumberOfServersForNextInterval(MachineStatistics statistics) {
 		assert statistics.totalNumberOfServers != 0;
-		assert statistics.numberOfRequestsCompletionsInLastInterval != 0;
+		assert statistics.requestCompletions != 0;
 		
-		double d = statistics.averageUtilisation / statistics.numberOfRequestsCompletionsInLastInterval;
+		double d = statistics.averageUtilisation / statistics.requestCompletions;
 		
-		double u_lign = Math.max(statistics.numberOfRequestsArrivalInLastInterval, statistics.numberOfRequestsCompletionsInLastInterval) * d;
+		double u_lign = Math.max(statistics.requestArrivals, statistics.requestCompletions) * d;
 		int newNumberOfServers = (int) Math.ceil( u_lign * statistics.totalNumberOfServers / targetUtilisation );
 		
 		return Math.max(1, newNumberOfServers) - statistics.totalNumberOfServers;

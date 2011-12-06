@@ -18,12 +18,14 @@ public class RoundRobinHeuristicForUrgaonkar extends RoundRobinHeuristic {
 	 * 
 	 */
 	private static final long serialVersionUID = 4279289006456262500L;
+	private long predictionTickInMillis;
 	
 	/**
 	 * Default constructor
 	 */
 	public RoundRobinHeuristicForUrgaonkar() {
 		super();
+		predictionTickInMillis = TimeUnit.HOUR.getMillis();
 	}
 	
 	/**
@@ -33,11 +35,13 @@ public class RoundRobinHeuristicForUrgaonkar extends RoundRobinHeuristic {
 	public MachineStatistics getStatistics(long eventTime) {
 		
 		MachineStatistics statistics = tierStatistics;
-		tierStatistics.totalNumberOfServers = getNumberOfMachines();
+		statistics.totalNumberOfServers = getNumberOfMachines();
 		
-		if( eventTime % TimeUnit.HOUR.getMillis() == 0 ){
+		if( eventTime % predictionTickInMillis == 0 ){
 			resetCounters();
-			tierStatistics = new MachineStatistics();//statistics);
+			tierStatistics = new MachineStatistics();
+		}else{
+			tierStatistics = new MachineStatistics(statistics);
 		}
 		
 		
