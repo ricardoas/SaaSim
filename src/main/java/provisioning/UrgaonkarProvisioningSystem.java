@@ -33,7 +33,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 	private static final double DEFAULT_PERCENTILE = 95.0;
 	private static final long predictiveTick = TimeUnit.HOUR.getMillis()/TimeUnit.SECOND.getMillis();
 	private static final long predictiveTickInMillis = TimeUnit.HOUR.getMillis();
-	private long reactiveTick;
+	private long reactiveTickInSeconds;
 	
 	private boolean enablePredictive;
 	private boolean enableReactive;
@@ -60,7 +60,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 		type = MachineType.valueOf(Configuration.getInstance().getString(PROP_MACHINE_TYPE).toUpperCase());
 		threshold = Configuration.getInstance().getDouble(PROP_REACTIVE_THRESHOLD, 2.0);
 		responseTime = Configuration.getInstance().getLong(PROP_RESPONSE_TIME, 1000)/TimeUnit.SECOND.getMillis();
-		reactiveTick = Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)/TimeUnit.SECOND.getMillis();
+		reactiveTickInSeconds = Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)/TimeUnit.SECOND.getMillis();
 		windowSize = Configuration.getInstance().getInt(PROP_PREDICTION_WINDOW_SIZE, DEFAULT_PREDICTION_WINDOW_SIZE);
 		percentile = Configuration.getInstance().getDouble(PROP_PERCENTILE, DEFAULT_PERCENTILE);
 		
@@ -96,13 +96,6 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 		boolean predictiveRound = now % predictiveTickInMillis == 0;
 		
 		int normalizedServersToAdd = 0;
-		
-		if(now == 2106000000){
-			System.out.println("UrgaonkarProvisioningSystem.sendStatistics()");
-		}
-		long aasda = (now % TimeUnit.HOUR.getMillis())/1000;
-		double x = statistics.getArrivalRate(aasda)/(statistics.totalNumberOfServers*type.getNumberOfCores());
-		System.out.println(x);
 		
 		if(predictiveRound && enablePredictive){
 			int index = (int)((now%TimeUnit.DAY.getMillis())/TimeUnit.HOUR.getMillis());
@@ -144,14 +137,17 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 					configurable.removeMachine(tier, false);
 				}
 			}
-			log.info(String.format("STAT-URGAONKAR PRED %d %d %d %f %f %f %f %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRate(predictiveTick), predictedArrivalRate, correctedPredictedArrivalRate, lost, after, statistics));
+			log.info(String.format("STAT-URGAONKAR PRED %d %d %d %f %f %f %f %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRateInTier(predictiveTick), predictedArrivalRate, correctedPredictedArrivalRate, lost, after, statistics));
 			lost = 0;
 			after = 0;
 		}else if(!predictiveRound && enableReactive){
 			
-			long interval = (now % TimeUnit.HOUR.getMillis())/1000;
+			if(now == 293100000){
+				System.out
+						.println("UrgaonkarProvisioningSystem.sendStatistics()");
+			}
 			
-			double observed = statistics.getArrivalRate(interval)/(statistics.totalNumberOfServers*type.getNumberOfCores());
+			double observed = statistics.getArrivalRateInLastIntervalInTier(reactiveTickInSeconds);
 			
 			int serversToAdd = 0;
 			if (observed/correctedPredictedArrivalRate > threshold){
@@ -182,7 +178,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 				
 			}
 //			log.info(String.format("STAT-URGAONKAR READ %d %d %d %f %f %s", now, antes, numberOfServersToAdd, lambda_pred, statistics.getArrivalRate(predictiveTick), statistics));
-			log.info(String.format("STAT-URGAONKAR REAC %d %d %d %f %f %f %f %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRate(interval), correctedPredictedArrivalRate, correctedPredictedArrivalRate, lost, after, statistics));
+			log.info(String.format("STAT-URGAONKAR REAC %d %d %d %f %f %f %f %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRateInLastIntervalInTier(reactiveTickInSeconds), correctedPredictedArrivalRate, correctedPredictedArrivalRate, lost, after, statistics));
 		}
 	}
 	

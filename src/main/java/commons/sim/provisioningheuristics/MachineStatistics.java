@@ -29,7 +29,7 @@ public class MachineStatistics implements Serializable{
 	public long requestArrivalsPerTier;
 	
 	public long requestsArrivalInLastInterval;
-	public long requestsArrivalInLastIntervalPerTier;
+	public long requestsArrivalsInLastIntervalPerTier;
 	
 	public long requestCompletions;
 	public long requestsCompletionsPerTier;
@@ -80,7 +80,7 @@ public class MachineStatistics implements Serializable{
 		
 		// Not reusable statistics
 		this.requestsArrivalInLastInterval = 0;
-		this.requestsArrivalInLastIntervalPerTier = 0;
+		this.requestsArrivalsInLastIntervalPerTier = 0;
 	}
 
 	@Override
@@ -129,6 +129,7 @@ public class MachineStatistics implements Serializable{
 	public void updateInterarrivalTime(long arrivalTimeInMillis) {
 		
 		requestArrivalsPerTier++;
+		requestsArrivalsInLastIntervalPerTier++;
 		
 		double iat = 1.0*(arrivalTimeInMillis - (lastArrivalTime==0?arrivalTimeInMillis:lastArrivalTime))/TimeUnit.SECOND.getMillis();
 		lastArrivalTime = arrivalTimeInMillis;
@@ -188,6 +189,10 @@ public class MachineStatistics implements Serializable{
 
 	public double getArrivalRateInTier(long timeIntervalInSeconds){
 		return 1.0*requestArrivalsPerTier/timeIntervalInSeconds;
+	}
+
+	public double getArrivalRateInLastIntervalInTier(long timeIntervalInSeconds){
+		return 1.0*requestsArrivalsInLastIntervalPerTier/timeIntervalInSeconds;
 	}
 
 	public void resetPerTickStatistics() {

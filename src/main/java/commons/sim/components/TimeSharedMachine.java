@@ -201,10 +201,10 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 			newRequestToAdd.assignTo(this.descriptor.getType());
 			processorQueue.add(newRequestToAdd);
 		}
-		if(getScheduler().now() - request.getArrivalTimeInMillis() > 
-		Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)){
-			System.out.println("TimeSharedMachine.requestFinished()");
-		}
+//		if(getScheduler().now() - request.getArrivalTimeInMillis() > 
+//		Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)){
+//			System.out.println("TimeSharedMachine.requestFinished()");
+//		}
 		//}else{
 			request.setFinishTime(getScheduler().now());
 			descriptor.updateTransference(request.getRequestSizeInBytes(), request.getResponseSizeInBytes());
