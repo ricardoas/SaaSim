@@ -48,7 +48,7 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 		long time = ONE_MINUTE_IN_MILLIS * 10;
 		
 		Request request = EasyMock.createStrictMock(Request.class);
-		EasyMock.expect(request.getArrivalTimeInMillis()).andReturn(time).once();
+		EasyMock.expect(request.getArrivalTimeInMillis()).andReturn(time).times(2);
 		EasyMock.expect(request.getUserID()).andReturn(userID).once();
 		EasyMock.replay(request);
 		
@@ -70,9 +70,8 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 		EasyMock.expect(request.getUserID()).andReturn(userID).times(2);
 		EasyMock.replay(request);
 		
-		ArrayList<Machine> servers = new ArrayList<Machine>();
 		Machine machine1 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
-		servers.add(machine1);
+		heuristic.addMachine(machine1);
 		
 		Machine nextServer = heuristic.next(request);
 		assertNotNull(nextServer);
@@ -97,17 +96,16 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 
 		long time = ONE_MINUTE_IN_MILLIS * 1;
 		
-		ArrayList<Machine> servers = new ArrayList<Machine>();
 		Machine machine1 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
 		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
 		Machine machine3 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
 		Machine machine4 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(4, false, MachineType.M1_SMALL, 0), null);
 		Machine machine5 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(5, false, MachineType.M1_SMALL, 0), null);
-		servers.add(machine1);
-		servers.add(machine2);
-		servers.add(machine3);
-		servers.add(machine4);
-		servers.add(machine5);
+		heuristic.addMachine(machine1);		
+		heuristic.addMachine(machine2);
+		heuristic.addMachine(machine3);
+		heuristic.addMachine(machine4);
+		heuristic.addMachine(machine5);
 		
 		//First request
 		Request request = EasyMock.createNiceMock(Request.class);
@@ -184,17 +182,16 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 	public void testGetServerForFirstRequestsWithMultipleServers2(){
 		int userID = 1;
 		
-		ArrayList<Machine> servers = new ArrayList<Machine>();
 		Machine machine1 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
 		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
 		Machine machine3 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
 		Machine machine4 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(4, false, MachineType.M1_SMALL, 0), null);
 		Machine machine5 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(5, false, MachineType.M1_SMALL, 0), null);
-		servers.add(machine1);
-		servers.add(machine2);
-		servers.add(machine3);
-		servers.add(machine4);
-		servers.add(machine5);
+		heuristic.addMachine(machine1);		
+		heuristic.addMachine(machine2);
+		heuristic.addMachine(machine3);
+		heuristic.addMachine(machine4);
+		heuristic.addMachine(machine5);
 		
 		//First request
 		Request request = EasyMock.createNiceMock(Request.class);
@@ -276,17 +273,16 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 		int userID = 999;
 		int secondUserID = 888;
 		
-		ArrayList<Machine> servers = new ArrayList<Machine>();
 		Machine machine1 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
 		Machine machine2 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(2, false, MachineType.M1_SMALL, 0), null);
 		Machine machine3 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(3, false, MachineType.M1_SMALL, 0), null);
 		Machine machine4 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(4, false, MachineType.M1_SMALL, 0), null);
 		Machine machine5 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(5, false, MachineType.M1_SMALL, 0), null);
-		servers.add(machine1);
-		servers.add(machine2);
-		servers.add(machine3);
-		servers.add(machine4);
-		servers.add(machine5);
+		heuristic.addMachine(machine1);		
+		heuristic.addMachine(machine2);
+		heuristic.addMachine(machine3);
+		heuristic.addMachine(machine4);
+		heuristic.addMachine(machine5);
 		
 		//First request
 		Request request = EasyMock.createNiceMock(Request.class);
@@ -376,9 +372,8 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 		EasyMock.expect(request.getUserID()).andReturn(userID).times(2);
 		EasyMock.replay(request);
 		
-		ArrayList<Machine> servers = new ArrayList<Machine>();
 		Machine machine1 = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), null);
-		servers.add(machine1);
+		heuristic.addMachine(machine1);
 		
 		heuristic.next(request);
 		assertEquals(1, heuristic.getStatistics(time).requestArrivals);
