@@ -43,10 +43,11 @@ public class AccountingSystemTest extends ValidConfigurationTest {
 
 	/**
 	 * Test method for {@link commons.sim.AccountingSystem#calculateUtility()}.
+	 * Utility cost based on reservation plan.
 	 */
 	@Test
 	public void testCalculateUtility() {
 		UtilityResult utility = Checkpointer.loadAccountingSystem().calculateUtility();
-		assertEquals(0.0, utility.getUtility(), 0.0);
+		assertEquals(-17692.5, utility.getUtility(), 0.0);
 	}
 }

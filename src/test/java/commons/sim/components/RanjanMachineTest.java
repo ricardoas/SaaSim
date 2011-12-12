@@ -103,10 +103,10 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		Request request4 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000});
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
-		loadBalancer.reportRequestQueued(request);
-		loadBalancer.reportRequestQueued(request2);
-		loadBalancer.reportRequestQueued(request3);
-		loadBalancer.reportRequestQueued(request4);
+		loadBalancer.reportRequestFinished(request);
+		loadBalancer.reportRequestFinished(request2);
+		loadBalancer.reportRequestFinished(request3);
+		loadBalancer.reportRequestFinished(request4);
 		EasyMock.replay(loadBalancer);
 		
 		Queue<Request> queue = EasyMock.createStrictMock(Queue.class);
@@ -154,7 +154,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		loadBalancer.reportRequestFinished(request);
 		loadBalancer.reportRequestFinished(request2);
 		loadBalancer.reportRequestFinished(request3);
-		loadBalancer.reportRequestQueued(request4);
+		loadBalancer.reportRequestFinished(request4);
 		EasyMock.replay(loadBalancer);
 		
 		Queue<Request> queue = EasyMock.createStrictMock(Queue.class);
