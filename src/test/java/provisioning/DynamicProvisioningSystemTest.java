@@ -19,6 +19,7 @@ import commons.cloud.UtilityResult;
 import commons.config.Configuration;
 import commons.io.Checkpointer;
 import commons.io.WorkloadParser;
+import commons.sim.AccountingSystem;
 import commons.sim.DynamicConfigurable;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.util.SaaSAppProperties;
@@ -75,13 +76,13 @@ public class DynamicProvisioningSystemTest extends ValidConfigurationTest {
 		DynamicProvisioningSystem dps = new DynamicProvisioningSystem();
 		dps.registerConfigurable(configurable);
 		
-		assertEquals(MachineType.M1_XLARGE, descriptor[0].getValue().getType());
-		assertEquals(MachineType.M1_XLARGE, descriptor[1].getValue().getType());
-		assertEquals(MachineType.M1_XLARGE, descriptor[2].getValue().getType());
-		assertEquals(MachineType.M1_XLARGE, descriptor[3].getValue().getType());
-		assertEquals(MachineType.M1_XLARGE, descriptor[4].getValue().getType());
-		assertEquals(MachineType.M1_XLARGE, descriptor[5].getValue().getType());
-		assertEquals(MachineType.M1_XLARGE, descriptor[6].getValue().getType());
+		assertEquals(MachineType.C1_MEDIUM, descriptor[0].getValue().getType());
+		assertEquals(MachineType.C1_MEDIUM, descriptor[1].getValue().getType());
+		assertEquals(MachineType.C1_MEDIUM, descriptor[2].getValue().getType());
+		assertEquals(MachineType.C1_MEDIUM, descriptor[3].getValue().getType());
+		assertEquals(MachineType.C1_MEDIUM, descriptor[4].getValue().getType());
+		assertEquals(MachineType.C1_MEDIUM, descriptor[5].getValue().getType());
+		assertEquals(MachineType.C1_MEDIUM, descriptor[6].getValue().getType());
 		
 		EasyMock.verify(configurable);
 	}
