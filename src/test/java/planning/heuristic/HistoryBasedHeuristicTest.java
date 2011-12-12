@@ -492,7 +492,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		Map<MachineType, Integer> plan = heuristic.getPlan(null);
 		assertNotNull(plan);
 		assertEquals(1, plan.size());
-		assertEquals(1, (int)plan.get(MachineType.M1_XLARGE));
+		assertEquals(1, (int)plan.get(MachineType.C1_MEDIUM));
 		
 		File output = new File(Checkpointer.MACHINE_DATA_DUMP);
 		assertFalse(output.exists());
