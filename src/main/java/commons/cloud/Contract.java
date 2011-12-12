@@ -123,11 +123,17 @@ public class Contract implements Comparable<Contract>, Serializable{
 		return name.equals(((Contract) obj).name);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int compareTo(Contract o) {
 		return this.name.compareTo(o.name);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		// Extremely inefficient but used just for debugging purposes.
@@ -142,6 +148,9 @@ public class Contract implements Comparable<Contract>, Serializable{
 				+ ", extraStorageCostPerByte=" + extraStorageCostPerByte + "]";
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int hashCode() {
 		assert name != null: "Null names are not allowed! Check your code.";

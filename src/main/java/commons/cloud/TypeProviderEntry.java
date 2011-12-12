@@ -40,6 +40,9 @@ public class TypeProviderEntry implements Serializable{
 		this.cost = onDemandCost + reservedCost + monitoringCost;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		return type.toString() 

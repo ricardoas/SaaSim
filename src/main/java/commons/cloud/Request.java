@@ -216,6 +216,9 @@ public class Request implements Serializable{
 		return reqID == other.reqID;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		return "Request [saasClient=" + saasClient + ", reqID=" + reqID
@@ -227,6 +230,9 @@ public class Request implements Serializable{
 				+ "]";
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;

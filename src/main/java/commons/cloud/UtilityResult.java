@@ -65,6 +65,9 @@ public class UtilityResult implements Serializable{
 		return uniqueReceipt + receipt - uniqueCost - cost - penalty;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("UTILITY");

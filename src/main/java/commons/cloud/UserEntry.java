@@ -96,6 +96,9 @@ public class UserEntry implements Serializable{
 		this.totalNumberOfRequests += entry.totalNumberOfRequests;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		return userID 

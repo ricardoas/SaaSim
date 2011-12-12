@@ -97,6 +97,9 @@ public class ProviderEntry implements Serializable{
 		return cost;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		return name 

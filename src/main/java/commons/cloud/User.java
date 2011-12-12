@@ -191,11 +191,17 @@ public class User implements Comparable<User>, Serializable{
 		return true;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int compareTo(User o) {
 		return this.contract.compareTo(o.contract);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", contract=" + contract
@@ -207,6 +213,9 @@ public class User implements Comparable<User>, Serializable{
 				+ storageInBytes + "]";
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;

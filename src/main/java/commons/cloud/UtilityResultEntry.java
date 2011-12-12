@@ -118,6 +118,9 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 		return penalty;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("ACCOUNTING");
@@ -138,11 +141,6 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 		
 	}
 
-	@Override
-	public int compareTo(UtilityResultEntry o) {
-		return this.time < o.time? -1: (this.time == o.time? 0: 1);
-	}
-
 	/**
 	 * Compare two {@link UtilityResultEntry}. 
 	 * <code>true</code> if them times are equals, <code>false</code> otherwise. 
@@ -159,7 +157,18 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 			return false;
 		return true;
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int compareTo(UtilityResultEntry o) {
+		return this.time < o.time? -1: (this.time == o.time? 0: 1);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
