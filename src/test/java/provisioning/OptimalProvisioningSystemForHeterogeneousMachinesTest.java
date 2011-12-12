@@ -37,9 +37,9 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		EasyMock.expect(config.getWorkloads()).andReturn(new String[]{PropertiesTesting.WORKLOAD});
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l).times(2);
 		
 		PowerMock.mockStaticPartial(Checkpointer.class, "loadSimulationInfo");
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(info).times(3);
@@ -64,9 +64,9 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		EasyMock.expect(config.getWorkloads()).andReturn(new String[]{PropertiesTesting.WORKLOAD});
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l).times(2);
 		
 		PowerMock.mockStaticPartial(Checkpointer.class, "loadSimulationInfo");
 		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(info).times(3);
@@ -86,9 +86,9 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		EasyMock.expect(config.getWorkloads()).andReturn(new String[]{PropertiesTesting.WORKLOAD});
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l).times(2);
 		
 		Provider provider = EasyMock.createMock(Provider.class);
 		User user = EasyMock.createMock(User.class);
@@ -122,9 +122,9 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		EasyMock.expect(config.getWorkloads()).andReturn(new String[]{PropertiesTesting.ONE_SERVER_WORKLOAD});
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l).times(2);
 		
 		MachineDescriptor machineDescriptor = EasyMock.createMock(MachineDescriptor.class);
 		
@@ -170,7 +170,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		EasyMock.expect(config.getWorkloads()).andReturn(new String[]{PropertiesTesting.ONE_SERVER_WORKLOAD});
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l).times(2);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_RISK)).andReturn(0.0);
 		
 		MachineDescriptor machineDescriptor = EasyMock.createMock(MachineDescriptor.class);
@@ -219,7 +219,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		EasyMock.expect(config.getWorkloads()).andReturn(new String[]{PropertiesTesting.ONE_SERVER_WORKLOAD});
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l).times(2);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_RISK)).andReturn(1.0);
 		
 		MachineDescriptor machineDescriptor = EasyMock.createMock(MachineDescriptor.class);
@@ -266,7 +266,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		EasyMock.expect(config.getWorkloads()).andReturn(new String[]{PropertiesTesting.ONE_SERVER_WORKLOAD});
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l).times(2);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_RISK)).andReturn(0.1);
 		
 		MachineDescriptor machineDescriptor = EasyMock.createMock(MachineDescriptor.class);
@@ -313,9 +313,9 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
-		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
+		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		EasyMock.expect(config.getWorkloads()).andReturn(new String[]{PropertiesTesting.FOUR_SERVERS_WORKLOAD});
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l).times(2);
 		
 		MachineDescriptor machineDescriptor = EasyMock.createMock(MachineDescriptor.class);
 		
@@ -362,7 +362,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		EasyMock.expect(config.getWorkloads()).andReturn(new String[]{PropertiesTesting.FOUR_SERVERS_WORKLOAD});
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l).times(2);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_RISK)).andReturn(0.0);
 		
 		MachineDescriptor machineDescriptor = EasyMock.createMock(MachineDescriptor.class);
@@ -412,7 +412,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		EasyMock.expect(config.getWorkloads()).andReturn(new String[]{PropertiesTesting.FOUR_SERVERS_WORKLOAD});
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l).times(2);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_RISK)).andReturn(0.5);
 		
 		MachineDescriptor machineDescriptor = EasyMock.createMock(MachineDescriptor.class);
@@ -462,7 +462,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		EasyMock.expect(config.getWorkloads()).andReturn(new String[]{PropertiesTesting.FOUR_SERVERS_WORKLOAD});
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l).times(2);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_RISK)).andReturn(0.0);
 		
 		MachineDescriptor machineDescriptor = EasyMock.createMock(MachineDescriptor.class);
@@ -514,7 +514,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(3);
 		EasyMock.expect(config.getWorkloads()).andReturn(new String[]{PropertiesTesting.FOUR_SERVERS_WORKLOAD});
-		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l);
+		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l).times(2);
 		EasyMock.expect(config.getDouble(SimulatorProperties.PLANNING_RISK)).andReturn(0.3);
 		
 		MachineDescriptor machineDescriptor = EasyMock.createMock(MachineDescriptor.class);
