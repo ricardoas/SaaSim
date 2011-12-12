@@ -142,16 +142,14 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 			after = 0;
 		}else if(!predictiveRound && enableReactive){
 			
-			if(now == 293100000){
-				System.out
-						.println("UrgaonkarProvisioningSystem.sendStatistics()");
-			}
-			
 			double observed = statistics.getArrivalRateInLastIntervalInTier(reactiveTickInSeconds);
 			
 			int serversToAdd = 0;
-			if (observed/correctedPredictedArrivalRate > threshold){
+			if (observed/(lambdaPeak * statistics.totalNumberOfServers) > threshold){
+				
 				serversToAdd = (int) Math.ceil(observed/lambdaPeak) - statistics.totalNumberOfServers*type.getNumberOfCores();
+				
+				serversToAdd = Math.max(1, serversToAdd);
 				
 				if(serversToAdd > 0){
 					

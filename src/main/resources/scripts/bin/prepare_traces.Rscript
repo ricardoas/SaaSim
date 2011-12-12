@@ -9,9 +9,9 @@ clientID = as.numeric(strsplit(filename, split='\\.|_')[[1]][2])
 size <- as.integer(c(100*1:9,1000*1:9,10000*1:9,100000*1:9))
 
 cpu <- function(){
-	if(rbinom(1,1,.405)){
-		if(rbinom(1,1,.187)){
-			if(rbinom(1,1,.174)){
+	if(!rbinom(1,1,.405)){
+		if(!rbinom(1,1,.187)){
+			if(!rbinom(1,1,.174)){
 				if(!rbinom(1,1,.102)){
 					if(!rbinom(1,1,.0808)){
 						30
