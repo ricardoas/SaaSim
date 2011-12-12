@@ -8,12 +8,19 @@ clientID = as.numeric(strsplit(filename, split='\\.|_')[[1]][2])
 
 size <- as.integer(c(100*1:9,1000*1:9,10000*1:9,100000*1:9))
 
+p1=.405
+p2=.187/(1-.405)
+p3=.174/(1-.405-.187)
+p4=.102/(1-.405-.187-.174)
+p5=.0808/(1-.405-.187-.174-.102)
+p6=(1-.405-.187-.174-.102-.0808)
+
 cpu <- function(){
-	if(!rbinom(1,1,.405)){
-		if(!rbinom(1,1,.187)){
-			if(!rbinom(1,1,.174)){
-				if(!rbinom(1,1,.102)){
-					if(!rbinom(1,1,.0808)){
+	if(!rbinom(1,1,p1)){
+		if(!rbinom(1,1,p2)){
+			if(!rbinom(1,1,p3)){
+				if(!rbinom(1,1,p4)){
+					if(!rbinom(1,1,p5)){
 						30
 					}else{ 170 }	
 				}else{ 50 }
