@@ -69,9 +69,6 @@ public class HistoryBasedWorkloadParser extends TimeBasedWorkloadParser {
 	 * Set the next period to read.
 	 * @param readNextPeriod the next period to read.
 	 */
-	/**
-	 * @param readNextPeriod
-	 */
 	public void setReadNextPeriod(boolean readNextPeriod){
 		this.readNexPeriod = readNextPeriod;
 	}
