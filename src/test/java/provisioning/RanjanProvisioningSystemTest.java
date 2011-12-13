@@ -1,7 +1,6 @@
 package provisioning;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,17 +36,13 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		buildFullConfiguration();
+		buildFullRanjanConfiguration();
+		this.dps = new RanjanProvisioningSystem();
 	}
 	
-	@Test
-	public void testWithEmptyStatistics() throws Exception {
-		this.dps = new RanjanProvisioningSystem();
-		try{
-			this.dps.evaluateNumberOfServersForNextInterval(null);
-			fail("Null statistics!");
-		}catch(NullPointerException e){
-		}
+	@Test(expected=NullPointerException.class)
+	public void testWithEmptyStatistics() {
+		this.dps.evaluateNumberOfServersForNextInterval(null);
 	}
 	
 	/**
@@ -63,9 +58,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		int totalNumberOfServers = 1;
 		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
-		this.dps = new RanjanProvisioningSystem();
 		assertEquals(1, this.dps.evaluateNumberOfServersForNextInterval(statistics));
-		
 	}
 	
 	/**
@@ -82,9 +75,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		int totalNumberOfServers = 3;
 		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
-		this.dps = new RanjanProvisioningSystem();
-		assertEquals(14, this.dps.evaluateNumberOfServersForNextInterval(statistics));
-		
+		assertEquals(47, this.dps.evaluateNumberOfServersForNextInterval(statistics));
 	}
 	
 	/**
@@ -101,9 +92,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		int totalNumberOfServers = 20;
 		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 
-		this.dps = new RanjanProvisioningSystem();
-		assertEquals(-9, this.dps.evaluateNumberOfServersForNextInterval(statistics));
-
+		assertEquals(198, this.dps.evaluateNumberOfServersForNextInterval(statistics));
 	}
 	
 	/**
@@ -120,15 +109,15 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		int totalNumberOfServers = 20;
 		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 
-		this.dps = new RanjanProvisioningSystem();
-		assertEquals(-19, this.dps.evaluateNumberOfServersForNextInterval(statistics));
-
+		assertEquals(-13, this.dps.evaluateNumberOfServersForNextInterval(statistics));
 	}
 	
 	/**
-	 * This scenario verifies a scenario where no demand has occurred
+	 * This scenario verifies a scenario where no demand has occurred. In this case, 
+	 * an AssertionError occurs, because isn't possible the values of number of 
+	 * servers and/or total requests completions are zero.
 	 */
-	@Test
+	@Test(expected=AssertionError.class)
 	public void testEvaluateNumberOfServersConsideringMultipleServersWithLowUtilization3() {
 		//Creating simulated statistics
 		double totalUtilization = 0.0;
@@ -137,17 +126,15 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		int totalNumberOfServers = 20;
 		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 
-		this.dps = new RanjanProvisioningSystem();
-		
-		assertEquals(-20, this.dps.evaluateNumberOfServersForNextInterval(statistics));
-
+		this.dps.evaluateNumberOfServersForNextInterval(statistics);
 	}
 	
 	/**
 	 * This scenario verifies a scenario where no machines were available and a high demand
-	 * has arrived
+	 * has arrived. In this case, an AssertionError occurs, because isn't possible the values 
+	 * of number of servers and/or total requests completions are zero.
 	 */
-	@Test
+	@Test(expected=AssertionError.class)
 	public void testEvaluateNumberOfServersWithoutPreviousMachines() {
 		//Creating simulated statistics
 		double totalUtilization = 0.0;
@@ -156,10 +143,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		int totalNumberOfServers = 0;
 		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
-		this.dps = new RanjanProvisioningSystem();
-		
 		assertEquals(1, this.dps.evaluateNumberOfServersForNextInterval(statistics));
-		
 	}
 	
 	/**
@@ -167,10 +151,10 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 	 * system creates a machine and adds it to simulator.
 	 * @throws ConfigurationException 
 	 */
-	@Ignore@Test
+	@SuppressWarnings("unchecked")
+	@Ignore @Test
 	public void testEvaluateUtilisationWithOneServerToBeAdded() throws ConfigurationException{
-		
-		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
+		//Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
 		int reservationLimit = 1;
 		int onDemandLimit = 1;
 
@@ -179,10 +163,6 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		long totalRequestsCompletions = 0;
 		int totalNumberOfServers = 0;
 		MachineStatistics statistics = new MachineStatistics(totalUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
-		
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
-		EasyMock.expect(scheduler.now()).andReturn(0l);
-		EasyMock.replay(scheduler);
 		
 		SimpleSimulator configurable = EasyMock.createStrictMock(SimpleSimulator.class);
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
@@ -198,8 +178,10 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		Provider[] providers = new Provider[1];
 		ArrayList<TypeProvider> types = new ArrayList<TypeProvider>();
 		types.add(new TypeProvider(0, MachineType.M1_SMALL, 1, 1, 100, 240, reservationLimit));
+		
 		Provider provider = new Provider(0, "1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		providers[0] = provider;
+		
 		EasyMock.expect(Checkpointer.loadProviders()).andReturn(providers);
 		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{});
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
@@ -222,7 +204,8 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		//assertTrue(provider.canBuyMachine(false, MachineType.SMALL));
 	}
 	
-	@Ignore@Test
+	@SuppressWarnings("unchecked")
+	@Ignore @Test
 	public void testEvaluateUtilisationWithOneServerToBeAddedAndLimitsReached(){
 		int reservationLimit = 1;
 		int onDemandLimit = 1;
@@ -259,13 +242,12 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		EasyMock.replay(config);
 		
 		this.dps = new RanjanProvisioningSystem();
-//		AccountingSystem system = new AccountingSystem(0, 1);
-//		system.buyMachine();
-//		system.buyMachine();
-//		this.dps.setAccountingSystem(system);
+		//AccountingSystem system = new AccountingSystem(0, 1);
+		//system.buyMachine();
+		//system.buyMachine();
+		//this.dps.setAccountingSystem(system);
 		
 		this.dps.registerConfigurable(configurable);
-
 		this.dps.sendStatistics(0, statistics, 0);
 		
 		PowerMock.verify(Configuration.class);
@@ -276,7 +258,8 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 	 * This scenarios verifies that after evaluating that nineteen machines should be removed, some calls
 	 * to simulator are performed.
 	 */
-	@Ignore@Test
+	@SuppressWarnings("unchecked")
+	@Ignore @Test
 	public void handleEventEvaluateUtilizationWithServersToRemove(){
 		int reservationLimit = 3;
 		int onDemandLimit = 3;
@@ -313,18 +296,17 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		EasyMock.replay(config);
 		
 		//Creating some machines to be removed
-//		AccountingSystem accountingSystem = new AccountingSystem(0, 1);
-//		accountingSystem.buyMachine();
-//		accountingSystem.buyMachine();
-//		accountingSystem.buyMachine();
-//		accountingSystem.buyMachine();
-//		accountingSystem.buyMachine();
-//		accountingSystem.buyMachine();
+		//AccountingSystem accountingSystem = new AccountingSystem(0, 1);
+		//accountingSystem.buyMachine();
+		//accountingSystem.buyMachine();
+		//accountingSystem.buyMachine();
+		//accountingSystem.buyMachine();
+		//accountingSystem.buyMachine();
+		//accountingSystem.buyMachine();
 		
 		this.dps = new RanjanProvisioningSystem();
 		this.dps.registerConfigurable(configurable);
-//		this.dps.setAccountingSystem(accountingSystem);
-		
+		//this.dps.setAccountingSystem(accountingSystem);
 		this.dps.sendStatistics(0, statistics, 0);
 		
 		PowerMock.verify(Configuration.class);
