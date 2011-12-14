@@ -2,7 +2,6 @@ package commons.sim.schedulingheuristics;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import commons.cloud.Request;
@@ -29,7 +28,7 @@ public class RanjanHeuristic extends AbstractSchedulingHeuristic {
 	private Map<Long, Long> lastRequestTimes;
 	private Map<Long, Machine> serversOfLastRequests;
 	
-	private int lastUsed;
+	private int nextToUse;
 
 	
 	/**
@@ -37,7 +36,7 @@ public class RanjanHeuristic extends AbstractSchedulingHeuristic {
 	 */
 	public RanjanHeuristic() {
 		super();
-		this.lastUsed = -1;
+		this.nextToUse = 0;
 		this.lastRequestTimes = new HashMap<Long, Long>();
 		this.serversOfLastRequests = new LinkedHashMap<Long, Machine>();
 	}
@@ -47,14 +46,14 @@ public class RanjanHeuristic extends AbstractSchedulingHeuristic {
 	 */
 	@Override
 	public Machine next(Request request) {
-		super.next(request);
+		Machine machine = super.next(request);
 		
-		Machine machine = getServerOfPreviousRequestInSession(request);
+		/*Machine machine = getServerOfPreviousRequestInSession(request);
 		if(machine != null){//Allocates to server already serving the session
 			return machine;
 		}
 		lastUsed = (lastUsed + 1) % machines.size();
-		machine = machines.get(lastUsed);
+		machine = machines.get(lastUsed);*/
 		
 		//Updating times
 		long userID = request.getUserID();
@@ -89,7 +88,7 @@ public class RanjanHeuristic extends AbstractSchedulingHeuristic {
 	 */
 	@Override
 	protected Machine getNextAvailableMachine() {
-		// TODO Auto-generated method stub
-		return null;
+		int index = nextToUse++;
+		return machines.isEmpty()? null: machines.get(index % machines.size());
 	}
 }

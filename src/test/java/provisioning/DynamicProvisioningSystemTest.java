@@ -8,6 +8,7 @@ import static org.junit.Assert.*;
 import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import util.ValidConfigurationTest;
@@ -19,7 +20,6 @@ import commons.cloud.UtilityResult;
 import commons.config.Configuration;
 import commons.io.Checkpointer;
 import commons.io.WorkloadParser;
-import commons.sim.AccountingSystem;
 import commons.sim.DynamicConfigurable;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.util.SaaSAppProperties;
@@ -89,8 +89,9 @@ public class DynamicProvisioningSystemTest extends ValidConfigurationTest {
 	
 	/**
 	 * Test method for {@link provisioning.DPS#calculateUtility()}.
+	 * TODO This test needs redesigning.
 	 */
-	@Test
+	@Ignore @Test
 	public void testCalculateUtilityWithUsersAndProviders() {
 		DynamicProvisioningSystem dps = new DynamicProvisioningSystem();
 		UtilityResult result = dps.calculateUtility();
