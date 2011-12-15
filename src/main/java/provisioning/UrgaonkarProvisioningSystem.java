@@ -175,8 +175,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 				}
 				
 			}
-//			log.info(String.format("STAT-URGAONKAR READ %d %d %d %f %f %s", now, antes, numberOfServersToAdd, lambda_pred, statistics.getArrivalRate(predictiveTick), statistics));
-			log.info(String.format("STAT-URGAONKAR REAC %d %d %d %f %f %f %f %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRateInLastIntervalInTier(reactiveTickInSeconds), correctedPredictedArrivalRate, correctedPredictedArrivalRate, lost, after, statistics));
+			log.debug(String.format("STAT-URGAONKAR REAC %d %d %d %f %f %f %f %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRateInLastIntervalInTier(reactiveTickInSeconds), correctedPredictedArrivalRate, correctedPredictedArrivalRate, lost, after, statistics));
 		}
 	}
 	
