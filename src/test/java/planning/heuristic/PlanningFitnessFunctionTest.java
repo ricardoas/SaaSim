@@ -512,12 +512,13 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
 		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
 		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
-		Provider[] providers = new Provider[1];
-		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		
+		Provider[] providers = new Provider[1];
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{0l}, new double[]{0d}, new long[]{0l}, new double[]{0d}, types);
+
 		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, null);
 		
-		double receipt = setupCost + price + 14580 * 0.1;
+		double receipt = setupCost + price + (14580 * 0.1);
 		assertEquals(receipt, function.calcReceipt(), 0.0001);
 		
 		PowerMock.verifyAll();
@@ -555,9 +556,10 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
 		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
 		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
+
 		Provider[] providers = new Provider[1];
-		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
-		
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{0l}, new double[]{0d}, new long[]{0l}, new double[]{0d}, types);
+
 		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, null);
 		
 		double receipt = setupCost * 2;
@@ -629,12 +631,13 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
 		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
 		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
+
 		Provider[] providers = new Provider[1];
-		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
-		
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{0l}, new double[]{0d}, new long[]{0l}, new double[]{0d}, types);
+
 		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, null);
 		
-		double receipt = setupCost * 2 + price + price2;
+		double receipt = (setupCost * 2) + price + price2;
 		assertEquals(receipt, function.calcReceipt(), 0.0001);
 	}
 	
@@ -732,12 +735,13 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
 		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
 		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
+
 		Provider[] providers = new Provider[1];
-		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
-		
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{0l}, new double[]{0d}, new long[]{0l}, new double[]{0d}, types);
+
 		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, null);
 		
-		double receipt = setupCost * 2 + 2 * price + 2 * price2;
+		double receipt = (2 * setupCost) + (2 * price) + (2 * price2);
 		assertEquals(receipt, function.calcReceipt(), 0.0001);
 		
 		PowerMock.verifyAll();
@@ -858,12 +862,13 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		List<TypeProvider> types = new ArrayList<TypeProvider>();
 		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
 		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
+
 		Provider[] providers = new Provider[1];
-		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
-		
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{0l}, new double[]{0d}, new long[]{0l}, new double[]{0d}, types);
+
 		PlanningFitnessFunction function = new PlanningFitnessFunction(summaries, cloudUsers, providers, null);
 		
-		double receipt = setupCost * 2 + 2 * price + 2 * price2 + 40 * 0.1 + 58 * 0.2;
+		double receipt = (2 * setupCost) + (2 * price) + (2 * price2) + (40 * 0.1) + (58 * 0.2);
 		assertEquals(receipt, function.calcReceipt(), 0.0001);
 		
 		PowerMock.verifyAll();
@@ -1645,7 +1650,13 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.01, 0.0005, smallReservationFee, 188, 5));
 		
 		Provider[] providers = new Provider[1];
-		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
+		
+		long[] transferLimitsInBytes = new long[1];
+		transferLimitsInBytes[0] = 0l;
+		double[] transferCostsPerByte = new double[1];
+		transferCostsPerByte[0] = 0d;
+		
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, transferLimitsInBytes, transferCostsPerByte, transferLimitsInBytes, transferCostsPerByte, types);
 		
 		PowerMock.replayAll(config);
 		
@@ -1714,7 +1725,13 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.01, 0.0005, smallReservationFee, 188, 5));
 		
 		Provider[] providers = new Provider[1];
-		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
+		
+		long[] transferLimitsInBytes = new long[1];
+		transferLimitsInBytes[0] = 0l;
+		double[] transferCostsPerByte = new double[1];
+		transferCostsPerByte[0] = 0d;
+		
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, transferLimitsInBytes, transferCostsPerByte, transferLimitsInBytes, transferCostsPerByte, types);
 		
 		PowerMock.replayAll(config);
 		
@@ -1778,10 +1795,10 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
 		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
 		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.37, 0.0005, 99, 188, 5));
-		
+
 		Provider[] providers = new Provider[1];
-		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
-		
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{0l}, new double[]{0d}, new long[]{0l}, new double[]{0d}, types);
+
 		PowerMock.replayAll(config);
 		
 		//Workload summaries
@@ -1847,10 +1864,10 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
 		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
 		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.37, 0.0005, 99, 188, 5));
-		
+
 		Provider[] providers = new Provider[1];
-		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
-		
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{0l}, new double[]{0d}, new long[]{0l}, new double[]{0d}, types);
+
 		PowerMock.replayAll(config);
 		
 		//Workload summaries
@@ -1913,10 +1930,10 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		types.add(new TypeProvider(0, MachineType.M1_LARGE, 0.1, 0.01, 100, 170, 5));
 		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.6, 0.25, 99, 188, 5));
 		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.01, 0.0005, 99, 188, 5));
-		
+
 		Provider[] providers = new Provider[1];
-		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
-		
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{0l}, new double[]{0d}, new long[]{0l}, new double[]{0d}, types);
+
 		PowerMock.replayAll(config);
 		
 		//Summaries
@@ -1990,10 +2007,10 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		types.add(new TypeProvider(0, MachineType.C1_MEDIUM, 0.17, 0.06, mediumReservation, 188, 5));
 		double smallReservation = 227.5;
 		types.add(new TypeProvider(0, MachineType.M1_SMALL, 0.085, 0.03, smallReservation, 188, 5));
-		
+
 		Provider[] providers = new Provider[1];
-		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
-		
+		providers[0] = new Provider(1, "p1", 10, 10, 0.15, new long[]{0l}, new double[]{0d}, new long[]{0l}, new double[]{0d}, types);
+
 		PowerMock.replayAll(config);
 		
 		//Workload summaries
