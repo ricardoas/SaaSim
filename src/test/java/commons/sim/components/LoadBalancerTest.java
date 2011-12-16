@@ -2,10 +2,7 @@ package commons.sim.components;
 
 import static org.junit.Assert.*;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -37,7 +34,6 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testAddServerWithSetupDelay(){
-		
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.M1_SMALL, 0);
 		
 		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
@@ -94,11 +90,13 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 	public void testRemoveServer(){
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.M1_SMALL, 0);
 		
-		Machine machine = EasyMock.createStrictMock(Machine.class);
+		Machine machine = EasyMock.createStrictMock(TimeSharedMachine.class);
 		EasyMock.expect(machine.getDescriptor()).andReturn(descriptor);
+		machine.shutdownOnFinish();
+		EasyMock.expectLastCall().times(1);
 		
 		SchedulingHeuristic schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
-		schedulingHeuristic.addMachine(machine);
+		schedulingHeuristic.addMachine(EasyMock.isA(Machine.class));
 		EasyMock.expect(schedulingHeuristic.removeMachine()).andReturn(machine);
 		
 		EasyMock.replay(schedulingHeuristic, machine);
@@ -110,20 +108,17 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		
 		//Removing a server
 		lb.removeMachine(false);
-		
 		EasyMock.verify(schedulingHeuristic, machine);
 	}
 	
 	@Test
 	public void testRemoveServerThatDoesNotExist(){
-		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.M1_SMALL, 0);
-		
 		SchedulingHeuristic schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
+		EasyMock.expect(schedulingHeuristic.removeMachine()).andReturn(null);
 		
 		EasyMock.replay(schedulingHeuristic);
 
 		LoadBalancer lb = new LoadBalancer(Checkpointer.loadScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 1);
-		
 		//Removing a server
 		lb.removeMachine(false);
 		
@@ -133,7 +128,6 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 	/**
 	 * Scheduling a new request with one machine artificially chosen by the heuristic
 	 */
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testHandleEventNewRequestWithOneMachine(){
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.M1_SMALL, 0);
@@ -141,15 +135,17 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		Request request = EasyMock.createStrictMock(Request.class);
 		JEEvent newRequestEvent = EasyMock.createStrictMock(JEEvent.class);
 		Machine machine = EasyMock.createStrictMock(TimeSharedMachine.class);
-//		EasyMock.expect(machine.getDescriptor()).andReturn(descriptor);
 		SchedulingHeuristic schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
 		
 		EasyMock.expect(newRequestEvent.getType()).andReturn(JEEventType.NEWREQUEST).once();
 		EasyMock.expect(newRequestEvent.getValue()).andReturn(new Request [] {request}).once();
 		
 		schedulingHeuristic.addMachine(EasyMock.isA(Machine.class));
-		EasyMock.expect(schedulingHeuristic.next(
-				EasyMock.isA(Request.class))).andReturn(machine);
+		EasyMock.expect(schedulingHeuristic.next(EasyMock.isA(Request.class))).andReturn(machine);
+		
+		List<Machine> machines = new ArrayList<Machine>();
+		machines.add(machine);
+		EasyMock.expect(schedulingHeuristic.getMachines()).andReturn(machines);
 		machine.sendRequest(request);
 		
 		EasyMock.replay(newRequestEvent, schedulingHeuristic, request, machine);
@@ -163,13 +159,11 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		assertEquals(1, lb.getServers().size());
 		
 		EasyMock.verify(newRequestEvent, schedulingHeuristic, request, machine);
-		
 	}
 	
 	/**
 	 * Scheduling a new request while the heuristic does not chooses any machines.
 	 */
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testHandleEventNewRequestWithNoAvailableMachine(){
 		Request request = EasyMock.createStrictMock(Request.class);
@@ -182,15 +176,13 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		EasyMock.expect(event.getType()).andReturn(JEEventType.NEWREQUEST).once();
 		EasyMock.expect(event.getValue()).andReturn(new Request [] {request}).once();
 		
-		EasyMock.expect(schedulingHeuristic.next(
-				EasyMock.isA(Request.class))).andReturn(null);
+		EasyMock.expect(schedulingHeuristic.next(EasyMock.isA(Request.class))).andReturn(null);
 		
 		EasyMock.replay(event, schedulingHeuristic, request, dps);
 		
 		//Load balancer being constructed without machines!
 		LoadBalancer lb = new LoadBalancer(Checkpointer.loadScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 1);
 		lb.setMonitor(dps);
-		
 		lb.handleEvent(event);
 		
 		EasyMock.verify(event, schedulingHeuristic, request, dps);
@@ -199,33 +191,26 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testHandleEventEvaluateUtilisation() throws ConfigurationException{
-		buildFullConfiguration();
-		
 		long evaluationTime = 1000;
 		double utilisation1 = 0.9;
 		double utilisation2 = 0.5;
 		long totalArrivals = 100l;
 		long totalCompletions = 100l;
+		MachineStatistics machineStatistics = new MachineStatistics((utilisation1+utilisation2)/2, totalArrivals, totalCompletions, 2);
 		
 		//Mocking machines actions
 		MachineDescriptor descriptor = new MachineDescriptor(0, false, MachineType.M1_SMALL, 0);
 		MachineDescriptor descriptor2 = new MachineDescriptor(1, true, MachineType.C1_MEDIUM, 0);
 		
-		TimeSharedMachine machine1 = EasyMock.createStrictMock(TimeSharedMachine.class);
-		TimeSharedMachine machine2 = EasyMock.createStrictMock(TimeSharedMachine.class);
-		EasyMock.expect(machine1.getDescriptor()).andReturn(descriptor);
-		EasyMock.expect(machine1.computeUtilisation(evaluationTime)).andReturn(utilisation1);
-		EasyMock.expect(machine2.getDescriptor()).andReturn(descriptor2);
-		EasyMock.expect(machine2.computeUtilisation(evaluationTime)).andReturn(utilisation2);
-		
 		//Mocking scheduling heuristic actions
 		SchedulingHeuristic schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
 		schedulingHeuristic.addMachine(EasyMock.isA(Machine.class));
 		EasyMock.expectLastCall().times(2);
+		EasyMock.expect(schedulingHeuristic.getStatistics(1000)).andReturn(machineStatistics);
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
-		monitor.sendStatistics(1000, new MachineStatistics((utilisation1+utilisation2)/2, totalArrivals, totalCompletions, 2), 0);
-		EasyMock.replay(machine1, machine2, schedulingHeuristic, monitor);
+		monitor.sendStatistics(1000, machineStatistics, 0);
+		EasyMock.replay(schedulingHeuristic, monitor);
 		
 		LoadBalancer lb = new LoadBalancer(Checkpointer.loadScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 0);
 		lb.setMonitor(monitor);
@@ -233,16 +218,15 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		lb.addMachine(descriptor, true);
 		lb.addMachine(descriptor2, true);
 		
-		JEEvent machineIsUpEvent = new JEEvent(JEEventType.ADD_SERVER, lb, 0l, machine1);
-		JEEvent machineIsUpEvent2 = new JEEvent(JEEventType.ADD_SERVER, lb, 0l, machine2);
+		JEEvent machineIsUpEvent = new JEEvent(JEEventType.ADD_SERVER, lb, 0l, descriptor);
+		JEEvent machineIsUpEvent2 = new JEEvent(JEEventType.ADD_SERVER, lb, 0l, descriptor2);
 		
 		lb.handleEvent(machineIsUpEvent);
 		lb.handleEvent(machineIsUpEvent2);
 		
 		//Calculating utilisation
 		lb.collectStatistics(evaluationTime, 300000, 0);
-		
-		EasyMock.verify(machine1, machine2, schedulingHeuristic, monitor);
+		EasyMock.verify(schedulingHeuristic, monitor);
 	}
 	
 	@Test
@@ -271,16 +255,21 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		monitor.machineTurnedOff(machineDescriptor);
+		EasyMock.expectLastCall().times(1);
 		
+		Machine machine = EasyMock.createMock(Machine.class);
 		SchedulingHeuristic schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
-		EasyMock.replay(monitor, schedulingHeuristic);
+		
+		EasyMock.replay(monitor, schedulingHeuristic, machine);
 		
 		LoadBalancer lb = new LoadBalancer(Checkpointer.loadScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 0);
 		lb.setMonitor(monitor);
+		lb.addMachine(machineDescriptor, false);
+		lb.removeMachine(false);
 		
 		lb.handleEvent(new JEEvent(JEEventType.MACHINE_TURNED_OFF, lb, 0l, machineDescriptor));
 		
-		EasyMock.verify(monitor, schedulingHeuristic);
+		EasyMock.verify(monitor, schedulingHeuristic, machine);
 	}
 	
 	@Test
@@ -303,13 +292,14 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testEstimateServersWithoutServers(){
-		
 		Capture<MachineStatistics> captured = new Capture<MachineStatistics>();
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		monitor.sendStatistics(EasyMock.anyLong(), EasyMock.capture(captured), EasyMock.anyInt());
 		
 		SchedulingHeuristic schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
+		EasyMock.expect(schedulingHeuristic.getNumberOfMachines()).andReturn(0);
+		
 		EasyMock.replay(monitor, schedulingHeuristic);
 		
 		LoadBalancer lb = new LoadBalancer(Checkpointer.loadScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 0);
@@ -326,28 +316,25 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testEstimateServersWithServers() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
-		
 		Capture<MachineStatistics> captured = new Capture<MachineStatistics>();
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		monitor.sendStatistics(EasyMock.anyLong(), EasyMock.capture(captured), EasyMock.anyInt());
 		
 		SchedulingHeuristic schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
-		Machine machine1 = EasyMock.createMock(Machine.class);
-		Machine machine2 = EasyMock.createMock(Machine.class);
-		Machine machine3 = EasyMock.createMock(Machine.class);
+		EasyMock.expect(schedulingHeuristic.getNumberOfMachines()).andReturn(3);
 		
-		EasyMock.replay(monitor, schedulingHeuristic, machine1, machine2, machine3);
+		MachineDescriptor descriptor1 = new MachineDescriptor(1, false, MachineType.M1_SMALL, 1);
+		MachineDescriptor descriptor2 = new MachineDescriptor(2, false, MachineType.M1_SMALL, 1);
+		MachineDescriptor descriptor3 = new MachineDescriptor(3, false, MachineType.M1_SMALL, 1);
+		
+		EasyMock.replay(monitor, schedulingHeuristic);
 		
 		LoadBalancer lb = new LoadBalancer(Checkpointer.loadScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 0);
 		lb.setMonitor(monitor);
-		
-		Field field = LoadBalancer.class.getDeclaredField("servers");
-		field.setAccessible(true);
-		List<Machine> servers = (List<Machine>) field.get(lb);
-		servers.add(machine1);
-		servers.add(machine2);
-		servers.add(machine3);
+		lb.addMachine(descriptor1, false);
+		lb.addMachine(descriptor2, false);
+		lb.addMachine(descriptor3, false);
 		
 		lb.estimateServers(100);
 		
