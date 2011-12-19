@@ -196,4 +196,10 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 		tiers[tier].cancelMachineRemoval(numberOfMachines);
 	}
 
+	@Override
+	public void removeMachine(int tier, MachineDescriptor descriptor,
+			boolean force) {
+		assert tiers.length >= tier : "This tier not exists!";
+	}
+
 }

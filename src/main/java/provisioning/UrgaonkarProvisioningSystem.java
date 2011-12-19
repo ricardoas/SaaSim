@@ -207,17 +207,21 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 	 */
 	private double getPeakArrivalRatePerServer(MachineStatistics statistics) {
 		
-		double lambdaPeak = (statistics.averageST + (statistics.calcVarST() + statistics.calcVarIAT())/(2 * (1.0*responseTime - statistics.averageST)));
-		
-		return 1.0/lambdaPeak;
+		return 1.0/(statistics.averageST + (statistics.calcVarST() + statistics.calcVarIAT())/(2 * (1.0*responseTime - statistics.averageST)));
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void reportLostRequest(Request request) {
 		super.reportLostRequest(request);
 		lost++;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void reportFinishedRequestAfterSLA(Request request) {
 		super.reportFinishedRequestAfterSLA(request);

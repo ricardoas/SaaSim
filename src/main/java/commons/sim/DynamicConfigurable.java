@@ -33,10 +33,17 @@ public interface DynamicConfigurable {
 	/**
 	 * Removes a server from specified tier. The removal policy is determined {@link SchedulingHeuristic}.
 	 * @param tier The tier whose machine will be removed.
-	 * @param force <code>true</code> to remove immediatelly, and <code>false</code> to stop scheduling and wait
+	 * @param force <code>true</code> to remove immediately, and <code>false</code> to stop scheduling and wait
 	 * until machine becomes idle to remove.
 	 */
 	void removeMachine(int tier, boolean force);
+
+	/**
+	 * Removes the server represented by {@link MachineDescriptor} from specified tier. 
+	 * @param force <code>true</code> to remove immediately, and <code>false</code> to stop scheduling and wait
+	 * until machine becomes idle to remove.
+	 */
+	void removeMachine(int tier, MachineDescriptor descriptor, boolean force);
 
 	/**
 	 * Set the {@link Monitor} of application.

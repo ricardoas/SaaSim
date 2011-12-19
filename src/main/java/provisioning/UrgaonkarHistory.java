@@ -4,15 +4,20 @@ import java.io.Serializable;
 
 import commons.sim.util.FastSemaphore;
 
+/**
+ * 
+ * 
+ * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
+ * @version 1.0 - with a setup delay.
+ */
 public class UrgaonkarHistory implements Serializable{
 
-	private static final int SETUP_TICKS = 29;
-
 	/**
-	 * 
+	 * Version 1.0
 	 */
 	private static final long serialVersionUID = -6305463166825960562L;
-
+	
+	private static final int SETUP_TICKS = 29;
 	private static final int HISTORY_SIZE = 5;
 	
 	private double [] predLambda;
