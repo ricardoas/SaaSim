@@ -5,6 +5,7 @@ import java.util.List;
 
 import commons.cloud.Request;
 import commons.sim.components.Machine;
+import commons.sim.components.MachineDescriptor;
 import commons.sim.provisioningheuristics.MachineStatistics;
 
 /**
@@ -37,6 +38,7 @@ public interface SchedulingHeuristic extends Serializable{
 	 * Removes a last {@link Machine} from the list of serves of application.
 	 * @return The removed machine.
 	 */
+	@Deprecated
 	Machine removeMachine();
 
 	/**
@@ -57,4 +59,12 @@ public interface SchedulingHeuristic extends Serializable{
 	 * @return A list containing the machines.
 	 */
 	List<Machine> getMachines();
+
+	/**
+	 * Removes a {@link Machine} represented by given {@link MachineDescriptor} 
+	 * from the list of servers.
+	 * @param descriptor The machine to be removed.
+	 * @return The removed machine.
+	 */
+	Machine removeMachine(MachineDescriptor descriptor);
 }

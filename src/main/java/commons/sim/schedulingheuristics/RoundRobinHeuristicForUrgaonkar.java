@@ -44,7 +44,6 @@ public class RoundRobinHeuristicForUrgaonkar extends RoundRobinHeuristic {
 			tierStatistics = new MachineStatistics(statistics);
 		}
 		
-		
 		return statistics;
 	}
 

@@ -9,6 +9,7 @@ import java.util.Map;
 import commons.cloud.Request;
 import commons.config.Configuration;
 import commons.sim.components.Machine;
+import commons.sim.components.MachineDescriptor;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.util.SimulatorProperties;
 
@@ -80,6 +81,24 @@ public abstract class AbstractSchedulingHeuristic implements SchedulingHeuristic
 	@Override
 	public Machine removeMachine() {
 		return machines.size() == 1? null: machines.removeLast();
+	}
+	
+	@Override
+	public Machine removeMachine(MachineDescriptor descriptor) {
+		
+		assert descriptor != null: "Can't remove null descriptor.";
+		
+		if(machines.size() == 1) return null;
+		
+		for (Machine machine : machines) {
+			if(machine.getDescriptor().equals(descriptor)){
+				boolean result = machines.remove(machine);
+				assert result: "Problem when removing machine. Check collection!";
+				return machine;
+			}
+		}
+		assert false: "Removing from wrong tier. Check DPS!";
+		return null;
 	}
 	
 	@Override

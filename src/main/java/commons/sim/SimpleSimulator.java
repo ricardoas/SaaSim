@@ -200,6 +200,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	public void removeMachine(int tier, MachineDescriptor descriptor,
 			boolean force) {
 		assert tiers.length >= tier : "This tier not exists!";
+		tiers[tier].removeMachine(descriptor, force);
 	}
 
 }

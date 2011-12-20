@@ -1,13 +1,18 @@
 package provisioning;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.log4j.MDC;
 
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.config.Configuration;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.provisioningheuristics.MachineStatistics;
+import commons.sim.util.SimulatorProperties;
+import commons.util.TimeUnit;
 
 /**
  * Simple implementation of QuID algorithm as depicted in: 
@@ -24,6 +29,8 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 
 	private double targetUtilisation;
 	private MachineType type;
+	
+	private LinkedList<LinkedList<MachineDescriptor>> list;
 
 	/**
 	 * Default constructor
@@ -32,6 +39,11 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 		super();
 		type = MachineType.valueOf(Configuration.getInstance().getString(PROP_MACHINE_TYPE).toUpperCase());
 		targetUtilisation = Configuration.getInstance().getDouble(PROP_TARGET_UTILISATION);
+		list = new LinkedList<LinkedList<MachineDescriptor>>();
+		long reactiveTick = TimeUnit.HOUR.getMillis()/Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL);
+		for (int i = 0; i < reactiveTick; i++) {
+			list.add(new LinkedList<MachineDescriptor>());
+		}
 	}
 	
 	/**
@@ -87,25 +99,28 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 		
 		log.debug(String.format("STAT-RANJAN %d %d %d %s", now, tier, numberOfServersToAdd, statistics));
 		
+		LinkedList<MachineDescriptor> availableToTurnOff = list.poll();
+		
 		if(numberOfServersToAdd > 0){
 			
-			if(numberOfServersToAdd > statistics.warmingDownMachines){
-				numberOfServersToAdd -= statistics.warmingDownMachines;
-				List<MachineDescriptor> machines = buyMachines(numberOfServersToAdd);
-				for (MachineDescriptor machineDescriptor : machines) {
-					configurable.addMachine(tier, machineDescriptor, true);
-				}
-				
-				configurable.cancelMachineRemoval(tier, statistics.warmingDownMachines);
-			}else{
-				configurable.cancelMachineRemoval(tier, numberOfServersToAdd);
+			List<MachineDescriptor> machines = buyMachines(numberOfServersToAdd);
+
+			for (MachineDescriptor machineDescriptor : machines) {
+				configurable.addMachine(tier, machineDescriptor, true);
 			}
+
+			availableToTurnOff.addAll(machines);
+//			list.add(availableToTurnOff);
 			
 		}else if(numberOfServersToAdd < 0){
-			for (int i = 0; i < -numberOfServersToAdd; i++) {
-				configurable.removeMachine(tier, false);
+			if(!availableToTurnOff.isEmpty()){
+				for (int i = 0; i < -numberOfServersToAdd; i++) {
+					configurable.removeMachine(tier,  availableToTurnOff.poll(), false);
+				}
 			}
 		}
+		
+		list.add(availableToTurnOff);
 	}
 
 	/**

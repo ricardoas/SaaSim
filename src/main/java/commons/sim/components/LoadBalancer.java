@@ -38,7 +38,6 @@ public class LoadBalancer extends JEAbstractEventHandler{
 
 	private final SchedulingHeuristic heuristic;
 	
-	private final Queue<Request> requestsToBeProcessed;
 	private final int maxServersAllowed;
 	private transient Monitor monitor;
 
@@ -58,7 +57,6 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		this.heuristic = heuristic;
 		this.maxServersAllowed = maxServersAllowed;
 		this.tier = tier;
-		this.requestsToBeProcessed = new LinkedList<Request>();
 		startingUp = new HashMap<MachineDescriptor, Machine>();
 		warmingDown = new HashMap<MachineDescriptor, Machine>();
 		
@@ -110,10 +108,6 @@ public class LoadBalancer extends JEAbstractEventHandler{
 				if(machine != null){
 					descriptor.setStartTimeInMillis(getScheduler().now());
 					heuristic.addMachine(machine);
-					
-					for (Request queuedRequest : requestsToBeProcessed) {
-						send(new JEEvent(JEEventType.NEWREQUEST, this, getScheduler().now(), queuedRequest));
-					}
 				}
 				break;
 			case MACHINE_TURNED_OFF:
@@ -201,6 +195,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	 * Remove a specific {@link Machine} to this tier.
 	 * @param force <code>true</code> if use force
 	 */
+	@Deprecated
 	public void removeMachine(boolean force) {
 		Machine machine = null;
 		
@@ -224,6 +219,21 @@ public class LoadBalancer extends JEAbstractEventHandler{
 			
 			entry.getKey().setStartTimeInMillis(getScheduler().now());
 			warmingDown.put(machine.getDescriptor(), machine);
+			machine.shutdownOnFinish();
+		}
+	}
+	
+	/**
+	 * Remove a specific {@link Machine} to this tier.
+	 * @param force <code>true</code> if use force
+	 */
+	public void removeMachine(MachineDescriptor descriptor, boolean force) {
+		
+		Machine machine = heuristic.removeMachine(descriptor);
+		if(machine != null){
+			if(force){
+				throw new RuntimeException("Not implemented yet!");
+			}
 			machine.shutdownOnFinish();
 		}
 	}
