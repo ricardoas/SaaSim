@@ -1,9 +1,12 @@
 package provisioning;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
+import provisioning.util.DPSInfo;
 
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
@@ -40,6 +43,8 @@ public class DynamicProvisioningSystem implements DPS{
 
 	private long maxRT;
 	
+	private DPSInfo info;
+
 	/**
 	 * Default constructor.
 	 */
@@ -48,6 +53,12 @@ public class DynamicProvisioningSystem implements DPS{
 		this.users = Checkpointer.loadUsers();
 		this.accountingSystem = Checkpointer.loadAccountingSystem();
 		this.maxRT = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME);
+
+		info = loadDPSInfo();
+	}
+	
+	protected DPSInfo loadDPSInfo(){
+		return null;
 	}
 	
 	@Override

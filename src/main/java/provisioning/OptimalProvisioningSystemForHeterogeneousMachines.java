@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.apache.commons.math.stat.descriptive.rank.Percentile;
 
+import provisioning.util.DPSInfo;
+
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.Request;
@@ -194,5 +196,10 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 				}
 			}
 		}
+	}
+
+	@Override
+	protected DPSInfo loadDPSInfo() {
+		return null;
 	}
 }

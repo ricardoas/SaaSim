@@ -1,6 +1,7 @@
 package provisioning;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import provisioning.util.DPSInfo;
@@ -75,14 +76,19 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 	/**
 	 * @return {@link DPSInfo}
 	 */
-	private DPSInfo loadDPSInfo() {
+	protected DPSInfo loadDPSInfo() {
 		DPSInfo info = Checkpointer.loadProvisioningInfo();
-		if(info.stat == null && info.history == null){
+		if(info.stat == null && info.history == null && info.list == null){
 			info.stat = new UrgaonkarStatistics[24];
 			for (int i = 0; i < info.stat.length; i++) {
 				info.stat[i] = new UrgaonkarStatistics(responseTime, predictiveTick, percentile, windowSize);
 			}
 			info.history = new UrgaonkarHistory();
+			
+			info.list = new LinkedList<LinkedList<MachineDescriptor>>();
+			for (int i = 0; i < reactiveTickInSeconds; i++) {
+				info.list.add(new LinkedList<MachineDescriptor>());
+			}
 		}
 		return info;
 	}

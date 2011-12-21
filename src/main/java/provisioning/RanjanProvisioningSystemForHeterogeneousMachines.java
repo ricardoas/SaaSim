@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import provisioning.util.DPSInfo;
+
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.Request;
@@ -105,5 +107,11 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 				}
 			}
 		}
+	}
+
+	@Override
+	protected DPSInfo loadDPSInfo() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

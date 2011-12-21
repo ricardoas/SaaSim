@@ -50,7 +50,7 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 	/**
 	 * @return {@link DPSInfo}
 	 */
-	private DPSInfo loadDPSInfo() {
+	protected DPSInfo loadDPSInfo() {
 		DPSInfo info = Checkpointer.loadProvisioningInfo();
 		if(info.list == null){
 			info.list = new LinkedList<LinkedList<MachineDescriptor>>();
