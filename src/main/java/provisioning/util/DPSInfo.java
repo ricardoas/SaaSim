@@ -1,6 +1,9 @@
 package provisioning.util;
 
 import java.io.Serializable;
+import java.util.LinkedList;
+
+import commons.sim.components.MachineDescriptor;
 
 import provisioning.UrgaonkarHistory;
 import provisioning.UrgaonkarStatistics;
@@ -14,4 +17,6 @@ public class DPSInfo implements Serializable {
 	
 	public UrgaonkarStatistics[] stat;
 	public UrgaonkarHistory history;
+	public LinkedList<LinkedList<MachineDescriptor>> list;
+	
 }

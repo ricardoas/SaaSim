@@ -6,9 +6,12 @@ import java.util.List;
 
 import org.apache.log4j.MDC;
 
+import provisioning.util.DPSInfo;
+
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.config.Configuration;
+import commons.io.Checkpointer;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.util.SimulatorProperties;
@@ -28,6 +31,7 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 	private static String PROP_TARGET_UTILISATION = "dps.ranjan.target";  
 
 	private double targetUtilisation;
+	private long reactiveTick;
 	private MachineType type;
 	
 	private LinkedList<LinkedList<MachineDescriptor>> list;
@@ -39,13 +43,24 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 		super();
 		type = MachineType.valueOf(Configuration.getInstance().getString(PROP_MACHINE_TYPE).toUpperCase());
 		targetUtilisation = Configuration.getInstance().getDouble(PROP_TARGET_UTILISATION);
-		list = new LinkedList<LinkedList<MachineDescriptor>>();
-		long reactiveTick = TimeUnit.HOUR.getMillis()/Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL);
-		for (int i = 0; i < reactiveTick; i++) {
-			list.add(new LinkedList<MachineDescriptor>());
-		}
+		reactiveTick = TimeUnit.HOUR.getMillis()/Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL);
+		list = loadDPSInfo().list;
 	}
 	
+	/**
+	 * @return {@link DPSInfo}
+	 */
+	private DPSInfo loadDPSInfo() {
+		DPSInfo info = Checkpointer.loadProvisioningInfo();
+		if(info.list == null){
+			info.list = new LinkedList<LinkedList<MachineDescriptor>>();
+			for (int i = 0; i < reactiveTick; i++) {
+				info.list.add(new LinkedList<MachineDescriptor>());
+			}
+		}
+		return info;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -114,7 +129,7 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 			
 		}else if(numberOfServersToAdd < 0){
 			if(!availableToTurnOff.isEmpty()){
-				for (int i = 0; i < -numberOfServersToAdd; i++) {
+				for (int i = 0; i < Math.min(-numberOfServersToAdd,availableToTurnOff.size()); i++) {
 					configurable.removeMachine(tier,  availableToTurnOff.poll(), false);
 				}
 			}

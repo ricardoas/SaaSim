@@ -108,10 +108,10 @@ public class LoadBalancer extends JEAbstractEventHandler{
 				}
 				break;
 			case MACHINE_TURNED_OFF:
-				Machine machineToTurnOff = warmingDown.remove(event.getValue()[0]);
-				if(machineToTurnOff != null){
+//				Machine machineToTurnOff = warmingDown.remove(event.getValue()[0]);
+//				if(machineToTurnOff != null){
 					monitor.machineTurnedOff((MachineDescriptor)event.getValue()[0]);
-				}
+//				}
 				break;
 			case REQUESTQUEUED:
 				monitor.requestQueued(getScheduler().now(), (Request)event.getValue()[0], tier);
@@ -224,6 +224,8 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	 * @param force <code>true</code> if use force
 	 */
 	public void removeMachine(MachineDescriptor descriptor, boolean force) {
+		
+		assert descriptor != null: "Can't remove null descriptor.";
 		
 		Machine machine = heuristic.removeMachine(descriptor);
 		if(machine != null){
