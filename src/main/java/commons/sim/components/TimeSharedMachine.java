@@ -17,7 +17,6 @@ import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.util.FastSemaphore;
-import commons.sim.util.SaaSAppProperties;
 import commons.util.Triple;
 
 /**

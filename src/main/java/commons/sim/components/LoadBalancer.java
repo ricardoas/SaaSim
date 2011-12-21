@@ -3,11 +3,9 @@ package commons.sim.components;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Queue;
 
 import provisioning.Monitor;
 
@@ -103,7 +101,6 @@ public class LoadBalancer extends JEAbstractEventHandler{
 				break;
 			case ADD_SERVER:
 				MachineDescriptor descriptor = (MachineDescriptor) event.getValue()[0];
-				
 				Machine machine = startingUp.remove(descriptor);
 				if(machine != null){
 					descriptor.setStartTimeInMillis(getScheduler().now());
@@ -115,7 +112,6 @@ public class LoadBalancer extends JEAbstractEventHandler{
 				if(machineToTurnOff != null){
 					monitor.machineTurnedOff((MachineDescriptor)event.getValue()[0]);
 				}
-				
 				break;
 			case REQUESTQUEUED:
 				monitor.requestQueued(getScheduler().now(), (Request)event.getValue()[0], tier);
