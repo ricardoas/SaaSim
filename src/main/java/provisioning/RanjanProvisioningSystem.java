@@ -31,7 +31,6 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 	private static String PROP_TARGET_UTILISATION = "dps.ranjan.target";  
 
 	private double targetUtilisation;
-	private long reactiveTick;
 	private MachineType type;
 	
 	private LinkedList<LinkedList<MachineDescriptor>> list;
@@ -43,7 +42,6 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 		super();
 		type = MachineType.valueOf(Configuration.getInstance().getString(PROP_MACHINE_TYPE).toUpperCase());
 		targetUtilisation = Configuration.getInstance().getDouble(PROP_TARGET_UTILISATION);
-		reactiveTick = TimeUnit.HOUR.getMillis()/Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL);
 		list = loadDPSInfo().list;
 	}
 	
@@ -52,6 +50,9 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 	 */
 	protected DPSInfo loadDPSInfo() {
 		DPSInfo info = Checkpointer.loadProvisioningInfo();
+		
+		long reactiveTick = TimeUnit.HOUR.getMillis()/Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL);
+		
 		if(info.list == null){
 			info.list = new LinkedList<LinkedList<MachineDescriptor>>();
 			for (int i = 0; i < reactiveTick; i++) {

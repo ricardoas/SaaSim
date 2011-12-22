@@ -59,6 +59,8 @@ public class Checkpointer {
 	public static void save() {
 		ObjectOutputStream out;
 		try {
+			long now = System.currentTimeMillis();
+			Logger.getLogger(Checkpointer.class).debug("CHKP SAVE-in" + simulationInfo);
 			out = new ObjectOutputStream(new FileOutputStream(CHECKPOINT_FILE));
 			out.writeObject(scheduler);
 			out.writeObject(simulationInfo);
@@ -69,7 +71,7 @@ public class Checkpointer {
 			out.writeObject(priorities);
 			out.writeObject(dpsInfo);
 			out.close();
-			Logger.getLogger(Checkpointer.class).debug("CHKP SAVE " + simulationInfo);
+			Logger.getLogger(Checkpointer.class).debug("CHKP SAVE-out " + (System.currentTimeMillis()-now) + " " + simulationInfo);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -149,6 +151,8 @@ public class Checkpointer {
 	}
 
 	public static void loadData() throws ConfigurationException{
+		long now = System.currentTimeMillis();
+		Logger.getLogger(Checkpointer.class).debug("CHKP LOAD-in" + simulationInfo);
 		if(hasCheckpoint()){
 			ObjectInputStream in;
 			try {
@@ -181,7 +185,7 @@ public class Checkpointer {
 			}
 			dpsInfo = new DPSInfo();
 		}
-		Logger.getLogger(Checkpointer.class).debug("CHKP LOAD " + simulationInfo);
+		Logger.getLogger(Checkpointer.class).debug("CHKP LOAD-out " + (System.currentTimeMillis() - now) + " " + simulationInfo);
 	}
 
 	public static AccountingSystem loadAccountingSystem() {
