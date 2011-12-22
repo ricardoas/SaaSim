@@ -50,6 +50,9 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 	private int after;
 	private double lambdaPeak;
 	private double correctedPredictedArrivalRate;
+	
+	private LinkedList<LinkedList<MachineDescriptor>> list;
+
 
 	/**
 	 * Default constructor 
@@ -67,6 +70,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 		
 		DPSInfo info = loadDPSInfo();
 		
+		list = info.list;
 		stat = info.stat;
 		last = info.history;
 		lost = 0;
@@ -77,16 +81,15 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 	 * @return {@link DPSInfo}
 	 */
 	protected DPSInfo loadDPSInfo() {
-		DPSInfo info = Checkpointer.loadProvisioningInfo();
+		DPSInfo info = super.loadDPSInfo();
 		if(info.stat == null && info.history == null && info.list == null){
 			info.stat = new UrgaonkarStatistics[24];
 			for (int i = 0; i < info.stat.length; i++) {
 				info.stat[i] = new UrgaonkarStatistics(responseTime, predictiveTick, percentile, windowSize);
 			}
 			info.history = new UrgaonkarHistory();
-			
 			info.list = new LinkedList<LinkedList<MachineDescriptor>>();
-			for (int i = 0; i < reactiveTickInSeconds; i++) {
+			for (int i = 0; i < TimeUnit.HOUR.getMillis()/(reactiveTickInSeconds*1000); i++) {
 				info.list.add(new LinkedList<MachineDescriptor>());
 			}
 		}
@@ -102,6 +105,8 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 		boolean predictiveRound = now % predictiveTickInMillis == 0;
 		
 		int normalizedServersToAdd = 0;
+		
+		LinkedList<MachineDescriptor> availableToTurnOff = list.poll();
 		
 		if(predictiveRound && enablePredictive){
 			int index = (int)((now%TimeUnit.DAY.getMillis())/TimeUnit.HOUR.getMillis());
@@ -125,22 +130,17 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 				
 				normalizedServersToAdd = (int) Math.ceil(1.0*serversToAdd/type.getNumberOfCores());
 				
-				if(normalizedServersToAdd > statistics.warmingDownMachines){
-					normalizedServersToAdd -= statistics.warmingDownMachines;
-					List<MachineDescriptor> machines = buyMachines(normalizedServersToAdd);
-					for (MachineDescriptor machineDescriptor : machines) {
-						configurable.addMachine(tier, machineDescriptor, true);
-					}
-					
-					configurable.cancelMachineRemoval(tier, statistics.warmingDownMachines);
-				}else{
-					configurable.cancelMachineRemoval(tier, normalizedServersToAdd);
+				List<MachineDescriptor> machines = buyMachines(normalizedServersToAdd);
+				for (MachineDescriptor machineDescriptor : machines) {
+					configurable.addMachine(tier, machineDescriptor, true);
 				}
+					
+				availableToTurnOff.addAll(machines);
 				
 			}else if(serversToAdd < 0){
 				normalizedServersToAdd = (int) Math.ceil(1.0*serversToAdd/type.getNumberOfCores());
-				for (int i = 0; i < -normalizedServersToAdd; i++) {
-					configurable.removeMachine(tier, false);
+				for (int i = 0; i < Math.min(-normalizedServersToAdd, availableToTurnOff.size()); i++) {
+					configurable.removeMachine(tier,  availableToTurnOff.poll(), false);
 				}
 			}
 			log.info(String.format("STAT-URGAONKAR PRED %d %d %d %f %f %f %f %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRateInTier(predictiveTick), predictedArrivalRate, correctedPredictedArrivalRate, lost, after, statistics));
@@ -161,28 +161,24 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 					
 					normalizedServersToAdd = (int) Math.ceil(1.0*serversToAdd/type.getNumberOfCores());
 					
-					if(normalizedServersToAdd > statistics.warmingDownMachines){
-						normalizedServersToAdd -= statistics.warmingDownMachines;
-						List<MachineDescriptor> machines = buyMachines(normalizedServersToAdd);
-						for (MachineDescriptor machineDescriptor : machines) {
-							configurable.addMachine(tier, machineDescriptor, true);
-						}
-						
-						configurable.cancelMachineRemoval(tier, statistics.warmingDownMachines);
-					}else{
-						configurable.cancelMachineRemoval(tier, normalizedServersToAdd);
+					List<MachineDescriptor> machines = buyMachines(normalizedServersToAdd);
+					for (MachineDescriptor machineDescriptor : machines) {
+						configurable.addMachine(tier, machineDescriptor, true);
 					}
+					availableToTurnOff.addAll(machines);
 					
 				}else if(serversToAdd < 0){
-//					normalizedServersToAdd = (int) Math.ceil(1.0*serversToAdd/type.getNumberOfCores());
-//					for (int i = 0; i < -normalizedServersToAdd; i++) {
-//						configurable.removeMachine(tier, false);
-//					}
+					normalizedServersToAdd = (int) Math.ceil(1.0*serversToAdd/type.getNumberOfCores());
+					for (int i = 0; i < Math.min(-normalizedServersToAdd, availableToTurnOff.size()); i++) {
+						configurable.removeMachine(tier,  availableToTurnOff.poll(), false);
+					}
 				}
 				
 			}
+			
 			log.debug(String.format("STAT-URGAONKAR REAC %d %d %d %f %f %f %f %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRateInLastIntervalInTier(reactiveTickInSeconds), correctedPredictedArrivalRate, correctedPredictedArrivalRate, lost, after, statistics));
 		}
+		list.add(availableToTurnOff);
 	}
 	
 	/**

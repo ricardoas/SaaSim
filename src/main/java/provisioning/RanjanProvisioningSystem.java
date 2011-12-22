@@ -126,7 +126,6 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 			}
 
 			availableToTurnOff.addAll(machines);
-//			list.add(availableToTurnOff);
 			
 		}else if(numberOfServersToAdd < 0){
 			if(!availableToTurnOff.isEmpty()){

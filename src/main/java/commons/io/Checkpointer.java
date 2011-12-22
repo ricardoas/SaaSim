@@ -60,7 +60,7 @@ public class Checkpointer {
 		ObjectOutputStream out;
 		try {
 			long now = System.currentTimeMillis();
-			Logger.getLogger(Checkpointer.class).debug("CHKP SAVE-in" + simulationInfo);
+			Logger.getLogger(Checkpointer.class).debug("CHKP SAVE-in");
 			out = new ObjectOutputStream(new FileOutputStream(CHECKPOINT_FILE));
 			out.writeObject(scheduler);
 			out.writeObject(simulationInfo);
@@ -152,7 +152,7 @@ public class Checkpointer {
 
 	public static void loadData() throws ConfigurationException{
 		long now = System.currentTimeMillis();
-		Logger.getLogger(Checkpointer.class).debug("CHKP LOAD-in" + simulationInfo);
+		Logger.getLogger(Checkpointer.class).debug("CHKP LOAD-in");
 		if(hasCheckpoint()){
 			ObjectInputStream in;
 			try {

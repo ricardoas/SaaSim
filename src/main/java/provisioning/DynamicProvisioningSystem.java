@@ -43,7 +43,7 @@ public class DynamicProvisioningSystem implements DPS{
 
 	private long maxRT;
 	
-	private DPSInfo info;
+//	private DPSInfo info;
 
 	/**
 	 * Default constructor.
@@ -54,11 +54,11 @@ public class DynamicProvisioningSystem implements DPS{
 		this.accountingSystem = Checkpointer.loadAccountingSystem();
 		this.maxRT = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME);
 
-		info = loadDPSInfo();
+//		info = loadDPSInfo();
 	}
 	
 	protected DPSInfo loadDPSInfo(){
-		return null;
+		return Checkpointer.loadProvisioningInfo();
 	}
 	
 	@Override
