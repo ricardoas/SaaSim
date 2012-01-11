@@ -1,6 +1,6 @@
 #!/bin/Rscript
 
-#Testando com tres fatores: UT
+#Testando com quatro fatores: UT
 print("@@@@@@@@@@@@@@@@ UT")
 us=c(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1) 
 ris=c(-1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1)
@@ -79,8 +79,33 @@ print(c("Us + Risco + Sinal", SSurs / SST))
 print(">>>> Valores significativos")
 summary(g)
 
+postscript("ut.ps")
+plot(ut_5_1_15, ylim=c(-150000, 150000))
+points(ut_5_1_m15)
+points(ut_5_1_40)
+points(ut_5_1_m40)
+points(ut_5_15_15)
+points(ut_5_15_m15)
+points(ut_5_15_40)
+points(ut_5_15_m40)
+points(ut_100_1_15)
+points(ut_100_1_m15)
+points(ut_100_1_40)
+points(ut_100_1_m40)
+points(ut_100_15_15)
+points(ut_100_15_m15)
+points(ut_100_15_40)
+points(ut_100_15_m40)
 
-#Testando com tres fatores: RF
+residuals <- c(ut_5_1_15 - mean(ut_5_1_15),  ut_5_1_m15 - mean(ut_5_1_m15), ut_5_1_40 - mean(ut_5_1_40), ut_5_1_m40 - mean(ut_5_1_m40), ut_5_15_15 - mean(ut_5_15_15), ut_5_15_m15 - mean(ut_5_15_m15), ut_5_15_40 - mean(ut_5_15_40), ut_5_15_m40 - mean(ut_5_15_m40), ut_100_1_15 - mean(ut_100_1_15), ut_100_1_m15 - mean(ut_100_1_m15), ut_100_15_15 - mean(ut_100_15_15), ut_100_15_m15 - mean(ut_100_15_m15), ut_100_15_40 - mean(ut_100_15_40), ut_100_15_m40 - mean(ut_100_15_m40))
+
+jpeg("qqnorm_ut.jpg")
+qqnorm( residuals )
+qqline( residuals )
+dev.off()
+
+
+#Testando com quatro fatores: RF
 print("@@@@@@@@@@@@@@@@ RF")
 us=c(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1) 
 ris=c(-1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1, -1, -1, -1, -1, -1, -1, 1, 1, 1, 1, 1, 1)
@@ -158,3 +183,28 @@ print(c("Us + Risco + Sinal", SSurs / SST))
 
 print(">>>> Valores significativos")
 summary(g)
+
+postscript("rf.ps")
+plot(rf_5_1_15, ylim=c(-150000, 150000))
+points(rf_5_1_m15)
+points(rf_5_1_40)
+points(rf_5_1_m40)
+points(rf_5_15_15)
+points(rf_5_15_m15)
+points(rf_5_15_40)
+points(rf_5_15_m40)
+points(rf_100_1_15)
+points(rf_100_1_m15)
+points(rf_100_1_40)
+points(rf_100_1_m40)
+points(rf_100_15_15)
+points(rf_100_15_m15)
+points(rf_100_15_40)
+points(rf_100_15_m40)
+
+residuals <- c(rf_5_1_15 - mean(rf_5_1_15),  rf_5_1_m15 - mean(rf_5_1_m15), rf_5_1_40 - mean(rf_5_1_40), rf_5_1_m40 - mean(rf_5_1_m40), rf_5_15_15 - mean(rf_5_15_15), rf_5_15_m15 - mean(rf_5_15_m15), rf_5_15_40 - mean(rf_5_15_40), rf_5_15_m40 - mean(rf_5_15_m40), rf_100_1_15 - mean(rf_100_1_15), rf_100_1_m15 - mean(rf_100_1_m15), rf_100_15_15 - mean(rf_100_15_15), rf_100_15_m15 - mean(rf_100_15_m15), rf_100_15_40 - mean(rf_100_15_40), rf_100_15_m40 - mean(rf_100_15_m40))
+
+jpeg("qqnorm_rf.jpg")
+qqnorm( residuals )
+qqline( residuals )
+dev.off()

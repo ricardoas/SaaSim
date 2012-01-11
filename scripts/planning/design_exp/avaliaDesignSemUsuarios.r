@@ -45,6 +45,19 @@ print(c("Risco + Error", SSre / SST))
 print(">>>> Valores significativos")
 summary(g)
 
+postscript("ut_pos_semU.ps")
+plot(ut_100_1_15, ylim=c(-150000, 150000))
+points(ut_100_1_40)
+points(ut_100_15_15)
+points(ut_100_15_40)
+
+residuals <- c(ut_100_1_15 - mean(ut_100_1_15), ut_100_15_15 - mean(ut_100_15_15), ut_100_15_40 - mean(ut_100_15_40))
+
+jpeg("qqnorm_ut_pos_semUs.jpg")
+qqnorm( residuals )
+qqline( residuals )
+dev.off()
+
 #Testando com tres fatores para erros positivos: RF
 print("@@@@@@@@@@@@@@@@ Erros positivos RF")
 #us=c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
@@ -90,6 +103,19 @@ print(c("Risco + Error", SSre / SST))
 
 print(">>>> Valores significativos")
 summary(g)
+
+postscript("rf_pos_semU.ps")
+plot(rf_100_1_15, ylim=c(-150000, 150000))
+points(rf_100_1_40)
+points(rf_100_15_15)
+points(rf_100_15_40)
+
+residuals <- c(rf_100_1_15 - mean(rf_100_1_15), rf_100_15_15 - mean(rf_100_15_15), rf_100_15_40 - mean(rf_100_15_40))
+
+jpeg("qqnorm_rf_pos_semUs.jpg")
+qqnorm( residuals )
+qqline( residuals )
+dev.off()
 
 #Testando com tres fatores para erros negativos: UT
 print("@@@@@@@@@@@@@@@@ Erros negativos UT")
@@ -137,6 +163,19 @@ print(c("Risco + Error", SSre / SST))
 print(">>>> Valores significativos")
 summary(g)
 
+postscript("ut_neg_semU.ps")
+plot(ut_100_1_m15, ylim=c(-150000, 150000))
+points(ut_100_1_m40)
+points(ut_100_15_m15)
+points(ut_100_15_m40)
+
+residuals <- c(ut_100_1_m15 - mean(ut_100_1_m15), ut_100_15_m15 - mean(ut_100_15_m15), ut_100_15_m40 - mean(ut_100_15_m40))
+
+jpeg("qqnorm_ut_neg_semUs.jpg")
+qqnorm( residuals )
+qqline( residuals )
+dev.off()
+
 #Testando com tres fatores para erros negativos: RF
 print("@@@@@@@@@@@@@@@@ Erros negativos RF")
 #us=c(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
@@ -182,4 +221,17 @@ print(c("Risco + Error", SSre / SST))
 
 print(">>>> Valores significativos")
 summary(g)
+
+postscript("rf_neg_semU.ps")
+plot(rf_100_1_m15, ylim=c(-150000, 150000))
+points(rf_100_1_m40)
+points(rf_100_15_m15)
+points(rf_100_15_m40)
+
+residuals <- c(rf_100_1_m15 - mean(rf_100_1_m15), rf_100_15_m15 - mean(rf_100_15_m15), rf_100_15_m40 - mean(rf_100_15_m40))
+
+jpeg("qqnorm_rf_neg_semUs.jpg")
+qqnorm( residuals )
+qqline( residuals )
+dev.off()
 
