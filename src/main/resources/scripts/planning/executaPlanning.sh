@@ -73,7 +73,7 @@ for value in `seq 1`; do
 	elif [ ${plan_heur} = "Over" ] || [ ${plan_heur} = "History" ] ; then
 		
 		#Running planning
-		for i in `seq 1 31`; do
+		for i in `seq 1 365`; do
 			java -Xmx2024m -server -cp $CLASSPATH planning.main.Main david.properties
 		done
 		rm .je.dat
@@ -83,7 +83,7 @@ for value in `seq 1`; do
 
 
 	#Running normal simulation
-	for i in `seq 1 31`; do
+	for i in `seq 1 365`; do
 		java -Xmx2024m -server -cp $CLASSPATH provisioning.Main david.properties > data_${value}.output
 	done
 
