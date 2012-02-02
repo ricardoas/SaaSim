@@ -10,7 +10,6 @@ import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.config.Configuration;
-import commons.io.Checkpointer;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.util.SimulatorProperties;
@@ -62,7 +61,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 		enablePredictive = Configuration.getInstance().getBoolean(PROP_ENABLE_PREDICTIVE, true);
 		enableReactive = Configuration.getInstance().getBoolean(PROP_ENABLE_REACTIVE, true);
 		type = MachineType.valueOf(Configuration.getInstance().getString(PROP_MACHINE_TYPE).toUpperCase());
-		threshold = Configuration.getInstance().getDouble(PROP_REACTIVE_THRESHOLD, 2.0);
+		threshold = Configuration.getInstance().getDouble(PROP_REACTIVE_THRESHOLD, 1.0);
 		responseTime = Configuration.getInstance().getLong(PROP_RESPONSE_TIME, 1000)/TimeUnit.SECOND.getMillis();
 		reactiveTickInSeconds = Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)/TimeUnit.SECOND.getMillis();
 		windowSize = Configuration.getInstance().getInt(PROP_PREDICTION_WINDOW_SIZE, DEFAULT_PREDICTION_WINDOW_SIZE);
@@ -138,7 +137,13 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 				availableToTurnOff.addAll(machines);
 				
 			}else if(serversToAdd < 0){
+				
 				normalizedServersToAdd = (int) Math.ceil(1.0*serversToAdd/type.getNumberOfCores());
+				
+				if(-normalizedServersToAdd >= statistics.totalNumberOfServers){
+					normalizedServersToAdd = 1-statistics.totalNumberOfServers;
+				}
+				
 				for (int i = 0; i < Math.min(-normalizedServersToAdd, availableToTurnOff.size()); i++) {
 					configurable.removeMachine(tier,  availableToTurnOff.poll(), false);
 				}
@@ -174,6 +179,32 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 					}
 				}
 				
+			}else if( observed/(lambdaPeak * statistics.totalNumberOfServers) < threshold ){
+				
+				serversToAdd = (int) Math.ceil(observed/lambdaPeak) - statistics.totalNumberOfServers*type.getNumberOfCores();
+				
+				
+				if(serversToAdd > 0){
+					
+					normalizedServersToAdd = (int) Math.ceil(1.0*serversToAdd/type.getNumberOfCores());
+					
+					List<MachineDescriptor> machines = buyMachines(normalizedServersToAdd);
+					for (MachineDescriptor machineDescriptor : machines) {
+						configurable.addMachine(tier, machineDescriptor, true);
+					}
+					availableToTurnOff.addAll(machines);
+					
+				}else if(serversToAdd < 0){
+					normalizedServersToAdd = (int) Math.ceil(1.0*serversToAdd/type.getNumberOfCores());
+
+					if(-normalizedServersToAdd >= statistics.totalNumberOfServers){
+						normalizedServersToAdd = 1-statistics.totalNumberOfServers;
+					}
+
+					for (int i = 0; i < Math.min(-normalizedServersToAdd, availableToTurnOff.size()); i++) {
+						configurable.removeMachine(tier,  availableToTurnOff.poll(), false);
+					}
+				}
 			}
 			
 			log.debug(String.format("STAT-URGAONKAR REAC %d %d %d %f %f %f %f %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRateInLastIntervalInTier(reactiveTickInSeconds), correctedPredictedArrivalRate, correctedPredictedArrivalRate, lost, after, statistics));
