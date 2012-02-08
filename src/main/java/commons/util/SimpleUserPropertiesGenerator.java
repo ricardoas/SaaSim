@@ -105,17 +105,17 @@ public class SimpleUserPropertiesGenerator {
 			
 			for (int clientID = 0; clientID < clients[i]; clientID++) {
 				
-				String[] normalTyp = new File(normPool).list(new TraceFilter(TYPYCAL_DAY_PATTERN));
-				String[] normalUnder = new File(normPool).list(new TraceFilter(UNDERLOADED_DAY_PATTERN));
-				String[] normalPeak = new File(normPool).list(new TraceFilter(PEAK_DAY_PATTERN));
+				File[] normalTyp = new File(normPool).listFiles(new TraceFilter(TYPYCAL_DAY_PATTERN));
+				File[] normalUnder = new File(normPool).listFiles(new TraceFilter(UNDERLOADED_DAY_PATTERN));
+				File[] normalPeak = new File(normPool).listFiles(new TraceFilter(PEAK_DAY_PATTERN));
 				
-				String[] peakTyp = new File(peakPool).list(new TraceFilter(TYPYCAL_DAY_PATTERN));
-				String[] peakUnder = new File(peakPool).list(new TraceFilter(UNDERLOADED_DAY_PATTERN));
-				String[] peakPeak = new File(peakPool).list(new TraceFilter(PEAK_DAY_PATTERN));
+				File[] peakTyp = new File(peakPool).listFiles(new TraceFilter(TYPYCAL_DAY_PATTERN));
+				File[] peakUnder = new File(peakPool).listFiles(new TraceFilter(UNDERLOADED_DAY_PATTERN));
+				File[] peakPeak = new File(peakPool).listFiles(new TraceFilter(PEAK_DAY_PATTERN));
 				
-				String[] transTyp = new File(transPool).list(new TraceFilter(TYPYCAL_DAY_PATTERN));
-				String[] transUnder = new File(transPool).list(new TraceFilter(UNDERLOADED_DAY_PATTERN));
-				String[] transPeak = new File(transPool).list(new TraceFilter(PEAK_DAY_PATTERN));
+				File[] transTyp = new File(transPool).listFiles(new TraceFilter(TYPYCAL_DAY_PATTERN));
+				File[] transUnder = new File(transPool).listFiles(new TraceFilter(UNDERLOADED_DAY_PATTERN));
+				File[] transPeak = new File(transPool).listFiles(new TraceFilter(PEAK_DAY_PATTERN));
 				
 				List<String> workloads = new ArrayList<String>();
 				
@@ -152,8 +152,8 @@ public class SimpleUserPropertiesGenerator {
 		}
 	}
 
-	private static void chooseTrace(String[] typicalDays, String[] underloadedDays,
-			String[] peakDays, List<String> workloads, Calendar today) {
+	private static void chooseTrace(File[] typicalDays, File[] underloadedDays,
+			File[] peakDays, List<String> workloads, Calendar today) {
 		switch (today.get(Calendar.DAY_OF_WEEK)) {
 		case Calendar.TUESDAY: // PEAK
 			workloads.add(randomPick(peakDays));
@@ -168,8 +168,8 @@ public class SimpleUserPropertiesGenerator {
 		}
 	}
 
-	private static String randomPick(String[] array) {
-		return array[(int)Math.floor(Math.random() * array.length)];
+	private static String randomPick(File[] array) {
+		return array[(int)Math.floor(Math.random() * array.length)].getAbsolutePath();
 	}
 
 	private static void writeWorkloadFile(String fileName, List<String> pointers) throws IOException {
