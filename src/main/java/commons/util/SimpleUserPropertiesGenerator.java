@@ -5,15 +5,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.math.random.RandomData;
-import org.apache.commons.math.random.RandomDataImpl;
 
 import commons.config.ComplexPropertiesConfiguration;
 
@@ -29,20 +28,21 @@ public class SimpleUserPropertiesGenerator {
 	
 	private static final String PROP_SIMULATION_DURATION = "simulation.duration";
 	private static final String PROP_TRANSITION_DURATION = "transition.duration";
-	private static final String PROP_PEAK_DURATION = "peak.duration";
+	private static final String PROP_HOLIDAYS = "holidays";
 
 	private static final String PROP_CLIENT_NUMBER = "client.number";
 	private static final String PROP_CLIENT_TYPE = "client.type";
 	private static final String PROP_CLIENT_STORAGE = "client.storage";
 	
+	private static final String PROP_SCENARIO = "scenario";
 	
-
+	private static final String PROP_NORM_DIR = "norm.dir";
+	private static final String PROP_TRANS_DIR = "trans.dir";
+	private static final String PROP_PEAK_DIR = "peak.dir";
 	
 	private static final String PEAK_DAY_PATTERN = "peak_";
 	private static final String UNDERLOADED_DAY_PATTERN = "under_";
 	private static final String TYPYCAL_DAY_PATTERN = "typ_";
-
-	private static final int TRANSITION_PERIOD_IN_DAYS = 15;
 
 	public static final long DIAMOND_STORAGE_IN_BYTES = 700;//700 MB
 	public static final long GOLD_STORAGE_IN_BYTES = 500;//500 MB
@@ -60,7 +60,7 @@ public class SimpleUserPropertiesGenerator {
 		String propertiesFile = null;
 		
 		for (String string : args) {
-			if(string.equals("cilents")){
+			if(string.equals("clients")){
 				generateClients = true;
 			}else if(string.equals("scenarios")){
 				generateScenarios = true;
@@ -69,7 +69,7 @@ public class SimpleUserPropertiesGenerator {
 			}
 		}
 		
-		PropertiesConfiguration config = new PropertiesConfiguration(propertiesFile);
+		ComplexPropertiesConfiguration config = new ComplexPropertiesConfiguration(propertiesFile){};
 		
 		if(generateClients){
 			generateClients(config);
@@ -83,187 +83,148 @@ public class SimpleUserPropertiesGenerator {
 		
 		
 		//Creating output file
-		createOutputFile(outputFile, workloadFilesPerUser);
+//		createOutputFile(outputFile, workloadFilesPerUser);
 	}
 
-	private static void generateClients(PropertiesConfiguration config) {
+	private static void generateClients(ComplexPropertiesConfiguration config) throws IOException {
 		
-		String[] clients = config.getStringArray(PROP_CLIENT_NUMBER);
+		long simulationDuration = config.getLong(PROP_SIMULATION_DURATION);
+		long transitionDuration = config.getLong(PROP_TRANSITION_DURATION);
+		int [] holidays = config.getIntegerArray(PROP_HOLIDAYS);
+
+		int[] clients = config.getIntegerArray(PROP_CLIENT_NUMBER);
+		String[] types = config.getStringArray(PROP_CLIENT_TYPE);
+		String[] normDirs = config.getStringArray(PROP_NORM_DIR);
+		String[] transDirs = config.getStringArray(PROP_TRANS_DIR);
+		String[] peakDirs = config.getStringArray(PROP_PEAK_DIR);
 		
 		for (int i = 0; i < clients.length; i++) {
-			int numberOfClients = Integer.valueOf(clients[0]);
+			String normPool = normDirs[i];
+			String transPool = transDirs[i];
+			String peakPool = peakDirs[i];
 			
-			long simulationDuration = config.getLong(PROP_SIMULATION_DURATION);
-			long transitionDuration = config.getLong(PROP_SIMULATION_DURATION);
-			long peakDuration = config.getLong(PROP_SIMULATION_DURATION);
-			
-			
-			String outputFile = args[2];
-			
-			String diamondPool = args[3];
-			String goldPool = args[4];
-			String bronzePool = args[5];
-			
-			long[] peakDays = new long[]{-360};
-			if(args.length > 6){
-				peakDays = new long[args.length - 6];
-			}
-			int index = 0;
-			
-			for(int i = 6; i < args.length; i++){
-				peakDays[index] = Long.parseLong(args[i]);
-				index++;
-			}
-			
-			Map<Integer, List<String>> workloadFilesPerUser = new HashMap<Integer, List<String>>();
-
-			createPlanWorkload(simulationPeriod, diamondPool, peakDays, random,
-					0, numberOfClients, workloadFilesPerUser);
-		}
-		
-		
-		//Calculating number of users in each plan
-		RandomData random = new RandomDataImpl();
-		int numberOfBronzeClients = 0;
-		int numberOfGoldClients = 0;
-		int numberOfDiamondClients = 0;
-		
-		for(int i = 0; i < numberOfClients; i++){
-			int value = random.nextInt(0, numberOfClients);
-			if(value >= 0 && value < 0.33 * numberOfClients){//bronze client
-				numberOfBronzeClients++;
-			}else if(value >= 0.33 * numberOfClients && value < 0.66 * numberOfClients){//gold clients
-				numberOfGoldClients++;
-			}else{
-				numberOfDiamondClients++;
-			}
-		}
-		
-		Map<Integer, List<String>> workloadFilesPerUser = new HashMap<Integer, List<String>>();
-		
-		//Creating diamond trace
-		createPlanWorkload(simulationPeriod, diamondPool, peakDays, random,
-				0, numberOfDiamondClients,workloadFilesPerUser);
-		
-		//Creating gold trace
-		createPlanWorkload(simulationPeriod, goldPool, peakDays, random,
-				numberOfDiamondClients, (numberOfDiamondClients+numberOfGoldClients), workloadFilesPerUser);
-		
-		//Creating bronze trace
-		createPlanWorkload(simulationPeriod, bronzePool, peakDays, random,
-				(numberOfDiamondClients+numberOfGoldClients), (numberOfDiamondClients+numberOfGoldClients+numberOfBronzeClients),
-				workloadFilesPerUser);
-	}
-
-	private static void generateScenarios(PropertiesConfiguration config) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	private static void createPlanWorkload(long simulationPeriod,
-			String pool, long[] peakDays, RandomData random,
-			int initialIndex, int endIndex,
-			Map<Integer, List<String>> workloadFilesPerUser) {
-		
-		String[] normalTyp = new File(pool+"/norm/").list(new TraceFilter(TYPYCAL_DAY_PATTERN));
-		String[] normalUnder = new File(pool+"/norm/").list(new TraceFilter(UNDERLOADED_DAY_PATTERN));
-		String[] normalPeak = new File(pool+"/norm/").list(new TraceFilter(PEAK_DAY_PATTERN));
-		
-		String[] peakTyp = new File(pool+"/peak/").list(new TraceFilter(TYPYCAL_DAY_PATTERN));
-		String[] peakUnder = new File(pool+"/peak/").list(new TraceFilter(UNDERLOADED_DAY_PATTERN));
-		String[] peakPeak = new File(pool+"/peak/").list(new TraceFilter(PEAK_DAY_PATTERN));
-		
-		String[] transTyp = new File(pool+"/trans/").list(new TraceFilter(TYPYCAL_DAY_PATTERN));
-		String[] transUnder = new File(pool+"/trans/").list(new TraceFilter(UNDERLOADED_DAY_PATTERN));
-		String[] transPeak = new File(pool+"/trans/").list(new TraceFilter(PEAK_DAY_PATTERN));
-		
-		for(int user = initialIndex; user < endIndex; user++){
-			List<String> workloads = new ArrayList<String>();
-			int currentWeekDay = 0;
-			int nextPeakIndex = 0;
-			
-			for(int day = 0; day < simulationPeriod; day++){
+			for (int clientID = 0; clientID < clients[i]; clientID++) {
 				
-				if(currentWeekDay == 7){
-					currentWeekDay = 0;
-				}
+				String[] normalTyp = new File(normPool).list(new TraceFilter(TYPYCAL_DAY_PATTERN));
+				String[] normalUnder = new File(normPool).list(new TraceFilter(UNDERLOADED_DAY_PATTERN));
+				String[] normalPeak = new File(normPool).list(new TraceFilter(PEAK_DAY_PATTERN));
 				
-				if(day >= peakDays[nextPeakIndex] - TRANSITION_PERIOD_IN_DAYS && day < peakDays[nextPeakIndex]){//transition workload
-					verifyDayToAdd(pool+"/trans/", random, transTyp, transUnder,
-							transPeak, workloads, currentWeekDay);
-				}else if(day >= peakDays[nextPeakIndex] && day < peakDays[nextPeakIndex] + TRANSITION_PERIOD_IN_DAYS){//peak workload
-					verifyDayToAdd(pool+"/peak/", random, peakTyp, peakUnder,
-							peakPeak, workloads, currentWeekDay);
-					if(day + 1 == peakDays[nextPeakIndex] + TRANSITION_PERIOD_IN_DAYS && (nextPeakIndex+1) < peakDays.length){
-						nextPeakIndex++;
+				String[] peakTyp = new File(peakPool).list(new TraceFilter(TYPYCAL_DAY_PATTERN));
+				String[] peakUnder = new File(peakPool).list(new TraceFilter(UNDERLOADED_DAY_PATTERN));
+				String[] peakPeak = new File(peakPool).list(new TraceFilter(PEAK_DAY_PATTERN));
+				
+				String[] transTyp = new File(transPool).list(new TraceFilter(TYPYCAL_DAY_PATTERN));
+				String[] transUnder = new File(transPool).list(new TraceFilter(UNDERLOADED_DAY_PATTERN));
+				String[] transPeak = new File(transPool).list(new TraceFilter(PEAK_DAY_PATTERN));
+				
+				List<String> workloads = new ArrayList<String>();
+				
+				Calendar today = GregorianCalendar.getInstance();
+				today.set(Calendar.DAY_OF_YEAR, 0);
+				
+				for (int holiday : holidays) {
+					for (int day = today.get(Calendar.DAY_OF_YEAR); day < holiday-transitionDuration; day++) {
+
+						chooseTrace(normalTyp, normalUnder, normalPeak, workloads, today);
+
+						today.add(Calendar.DAY_OF_YEAR, 1);
 					}
-				}else{//normal workload
-					verifyDayToAdd(pool+"/norm/", random, normalTyp, normalUnder,
-							normalPeak, workloads, currentWeekDay);
+					for (int day = today.get(Calendar.DAY_OF_YEAR); day < holiday; day++) {
+						chooseTrace(transTyp, transUnder, transPeak, workloads, today);
+
+						today.add(Calendar.DAY_OF_YEAR, 1);
+					}
+					for (int day = today.get(Calendar.DAY_OF_YEAR); day < holiday+7; day++) {
+						chooseTrace(peakTyp, peakUnder, peakPeak, workloads, today);
+
+						today.add(Calendar.DAY_OF_YEAR, 1);
+					}
 				}
-				currentWeekDay++;
+
+				for (int day = holidays[holidays.length-1]; day < simulationDuration; day++) {
+					chooseTrace(normalTyp, normalUnder, normalPeak, workloads, today);
+
+					today.add(Calendar.DAY_OF_YEAR, 1);
+				}
+				
+				writeWorkloadFile(types[i] + "_" + clientID + ".trc", workloads);
 			}
-			workloadFilesPerUser.put(user, workloads);
 		}
 	}
 
-	private static void verifyDayToAdd(String pool, RandomData random,
-			String[] typPeriod, String[] underPeriod, String[] peakPeriod,
-			List<String> workloads, int currentWeekDay) {
-	
-		
-		if(currentWeekDay == 5 || currentWeekDay == 6){//under load day in week
-			int workloadFileIndex = random.nextInt(0, underPeriod.length-1);
-			workloads.add(pool+underPeriod[workloadFileIndex]);
-		}else if(currentWeekDay == 3){//peak day in week
-			int workloadFileIndex = random.nextInt(0, peakPeriod.length-1);
-			workloads.add(pool+peakPeriod[workloadFileIndex]);
-		}else{//normal day
-			int workloadFileIndex = random.nextInt(0, typPeriod.length-1);
-			workloads.add(pool+typPeriod[workloadFileIndex]);
+	private static void chooseTrace(String[] typicalDays, String[] underloadedDays,
+			String[] peakDays, List<String> workloads, Calendar today) {
+		switch (today.get(Calendar.DAY_OF_WEEK)) {
+		case Calendar.TUESDAY: // PEAK
+			workloads.add(randomPick(peakDays));
+			break;
+		case Calendar.THURSDAY:
+		case Calendar.FRIDAY: // UNDER
+			workloads.add(randomPick(underloadedDays));
+			break;
+		default: // NORMAL
+			workloads.add(randomPick(typicalDays));
+			break;
 		}
-	}
-	
-	private static void createOutputFile(String outputFile, Map<Integer, List<String>> workloadFilesPerUser) throws IOException {
-		BufferedWriter usersPropertiesWriter = new BufferedWriter(new FileWriter(outputFile));
-		usersPropertiesWriter.write("saas.number="+workloadFilesPerUser.size()+"\n\n");
-		
-		for(Entry<Integer, List<String>> entry : workloadFilesPerUser.entrySet()){
-			
-			boolean isGold = entry.getValue().get(0).contains("gold");
-			boolean isDiamond = entry.getValue().get(0).contains("diamond");
-			
-			String plan;
-			long storage;
-			if(isGold){
-				plan = "gold";
-				storage = GOLD_STORAGE_IN_BYTES;
-			}else if(isDiamond){
-				plan = "diamond";
-				storage = DIAMOND_STORAGE_IN_BYTES;
-			}else{
-				plan = "bronze";
-				storage = BRONZE_STORAGE_IN_BYTES;
-			}
-			
-			usersPropertiesWriter.write("saas.user.id="+entry.getKey()+"\n");
-			usersPropertiesWriter.write("saas.user.plan="+plan+"\n");
-			usersPropertiesWriter.write("saas.user.storage="+storage+"\n");
-			usersPropertiesWriter.write("saas.user.workload="+entry.getKey()+".trc\n");
-			usersPropertiesWriter.write("\n");
-			
-			writeWorkloadFile(entry.getKey(), entry.getValue());
-		}
-		
-		usersPropertiesWriter.close();
 	}
 
-	private static void writeWorkloadFile(Integer key, List<String> pointers) throws IOException {
-		BufferedWriter workloadWriter = new BufferedWriter(new FileWriter(key+".trc"));
+	private static String randomPick(String[] array) {
+		return array[(int)Math.floor(Math.random() * array.length)];
+	}
+
+	private static void writeWorkloadFile(String fileName, List<String> pointers) throws IOException {
+		BufferedWriter workloadWriter = new BufferedWriter(new FileWriter(fileName));
 		for(String pointer : pointers){
 			workloadWriter.write(pointer+"\n");
 		}
 		workloadWriter.close();
 	}
 
+	private static void generateScenarios(ComplexPropertiesConfiguration config) throws IOException {
+		
+		int[] scenarios = config.getIntegerArray(PROP_SCENARIO);
+		String[] types = config.getStringArray(PROP_CLIENT_TYPE);
+		String[] storage = config.getStringArray(PROP_CLIENT_STORAGE);
+		
+		File[][] workloads = new File[types.length][];
+		for (int i = 0; i < types.length; i++) {
+			workloads[i] = new File("./").getAbsoluteFile().listFiles(new TraceFilter(types[i]));
+		}
+		
+		for (int scenarioID = 0; scenarioID < scenarios.length/types.length; scenarioID++) {
+			
+			int totalOfUsersInThisScenario = 0;
+			for (int j = scenarioID; j < scenarioID+types.length; j++) {
+				totalOfUsersInThisScenario += scenarios[j];
+			}
+			
+			StringBuilder sb = new StringBuilder("saas.number=");
+			sb.append(totalOfUsersInThisScenario);
+			sb.append('\n');
+			sb.append('\n');
+			
+			for (int scenarioIndex = scenarioID; scenarioIndex < scenarioID+types.length; scenarioIndex++) {
+
+				List<File> list = Arrays.asList(workloads[scenarioIndex%types.length]);
+				Collections.shuffle(list);
+				Iterator<File> workloadIterator = list.iterator();
+				
+				for (int numberOfClients = 0; numberOfClients < scenarios[scenarioIndex]; numberOfClients++) {
+					sb.append("saas.user.plan=");
+					sb.append(types[scenarioIndex%types.length]);
+					sb.append('\n');
+					sb.append("saas.user.storage=");
+					sb.append(storage[scenarioIndex%types.length]);
+					sb.append('\n');
+					sb.append("saas.user.workload=");
+					sb.append(workloadIterator.next().getAbsolutePath());
+					sb.append('\n');
+				}
+			}
+			
+			FileWriter fileWriter = new FileWriter("user_" + scenarioID + ".properties");
+			fileWriter.write(sb.toString());
+			fileWriter.close();
+		}
+	}
 }
