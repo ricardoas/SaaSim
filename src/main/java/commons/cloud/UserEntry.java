@@ -13,7 +13,7 @@ public class UserEntry implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = -6304129259620208175L;
-	private final int userID;
+	private int userID;
 	public String contractName;
 	private long extraConsumedCPU;
 	private double cpuCost;
@@ -46,7 +46,7 @@ public class UserEntry implements Serializable{
 			         double cpuCost, long consumedTransference, double transferenceCost, 
 			         double storageCost, double penalty, long numOfFinishedRequests, 
 			         long numOfLostRequests, long numOfFinishedRequestsAfterSLA) {
-		this.userID = userID;
+		this.userID = 1;
 		this.contractName = contractName;
 		this.price = price;
 		this.extraConsumedCPU = extraConsumedCPU;
@@ -83,6 +83,7 @@ public class UserEntry implements Serializable{
 	 * @param entry The entry to be added with the values of this {@link UserEntry}.
 	 */
 	public void add(UserEntry entry) {
+		this.userID += entry.userID;
 		this.price += entry.price;
 		this.extraConsumedCPU += entry.extraConsumedCPU;
 		this.cpuCost += entry.cpuCost;

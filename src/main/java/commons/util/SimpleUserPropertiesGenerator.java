@@ -183,6 +183,7 @@ public class SimpleUserPropertiesGenerator {
 	private static void generateScenarios(ComplexPropertiesConfiguration config) throws IOException {
 		
 		int[] scenarios = config.getIntegerArray(PROP_SCENARIO);
+		
 		String[] types = config.getStringArray(PROP_CLIENT_TYPE);
 		String[] storage = config.getStringArray(PROP_CLIENT_STORAGE);
 		
@@ -194,7 +195,7 @@ public class SimpleUserPropertiesGenerator {
 		for (int scenarioID = 0; scenarioID < scenarios.length/types.length; scenarioID++) {
 			
 			int totalOfUsersInThisScenario = 0;
-			for (int j = scenarioID; j < scenarioID+types.length; j++) {
+			for (int j = scenarioID*types.length; j < (scenarioID+1)*types.length; j++) {
 				totalOfUsersInThisScenario += scenarios[j];
 			}
 			
@@ -203,7 +204,7 @@ public class SimpleUserPropertiesGenerator {
 			sb.append('\n');
 			sb.append('\n');
 			
-			for (int scenarioIndex = scenarioID; scenarioIndex < scenarioID+types.length; scenarioIndex++) {
+			for (int scenarioIndex = scenarioID*types.length; scenarioIndex < (scenarioID+1)*types.length; scenarioIndex++) {
 
 				List<File> list = Arrays.asList(workloads[scenarioIndex%types.length]);
 				Collections.shuffle(list);
