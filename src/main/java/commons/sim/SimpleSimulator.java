@@ -16,14 +16,17 @@ import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
 import commons.sim.util.SimulatorProperties;
 import commons.util.SimulationInfo;
+import commons.util.TimeUnit;
 
 /**
  * This class represents a simulator of SaaSim, it features and basic operations.
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class SimpleSimulator extends JEAbstractEventHandler implements Simulator{
+public class SimpleSimulator extends JEAbstractEventHandler implements Simulator, ServiceEntry{
 	
+	private static final long MILLIS = TimeUnit.SECOND.getMillis();
+
 	/**
 	 * 
 	 */
@@ -38,6 +41,12 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 
 	private int numberOfRequests;
 
+	private long lastArrival;
+
+	private int arrivalRate;
+
+	private int threshold;
+
 	/**
 	 * Default constructor.
 	 * @param scheduler A {@link JEEventScheduler} to represent a scheduler of {@link SimpleSimulator}.
@@ -47,6 +56,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 		super(scheduler);
 		this.tiers = tiers;
 		this.numberOfRequests = 0;
+		this.threshold = Integer.MAX_VALUE;
 	}
 	
 	/**
@@ -129,9 +139,31 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 				}
 				send(new JEEvent(JEEventType.ESTIMATE_SERVERS, this, getScheduler().now() + 1000 * 60 * 60));//One hour later
 				break;
+			case NEWREQUEST:
+				if(!isOverloaded(event.getScheduledTime())){
+					forward(event, tiers[0]);
+				}else{
+					monitor.requestQueued(event.getScheduledTime(), (Request) event.getValue()[0], -1);
+				}
+				break;
 			default:
 				break;
 		}
+	}
+	
+	@Override
+	public void config(int threshold){
+		if(threshold > 0){
+//			this.threshold = threshold;
+		}
+	}
+
+	public boolean isOverloaded(long arrivalTime) {
+		if(arrivalTime - lastArrival > MILLIS){
+			lastArrival = (arrivalTime/1000) * 1000;
+			arrivalRate = 0;
+		}
+		return ++arrivalRate > threshold;
 	}
 
 	/**
@@ -140,7 +172,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 * @return
 	 */
 	protected JEEvent parseEvent(Request request) {
-		return new JEEvent(JEEventType.NEWREQUEST, tiers[0], request.getArrivalTimeInMillis(), request);
+		return new JEEvent(JEEventType.NEWREQUEST, this, request.getArrivalTimeInMillis(), request);
 	}
 	
 	/**

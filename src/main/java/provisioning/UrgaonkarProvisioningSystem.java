@@ -107,6 +107,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 		
 		LinkedList<MachineDescriptor> availableToTurnOff = list.poll();
 		
+		
 		if(predictiveRound && enablePredictive){
 			int index = (int)((now%TimeUnit.DAY.getMillis())/TimeUnit.HOUR.getMillis());
 			
@@ -124,6 +125,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 			correctedPredictedArrivalRate = last.applyError(predictedArrivalRate);
 			
 			int serversToAdd = (int) Math.ceil(correctedPredictedArrivalRate/lambdaPeak) - statistics.totalNumberOfServers*type.getNumberOfCores();
+			
 			
 			if(serversToAdd > 0){
 				
@@ -148,7 +150,12 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 					configurable.removeMachine(tier,  availableToTurnOff.poll(), false);
 				}
 			}
-			log.info(String.format("STAT-URGAONKAR PRED %d %d %d %f %f %f %f %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRateInTier(predictiveTick), predictedArrivalRate, correctedPredictedArrivalRate, lost, after, statistics));
+			
+			int sentryLimit = (int)Math.ceil(lambdaPeak * (statistics.totalNumberOfServers + normalizedServersToAdd));
+			
+			configurable.config(sentryLimit);
+			
+			log.info(String.format("STAT-URGAONKAR PRED %d %d %d %f %f %f %f %d %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRateInTier(predictiveTick), predictedArrivalRate, correctedPredictedArrivalRate, lost, after, sentryLimit, statistics));
 			lost = 0;
 			after = 0;
 		}else if(!predictiveRound && enableReactive){
@@ -163,7 +170,6 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 				serversToAdd = Math.max(1, serversToAdd);
 				
 				if(serversToAdd > 0){
-					
 					normalizedServersToAdd = (int) Math.ceil(1.0*serversToAdd/type.getNumberOfCores());
 					
 					List<MachineDescriptor> machines = buyMachines(normalizedServersToAdd);
@@ -171,30 +177,13 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 						configurable.addMachine(tier, machineDescriptor, true);
 					}
 					availableToTurnOff.addAll(machines);
-					
-				}else if(serversToAdd < 0){
-					normalizedServersToAdd = (int) Math.ceil(1.0*serversToAdd/type.getNumberOfCores());
-					for (int i = 0; i < Math.min(-normalizedServersToAdd, availableToTurnOff.size()); i++) {
-						configurable.removeMachine(tier,  availableToTurnOff.poll(), false);
-					}
 				}
 				
 			}else if( observed/(lambdaPeak * statistics.totalNumberOfServers) < threshold ){
 				
 				serversToAdd = (int) Math.ceil(observed/lambdaPeak) - statistics.totalNumberOfServers*type.getNumberOfCores();
 				
-				
-				if(serversToAdd > 0){
-					
-					normalizedServersToAdd = (int) Math.ceil(1.0*serversToAdd/type.getNumberOfCores());
-					
-					List<MachineDescriptor> machines = buyMachines(normalizedServersToAdd);
-					for (MachineDescriptor machineDescriptor : machines) {
-						configurable.addMachine(tier, machineDescriptor, true);
-					}
-					availableToTurnOff.addAll(machines);
-					
-				}else if(serversToAdd < 0){
+				if(serversToAdd < 0){
 					normalizedServersToAdd = (int) Math.ceil(1.0*serversToAdd/type.getNumberOfCores());
 
 					if(-normalizedServersToAdd >= statistics.totalNumberOfServers){
@@ -205,9 +194,14 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 						configurable.removeMachine(tier,  availableToTurnOff.poll(), false);
 					}
 				}
+
 			}
+
+			int sentryLimit = (int)Math.ceil(lambdaPeak * (statistics.totalNumberOfServers + normalizedServersToAdd));
 			
-			log.debug(String.format("STAT-URGAONKAR REAC %d %d %d %f %f %f %f %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRateInLastIntervalInTier(reactiveTickInSeconds), correctedPredictedArrivalRate, correctedPredictedArrivalRate, lost, after, statistics));
+			configurable.config(sentryLimit);
+			
+			log.debug(String.format("STAT-URGAONKAR REAC %d %d %d %f %f %f %f %d %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRateInLastIntervalInTier(reactiveTickInSeconds), correctedPredictedArrivalRate, correctedPredictedArrivalRate, lost, after, sentryLimit, statistics));
 		}
 		list.add(availableToTurnOff);
 	}
