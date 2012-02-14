@@ -10,7 +10,9 @@ import org.junit.Test;
 import util.ValidConfigurationTest;
 
 import commons.cloud.Request;
+import commons.config.Configuration;
 import commons.config.PropertiesTesting;
+import commons.sim.jeevent.JECheckpointer;
 
 public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 	
@@ -144,7 +146,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 		assertEquals(160915, parser.next().getArrivalTimeInMillis());
 		assertEquals(161383, parser.next().getArrivalTimeInMillis());
 		
-		Checkpointer.save();
+		JECheckpointer.save();
 		
 		// Second Day
 		buildFullConfiguration();
@@ -156,7 +158,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 		assertEquals(dayInMillis + 160315, parser.next().getArrivalTimeInMillis());
 		assertEquals(dayInMillis + 160915, parser.next().getArrivalTimeInMillis());
 		assertEquals(dayInMillis + 161383, parser.next().getArrivalTimeInMillis());
-		Checkpointer.save();
+		JECheckpointer.save();
 		
 		// Third Day
 		buildFullConfiguration();
@@ -167,7 +169,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 		assertEquals(2*dayInMillis + 160315, parser.next().getArrivalTimeInMillis());
 		assertEquals(2*dayInMillis + 160915, parser.next().getArrivalTimeInMillis());
 		assertEquals(2*dayInMillis + 161383, parser.next().getArrivalTimeInMillis());
-		Checkpointer.save();
+		JECheckpointer.save();
 		
 		// Fourth Day
 		buildFullConfiguration();
@@ -178,7 +180,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 		assertEquals(3*dayInMillis + 160315, parser.next().getArrivalTimeInMillis());
 		assertEquals(3*dayInMillis + 160915, parser.next().getArrivalTimeInMillis());
 		assertEquals(3*dayInMillis + 161383, parser.next().getArrivalTimeInMillis());
-		Checkpointer.save();
+		JECheckpointer.save();
 		
 		// Fifth Day
 		buildFullConfiguration();
@@ -190,7 +192,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 		assertEquals(4*dayInMillis + 160915, parser.next().getArrivalTimeInMillis());
 		assertEquals(4*dayInMillis + 161383, parser.next().getArrivalTimeInMillis());
 		
-		assertTrue(Checkpointer.loadSimulationInfo().isFinishDay());
+		assertTrue(Configuration.getInstance().getSimulationInfo().isFinishDay());
 	}
 	
 }

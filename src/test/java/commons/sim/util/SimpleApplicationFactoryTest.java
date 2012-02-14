@@ -7,8 +7,9 @@ import org.junit.Test;
 
 import util.ValidConfigurationTest;
 
-import commons.io.Checkpointer;
+import commons.config.Configuration;
 import commons.sim.components.LoadBalancer;
+import commons.sim.jeevent.JECheckpointer;
 
 public class SimpleApplicationFactoryTest extends ValidConfigurationTest{
 
@@ -31,7 +32,7 @@ public class SimpleApplicationFactoryTest extends ValidConfigurationTest{
 		ApplicationFactory factory = ApplicationFactory.getInstance();
 		assertNotNull(factory);
 		
-		LoadBalancer[] loadBalancers = factory.buildApplication(Checkpointer.loadScheduler());
+		LoadBalancer[] loadBalancers = factory.buildApplication(Configuration.getInstance().getScheduler());
 		assertNotNull(loadBalancers);
 		assertEquals(1, loadBalancers.length);
 	}
@@ -43,7 +44,7 @@ public class SimpleApplicationFactoryTest extends ValidConfigurationTest{
 		ApplicationFactory factory = ApplicationFactory.getInstance();
 		assertNotNull(factory);
 		
-		LoadBalancer[] loadBalancers = factory.buildApplication(Checkpointer.loadScheduler());
+		LoadBalancer[] loadBalancers = factory.buildApplication(Configuration.getInstance().getScheduler());
 		assertNotNull(loadBalancers);
 		assertEquals(5, loadBalancers.length);
 	}

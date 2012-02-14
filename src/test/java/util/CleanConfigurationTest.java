@@ -7,7 +7,7 @@ import org.junit.Before;
 
 import commons.config.Configuration;
 import commons.io.AbstractWorkloadParser;
-import commons.io.Checkpointer;
+import commons.sim.jeevent.JECheckpointer;
 
 /**
  * Super class of tests which do not need a configuration
@@ -23,7 +23,7 @@ public class CleanConfigurationTest {
 	 */
 	@Before
 	public void setUp() throws Exception{
-		Checkpointer.clear();
+		JECheckpointer.clear();
 		
 		Field field = Configuration.class.getDeclaredField("instance");
 		field.setAccessible(true);
@@ -36,7 +36,7 @@ public class CleanConfigurationTest {
 	
 	@AfterClass
 	public static void tearDownAfterClass(){
-		Checkpointer.clear();
+		JECheckpointer.clear();
 	}
 
 

@@ -13,7 +13,8 @@ import util.ValidConfigurationTest;
 import commons.cloud.Provider;
 import commons.cloud.User;
 import commons.cloud.UtilityResult;
-import commons.io.Checkpointer;
+import commons.config.Configuration;
+import commons.sim.jeevent.JECheckpointer;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
@@ -23,13 +24,13 @@ public class AccountingSystemTest extends ValidConfigurationTest {
 	
 	@AfterClass
 	public static void tearDown(){
-		Checkpointer.clear();
+		JECheckpointer.clear();
 	}
 
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		Checkpointer.clear();
+		JECheckpointer.clear();
 		buildFullConfiguration();
 	}
 
@@ -38,7 +39,7 @@ public class AccountingSystemTest extends ValidConfigurationTest {
 	 */
 	@Test(expected=AssertionError.class)
 	public void testAccountPartialUtility() {
-		Checkpointer.loadAccountingSystem().accountPartialUtility(0, null, null);
+		Configuration.getInstance().getAccountingSystem().accountPartialUtility(0, null, null);
 	}
 
 	/**
@@ -47,7 +48,7 @@ public class AccountingSystemTest extends ValidConfigurationTest {
 	 */
 	@Test
 	public void testCalculateUtility() {
-		UtilityResult utility = Checkpointer.loadAccountingSystem().calculateUtility();
+		UtilityResult utility = Configuration.getInstance().getAccountingSystem().calculateUtility();
 		assertEquals(-17692.5, utility.getUtility(), 0.0);
 	}
 }

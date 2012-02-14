@@ -18,10 +18,10 @@ import commons.cloud.Provider;
 import commons.cloud.User;
 import commons.cloud.UtilityResult;
 import commons.config.Configuration;
-import commons.io.Checkpointer;
 import commons.io.WorkloadParser;
 import commons.sim.DynamicConfigurable;
 import commons.sim.components.MachineDescriptor;
+import commons.sim.jeevent.JECheckpointer;
 import commons.sim.util.SaaSAppProperties;
 
 /**
@@ -97,10 +97,10 @@ public class DynamicProvisioningSystemTest extends ValidConfigurationTest {
 		UtilityResult result = dps.calculateUtility();
 		
 		UtilityResult currentResult = new UtilityResult(2, 3);
-		for(User user : Checkpointer.loadUsers()){
+		for(User user : Configuration.getInstance().getUsers()){
 			user.calculateOneTimeFees();
 		}
-		for(Provider provider : Checkpointer.loadProviders()){
+		for(Provider provider : Configuration.getInstance().getProviders()){
 			provider.calculateUniqueCost();
 		}
 		

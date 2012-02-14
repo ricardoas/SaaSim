@@ -1,6 +1,8 @@
 package commons.sim;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,12 +18,13 @@ import util.ValidConfigurationTest;
 
 import commons.cloud.MachineType;
 import commons.cloud.Request;
-import commons.io.Checkpointer;
+import commons.config.Configuration;
 import commons.io.WorkloadParser;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
 import commons.sim.components.TimeSharedMachine;
+import commons.sim.jeevent.JECheckpointer;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventHandler;
 import commons.sim.jeevent.JEEventScheduler;
@@ -45,7 +48,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		EasyMock.replay(loadBalancer);
 		
-		assertNotNull(new SimpleSimulator(Checkpointer.loadScheduler(), loadBalancer));
+		assertNotNull(new SimpleSimulator(Configuration.getInstance().getScheduler(), loadBalancer));
 		EasyMock.verify(loadBalancer);
 	}
 	
@@ -148,8 +151,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, heuristic, 2, 3);
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
-		JEEvent event = new JEEvent(JEEventType.ADD_SERVER, handler, 1L, descriptor);
-		loadBalancer.handleEvent(event);
+//		JEEvent event = new JEEvent(JEEventType.ADD_SERVER, handler, 1L, descriptor);
+		loadBalancer.serverIsUp(descriptor);
 		
 		simulator.removeMachine(0, false);
 		EasyMock.verify(monitor, scheduler, handler, timeSharedMachine);
@@ -182,7 +185,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
 		JEEvent eventAddServer = new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine);
-		loadBalancer.handleEvent(eventAddServer);
+//		loadBalancer.handleEvent(eventAddServer);
+		loadBalancer.serverIsUp(timeSharedMachine.getDescriptor());
 		
 		assertTrue(loadBalancer.getServers().size() == 1);
 		simulator.removeMachine(0, true);
@@ -215,7 +219,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
 		JEEvent event = new JEEvent(JEEventType.ADD_SERVER, handler, 1L, descriptor);
-		loadBalancer.handleEvent(event);
+//		loadBalancer.handleEvent(event);
+		loadBalancer.serverIsUp(descriptor);
 		
 		simulator.removeMachine(0, false);
 		EasyMock.verify(monitor, scheduler, handler, timeSharedMachine, heuristic);
@@ -249,8 +254,11 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
-		loadBalancer.handleEvent(new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine));
-		loadBalancer.handleEvent(new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine2));
+//		loadBalancer.handleEvent(new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine));
+//		loadBalancer.handleEvent(new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine2));
+		
+		loadBalancer.serverIsUp(timeSharedMachine.getDescriptor());
+		loadBalancer.serverIsUp(timeSharedMachine2.getDescriptor());
 		
 		assertTrue(loadBalancer.getServers().size() == 2);
 		simulator.removeMachine(0, true);
@@ -307,7 +315,9 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		simulator.setWorkloadParser(workloadParser);
 		JEEvent event = new JEEvent(JEEventType.READWORKLOAD, handler, 1L, timeSharedMachine);
-		simulator.handleEvent(event);
+//		simulator.handleEvent(event);
+		simulator.readWorkload();
+		
 		assertEquals(JEEventType.READWORKLOAD, eventReadWorkload.getValue().getType());
 		
 		EasyMock.verify(monitor, scheduler, handler, workloadParser, timeSharedMachine);
@@ -315,8 +325,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testHandleEventChargeUsers() {
-		while(!Checkpointer.loadSimulationInfo().isChargeDay()){
-			Checkpointer.loadSimulationInfo().addDay();
+		while(!Configuration.getInstance().getSimulationInfo().isChargeDay()){
+			Configuration.getInstance().getSimulationInfo().addDay();
 		}
 		
 		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
@@ -336,7 +346,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		simulator.setMonitor(monitor);
 		
 		JEEvent event = new JEEvent(JEEventType.CHARGE_USERS, handler, 31 * TimeUnit.DAY.getMillis() - 1);
-		simulator.handleEvent(event);
+//		simulator.handleEvent(event);
+		simulator.chargeUsers();
 		
 		EasyMock.verify(monitor, scheduler, handler);
 	}
@@ -374,7 +385,9 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		simulator.setWorkloadParser(workloadParser);
 		JEEvent event = new JEEvent(JEEventType.READWORKLOAD, handler, 1L, timeSharedMachine);
-		simulator.handleEvent(event);
+//		simulator.handleEvent(event);
+		simulator.readWorkload();
+		
 		assertEquals(JEEventType.READWORKLOAD, eventReadWorkload.getValue().getType());
 		
 		EasyMock.verify(monitor, scheduler, handler, workloadParser, timeSharedMachine, request);
@@ -412,7 +425,9 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		simulator.setWorkloadParser(workloadParser);
 		JEEvent event = new JEEvent(JEEventType.READWORKLOAD, handler, 1L, timeSharedMachine);
-		simulator.handleEvent(event);
+//		simulator.handleEvent(event);
+		simulator.readWorkload();
+		
 		assertEquals(JEEventType.NEWREQUEST, eventReadWorkload.getValue().getType());
 		
 		EasyMock.verify(monitor, scheduler, handler, workloadParser, timeSharedMachine, request);
@@ -446,7 +461,9 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		simulator.setWorkloadParser(workloadParser);
 		
 		JEEvent event = new JEEvent(JEEventType.COLLECT_STATISTICS, handler, 1L, timeSharedMachine);
-		simulator.handleEvent(event);
+//		simulator.handleEvent(event);
+		simulator.collectStatistics();
+		
 		assertEquals(JEEventType.COLLECT_STATISTICS, eventCollectStatistics.getValue().getType());
 		
 		EasyMock.verify(monitor, scheduler, handler, workloadParser, timeSharedMachine);
@@ -489,7 +506,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		Capture<JEEvent> secondEvent = new Capture<JEEvent>();
 		Capture<JEEvent> thirdEvent = new Capture<JEEvent>();
 
-		SimulationInfo info = Checkpointer.loadSimulationInfo();
+		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
 		while(!info.isChargeDay()){
 			info.addDay();
 		}
@@ -531,7 +548,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		Capture<JEEvent> secondEvent = new Capture<JEEvent>();
 		Capture<JEEvent> thirdEvent = new Capture<JEEvent>();
 
-		SimulationInfo info = Checkpointer.loadSimulationInfo();
+		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
 		while(!info.isChargeDay()){
 			info.addDay();
 		}
@@ -573,7 +590,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		Capture<JEEvent> firstEvent = new Capture<JEEvent>();
 		Capture<JEEvent> secondEvent = new Capture<JEEvent>();
 
-		SimulationInfo info = Checkpointer.loadSimulationInfo();
+		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
 		while(!info.isFinishDay()){
 			info.addDay();
 		}
@@ -612,7 +629,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		Capture<JEEvent> secondEvent = new Capture<JEEvent>();
 		Capture<JEEvent> thirdEvent = new Capture<JEEvent>();
 
-		SimulationInfo info = Checkpointer.loadSimulationInfo();
+		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
 		while(!info.isChargeDay()){
 			info.addDay();
 		}

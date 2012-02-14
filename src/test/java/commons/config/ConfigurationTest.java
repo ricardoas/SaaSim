@@ -19,7 +19,7 @@ import provisioning.DynamicProvisioningSystem;
 
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
-import commons.io.Checkpointer;
+import commons.sim.jeevent.JECheckpointer;
 import commons.sim.schedulingheuristics.RoundRobinHeuristic;
 
 public class ConfigurationTest {
@@ -29,12 +29,12 @@ public class ConfigurationTest {
 		Field field = Configuration.class.getDeclaredField("instance");
 		field.setAccessible(true);
 		field.set(null, null);
-		Checkpointer.clear();
+		JECheckpointer.clear();
 	}
 	
 	@After
 	public void tearDown(){
-		Checkpointer.clear();
+		JECheckpointer.clear();
 	}
 	
 	@Test(expected=ConfigurationException.class)
@@ -91,7 +91,7 @@ public class ConfigurationTest {
 	@Test
 	public void testBuildInstanceWithValidConfigurationAndPreviousSimData() throws ConfigurationException {
 		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
-		Checkpointer.save();
+		JECheckpointer.save();
 		
 		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
 		assertNotNull(Configuration.getInstance());
@@ -196,7 +196,7 @@ public class ConfigurationTest {
 	public void testEmptyIaaSPlanFile() throws ConfigurationException{
 		Configuration.buildInstance(PropertiesTesting.EMPTY_IAAS_PLANS_FILE);
 		
-		Provider[] providers = Checkpointer.loadProviders();
+		Provider[] providers = Configuration.getInstance().getProviders();
 		assertEquals(3, providers.length);
 		for(Provider provider : providers){
 			assertFalse(provider.canBuyMachine(true, MachineType.M1_SMALL));

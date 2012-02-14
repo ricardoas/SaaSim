@@ -11,8 +11,9 @@ import org.junit.Test;
 
 import util.ValidConfigurationTest;
 
-import commons.io.Checkpointer;
+import commons.config.Configuration;
 import commons.sim.components.MachineDescriptor;
+import commons.sim.jeevent.JECheckpointer;
 import commons.util.DataUnit;
 
 /**
@@ -27,16 +28,16 @@ public class ProviderTest extends ValidConfigurationTest {
 	@Override
 	public void setUp() throws Exception{
 		super.setUp();
-		Checkpointer.clear();
+		JECheckpointer.clear();
 		
 		buildFullConfiguration();
-		amazon = Checkpointer.loadProviders()[1];
+		amazon = Configuration.getInstance().getProviders()[1];
 		assert amazon.getName().equals("amazon"): "Check providers order in iaas.providers file.";
 	}
 
 	@After
 	public void tearDown(){
-		Checkpointer.clear();
+		JECheckpointer.clear();
 	}
 	
 	/**

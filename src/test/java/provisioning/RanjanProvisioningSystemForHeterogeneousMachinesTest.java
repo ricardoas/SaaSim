@@ -23,16 +23,16 @@ import commons.cloud.Request;
 import commons.cloud.TypeProvider;
 import commons.cloud.User;
 import commons.config.Configuration;
-import commons.io.Checkpointer;
 import commons.io.WorkloadParser;
 import commons.io.WorkloadParserFactory;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.MachineDescriptor;
+import commons.sim.jeevent.JECheckpointer;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.util.SaaSAppProperties;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Configuration.class, WorkloadParserFactory.class, Checkpointer.class})
+@PrepareForTest({Configuration.class, WorkloadParserFactory.class, JECheckpointer.class})
 public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidConfigurationTest {
 	//FIXME Classified like a ValidConfigurationTest, but still containing use of PowerMock
 
@@ -188,9 +188,9 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		Provider provider = new Provider(0, "1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		providers[0] = provider;
 		
-		PowerMock.mockStaticPartial(Checkpointer.class, "loadProviders", "loadUsers");
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(providers);
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{});
+		PowerMock.mockStaticPartial(JECheckpointer.class, "loadProviders", "loadUsers");
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(providers);
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{});
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(0l);
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
 		
@@ -256,9 +256,9 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		Provider provider = new Provider(0, "1", onDemandLimit, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		providers[0] = provider;
 		
-		PowerMock.mockStaticPartial(Checkpointer.class, "loadProviders", "loadUsers");
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(providers);
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{});
+		PowerMock.mockStaticPartial(JECheckpointer.class, "loadProviders", "loadUsers");
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(providers);
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{});
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(0l);
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
 		
@@ -331,9 +331,9 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		Provider provider = new Provider(0, "1", onDemandLimit, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		providers[0] = provider;
 		
-		PowerMock.mockStaticPartial(Checkpointer.class, "loadProviders", "loadUsers");
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(providers);
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{});
+		PowerMock.mockStaticPartial(JECheckpointer.class, "loadProviders", "loadUsers");
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(providers);
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{});
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(0l);
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
 		
@@ -405,9 +405,9 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		Provider provider = new Provider(0, "1", onDemandLimit, 10, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		providers[0] = provider;
 		
-		PowerMock.mockStaticPartial(Checkpointer.class, "loadProviders", "loadUsers");
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(providers);
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{});
+		PowerMock.mockStaticPartial(JECheckpointer.class, "loadProviders", "loadUsers");
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(providers);
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{});
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(0l);
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
 		
@@ -470,9 +470,9 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		Provider provider = new Provider(0, "1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		providers[0] = provider;
 		
-		PowerMock.mockStaticPartial(Checkpointer.class, "loadProviders", "loadUsers");
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(providers);
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{});
+		PowerMock.mockStaticPartial(JECheckpointer.class, "loadProviders", "loadUsers");
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(providers);
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{});
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(0l);
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
 		
@@ -511,14 +511,14 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		EasyMock.expect(request.getSaasClient()).andReturn(0).times(2);
 		
 		//Configuration mock
-		PowerMock.mockStaticPartial(Checkpointer.class, "loadProviders", "loadUsers");
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(new Provider[]{});
+		PowerMock.mockStaticPartial(JECheckpointer.class, "loadProviders", "loadUsers");
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{});
 		
 		User user = EasyMock.createStrictMock(User.class);
 		user.reportLostRequest(request);
 		User[] users = new User[1];
 		users[0] = user;
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(users);
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(users);
 		
 		PowerMock.replayAll(request, user);
 		
@@ -537,14 +537,14 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		EasyMock.expect(request.getSaasClient()).andReturn(0);
 		
 		//Configuration mock
-		PowerMock.mockStaticPartial(Checkpointer.class, "loadProviders", "loadUsers");
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(new Provider[]{});
+		PowerMock.mockStaticPartial(JECheckpointer.class, "loadProviders", "loadUsers");
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{});
 		
 		User user = EasyMock.createStrictMock(User.class);
 		user.reportFinishedRequest(request);
 		User[] users = new User[1];
 		users[0] = user;
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(users);
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(users);
 		
 		PowerMock.replayAll(request, user);
 		

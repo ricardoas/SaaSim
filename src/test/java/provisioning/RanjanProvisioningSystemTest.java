@@ -20,11 +20,11 @@ import commons.cloud.TypeProvider;
 import commons.cloud.User;
 import commons.config.Configuration;
 import commons.config.PropertiesTesting;
-import commons.io.Checkpointer;
 import commons.io.WorkloadParser;
 import commons.io.WorkloadParserFactory;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.MachineDescriptor;
+import commons.sim.jeevent.JECheckpointer;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.util.SaaSAppProperties;
@@ -182,8 +182,8 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		Provider provider = new Provider(0, "1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, types);
 		providers[0] = provider;
 		
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(providers);
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{});
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(providers);
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{});
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
 		
 		PowerMock.replay(Configuration.class);
@@ -231,10 +231,10 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		Provider[] providers = new Provider[1];
 		Provider provider = new Provider(0, "1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers[0] = provider;
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(providers);
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{});
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(providers);
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{});
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(providers);
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{});
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(providers);
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{});
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
 		EasyMock.expect(config.getStringArray(SaaSUsersProperties.SAAS_USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.WORKLOAD});
 		
@@ -285,10 +285,10 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		Provider[] providers = new Provider[1];
 		Provider provider = new Provider(0, "1", onDemandLimit, reservationLimit, 0.15, new long[]{}, new double[]{}, new long[]{}, new double[]{}, new ArrayList<TypeProvider>());
 		providers[0] = provider;
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(providers);
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{});
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(providers);
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{});
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(providers);
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{});
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(providers);
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{});
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER)).andReturn(new int[]{0});
 		EasyMock.expect(config.getStringArray(SaaSUsersProperties.SAAS_USER_WORKLOAD)).andReturn(new String[]{PropertiesTesting.WORKLOAD});
 		

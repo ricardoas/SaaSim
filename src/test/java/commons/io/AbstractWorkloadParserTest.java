@@ -11,7 +11,9 @@ import org.junit.Test;
 import util.ValidConfigurationTest;
 
 import commons.cloud.Request;
+import commons.config.Configuration;
 import commons.config.PropertiesTesting;
+import commons.sim.jeevent.JECheckpointer;
 import commons.util.SimulationInfo;
 
 /**
@@ -90,7 +92,7 @@ public class AbstractWorkloadParserTest extends ValidConfigurationTest{
 	@Test(expected=RuntimeException.class)
 	public void testConstructorWithWorkloadWithBlankLine() throws ConfigurationException{
 		buildFullConfiguration();
-		SimulationInfo info = Checkpointer.loadSimulationInfo();
+		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
 		info.addDay();
 		info.addDay();
 		info.addDay();
@@ -100,7 +102,7 @@ public class AbstractWorkloadParserTest extends ValidConfigurationTest{
 	@Test(expected=RuntimeException.class)
 	public void testConstructorWithWorkloadWithBlankEndLine() throws ConfigurationException{
 		buildFullConfiguration();
-		SimulationInfo info = Checkpointer.loadSimulationInfo();
+		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
 		info.addDay();
 		info.addDay();
 		info.addDay();

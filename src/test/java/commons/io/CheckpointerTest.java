@@ -17,16 +17,18 @@ import util.ValidConfigurationTest;
 
 import commons.cloud.Provider;
 import commons.cloud.User;
+import commons.config.Configuration;
 import commons.sim.AccountingSystem;
 import commons.sim.Simulator;
 import commons.sim.components.LoadBalancer;
+import commons.sim.jeevent.JECheckpointer;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.util.SimulationInfo;
 
 public class CheckpointerTest extends ValidConfigurationTest{
 	
-	private static final File machineDataFile = new File(Checkpointer.MACHINE_DATA_DUMP);
-	private static final File file = new File(Checkpointer.CHECKPOINT_FILE);
+	private static final File machineDataFile = new File(JECheckpointer.MACHINE_DATA_DUMP);
+	private static final File file = new File(JECheckpointer.CHECKPOINT_FILE);
 	
 	@Override
 	@Before
@@ -46,12 +48,12 @@ public class CheckpointerTest extends ValidConfigurationTest{
 	public void testHasCheckpointTrue() throws IOException {
 		assert file.createNewFile();
 
-		assertTrue(Checkpointer.hasCheckpoint());
+		assertTrue(JECheckpointer.hasCheckpoint());
 	}
 
 	@Test
 	public void testHasCheckpointFalse() {
-		assertFalse(Checkpointer.hasCheckpoint());
+		assertFalse(JECheckpointer.hasCheckpoint());
 	}
 
 	@Test
@@ -59,7 +61,7 @@ public class CheckpointerTest extends ValidConfigurationTest{
 		assert file.createNewFile();
 		assert file.setWritable(false);
 		
-		assertFalse(Checkpointer.hasCheckpoint());
+		assertFalse(JECheckpointer.hasCheckpoint());
 	}
 
 	@Test
@@ -67,9 +69,9 @@ public class CheckpointerTest extends ValidConfigurationTest{
 		file.delete();
 		assertFalse(file.exists());
 
-		Checkpointer.loadScheduler();
-		Checkpointer.save(new SimulationInfo(2, 9), null, null, null);
-		assertTrue(Checkpointer.hasCheckpoint());
+		Configuration.getInstance().getScheduler();
+		JECheckpointer.save(new SimulationInfo(2, 9), null, null, null);
+		assertTrue(JECheckpointer.hasCheckpoint());
 	}
 
 	@Test
@@ -77,8 +79,8 @@ public class CheckpointerTest extends ValidConfigurationTest{
 		file.delete();
 		assertFalse(file.exists());
 
-		Checkpointer.loadScheduler();
-		Checkpointer.save(null, new User[] {}, null, null);
+		Configuration.getInstance().getScheduler();
+		JECheckpointer.save(null, new User[] {}, null, null);
 		assertTrue(file.exists());
 	}
 
@@ -87,7 +89,7 @@ public class CheckpointerTest extends ValidConfigurationTest{
 		file.delete();
 		assertFalse(file.exists());
 
-		Checkpointer.save(null, null, new Provider[] {}, null);
+		JECheckpointer.save(null, null, new Provider[] {}, null);
 		assertTrue(file.exists());
 	}
 
@@ -96,7 +98,7 @@ public class CheckpointerTest extends ValidConfigurationTest{
 		file.delete();
 		assertFalse(file.exists());
 
-		Checkpointer.save(null, null, null, new LoadBalancer[] {});
+		JECheckpointer.save(null, null, null, new LoadBalancer[] {});
 		assertTrue(file.exists());
 	}
 
@@ -104,14 +106,14 @@ public class CheckpointerTest extends ValidConfigurationTest{
 	public void testDumpMachineData() throws IOException {
 		assert !machineDataFile.exists() || machineDataFile.delete();
 
-		Checkpointer.dumpMachineData(new MachineUsageData());
+		JECheckpointer.dumpMachineData(new MachineUsageData());
 		assertTrue(machineDataFile.exists());
 	}
 
 	@Test(expected=ConfigurationRuntimeException.class)
 	public void testLoadDataWithoutFile() throws ConfigurationException {
 		assert !file.exists();
-		Checkpointer.loadData();
+		JECheckpointer.loadData();
 	}
 
 	@Test
@@ -121,7 +123,7 @@ public class CheckpointerTest extends ValidConfigurationTest{
 		writer.write(invalid);
 		writer.close();
 		try{
-			Checkpointer.loadData();
+			JECheckpointer.loadData();
 			fail("Should fail on loading.");
 		}catch(RuntimeException e){
 			/* catch exception */
@@ -137,30 +139,30 @@ public class CheckpointerTest extends ValidConfigurationTest{
 		
 		buildFullConfiguration();
 //		AccountingSystem accountingSystemBefore = Checkpointer.loadAccountingSystem();
-		Simulator applicationBefore = Checkpointer.loadApplication();
-		Provider[] providersBefore = Checkpointer.loadProviders();
-		JEEventScheduler schedulerBefore = Checkpointer.loadScheduler();
-		SimulationInfo simulationInfoBefore = Checkpointer.loadSimulationInfo();
-		User[] usersBefore = Checkpointer.loadUsers();
-		Checkpointer.save();
+		Simulator applicationBefore = Configuration.getInstance().getApplication();
+		Provider[] providersBefore = Configuration.getInstance().getProviders();
+		JEEventScheduler schedulerBefore = Configuration.getInstance().getScheduler();
+		SimulationInfo simulationInfoBefore = Configuration.getInstance().getSimulationInfo();
+		User[] usersBefore = Configuration.getInstance().getUsers();
+		JECheckpointer.save();
 		
 		buildFullConfiguration();
 		
 		simulationInfoBefore.addDay();
 		
 //		assertEquals(accountingSystemBefore, Checkpointer.loadAccountingSystem());
-		assertEquals(applicationBefore, Checkpointer.loadApplication());
-		assertArrayEquals(providersBefore, Checkpointer.loadProviders());
-		assertEquals(schedulerBefore, Checkpointer.loadScheduler());
-		assertEquals(simulationInfoBefore, Checkpointer.loadSimulationInfo());
-		assertArrayEquals(usersBefore, Checkpointer.loadUsers());
+		assertEquals(applicationBefore, Configuration.getInstance().getApplication());
+		assertArrayEquals(providersBefore, Configuration.getInstance().getProviders());
+		assertEquals(schedulerBefore, Configuration.getInstance().getScheduler());
+		assertEquals(simulationInfoBefore, Configuration.getInstance().getSimulationInfo());
+		assertArrayEquals(usersBefore, Configuration.getInstance().getUsers());
 	}
 	
 	@Test
 	public void testLoadDataWithPermissionDenied() throws IOException {
 		assert file.createNewFile() && file.setReadable(false);
 		
-		Checkpointer.loadApplication();
+		Configuration.getInstance().getApplication();
 	}
 	
 	@Test
@@ -168,7 +170,7 @@ public class CheckpointerTest extends ValidConfigurationTest{
 		assert file.createNewFile();
 		assert machineDataFile.createNewFile();
 		
-		Checkpointer.clear();
+		JECheckpointer.clear();
 		
 		assertFalse(file.exists());
 		assertFalse(machineDataFile.exists());

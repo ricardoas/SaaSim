@@ -13,7 +13,8 @@ import util.ValidConfigurationTest;
 
 import commons.cloud.MachineType;
 import commons.cloud.Request;
-import commons.io.Checkpointer;
+import commons.config.Configuration;
+import commons.sim.jeevent.JECheckpointer;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
@@ -36,7 +37,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testConstructor(){
 		
-		TimeSharedMachine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), xLargeMachine, null);
+		TimeSharedMachine machine = new TimeSharedMachine(Configuration.getInstance().getScheduler(), xLargeMachine, null);
 		assertEquals(xLargeMachine, machine.getDescriptor());
 		assertNull(machine.getLoadBalancer());
 		assertNotNull(machine.getProcessorQueue());
@@ -53,17 +54,17 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 		
 		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{50, 50});
 		
-		TimeSharedMachine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), smallMachine, loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(Configuration.getInstance().getScheduler(), smallMachine, loadBalancer);
 		
 		machine.sendRequest(request);
 		Queue<Request> queue = machine.getProcessorQueue();
 		assertNotNull(queue);
 		assertTrue(queue.isEmpty());
 		
-		Checkpointer.loadScheduler().start();
+		Configuration.getInstance().getScheduler().start();
 		
 		assertEquals(request, captured.getValue());
-		assertEquals(50, Checkpointer.loadScheduler().now());
+		assertEquals(50, Configuration.getInstance().getScheduler().now());
 		
 		EasyMock.verify(loadBalancer);
 	}
@@ -83,17 +84,17 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 		
 		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{2500, 2500});
 		
-		TimeSharedMachine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), smallMachine, loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(Configuration.getInstance().getScheduler(), smallMachine, loadBalancer);
 		
 		machine.sendRequest(request);
 		Queue<Request> queue = machine.getProcessorQueue();
 		assertNotNull(queue);
 		assertTrue(queue.isEmpty());
 		
-		Checkpointer.loadScheduler().start();
+		Configuration.getInstance().getScheduler().start();
 		
 		assertEquals(request, captured.getValue());
-		assertEquals(2500, Checkpointer.loadScheduler().now());
+		assertEquals(2500, Configuration.getInstance().getScheduler().now());
 		
 		EasyMock.verify(loadBalancer);
 	}
@@ -112,7 +113,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 		loadBalancer.reportRequestFinished(request4);
 		EasyMock.replay(loadBalancer);
 		
-		TimeSharedMachine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(Configuration.getInstance().getScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), loadBalancer);
 		
 		machine.sendRequest(request);
 		machine.sendRequest(request2);
@@ -126,9 +127,9 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 		assertEquals(request4, processorQueue.poll());
 		assertNull(processorQueue.poll());
 		
-		Checkpointer.loadScheduler().start();
+		Configuration.getInstance().getScheduler().start();
 		
-		assertEquals(20000, Checkpointer.loadScheduler().now());
+		assertEquals(20000, Configuration.getInstance().getScheduler().now());
 		
 		EasyMock.verify(loadBalancer);
 	}
@@ -149,7 +150,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 		loadBalancer.reportRequestFinished(request4);
 		EasyMock.replay(loadBalancer);
 		
-		TimeSharedMachine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(Configuration.getInstance().getScheduler(), new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), loadBalancer);
 		
 		machine.sendRequest(request);
 		machine.sendRequest(request2);
@@ -163,9 +164,9 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 		assertEquals(request4, processorQueue.poll());
 		assertNull(processorQueue.poll());
 		
-		Checkpointer.loadScheduler().start();
+		Configuration.getInstance().getScheduler().start();
 		
-		assertEquals(20000, Checkpointer.loadScheduler().now());
+		assertEquals(20000, Configuration.getInstance().getScheduler().now());
 		
 		EasyMock.verify(loadBalancer);
 	}
@@ -184,7 +185,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 		loadBalancer.reportRequestFinished(request4);
 		EasyMock.replay(loadBalancer);
 		
-		TimeSharedMachine machine = new TimeSharedMachine(Checkpointer.loadScheduler(), new MachineDescriptor(1, false, MachineType.M1_XLARGE, 0), loadBalancer);
+		TimeSharedMachine machine = new TimeSharedMachine(Configuration.getInstance().getScheduler(), new MachineDescriptor(1, false, MachineType.M1_XLARGE, 0), loadBalancer);
 		
 		machine.sendRequest(request);
 		machine.sendRequest(request2);
@@ -194,21 +195,21 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 		Queue<Request> processorQueue = machine.getProcessorQueue();
 		assertTrue(processorQueue.isEmpty());
 		
-		Checkpointer.loadScheduler().start();
+		Configuration.getInstance().getScheduler().start();
 		
-		assertEquals(5000, Checkpointer.loadScheduler().now());
+		assertEquals(5000, Configuration.getInstance().getScheduler().now());
 		
 		EasyMock.verify(loadBalancer);
 	}
 
 	@Test
 	public void testShutdownWithEmptyMachine(){
-		JEEventScheduler scheduler = Checkpointer.loadScheduler();
+		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		EasyMock.expect(loadBalancer.getHandlerId()).andReturn(scheduler.registerHandler(loadBalancer));
-		Capture<JEEvent> captured = new Capture<JEEvent>();
-		loadBalancer.handleEvent(EasyMock.capture(captured));
+		Capture<MachineDescriptor> captured = new Capture<MachineDescriptor>();
+		loadBalancer.serverIsDown(EasyMock.capture(captured));
 		EasyMock.expectLastCall();
 		
 		EasyMock.replay(loadBalancer);
@@ -218,27 +219,24 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 		
 		scheduler.start();
 		
-		JEEvent event = captured.getValue();
-		assertNotNull(event);
-		assertEquals(JEEventType.MACHINE_TURNED_OFF, event.getType());
-		assertEquals(machine.getDescriptor(), event.getValue()[0]);
+		assertEquals(machine.getDescriptor(), captured.getValue());
 		
-		assertEquals(0, Checkpointer.loadScheduler().now());
+		assertEquals(0, Configuration.getInstance().getScheduler().now());
 		
 		EasyMock.verify(loadBalancer);
 	}
 	
 	@Test
 	public void testShutdownWithNonEmptyMachine(){
-		JEEventScheduler scheduler = Checkpointer.loadScheduler();
+		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000});
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.reportRequestFinished(request);
 		EasyMock.expect(loadBalancer.getHandlerId()).andReturn(scheduler.registerHandler(loadBalancer));
-		Capture<JEEvent> captured = new Capture<JEEvent>();
-		loadBalancer.handleEvent(EasyMock.capture(captured));
+		Capture<MachineDescriptor> captured = new Capture<MachineDescriptor>();
+		loadBalancer.serverIsDown(EasyMock.capture(captured));
 		EasyMock.expectLastCall();
 		EasyMock.replay(loadBalancer);
 
@@ -249,12 +247,9 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 		
 		scheduler.start();
 		
-		JEEvent event = captured.getValue();
-		assertNotNull(event);
-		assertEquals(JEEventType.MACHINE_TURNED_OFF, event.getType());
-		assertEquals(machine.getDescriptor(), event.getValue()[0]);
+		assertEquals(machine.getDescriptor(), captured.getValue());
 		
-		assertEquals(5000, Checkpointer.loadScheduler().now());
+		assertEquals(5000, Configuration.getInstance().getScheduler().now());
 		
 		EasyMock.verify(loadBalancer);
 	}
@@ -265,15 +260,15 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 	 */
 	@Test
 	public void testHandlePreemptionOfLastRequestOnQueueWithShutdown(){
-		JEEventScheduler scheduler = Checkpointer.loadScheduler();
+		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
 
 		Request request = new Request(0, 0, 0, 0, 100000L, 100000L, new long[]{450, 450, 450, 450, 450});
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		loadBalancer.reportRequestFinished(request);
 		EasyMock.expect(loadBalancer.getHandlerId()).andReturn(scheduler.registerHandler(loadBalancer));
-		Capture<JEEvent> captured = new Capture<JEEvent>();
-		loadBalancer.handleEvent(EasyMock.capture(captured));
+		Capture<MachineDescriptor> captured = new Capture<MachineDescriptor>();
+		loadBalancer.serverIsDown(EasyMock.capture(captured));
 		EasyMock.expectLastCall();
 		
 		EasyMock.replay(loadBalancer);
@@ -284,10 +279,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 		
 		scheduler.start();
 		
-		JEEvent event = captured.getValue();
-		assertNotNull(event);
-		assertEquals(JEEventType.MACHINE_TURNED_OFF, event.getType());
-		assertEquals(machine.getDescriptor(), event.getValue()[0]);
+		assertEquals(machine.getDescriptor(), captured.getValue());
 		
 		EasyMock.verify(loadBalancer);
 	}
@@ -297,7 +289,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 	 */
 	@Test
 	public void testHandlePreemptionOfTwoRequestAndOneCore(){
-		JEEventScheduler scheduler = Checkpointer.loadScheduler();
+		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
 
 		Request firstRequest = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{500, 500});
 		Request secondRequest = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{400, 400});
@@ -321,7 +313,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testHandlePreemptionOfTwoRequestAndMultiCores(){
-		JEEventScheduler scheduler = Checkpointer.loadScheduler();
+		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
 
 		Request firstRequest = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{500, 500, 500});
 		Request secondRequest = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{400, 400, 400});
@@ -349,7 +341,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		EasyMock.replay(loadBalancer);
 		
-		JEEventScheduler scheduler = Checkpointer.loadScheduler();
+		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		TimeSharedMachine machine = new TimeSharedMachine(scheduler, largeMachine, loadBalancer);
 		assertEquals(Double.NaN, machine.computeUtilisation(scheduler.now()), 0.0001);
@@ -385,7 +377,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 		assertEquals(1, machine.computeUtilisation(50), 0.0001);
 		
 		//Simulating a preemption event
-		machine.handleEvent(new JEEvent(JEEventType.PREEMPTION, machine, 100l, 100l, request));
+		machine.handlePreemption(100l, request);
 		
 		assertEquals(1, machine.computeUtilisation(100), 0.0001);
 		assertEquals(1, machine.computeUtilisation(150), 0.0001);
@@ -415,12 +407,12 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 		machine.sendRequest(request);
 		
 		//Simulating a preemption event
-		machine.handleEvent(new JEEvent(JEEventType.PREEMPTION, machine, 100l, 100l, request));
+		machine.handlePreemption(100l, request);
 		
 		//As a compute utilisation is performed, the next compute utilisation will start from this time!
 		assertEquals(1, machine.computeUtilisation(100), 0.0001);
 		
-		machine.handleEvent(new JEEvent(JEEventType.PREEMPTION, machine, 150l, 50l, request));
+		machine.handlePreemption(50l, request);
 		assertEquals(0.25, machine.computeUtilisation(300), 0.0001);
 		
 		EasyMock.verify(loadBalancer, scheduler);
@@ -453,7 +445,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 		assertEquals(0.5, machine.computeUtilisation(50), 0.0001);
 		
 		//Simulating a preemption event
-		machine.handleEvent(new JEEvent(JEEventType.PREEMPTION, machine, 100l, 100l, request));
+		machine.handlePreemption(100l, request);
 		
 		assertEquals(0.5, machine.computeUtilisation(100), 0.0001);
 		assertEquals(0.5, machine.computeUtilisation(150), 0.0001);
@@ -468,7 +460,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testComputeUtilisationOfMachineWithRunningRequestAndQuadCore(){
 		
-		JEEventScheduler scheduler = Checkpointer.loadScheduler();
+		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
@@ -488,7 +480,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testComputeUtilisationOfMachineAsRequestFinishesAndOneCore(){
 		
-		JEEventScheduler scheduler = Checkpointer.loadScheduler();
+		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
@@ -513,7 +505,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testComputeUtilisationOfMachineAsRequestFinishesAndQuadCore(){
 		
-		JEEventScheduler scheduler = Checkpointer.loadScheduler();
+		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
@@ -538,7 +530,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testComputeUtilisationOfMachineAfterRequestFinishesAndOneCore(){
 		
-		JEEventScheduler scheduler = Checkpointer.loadScheduler();
+		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
@@ -564,7 +556,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testComputeUtilisationOfMachineAfterRequestFinishesAndQuadCore(){
 		
-		JEEventScheduler scheduler = Checkpointer.loadScheduler();
+		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
@@ -590,7 +582,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testComputeUtilisationOfMachineAfterRequestFinishesAndOneCore2(){
 		
-		JEEventScheduler scheduler = Checkpointer.loadScheduler();
+		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
@@ -615,7 +607,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testComputeUtilisationOfMachineAfterRequestFinishesAndDualCore2(){
 		
-		JEEventScheduler scheduler = Checkpointer.loadScheduler();
+		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
@@ -639,7 +631,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 
 	@Test
 	public void testIsBusyWithRequests(){
-		JEEventScheduler scheduler = Checkpointer.loadScheduler();
+		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
@@ -659,7 +651,7 @@ public class TimeSharedMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testMachineIsBusyAfterRequestFinishes(){
 		
-		JEEventScheduler scheduler = Checkpointer.loadScheduler();
+		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		

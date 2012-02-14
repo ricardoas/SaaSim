@@ -16,19 +16,19 @@ import commons.cloud.Provider;
 import commons.cloud.User;
 import commons.config.Configuration;
 import commons.config.PropertiesTesting;
-import commons.io.Checkpointer;
 import commons.io.GEISTWorkloadParser;
 import commons.io.WorkloadParser;
 import commons.sim.AccountingSystem;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.MachineDescriptor;
+import commons.sim.jeevent.JECheckpointer;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.util.SaaSAppProperties;
 import commons.sim.util.SimulatorProperties;
 import commons.util.SimulationInfo;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Configuration.class, Checkpointer.class})
+@PrepareForTest({Configuration.class, JECheckpointer.class})
 public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 	
 	@Test
@@ -41,8 +41,8 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(config.getWorkloads()).andReturn(new String[]{PropertiesTesting.WORKLOAD});
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l).times(2);
 		
-		PowerMock.mockStaticPartial(Checkpointer.class, "loadSimulationInfo");
-		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(info).times(3);
+		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo");
+		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info).times(3);
 
 		PowerMock.replayAll(config);
 		
@@ -68,8 +68,8 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(config.getWorkloads()).andReturn(new String[]{PropertiesTesting.WORKLOAD});
 		EasyMock.expect(config.getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)).andReturn(8000l).times(2);
 		
-		PowerMock.mockStaticPartial(Checkpointer.class, "loadSimulationInfo");
-		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(info).times(3);
+		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo");
+		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info).times(3);
 
 		PowerMock.replayAll(config);
 		
@@ -80,7 +80,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 	}
 	
 	@Test
-	@PrepareForTest({Configuration.class, Checkpointer.class, OptimalProvisioningSystemForHeterogeneousMachines.class})
+	@PrepareForTest({Configuration.class, JECheckpointer.class, OptimalProvisioningSystemForHeterogeneousMachines.class})
 	public void testSendStatisticsWithoutRequests() throws Exception{
 		SimulationInfo info = new SimulationInfo(0, 0, 2);
 		
@@ -94,11 +94,11 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		User user = EasyMock.createMock(User.class);
 		AccountingSystem accounting = EasyMock.createMock(AccountingSystem.class);
 		
-		PowerMock.mockStaticPartial(Checkpointer.class, "loadSimulationInfo", "loadProviders", "loadUsers", "loadAccountingSystem");
-		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(info);
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(new Provider[]{provider});
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{user});
-		EasyMock.expect(Checkpointer.loadAccountingSystem()).andReturn(accounting);
+		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders", "loadUsers", "loadAccountingSystem");
+		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info);
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{provider});
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{user});
+		EasyMock.expect(Configuration.getInstance().getAccountingSystem()).andReturn(accounting);
 
 		GEISTWorkloadParser parser = EasyMock.createMock(GEISTWorkloadParser.class);
 		EasyMock.expect(parser.hasNext()).andReturn(false);
@@ -116,7 +116,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 	}
 	
 	@Test
-	@PrepareForTest({Configuration.class, Checkpointer.class, OptimalProvisioningSystemForHeterogeneousMachines.class})
+	@PrepareForTest({Configuration.class, JECheckpointer.class, OptimalProvisioningSystemForHeterogeneousMachines.class})
 	public void testSendStatisticsWithSequentialRequestsAndReservedResources() throws Exception{
 		SimulationInfo info = new SimulationInfo(0, 0, 2);
 		
@@ -145,11 +145,11 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		User user = EasyMock.createMock(User.class);
 		AccountingSystem accounting = EasyMock.createMock(AccountingSystem.class);
 		
-		PowerMock.mockStaticPartial(Checkpointer.class, "loadSimulationInfo", "loadProviders", "loadUsers", "loadAccountingSystem");
-		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(info).anyTimes();
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(new Provider[]{provider});
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{user});
-		EasyMock.expect(Checkpointer.loadAccountingSystem()).andReturn(accounting);
+		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders", "loadUsers", "loadAccountingSystem");
+		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info).anyTimes();
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{provider});
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{user});
+		EasyMock.expect(Configuration.getInstance().getAccountingSystem()).andReturn(accounting);
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
@@ -162,7 +162,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 	}
 	
 	@Test
-	@PrepareForTest({Configuration.class, Checkpointer.class, OptimalProvisioningSystemForHeterogeneousMachines.class})
+	@PrepareForTest({Configuration.class, JECheckpointer.class, OptimalProvisioningSystemForHeterogeneousMachines.class})
 	public void testSendStatisticsWithSequentialRequestsAndOnDemandResourcesWithoutRisk() throws Exception{
 		SimulationInfo info = new SimulationInfo(0, 0, 2);
 		
@@ -194,11 +194,11 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		User user = EasyMock.createMock(User.class);
 		AccountingSystem accounting = EasyMock.createMock(AccountingSystem.class);
 		
-		PowerMock.mockStaticPartial(Checkpointer.class, "loadSimulationInfo", "loadProviders", "loadUsers", "loadAccountingSystem");
-		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(info).anyTimes();
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(new Provider[]{provider});
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{user});
-		EasyMock.expect(Checkpointer.loadAccountingSystem()).andReturn(accounting);
+		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders", "loadUsers", "loadAccountingSystem");
+		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info).anyTimes();
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{provider});
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{user});
+		EasyMock.expect(Configuration.getInstance().getAccountingSystem()).andReturn(accounting);
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
@@ -211,7 +211,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 	}
 	
 	@Test
-	@PrepareForTest({Configuration.class, Checkpointer.class, OptimalProvisioningSystemForHeterogeneousMachines.class})
+	@PrepareForTest({Configuration.class, JECheckpointer.class, OptimalProvisioningSystemForHeterogeneousMachines.class})
 	public void testSendStatisticsWithSequentialRequestsAndOnDemandResourcesWithRisk() throws Exception{
 		SimulationInfo info = new SimulationInfo(0, 0, 2);
 		
@@ -241,11 +241,11 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		User user = EasyMock.createMock(User.class);
 		AccountingSystem accounting = EasyMock.createMock(AccountingSystem.class);
 		
-		PowerMock.mockStaticPartial(Checkpointer.class, "loadSimulationInfo", "loadProviders", "loadUsers", "loadAccountingSystem");
-		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(info).anyTimes();
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(new Provider[]{provider});
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{user});
-		EasyMock.expect(Checkpointer.loadAccountingSystem()).andReturn(accounting);
+		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders", "loadUsers", "loadAccountingSystem");
+		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info).anyTimes();
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{provider});
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{user});
+		EasyMock.expect(Configuration.getInstance().getAccountingSystem()).andReturn(accounting);
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
@@ -258,7 +258,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 	}
 	
 	@Test
-	@PrepareForTest({Configuration.class, Checkpointer.class, OptimalProvisioningSystemForHeterogeneousMachines.class})
+	@PrepareForTest({Configuration.class, JECheckpointer.class, OptimalProvisioningSystemForHeterogeneousMachines.class})
 	public void testSendStatisticsWithSequentialRequestsAndOnDemandResourcesWithtRisk2() throws Exception{
 		SimulationInfo info = new SimulationInfo(0, 0, 2);
 		
@@ -290,11 +290,11 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		User user = EasyMock.createMock(User.class);
 		AccountingSystem accounting = EasyMock.createMock(AccountingSystem.class);
 		
-		PowerMock.mockStaticPartial(Checkpointer.class, "loadSimulationInfo", "loadProviders", "loadUsers", "loadAccountingSystem");
-		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(info).anyTimes();
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(new Provider[]{provider});
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{user});
-		EasyMock.expect(Checkpointer.loadAccountingSystem()).andReturn(accounting);
+		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders", "loadUsers", "loadAccountingSystem");
+		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info).anyTimes();
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{provider});
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{user});
+		EasyMock.expect(Configuration.getInstance().getAccountingSystem()).andReturn(accounting);
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
@@ -307,7 +307,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 	}
 	
 	@Test
-	@PrepareForTest({Configuration.class, Checkpointer.class, OptimalProvisioningSystemForHeterogeneousMachines.class})
+	@PrepareForTest({Configuration.class, JECheckpointer.class, OptimalProvisioningSystemForHeterogeneousMachines.class})
 	public void testSendStatisticsWithParallelRequestsAndReservedResources() throws Exception{
 		SimulationInfo info = new SimulationInfo(0, 0, 2);
 		
@@ -337,11 +337,11 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		User user = EasyMock.createMock(User.class);
 		AccountingSystem accounting = EasyMock.createMock(AccountingSystem.class);
 		
-		PowerMock.mockStaticPartial(Checkpointer.class, "loadSimulationInfo", "loadProviders", "loadUsers", "loadAccountingSystem");
-		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(info).anyTimes();
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(new Provider[]{provider});
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{user});
-		EasyMock.expect(Checkpointer.loadAccountingSystem()).andReturn(accounting);
+		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders", "loadUsers", "loadAccountingSystem");
+		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info).anyTimes();
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{provider});
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{user});
+		EasyMock.expect(Configuration.getInstance().getAccountingSystem()).andReturn(accounting);
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
@@ -354,7 +354,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 	}
 	
 	@Test
-	@PrepareForTest({Configuration.class, Checkpointer.class, OptimalProvisioningSystemForHeterogeneousMachines.class})
+	@PrepareForTest({Configuration.class, JECheckpointer.class, OptimalProvisioningSystemForHeterogeneousMachines.class})
 	public void testSendStatisticsWithParallelRequestsAndOnDemandResourcesWithoutRisk() throws Exception{
 		SimulationInfo info = new SimulationInfo(0, 0, 2);
 		
@@ -387,11 +387,11 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		User user = EasyMock.createMock(User.class);
 		AccountingSystem accounting = EasyMock.createMock(AccountingSystem.class);
 		
-		PowerMock.mockStaticPartial(Checkpointer.class, "loadSimulationInfo", "loadProviders", "loadUsers", "loadAccountingSystem");
-		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(info).anyTimes();
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(new Provider[]{provider});
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{user});
-		EasyMock.expect(Checkpointer.loadAccountingSystem()).andReturn(accounting);
+		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders", "loadUsers", "loadAccountingSystem");
+		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info).anyTimes();
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{provider});
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{user});
+		EasyMock.expect(Configuration.getInstance().getAccountingSystem()).andReturn(accounting);
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
@@ -404,7 +404,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 	}
 	
 	@Test
-	@PrepareForTest({Configuration.class, Checkpointer.class, OptimalProvisioningSystemForHeterogeneousMachines.class})
+	@PrepareForTest({Configuration.class, JECheckpointer.class, OptimalProvisioningSystemForHeterogeneousMachines.class})
 	public void testSendStatisticsWithParallelRequestsAndOnDemandResourcesWithRisk() throws Exception{
 		SimulationInfo info = new SimulationInfo(0, 0, 2);
 		
@@ -437,11 +437,11 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		User user = EasyMock.createMock(User.class);
 		AccountingSystem accounting = EasyMock.createMock(AccountingSystem.class);
 		
-		PowerMock.mockStaticPartial(Checkpointer.class, "loadSimulationInfo", "loadProviders", "loadUsers", "loadAccountingSystem");
-		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(info).anyTimes();
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(new Provider[]{provider});
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{user});
-		EasyMock.expect(Checkpointer.loadAccountingSystem()).andReturn(accounting);
+		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders", "loadUsers", "loadAccountingSystem");
+		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info).anyTimes();
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{provider});
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{user});
+		EasyMock.expect(Configuration.getInstance().getAccountingSystem()).andReturn(accounting);
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
@@ -454,7 +454,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 	}
 	
 	@Test
-	@PrepareForTest({Configuration.class, Checkpointer.class, OptimalProvisioningSystemForHeterogeneousMachines.class})
+	@PrepareForTest({Configuration.class, JECheckpointer.class, OptimalProvisioningSystemForHeterogeneousMachines.class})
 	public void testSendStatisticsWithParallelRequestsAndMixedResourcesWithoutRisk() throws Exception{
 		SimulationInfo info = new SimulationInfo(0, 0, 2);
 		
@@ -489,11 +489,11 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		User user = EasyMock.createMock(User.class);
 		AccountingSystem accounting = EasyMock.createMock(AccountingSystem.class);
 		
-		PowerMock.mockStaticPartial(Checkpointer.class, "loadSimulationInfo", "loadProviders", "loadUsers", "loadAccountingSystem");
-		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(info).anyTimes();
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(new Provider[]{provider});
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{user});
-		EasyMock.expect(Checkpointer.loadAccountingSystem()).andReturn(accounting);
+		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders", "loadUsers", "loadAccountingSystem");
+		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info).anyTimes();
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{provider});
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{user});
+		EasyMock.expect(Configuration.getInstance().getAccountingSystem()).andReturn(accounting);
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
@@ -506,7 +506,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 	}
 	
 	@Test
-	@PrepareForTest({Configuration.class, Checkpointer.class, OptimalProvisioningSystemForHeterogeneousMachines.class})
+	@PrepareForTest({Configuration.class, JECheckpointer.class, OptimalProvisioningSystemForHeterogeneousMachines.class})
 	public void testSendStatisticsWithParallelRequestsAndMixedResourcesWithRisk() throws Exception{
 		SimulationInfo info = new SimulationInfo(0, 0, 2);
 		
@@ -541,11 +541,11 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		User user = EasyMock.createMock(User.class);
 		AccountingSystem accounting = EasyMock.createMock(AccountingSystem.class);
 		
-		PowerMock.mockStaticPartial(Checkpointer.class, "loadSimulationInfo", "loadProviders", "loadUsers", "loadAccountingSystem");
-		EasyMock.expect(Checkpointer.loadSimulationInfo()).andReturn(info).anyTimes();
-		EasyMock.expect(Checkpointer.loadProviders()).andReturn(new Provider[]{provider});
-		EasyMock.expect(Checkpointer.loadUsers()).andReturn(new User[]{user});
-		EasyMock.expect(Checkpointer.loadAccountingSystem()).andReturn(accounting);
+		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders", "loadUsers", "loadAccountingSystem");
+		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info).anyTimes();
+		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{provider});
+		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{user});
+		EasyMock.expect(Configuration.getInstance().getAccountingSystem()).andReturn(accounting);
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		

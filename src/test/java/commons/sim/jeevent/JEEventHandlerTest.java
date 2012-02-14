@@ -3,21 +3,19 @@ package commons.sim.jeevent;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import util.CleanConfigurationTest;
 
-import commons.io.Checkpointer;
 
 public class JEEventHandlerTest extends CleanConfigurationTest {
 	
 	private JEEventScheduler scheduler;
 
-	@Before
+	@Override
 	public void setUp() throws Exception{
 		super.setUp();
-		scheduler = new JEEventScheduler(Checkpointer.INTERVAL);
+		scheduler = new JEEventScheduler(JECheckpointer.INTERVAL);
 	}
 
 	@Test
@@ -27,9 +25,6 @@ public class JEEventHandlerTest extends CleanConfigurationTest {
 			 * 
 			 */
 			private static final long serialVersionUID = 8253763434426330037L;
-
-			@Override
-			public void handleEvent(JEEvent event) {/* Empty implementation. */}
 		};
 		assertEquals(handler, scheduler.getHandler(handler.getHandlerId()));
 	}

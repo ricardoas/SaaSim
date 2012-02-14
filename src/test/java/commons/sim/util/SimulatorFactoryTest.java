@@ -7,8 +7,9 @@ import org.junit.Test;
 
 import util.ValidConfigurationTest;
 
-import commons.io.Checkpointer;
+import commons.config.Configuration;
 import commons.sim.Simulator;
+import commons.sim.jeevent.JECheckpointer;
 
 public class SimulatorFactoryTest extends ValidConfigurationTest{
 
@@ -16,14 +17,14 @@ public class SimulatorFactoryTest extends ValidConfigurationTest{
 	public void testBuildSameSimulatorAfterCheckPoint() throws ConfigurationException{
 		
 		buildFullConfiguration();
-		Simulator application = Checkpointer.loadApplication();
+		Simulator application = Configuration.getInstance().getApplication();
 		assertNotNull(application);
 		
-		Checkpointer.save();
+		JECheckpointer.save();
 		
 		buildFullConfiguration();
 		
-		Simulator applicationAfterCheckpoint = Checkpointer.loadApplication();
+		Simulator applicationAfterCheckpoint = Configuration.getInstance().getApplication();
 		assertNotNull(applicationAfterCheckpoint);
 		assertEquals(applicationAfterCheckpoint, applicationAfterCheckpoint);
 	}
