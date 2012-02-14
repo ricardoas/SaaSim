@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import commons.cloud.Request;
+import commons.config.Configuration;
+import commons.sim.jeevent.JECheckpointer;
 
 /**
 * A different implementation of {@link WorkloadParser}, based on time.
@@ -29,7 +31,7 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 		}
 		this.parsers = parser;
 		this.tick = tick;
-		this.currentTick = Checkpointer.loadSimulationInfo().getCurrentDayInMillis() + tick;
+		this.currentTick = Configuration.getInstance().getSimulationInfo().getCurrentDayInMillis() + tick;
 		this.leftOver = new Request[parsers.length];
 	}
 	

@@ -5,6 +5,7 @@ package commons.sim.jeevent;
 
 
 
+
 /**
  * TODO make doc
  *
@@ -13,15 +14,15 @@ package commons.sim.jeevent;
  */
 public abstract class JEAbstractEventHandler implements JEEventHandler {
 	
-    /**
+	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 2572195285367262298L;
+	private static final long serialVersionUID = 5073241509806147279L;
 
 	private int id;
     
     private JEEventScheduler scheduler;
-    
+
     /**
      * Default empty constructor. Creates and registers a handler in the scheduler.
      */
@@ -30,26 +31,13 @@ public abstract class JEAbstractEventHandler implements JEEventHandler {
     	this.scheduler = scheduler;
 		this.id = this.scheduler.registerHandler(this);
     }
-    
+
     /**
-	 * {@inheritDoc}
-	 */
-	
-    @Override
-	public abstract void handleEvent(JEEvent event);
-    
-    /**
-	 * {@inheritDoc}
-	 */
-	
+     * {@inheritDoc}
+     */
     @Override
 	public void send(JEEvent event) {
     	getScheduler().queueEvent(event);
-    }
-    
-    @Override
-	public void forward(JEEvent event, JEEventHandler handler) {
-    	getScheduler().queueEvent(new JEEvent(event, handler));
     }
     
     /**
@@ -67,6 +55,11 @@ public abstract class JEAbstractEventHandler implements JEEventHandler {
 	public int getHandlerId() {
     	return id;
     }
+    
+	@Override
+	public long now() {
+		return scheduler.now();
+	}
 
 	/**
 	 * {@inheritDoc}

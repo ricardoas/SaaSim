@@ -6,7 +6,6 @@ package commons.sim.schedulingheuristics;
 import java.util.ArrayList;
 import java.util.List;
 
-import commons.cloud.Request;
 import commons.sim.components.Machine;
 
 /**

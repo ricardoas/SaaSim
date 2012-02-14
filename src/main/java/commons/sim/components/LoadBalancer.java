@@ -15,6 +15,7 @@ import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
+import commons.sim.jeevent.JEHandlingPoint;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.schedulingheuristics.SchedulingHeuristic;
 import commons.sim.util.SaaSAppProperties;
@@ -57,7 +58,6 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		this.tier = tier;
 		startingUp = new HashMap<MachineDescriptor, Machine>();
 		warmingDown = new HashMap<MachineDescriptor, Machine>();
-		
 	}
 
 	/**
@@ -66,7 +66,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	 */
 	public void addMachine(MachineDescriptor descriptor, boolean useStartUpDelay){
 		Machine machine = buildMachine(descriptor);
-		long machineUpTime = getScheduler().now();
+		long machineUpTime = now();
 		if(useStartUpDelay){
 			machineUpTime = machineUpTime + (Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SETUP_TIME));
 		}
@@ -84,41 +84,36 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		return new TimeSharedMachine(getScheduler(), machineDescriptor, this);
 	}
 	
+	@JEHandlingPoint(JEEventType.NEWREQUEST)
+	public void handleNewRequest(Request request){
+		Machine nextServer = heuristic.next(request);
+		if(nextServer != null){//Reusing an existent machine
+			nextServer.sendRequest(request);
+		}else{
+			monitor.requestQueued(now(), request, tier);
+		}
+	}
+	
+	@JEHandlingPoint(JEEventType.ADD_SERVER)
+	public void serverIsUp(MachineDescriptor descriptor){
+		Machine machine = startingUp.remove(descriptor);
+		if(machine != null){
+			descriptor.setStartTimeInMillis(now());
+			heuristic.addMachine(machine);
+		}
+	}
+	
+	@JEHandlingPoint(JEEventType.MACHINE_TURNED_OFF)
+	public void serverIsDown(MachineDescriptor descriptor){
+		monitor.machineTurnedOff(descriptor);
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
-	public void handleEvent(JEEvent event) {
-		switch (event.getType()) {
-			case NEWREQUEST:
-				Request request = (Request) event.getValue()[0];
-				Machine nextServer = heuristic.next(request);
-				if(nextServer != null){//Reusing an existent machine
-					nextServer.sendRequest(request);
-				}else{
-					monitor.requestQueued(getScheduler().now(), request, tier);
-				}
-				break;
-			case ADD_SERVER:
-				MachineDescriptor descriptor = (MachineDescriptor) event.getValue()[0];
-				Machine machine = startingUp.remove(descriptor);
-				if(machine != null){
-					descriptor.setStartTimeInMillis(getScheduler().now());
-					heuristic.addMachine(machine);
-				}
-				break;
-			case MACHINE_TURNED_OFF:
-//				Machine machineToTurnOff = warmingDown.remove(event.getValue()[0]);
-//				if(machineToTurnOff != null){
-					monitor.machineTurnedOff((MachineDescriptor)event.getValue()[0]);
-//				}
-				break;
-			case REQUESTQUEUED:
-				monitor.requestQueued(getScheduler().now(), (Request)event.getValue()[0], tier);
-				break;
-			default:
-				break;
-		}
+	@JEHandlingPoint(JEEventType.REQUESTQUEUED)
+	public void requestWasQueued(Request request) {
+		monitor.requestQueued(now(), request, tier);
 	}
 	
 	/**
@@ -175,7 +170,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	 */
 	public void reportRequestQueued(Request requestQueued){
 		//heuristic.reportFinishedRequest(requestQueued);
-		monitor.requestQueued(getScheduler().now(), requestQueued, tier);
+		monitor.requestQueued(now(), requestQueued, tier);
 	}
 
 	/**
@@ -213,7 +208,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 			iterator.remove();
 			machine = entry.getValue();
 			
-			entry.getKey().setStartTimeInMillis(getScheduler().now());
+			entry.getKey().setStartTimeInMillis(now());
 			warmingDown.put(machine.getDescriptor(), machine);
 			machine.shutdownOnFinish();
 		}

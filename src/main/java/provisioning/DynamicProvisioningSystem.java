@@ -14,11 +14,11 @@ import commons.cloud.User;
 import commons.cloud.UtilityResult;
 import commons.cloud.UtilityResultEntry;
 import commons.config.Configuration;
-import commons.io.Checkpointer;
 import commons.io.WorkloadParserFactory;
 import commons.sim.AccountingSystem;
 import commons.sim.DynamicConfigurable;
 import commons.sim.components.MachineDescriptor;
+import commons.sim.jeevent.JECheckpointer;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.util.SaaSAppProperties;
 
@@ -46,14 +46,14 @@ public class DynamicProvisioningSystem implements DPS{
 	 * Default constructor.
 	 */
 	public DynamicProvisioningSystem() {
-		this.providers = Checkpointer.loadProviders();
-		this.users = Checkpointer.loadUsers();
-		this.accountingSystem = Checkpointer.loadAccountingSystem();
+		this.providers = Configuration.getInstance().getProviders();
+		this.users = Configuration.getInstance().getUsers();
+		this.accountingSystem = Configuration.getInstance().getAccountingSystem();
 		this.maxRT = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME);
 	}
 	
 	protected DPSInfo loadDPSInfo(){
-		return Checkpointer.loadProvisioningInfo();
+		return Configuration.getInstance().getProvisioningInfo();
 	}
 	
 	@Override
@@ -69,7 +69,7 @@ public class DynamicProvisioningSystem implements DPS{
 		
 		this.configurable = configurable;
 		
-		if(Checkpointer.loadSimulationInfo().isFirstDay()){
+		if(Configuration.getInstance().getSimulationInfo().isFirstDay()){
 			addServersToTier(Configuration.getInstance().getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER));
 		}
 		

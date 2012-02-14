@@ -9,12 +9,6 @@ import java.io.Serializable;
 public interface JEEventHandler extends Serializable{
 
 	/**
-	 * @param <T>
-	 * @param event
-	 */
-	void handleEvent(JEEvent event);
-
-	/**
 	 * @param event
 	 */
 	void send(JEEvent event);
@@ -23,11 +17,10 @@ public interface JEEventHandler extends Serializable{
 	 * @return
 	 */
 	int getHandlerId();
-
+	
 	/**
-	 * @param event
-	 * @param handler
+	 * @return
 	 */
-	void forward(JEEvent event, JEEventHandler handler);
-
+	long now();
+	
 }

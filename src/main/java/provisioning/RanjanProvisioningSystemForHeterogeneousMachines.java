@@ -8,7 +8,6 @@ import provisioning.util.DPSInfo;
 
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
-import commons.cloud.Request;
 import commons.sim.provisioningheuristics.MachineStatistics;
 
 /**

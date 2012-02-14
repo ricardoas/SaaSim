@@ -4,11 +4,14 @@
 package commons.sim.jeevent;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.TreeSet;
 
-import commons.io.Checkpointer;
+import commons.config.Configuration;
 
 /**
  * Event scheduler. Events are ordered in time.
@@ -29,6 +32,7 @@ public class JEEventScheduler implements Serializable{
     private HashMap<Integer,JEEventHandler> handlerMap;
     public TreeSet<JEEvent> eventSet;
 	private Random random;
+	private transient Map<Class<?>,Map<JEEventType, Method>> handlingMethods;
 	
     /**
      * Default empty constructor.
@@ -36,10 +40,10 @@ public class JEEventScheduler implements Serializable{
      * @throws IOException 
      */
     public JEEventScheduler(long simulationEnd){
-		reset(0, simulationEnd);
 		this.handlerMap = new HashMap<Integer, JEEventHandler>();
 		this.eventSet = new TreeSet<JEEvent>();
 		this.random = new Random();
+		reset(0, simulationEnd);
     }
     
     /**
@@ -48,6 +52,7 @@ public class JEEventScheduler implements Serializable{
 	public void reset(long simulationStart, long simulationEnd) {
 		this.now = simulationStart;
 		this.simulationEnd = simulationEnd;
+		this.handlingMethods = new HashMap<Class<?>, Map<JEEventType,Method>>();
 	}
 
 	/**
@@ -90,12 +95,27 @@ public class JEEventScheduler implements Serializable{
 		return id;
     }
     
+	private Map<JEEventType, Method> extractHandlers(Class<?> clazz, HashMap<JEEventType,Method> map) {
+		
+		if(clazz.getSuperclass() != null){
+			extractHandlers(clazz.getSuperclass(), map);
+		}
+		
+		Method[] methods = clazz.getMethods();
+		for (Method method : methods) {
+			if(method.isAnnotationPresent(JEHandlingPoint.class)){
+				map.put(method.getAnnotation(JEHandlingPoint.class).value(), method);
+			}
+		}
+		return map;
+	}
+
     /**
      * Start the emulation.
      */
     public void start() {
     	
-    	this.now = Checkpointer.loadSimulationInfo().getCurrentDayInMillis();
+    	this.now = Configuration.getInstance().getSimulationInfo().getCurrentDayInMillis();
     	
 		if (!eventSet.isEmpty()) {
 			schedule();
@@ -139,7 +159,23 @@ public class JEEventScheduler implements Serializable{
 		
     	assert handlerMap.containsKey(event.getTargetHandlerId()): "ERROR: no Handler registered with id " + (event.getTargetHandlerId());
 
-		handlerMap.get(event.getTargetHandlerId()).handleEvent(event);
+		JEEventHandler handler = handlerMap.get(event.getTargetHandlerId());
+		try {
+			handlingMethods.get(handler.getClass()).get(event.getType()).invoke(handler, event.getValue());
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			System.out.println(handlingMethods.get(handler.getClass()).get(event.getType()));
+			System.out.println(event.getValue());
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			// TODO Auto-generated catch block
+			System.out.println(handlingMethods.get(handler.getClass()).get(event.getType()));
+			System.out.println(event.getValue());
+			e.printStackTrace();
+		}
     }
     
     /**
@@ -184,5 +220,12 @@ public class JEEventScheduler implements Serializable{
     	for (JEEvent event : eventSet) {
     		System.out.println(event);
 		}
+	}
+
+	public JEEventScheduler registerHandlerClass(Class<?> handlerClass) {
+		if(!handlingMethods.containsKey(handlerClass)){
+			handlingMethods.put(handlerClass, extractHandlers(handlerClass, new HashMap<JEEventType, Method>()));
+		}
+		return this;
 	}
 }

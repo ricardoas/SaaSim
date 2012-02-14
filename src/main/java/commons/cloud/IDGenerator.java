@@ -1,6 +1,7 @@
 package commons.cloud;
 
-import commons.io.Checkpointer;
+import commons.config.Configuration;
+import commons.sim.jeevent.JECheckpointer;
 
 /**
  * Singleton for ID generation.
@@ -19,7 +20,7 @@ public enum IDGenerator {
 	 * Private constructor
 	 */
 	private IDGenerator(){
-		nextID = Checkpointer.loadSimulationInfo().getCurrentDayInMillis();
+		nextID = Configuration.getInstance().getSimulationInfo().getCurrentDayInMillis();
 	}
 	
 	/**

@@ -15,10 +15,10 @@ import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.cloud.User;
 import commons.config.Configuration;
-import commons.io.Checkpointer;
 import commons.io.WorkloadParser;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.LoadBalancer;
+import commons.sim.jeevent.JECheckpointer;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
@@ -32,6 +32,10 @@ import commons.sim.util.SimulatorProperties;
  */
 public class OverProvisionHeuristic extends SimpleSimulator implements PlanningHeuristic {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5387121938928308579L;
 	public static final double FACTOR = 0.2;//Utilisation factor according to Above the Clouds: ...
 	private final long COUNTING_PAGE_SIZE = 100;
 
@@ -97,18 +101,18 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 			this.requestsMeanDemand = (this.requestsMeanDemand + (this.totalProcessingTime / this.numberOfRequests)) / 2;
 		}
 
-		if(Checkpointer.loadSimulationInfo().isFinishDay()){//Simulation finished!
-			Checkpointer.clear();
+		if(Configuration.getInstance().getSimulationInfo().isFinishDay()){//Simulation finished!
+			JECheckpointer.clear();
 			PlanIOHandler.clear();
 			Map<MachineType, Integer> plan = this.getPlan(null);
 			try {
-				PlanIOHandler.createPlanFile(plan, Checkpointer.loadProviders());
+				PlanIOHandler.createPlanFile(plan, Configuration.getInstance().getProviders());
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		}else{
 			try {
-				Checkpointer.save();
+				JECheckpointer.save();
 				PlanIOHandler.createNumberOfMachinesFile(this.maximumNumberOfServers, this.nextRequestsCounter, this.requestsMeanDemand);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
@@ -120,26 +124,21 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void handleEvent(JEEvent event) {
-		switch (event.getType()) {
-		case READWORKLOAD:
-			if(workloadParser.hasNext()) {
-				List<Request> requests = workloadParser.next();
-				numberOfRequests += requests.size();
-
-				totalProcessingTime += calcNumberOfMachines(requests, event.getScheduledTime());
-				evaluateMaximumNumber();
-				if(workloadParser.hasNext()){
-					long newEventTime = getScheduler().now() + Configuration.getInstance().getParserPageSize().getMillis();
-					send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime, true));
-				}else{
-					workloadParser.close();
-				}
+	public void readWorkload() {
+		if(workloadParser.hasNext()) {
+			List<Request> requests = workloadParser.next();
+			numberOfRequests += requests.size();
+			
+			totalProcessingTime += calcNumberOfMachines(requests, now());
+			evaluateMaximumNumber();
+			if(workloadParser.hasNext()){
+				long newEventTime = now() + Configuration.getInstance().getParserPageSize().getMillis();
+				send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime, true));
+			}else{
+				workloadParser.close();
 			}
-			break;
-		default:
-			break;
-		}	
+		}
+		
 	}
 	
 	/**

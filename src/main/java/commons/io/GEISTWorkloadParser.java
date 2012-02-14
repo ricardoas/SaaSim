@@ -3,6 +3,8 @@ package commons.io;
 import java.util.StringTokenizer;
 
 import commons.cloud.Request;
+import commons.config.Configuration;
+import commons.sim.jeevent.JECheckpointer;
 
 /**
  * GEIST parser. A GEIST workload file contains one request per line.
@@ -24,7 +26,7 @@ public class GEISTWorkloadParser extends AbstractWorkloadParser{
 	 * @param workloads 
 	 */
 	public GEISTWorkloadParser(String workload) {
-		super(workload, Checkpointer.loadSimulationInfo().getCurrentDayInMillis());
+		super(workload, Configuration.getInstance().getSimulationInfo().getCurrentDayInMillis());
 	}
 	
 	/**

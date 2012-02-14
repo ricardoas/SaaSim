@@ -11,6 +11,7 @@ import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.config.Configuration;
 import commons.sim.components.MachineDescriptor;
+import commons.sim.jeevent.JECheckpointer;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.util.SimulatorProperties;
 import commons.util.TimeUnit;

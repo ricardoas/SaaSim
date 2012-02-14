@@ -18,11 +18,11 @@ import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.User;
 import commons.config.Configuration;
-import commons.io.Checkpointer;
 import commons.sim.SimpleSimulator;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.Machine;
 import commons.sim.components.MachineDescriptor;
+import commons.sim.jeevent.JECheckpointer;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.util.SimulatorProperties;
 import commons.util.TimeUnit;
@@ -68,7 +68,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic {
 	public void findPlan(Provider[] cloudProviders, User[] cloudUsers) {
 		//Simulating ...
 		DPS dps = (DPS) this.monitor;
-		SimpleSimulator simulator = (SimpleSimulator) Checkpointer.loadApplication();
+		SimpleSimulator simulator = (SimpleSimulator) Configuration.getInstance().getApplication();
 		dps.registerConfigurable(simulator);
 		simulator.start();
 		
@@ -78,12 +78,12 @@ public class HistoryBasedHeuristic implements PlanningHeuristic {
 		
 //		System.out.println("DAy: "+Checkpointer.loadSimulationInfo().getCurrentDay());
 		
-		if(Checkpointer.loadSimulationInfo().isFinishDay()){//Simulation finished!
+		if(Configuration.getInstance().getSimulationInfo().isFinishDay()){//Simulation finished!
 			calculateMachinesToReserve(config);
-			Checkpointer.clear();
+			JECheckpointer.clear();
 			PlanIOHandler.clear();
 			try {
-				PlanIOHandler.createPlanFile(this.plan, Checkpointer.loadProviders());
+				PlanIOHandler.createPlanFile(this.plan, Configuration.getInstance().getProviders());
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -120,7 +120,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic {
 	 */
 	private void calculateMachinesToReserve(Configuration config) {
 		Map<MachineType, Map<Long, Double>> map = this.machineData.getMachineUsagePerType();
-		Map<MachineType, Double> limits = findReservationLimits(Checkpointer.loadProviders()[0]);
+		Map<MachineType, Double> limits = findReservationLimits(Configuration.getInstance().getProviders()[0]);
 		long planningPeriod = config.getLong(SimulatorProperties.PLANNING_PERIOD);
 	
 		Map<MachineType, List<Double>> typeUse = new HashMap<MachineType, List<Double>>();
@@ -171,8 +171,8 @@ public class HistoryBasedHeuristic implements PlanningHeuristic {
 
 	private void persisDataToNextRound(LoadBalancer[] loadBalancers, Configuration config) {
 		try {
-			Checkpointer.save();
-			Checkpointer.dumpMachineData(this.machineData);
+			JECheckpointer.save();
+			JECheckpointer.dumpMachineData(this.machineData);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

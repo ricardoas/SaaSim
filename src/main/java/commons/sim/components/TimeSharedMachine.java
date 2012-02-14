@@ -11,11 +11,12 @@ import java.util.Queue;
 
 import commons.cloud.Request;
 import commons.config.Configuration;
-import commons.io.Checkpointer;
+import commons.sim.jeevent.JECheckpointer;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
+import commons.sim.jeevent.JEHandlingPoint;
 import commons.sim.util.FastSemaphore;
 import commons.util.Triple;
 
@@ -131,7 +132,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		}else if(canQueue()){
 			this.backlog.add(request);
 		}else{
-			send(new JEEvent(JEEventType.REQUESTQUEUED, getLoadBalancer(), getScheduler().now(), request));
+			send(new JEEvent(JEEventType.REQUESTQUEUED, getLoadBalancer(), now(), request));
 		}
 	}
 
@@ -149,7 +150,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 */
 	protected void tryToShutdown() {
 		if(shutdownOnFinish && !isBusy()){
-			long scheduledTime = getScheduler().now();
+			long scheduledTime = now();
 			descriptor.setFinishTimeInMillis(scheduledTime);
 			send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, scheduledTime, descriptor));
 		}
@@ -158,36 +159,28 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
-	public void handleEvent(JEEvent event) {
-		switch (event.getType()) {
-			case PREEMPTION:
-				Request request = (Request) event.getValue()[1];
-				this.semaphore.release();
-				
-				long processedDemand = (Long) event.getValue()[0];
-				
-				totalTimeUsedInLastPeriod += processedDemand;
-				totalTimeUsed += processedDemand;
-				
-				lastUpdate = getScheduler().now();
-				
-				request.update(processedDemand);
-				
-				if(request.isFinished()){
-					requestFinished(request);
-				}else{
-					processorQueue.add(request);
-				}
-				
-				if(!processorQueue.isEmpty() && this.semaphore.tryAcquire()){
-					scheduleNext();
-				}
-				
-				tryToShutdown();
-				break;
+	@JEHandlingPoint(JEEventType.PREEMPTION)
+	public void handlePreemption(long processedDemand, Request request) {
+		this.semaphore.release();
+
+		totalTimeUsedInLastPeriod += processedDemand;
+		totalTimeUsed += processedDemand;
+
+		lastUpdate = now();
+
+		request.update(processedDemand);
+
+		if(request.isFinished()){
+			requestFinished(request);
+		}else{
+			processorQueue.add(request);
 		}
-		event = null;
+
+		if(!processorQueue.isEmpty() && this.semaphore.tryAcquire()){
+			scheduleNext();
+		}
+
+		tryToShutdown();
 	}
 	
 	/**
@@ -205,7 +198,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 //			System.out.println("TimeSharedMachine.requestFinished()");
 //		}
 		//}else{
-			request.setFinishTime(getScheduler().now());
+			request.setFinishTime(now());
 			descriptor.updateTransference(request.getRequestSizeInBytes(), request.getResponseSizeInBytes());
 			getLoadBalancer().reportRequestFinished(request);
 		//}
@@ -216,8 +209,8 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 */
 	protected void scheduleNext() {
 		Request nextRequest = processorQueue.poll();
-		long nextQuantum = Math.min(nextRequest.getTotalToProcess(), Checkpointer.loadPriorities()[nextRequest.getSaasClient()]);
-		lastUpdate = getScheduler().now();
+		long nextQuantum = Math.min(nextRequest.getTotalToProcess(), Configuration.getInstance().getPriorities()[nextRequest.getSaasClient()]);
+		lastUpdate = now();
 		send(new JEEvent(JEEventType.PREEMPTION, this, nextQuantum+lastUpdate, nextQuantum, nextRequest));
 	}
 	
@@ -353,6 +346,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		return getClass().getName() + ": " + descriptor;
 	}
 	
+	@Override
 	@Deprecated
 	public List<Triple<Long, Long, Long>> estimateFinishTime(Request newRequest) {
 		
@@ -367,7 +361,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		
 		while(!queue.isEmpty()){
 			Request request = queue.poll();
-			int priority = Checkpointer.loadPriorities()[request.getSaasClient()];
+			int priority = Configuration.getInstance().getPriorities()[request.getSaasClient()];
 			Info info = times.get(request);
 			long demand = Math.min(priority, request.getTotalToProcess()-info.processedDemand);
 			processedTime += demand;

@@ -6,14 +6,15 @@ import provisioning.Monitor;
 
 import commons.cloud.Request;
 import commons.config.Configuration;
-import commons.io.Checkpointer;
 import commons.io.WorkloadParser;
 import commons.sim.components.LoadBalancer;
 import commons.sim.components.MachineDescriptor;
+import commons.sim.jeevent.JECheckpointer;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;
 import commons.sim.jeevent.JEEventType;
+import commons.sim.jeevent.JEHandlingPoint;
 import commons.sim.util.SimulatorProperties;
 import commons.util.SimulationInfo;
 import commons.util.TimeUnit;
@@ -84,9 +85,9 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	protected void prepareBeforeStart() {
 		send(new JEEvent(JEEventType.READWORKLOAD, this, getScheduler().now()));
 		
-		SimulationInfo info = Checkpointer.loadSimulationInfo();
+		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
 		if(info.isChargeDay()){
-			send(new JEEvent(JEEventType.CHARGE_USERS, this, info.getCurrentDayInMillis() + Checkpointer.INTERVAL - 1));
+			send(new JEEvent(JEEventType.CHARGE_USERS, this, info.getCurrentDayInMillis() + JECheckpointer.INTERVAL - 1));
 		}
 		
 		monitoringInterval = Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL);
@@ -99,55 +100,54 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 			}
 		}
 	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void handleEvent(JEEvent event) {
-		switch (event.getType()) {
-			case READWORKLOAD:
-				if(workloadParser.hasNext()) {
-					List<Request> list = workloadParser.next();
-					numberOfRequests += list.size(); 
-					for (Request request : list) {
-						send(parseEvent(request));
-					}
-					if(workloadParser.hasNext()){
-						long newEventTime = getScheduler().now() + Configuration.getInstance().getParserPageSize().getMillis();
-						send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime, true));
-					}else{
-						workloadParser.close();
-					}
-				}
-				break;
-			case CHARGE_USERS:
-				this.monitor.chargeUsers(event.getScheduledTime());
-				break;
-			case COLLECT_STATISTICS:
-				long time = event.getScheduledTime();
-				for (LoadBalancer loadBalancer : tiers) {
-					loadBalancer.collectStatistics(time, monitoringInterval, numberOfRequests);
-				}
-				numberOfRequests = 0;
-				send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)));
-				break;
-			case ESTIMATE_SERVERS:
-				long currentTime = event.getScheduledTime();
-				for (LoadBalancer loadBalancer : tiers) {
-					loadBalancer.estimateServers(currentTime);
-				}
-				send(new JEEvent(JEEventType.ESTIMATE_SERVERS, this, getScheduler().now() + 1000 * 60 * 60));//One hour later
-				break;
-			case NEWREQUEST:
-				if(!isOverloaded(event.getScheduledTime())){
-					forward(event, tiers[0]);
-				}else{
-					monitor.requestQueued(event.getScheduledTime(), (Request) event.getValue()[0], -1);
-				}
-				break;
-			default:
-				break;
+	
+	@JEHandlingPoint(JEEventType.READWORKLOAD)
+	public void readWorkload(){
+		if(workloadParser.hasNext()) {
+			List<Request> list = workloadParser.next();
+			numberOfRequests += list.size(); 
+			for (Request request : list) {
+				send(parseEvent(request));
+			}
+			if(workloadParser.hasNext()){
+				long newEventTime = getScheduler().now() + Configuration.getInstance().getParserPageSize().getMillis();
+				send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime));
+			}else{
+				workloadParser.close();
+			}
+		}
+	}
+	
+	@JEHandlingPoint(JEEventType.CHARGE_USERS)
+	public void chargeUsers(){
+		this.monitor.chargeUsers(getScheduler().now());
+	}
+	
+	@JEHandlingPoint(JEEventType.COLLECT_STATISTICS)
+	public void collectStatistics(){
+		long time = getScheduler().now();
+		for (LoadBalancer loadBalancer : tiers) {
+			loadBalancer.collectStatistics(time, monitoringInterval, numberOfRequests);
+		}
+		numberOfRequests = 0;
+		send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)));
+	}
+	
+	@JEHandlingPoint(JEEventType.ESTIMATE_SERVERS)
+	public void estimateServers(){
+		long currentTime = getScheduler().now();
+		for (LoadBalancer loadBalancer : tiers) {
+			loadBalancer.estimateServers(currentTime);
+		}
+		send(new JEEvent(JEEventType.ESTIMATE_SERVERS, this, getScheduler().now() + 1000 * 60 * 60));//One hour later
+	}
+	
+	@JEHandlingPoint(JEEventType.NEWREQUEST)
+	public void newRequest(Request request){
+		if(!isOverloaded(getScheduler().now())){
+			send(new JEEvent(JEEventType.NEWREQUEST, tiers[0], getScheduler().now(), request));
+		}else{
+			monitor.requestQueued(getScheduler().now(), request, -1);
 		}
 	}
 	
@@ -234,5 +234,4 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 		assert tiers.length >= tier : "This tier not exists!";
 		tiers[tier].removeMachine(descriptor, force);
 	}
-
 }

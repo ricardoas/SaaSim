@@ -11,7 +11,6 @@ import provisioning.util.DPSFactory;
 
 import commons.cloud.UtilityResult;
 import commons.config.Configuration;
-import commons.io.Checkpointer;
 import commons.sim.Simulator;
 
 /**
@@ -37,28 +36,30 @@ public class Main {
 		
 		Configuration.buildInstance(args[0]);
 		
+		Configuration configuration = Configuration.getInstance();
+		
 		DPS dps = DPSFactory.createDPS();
 		
-		Simulator simulator = Checkpointer.loadApplication();
+		Simulator simulator = configuration.getApplication();
 		
 		dps.registerConfigurable(simulator);
 		
 		simulator.start();
 		
-		if(Checkpointer.loadSimulationInfo().isFinishDay()){
+		if(configuration.getSimulationInfo().isFinishDay()){
 			
 			UtilityResult utilityResult = dps.calculateUtility();
 			
 			Logger.getLogger(Main.class).info(utilityResult);
 			
-			String events = Checkpointer.loadScheduler().dumpPostMortemEvents();
+			String events = configuration.getScheduler().dumpPostMortemEvents();
 			if(!events.isEmpty()){
 				FileWriter writer = new FileWriter(new File("events.dat"));
 				writer.write(events);
 				writer.close();
 			}
 		}else{//Persisting dump
-			Checkpointer.save();
+			configuration.save();
 		}
 	}
 }

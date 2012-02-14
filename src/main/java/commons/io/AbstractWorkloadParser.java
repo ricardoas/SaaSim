@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import commons.cloud.Request;
+import commons.config.Configuration;
+import commons.sim.jeevent.JECheckpointer;
 
 /**
  * Represents a abstract {@link WorkloadParser}.
@@ -57,7 +59,7 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 	 * @return The content of file.
 	 */
 	private String readFileToUse(String workload) {
-		this.currentDay = Checkpointer.loadSimulationInfo().getCurrentDay();
+		this.currentDay = Configuration.getInstance().getSimulationInfo().getCurrentDay();
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new FileReader(workload));

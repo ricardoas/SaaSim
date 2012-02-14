@@ -9,6 +9,7 @@ import static commons.sim.util.SimulatorProperties.*;
 import static commons.util.DataUnit.*;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,16 +19,28 @@ import java.util.Map;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationRuntimeException;
+import org.apache.log4j.Logger;
+
+import planning.heuristic.OverProvisionHeuristic;
+import provisioning.util.DPSInfo;
 
 import commons.cloud.Contract;
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.TypeProvider;
 import commons.cloud.User;
-import commons.io.Checkpointer;
 import commons.io.ParserIdiom;
+import commons.sim.AccountingSystem;
+import commons.sim.SimpleSimulator;
+import commons.sim.Simulator;
+import commons.sim.components.LoadBalancer;
+import commons.sim.components.TimeSharedMachine;
+import commons.sim.jeevent.JECheckpointer;
+import commons.sim.jeevent.JEEventScheduler;
+import commons.sim.util.SimulatorFactory;
 import commons.sim.util.SimulatorProperties;
 import commons.util.DataUnit;
+import commons.util.SimulationInfo;
 import commons.util.TimeUnit;
 
 /**
@@ -42,6 +55,15 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	private static Configuration instance;
 	
 	private int[] priorities;
+	
+	private JEEventScheduler scheduler;
+	private SimulationInfo simulationInfo;
+	private Simulator application;
+	private Provider[] providers;
+	private User[] users;
+	private AccountingSystem accountingSystem;
+	private DPSInfo dpsInfo;
+
 	
 	/**
 	 * Private constructor.
@@ -60,10 +82,49 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	 * @throws ConfigurationException
 	 */
 	public static void buildInstance(String propertiesFileName) throws ConfigurationException{
+		Logger.getLogger(JECheckpointer.class).debug("CHKP LOAD-in");
 		instance = new Configuration(propertiesFileName);
-		Checkpointer.loadData();
-	}
 
+		if(JECheckpointer.hasCheckpoint()){
+			try {
+				ObjectInputStream in = JECheckpointer.load();
+				instance.scheduler = (JEEventScheduler) in.readObject();
+				instance.simulationInfo = (SimulationInfo) in.readObject(); 
+				instance.simulationInfo.addDay();
+				instance.scheduler.reset(instance.simulationInfo.getCurrentDayInMillis(), instance.simulationInfo.getCurrentDayInMillis() + TimeUnit.DAY.getMillis());
+				instance.application = (Simulator) in.readObject();
+				instance.providers = (Provider[]) in.readObject();
+				instance.users = (User[]) in.readObject();
+				instance.accountingSystem = (AccountingSystem) in.readObject();
+				instance.priorities = (int []) in.readObject();
+				instance.dpsInfo = (DPSInfo) in.readObject();
+				in.close();
+				JECheckpointer.clear();
+			} catch (Exception e) {
+				throw new ConfigurationException(e);
+			}
+		}else{
+			instance.simulationInfo = new SimulationInfo();
+			instance.scheduler = new JEEventScheduler(TimeUnit.DAY.getMillis());
+			instance.application = SimulatorFactory.buildSimulator(Configuration.getInstance().getScheduler());
+			instance.providers = Configuration.getInstance().readProviders();
+			instance.users = Configuration.getInstance().readUsers();
+			instance.accountingSystem = new AccountingSystem(instance.users, instance.providers);
+			instance.priorities = new int[instance.users.length];
+			for (int i = 0; i < instance.priorities.length; i++) {
+				instance.priorities[i] = 100;//users[i].getContract().getPriority(); FIXME Ricardo: don't know if we need this anymore
+			}
+			instance.dpsInfo = new DPSInfo();
+		}
+		
+		instance.scheduler.registerHandlerClass(LoadBalancer.class).
+					registerHandlerClass(SimpleSimulator.class).
+					registerHandlerClass(TimeSharedMachine.class).
+					registerHandlerClass(OverProvisionHeuristic.class);
+		
+		Logger.getLogger(JECheckpointer.class).debug("CHKP LOAD-out " + instance.simulationInfo);
+	}
+	
 	/**
 	 * Returns the single instance of this configuration.
 	 * @return
@@ -73,6 +134,14 @@ public class Configuration extends ComplexPropertiesConfiguration{
 			throw new ConfigurationRuntimeException();
 		}
 		return instance;
+	}
+
+	/**
+	 */
+	public void save(){
+		assert instance != null;
+		
+		JECheckpointer.save(scheduler, simulationInfo, application, providers, users, accountingSystem, priorities, dpsInfo);
 	}
 
 	/**
@@ -116,7 +185,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	 * @throws ConfigurationException 
 	 * @throws IOException
 	 */
-	public Provider[] getProviders() throws ConfigurationException{
+	public Provider[] readProviders() throws ConfigurationException{
 		int numberOfProviders = getInt(IAAS_NUMBER_OF_PROVIDERS);
 		
 		String[] names = getStringArray(IAAS_PROVIDER_NAME);
@@ -216,7 +285,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	 * @throws ConfigurationException 
 	 * @throws IOException
 	 */
-	public User[] getUsers() throws ConfigurationException{
+	public User[] readUsers() throws ConfigurationException{
 		int numberOfPlans = getInt(NUMBER_OF_PLANS);
 		String[] planNames = getStringArray(PLAN_NAME);
 		int[] priorities = getIntegerArray(PLAN_PRIORITY);
@@ -499,11 +568,39 @@ public class Configuration extends ComplexPropertiesConfiguration{
 		return workloads;
 	}
 
-	public int[] getPriority() {
+	public int[] getPriorities() {
 		return priorities;
 	}
 
 	public void enableParserError() {
 		setProperty(SimulatorProperties.PLANNING_USE_ERROR, true);
+	}
+
+	public Simulator getApplication() {
+		return this.application;
+	}
+
+	public SimulationInfo getSimulationInfo() {
+		return this.simulationInfo;
+	}
+
+	public Provider[] getProviders() {
+		return this.providers;
+	}
+
+	public User[] getUsers() {
+		return this.users;
+	}
+
+	public JEEventScheduler getScheduler() {
+		return this.scheduler;
+	}
+
+	public DPSInfo getProvisioningInfo() {
+		return this.dpsInfo;
+	}
+
+	public AccountingSystem getAccountingSystem() {
+		return this.accountingSystem;
 	}
 }

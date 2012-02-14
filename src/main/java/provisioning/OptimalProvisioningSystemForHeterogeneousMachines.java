@@ -12,9 +12,9 @@ import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.cloud.Request;
 import commons.config.Configuration;
-import commons.io.Checkpointer;
 import commons.io.GEISTWorkloadParser;
 import commons.io.WorkloadParser;
+import commons.sim.jeevent.JECheckpointer;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.util.SaaSAppProperties;
 import commons.sim.util.SimulatorProperties;
@@ -52,7 +52,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 		String[] workloadFiles = Configuration.getInstance().getWorkloads();
 		this.parsers = new WorkloadParser[workloadFiles.length];
 		this.tick = 1000 * 60 * 60;
-		this.currentTick = Checkpointer.loadSimulationInfo().getCurrentDayInMillis() + tick;
+		this.currentTick = Configuration.getInstance().getSimulationInfo().getCurrentDayInMillis() + tick;
 		this.leftOver = new Request[workloadFiles.length];
 		for(int i = 0; i < workloadFiles.length; i++){
 			this.parsers[i] = new GEISTWorkloadParser(workloadFiles[i]);

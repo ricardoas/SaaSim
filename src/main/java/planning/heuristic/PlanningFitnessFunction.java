@@ -18,6 +18,7 @@ import commons.cloud.Provider;
 import commons.cloud.User;
 import commons.cloud.UtilityResultEntry;
 import commons.config.Configuration;
+import commons.sim.components.Machine;
 import commons.sim.util.SaaSAppProperties;
 import commons.sim.util.SimulatorProperties;
 import commons.util.SimulationInfo;

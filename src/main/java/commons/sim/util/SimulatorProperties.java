@@ -1,5 +1,7 @@
 package commons.sim.util;
 
+import commons.sim.Simulator;
+
 /**
  * This class containing the properties to use in {@link Simulator}.
  *  

@@ -1,6 +1,6 @@
 package planning.util;
 
-import static commons.io.Checkpointer.MACHINE_DATA_DUMP;
+import static commons.sim.jeevent.JECheckpointer.MACHINE_DATA_DUMP;
 
 import java.io.BufferedReader;
 import java.io.EOFException;
