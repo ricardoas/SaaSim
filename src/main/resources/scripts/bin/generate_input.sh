@@ -17,4 +17,4 @@ if [ -f ".je.dat" ]; then
 	rm .je.dat
 fi 
 
-java -server -cp $CLASSPATH commons.util.SimpleUserPropertiesGenerator $*
+java -server -cp $CLASSPATH saasim.util.SimpleUserPropertiesGenerator $*

@@ -8,8 +8,8 @@ if [ -f ".je.dat" ]; then
 	rm .je.dat
 fi 
 
-java -server -cp $CLASSPATH provisioning.Main $*
+java -server -cp $CLASSPATH saasim.provisioning.Main $*
 
 while [ -f ".je.dat" ] ; do
-	java -server -cp $CLASSPATH provisioning.Main $*
+	java -server -cp $CLASSPATH saasim.provisioning.Main $*
 done

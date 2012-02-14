@@ -64,7 +64,7 @@ NORM_POOL="/home/david/workspace/SaaSim/norm"
 PEAK_POOL="/home/david/workspace/SaaSim/peak"
 TRANS_POOL="/home/david/workspace/SaaSim/trans"
 
-java -server -cp $CLASSPATH commons.util.UserPropertiesGenerator ${NUM_USERS} ${SIM_PERIOD} ${OUTPUT} ${NORM_POOL} ${TRANS_POOL} ${PEAK_POOL} ${PEAK_DAYS}
+java -server -cp $CLASSPATH saasim.util.UserPropertiesGenerator ${NUM_USERS} ${SIM_PERIOD} ${OUTPUT} ${NORM_POOL} ${TRANS_POOL} ${PEAK_POOL} ${PEAK_DAYS}
 
 
 

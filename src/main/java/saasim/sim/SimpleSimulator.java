@@ -107,7 +107,9 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 			List<Request> list = workloadParser.next();
 			numberOfRequests += list.size(); 
 			for (Request request : list) {
-				send(parseEvent(request));
+				if(request.getCpuDemandInMillis()[0] != 0){
+					send(parseEvent(request));
+				}
 			}
 			if(workloadParser.hasNext()){
 				long newEventTime = getScheduler().now() + Configuration.getInstance().getParserPageSize().getMillis();

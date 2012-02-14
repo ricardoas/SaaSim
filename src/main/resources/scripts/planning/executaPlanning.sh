@@ -35,16 +35,16 @@ find_self && set_classpath
 #	sed -i "s/#users#/users.properties/g" ${USERS}_${PERIOD}_${plan_heur}.properties
 #
 #	if [ ${plan_heur} == EVOLUTIONARY ] || [ ${plan_heur} == OPTIMAL ]; then
-#		java -server -cp $CLASSPATH commons.util.AggregateWorkload ${USERS}_${PERIOD}_${plan_heur}.properties
+#		java -server -cp $CLASSPATH saasim.util.AggregateWorkload ${USERS}_${PERIOD}_${plan_heur}.properties
 #		sed -i "s/users.properties/newUsers.properties/g" ${USERS}_${PERIOD}_${plan_heur}.properties
 #	fi 
 #
 #	#Running planning
-#	java -Xmx1024m -server -cp $CLASSPATH planning.main.Main ${USERS}_${PERIOD}_${plan_heur}.properties
+#	java -Xmx1024m -server -cp $CLASSPATH saasim.planning.Main.Main ${USERS}_${PERIOD}_${plan_heur}.properties
 #	mv output.plan model.plan	
 #
 #	#Running normal simulation
-#	java -Xmx1024m -server -cp $CLASSPATH provisioning.Main ${USERS}_${PERIOD}_${plan_heur}.properties > ${USERS}_${PERIOD}_${plan_heur}.output
+#	java -Xmx1024m -server -cp $CLASSPATH saasim.provisioning.Main ${USERS}_${PERIOD}_${plan_heur}.properties > ${USERS}_${PERIOD}_${plan_heur}.output
 #
 #	mkdir result_${USERS}_${PERIOD}_${plan_heur}
 #	mv model.plan ${USERS}_${PERIOD}_${plan_heur}.output result_${USERS}_${PERIOD}_${plan_heur}
@@ -63,18 +63,18 @@ for value in `seq 1`; do
 	rm .je.dat
 	
 	if [ ${plan_heur} = "Optimal" ] ; then
-		java -Xmx2024m -server -cp $CLASSPATH commons.util.AggregateWorkload david.properties
+		java -Xmx2024m -server -cp $CLASSPATH saasim.util.AggregateWorkload david.properties
 		cp david.properties ${plan_heur}.properties
 		sed -i "s/users.properties/newUsers.properties/g" ${plan_heur}.properties
 		
-		java -Xmx2024m -server -cp $CLASSPATH planning.main.Main ${plan_heur}.properties
+		java -Xmx2024m -server -cp $CLASSPATH saasim.planning.Main.Main ${plan_heur}.properties
 		mv output.plan model.plan
 		echo "Aggregated and planned"
 	elif [ ${plan_heur} = "Over" ] || [ ${plan_heur} = "History" ] ; then
 		
 		#Running planning
 		for i in `seq 1 365`; do
-			java -Xmx2024m -server -cp $CLASSPATH planning.main.Main david.properties
+			java -Xmx2024m -server -cp $CLASSPATH saasim.planning.Main.Main david.properties
 		done
 		rm .je.dat
 		mv output.plan model.plan
@@ -84,7 +84,7 @@ for value in `seq 1`; do
 
 	#Running normal simulation
 	for i in `seq 1 365`; do
-		java -Xmx2024m -server -cp $CLASSPATH provisioning.Main david.properties > data_${value}.output
+		java -Xmx2024m -server -cp $CLASSPATH saasim.provisioning.Main david.properties > data_${value}.output
 	done
 
 	mv model.plan model_${value}.plan

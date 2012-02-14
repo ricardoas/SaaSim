@@ -30,7 +30,7 @@ public class Main {
 	public static void main(String[] args) throws ConfigurationException, IOException {
 		
 		if(args.length != 1){
-			System.out.println("Usage: java -cp saasim.jar provisioning.Main <property file>");
+			System.out.println("Usage: java -cp saasim.jar saasim.provisioning.Main <property file>");
 			System.exit(1);
 		}
 		
