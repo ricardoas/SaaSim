@@ -7,13 +7,6 @@ import org.easymock.IAnswer;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import saasim.sim.jeevent.JEAbstractEventHandler;
-import saasim.sim.jeevent.JECheckpointer;
-import saasim.sim.jeevent.JEEvent;
-import saasim.sim.jeevent.JEEventHandler;
-import saasim.sim.jeevent.JEEventScheduler;
-import saasim.sim.jeevent.JEEventType;
-import saasim.sim.jeevent.JEException;
 import saasim.util.ValidConfigurationTest;
 
 

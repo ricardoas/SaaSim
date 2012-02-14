@@ -9,7 +9,6 @@ import java.util.Comparator;
 import org.junit.Assert;
 import org.junit.Test;
 
-import saasim.cloud.MachineType;
 import saasim.util.CleanConfigurationTest;
 
 /**

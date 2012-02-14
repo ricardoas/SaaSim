@@ -8,7 +8,6 @@ import java.util.List;
 import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Test;
 
-import saasim.planning.io.PlanningWorkloadParser;
 import saasim.planning.util.Summary;
 
 

@@ -12,13 +12,8 @@ import org.junit.Test;
 import saasim.cloud.MachineType;
 import saasim.cloud.Request;
 import saasim.config.Configuration;
-import saasim.sim.components.LoadBalancer;
-import saasim.sim.components.MachineDescriptor;
-import saasim.sim.components.TimeSharedMachine;
-import saasim.sim.jeevent.JECheckpointer;
 import saasim.sim.jeevent.JEEvent;
 import saasim.sim.jeevent.JEEventScheduler;
-import saasim.sim.jeevent.JEEventType;
 import saasim.util.ValidConfigurationTest;
 
 

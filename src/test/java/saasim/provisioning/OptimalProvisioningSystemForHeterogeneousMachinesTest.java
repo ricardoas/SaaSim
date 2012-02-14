@@ -18,7 +18,6 @@ import saasim.config.Configuration;
 import saasim.config.PropertiesTesting;
 import saasim.io.GEISTWorkloadParser;
 import saasim.io.WorkloadParser;
-import saasim.provisioning.OptimalProvisioningSystemForHeterogeneousMachines;
 import saasim.sim.AccountingSystem;
 import saasim.sim.SimpleSimulator;
 import saasim.sim.components.MachineDescriptor;

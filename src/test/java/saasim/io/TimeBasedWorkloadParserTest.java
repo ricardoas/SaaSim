@@ -2,17 +2,12 @@ package saasim.io;
 
 import static org.junit.Assert.*;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
 
 import saasim.cloud.Request;
-import saasim.io.GEISTWorkloadParser;
-import saasim.io.TimeBasedWorkloadParser;
-import saasim.io.WorkloadParser;
-import saasim.io.WorkloadParserFactory;
 import saasim.util.ValidConfigurationTest;
 
 

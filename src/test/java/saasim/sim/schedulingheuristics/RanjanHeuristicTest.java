@@ -13,9 +13,7 @@ import saasim.config.Configuration;
 import saasim.sim.components.Machine;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.components.TimeSharedMachine;
-import saasim.sim.jeevent.JECheckpointer;
 import saasim.sim.provisioningheuristics.MachineStatistics;
-import saasim.sim.schedulingheuristics.RanjanHeuristic;
 import saasim.util.ValidConfigurationTest;
 
 

@@ -3,16 +3,12 @@
  */
 package saasim.cloud;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import org.easymock.EasyMock;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import saasim.cloud.Contract;
-import saasim.cloud.Request;
-import saasim.cloud.User;
 import saasim.util.DataUnit;
 import saasim.util.TimeUnit;
 import saasim.util.ValidConfigurationTest;

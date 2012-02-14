@@ -7,8 +7,6 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import saasim.cloud.MachineType;
-import saasim.cloud.Request;
 import saasim.util.CleanConfigurationTest;
 
 /**

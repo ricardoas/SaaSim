@@ -8,8 +8,6 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Test;
 
 import saasim.cloud.Request;
-import saasim.io.WorkloadParser;
-import saasim.io.WorkloadParserFactory;
 import saasim.util.ValidConfigurationTest;
 
 

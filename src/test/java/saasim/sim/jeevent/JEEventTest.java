@@ -5,10 +5,6 @@ import static org.junit.Assert.assertEquals;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
-import saasim.sim.jeevent.JEAbstractEventHandler;
-import saasim.sim.jeevent.JEEvent;
-import saasim.sim.jeevent.JEEventHandler;
-import saasim.sim.jeevent.JEEventType;
 import saasim.util.CleanConfigurationTest;
 
 public class JEEventTest extends CleanConfigurationTest {

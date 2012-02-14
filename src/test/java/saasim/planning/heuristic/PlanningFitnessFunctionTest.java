@@ -23,7 +23,6 @@ import saasim.cloud.Provider;
 import saasim.cloud.TypeProvider;
 import saasim.cloud.User;
 import saasim.config.Configuration;
-import saasim.planning.heuristic.PlanningFitnessFunction;
 import saasim.planning.util.Summary;
 import saasim.sim.util.SaaSAppProperties;
 import saasim.sim.util.SimulatorProperties;

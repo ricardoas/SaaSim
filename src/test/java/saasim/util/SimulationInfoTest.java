@@ -4,8 +4,6 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import saasim.util.SimulationInfo;
-
 public class SimulationInfoTest {
 
 	@Test

@@ -25,7 +25,6 @@ import saasim.cloud.Provider;
 import saasim.cloud.TypeProvider;
 import saasim.cloud.User;
 import saasim.config.Configuration;
-import saasim.planning.heuristic.HistoryBasedHeuristic;
 import saasim.planning.util.MachineUsageData;
 import saasim.planning.util.PlanIOHandler;
 import saasim.provisioning.DPS;

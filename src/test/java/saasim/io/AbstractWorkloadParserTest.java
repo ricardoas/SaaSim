@@ -11,8 +11,6 @@ import org.junit.Test;
 import saasim.cloud.Request;
 import saasim.config.Configuration;
 import saasim.config.PropertiesTesting;
-import saasim.io.AbstractWorkloadParser;
-import saasim.sim.jeevent.JECheckpointer;
 import saasim.util.SimulationInfo;
 import saasim.util.ValidConfigurationTest;
 

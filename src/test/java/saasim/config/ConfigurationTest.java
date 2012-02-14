@@ -1,22 +1,17 @@
 package saasim.config;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.ConfigurationRuntimeException;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import saasim.cloud.MachineType;
 import saasim.cloud.Provider;
-import saasim.config.Configuration;
 import saasim.planning.heuristic.AGHeuristic;
 import saasim.provisioning.DynamicProvisioningSystem;
 import saasim.sim.jeevent.JECheckpointer;

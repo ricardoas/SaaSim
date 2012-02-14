@@ -1,19 +1,5 @@
 package saasim.sim.schedulingheuristics;
 
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-
-import org.easymock.EasyMock;
-import org.junit.Test;
-import org.powermock.api.easymock.PowerMock;
-
-import saasim.cloud.MachineType;
-import saasim.cloud.Request;
-import saasim.sim.components.Machine;
-import saasim.sim.components.MachineDescriptor;
-import saasim.sim.components.TimeSharedMachine;
-import saasim.sim.jeevent.JECheckpointer;
 import saasim.util.ValidConfigurationTest;
 
 

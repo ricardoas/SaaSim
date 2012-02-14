@@ -6,7 +6,6 @@ package saasim.provisioning.util;
 import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Test;
 
-import saasim.provisioning.util.DPSFactory;
 import saasim.util.ValidConfigurationTest;
 
 /**

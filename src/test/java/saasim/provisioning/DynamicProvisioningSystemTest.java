@@ -17,12 +17,8 @@ import saasim.cloud.User;
 import saasim.cloud.UtilityResult;
 import saasim.config.Configuration;
 import saasim.io.WorkloadParser;
-import saasim.provisioning.DPS;
-import saasim.provisioning.DynamicProvisioningSystem;
-import saasim.provisioning.Monitor;
 import saasim.sim.DynamicConfigurable;
 import saasim.sim.components.MachineDescriptor;
-import saasim.sim.jeevent.JECheckpointer;
 import saasim.sim.util.SaaSAppProperties;
 import saasim.util.ValidConfigurationTest;
 

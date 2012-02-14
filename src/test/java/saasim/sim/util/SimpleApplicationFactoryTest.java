@@ -7,8 +7,6 @@ import org.junit.Test;
 
 import saasim.config.Configuration;
 import saasim.sim.components.LoadBalancer;
-import saasim.sim.jeevent.JECheckpointer;
-import saasim.sim.util.ApplicationFactory;
 import saasim.util.ValidConfigurationTest;
 
 

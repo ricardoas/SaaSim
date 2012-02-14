@@ -1,13 +1,9 @@
 package saasim.cloud;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-import java.util.Iterator;
-
-import org.easymock.EasyMock;
 import org.junit.Test;
 
-import saasim.cloud.UtilityResult;
 import saasim.util.CleanConfigurationTest;
 
 public class UtilityResultTest extends CleanConfigurationTest {

@@ -5,10 +5,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import saasim.sim.jeevent.JEAbstractEventHandler;
-import saasim.sim.jeevent.JECheckpointer;
-import saasim.sim.jeevent.JEEventHandler;
-import saasim.sim.jeevent.JEEventScheduler;
 import saasim.util.CleanConfigurationTest;
 
 

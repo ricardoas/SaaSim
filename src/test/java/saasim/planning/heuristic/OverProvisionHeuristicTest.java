@@ -26,7 +26,6 @@ import saasim.config.Configuration;
 import saasim.io.TimeBasedWorkloadParser;
 import saasim.io.WorkloadParser;
 import saasim.io.WorkloadParserFactory;
-import saasim.planning.heuristic.OverProvisionHeuristic;
 import saasim.planning.util.PlanIOHandler;
 import saasim.provisioning.DPS;
 import saasim.provisioning.util.DPSFactory;

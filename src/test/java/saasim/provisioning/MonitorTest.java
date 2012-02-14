@@ -12,10 +12,7 @@ import saasim.cloud.MachineType;
 import saasim.cloud.Request;
 import saasim.cloud.UtilityResult;
 import saasim.config.Configuration;
-import saasim.provisioning.DynamicProvisioningSystem;
-import saasim.provisioning.Monitor;
 import saasim.sim.components.MachineDescriptor;
-import saasim.sim.jeevent.JECheckpointer;
 import saasim.sim.provisioningheuristics.MachineStatistics;
 import saasim.util.ValidConfigurationTest;
 

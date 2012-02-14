@@ -9,11 +9,6 @@ import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Test;
 
-import saasim.cloud.MachineType;
-import saasim.cloud.Provider;
-import saasim.cloud.ProviderEntry;
-import saasim.cloud.TypeProvider;
-import saasim.cloud.TypeProviderEntry;
 import saasim.config.Configuration;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.jeevent.JECheckpointer;

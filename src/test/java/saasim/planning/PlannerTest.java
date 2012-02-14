@@ -19,7 +19,6 @@ import saasim.cloud.Provider;
 import saasim.cloud.User;
 import saasim.config.Configuration;
 import saasim.config.PropertiesTesting;
-import saasim.planning.Planner;
 import saasim.planning.heuristic.PlanningHeuristic;
 import saasim.planning.util.PlanningHeuristicFactory;
 import saasim.provisioning.Monitor;
