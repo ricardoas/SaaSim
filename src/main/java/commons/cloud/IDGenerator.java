@@ -1,7 +1,6 @@
 package commons.cloud;
 
 import commons.config.Configuration;
-import commons.sim.jeevent.JECheckpointer;
 
 /**
  * Singleton for ID generation.

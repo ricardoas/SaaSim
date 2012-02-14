@@ -7,7 +7,6 @@ import java.io.IOException;
 
 import commons.cloud.Request;
 import commons.config.Configuration;
-import commons.sim.jeevent.JECheckpointer;
 
 /**
  * Represents a abstract {@link WorkloadParser}.

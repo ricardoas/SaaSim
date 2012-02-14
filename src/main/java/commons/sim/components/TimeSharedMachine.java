@@ -11,7 +11,6 @@ import java.util.Queue;
 
 import commons.cloud.Request;
 import commons.config.Configuration;
-import commons.sim.jeevent.JECheckpointer;
 import commons.sim.jeevent.JEAbstractEventHandler;
 import commons.sim.jeevent.JEEvent;
 import commons.sim.jeevent.JEEventScheduler;

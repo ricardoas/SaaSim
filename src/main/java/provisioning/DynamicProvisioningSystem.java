@@ -18,7 +18,6 @@ import commons.io.WorkloadParserFactory;
 import commons.sim.AccountingSystem;
 import commons.sim.DynamicConfigurable;
 import commons.sim.components.MachineDescriptor;
-import commons.sim.jeevent.JECheckpointer;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.util.SaaSAppProperties;
 

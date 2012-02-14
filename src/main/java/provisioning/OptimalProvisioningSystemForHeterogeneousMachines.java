@@ -14,7 +14,6 @@ import commons.cloud.Request;
 import commons.config.Configuration;
 import commons.io.GEISTWorkloadParser;
 import commons.io.WorkloadParser;
-import commons.sim.jeevent.JECheckpointer;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.util.SaaSAppProperties;
 import commons.sim.util.SimulatorProperties;

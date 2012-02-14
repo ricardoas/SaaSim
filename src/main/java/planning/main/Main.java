@@ -8,7 +8,6 @@ import provisioning.util.DPSFactory;
 
 import commons.config.Configuration;
 import commons.sim.components.LoadBalancer;
-import commons.sim.jeevent.JECheckpointer;
 import commons.sim.jeevent.JEEventScheduler;
 
 /**

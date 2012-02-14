@@ -4,15 +4,12 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.MDC;
-
 import provisioning.util.DPSInfo;
 
 import commons.cloud.MachineType;
 import commons.cloud.Provider;
 import commons.config.Configuration;
 import commons.sim.components.MachineDescriptor;
-import commons.sim.jeevent.JECheckpointer;
 import commons.sim.provisioningheuristics.MachineStatistics;
 import commons.sim.util.SimulatorProperties;
 import commons.util.TimeUnit;

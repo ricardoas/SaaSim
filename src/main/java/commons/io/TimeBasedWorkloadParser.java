@@ -5,7 +5,6 @@ import java.util.List;
 
 import commons.cloud.Request;
 import commons.config.Configuration;
-import commons.sim.jeevent.JECheckpointer;
 
 /**
 * A different implementation of {@link WorkloadParser}, based on time.
