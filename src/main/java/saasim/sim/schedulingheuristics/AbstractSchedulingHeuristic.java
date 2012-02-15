@@ -52,7 +52,7 @@ public abstract class AbstractSchedulingHeuristic implements SchedulingHeuristic
 	
 	private final boolean enableSessionAffinity;
 	
-	protected MachineStatistics tierStatistics;
+	public MachineStatistics tierStatistics;
 
 	/**
 	 * Default constructor

@@ -16,6 +16,7 @@ import saasim.sim.jeevent.JEEventScheduler;
 import saasim.sim.jeevent.JEEventType;
 import saasim.sim.jeevent.JEHandlingPoint;
 import saasim.sim.provisioningheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.AbstractSchedulingHeuristic;
 import saasim.sim.schedulingheuristics.SchedulingHeuristic;
 import saasim.sim.util.SaaSAppProperties;
 import saasim.util.TimeUnit;
@@ -92,6 +93,10 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		}else{
 			monitor.requestQueued(now(), request, tier);
 		}
+	}
+	
+	public void registerDrop(Request request){
+		((AbstractSchedulingHeuristic)heuristic).tierStatistics.updateInterarrivalTime(request.getArrivalTimeInMillis());
 	}
 	
 	@JEHandlingPoint(JEEventType.ADD_SERVER)

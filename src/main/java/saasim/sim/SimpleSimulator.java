@@ -150,13 +150,14 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 			send(new JEEvent(JEEventType.NEWREQUEST, tiers[0], getScheduler().now(), request));
 		}else{
 			monitor.requestQueued(getScheduler().now(), request, -1);
+			tiers[0].registerDrop(request);
 		}
 	}
 	
 	@Override
 	public void config(int threshold){
 		if(threshold > 0){
-//			this.threshold = threshold;
+			this.threshold = threshold;
 		}
 	}
 

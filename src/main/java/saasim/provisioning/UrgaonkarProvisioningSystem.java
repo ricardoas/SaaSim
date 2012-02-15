@@ -146,7 +146,9 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 					normalizedServersToAdd = 1-statistics.totalNumberOfServers;
 				}
 				
-				for (int i = 0; i < Math.min(-normalizedServersToAdd, availableToTurnOff.size()); i++) {
+				normalizedServersToAdd = Math.min(-normalizedServersToAdd, availableToTurnOff.size());
+				
+				for (int i = 0; i < normalizedServersToAdd; i++) {
 					configurable.removeMachine(tier,  availableToTurnOff.poll(), false);
 				}
 			}
@@ -189,8 +191,10 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 					if(-normalizedServersToAdd >= statistics.totalNumberOfServers){
 						normalizedServersToAdd = 1-statistics.totalNumberOfServers;
 					}
+					
+					normalizedServersToAdd = Math.min(-normalizedServersToAdd, availableToTurnOff.size());
 
-					for (int i = 0; i < Math.min(-normalizedServersToAdd, availableToTurnOff.size()); i++) {
+					for (int i = 0; i < normalizedServersToAdd; i++) {
 						configurable.removeMachine(tier,  availableToTurnOff.poll(), false);
 					}
 				}
@@ -199,7 +203,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 
 			int sentryLimit = (int)Math.ceil(lambdaPeak * (statistics.totalNumberOfServers + normalizedServersToAdd));
 			
-			configurable.config(sentryLimit);
+//			configurable.config(sentryLimit);
 			
 			log.debug(String.format("STAT-URGAONKAR REAC %d %d %d %f %f %f %f %d %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRateInLastIntervalInTier(reactiveTickInSeconds), correctedPredictedArrivalRate, correctedPredictedArrivalRate, lost, after, sentryLimit, statistics));
 		}
