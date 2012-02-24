@@ -33,7 +33,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 	private static final double DEFAULT_PERCENTILE = 95.0;
 	private static final long predictiveTick = TimeUnit.HOUR.getMillis()/TimeUnit.SECOND.getMillis();
 	private static final long predictiveTickInMillis = TimeUnit.HOUR.getMillis();
-	private long reactiveTickInSeconds;
+	protected long reactiveTickInSeconds;
 	
 	private boolean enablePredictive;
 	private boolean enableReactive;
@@ -87,12 +87,15 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 				info.stat[i] = new UrgaonkarStatistics(responseTime, predictiveTick, percentile, windowSize);
 			}
 			info.history = new UrgaonkarHistory();
-			info.list = new LinkedList<LinkedList<MachineDescriptor>>();
-			for (int i = 0; i < TimeUnit.HOUR.getMillis()/(reactiveTickInSeconds*1000); i++) {
-				info.list.add(new LinkedList<MachineDescriptor>());
-			}
+			info.list = buildMachineList(info);
 		}
 		return info;
+	}
+
+	protected LinkedList<LinkedList<MachineDescriptor>> buildMachineList(DPSInfo info) {
+		LinkedList<LinkedList<MachineDescriptor>> machineList = new LinkedList<LinkedList<MachineDescriptor>>();
+		machineList.add(new LinkedList<MachineDescriptor>());
+		return machineList;
 	}
 	
 	/**
@@ -155,7 +158,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 			
 			int sentryLimit = (int)Math.ceil(lambdaPeak * (statistics.totalNumberOfServers + normalizedServersToAdd));
 			
-			configurable.config(sentryLimit);
+			configurable.config(0, sentryLimit);
 			
 			log.info(String.format("STAT-URGAONKAR PRED %d %d %d %f %f %f %f %d %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRateInTier(predictiveTick), predictedArrivalRate, correctedPredictedArrivalRate, lost, after, sentryLimit, statistics));
 			lost = 0;
@@ -203,7 +206,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 
 			int sentryLimit = (int)Math.ceil(lambdaPeak * (statistics.totalNumberOfServers + normalizedServersToAdd));
 			
-			configurable.config(sentryLimit);
+			configurable.config(0, sentryLimit);
 			
 			log.debug(String.format("STAT-URGAONKAR REAC %d %d %d %f %f %f %f %d %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRateInLastIntervalInTier(reactiveTickInSeconds), correctedPredictedArrivalRate, correctedPredictedArrivalRate, lost, after, sentryLimit, statistics));
 		}

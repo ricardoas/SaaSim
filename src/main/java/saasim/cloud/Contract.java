@@ -95,6 +95,13 @@ public class Contract implements Comparable<Contract>, Serializable{
 	}
 	
 	/**
+	 * @return
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
 	 * According to https://signin.crm.dynamics.com/portal/static/1046/sla.htm
 	 * @param totalLoss a double represents the total percent of requests loss.
 	 * @return The calculated penalty.

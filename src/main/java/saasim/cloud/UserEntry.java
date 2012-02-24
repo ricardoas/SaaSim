@@ -60,6 +60,11 @@ public class UserEntry implements Serializable{
 		this.numberOfLostRequests = numOfLostRequests;
 		this.totalNumberOfRequests = numOfLostRequests + numOfFinishedRequests + numOfFinishedRequestsAfterSLA;
 	}
+	
+	public UserEntry(String contratName){
+		this.userID = 0;
+		this.contractName = contratName;
+	}
 
 	/**
 	 * Gets the receipt calculated by the price of {@link Contract} added to cpu cost and transference cost

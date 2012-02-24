@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import saasim.cloud.Contract;
 import saasim.cloud.MachineType;
 import saasim.cloud.Provider;
 import saasim.cloud.Request;
@@ -37,14 +38,18 @@ public class DynamicProvisioningSystem implements DPS{
 	
 	protected final Provider[] providers;
 	
+	protected final Contract[] contracts;
+	
 	Logger log = Logger.getLogger(getClass());
 
 	private long maxRT;
+
 
 	/**
 	 * Default constructor.
 	 */
 	public DynamicProvisioningSystem() {
+		this.contracts = Configuration.getInstance().getContracts();
 		this.providers = Configuration.getInstance().getProviders();
 		this.users = Configuration.getInstance().getUsers();
 		this.accountingSystem = Configuration.getInstance().getAccountingSystem();
@@ -181,7 +186,7 @@ public class DynamicProvisioningSystem implements DPS{
 	@Override
 	public void chargeUsers(long currentTimeInMillis) {
 		
-		UtilityResultEntry entry = accountingSystem.accountPartialUtility(currentTimeInMillis, users, providers);
+		UtilityResultEntry entry = accountingSystem.accountPartialUtility(currentTimeInMillis, contracts, users, providers);
 		log.info(entry);		
 	}
 

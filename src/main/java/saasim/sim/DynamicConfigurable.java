@@ -58,6 +58,6 @@ public interface DynamicConfigurable {
 	 */
 	void cancelMachineRemoval(int tier, int numberOfServers);
 	
-	void config(int threshold);
+	void config(int tier, int threshold);
 	
 }

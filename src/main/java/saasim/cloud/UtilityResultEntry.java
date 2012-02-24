@@ -32,10 +32,11 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 	/**
 	 * Default constructor.
 	 * @param time value of current time in millis
+	 * @param contracts 
 	 * @param users an array containing the users in the application
 	 * @param providers an array containing the providers in the application
 	 */
-	public UtilityResultEntry(long time, User[] users, Provider[] providers) {
+	public UtilityResultEntry(long time, Contract[] contracts, User[] users, Provider[] providers) {
 		assert users != null;
 		assert providers != null;
 		
@@ -52,17 +53,15 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 		
 		contractEntries = new TreeMap<String, UserEntry>();
 		
+		for (Contract contract : contracts) {
+			contractEntries.put(contract.getName(), new UserEntry(contract.getName()));
+		}
+		
 		for (int i = 0; i < numberOfUsers; i++) {
 			UserEntry entry = users[i].calculatePartialReceipt();
 			receipt += entry.getReceipt();
 			penalty += entry.getPenalty();
-			
-			if(!contractEntries.containsKey(entry.contractName)) {
-				contractEntries.put(entry.contractName, entry);
-			} else {
-				UserEntry contractEntry = contractEntries.get(entry.contractName);
-				contractEntry.add(entry);
-			}
+			contractEntries.get(entry.contractName).add(entry);
 		}
 		
 		for (Entry<String, UserEntry> entry : contractEntries.entrySet()) {

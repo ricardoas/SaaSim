@@ -3,6 +3,7 @@ package saasim.config;
 import saasim.cloud.MachineType;
 import saasim.provisioning.DPS;
 import saasim.provisioning.DynamicProvisioningSystem;
+import saasim.provisioning.EC2UrgaonkarProvisioningSystem;
 import saasim.provisioning.OptimalProvisioningSystemForHeterogeneousMachines;
 import saasim.provisioning.RanjanProvisioningSystem;
 import saasim.provisioning.RanjanProvisioningSystemForHeterogeneousMachines;
@@ -40,7 +41,11 @@ public enum DPSHeuristicValues {
 	/**
 	 * Default Urgaonkar's algorithm implementation.
 	 */
-	URGAONKAR(UrgaonkarProvisioningSystem.class.getCanonicalName());
+	URGAONKAR(UrgaonkarProvisioningSystem.class.getCanonicalName()),
+	/**
+	 * Urgaonkar's algorithm optimized for EC2 environment.
+	 */
+	EC2_URGAONKAR(EC2UrgaonkarProvisioningSystem.class.getCanonicalName());
 	
 	private final String className;
 

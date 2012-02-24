@@ -1,5 +1,6 @@
 package saasim.sim;
 
+import java.util.Arrays;
 import java.util.List;
 
 import saasim.cloud.Request;
@@ -34,6 +35,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	private static final long serialVersionUID = -8028580648054904982L;
 	
 	private LoadBalancer tiers [];
+	private int thresholds [];
 	
 	protected transient WorkloadParser<List<Request>> workloadParser;
 	protected transient Monitor monitor;
@@ -58,6 +60,8 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 		this.tiers = tiers;
 		this.numberOfRequests = 0;
 		this.threshold = Integer.MAX_VALUE;
+		this.thresholds = new int[tiers.length];
+		Arrays.fill(thresholds, Integer.MAX_VALUE);
 	}
 	
 	/**
@@ -155,10 +159,8 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	}
 	
 	@Override
-	public void config(int threshold){
-		if(threshold > 0){
-			this.threshold = threshold;
-		}
+	public void config(int tier, int threshold){
+		tiers[tier].config(threshold);
 	}
 
 	public boolean isOverloaded(long arrivalTime) {
@@ -219,7 +221,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	public void setMonitor(Monitor monitor) {
 		this.monitor = monitor;
 		for (LoadBalancer loadBalancers : tiers) {
-			loadBalancers.setMonitor(monitor);
+			loadBalancers.setMonitor(monitor, this);
 		}
 	}
 
@@ -236,5 +238,12 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 			boolean force) {
 		assert tiers.length >= tier : "This tier not exists!";
 		tiers[tier].removeMachine(descriptor, force);
+	}
+
+	@Override
+	public void config(int requestAcceptanceRate) {
+		if(threshold > 0){
+			this.threshold = requestAcceptanceRate;
+		}
 	}
 }

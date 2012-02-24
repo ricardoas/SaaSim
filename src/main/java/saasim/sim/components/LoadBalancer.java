@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import saasim.cloud.Request;
 import saasim.config.Configuration;
 import saasim.provisioning.Monitor;
+import saasim.sim.ServiceEntry;
 import saasim.sim.jeevent.JEAbstractEventHandler;
 import saasim.sim.jeevent.JEEvent;
 import saasim.sim.jeevent.JEEventScheduler;
@@ -44,6 +45,10 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	private Map<MachineDescriptor, Machine> startingUp;
 	private Map<MachineDescriptor, Machine> warmingDown;
 
+	private ServiceEntry sentry;
+
+	private int threshold;
+
 	
 	/**
 	 * Default constructor.
@@ -59,6 +64,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		this.tier = tier;
 		startingUp = new HashMap<MachineDescriptor, Machine>();
 		warmingDown = new HashMap<MachineDescriptor, Machine>();
+		this.threshold = Integer.MAX_VALUE;
 	}
 
 	/**
@@ -105,6 +111,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		if(machine != null){
 			descriptor.setStartTimeInMillis(now());
 			heuristic.addMachine(machine);
+			sentry.config(threshold * heuristic.getNumberOfMachines());
 		}
 	}
 	
@@ -164,9 +171,12 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	/**
 	 * Sets the monitor of the application
 	 * @param monitor the monitor to set
+	 * @param sentry TODO
+	 * @param sentry 
 	 */
-	public void setMonitor(Monitor monitor) {
+	public void setMonitor(Monitor monitor, ServiceEntry sentry) {
 		this.monitor = monitor;
+		this.sentry = sentry;
 	}
 
 	/**
@@ -265,5 +275,11 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	public int hashCode() {
 		return super.hashCode();
 	}
-
+	
+	public void config(int threshold){
+		if(threshold > 0){
+			this.threshold = threshold;
+			sentry.config(threshold * heuristic.getNumberOfMachines());
+		}
+	}
 }

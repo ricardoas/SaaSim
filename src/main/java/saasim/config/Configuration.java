@@ -60,6 +60,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	private SimulationInfo simulationInfo;
 	private Simulator application;
 	private Provider[] providers;
+	private Contract[] contracts;
 	private User[] users;
 	private AccountingSystem accountingSystem;
 	private DPSInfo dpsInfo;
@@ -94,6 +95,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 				instance.scheduler.reset(instance.simulationInfo.getCurrentDayInMillis(), instance.simulationInfo.getCurrentDayInMillis() + TimeUnit.DAY.getMillis());
 				instance.application = (Simulator) in.readObject();
 				instance.providers = (Provider[]) in.readObject();
+				instance.contracts = (Contract[]) in.readObject();
 				instance.users = (User[]) in.readObject();
 				instance.accountingSystem = (AccountingSystem) in.readObject();
 				instance.priorities = (int []) in.readObject();
@@ -108,6 +110,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 			instance.scheduler = new JEEventScheduler(TimeUnit.DAY.getMillis());
 			instance.application = SimulatorFactory.buildSimulator(Configuration.getInstance().getScheduler());
 			instance.providers = Configuration.getInstance().readProviders();
+			instance.contracts = Configuration.getInstance().readContracts();
 			instance.users = Configuration.getInstance().readUsers();
 			instance.accountingSystem = new AccountingSystem(instance.users, instance.providers);
 			instance.priorities = new int[instance.users.length];
@@ -141,7 +144,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	public void save(){
 		assert instance != null;
 		
-		JECheckpointer.save(scheduler, simulationInfo, application, providers, users, accountingSystem, priorities, dpsInfo);
+		JECheckpointer.save(scheduler, simulationInfo, application, providers, contracts, users, accountingSystem, priorities, dpsInfo);
 	}
 
 	/**
@@ -287,26 +290,12 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	 */
 	public User[] readUsers() throws ConfigurationException{
 		int numberOfPlans = getInt(NUMBER_OF_PLANS);
-		String[] planNames = getStringArray(PLAN_NAME);
-		int[] priorities = getIntegerArray(PLAN_PRIORITY);
-		double[] prices = getDoubleArray(PLAN_PRICE);
-		double[] setupCosts = getDoubleArray(PLAN_SETUP);
-		long[] cpuLimitsInHours = getLongArray(PLAN_CPU_LIMIT);
-		double[] extraCpuCostsPerHour = getDoubleArray(PLAN_EXTRA_CPU_COST);
-		long[][] planTransferLimitsInBytes = DataUnit.convert(getLong2DArray(PLAN_TRANSFER_LIMIT), MB, B);
-		double[][] transferCostsPerBytes = DataUnit.convert(getDouble2DArray(PLAN_EXTRA_TRANSFER_COST), B, MB);
-		long[] storageLimitsInBytes = DataUnit.convert(getLongArray(PLAN_STORAGE_LIMIT), MB, B);
-		double[] storageCostsPerBytes = DataUnit.convert(getDoubleArray(PLAN_EXTRA_STORAGE_COST), B, MB);
+		
+		readContracts();
 		
 		Map<String, Contract> contractsPerName = new HashMap<String, Contract>();
 		for(int i = 0; i < numberOfPlans; i++){
-			if(planTransferLimitsInBytes[i].length != transferCostsPerBytes[i].length - 1){
-				throw new ConfigurationException("Check values of " + PLAN_TRANSFER_LIMIT + " and " + PLAN_EXTRA_TRANSFER_COST);
-			}
-			contractsPerName.put(planNames[i], 
-					new Contract(planNames[i], priorities[i], setupCosts[i], prices[i], 
-							cpuLimitsInHours[i], extraCpuCostsPerHour[i], planTransferLimitsInBytes[i], transferCostsPerBytes[i],
-							storageLimitsInBytes[i], storageCostsPerBytes[i]));
+			contractsPerName.put(contracts[i].getName(),contracts[i]);
 		}
 		
 		int numberOfUsers = getInt(SAAS_NUMBER_OF_USERS);
@@ -323,6 +312,35 @@ public class Configuration extends ComplexPropertiesConfiguration{
 			users[i] = new User(i, contractsPerName.get(plans[i]), storageInBytes[i]);
 		}
 		return users;
+	}
+
+	private Contract[] readContracts() throws ConfigurationException {
+		
+		int numberOfPlans = getInt(NUMBER_OF_PLANS);
+		
+		Contract[] contracts = new Contract[numberOfPlans];
+		
+		String[] planNames = getStringArray(PLAN_NAME);
+		int[] priorities = getIntegerArray(PLAN_PRIORITY);
+		double[] prices = getDoubleArray(PLAN_PRICE);
+		double[] setupCosts = getDoubleArray(PLAN_SETUP);
+		long[] cpuLimitsInHours = getLongArray(PLAN_CPU_LIMIT);
+		double[] extraCpuCostsPerHour = getDoubleArray(PLAN_EXTRA_CPU_COST);
+		long[][] planTransferLimitsInBytes = DataUnit.convert(getLong2DArray(PLAN_TRANSFER_LIMIT), MB, B);
+		double[][] transferCostsPerBytes = DataUnit.convert(getDouble2DArray(PLAN_EXTRA_TRANSFER_COST), B, MB);
+		long[] storageLimitsInBytes = DataUnit.convert(getLongArray(PLAN_STORAGE_LIMIT), MB, B);
+		double[] storageCostsPerBytes = DataUnit.convert(getDoubleArray(PLAN_EXTRA_STORAGE_COST), B, MB);
+
+		for(int i = 0; i < numberOfPlans; i++){
+			if(planTransferLimitsInBytes[i].length != transferCostsPerBytes[i].length - 1){
+				throw new ConfigurationException("Check values of " + PLAN_TRANSFER_LIMIT + " and " + PLAN_EXTRA_TRANSFER_COST);
+			}
+			Contract plan = new Contract(planNames[i], priorities[i], setupCosts[i], prices[i], 
+					cpuLimitsInHours[i], extraCpuCostsPerHour[i], planTransferLimitsInBytes[i], transferCostsPerBytes[i],
+					storageLimitsInBytes[i], storageCostsPerBytes[i]);
+			contracts [i] = plan;
+		}
+		return contracts;
 	}
 
 	private void verifyProperties() throws ConfigurationException{
@@ -602,5 +620,9 @@ public class Configuration extends ComplexPropertiesConfiguration{
 
 	public AccountingSystem getAccountingSystem() {
 		return this.accountingSystem;
+	}
+
+	public Contract[] getContracts() {
+		return this.contracts;
 	}
 }
