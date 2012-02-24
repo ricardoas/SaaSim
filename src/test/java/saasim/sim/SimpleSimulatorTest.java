@@ -483,7 +483,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.expect(monitor.isOptimal()).andReturn(false);
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
-		loadBalancer.setMonitor(monitor);
+		loadBalancer.setMonitor(monitor, null);
 		
 		EasyMock.replay(monitor, loadBalancer, scheduler);
 		
@@ -524,7 +524,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.expect(monitor.isOptimal()).andReturn(false);
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
-		loadBalancer.setMonitor(monitor);
+		loadBalancer.setMonitor(monitor, null);
 		
 		EasyMock.replay(monitor, loadBalancer, scheduler);
 		
@@ -567,7 +567,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.expect(monitor.isOptimal()).andReturn(false);
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
-		loadBalancer.setMonitor(monitor);
+		loadBalancer.setMonitor(monitor, null);
 		
 		EasyMock.replay(monitor, loadBalancer, scheduler);
 		
@@ -603,7 +603,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		scheduler.start();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
-		loadBalancer.setMonitor(EasyMock.isA(Monitor.class));
+		loadBalancer.setMonitor(EasyMock.isA(Monitor.class), null);
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		EasyMock.expect(monitor.isOptimal()).andReturn(false);
@@ -643,7 +643,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		scheduler.start();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
-		loadBalancer.setMonitor(EasyMock.isA(Monitor.class));
+		loadBalancer.setMonitor(EasyMock.isA(Monitor.class), null);
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		EasyMock.expect(monitor.isOptimal()).andReturn(false);

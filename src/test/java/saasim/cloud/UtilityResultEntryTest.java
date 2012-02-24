@@ -12,7 +12,7 @@ public class UtilityResultEntryTest extends CleanConfigurationTest {
 	
 	@Test
 	public void testConstructWithEmptyUsersAndProviders(){
-		UtilityResultEntry entry = new UtilityResultEntry(999, new User[]{}, new Provider[]{});
+		UtilityResultEntry entry = new UtilityResultEntry(999, new Contract[]{}, new User[]{}, new Provider[]{});
 		assertEquals(999, entry.getTime());
 		assertEquals(0, entry.getCost(), 0.00001);
 		assertEquals(0, entry.getReceipt(), 0.00001);
@@ -22,21 +22,21 @@ public class UtilityResultEntryTest extends CleanConfigurationTest {
 	
 	@Test
 	public void testCompareToWithEqualTimes(){
-		UtilityResultEntry entry = new UtilityResultEntry(0, new User[]{}, new Provider[]{});
-		UtilityResultEntry entry2 = new UtilityResultEntry(0, new User[]{}, new Provider[]{});
+		UtilityResultEntry entry = new UtilityResultEntry(0, new Contract[]{}, new User[]{}, new Provider[]{});
+		UtilityResultEntry entry2 = new UtilityResultEntry(0, new Contract[]{}, new User[]{}, new Provider[]{});
 		
 		assertEquals(0, entry.compareTo(entry2));
 		
-		entry = new UtilityResultEntry(10000, new User[]{}, new Provider[]{});
-		entry2 = new UtilityResultEntry(10000, new User[]{}, new Provider[]{});
+		entry = new UtilityResultEntry(10000, new Contract[]{}, new User[]{}, new Provider[]{});
+		entry2 = new UtilityResultEntry(10000, new Contract[]{}, new User[]{}, new Provider[]{});
 		
 		assertEquals(0, entry.compareTo(entry2));
 	}
 	
 	@Test
 	public void testCompareToWithDifferentTimes(){
-		UtilityResultEntry entry = new UtilityResultEntry(0, new User[]{}, new Provider[]{});
-		UtilityResultEntry entry2 = new UtilityResultEntry(1, new User[]{}, new Provider[]{});
+		UtilityResultEntry entry = new UtilityResultEntry(0, new Contract[]{}, new User[]{}, new Provider[]{});
+		UtilityResultEntry entry2 = new UtilityResultEntry(1, new Contract[]{}, new User[]{}, new Provider[]{});
 		
 		assertEquals(-1, entry.compareTo(entry2));
 		assertEquals(1, entry2.compareTo(entry));
@@ -94,7 +94,7 @@ public class UtilityResultEntryTest extends CleanConfigurationTest {
 //		Provider[] providers = new Provider[1];
 //		providers[0] = provider;
 //		
-//		UtilityResultEntry entry = new UtilityResultEntry(0, new User[]{}, providers);
+//		UtilityResultEntry entry = new UtilityResultEntry(0, new Contract[]{}, new User[]{}, providers);
 //		double inCost = 111.999;
 //		double outCost = 0.9999;
 //		entry.addTransferenceToCost(0, 10000, inCost, 2000, outCost);
@@ -117,7 +117,7 @@ public class UtilityResultEntryTest extends CleanConfigurationTest {
 //		Provider[] providers = new Provider[1];
 //		providers[0] = provider;
 //		
-//		UtilityResultEntry entry = new UtilityResultEntry(0, new User[]{}, providers);
+//		UtilityResultEntry entry = new UtilityResultEntry(0, new Contract[]{}, new User[]{}, providers);
 //		double inCost = 111.999;
 //		double outCost = 0.9999;
 //		entry.addTransferenceToCost(1, 10000, inCost, 2000, outCost);
@@ -134,7 +134,7 @@ public class UtilityResultEntryTest extends CleanConfigurationTest {
 //		Provider[] providers = new Provider[1];
 //		providers[0] = provider;
 //		
-//		UtilityResultEntry entry = new UtilityResultEntry(0, new User[]{}, providers);
+//		UtilityResultEntry entry = new UtilityResultEntry(0, new Contract[]{}, new User[]{}, providers);
 //		double onDemandCost = 1.23;
 //		double reservedCost = 2.99;
 //		double monitoringCost = 3.87;
@@ -196,8 +196,8 @@ public class UtilityResultEntryTest extends CleanConfigurationTest {
 	
 	@Test
 	public void testHashCodeEqualsConsistencyWithSameTime() {
-		UtilityResultEntry entry = new UtilityResultEntry(2, new User[]{}, new Provider[]{});
-		UtilityResultEntry entryClone = new UtilityResultEntry(2, new User[]{}, new Provider[]{});
+		UtilityResultEntry entry = new UtilityResultEntry(2, new Contract[]{}, new User[]{}, new Provider[]{});
+		UtilityResultEntry entryClone = new UtilityResultEntry(2, new Contract[]{}, new User[]{}, new Provider[]{});
 		assertTrue(entry.equals(entry));
 		assertTrue(entry.equals(entryClone));
 		assertTrue(entryClone.equals(entry));
@@ -206,8 +206,8 @@ public class UtilityResultEntryTest extends CleanConfigurationTest {
 	
 	@Test
 	public void testHashCodeEqualsConsistencyWithDifferentTime() {
-		UtilityResultEntry entry1 = new UtilityResultEntry(2, new User[]{}, new Provider[]{});
-		UtilityResultEntry entry2 = new UtilityResultEntry(10, new User[]{}, new Provider[]{});
+		UtilityResultEntry entry1 = new UtilityResultEntry(2, new Contract[]{}, new User[]{}, new Provider[]{});
+		UtilityResultEntry entry2 = new UtilityResultEntry(10, new Contract[]{}, new User[]{}, new Provider[]{});
 		assertFalse(entry1.equals(entry2));
 		assertFalse(entry2.equals(entry1));
 		assertFalse(entry1.hashCode() == entry2.hashCode());
@@ -215,13 +215,13 @@ public class UtilityResultEntryTest extends CleanConfigurationTest {
 	
 	@Test(expected=AssertionError.class)
 	public void testEqualsConsistencyWithNullObject() {
-		UtilityResultEntry entry1 = new UtilityResultEntry(2, new User[]{}, new Provider[]{});
+		UtilityResultEntry entry1 = new UtilityResultEntry(2, new Contract[]{}, new User[]{}, new Provider[]{});
 		entry1.equals(null);
 	}
 	
 	@Test(expected=AssertionError.class)
 	public void testEqualsConsistencyWithAnotherClassObject() {
-		UtilityResultEntry entry1 = new UtilityResultEntry(2, new User[]{}, new Provider[]{});
+		UtilityResultEntry entry1 = new UtilityResultEntry(2, new Contract[]{}, new User[]{}, new Provider[]{});
 		entry1.equals(new MachineDescriptor(0, false, MachineType.M1_SMALL, 0));
 	}
 }

@@ -39,7 +39,7 @@ public class AccountingSystemTest extends ValidConfigurationTest {
 	 */
 	@Test(expected=AssertionError.class)
 	public void testAccountPartialUtility() {
-		Configuration.getInstance().getAccountingSystem().accountPartialUtility(0, null, null);
+		Configuration.getInstance().getAccountingSystem().accountPartialUtility(0, null, null, null);
 	}
 
 	/**

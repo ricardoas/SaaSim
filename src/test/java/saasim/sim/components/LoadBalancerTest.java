@@ -185,7 +185,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		
 		//Load balancer being constructed without machines!
 		LoadBalancer lb = new LoadBalancer(Configuration.getInstance().getScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 1);
-		lb.setMonitor(dps);
+		lb.setMonitor(dps, null);
 //		lb.handleEvent(event);
 		lb.handleNewRequest(request);
 		
@@ -217,7 +217,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		EasyMock.replay(schedulingHeuristic, monitor);
 		
 		LoadBalancer lb = new LoadBalancer(Configuration.getInstance().getScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 0);
-		lb.setMonitor(monitor);
+		lb.setMonitor(monitor, null);
 		
 		lb.addMachine(descriptor, true);
 		lb.addMachine(descriptor2, true);
@@ -270,7 +270,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, schedulingHeuristic, machine);
 		
 		LoadBalancer lb = new LoadBalancer(Configuration.getInstance().getScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 0);
-		lb.setMonitor(monitor);
+		lb.setMonitor(monitor, null);
 		lb.addMachine(machineDescriptor, false);
 		lb.removeMachine(false);
 		
@@ -291,7 +291,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, schedulingHeuristic, request);
 		
 		LoadBalancer lb = new LoadBalancer(Configuration.getInstance().getScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 0);
-		lb.setMonitor(monitor);
+		lb.setMonitor(monitor, null);
 		
 //		lb.handleEvent(new JEEvent(JEEventType.REQUESTQUEUED, lb, 0l, request));
 		lb.requestWasQueued(request);
@@ -312,7 +312,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, schedulingHeuristic);
 		
 		LoadBalancer lb = new LoadBalancer(Configuration.getInstance().getScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 0);
-		lb.setMonitor(monitor);
+		lb.setMonitor(monitor, null);
 		lb.estimateServers(0);
 		
 		assertEquals(0, captured.getValue().averageUtilisation, 0.00001);
@@ -340,7 +340,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, schedulingHeuristic);
 		
 		LoadBalancer lb = new LoadBalancer(Configuration.getInstance().getScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 0);
-		lb.setMonitor(monitor);
+		lb.setMonitor(monitor, null);
 		lb.addMachine(descriptor1, false);
 		lb.addMachine(descriptor2, false);
 		lb.addMachine(descriptor3, false);
