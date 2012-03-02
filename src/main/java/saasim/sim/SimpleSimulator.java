@@ -167,10 +167,11 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	}
 
 	public boolean isOverloaded(long arrivalTime) {
+		
 		if(arrivalTime - lastArrival > MILLIS){
 			lastArrival = (arrivalTime/1000) * 1000;
-			arrivalRate = 0;
 			peakArrivalRate = Math.max(peakArrivalRate, arrivalRate);
+			arrivalRate = 0;
 		}
 		return ++arrivalRate > threshold;
 	}
