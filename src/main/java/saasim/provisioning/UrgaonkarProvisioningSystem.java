@@ -42,7 +42,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 	
 	private UrgaonkarStatistics [] stat;
 	private UrgaonkarHistory last;
-	private MachineType type;
+	protected MachineType type;
 	private int windowSize;
 	private double percentile;
 	private int lost;
@@ -143,17 +143,8 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 				
 			}else if(serversToAdd < 0){
 				
-				normalizedServersToAdd = (int) Math.ceil(1.0*serversToAdd/type.getNumberOfCores());
-				
-				if(-normalizedServersToAdd >= statistics.totalNumberOfServers){
-					normalizedServersToAdd = 1-statistics.totalNumberOfServers;
-				}
-				
-				normalizedServersToAdd = -Math.min(-normalizedServersToAdd, availableToTurnOff.size());
-				
-				for (int i = 0; i < -normalizedServersToAdd; i++) {
-					configurable.removeMachine(tier,  availableToTurnOff.poll(), false);
-				}
+				normalizedServersToAdd = removeMachine(statistics, tier,
+						availableToTurnOff, serversToAdd);
 			}
 			
 			int sentryLimit = (int)Math.ceil(lambdaPeak * (statistics.totalNumberOfServers + normalizedServersToAdd));
@@ -189,17 +180,8 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 				serversToAdd = (int) Math.ceil(observed/lambdaPeak) - statistics.totalNumberOfServers*type.getNumberOfCores();
 				
 				if(serversToAdd < 0){
-					normalizedServersToAdd = (int) Math.ceil(1.0*serversToAdd/type.getNumberOfCores());
-
-					if(-normalizedServersToAdd >= statistics.totalNumberOfServers){
-						normalizedServersToAdd = 1-statistics.totalNumberOfServers;
-					}
-					
-					normalizedServersToAdd = -Math.min(-normalizedServersToAdd, availableToTurnOff.size());
-
-					for (int i = 0; i < -normalizedServersToAdd; i++) {
-						configurable.removeMachine(tier,  availableToTurnOff.poll(), false);
-					}
+					normalizedServersToAdd = removeMachine(statistics, tier,
+							availableToTurnOff, serversToAdd);
 				}
 
 			}
@@ -211,6 +193,11 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 			log.debug(String.format("STAT-URGAONKAR REAC %d %d %d %f %f %f %f %d %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRateInLastIntervalInTier(reactiveTickInSeconds), correctedPredictedArrivalRate, correctedPredictedArrivalRate, lost, after, sentryLimit, statistics));
 		}
 		list.add(availableToTurnOff);
+	}
+
+	protected int removeMachine(MachineStatistics statistics, int tier,
+			LinkedList<MachineDescriptor> availableToTurnOff, int serversToAdd) {
+		return 0;
 	}
 	
 	/**

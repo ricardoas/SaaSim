@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>br.edu.ufcg.lsd</groupId>
 	<artifactId>saasim</artifactId>
-	<version>0.0.3-SNAPSHOT</version>
+	<version>0.0.4-SNAPSHOT</version>
 	<name>SaaSim</name>
 	<description>SaaS Application Simulator</description>
 	<properties>

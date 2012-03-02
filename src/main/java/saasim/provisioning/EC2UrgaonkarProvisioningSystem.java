@@ -4,6 +4,7 @@ import java.util.LinkedList;
 
 import saasim.provisioning.util.DPSInfo;
 import saasim.sim.components.MachineDescriptor;
+import saasim.sim.provisioningheuristics.MachineStatistics;
 import saasim.util.TimeUnit;
 
 
@@ -29,5 +30,23 @@ public class EC2UrgaonkarProvisioningSystem extends UrgaonkarProvisioningSystem 
 		}
 		return machineList;
 	}
+	
+	protected int removeMachine(MachineStatistics statistics, int tier,
+			LinkedList<MachineDescriptor> availableToTurnOff, int serversToAdd) {
+		int normalizedServersToAdd;
+		normalizedServersToAdd = (int) Math.ceil(1.0*serversToAdd/type.getNumberOfCores());
+
+		if(-normalizedServersToAdd >= statistics.totalNumberOfServers){
+			normalizedServersToAdd = 1-statistics.totalNumberOfServers;
+		}
+		
+		normalizedServersToAdd = -Math.min(-normalizedServersToAdd, availableToTurnOff.size());
+
+		for (int i = 0; i < -normalizedServersToAdd; i++) {
+			configurable.removeMachine(tier,  availableToTurnOff.poll(), false);
+		}
+		return normalizedServersToAdd;
+	}
+
 	
 }
