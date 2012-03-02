@@ -247,7 +247,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 
 	@Override
 	public void config(int requestAcceptanceRate) {
-		if(threshold > 0){
+		if(requestAcceptanceRate > 0){
 			this.threshold = requestAcceptanceRate;
 		}
 	}
