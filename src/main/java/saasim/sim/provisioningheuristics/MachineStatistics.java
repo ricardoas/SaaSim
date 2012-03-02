@@ -41,6 +41,7 @@ public class MachineStatistics implements Serializable{
 	
 	public double averageST;
 	private double SSD_ST;
+	public double peakArrivalRate;
 	
 	
 	
@@ -199,5 +200,9 @@ public class MachineStatistics implements Serializable{
 	public void resetPerTickStatistics() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public double getPeakArrivalRateInTier() {
+		return peakArrivalRate;
 	}
 }

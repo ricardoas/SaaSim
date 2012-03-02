@@ -144,11 +144,13 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	 * @param now the actual time
 	 * @param timeInterval TODO the interval to collect statistics
 	 * @param numberOfRequests total number of requests submitted to the system (A<sub>0</sub>)
+	 * @param peakArrivalRate Peak arrival rate during last session
 	 */
-	public void collectStatistics(long now, long timeInterval, int numberOfRequests) {
+	public void collectStatistics(long now, long timeInterval, int numberOfRequests, int peakArrivalRate) {
 		MachineStatistics statistics = heuristic.getStatistics(now);
 		statistics.requestArrivals += numberOfRequests;
 		statistics.observationPeriod = timeInterval / TimeUnit.SECOND.getMillis();
+		statistics.peakArrivalRate = peakArrivalRate;
 		monitor.sendStatistics(now, statistics, tier);
 	}
 

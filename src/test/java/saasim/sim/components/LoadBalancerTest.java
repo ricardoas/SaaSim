@@ -231,7 +231,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		lb.serverIsUp(descriptor2);
 		
 		//Calculating utilisation
-		lb.collectStatistics(evaluationTime, 300000, 0);
+		lb.collectStatistics(evaluationTime, 300000, 0, 0);
 		EasyMock.verify(schedulingHeuristic, monitor);
 	}
 	

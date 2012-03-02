@@ -45,7 +45,7 @@ public class UrgaonkarStatistics implements Serializable{
 	 */
 	public void add(MachineStatistics statistics) {
 		
-		arrivalRate[index++ % arrivalRate.length] = statistics.getArrivalRateInTier(predictionTick);
+		arrivalRate[index++ % arrivalRate.length] = statistics.getPeakArrivalRateInTier();
 		
 		lambdaPeak = (statistics.averageST + (statistics.calcVarST() + statistics.calcVarIAT())/(2 * (1.0*maxRT - statistics.averageST)));
 		

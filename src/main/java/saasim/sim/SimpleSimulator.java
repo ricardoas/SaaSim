@@ -50,6 +50,8 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 
 	private int threshold;
 
+	private int peakArrivalRate;
+
 	/**
 	 * Default constructor.
 	 * @param scheduler A {@link JEEventScheduler} to represent a scheduler of {@link SimpleSimulator}.
@@ -133,8 +135,9 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	public void collectStatistics(){
 		long time = getScheduler().now();
 		for (LoadBalancer loadBalancer : tiers) {
-			loadBalancer.collectStatistics(time, monitoringInterval, numberOfRequests);
+			loadBalancer.collectStatistics(time, monitoringInterval, numberOfRequests, peakArrivalRate);
 		}
+		peakArrivalRate = 0;
 		numberOfRequests = 0;
 		send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)));
 	}
@@ -167,6 +170,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 		if(arrivalTime - lastArrival > MILLIS){
 			lastArrival = (arrivalTime/1000) * 1000;
 			arrivalRate = 0;
+			peakArrivalRate = Math.max(peakArrivalRate, arrivalRate);
 		}
 		return ++arrivalRate > threshold;
 	}
