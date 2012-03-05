@@ -143,14 +143,14 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 	 * @return The number of machines to buy, if positive, or to release, otherwise. 
 	 */
 	protected int evaluateNumberOfServersForNextInterval(MachineStatistics statistics) {
-		assert statistics.totalNumberOfServers != 0;
+		assert statistics.totalNumberOfActiveServers != 0;
 		assert statistics.requestCompletions != 0;
 		
 		double d = statistics.averageUtilisation / statistics.requestCompletions;
 		
 		double u_lign = Math.max(statistics.requestArrivals, statistics.requestCompletions) * d;
-		int newNumberOfServers = (int) Math.ceil( u_lign * statistics.totalNumberOfServers / targetUtilisation );
+		int newNumberOfServers = (int) Math.ceil( u_lign * statistics.totalNumberOfActiveServers / targetUtilisation );
 		
-		return Math.max(1, newNumberOfServers) - statistics.totalNumberOfServers;
+		return Math.max(1, newNumberOfServers) - statistics.totalNumberOfActiveServers;
 	}
 }

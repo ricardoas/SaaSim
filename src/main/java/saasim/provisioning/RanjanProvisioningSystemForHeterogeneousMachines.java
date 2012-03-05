@@ -54,14 +54,14 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 		}
 		
 		double u_lign = Math.max(statistics.requestArrivals, statistics.requestCompletions) * d;
-		long newNumberOfServers = (int)Math.ceil( statistics.totalNumberOfServers * u_lign / TARGET_UTILIZATION );
+		long newNumberOfServers = (int)Math.ceil( statistics.totalNumberOfActiveServers * u_lign / TARGET_UTILIZATION );
 		
-		long numberOfServersToAdd = (newNumberOfServers - statistics.totalNumberOfServers);
+		long numberOfServersToAdd = (newNumberOfServers - statistics.totalNumberOfActiveServers);
 		if(numberOfServersToAdd != 0){
 			return numberOfServersToAdd;
 		}
 		if(statistics.requestArrivals > 0 && 
-				statistics.totalNumberOfServers == 0){
+				statistics.totalNumberOfActiveServers == 0){
 			return 1l;
 		}
 		return numberOfServersToAdd;

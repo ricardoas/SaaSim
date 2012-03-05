@@ -104,7 +104,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 		this.currentTick += tick;
 		
 		//Calculating number of machines!
-		evaluateNumberOfServersToAdd(tier, statistics.totalNumberOfServers);
+		evaluateNumberOfServersToAdd(tier, statistics.totalNumberOfActiveServers);
 	}
 	
 	private void countData(Request request, long currentTime) {

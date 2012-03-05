@@ -66,4 +66,6 @@ public interface Machine extends JEEventHandler{
 	 * Cancels the shutdown of {@link Machine}.
 	 */
 	void cancelShutdown();
+
+	void shutdownNow();
 }

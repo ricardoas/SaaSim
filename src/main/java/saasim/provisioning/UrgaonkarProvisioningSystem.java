@@ -28,6 +28,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 	private static final String PROP_MACHINE_TYPE = "dps.urgaonkar.type";
 	private static final String PROP_REACTIVE_THRESHOLD = "dps.urgaonkar.reactive.threshold";
 	private static final String PROP_RESPONSE_TIME = "dps.urgaonkar.responsetime";
+	private static final String PROP_FORCE_SHUTDOWN = "dps.urgaonkar.forceshutdown";
 	
 	private static int DEFAULT_PREDICTION_WINDOW_SIZE = 5;
 	private static final double DEFAULT_PERCENTILE = 95.0;
@@ -51,6 +52,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 	private double correctedPredictedArrivalRate;
 	
 	private LinkedList<LinkedList<MachineDescriptor>> list;
+	protected boolean forceShutdown;
 
 
 	/**
@@ -66,6 +68,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 		reactiveTickInSeconds = Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)/TimeUnit.SECOND.getMillis();
 		windowSize = Configuration.getInstance().getInt(PROP_PREDICTION_WINDOW_SIZE, DEFAULT_PREDICTION_WINDOW_SIZE);
 		percentile = Configuration.getInstance().getDouble(PROP_PERCENTILE, DEFAULT_PERCENTILE);
+		forceShutdown = Configuration.getInstance().getBoolean(PROP_FORCE_SHUTDOWN, false);
 		
 		DPSInfo info = loadDPSInfo();
 		
@@ -127,7 +130,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 			
 			correctedPredictedArrivalRate = last.applyError(predictedArrivalRate);
 			
-			int serversToAdd = (int) Math.ceil(correctedPredictedArrivalRate/lambdaPeak) - statistics.totalNumberOfServers*type.getNumberOfCores();
+			int serversToAdd = (int) Math.ceil(correctedPredictedArrivalRate/lambdaPeak) - (statistics.totalNumberOfActiveServers+statistics.startingUpServers)*type.getNumberOfCores();
 			
 			
 			if(serversToAdd > 0){
@@ -143,11 +146,20 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 				
 			}else if(serversToAdd < 0){
 				
-				normalizedServersToAdd = removeMachine(statistics, tier,
-						availableToTurnOff, serversToAdd);
+				normalizedServersToAdd = (int) Math.ceil(1.0*serversToAdd/type.getNumberOfCores());
+
+				if(-normalizedServersToAdd >= statistics.totalNumberOfActiveServers){
+					normalizedServersToAdd = 1-statistics.totalNumberOfActiveServers;
+				}
+				
+				normalizedServersToAdd = -Math.min(-normalizedServersToAdd, availableToTurnOff.size());
+
+				for (int i = 0; i < -normalizedServersToAdd; i++) {
+					configurable.removeMachine(tier,  availableToTurnOff.poll(), forceShutdown);
+				}
 			}
 			
-			int sentryLimit = (int)Math.ceil(lambdaPeak * (statistics.totalNumberOfServers + normalizedServersToAdd));
+			int sentryLimit = (int)Math.ceil(lambdaPeak * (statistics.totalNumberOfActiveServers + normalizedServersToAdd));
 			
 			configurable.config(0, sentryLimit);
 			
@@ -159,9 +171,9 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 			double observed = statistics.getArrivalRateInLastIntervalInTier(reactiveTickInSeconds);
 			
 			int serversToAdd = 0;
-			if (observed/(lambdaPeak * statistics.totalNumberOfServers) > threshold){
+			if (observed/(lambdaPeak * statistics.totalNumberOfActiveServers) > threshold){
 				
-				serversToAdd = (int) Math.ceil(observed/lambdaPeak) - statistics.totalNumberOfServers*type.getNumberOfCores();
+				serversToAdd = (int) Math.ceil(observed/lambdaPeak) - (statistics.totalNumberOfActiveServers+statistics.startingUpServers)*type.getNumberOfCores();
 				
 				serversToAdd = Math.max(1, serversToAdd);
 				
@@ -175,18 +187,17 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 					availableToTurnOff.addAll(machines);
 				}
 				
-			}else if( observed/(lambdaPeak * statistics.totalNumberOfServers) < threshold ){
+			}else if( observed/(lambdaPeak * statistics.totalNumberOfActiveServers) < threshold ){
 				
-				serversToAdd = (int) Math.ceil(observed/lambdaPeak) - statistics.totalNumberOfServers*type.getNumberOfCores();
+				serversToAdd = (int) Math.ceil(observed/lambdaPeak) - statistics.totalNumberOfActiveServers*type.getNumberOfCores();
 				
 				if(serversToAdd < 0){
-					normalizedServersToAdd = removeMachine(statistics, tier,
-							availableToTurnOff, serversToAdd);
+					normalizedServersToAdd = removeMachine(statistics, tier, availableToTurnOff, serversToAdd);
 				}
 
 			}
 
-			int sentryLimit = (int)Math.ceil(lambdaPeak * (statistics.totalNumberOfServers + normalizedServersToAdd));
+			int sentryLimit = (int)Math.ceil(lambdaPeak * (statistics.totalNumberOfActiveServers + normalizedServersToAdd));
 			
 			configurable.config(0, sentryLimit);
 			

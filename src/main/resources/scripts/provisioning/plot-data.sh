@@ -1,26 +1,21 @@
 #!/bin/bash
 
-for i in user_?.*log; do mv $i user_0${i#*_}; done
+args <- commandArgs(TRUE)
 
-for i in *log; do grep -H UTILITY $i > ${i}.utility; done
+name=args[1]
 
-for i in *log; do grep -H ACCOUNTING $i >> ${i}.accounting; done
+data <- read.table(name)
 
+library("Cairo")
 
+CairoJPEG(filename=paste(name, ".jpeg", sep=""))
 
-a <- (read.table("user_01.properties_config-urgaonkar-2.log.accounting") +
-read.table("user_01.properties_config-urgaonkar-2.log.accounting") +
-read.table("user_01.properties_config-urgaonkar-2.log.accounting") +
-read.table("user_01.properties_config-urgaonkar-2.log.accounting") +
-read.table("user_01.properties_config-urgaonkar-2.log.accounting") +
-read.table("user_01.properties_config-urgaonkar-2.log.accounting") ) /6
+attach(data)
 
-write.table(a, file=args[1])
+plot(V3, ylim=range(data[,3:6]))
+points(V4, ylim=range(data[,3:6]),col="green")
+points(V5, ylim=range(data[,3:6]),col="orange")
+points(V6, ylim=range(data[,3:6]),col="red")
 
-for i in `seq 0 6 36`; do
+dev.off()
 
-	for j in `seq ${i} $((${i}+5))`; do
-		grep -H UTILITY user_${i}.*urgaonkar-1.log > 
-	done
-
-done

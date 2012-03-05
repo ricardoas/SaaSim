@@ -16,7 +16,8 @@ public class MachineStatistics implements Serializable{
 	 */
 	private static final long serialVersionUID = -5595741138385801795L;
 	public double averageUtilisation;
-	public int totalNumberOfServers;
+	public int totalNumberOfActiveServers;
+	public int startingUpServers;
 	public int warmingDownMachines;
 	
 	public double arrivalRate;
@@ -56,7 +57,7 @@ public class MachineStatistics implements Serializable{
 		this.averageUtilisation = averageUtilization;
 		this.requestArrivals = totalRequestsArrivals;
 		this.requestCompletions = totalRequestsCompletions;
-		this.totalNumberOfServers = totalNumberOfServers;
+		this.totalNumberOfActiveServers = totalNumberOfServers;
 		this.lastArrivalTime = 0;
 	}
 
@@ -66,7 +67,8 @@ public class MachineStatistics implements Serializable{
 	
 	public MachineStatistics(MachineStatistics statistics) {
 		this.averageUtilisation = statistics.averageUtilisation;
-		this.totalNumberOfServers = statistics.totalNumberOfServers;
+		this.totalNumberOfActiveServers = statistics.totalNumberOfActiveServers;
+		this.startingUpServers = statistics.startingUpServers;
 		this.warmingDownMachines = statistics.warmingDownMachines;
 		this.arrivalRate = statistics.arrivalRate;
 		this.tier = statistics.tier;
@@ -96,7 +98,7 @@ public class MachineStatistics implements Serializable{
 				* result
 				+ (int) (requestCompletions ^ (requestCompletions >>> 32));
 		result = prime * result
-				+ (int) (totalNumberOfServers ^ (totalNumberOfServers >>> 32));
+				+ (int) (totalNumberOfActiveServers ^ (totalNumberOfActiveServers >>> 32));
 		long temp;
 		temp = Double.doubleToLongBits(averageUtilisation);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
@@ -116,7 +118,7 @@ public class MachineStatistics implements Serializable{
 			return false;
 		if (requestCompletions != other.requestCompletions)
 			return false;
-		if (totalNumberOfServers != other.totalNumberOfServers)
+		if (totalNumberOfActiveServers != other.totalNumberOfActiveServers)
 			return false;
 		if (Double.doubleToLongBits(averageUtilisation) != Double
 				.doubleToLongBits(other.averageUtilisation))
@@ -145,22 +147,23 @@ public class MachineStatistics implements Serializable{
 	@Override
 	public String toString() {
 		return "MachineStatistics [U= " + averageUtilisation
-				+ " , N= " + totalNumberOfServers
-				+ " , N_warmingDown= " + warmingDownMachines
-				+ " , A_0= " + arrivalRate + " , tier= " + tier
-				+ " , T= " + observationPeriod
-				+ " , B= " + totalBusyTime
-				+ " , A_0= "
+				+ " N= " + totalNumberOfActiveServers
+				+ " N_warmingDown= " + warmingDownMachines
+				+ " N_startingUp = " + startingUpServers
+				+ " A_0= " + arrivalRate + " tier= " + tier
+				+ " T= " + observationPeriod
+				+ " B= " + totalBusyTime
+				+ " A_0= "
 				+ requestArrivals
-				+ " , A_i= "
+				+ " A_i= "
 				+ requestArrivalsPerTier
-				+ " , C_0= "
+				+ " C_0= "
 				+ requestCompletions
-				+ " , C_i= "
+				+ " C_i= "
 				+ requestsCompletionsPerTier
-				+ " , averageIAT= "
-				+ averageIAT + " , var_IAT= " + calcVarIAT() + " , averageST= "
-				+ averageST + " , var_ST= " + calcVarST() + " ]";
+				+ " averageIAT= "
+				+ averageIAT + " var_IAT= " + calcVarIAT() + " averageST= "
+				+ averageST + " var_ST= " + calcVarST() + " ]";
 	}
 
 	/**

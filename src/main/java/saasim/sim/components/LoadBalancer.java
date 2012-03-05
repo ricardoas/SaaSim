@@ -151,6 +151,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		statistics.requestArrivals += numberOfRequests;
 		statistics.observationPeriod = timeInterval / TimeUnit.SECOND.getMillis();
 		statistics.peakArrivalRate = peakArrivalRate;
+		statistics.startingUpServers = startingUp.size();
 		monitor.sendStatistics(now, statistics, tier);
 	}
 
@@ -242,7 +243,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		Machine machine = heuristic.removeMachine(descriptor);
 		if(machine != null){
 			if(force){
-				throw new RuntimeException("Not implemented yet!");
+				machine.shutdownNow();
 			}
 			machine.shutdownOnFinish();
 		}

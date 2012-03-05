@@ -35,7 +35,7 @@ public class RoundRobinHeuristicForUrgaonkar extends RoundRobinHeuristic {
 	public MachineStatistics getStatistics(long eventTime) {
 		
 		MachineStatistics statistics = tierStatistics;
-		statistics.totalNumberOfServers = getNumberOfMachines();
+		statistics.totalNumberOfActiveServers = getNumberOfMachines();
 		
 		if( eventTime % predictionTickInMillis == 0 ){
 			resetCounters();

@@ -50,6 +50,8 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	protected Queue<Request> backlog;
 
 	private long maxOnQueue;
+
+	private boolean shutdown;
 	
 	/**
 	 * Default constructor.
@@ -75,6 +77,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		this.maxBacklogSize = Configuration.getInstance().getLong(MACHINE_BACKLOG_SIZE, 0);
 		this.backlog = new LinkedList<Request>();
 		this.maxOnQueue = maxThreads - NUMBER_OF_CORES;
+		this.shutdown = false;
 	}
 	
 	/**
@@ -161,26 +164,32 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 */
 	@JEHandlingPoint(JEEventType.PREEMPTION)
 	public void handlePreemption(long processedDemand, Request request) {
-		this.semaphore.release();
-
-		totalTimeUsedInLastPeriod += processedDemand;
-		totalTimeUsed += processedDemand;
-
-		lastUpdate = now();
-
-		request.update(processedDemand);
-
-		if(request.isFinished()){
-			requestFinished(request);
+		if(!shutdown){
+			this.semaphore.release();
+			
+			totalTimeUsedInLastPeriod += processedDemand;
+			totalTimeUsed += processedDemand;
+			
+			lastUpdate = now();
+			
+			request.update(processedDemand);
+			
+			if(request.isFinished()){
+				requestFinished(request);
+			}else{
+				processorQueue.add(request);
+			}
+			
+			if(!processorQueue.isEmpty() && this.semaphore.tryAcquire()){
+				scheduleNext();
+			}
+			
+			tryToShutdown();
 		}else{
-			processorQueue.add(request);
+			this.semaphore.release();
+			descriptor.updateTransference(request.getRequestSizeInBytes(), 0);
+			send(new JEEvent(JEEventType.REQUESTQUEUED, getLoadBalancer(), now(), request));
 		}
-
-		if(!processorQueue.isEmpty() && this.semaphore.tryAcquire()){
-			scheduleNext();
-		}
-
-		tryToShutdown();
 	}
 	
 	/**
@@ -193,15 +202,9 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 			newRequestToAdd.assignTo(this.descriptor.getType());
 			processorQueue.add(newRequestToAdd);
 		}
-//		if(getScheduler().now() - request.getArrivalTimeInMillis() > 
-//		Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME)){
-//			System.out.println("TimeSharedMachine.requestFinished()");
-//		}
-		//}else{
-			request.setFinishTime(now());
-			descriptor.updateTransference(request.getRequestSizeInBytes(), request.getResponseSizeInBytes());
-			getLoadBalancer().reportRequestFinished(request);
-		//}
+		request.setFinishTime(now());
+		descriptor.updateTransference(request.getRequestSizeInBytes(), request.getResponseSizeInBytes());
+		getLoadBalancer().reportRequestFinished(request);
 	}
 
 	/**
@@ -373,5 +376,13 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 			}
 		}
 		return executionTimes;
+	}
+
+	@Override
+	public void shutdownNow() {
+		shutdown = true;
+		long scheduledTime = now();
+		descriptor.setFinishTimeInMillis(scheduledTime);
+		send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, scheduledTime, descriptor));
 	}
 }

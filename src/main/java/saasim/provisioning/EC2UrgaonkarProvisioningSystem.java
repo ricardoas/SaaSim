@@ -36,14 +36,14 @@ public class EC2UrgaonkarProvisioningSystem extends UrgaonkarProvisioningSystem 
 		int normalizedServersToAdd;
 		normalizedServersToAdd = (int) Math.ceil(1.0*serversToAdd/type.getNumberOfCores());
 
-		if(-normalizedServersToAdd >= statistics.totalNumberOfServers){
-			normalizedServersToAdd = 1-statistics.totalNumberOfServers;
+		if(-normalizedServersToAdd >= statistics.totalNumberOfActiveServers){
+			normalizedServersToAdd = 1-statistics.totalNumberOfActiveServers;
 		}
 		
 		normalizedServersToAdd = -Math.min(-normalizedServersToAdd, availableToTurnOff.size());
 
 		for (int i = 0; i < -normalizedServersToAdd; i++) {
-			configurable.removeMachine(tier,  availableToTurnOff.poll(), false);
+			configurable.removeMachine(tier,  availableToTurnOff.poll(), forceShutdown);
 		}
 		return normalizedServersToAdd;
 	}
