@@ -384,5 +384,10 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		long scheduledTime = now();
 		descriptor.setFinishTimeInMillis(scheduledTime);
 		send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, scheduledTime, descriptor));
+		
+		for (Request request : processorQueue) {
+			descriptor.updateTransference(request.getRequestSizeInBytes(), 0);
+			send(new JEEvent(JEEventType.REQUESTQUEUED, getLoadBalancer(), now(), request));
+		}
 	}
 }
