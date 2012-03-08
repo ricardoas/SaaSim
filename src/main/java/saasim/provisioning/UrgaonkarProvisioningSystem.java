@@ -39,7 +39,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 	private boolean enablePredictive;
 	private boolean enableReactive;
 	private double threshold;
-	private long responseTime;
+	private double responseTime;
 	
 	private UrgaonkarStatistics [] stat;
 	private UrgaonkarHistory last;
@@ -64,7 +64,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 		enableReactive = Configuration.getInstance().getBoolean(PROP_ENABLE_REACTIVE, true);
 		type = MachineType.valueOf(Configuration.getInstance().getString(PROP_MACHINE_TYPE).toUpperCase());
 		threshold = Configuration.getInstance().getDouble(PROP_REACTIVE_THRESHOLD, 1.0);
-		responseTime = Configuration.getInstance().getLong(PROP_RESPONSE_TIME, 1000)/TimeUnit.SECOND.getMillis();
+		responseTime = Configuration.getInstance().getDouble(PROP_RESPONSE_TIME, 1000.0)/TimeUnit.SECOND.getMillis();
 		reactiveTickInSeconds = Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)/TimeUnit.SECOND.getMillis();
 		windowSize = Configuration.getInstance().getInt(PROP_PREDICTION_WINDOW_SIZE, DEFAULT_PREDICTION_WINDOW_SIZE);
 		percentile = Configuration.getInstance().getDouble(PROP_PERCENTILE, DEFAULT_PERCENTILE);
