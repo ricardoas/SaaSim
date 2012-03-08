@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>br.edu.ufcg.lsd</groupId>
 	<artifactId>saasim</artifactId>
-	<version>0.0.4-SNAPSHOT</version>
+	<version>0.0.5-SNAPSHOT</version>
 	<name>SaaSim</name>
 	<description>SaaS Application Simulator</description>
 	<properties>
@@ -29,11 +29,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.jgap</groupId>
-			<artifactId>JGAP</artifactId>
-			<version>3.5</version>
-		</dependency>
-		<dependency>
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-api-easymock</artifactId>
 			<version>1.4.10</version>
@@ -44,6 +39,16 @@
 			<artifactId>powermock-module-junit4</artifactId>
 			<version>1.4.10</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.9</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math</artifactId>
+			<version>2.2</version>
 		</dependency>
 	</dependencies>
 	<build>

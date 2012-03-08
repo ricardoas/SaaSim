@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.jgap.FitnessFunction;
-import org.jgap.Gene;
-import org.jgap.IChromosome;
+//import org.jgap.FitnessFunction;
+//import org.jgap.Gene;
+//import org.jgap.IChromosome;
 
 import saasim.cloud.Contract;
 import saasim.cloud.MachineType;
@@ -30,7 +30,7 @@ import saasim.util.SimulationInfo;
  * 
  * @author David Candeia - davidcmm@lsd.ufcg.edu.br
  */
-public class PlanningFitnessFunction extends FitnessFunction{
+public class PlanningFitnessFunction{// extends FitnessFunction{
 
 	public static final int HOUR_IN_MILLIS = 3600000;
 
@@ -61,110 +61,110 @@ public class PlanningFitnessFunction extends FitnessFunction{
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected double evaluate(IChromosome arg0) {
-		//Since round-robin is used, the total arrival rate is splitted among reserved servers according to each server power
-		Map<MachineType, Integer> currentPowerPerMachineType = new HashMap<MachineType, Integer>();
-		int index = 0;
-		double totalPower = 0;
-		for(Gene gene : arg0.getGenes()){
-			Integer numberOfMachinesReserved = (Integer)gene.getAllele();
-			MachineType type = this.types.get(index);
-			
-			currentPowerPerMachineType.put(type, (int)Math.round(1.0 * numberOfMachinesReserved * type.getNumberOfCores()));
-			totalPower += Math.round(1.0 * numberOfMachinesReserved * type.getNumberOfCores());
-			index++;
-		}
-		
-		Map<MachineType, Double> totalRequestsFinished = new HashMap<MachineType, Double>();
-		long requestsLostDueToResponseTime = 0;
-		long requestsLostDueToThroughput = 0;
-		double ratesDifference = 0d;
-		double accumulatedRequestsMeanServiceTime = 0d;
-		
-		int currentSummaryInterval = 0;
-		int totalNumberOfIntervals = calcNumberOfIntervals();
-		long maxResponseTimeInMillis = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME);
-		
-		while(currentSummaryInterval < totalNumberOfIntervals){
-			
-			double arrivalRate = aggregateArrivals(currentSummaryInterval);
-			double meanServiceTimeInMillis = aggregateServiceDemand(currentSummaryInterval);
-			accumulatedRequestsMeanServiceTime += meanServiceTimeInMillis;
-			
-			//Calculating arrival rates per machine type
-			Map<MachineType, Double> arrivalRatesPerMachineType = extractArrivalsPerMachineType(currentPowerPerMachineType, totalPower, arrivalRate);
-			
-			//Assuming a base computing power (e.g., EC2 unit for each core)
-			Map<MachineType, Double> throughputPerMachineType = new HashMap<MachineType, Double>();
-			double reservedThroughput = 0d;
-			double missingThroughput = 0d;
-			for(MachineType type : arrivalRatesPerMachineType.keySet()){
-				Double currentArrivalRate = arrivalRatesPerMachineType.get(type);
-				double maximumThroughput = (1 / (meanServiceTimeInMillis/1000)) * type.getNumberOfCores();//Using all cores
-				if(currentArrivalRate > maximumThroughput){//Requests are missed
-					throughputPerMachineType.put(type, maximumThroughput);
-					missingThroughput += (currentArrivalRate - maximumThroughput);
-					reservedThroughput += maximumThroughput;
-					
-					Double totalFinished = totalRequestsFinished.get(type);
-					if(totalFinished == null){
-						totalFinished = 0d;
-					}
-					totalFinished += Math.round(maximumThroughput * SUMMARY_LENGTH_IN_SECONDS);
-					totalRequestsFinished.put(type, totalFinished);
-					
-				}else{//All requests are attended!
-					throughputPerMachineType.put(type, currentArrivalRate);
-					reservedThroughput += currentArrivalRate;
-					
-					Double totalFinished = totalRequestsFinished.get(type);
-					if(totalFinished == null){
-						totalFinished = 0d;
-					}
-					totalFinished += Math.round(currentArrivalRate * SUMMARY_LENGTH_IN_SECONDS);
-					totalRequestsFinished.put(type, totalFinished);
-				}
-			}
-			
-			if(reservedThroughput == 0){//No arrival at reserved machines!
-				missingThroughput = arrivalRate;
-			}
-			
-			//Calculating missing requests. This value is amortized by queue size!
-			long requestsMissed = Math.round(missingThroughput * SUMMARY_LENGTH_IN_SECONDS);
-			if(ratesDifference == 0 && reservedThroughput != 0){//Queue starts at this interval, so some requests are not really missed!
-				requestsMissed -= (maxResponseTimeInMillis / meanServiceTimeInMillis) * totalPower;
-			}
-			ratesDifference = missingThroughput;
-			requestsLostDueToThroughput += requestsMissed;
-			
-			//Estimated response time
-			double totalNumberOfUsers = aggregateNumberOfUsers(currentSummaryInterval) * (reservedThroughput / arrivalRate);
-			double averageThinkTimeInSeconds = aggregateThinkTime(currentSummaryInterval);
-			if(reservedThroughput != 0){
-				double responseTimeInSeconds = totalNumberOfUsers / reservedThroughput - averageThinkTimeInSeconds;
-				double responseTimeLoss = Math.max( (responseTimeInSeconds * 1000 - maxResponseTimeInMillis)/maxResponseTimeInMillis, 0 );
-				requestsLostDueToResponseTime += calcResponseTimeLoss(responseTimeLoss, totalRequestsFinished);
-			}
-			
-			currentSummaryInterval++;
-		}
-		
-		//Estimating utility
-		double receipt = calcReceipt();
-		double cost = calcCost(totalRequestsFinished, accumulatedRequestsMeanServiceTime / totalNumberOfIntervals, currentPowerPerMachineType, requestsLostDueToResponseTime, requestsLostDueToThroughput);
-		
-		double fitness = receipt - cost;
-		
-		if(fitness < 1){
-			return (1/Math.abs(fitness))+1;
-		}
-		return fitness;
-	}
+//	/**
+//	 * {@inheritDoc}
+//	 */
+//	@Override
+//	protected double evaluate(IChromosome arg0) {
+//		//Since round-robin is used, the total arrival rate is splitted among reserved servers according to each server power
+//		Map<MachineType, Integer> currentPowerPerMachineType = new HashMap<MachineType, Integer>();
+//		int index = 0;
+//		double totalPower = 0;
+//		for(Gene gene : arg0.getGenes()){
+//			Integer numberOfMachinesReserved = (Integer)gene.getAllele();
+//			MachineType type = this.types.get(index);
+//			
+//			currentPowerPerMachineType.put(type, (int)Math.round(1.0 * numberOfMachinesReserved * type.getNumberOfCores()));
+//			totalPower += Math.round(1.0 * numberOfMachinesReserved * type.getNumberOfCores());
+//			index++;
+//		}
+//		
+//		Map<MachineType, Double> totalRequestsFinished = new HashMap<MachineType, Double>();
+//		long requestsLostDueToResponseTime = 0;
+//		long requestsLostDueToThroughput = 0;
+//		double ratesDifference = 0d;
+//		double accumulatedRequestsMeanServiceTime = 0d;
+//		
+//		int currentSummaryInterval = 0;
+//		int totalNumberOfIntervals = calcNumberOfIntervals();
+//		long maxResponseTimeInMillis = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME);
+//		
+//		while(currentSummaryInterval < totalNumberOfIntervals){
+//			
+//			double arrivalRate = aggregateArrivals(currentSummaryInterval);
+//			double meanServiceTimeInMillis = aggregateServiceDemand(currentSummaryInterval);
+//			accumulatedRequestsMeanServiceTime += meanServiceTimeInMillis;
+//			
+//			//Calculating arrival rates per machine type
+//			Map<MachineType, Double> arrivalRatesPerMachineType = extractArrivalsPerMachineType(currentPowerPerMachineType, totalPower, arrivalRate);
+//			
+//			//Assuming a base computing power (e.g., EC2 unit for each core)
+//			Map<MachineType, Double> throughputPerMachineType = new HashMap<MachineType, Double>();
+//			double reservedThroughput = 0d;
+//			double missingThroughput = 0d;
+//			for(MachineType type : arrivalRatesPerMachineType.keySet()){
+//				Double currentArrivalRate = arrivalRatesPerMachineType.get(type);
+//				double maximumThroughput = (1 / (meanServiceTimeInMillis/1000)) * type.getNumberOfCores();//Using all cores
+//				if(currentArrivalRate > maximumThroughput){//Requests are missed
+//					throughputPerMachineType.put(type, maximumThroughput);
+//					missingThroughput += (currentArrivalRate - maximumThroughput);
+//					reservedThroughput += maximumThroughput;
+//					
+//					Double totalFinished = totalRequestsFinished.get(type);
+//					if(totalFinished == null){
+//						totalFinished = 0d;
+//					}
+//					totalFinished += Math.round(maximumThroughput * SUMMARY_LENGTH_IN_SECONDS);
+//					totalRequestsFinished.put(type, totalFinished);
+//					
+//				}else{//All requests are attended!
+//					throughputPerMachineType.put(type, currentArrivalRate);
+//					reservedThroughput += currentArrivalRate;
+//					
+//					Double totalFinished = totalRequestsFinished.get(type);
+//					if(totalFinished == null){
+//						totalFinished = 0d;
+//					}
+//					totalFinished += Math.round(currentArrivalRate * SUMMARY_LENGTH_IN_SECONDS);
+//					totalRequestsFinished.put(type, totalFinished);
+//				}
+//			}
+//			
+//			if(reservedThroughput == 0){//No arrival at reserved machines!
+//				missingThroughput = arrivalRate;
+//			}
+//			
+//			//Calculating missing requests. This value is amortized by queue size!
+//			long requestsMissed = Math.round(missingThroughput * SUMMARY_LENGTH_IN_SECONDS);
+//			if(ratesDifference == 0 && reservedThroughput != 0){//Queue starts at this interval, so some requests are not really missed!
+//				requestsMissed -= (maxResponseTimeInMillis / meanServiceTimeInMillis) * totalPower;
+//			}
+//			ratesDifference = missingThroughput;
+//			requestsLostDueToThroughput += requestsMissed;
+//			
+//			//Estimated response time
+//			double totalNumberOfUsers = aggregateNumberOfUsers(currentSummaryInterval) * (reservedThroughput / arrivalRate);
+//			double averageThinkTimeInSeconds = aggregateThinkTime(currentSummaryInterval);
+//			if(reservedThroughput != 0){
+//				double responseTimeInSeconds = totalNumberOfUsers / reservedThroughput - averageThinkTimeInSeconds;
+//				double responseTimeLoss = Math.max( (responseTimeInSeconds * 1000 - maxResponseTimeInMillis)/maxResponseTimeInMillis, 0 );
+//				requestsLostDueToResponseTime += calcResponseTimeLoss(responseTimeLoss, totalRequestsFinished);
+//			}
+//			
+//			currentSummaryInterval++;
+//		}
+//		
+//		//Estimating utility
+//		double receipt = calcReceipt();
+//		double cost = calcCost(totalRequestsFinished, accumulatedRequestsMeanServiceTime / totalNumberOfIntervals, currentPowerPerMachineType, requestsLostDueToResponseTime, requestsLostDueToThroughput);
+//		
+//		double fitness = receipt - cost;
+//		
+//		if(fitness < 1){
+//			return (1/Math.abs(fitness))+1;
+//		}
+//		return fitness;
+//	}
 	
 	/**
 	 * This method distributes a certain arrival rate to existing reserved machine according to their processing power

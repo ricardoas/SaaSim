@@ -8,13 +8,13 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.jgap.Chromosome;
-import org.jgap.Configuration;
-import org.jgap.Gene;
-import org.jgap.IChromosome;
-import org.jgap.InvalidConfigurationException;
-import org.jgap.impl.DefaultConfiguration;
-import org.jgap.impl.IntegerGene;
+//import org.jgap.Chromosome;
+//import org.jgap.Configuration;
+//import org.jgap.Gene;
+//import org.jgap.IChromosome;
+//import org.jgap.InvalidConfigurationException;
+//import org.jgap.impl.DefaultConfiguration;
+//import org.jgap.impl.IntegerGene;
 
 import saasim.cloud.MachineType;
 import saasim.cloud.Provider;
@@ -40,7 +40,7 @@ public class OptimalHeuristic implements PlanningHeuristic{
 	private Map<User, List<Summary>> summaries;
 	private List<MachineType> types;
 	
-	private IChromosome bestChromosome; 
+//	private IChromosome bestChromosome; 
 	
 	/**
 	 * Default constructor.
@@ -51,7 +51,7 @@ public class OptimalHeuristic implements PlanningHeuristic{
 	public OptimalHeuristic(JEEventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
 		this.types = new ArrayList<MachineType>();
 		this.summaries = new HashMap<User, List<Summary>>();
-		this.bestChromosome = null;
+//		this.bestChromosome = null;
 	}
 
 	/**
@@ -59,64 +59,64 @@ public class OptimalHeuristic implements PlanningHeuristic{
 	 */
 	@Override
 	public void findPlan(Provider[] cloudProviders, User[] cloudUsers){
-		//Reading workload data
-		readWorkloadData(cloudUsers);
-	
-		//Configuring genetic algorithm
-		Configuration config = new DefaultConfiguration();
-		try {
-			PlanningFitnessFunction myFunc = createFitnessFunction(cloudUsers, cloudProviders);
-			
-			Map<MachineType, Integer> limits = findReservationLimits(cloudProviders[0]);
-			for(MachineType type : limits.keySet()){
-				types.add(type);
-			}
-			int [] currentValues = new int[limits.size()];
-			
-			evaluateGenes(config, myFunc, cloudProviders[0], limits, 0, currentValues);//Searching best configuration
-		} catch (InvalidConfigurationException e) {
-			e.printStackTrace();
-		}
-		
-		Map<MachineType, Integer> plan = this.getPlan(cloudUsers);
-		try {
-			PlanIOHandler.createPlanFile(plan, cloudProviders);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+//		//Reading workload data
+//		readWorkloadData(cloudUsers);
+//	
+//		//Configuring genetic algorithm
+//		Configuration config = new DefaultConfiguration();
+//		try {
+//			PlanningFitnessFunction myFunc = createFitnessFunction(cloudUsers, cloudProviders);
+//			
+//			Map<MachineType, Integer> limits = findReservationLimits(cloudProviders[0]);
+//			for(MachineType type : limits.keySet()){
+//				types.add(type);
+//			}
+//			int [] currentValues = new int[limits.size()];
+//			
+//			evaluateGenes(config, myFunc, cloudProviders[0], limits, 0, currentValues);//Searching best configuration
+//		} catch (InvalidConfigurationException e) {
+//			e.printStackTrace();
+//		}
+//		
+//		Map<MachineType, Integer> plan = this.getPlan(cloudUsers);
+//		try {
+//			PlanIOHandler.createPlanFile(plan, cloudProviders);
+//		} catch (IOException e) {
+//			throw new RuntimeException(e);
+//		}
 	}
 
-	/**
-	 * Searches the best configuration for the planning.
-	 * @param config {@link Configuration} of the application
-	 * @param function the {@link PlanningFitnessFunction}
-	 * @param provider the {@link Provider} of application
-	 * @param limits the limits of reservation for this {@link OptimalHeuristic}
-	 * @param typesIndex the index of types
-	 * @param currentValues the current values based on the limits of reservation
-	 * @throws InvalidConfigurationException
-	 */
-	private void evaluateGenes(Configuration config, PlanningFitnessFunction function, Provider provider, Map<MachineType, Integer> limits, int typesIndex, int[] currentValues) throws InvalidConfigurationException {
-		if(typesIndex < this.types.size()){
-			MachineType machineType = this.types.get(typesIndex);
-			Integer limit = limits.get(machineType);
-			for(int i = 0; i <= limit; i++){
-				currentValues[typesIndex] = i;
-				evaluateGenes(config, function, provider, limits, typesIndex+1, currentValues);
-			}
-		}else{
-			Gene[] genes = new IntegerGene[provider.getAvailableTypes().length];
-			for(int i = 0; i < provider.getAvailableTypes().length; i++){
-				genes[i] = new IntegerGene(config);
-				genes[i].setAllele(currentValues[i]);
-			}
-			Chromosome chrom = new Chromosome(config, genes);
-			double fitness = function.evaluate(chrom);
-			if(this.bestChromosome == null || this.bestChromosome.getFitnessValue() < fitness){
-				this.bestChromosome = chrom;
-			}
-		}
-	}
+//	/**
+//	 * Searches the best configuration for the planning.
+//	 * @param config {@link Configuration} of the application
+//	 * @param function the {@link PlanningFitnessFunction}
+//	 * @param provider the {@link Provider} of application
+//	 * @param limits the limits of reservation for this {@link OptimalHeuristic}
+//	 * @param typesIndex the index of types
+//	 * @param currentValues the current values based on the limits of reservation
+//	 * @throws InvalidConfigurationException
+//	 */
+//	private void evaluateGenes(Configuration config, PlanningFitnessFunction function, Provider provider, Map<MachineType, Integer> limits, int typesIndex, int[] currentValues) throws InvalidConfigurationException {
+//		if(typesIndex < this.types.size()){
+//			MachineType machineType = this.types.get(typesIndex);
+//			Integer limit = limits.get(machineType);
+//			for(int i = 0; i <= limit; i++){
+//				currentValues[typesIndex] = i;
+//				evaluateGenes(config, function, provider, limits, typesIndex+1, currentValues);
+//			}
+//		}else{
+//			Gene[] genes = new IntegerGene[provider.getAvailableTypes().length];
+//			for(int i = 0; i < provider.getAvailableTypes().length; i++){
+//				genes[i] = new IntegerGene(config);
+//				genes[i].setAllele(currentValues[i]);
+//			}
+//			Chromosome chrom = new Chromosome(config, genes);
+//			double fitness = function.evaluate(chrom);
+//			if(this.bestChromosome == null || this.bestChromosome.getFitnessValue() < fitness){
+//				this.bestChromosome = chrom;
+//			}
+//		}
+//	}
 
 	/**
 	 * Reads the workload data through the {@link User}s of application.  
@@ -229,11 +229,11 @@ public class OptimalHeuristic implements PlanningHeuristic{
 	@Override
 	public Map<MachineType, Integer> getPlan(User[] cloudUsers) {
 		Map<MachineType, Integer> plan = new HashMap<MachineType, Integer>();
-		Gene[] genes = this.bestChromosome.getGenes();
+//		Gene[] genes = this.bestChromosome.getGenes();
 		int index = 0;
 		
 		for(MachineType type : this.types){
-			plan.put(type, (Integer) genes[index++].getAllele());
+//			plan.put(type, (Integer) genes[index++].getAllele());
 		}
 //		System.out.println("CONFIG: "+genes[0].getAllele()+" "+genes[1].getAllele()+" "+genes[2].getAllele());
 //		System.out.println("BEST: "+bestChromosome.getFitnessValue());
