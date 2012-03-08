@@ -47,7 +47,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 
 	private ServiceEntry sentry;
 
-	private int threshold;
+	private double threshold;
 
 	
 	/**
@@ -111,13 +111,14 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		if(machine != null){
 			descriptor.setStartTimeInMillis(now());
 			heuristic.addMachine(machine);
-			sentry.config(threshold * heuristic.getNumberOfMachines());
+			config(threshold);
 		}
 	}
 	
 	@JEHandlingPoint(JEEventType.MACHINE_TURNED_OFF)
 	public void serverIsDown(MachineDescriptor descriptor){
 		monitor.machineTurnedOff(descriptor);
+		config(threshold);
 	}
 	
 	/**
@@ -279,10 +280,10 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		return super.hashCode();
 	}
 	
-	public void config(int threshold){
+	public void config(double threshold){
 		if(threshold > 0){
 			this.threshold = threshold;
-			sentry.config(threshold * heuristic.getNumberOfMachines());
+			sentry.config((int)Math.floor(threshold * heuristic.getNumberOfMachines()));
 		}
 	}
 }

@@ -162,7 +162,7 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	}
 	
 	@Override
-	public void config(int tier, int threshold){
+	public void config(int tier, double threshold){
 		tiers[tier].config(threshold);
 	}
 

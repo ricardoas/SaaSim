@@ -134,7 +134,7 @@ public class User implements Comparable<User>, Serializable{
 	 * @return The penalty calculated.
 	 */
 	public double calculatePenalty(double totalLoss) {
-		return this.contract.calculatePenalty(totalLoss);
+		return this.contract.calculatePenalty(totalLoss, 0);
 	}
 	
 	/**

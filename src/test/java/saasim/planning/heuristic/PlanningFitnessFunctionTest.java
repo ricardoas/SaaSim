@@ -83,7 +83,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		double requestsThatCouldNotBeAttended = 0;
 		double totalRequestsFinished = 70;
 		
-		double expectedPenalty = contract.calculatePenalty(0.2142857) + contract2.calculatePenalty(0.2142857);
+		double expectedPenalty = contract.calculatePenalty(0.2142857, 0) + contract2.calculatePenalty(0.2142857, 0);
 		assertEquals(expectedPenalty, function.calcPenalties(responseTimeRequestsLost, requestsThatCouldNotBeAttended, totalRequestsFinished), 0.00001);
 		
 		PowerMock.verifyAll();
@@ -111,7 +111,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		double requestsThatCouldNotBeAttended = 25;
 		double totalRequestsFinished = 80;
 		
-		double expectedPenalty = contract.calculatePenalty(0.15625) + contract2.calculatePenalty(0.15625);
+		double expectedPenalty = contract.calculatePenalty(0.15625, 0) + contract2.calculatePenalty(0.15625, 0);
 		assertEquals(expectedPenalty, function.calcPenalties(responseTimeRequestsLost, requestsThatCouldNotBeAttended, totalRequestsFinished), 0.00001);
 		
 		PowerMock.verifyAll();
@@ -139,7 +139,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		double requestsThatCouldNotBeAttended = 15;
 		double totalRequestsFinished = 60;
 		
-		double expectedPenalty = contract.calculatePenalty(0.375) + contract2.calculatePenalty(0.375);
+		double expectedPenalty = contract.calculatePenalty(0.375, 0) + contract2.calculatePenalty(0.375, 0);
 		assertEquals(expectedPenalty, function.calcPenalties(responseTimeRequestsLost, requestsThatCouldNotBeAttended, totalRequestsFinished), 0.00001);
 		
 		PowerMock.verifyAll();
@@ -167,7 +167,7 @@ public class PlanningFitnessFunctionTest extends MockedConfigurationTest {
 		double requestsThatCouldNotBeAttended = 30;
 		double totalRequestsFinished = 0;
 		
-		double expectedPenalty = contract.calculatePenalty(1) + contract2.calculatePenalty(1);
+		double expectedPenalty = contract.calculatePenalty(1, 0) + contract2.calculatePenalty(1, 0);
 		assertEquals(expectedPenalty, function.calcPenalties(responseTimeRequestsLost, requestsThatCouldNotBeAttended, totalRequestsFinished), 0.00001);
 		
 		PowerMock.verifyAll();

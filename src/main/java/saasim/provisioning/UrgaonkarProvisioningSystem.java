@@ -159,11 +159,9 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 				}
 			}
 			
-			int sentryLimit = (int)Math.ceil(lambdaPeak * (statistics.totalNumberOfActiveServers + normalizedServersToAdd));
+			configurable.config(0, lambdaPeak);
 			
-			configurable.config(0, sentryLimit);
-			
-			log.info(String.format("STAT-URGAONKAR PRED %d %d %d %f %f %f %f %d %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRateInTier(predictiveTick), predictedArrivalRate, correctedPredictedArrivalRate, lost, after, sentryLimit, statistics));
+			log.info(String.format("STAT-URGAONKAR PRED %d %d %d %f %f %f %f %d %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRateInTier(predictiveTick), predictedArrivalRate, correctedPredictedArrivalRate, lost, after, lambdaPeak*statistics.totalNumberOfActiveServers, statistics));
 			lost = 0;
 			after = 0;
 		}else if(!predictiveRound && enableReactive){
@@ -197,11 +195,9 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 
 			}
 
-			int sentryLimit = (int)Math.ceil(lambdaPeak * (statistics.totalNumberOfActiveServers + normalizedServersToAdd));
+			configurable.config(0, lambdaPeak);
 			
-			configurable.config(0, sentryLimit);
-			
-			log.debug(String.format("STAT-URGAONKAR REAC %d %d %d %f %f %f %f %d %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRateInLastIntervalInTier(reactiveTickInSeconds), correctedPredictedArrivalRate, correctedPredictedArrivalRate, lost, after, sentryLimit, statistics));
+			log.debug(String.format("STAT-URGAONKAR REAC %d %d %d %f %f %f %f %d %d %d %s", now, serversToAdd, normalizedServersToAdd, lambdaPeak, statistics.getArrivalRateInLastIntervalInTier(reactiveTickInSeconds), correctedPredictedArrivalRate, correctedPredictedArrivalRate, lost, after, lambdaPeak*statistics.totalNumberOfActiveServers, statistics));
 		}
 		list.add(availableToTurnOff);
 	}

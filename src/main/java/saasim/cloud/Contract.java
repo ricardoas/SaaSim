@@ -83,7 +83,7 @@ public class Contract implements Comparable<Contract>, Serializable{
 		
 		double percentageLost = (1.0*numOfLostRequests + numOfFinishedRequestsAfterSLA)/(numOfFinishedRequests + numOfFinishedRequestsAfterSLA + numOfLostRequests);
 		
-		return new UserEntry(userID, name, price, extraConsumedCPUInMillis, CPUCost, consumedTransferenceInBytes, transferenceCost, storageCost, calculatePenalty(percentageLost), numOfFinishedRequests, numOfLostRequests, numOfFinishedRequestsAfterSLA);
+		return new UserEntry(userID, name, price, extraConsumedCPUInMillis, CPUCost, consumedTransferenceInBytes, transferenceCost, storageCost, calculatePenalty(percentageLost, 0), numOfFinishedRequests, numOfLostRequests, numOfFinishedRequestsAfterSLA);
 	}
 	
 	/**
@@ -103,15 +103,16 @@ public class Contract implements Comparable<Contract>, Serializable{
 
 	/**
 	 * According to https://signin.crm.dynamics.com/portal/static/1046/sla.htm
-	 * @param totalLoss a double represents the total percent of requests loss.
+	 * @param slaInfractionPercentage a double represents the total percent of requests loss.
+	 * @param unavailability TODO
 	 * @return The calculated penalty.
 	 */
-	public double calculatePenalty(double totalLoss) {
-		if(totalLoss <= 0.001 || Double.isInfinite(totalLoss) || Double.isNaN(totalLoss)){
+	public double calculatePenalty(double slaInfractionPercentage, double unavailability) {
+		if(slaInfractionPercentage <= 0.001 || Double.isInfinite(slaInfractionPercentage) || Double.isNaN(slaInfractionPercentage)){
 			return 0;
-		}else if(totalLoss > 0.001 && totalLoss <= 0.01){
+		}else if(slaInfractionPercentage > 0.001 && slaInfractionPercentage <= 0.01){
 			return price * 0.25;
-		}else if(totalLoss > 0.01 && totalLoss <= 0.05){
+		}else if(slaInfractionPercentage > 0.01 && slaInfractionPercentage <= 0.05){
 			return price * 0.5;
 		}else{
 			return price  * 1;
