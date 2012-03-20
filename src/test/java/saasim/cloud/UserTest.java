@@ -148,7 +148,7 @@ public class UserTest extends ValidConfigurationTest {
 		
 		User user = new User(1, gold , storageLimits);
 		
-		assertEquals(0, user.calculatePenalty(0), 0.0);
+		assertEquals(0, user.calculatePenalty(0, 0), 0.0);
 		
 		EasyMock.verify(gold);
 	}
@@ -163,9 +163,9 @@ public class UserTest extends ValidConfigurationTest {
 		
 		User user = new User(1, gold , storageLimits);
 		
-		assertEquals(10, user.calculatePenalty(0), 0.0);
-		assertEquals(10, user.calculatePenalty(0.0001), 0.0);
-		assertEquals(10, user.calculatePenalty(0.1), 0.0);
+		assertEquals(10, user.calculatePenalty(0, 0), 0.0);
+		assertEquals(10, user.calculatePenalty(0.0001, 0), 0.0);
+		assertEquals(10, user.calculatePenalty(0.1, 0), 0.0);
 		
 		EasyMock.verify(gold);
 	}
@@ -180,9 +180,9 @@ public class UserTest extends ValidConfigurationTest {
 		
 		User user = new User(1, gold , storageLimits);
 		
-		assertEquals(10, user.calculatePenalty(0.25), 0.0);
-		assertEquals(10, user.calculatePenalty(0.75), 0.0);
-		assertEquals(10, user.calculatePenalty(0.99999), 0.0);
+		assertEquals(10, user.calculatePenalty(0.25, 0), 0.0);
+		assertEquals(10, user.calculatePenalty(0.75, 0), 0.0);
+		assertEquals(10, user.calculatePenalty(0.99999, 0), 0.0);
 		
 		EasyMock.verify(gold);
 	}

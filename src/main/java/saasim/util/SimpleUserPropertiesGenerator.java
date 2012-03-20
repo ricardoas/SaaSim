@@ -3,6 +3,7 @@ package saasim.util;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +12,7 @@ import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 
 import org.apache.commons.configuration.ConfigurationException;
 
@@ -80,7 +82,7 @@ public class SimpleUserPropertiesGenerator {
 			generateScenarios(config);
 		}
 		
-		
+		shuffleScenarios();
 		
 		
 		//Creating output file
@@ -225,6 +227,63 @@ public class SimpleUserPropertiesGenerator {
 			}
 			
 			FileWriter fileWriter = new FileWriter("user_" + scenarioID + ".properties");
+			fileWriter.write(sb.toString());
+			fileWriter.close();
+		}
+	}
+	
+	private static class UserProp{
+		
+		String plan;
+		String storage;
+		String workload;
+		
+		public UserProp(String plan, String storage, String workload) {
+			this.plan = plan;
+			this.storage = storage;
+			this.workload = workload;
+		}
+		
+		
+	}
+	
+	private static void shuffleScenarios() throws ConfigurationException, IOException{
+		String[] list = new File("./").list(new TraceFilter("user_"));
+		
+		System.out.println(Arrays.toString(list));
+		
+		for (String string : list) {
+			ComplexPropertiesConfiguration config = new ComplexPropertiesConfiguration(string){};
+
+			StringBuilder sb = new StringBuilder("saas.number=");
+			sb.append(config.getString("saas.number"));
+			sb.append('\n');
+			sb.append('\n');
+			
+			String[] plans = config.getStringArray("saas.user.plan");
+			String[] storage = config.getStringArray("saas.user.storage");
+			String[] workloads = config.getStringArray("saas.user.workload");
+			
+			List<UserProp> users = new ArrayList<UserProp>();
+			
+			for (int i = 0; i < plans.length; i++) {
+				users.add(new UserProp(plans[i], storage[i], workloads[i]));
+			}
+			Collections.shuffle(users);
+			
+			for (UserProp prop: users) {
+				sb.append("saas.user.plan=");
+				sb.append(prop.plan);
+				sb.append('\n');
+				sb.append("saas.user.storage=");
+				sb.append(prop.storage);
+				sb.append('\n');
+				sb.append("saas.user.workload=");
+				sb.append(prop.workload);
+				sb.append('\n');
+			}
+			
+			FileWriter fileWriter = new FileWriter(string);
 			fileWriter.write(sb.toString());
 			fileWriter.close();
 		}

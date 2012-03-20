@@ -130,11 +130,12 @@ public class User implements Comparable<User>, Serializable{
 	
 	/**
 	 * Calculate the penalty of this {@link User}.
-	 * @param totalLoss a double represents the total percent of requests loss.
+	 * @param slaInfractionPercentage a double represents the total percent of requests loss.
+	 * @param unavailability TODO
 	 * @return The penalty calculated.
 	 */
-	public double calculatePenalty(double totalLoss) {
-		return this.contract.calculatePenalty(totalLoss, 0);
+	public double calculatePenalty(double slaInfractionPercentage, double unavailability) {
+		return this.contract.calculatePenalty(slaInfractionPercentage, unavailability);
 	}
 	
 	/**

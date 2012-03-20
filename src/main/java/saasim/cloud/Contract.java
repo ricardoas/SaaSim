@@ -58,6 +58,13 @@ public class Contract implements Comparable<Contract>, Serializable{
 		this.storageLimitInBytes = storageLimitInBytes;
 		this.extraStorageCostPerByte = storageCostPerBytes;
 	}
+	
+	/**
+	 * @return This {@link Contract} priority on the scheduling queue.
+	 */
+	public int getPriority() {
+		return priority;
+	}
 
 	/**
 	 * Calculate the receipt for this {@link Contract}. 
@@ -71,19 +78,34 @@ public class Contract implements Comparable<Contract>, Serializable{
 	 * @param numOfFinishedRequestsAfterSLA TODO number represents a finished requests after SLA defines.
 	 * @return A {@link UserEntry} encapsulating the calculated receipt.
 	 */
-	public UserEntry calculateReceipt(int userID, long consumedCpuInMillis, long consumedInTransferenceInBytes, long consumedOutTransferenceInBytes,
-			long consumedStorageInBytes, long numOfFinishedRequests, long numOfLostRequests, long numOfFinishedRequestsAfterSLA) {
-		
-		long extraConsumedCPUInMillis = Math.max(0, consumedCpuInMillis - cpuLimitInMillis);
-		long consumedTransferenceInBytes = consumedInTransferenceInBytes + consumedOutTransferenceInBytes;
-		
+	public UserEntry calculateReceipt(int userID, long consumedCpuInMillis,
+			long consumedInTransferenceInBytes,
+			long consumedOutTransferenceInBytes, long consumedStorageInBytes,
+			long numOfFinishedRequests, long numOfLostRequests,
+			long numOfFinishedRequestsAfterSLA) {
+
+		long extraConsumedCPUInMillis = Math.max(0, consumedCpuInMillis
+				- cpuLimitInMillis);
+		long consumedTransferenceInBytes = consumedInTransferenceInBytes
+				+ consumedOutTransferenceInBytes;
+
 		double CPUCost = extraCpuCostPerMillis * extraConsumedCPUInMillis;
-		double transferenceCost = CostCalculus.calcTransferenceCost(consumedTransferenceInBytes , transferenceLimitsInBytes, transferenceCostsInBytes);
+		double transferenceCost = CostCalculus.calcTransferenceCost(
+				consumedTransferenceInBytes, transferenceLimitsInBytes,
+				transferenceCostsInBytes);
 		double storageCost = Math.max(0, consumedStorageInBytes - storageLimitInBytes) * extraStorageCostPerByte;
+
+		double slaInfractionPercentage = (1.0 * numOfFinishedRequestsAfterSLA)
+				/ (numOfFinishedRequests + numOfFinishedRequestsAfterSLA);
+
+		double unavailability = (1.0 * numOfLostRequests)
+				/ (numOfFinishedRequests + numOfFinishedRequestsAfterSLA + numOfLostRequests);
 		
-		double percentageLost = (1.0*numOfLostRequests + numOfFinishedRequestsAfterSLA)/(numOfFinishedRequests + numOfFinishedRequestsAfterSLA + numOfLostRequests);
-		
-		return new UserEntry(userID, name, price, extraConsumedCPUInMillis, CPUCost, consumedTransferenceInBytes, transferenceCost, storageCost, calculatePenalty(percentageLost, 0), numOfFinishedRequests, numOfLostRequests, numOfFinishedRequestsAfterSLA);
+		return new UserEntry(userID, name, price, extraConsumedCPUInMillis,
+				CPUCost, consumedTransferenceInBytes, transferenceCost,
+				storageCost, calculatePenalty(slaInfractionPercentage, unavailability),
+				numOfFinishedRequests, numOfLostRequests,
+				numOfFinishedRequestsAfterSLA);
 	}
 	
 	/**

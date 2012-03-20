@@ -245,8 +245,9 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		if(machine != null){
 			if(force){
 				machine.shutdownNow();
+			}else{
+				machine.shutdownOnFinish();
 			}
-			machine.shutdownOnFinish();
 		}
 	}
 	

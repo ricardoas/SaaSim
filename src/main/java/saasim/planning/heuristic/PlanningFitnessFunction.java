@@ -220,15 +220,14 @@ public class PlanningFitnessFunction{// extends FitnessFunction{
 	 * @return The penalty calculated.
 	 */
 	protected double calcPenalties(double responseTimeRequestsLost, double requestsThatCouldNotBeAttended, double totalRequestsFinished){
-		double lossPerUser = (responseTimeRequestsLost + requestsThatCouldNotBeAttended) / (requestsThatCouldNotBeAttended + responseTimeRequestsLost +
-				totalRequestsFinished) / this.cloudUsers.length;
+		double slaInfractionPercentage = (responseTimeRequestsLost) / (responseTimeRequestsLost + totalRequestsFinished) / this.cloudUsers.length;
 		if(totalRequestsFinished == 0){
-			lossPerUser = 1;
+			slaInfractionPercentage = 1;
 		}
 		
 		double penalty = 0d;
 		for(User user : this.cloudUsers){
-			penalty += user.calculatePenalty(lossPerUser);
+			penalty += user.calculatePenalty(slaInfractionPercentage, 0);
 		}
 		return penalty;
 	}

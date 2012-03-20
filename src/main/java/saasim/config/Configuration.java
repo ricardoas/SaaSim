@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import saasim.cloud.Contract;
 import saasim.cloud.MachineType;
 import saasim.cloud.Provider;
+import saasim.cloud.RunTimeSLAContract;
 import saasim.cloud.TypeProvider;
 import saasim.cloud.User;
 import saasim.io.ParserIdiom;
@@ -115,7 +116,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 			instance.accountingSystem = new AccountingSystem(instance.users, instance.providers);
 			instance.priorities = new int[instance.users.length];
 			for (int i = 0; i < instance.priorities.length; i++) {
-				instance.priorities[i] = 100;//users[i].getContract().getPriority(); FIXME Ricardo: don't know if we need this anymore
+				instance.priorities[i] = instance.users[i].getContract().getPriority(); //FIXME Ricardo: don't know if we need this anymore
 			}
 			instance.dpsInfo = new DPSInfo();
 		}
@@ -335,7 +336,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 			if(planTransferLimitsInBytes[i].length != transferCostsPerBytes[i].length - 1){
 				throw new ConfigurationException("Check values of " + PLAN_TRANSFER_LIMIT + " and " + PLAN_EXTRA_TRANSFER_COST);
 			}
-			Contract plan = new Contract(planNames[i], priorities[i], setupCosts[i], prices[i], 
+			Contract plan = new RunTimeSLAContract(planNames[i], priorities[i], setupCosts[i], prices[i], 
 					cpuLimitsInHours[i], extraCpuCostsPerHour[i], planTransferLimitsInBytes[i], transferCostsPerBytes[i],
 					storageLimitsInBytes[i], storageCostsPerBytes[i]);
 			contracts [i] = plan;
