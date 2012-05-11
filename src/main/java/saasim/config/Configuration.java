@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -50,6 +51,16 @@ import saasim.util.TimeUnit;
  */
 public class Configuration extends ComplexPropertiesConfiguration{
 	
+	private static final String DEFAULT_PROPERTIES_FILE_NAME = "saasim.properties";
+
+	static{
+		try {
+			buildInstance(DEFAULT_PROPERTIES_FILE_NAME);
+		} catch (ConfigurationException e) {
+			throw new ConfigurationRuntimeException(e);
+		}
+	}
+	
 	/**
 	 * Unique instance.
 	 */
@@ -84,6 +95,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	 * @throws ConfigurationException
 	 */
 	public static void buildInstance(String propertiesFileName) throws ConfigurationException{
+		Locale.setDefault(Locale.US);
 		Logger.getLogger(JECheckpointer.class).debug("CHKP LOAD-in");
 		instance = new Configuration(propertiesFileName);
 

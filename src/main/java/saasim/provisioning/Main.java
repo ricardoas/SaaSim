@@ -3,7 +3,6 @@ package saasim.provisioning;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Locale;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
@@ -34,10 +33,6 @@ public class Main {
 			System.out.println("Usage: java -cp saasim.jar saasim.provisioning.Main <property file>");
 			System.exit(1);
 		}
-		
-		Locale.setDefault(Locale.US);
-		
-		Configuration.buildInstance(args[0]);
 		
 		Configuration configuration = Configuration.getInstance();
 		
