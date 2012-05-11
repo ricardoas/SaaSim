@@ -34,33 +34,4 @@ public class CostCalculus {
 		
 		return total;
 	}
-	
-	public static void main(String[] args) {
-		
-		
-		double cost = CostCalculus.calcTransferenceCost(1987920692670L/Math.pow(2, 30), 
-				new long []{1,10240,51200,153600}, 
-				new double[]{0,0.12,0.09,0.07,0.05});
-		System.out.println(cost);
-
-		cost = CostCalculus.calcTransferenceCost(1987920692670L, 
-				DataUnit.convert(new long []{1,10240,51200,153600}, DataUnit.GB, DataUnit.B), 
-				DataUnit.convert(new double[]{0,0.12,0.09,0.07,0.05}, DataUnit.B, DataUnit.GB));
-		System.out.println(cost);
-		
-		System.out.println(1987920692670L/Math.pow(2, 30));
-		
-		cost = CostCalculus.calcTransferenceCost(1987920692670L/Math.pow(2, 20), 
-				new long []{46080}, 
-				new double[]{0,0.005});
-		System.out.println(cost);
-		
-		cost = CostCalculus.calcTransferenceCost(1987920692670L, 
-				DataUnit.convert(new long []{46080}, DataUnit.MB, DataUnit.B), 
-				DataUnit.convert(new double[]{0,0.005}, DataUnit.B, DataUnit.MB));
-		System.out.println(cost);
-		
-		
-}
-
 }

@@ -35,7 +35,6 @@ public class SimulationInfoTest {
 		SimulationInfo info = new SimulationInfo(0, 0, 1);
 		assertFalse(info.isFinishDay());
 		info.addDay();
-		System.out.println(info.getCurrentDay());
 		assertTrue(info.isFinishDay());
 	}
 

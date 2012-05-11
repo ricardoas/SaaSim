@@ -165,16 +165,12 @@ public class JEEventScheduler implements Serializable{
 			handlingMethods.get(handler.getClass()).get(event.getType()).invoke(handler, event.getValue());
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
-			System.out.println(handlingMethods.get(handler.getClass()).get(event.getType()));
-			System.out.println(event.getValue());
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvocationTargetException e) {
 			// TODO Auto-generated catch block
-			System.out.println(handlingMethods.get(handler.getClass()).get(event.getType()));
-			System.out.println(event.getValue());
 			e.printStackTrace();
 		}
     }
