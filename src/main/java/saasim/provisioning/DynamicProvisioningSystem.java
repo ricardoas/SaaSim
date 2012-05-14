@@ -30,15 +30,20 @@ import saasim.sim.util.SaaSAppProperties;
  */
 public class DynamicProvisioningSystem implements DPS{
 
-	protected final AccountingSystem accountingSystem;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6216602265072540791L;
+
+	protected AccountingSystem accountingSystem;
 	
 	protected DynamicConfigurable configurable;
 	
-	protected final User[] users;
+	protected User[] users;
 	
-	protected final Provider[] providers;
+	protected Provider[] providers;
 	
-	protected final Contract[] contracts;
+	protected Contract[] contracts;
 	
 	Logger log = Logger.getLogger(getClass());
 
@@ -69,9 +74,9 @@ public class DynamicProvisioningSystem implements DPS{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final void registerConfigurable(DynamicConfigurable configurable) {
+	public final void registerConfigurable(DynamicConfigurable[] configurables) {
 		
-		this.configurable = configurable;
+		this.configurable = configurables[0];
 		
 		if(Configuration.getInstance().getSimulationInfo().isFirstDay()){
 			addServersToTier(Configuration.getInstance().getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER));

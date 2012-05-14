@@ -12,11 +12,12 @@ import saasim.sim.DynamicConfigurable;
 public interface DPS extends Monitor{
 	
 	/**
-	 * Resisters a new {@link DynamicConfigurable} instance to dynamically 
-	 * provide infrastructure.
-	 * @param configurable {@link DynamicConfigurable} instance.
+	 * Registers new applications to provision. Subsequent calls override 
+	 * previously configured applications. Be sure to call it only once.
+	 * 
+	 * @param dynamicConfigurables {@link DynamicConfigurable} instances.
 	 */
-	void registerConfigurable(DynamicConfigurable configurable);
+	void registerConfigurable(DynamicConfigurable[] dynamicConfigurables);
 	
 	/**
 	 * Compute application total utility.

@@ -139,7 +139,7 @@ public class CheckpointerTest extends ValidConfigurationTest{
 		
 		buildFullConfiguration();
 //		AccountingSystem accountingSystemBefore = Checkpointer.loadAccountingSystem();
-		Simulator applicationBefore = Configuration.getInstance().getApplication();
+		Simulator applicationBefore = Configuration.getInstance().getSimulator();
 		Provider[] providersBefore = Configuration.getInstance().getProviders();
 		EventScheduler schedulerBefore = Configuration.getInstance().getScheduler();
 		SimulationInfo simulationInfoBefore = Configuration.getInstance().getSimulationInfo();
@@ -151,7 +151,7 @@ public class CheckpointerTest extends ValidConfigurationTest{
 		simulationInfoBefore.addDay();
 		
 //		assertEquals(accountingSystemBefore, Checkpointer.loadAccountingSystem());
-		assertEquals(applicationBefore, Configuration.getInstance().getApplication());
+		assertEquals(applicationBefore, Configuration.getInstance().getSimulator());
 		assertArrayEquals(providersBefore, Configuration.getInstance().getProviders());
 		assertEquals(schedulerBefore, Configuration.getInstance().getScheduler());
 		assertEquals(simulationInfoBefore, Configuration.getInstance().getSimulationInfo());
@@ -162,7 +162,7 @@ public class CheckpointerTest extends ValidConfigurationTest{
 	public void testLoadDataWithPermissionDenied() throws IOException {
 		assert file.createNewFile() && file.setReadable(false);
 		
-		Configuration.getInstance().getApplication();
+		Configuration.getInstance().getSimulator();
 	}
 	
 	@Test

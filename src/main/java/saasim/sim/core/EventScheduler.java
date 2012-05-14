@@ -1,6 +1,3 @@
-/* JEEventScheduler - Decompiled by JODE
- * Visit http://jode.sourceforge.net/
- */
 package saasim.sim.core;
 import java.io.IOException;
 import java.io.Serializable;
@@ -126,7 +123,7 @@ public class EventScheduler implements Serializable{
     }
 
 	public String dumpPostMortemEvents() {
-		StringBuilder sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder("EVENTS-LEFT ");
 		if(!eventSet.isEmpty()){
 			while(!eventSet.isEmpty()){
 				sb.append(eventSet.pollFirst());

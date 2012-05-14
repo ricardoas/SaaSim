@@ -73,7 +73,7 @@ public class DynamicProvisioningSystemTest extends ValidConfigurationTest {
 		EasyMock.replay(configurable);
 		
 		DynamicProvisioningSystem dps = new DynamicProvisioningSystem();
-		dps.registerConfigurable(configurable);
+		dps.registerConfigurable(new DynamicConfigurable[]{configurable});
 		
 		assertEquals(MachineType.C1_MEDIUM, descriptor[0].getValue().getType());
 		assertEquals(MachineType.C1_MEDIUM, descriptor[1].getValue().getType());

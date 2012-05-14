@@ -15,7 +15,7 @@ import saasim.io.WorkloadParser;
 import saasim.planning.util.PlanIOHandler;
 import saasim.provisioning.DPS;
 import saasim.provisioning.Monitor;
-import saasim.sim.SimpleSimulator;
+import saasim.sim.SimpleMultiTierApplication;
 import saasim.sim.components.LoadBalancer;
 import saasim.sim.core.EventCheckpointer;
 import saasim.sim.core.Event;
@@ -30,7 +30,7 @@ import saasim.sim.util.SimulatorProperties;
  * 
  * @author David Candeia - davidcmm@lsd.ufcg.edu.br
  */
-public class OverProvisionHeuristic extends SimpleSimulator implements PlanningHeuristic {
+public class OverProvisionHeuristic extends SimpleMultiTierApplication implements PlanningHeuristic {
 
 	/**
 	 * 

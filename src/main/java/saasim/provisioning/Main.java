@@ -1,15 +1,8 @@
 package saasim.provisioning;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
-
-import saasim.cloud.UtilityResult;
 import saasim.config.Configuration;
-import saasim.provisioning.util.DPSFactory;
-import saasim.sim.Simulator;
 
 
 /**
@@ -26,35 +19,11 @@ public class Main {
 	 */
 	public static void main(String[] args) throws IOException {
 		
-		if(args.length != 1){
-			System.out.println("Usage: java -cp saasim.jar saasim.provisioning.Main <property file>");
+		if(args.length != 0){
+			System.out.println("Usage: java <-Dsaasim.properties=path_to_file> -cp saasim.jar saasim.provisioning.Main");
 			System.exit(1);
 		}
 		
-		Configuration configuration = Configuration.getInstance();
-		
-		DPS dps = DPSFactory.createDPS();
-		
-		Simulator simulator = configuration.getApplication();
-		
-		dps.registerConfigurable(simulator);
-		
-		simulator.start();
-		
-		if(configuration.getSimulationInfo().isFinishDay()){
-			
-			UtilityResult utilityResult = dps.calculateUtility();
-			
-			Logger.getLogger(Main.class).info(utilityResult);
-			
-			String events = configuration.getScheduler().dumpPostMortemEvents();
-			if(!events.isEmpty()){
-				FileWriter writer = new FileWriter(new File("events.dat"));
-				writer.write(events);
-				writer.close();
-			}
-		}else{//Persisting dump
-			configuration.save();
-		}
+		Configuration.getInstance().getSimulator().start();
 	}
 }

@@ -20,7 +20,8 @@ import saasim.config.Configuration;
 import saasim.config.PropertiesTesting;
 import saasim.io.WorkloadParser;
 import saasim.io.WorkloadParserFactory;
-import saasim.sim.SimpleSimulator;
+import saasim.sim.DynamicConfigurable;
+import saasim.sim.SimpleMultiTierApplication;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.core.EventScheduler;
 import saasim.sim.provisioningheuristics.MachineStatistics;
@@ -163,7 +164,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		int totalNumberOfServers = 0;
 		MachineStatistics statistics = new MachineStatistics(totalUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
-		SimpleSimulator configurable = EasyMock.createStrictMock(SimpleSimulator.class);
+		SimpleMultiTierApplication configurable = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		configurable.addMachine(0, new MachineDescriptor(0, false, MachineType.M1_SMALL, 0), true);
 		
@@ -195,7 +196,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		EasyMock.replay(parser);
 		
 		this.dps = new RanjanProvisioningSystem();
-		this.dps.registerConfigurable(configurable);
+		this.dps.registerConfigurable(new DynamicConfigurable[]{configurable});
 		this.dps.sendStatistics(0, statistics, 0);
 		
 		PowerMock.verifyAll();
@@ -218,7 +219,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		EasyMock.replay(scheduler);
 		
-		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
+		SimpleMultiTierApplication configurable = EasyMock.createMock(SimpleMultiTierApplication.class);
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		EasyMock.replay(configurable);
 		
@@ -246,7 +247,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		//system.buyMachine();
 		//this.dps.setAccountingSystem(system);
 		
-		this.dps.registerConfigurable(configurable);
+		this.dps.registerConfigurable(new DynamicConfigurable[]{configurable});
 		this.dps.sendStatistics(0, statistics, 0);
 		
 		PowerMock.verify(Configuration.class);
@@ -269,7 +270,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		int totalNumberOfServers = 20;
 		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
-		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
+		SimpleMultiTierApplication configurable = EasyMock.createMock(SimpleMultiTierApplication.class);
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		configurable.removeMachine(0, false);
 		EasyMock.expectLastCall().times(19);
@@ -304,7 +305,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		//accountingSystem.buyMachine();
 		
 		this.dps = new RanjanProvisioningSystem();
-		this.dps.registerConfigurable(configurable);
+		this.dps.registerConfigurable(new DynamicConfigurable[]{configurable});
 		//this.dps.setAccountingSystem(accountingSystem);
 		this.dps.sendStatistics(0, statistics, 0);
 		

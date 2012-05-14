@@ -1,6 +1,3 @@
-/**
- * 
- */
 package saasim.sim.core;
 
 import java.lang.annotation.ElementType;

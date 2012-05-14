@@ -1,6 +1,3 @@
-/* JEEventHandler - Decompiled by JODE
- * Visit http://jode.sourceforge.net/
- */
 package saasim.sim.core;
 
 

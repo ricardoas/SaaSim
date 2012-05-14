@@ -1,5 +1,7 @@
 package saasim.provisioning;
 
+import java.io.Serializable;
+
 import saasim.cloud.Request;
 import saasim.sim.components.Machine;
 import saasim.sim.components.MachineDescriptor;
@@ -10,7 +12,7 @@ import saasim.sim.provisioningheuristics.MachineStatistics;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public interface Monitor {
+public interface Monitor extends Serializable{
 	
 	/**
 	 * Report when a specific {@link Request} has been finished.

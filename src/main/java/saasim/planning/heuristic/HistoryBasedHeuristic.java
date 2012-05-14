@@ -17,7 +17,8 @@ import saasim.planning.util.MachineUsageData;
 import saasim.planning.util.PlanIOHandler;
 import saasim.provisioning.DPS;
 import saasim.provisioning.Monitor;
-import saasim.sim.SimpleSimulator;
+import saasim.sim.DynamicConfigurable;
+import saasim.sim.SimpleMultiTierApplication;
 import saasim.sim.components.LoadBalancer;
 import saasim.sim.components.Machine;
 import saasim.sim.components.MachineDescriptor;
@@ -68,8 +69,8 @@ public class HistoryBasedHeuristic implements PlanningHeuristic {
 	public void findPlan(Provider[] cloudProviders, User[] cloudUsers) {
 		//Simulating ...
 		DPS dps = (DPS) this.monitor;
-		SimpleSimulator simulator = (SimpleSimulator) Configuration.getInstance().getApplication();
-		dps.registerConfigurable(simulator);
+		SimpleMultiTierApplication simulator = (SimpleMultiTierApplication) Configuration.getInstance().getSimulator();
+		dps.registerConfigurable(new DynamicConfigurable[]{simulator});
 		simulator.start();
 		
 		//Calculating machines use data
@@ -181,10 +182,10 @@ public class HistoryBasedHeuristic implements PlanningHeuristic {
 	/**
 	 * Calculates the usage of machines to make the planning, and for this, updating the usage of the {@link MachineUsageData}
 	 * in this {@link HistoryBasedHeuristic}.
-	 * @param simulator {@link SimpleSimulator} to use for recovered the tiers of application.
+	 * @param simulator {@link SimpleMultiTierApplication} to use for recovered the tiers of application.
 	 * @return A set of {@link LoadBalancer}s of the application.
 	 */
-	private LoadBalancer[] calculateMachinesUsage(SimpleSimulator simulator) {
+	private LoadBalancer[] calculateMachinesUsage(SimpleMultiTierApplication simulator) {
 		LoadBalancer[] loadBalancers = simulator.getTiers();
 		
 		for(LoadBalancer lb : loadBalancers){

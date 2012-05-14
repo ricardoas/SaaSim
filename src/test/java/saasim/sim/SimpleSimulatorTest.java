@@ -45,7 +45,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		EasyMock.replay(loadBalancer);
 		
-		assertNotNull(new SimpleSimulator(Configuration.getInstance().getScheduler(), loadBalancer));
+		assertNotNull(new SimpleMultiTierApplication(Configuration.getInstance().getScheduler(), loadBalancer));
 		EasyMock.verify(loadBalancer);
 	}
 	
@@ -55,12 +55,12 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		
-		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(3);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleMultiTierApplication.class))).andReturn(1).times(3);
 		
 		EasyMock.replay(monitor, scheduler, handler);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator = new SimpleSimulator(scheduler, loadBalancer);
+		SimpleMultiTierApplication simulator = new SimpleMultiTierApplication(scheduler, loadBalancer);
 		
 		simulator.addMachine(4, new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0), false);
 		EasyMock.verify(monitor, scheduler, handler);
@@ -72,13 +72,13 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		
-		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(3);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleMultiTierApplication.class))).andReturn(1).times(3);
 		EasyMock.expect(scheduler.now()).andReturn(0L).times(2);
 		
 		EasyMock.replay(monitor, scheduler, handler);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator = new SimpleSimulator(scheduler, loadBalancer);
+		SimpleMultiTierApplication simulator = new SimpleMultiTierApplication(scheduler, loadBalancer);
 		
 		simulator.addMachine(0, null, false);
 		EasyMock.verify(monitor, scheduler, handler);
@@ -90,7 +90,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		
-		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(3);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleMultiTierApplication.class))).andReturn(1).times(3);
 		EasyMock.expect(scheduler.now()).andReturn(0L).times(3);
 		Capture<Event> event = new Capture<Event>();
 		scheduler.queueEvent(EasyMock.capture(event));
@@ -99,7 +99,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, scheduler, handler);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
+		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, loadBalancer);
 		
 		simulator.addMachine(0, new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0), false);
 		assertEquals(EventType.ADD_SERVER, event.getValue().getType());
@@ -113,12 +113,12 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		
-		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(3);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleMultiTierApplication.class))).andReturn(1).times(3);
 		
 		EasyMock.replay(monitor, scheduler, handler);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator = new SimpleSimulator(scheduler, loadBalancer);
+		SimpleMultiTierApplication simulator = new SimpleMultiTierApplication(scheduler, loadBalancer);
 		
 		simulator.removeMachine(4, false);
 		EasyMock.verify(monitor, scheduler, handler);
@@ -132,7 +132,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		TimeSharedMachine timeSharedMachine = EasyMock.createStrictMock(TimeSharedMachine.class);
 		SchedulingHeuristic heuristic = EasyMock.createMock(SchedulingHeuristic.class);
 		
-		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(2);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleMultiTierApplication.class))).andReturn(1).times(2);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1);
 
 		heuristic.addMachine(EasyMock.isA(Machine.class));
@@ -146,7 +146,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.replay(heuristic, monitor, scheduler, handler, timeSharedMachine);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, heuristic, 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
+		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, loadBalancer);
 		
 //		JEEvent event = new JEEvent(JEEventType.ADD_SERVER, handler, 1L, descriptor);
 		loadBalancer.serverIsUp(descriptor);
@@ -162,7 +162,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		TimeSharedMachine timeSharedMachine = EasyMock.createStrictMock(TimeSharedMachine.class);
 		
-		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(2);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleMultiTierApplication.class))).andReturn(1).times(2);
 		EasyMock.expect(scheduler.now()).andReturn(0L).times(3);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1);
 		
@@ -179,7 +179,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, scheduler, handler, timeSharedMachine);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
+		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, loadBalancer);
 		
 		Event eventAddServer = new Event(EventType.ADD_SERVER, handler, 1L, timeSharedMachine);
 //		loadBalancer.handleEvent(eventAddServer);
@@ -201,7 +201,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		TimeSharedMachine timeSharedMachine = EasyMock.createStrictMock(TimeSharedMachine.class);
 		SchedulingHeuristic heuristic = EasyMock.createMock(SchedulingHeuristic.class);
 		
-		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(2);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleMultiTierApplication.class))).andReturn(1).times(2);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1);
 		
 		MachineDescriptor descriptor = new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0);
@@ -213,7 +213,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, scheduler, handler, timeSharedMachine, heuristic);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, heuristic, 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
+		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, loadBalancer);
 		
 		Event event = new Event(EventType.ADD_SERVER, handler, 1L, descriptor);
 //		loadBalancer.handleEvent(event);
@@ -231,7 +231,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		TimeSharedMachine timeSharedMachine = EasyMock.createStrictMock(TimeSharedMachine.class);
 		TimeSharedMachine timeSharedMachine2 = EasyMock.createStrictMock(TimeSharedMachine.class);
 		
-		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(2);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleMultiTierApplication.class))).andReturn(1).times(2);
 		EasyMock.expect(scheduler.now()).andReturn(0L).times(4);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1).times(2);
 		
@@ -249,7 +249,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, scheduler, handler, timeSharedMachine, timeSharedMachine2);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
+		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, loadBalancer);
 		
 //		loadBalancer.handleEvent(new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine));
 //		loadBalancer.handleEvent(new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine2));
@@ -273,12 +273,12 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		
-		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(2);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleMultiTierApplication.class))).andReturn(1).times(2);
 		
 		EasyMock.replay(monitor, scheduler, handler, workloadParser);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
+		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, loadBalancer);
 		simulator.setWorkloadParser(null);
 		
 		EasyMock.verify(monitor, scheduler, handler, workloadParser);
@@ -293,7 +293,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		TimeSharedMachine timeSharedMachine = EasyMock.createStrictMock(TimeSharedMachine.class);
 		
-		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(2);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleMultiTierApplication.class))).andReturn(1).times(2);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1);
 		EasyMock.expect(scheduler.now()).andReturn(0L);
 		
@@ -308,7 +308,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, scheduler, handler, workloadParser, timeSharedMachine);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
+		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, loadBalancer);
 		
 		simulator.setWorkloadParser(workloadParser);
 		Event event = new Event(EventType.READWORKLOAD, handler, 1L, timeSharedMachine);
@@ -330,7 +330,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		
-		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(2);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleMultiTierApplication.class))).andReturn(1).times(2);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1);
 		
 		monitor.chargeUsers(31 * TimeUnit.DAY.getMillis() - 1);
@@ -339,7 +339,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, scheduler, handler);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
+		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, loadBalancer);
 		simulator.setMonitor(monitor);
 		
 		Event event = new Event(EventType.CHARGE_USERS, handler, 31 * TimeUnit.DAY.getMillis() - 1);
@@ -359,8 +359,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		TimeSharedMachine timeSharedMachine = EasyMock.createStrictMock(TimeSharedMachine.class);
 		Request request = EasyMock.createStrictMock(Request.class);
 		
-		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1);
-		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(2);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleMultiTierApplication.class))).andReturn(1);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleMultiTierApplication.class))).andReturn(2);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1);
 		
 		Capture<Event> eventReadWorkload = new Capture<Event>();
@@ -378,7 +378,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, scheduler, handler, workloadParser, timeSharedMachine, request);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
+		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, loadBalancer);
 		
 		simulator.setWorkloadParser(workloadParser);
 		Event event = new Event(EventType.READWORKLOAD, handler, 1L, timeSharedMachine);
@@ -400,7 +400,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		TimeSharedMachine timeSharedMachine = EasyMock.createStrictMock(TimeSharedMachine.class);
 		Request request = EasyMock.createStrictMock(Request.class);
 		
-		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(2);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleMultiTierApplication.class))).andReturn(1).times(2);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1);
 		
 		Capture<Event> eventReadWorkload = new Capture<Event>();
@@ -418,7 +418,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, scheduler, handler, workloadParser, timeSharedMachine, request);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
+		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, loadBalancer);
 		
 		simulator.setWorkloadParser(workloadParser);
 		Event event = new Event(EventType.READWORKLOAD, handler, 1L, timeSharedMachine);
@@ -439,7 +439,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		TimeSharedMachine timeSharedMachine = EasyMock.createStrictMock(TimeSharedMachine.class);
 		
-		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(2);
+		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleMultiTierApplication.class))).andReturn(1).times(2);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1);
 		EasyMock.expect(scheduler.now()).andReturn(0L).times(1);
 		
@@ -453,7 +453,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, scheduler, handler, workloadParser, timeSharedMachine);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
-		SimpleSimulator simulator = new SimpleSimulator(scheduler, loadBalancer);
+		SimpleMultiTierApplication simulator = new SimpleMultiTierApplication(scheduler, loadBalancer);
 		simulator.setMonitor(monitor);
 		simulator.setWorkloadParser(workloadParser);
 		
@@ -466,199 +466,199 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.verify(monitor, scheduler, handler, workloadParser, timeSharedMachine);
 	}
 	
-	@Test
-	public void testStartWithoutBeingLastSimulationDay() throws Exception{
-		Capture<Event> firstEvent = new Capture<Event>();
-		Capture<Event> secondEvent = new Capture<Event>();
-		
-		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
-		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleSimulator.class))).andReturn(1);
-		EasyMock.expect(scheduler.now()).andReturn(0l);
-		scheduler.queueEvent(EasyMock.capture(firstEvent));
-		EasyMock.expect(scheduler.now()).andReturn(0l);
-		scheduler.queueEvent(EasyMock.capture(secondEvent));
-		scheduler.start();
-		
-		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
-		EasyMock.expect(monitor.isOptimal()).andReturn(false);
-		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
-		loadBalancer.setMonitor(monitor, null);
-		
-		EasyMock.replay(monitor, loadBalancer, scheduler);
-		
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
-		simulator.setMonitor(monitor);
-		simulator.start();
-		
-		assertEquals(EventType.READWORKLOAD, firstEvent.getValue().getType());
-		assertEquals(EventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
-		
-		EasyMock.verify(monitor, loadBalancer, scheduler);
-	}
-	
-	@Test
-	public void testStartInFirstChargeUsersDay() throws Exception{
-		Capture<Event> firstEvent = new Capture<Event>();
-		Capture<Event> secondEvent = new Capture<Event>();
-		Capture<Event> thirdEvent = new Capture<Event>();
-
-		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
-		while(!info.isChargeDay()){
-			info.addDay();
-		}
-		
-		assert info.isChargeDay();
-		
-		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
-		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleSimulator.class))).andReturn(1);
-		EasyMock.expect(scheduler.now()).andReturn(0l);
-		scheduler.queueEvent(EasyMock.capture(firstEvent));
-		EasyMock.expectLastCall().times(2);
-		scheduler.start();
-		EasyMock.expect(scheduler.now()).andReturn(0l);
-		scheduler.queueEvent(EasyMock.capture(secondEvent));
-		scheduler.queueEvent(EasyMock.capture(thirdEvent));
-		
-		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
-		EasyMock.expect(monitor.isOptimal()).andReturn(false);
-		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
-		loadBalancer.setMonitor(monitor, null);
-		
-		EasyMock.replay(monitor, loadBalancer, scheduler);
-		
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
-		simulator.setMonitor(monitor);
-		simulator.start();
-		
-		assertEquals(EventType.READWORKLOAD, firstEvent.getValue().getType());
-		assertEquals(EventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
-		assertEquals(EventType.CHARGE_USERS, thirdEvent.getValue().getType());
-
-		EasyMock.verify(monitor, loadBalancer, scheduler);
-	}
-	
-	@Test
-	public void testStartInOtherChargeUsersDay() throws Exception{
-		Capture<Event> firstEvent = new Capture<Event>();
-		Capture<Event> secondEvent = new Capture<Event>();
-		Capture<Event> thirdEvent = new Capture<Event>();
-
-		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
-		while(!info.isChargeDay()){
-			info.addDay();
-		}
-		info.addDay();
-		while(!info.isChargeDay()){
-			info.addDay();
-		}
-		
-		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
-		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleSimulator.class))).andReturn(1);
-		EasyMock.expect(scheduler.now()).andReturn(0l);
-		scheduler.queueEvent(EasyMock.capture(firstEvent));
-		EasyMock.expect(scheduler.now()).andReturn(0l);
-		scheduler.queueEvent(EasyMock.capture(secondEvent));
-		scheduler.queueEvent(EasyMock.capture(thirdEvent));
-		scheduler.start();
-		
-		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
-		EasyMock.expect(monitor.isOptimal()).andReturn(false);
-		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
-		loadBalancer.setMonitor(monitor, null);
-		
-		EasyMock.replay(monitor, loadBalancer, scheduler);
-		
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
-		simulator.setMonitor(monitor);
-		simulator.start();
-		
-		assertEquals(EventType.READWORKLOAD, firstEvent.getValue().getType());
-		assertEquals(EventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
-		assertEquals(EventType.CHARGE_USERS, thirdEvent.getValue().getType());
-
-		EasyMock.verify(monitor, loadBalancer, scheduler);
-	}
-	
-	@Test
-	public void testStartBeingLastSimulationDay() throws Exception{
-		Capture<Event> firstEvent = new Capture<Event>();
-		Capture<Event> secondEvent = new Capture<Event>();
-
-		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
-		while(!info.isFinishDay()){
-			info.addDay();
-		}
-		
-		assert info.isFinishDay();
-		
-		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
-		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleSimulator.class))).andReturn(1);
-		EasyMock.expect(scheduler.now()).andReturn(0l);
-		scheduler.queueEvent(EasyMock.capture(firstEvent));
-		EasyMock.expect(scheduler.now()).andReturn(0l);
-		scheduler.queueEvent(EasyMock.capture(secondEvent));
-		scheduler.start();
-		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
-		loadBalancer.setMonitor(EasyMock.isA(Monitor.class), null);
-		
-		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
-		EasyMock.expect(monitor.isOptimal()).andReturn(false);
-		
-		EasyMock.replay(monitor, loadBalancer, scheduler);
-		
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
-		simulator.setMonitor(monitor);
-		simulator.start();
-		
-		assertEquals(EventType.READWORKLOAD, firstEvent.getValue().getType());
-		assertEquals(EventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
-		
-		EasyMock.verify(monitor, loadBalancer, scheduler);
-	}
-
-	@Test
-	public void testStartBeingChargeDay() throws Exception{
-		Capture<Event> firstEvent = new Capture<Event>();
-		Capture<Event> secondEvent = new Capture<Event>();
-		Capture<Event> thirdEvent = new Capture<Event>();
-
-		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
-		while(!info.isChargeDay()){
-			info.addDay();
-		}
-		
-		assert info.isChargeDay();
-		
-		EventScheduler scheduler = EasyMock.createMock(EventScheduler.class);
-		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleSimulator.class))).andReturn(1);
-		EasyMock.expect(scheduler.now()).andReturn(0l);
-		scheduler.queueEvent(EasyMock.capture(firstEvent));
-		EasyMock.expect(scheduler.now()).andReturn(0l);
-		scheduler.queueEvent(EasyMock.capture(secondEvent));
-		scheduler.queueEvent(EasyMock.capture(thirdEvent));
-		scheduler.start();
-		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
-		loadBalancer.setMonitor(EasyMock.isA(Monitor.class), null);
-		
-		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
-		EasyMock.expect(monitor.isOptimal()).andReturn(false);
-		EasyMock.replay(monitor, loadBalancer, scheduler);
-		
-		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
-		simulator.setMonitor(monitor);
-		simulator.start();
-		
-		assertEquals(EventType.READWORKLOAD, firstEvent.getValue().getType());
-		assertEquals(EventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
-		assertEquals(EventType.CHARGE_USERS, thirdEvent.getValue().getType());
-		
-		assertEquals(31 * TimeUnit.DAY.getMillis() - 1, thirdEvent.getValue().getScheduledTime());
-		
-		EasyMock.verify(monitor, loadBalancer, scheduler);
-	}
+//	@Test
+//	public void testStartWithoutBeingLastSimulationDay() throws Exception{
+//		Capture<Event> firstEvent = new Capture<Event>();
+//		Capture<Event> secondEvent = new Capture<Event>();
+//		
+//		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
+//		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleMultiTierApplication.class))).andReturn(1);
+//		EasyMock.expect(scheduler.now()).andReturn(0l);
+//		scheduler.queueEvent(EasyMock.capture(firstEvent));
+//		EasyMock.expect(scheduler.now()).andReturn(0l);
+//		scheduler.queueEvent(EasyMock.capture(secondEvent));
+//		scheduler.start();
+//		
+//		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
+//		EasyMock.expect(monitor.isOptimal()).andReturn(false);
+//		
+//		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+//		loadBalancer.setMonitor(monitor, null);
+//		
+//		EasyMock.replay(monitor, loadBalancer, scheduler);
+//		
+//		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, loadBalancer);
+//		simulator.setMonitor(monitor);
+//		simulator.start();
+//		
+//		assertEquals(EventType.READWORKLOAD, firstEvent.getValue().getType());
+//		assertEquals(EventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
+//		
+//		EasyMock.verify(monitor, loadBalancer, scheduler);
+//	}
+//	
+//	@Test
+//	public void testStartInFirstChargeUsersDay() throws Exception{
+//		Capture<Event> firstEvent = new Capture<Event>();
+//		Capture<Event> secondEvent = new Capture<Event>();
+//		Capture<Event> thirdEvent = new Capture<Event>();
+//
+//		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
+//		while(!info.isChargeDay()){
+//			info.addDay();
+//		}
+//		
+//		assert info.isChargeDay();
+//		
+//		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
+//		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleMultiTierApplication.class))).andReturn(1);
+//		EasyMock.expect(scheduler.now()).andReturn(0l);
+//		scheduler.queueEvent(EasyMock.capture(firstEvent));
+//		EasyMock.expectLastCall().times(2);
+//		scheduler.start();
+//		EasyMock.expect(scheduler.now()).andReturn(0l);
+//		scheduler.queueEvent(EasyMock.capture(secondEvent));
+//		scheduler.queueEvent(EasyMock.capture(thirdEvent));
+//		
+//		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
+//		EasyMock.expect(monitor.isOptimal()).andReturn(false);
+//		
+//		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+//		loadBalancer.setMonitor(monitor, null);
+//		
+//		EasyMock.replay(monitor, loadBalancer, scheduler);
+//		
+//		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, loadBalancer);
+//		simulator.setMonitor(monitor);
+//		simulator.start();
+//		
+//		assertEquals(EventType.READWORKLOAD, firstEvent.getValue().getType());
+//		assertEquals(EventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
+//		assertEquals(EventType.CHARGE_USERS, thirdEvent.getValue().getType());
+//
+//		EasyMock.verify(monitor, loadBalancer, scheduler);
+//	}
+//	
+//	@Test
+//	public void testStartInOtherChargeUsersDay() throws Exception{
+//		Capture<Event> firstEvent = new Capture<Event>();
+//		Capture<Event> secondEvent = new Capture<Event>();
+//		Capture<Event> thirdEvent = new Capture<Event>();
+//
+//		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
+//		while(!info.isChargeDay()){
+//			info.addDay();
+//		}
+//		info.addDay();
+//		while(!info.isChargeDay()){
+//			info.addDay();
+//		}
+//		
+//		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
+//		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleMultiTierApplication.class))).andReturn(1);
+//		EasyMock.expect(scheduler.now()).andReturn(0l);
+//		scheduler.queueEvent(EasyMock.capture(firstEvent));
+//		EasyMock.expect(scheduler.now()).andReturn(0l);
+//		scheduler.queueEvent(EasyMock.capture(secondEvent));
+//		scheduler.queueEvent(EasyMock.capture(thirdEvent));
+//		scheduler.start();
+//		
+//		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
+//		EasyMock.expect(monitor.isOptimal()).andReturn(false);
+//		
+//		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+//		loadBalancer.setMonitor(monitor, null);
+//		
+//		EasyMock.replay(monitor, loadBalancer, scheduler);
+//		
+//		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, loadBalancer);
+//		simulator.setMonitor(monitor);
+//		simulator.start();
+//		
+//		assertEquals(EventType.READWORKLOAD, firstEvent.getValue().getType());
+//		assertEquals(EventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
+//		assertEquals(EventType.CHARGE_USERS, thirdEvent.getValue().getType());
+//
+//		EasyMock.verify(monitor, loadBalancer, scheduler);
+//	}
+//	
+//	@Test
+//	public void testStartBeingLastSimulationDay() throws Exception{
+//		Capture<Event> firstEvent = new Capture<Event>();
+//		Capture<Event> secondEvent = new Capture<Event>();
+//
+//		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
+//		while(!info.isFinishDay()){
+//			info.addDay();
+//		}
+//		
+//		assert info.isFinishDay();
+//		
+//		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
+//		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleMultiTierApplication.class))).andReturn(1);
+//		EasyMock.expect(scheduler.now()).andReturn(0l);
+//		scheduler.queueEvent(EasyMock.capture(firstEvent));
+//		EasyMock.expect(scheduler.now()).andReturn(0l);
+//		scheduler.queueEvent(EasyMock.capture(secondEvent));
+//		scheduler.start();
+//		
+//		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+//		loadBalancer.setMonitor(EasyMock.isA(Monitor.class), null);
+//		
+//		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
+//		EasyMock.expect(monitor.isOptimal()).andReturn(false);
+//		
+//		EasyMock.replay(monitor, loadBalancer, scheduler);
+//		
+//		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, loadBalancer);
+//		simulator.setMonitor(monitor);
+//		simulator.start();
+//		
+//		assertEquals(EventType.READWORKLOAD, firstEvent.getValue().getType());
+//		assertEquals(EventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
+//		
+//		EasyMock.verify(monitor, loadBalancer, scheduler);
+//	}
+//
+//	@Test
+//	public void testStartBeingChargeDay() throws Exception{
+//		Capture<Event> firstEvent = new Capture<Event>();
+//		Capture<Event> secondEvent = new Capture<Event>();
+//		Capture<Event> thirdEvent = new Capture<Event>();
+//
+//		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
+//		while(!info.isChargeDay()){
+//			info.addDay();
+//		}
+//		
+//		assert info.isChargeDay();
+//		
+//		EventScheduler scheduler = EasyMock.createMock(EventScheduler.class);
+//		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleMultiTierApplication.class))).andReturn(1);
+//		EasyMock.expect(scheduler.now()).andReturn(0l);
+//		scheduler.queueEvent(EasyMock.capture(firstEvent));
+//		EasyMock.expect(scheduler.now()).andReturn(0l);
+//		scheduler.queueEvent(EasyMock.capture(secondEvent));
+//		scheduler.queueEvent(EasyMock.capture(thirdEvent));
+//		scheduler.start();
+//		
+//		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+//		loadBalancer.setMonitor(EasyMock.isA(Monitor.class), null);
+//		
+//		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
+//		EasyMock.expect(monitor.isOptimal()).andReturn(false);
+//		EasyMock.replay(monitor, loadBalancer, scheduler);
+//		
+//		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, loadBalancer);
+//		simulator.setMonitor(monitor);
+//		simulator.start();
+//		
+//		assertEquals(EventType.READWORKLOAD, firstEvent.getValue().getType());
+//		assertEquals(EventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
+//		assertEquals(EventType.CHARGE_USERS, thirdEvent.getValue().getType());
+//		
+//		assertEquals(31 * TimeUnit.DAY.getMillis() - 1, thirdEvent.getValue().getScheduledTime());
+//		
+//		EasyMock.verify(monitor, loadBalancer, scheduler);
+//	}
 }

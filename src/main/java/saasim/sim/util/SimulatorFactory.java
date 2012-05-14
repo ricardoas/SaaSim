@@ -1,5 +1,6 @@
 package saasim.sim.util;
 
+import saasim.sim.SimpleMultiTierApplication;
 import saasim.sim.SimpleSimulator;
 import saasim.sim.Simulator;
 import saasim.sim.core.EventScheduler;
@@ -17,6 +18,8 @@ public class SimulatorFactory {
 	 * @return {@link Simulator} builded.
 	 */
 	public static Simulator buildSimulator(EventScheduler scheduler){
-		return new SimpleSimulator(scheduler, ApplicationFactory.getInstance().buildApplication(scheduler));
+		return new SimpleSimulator(scheduler, new SimpleMultiTierApplication(
+				scheduler, ApplicationFactory.getInstance().buildApplication(
+						scheduler)));
 	}
 }

@@ -6,6 +6,7 @@ import saasim.cloud.Request;
 import saasim.io.WorkloadParser;
 import saasim.provisioning.DPS;
 import saasim.provisioning.Monitor;
+import saasim.sim.components.LoadBalancer;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.schedulingheuristics.SchedulingHeuristic;
 
@@ -14,7 +15,7 @@ import saasim.sim.schedulingheuristics.SchedulingHeuristic;
  * Interface for applications which underlying infrastructure can be dynamically configurable.
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public interface DynamicConfigurable {
+public interface DynamicConfigurable extends ServiceEntry{
 	
 	/**
 	 * Add a new server to the infrastructure
@@ -60,4 +61,9 @@ public interface DynamicConfigurable {
 	
 	void config(int tier, double threshold);
 	
+	/**
+	 * Gets the tiers of simulation.
+	 * @return The tiers of simulation.
+	 */
+	LoadBalancer[] getTiers();
 }

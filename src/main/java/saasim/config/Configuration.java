@@ -31,7 +31,7 @@ import saasim.io.ParserIdiom;
 import saasim.planning.heuristic.OverProvisionHeuristic;
 import saasim.provisioning.util.DPSInfo;
 import saasim.sim.AccountingSystem;
-import saasim.sim.SimpleSimulator;
+import saasim.sim.SimpleMultiTierApplication;
 import saasim.sim.Simulator;
 import saasim.sim.components.LoadBalancer;
 import saasim.sim.components.TimeSharedMachine;
@@ -110,18 +110,17 @@ public class Configuration extends ComplexPropertiesConfiguration{
 			instance.simulationInfo = (SimulationInfo) objects[1]; 
 			instance.simulationInfo.addDay();
 			instance.scheduler.reset(instance.simulationInfo.getCurrentDayInMillis(), instance.simulationInfo.getCurrentDayInMillis() + TimeUnit.DAY.getMillis());
-			instance.application = (Simulator) objects[2];
-			instance.providers = (Provider[]) objects[3];
-			instance.contracts = (Contract[]) objects[4];
-			instance.users = (User[]) objects[5];
-			instance.accountingSystem = (AccountingSystem) objects[6];
-			instance.priorities = (int []) objects[7];
-			instance.dpsInfo = (DPSInfo) objects[8];
+			instance.providers = (Provider[]) objects[2];
+			instance.contracts = (Contract[]) objects[3];
+			instance.users = (User[]) objects[4];
+			instance.accountingSystem = (AccountingSystem) objects[5];
+			instance.priorities = (int []) objects[6];
+			instance.dpsInfo = (DPSInfo) objects[7];
+			instance.application = (Simulator) objects[8];
 			EventCheckpointer.clear();
 		}else{
 			instance.simulationInfo = new SimulationInfo();
 			instance.scheduler = new EventScheduler(TimeUnit.DAY.getMillis());
-			instance.application = SimulatorFactory.buildSimulator(Configuration.getInstance().getScheduler());
 			instance.providers = Configuration.getInstance().readProviders();
 			instance.contracts = Configuration.getInstance().readContracts();
 			instance.users = Configuration.getInstance().readUsers();
@@ -131,10 +130,11 @@ public class Configuration extends ComplexPropertiesConfiguration{
 				instance.priorities[i] = instance.users[i].getContract().getPriority(); //FIXME Ricardo: don't know if we need this anymore
 			}
 			instance.dpsInfo = new DPSInfo();
+			instance.application = SimulatorFactory.buildSimulator(Configuration.getInstance().getScheduler());
 		}
 		
 		instance.scheduler.registerHandlerClass(LoadBalancer.class).
-					registerHandlerClass(SimpleSimulator.class).
+					registerHandlerClass(SimpleMultiTierApplication.class).
 					registerHandlerClass(TimeSharedMachine.class).
 					registerHandlerClass(OverProvisionHeuristic.class);
 		
@@ -607,7 +607,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 		setProperty(SimulatorProperties.PLANNING_USE_ERROR, true);
 	}
 
-	public Simulator getApplication() {
+	public Simulator getSimulator() {
 		return this.application;
 	}
 

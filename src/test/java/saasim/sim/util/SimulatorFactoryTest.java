@@ -17,14 +17,14 @@ public class SimulatorFactoryTest extends ValidConfigurationTest{
 	public void testBuildSameSimulatorAfterCheckPoint() throws ConfigurationException{
 		
 		buildFullConfiguration();
-		Simulator application = Configuration.getInstance().getApplication();
+		Simulator application = Configuration.getInstance().getSimulator();
 		assertNotNull(application);
 		
 		EventCheckpointer.save();
 		
 		buildFullConfiguration();
 		
-		Simulator applicationAfterCheckpoint = Configuration.getInstance().getApplication();
+		Simulator applicationAfterCheckpoint = Configuration.getInstance().getSimulator();
 		assertNotNull(applicationAfterCheckpoint);
 		assertEquals(applicationAfterCheckpoint, applicationAfterCheckpoint);
 	}

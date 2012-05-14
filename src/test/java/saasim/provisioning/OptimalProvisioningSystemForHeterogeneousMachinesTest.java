@@ -19,7 +19,7 @@ import saasim.config.PropertiesTesting;
 import saasim.io.GEISTWorkloadParser;
 import saasim.io.WorkloadParser;
 import saasim.sim.AccountingSystem;
-import saasim.sim.SimpleSimulator;
+import saasim.sim.SimpleMultiTierApplication;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.core.EventCheckpointer;
 import saasim.sim.provisioningheuristics.MachineStatistics;
@@ -140,7 +140,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(provider.canBuyMachine(true, MachineType.M2_2XLARGE)).andReturn(false);
 		EasyMock.expect(provider.canBuyMachine(true, MachineType.M2_4XLARGE)).andReturn(false);
 		
-		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
+		SimpleMultiTierApplication configurable = EasyMock.createMock(SimpleMultiTierApplication.class);
 		configurable.addMachine(0, machineDescriptor, true);
 		
 		User user = EasyMock.createMock(User.class);
@@ -189,7 +189,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(provider.canBuyMachine(false, MachineType.M1_SMALL)).andReturn(true).times(2);
 		EasyMock.expect(provider.buyMachine(false, MachineType.M1_SMALL)).andReturn(machineDescriptor);
 		
-		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
+		SimpleMultiTierApplication configurable = EasyMock.createMock(SimpleMultiTierApplication.class);
 		configurable.addMachine(0, machineDescriptor, true);
 		
 		User user = EasyMock.createMock(User.class);
@@ -237,7 +237,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(provider.canBuyMachine(true, MachineType.T1_MICRO)).andReturn(false);
 		EasyMock.expect(provider.canBuyMachine(false, MachineType.M1_SMALL)).andReturn(true);
 		
-		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
+		SimpleMultiTierApplication configurable = EasyMock.createMock(SimpleMultiTierApplication.class);
 		
 		User user = EasyMock.createMock(User.class);
 		AccountingSystem accounting = EasyMock.createMock(AccountingSystem.class);
@@ -285,7 +285,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(provider.canBuyMachine(false, MachineType.M1_SMALL)).andReturn(true).times(2);
 		EasyMock.expect(provider.buyMachine(false, MachineType.M1_SMALL)).andReturn(machineDescriptor);
 		
-		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
+		SimpleMultiTierApplication configurable = EasyMock.createMock(SimpleMultiTierApplication.class);
 		configurable.addMachine(0, machineDescriptor, true);
 		
 		User user = EasyMock.createMock(User.class);
@@ -331,7 +331,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(provider.canBuyMachine(true, MachineType.M2_2XLARGE)).andReturn(false);
 		EasyMock.expect(provider.canBuyMachine(true, MachineType.M2_4XLARGE)).andReturn(false);
 		
-		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
+		SimpleMultiTierApplication configurable = EasyMock.createMock(SimpleMultiTierApplication.class);
 		configurable.addMachine(0, machineDescriptor, true);
 		EasyMock.expectLastCall().times(4);
 		
@@ -381,7 +381,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(provider.canBuyMachine(false, MachineType.M1_SMALL)).andReturn(true).times(5);
 		EasyMock.expect(provider.buyMachine(false, MachineType.M1_SMALL)).andReturn(machineDescriptor).times(4);
 		
-		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
+		SimpleMultiTierApplication configurable = EasyMock.createMock(SimpleMultiTierApplication.class);
 		configurable.addMachine(0, machineDescriptor, true);
 		EasyMock.expectLastCall().times(4);
 		
@@ -431,7 +431,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(provider.canBuyMachine(false, MachineType.M1_SMALL)).andReturn(true).times(3);
 		EasyMock.expect(provider.buyMachine(false, MachineType.M1_SMALL)).andReturn(machineDescriptor).times(2);
 		
-		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
+		SimpleMultiTierApplication configurable = EasyMock.createMock(SimpleMultiTierApplication.class);
 		configurable.addMachine(0, machineDescriptor, true);
 		EasyMock.expectLastCall().times(2);
 		
@@ -483,7 +483,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(provider.canBuyMachine(false, MachineType.M1_SMALL)).andReturn(true).times(2);
 		EasyMock.expect(provider.buyMachine(false, MachineType.M1_SMALL)).andReturn(machineDescriptor);
 		
-		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
+		SimpleMultiTierApplication configurable = EasyMock.createMock(SimpleMultiTierApplication.class);
 		configurable.addMachine(0, machineDescriptor, true);
 		EasyMock.expectLastCall().times(4);
 		
@@ -535,7 +535,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(provider.canBuyMachine(false, MachineType.M1_SMALL)).andReturn(true).times(2);
 		EasyMock.expect(provider.buyMachine(false, MachineType.M1_SMALL)).andReturn(machineDescriptor);
 		
-		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
+		SimpleMultiTierApplication configurable = EasyMock.createMock(SimpleMultiTierApplication.class);
 		configurable.addMachine(0, machineDescriptor, true);
 		EasyMock.expectLastCall().times(4);
 		

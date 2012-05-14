@@ -1,6 +1,6 @@
 package saasim.sim;
 
-import saasim.sim.components.LoadBalancer;
+
 
 /**
  * Defines simulator operations. All simulators are dynamically 
@@ -8,7 +8,7 @@ import saasim.sim.components.LoadBalancer;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public interface Simulator extends DynamicConfigurable{
+public interface Simulator{
 	
 	/**
 	 * Start simulation.
@@ -16,8 +16,8 @@ public interface Simulator extends DynamicConfigurable{
 	void start();
 
 	/**
-	 * Gets the tiers of simulation.
-	 * @return The tiers of simulation.
+	 * 
+	 * @return All simulated applications.
 	 */
-	LoadBalancer[] getTiers();
+	DynamicConfigurable [] getApplications();
 }

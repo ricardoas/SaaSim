@@ -31,7 +31,7 @@ public class Main {
 			
 			EventScheduler scheduler = Configuration.getInstance().getScheduler();
 			DPS dps = DPSFactory.createDPS();
-			LoadBalancer[] loadBalancers = Configuration.getInstance().getApplication().getTiers();
+			LoadBalancer[] loadBalancers = Configuration.getInstance().getSimulator().getTiers();
 			
 			//Creating planner
 			Planner planner = new Planner(scheduler, dps, loadBalancers, Configuration.getInstance().getProviders(), Configuration.getInstance().getUsers());

@@ -29,7 +29,7 @@ import saasim.planning.util.MachineUsageData;
 import saasim.planning.util.PlanIOHandler;
 import saasim.provisioning.DPS;
 import saasim.provisioning.util.DPSFactory;
-import saasim.sim.SimpleSimulator;
+import saasim.sim.SimpleMultiTierApplication;
 import saasim.sim.components.LoadBalancer;
 import saasim.sim.components.Machine;
 import saasim.sim.components.MachineDescriptor;
@@ -102,7 +102,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		loadBalancers[0] = lb1;
 		
 		//Simulator
-		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -175,7 +175,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		loadBalancers[0] = lb1;
 		
 		//Simulator
-		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -272,7 +272,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		loadBalancers[0] = lb1;
 		
 		//Simulator
-		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -370,7 +370,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		loadBalancers[0] = lb1;
 		
 		//Simulator
-		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -469,7 +469,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		loadBalancers[0] = lb1;
 		
 		//Simulator
-		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -570,7 +570,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		loadBalancers[0] = lb1;
 		
 		//Simulator
-		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -710,7 +710,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		loadBalancers[2] = lb3;
 		
 		//Simulator
-		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		simulator.start();
@@ -721,7 +721,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
-		dps.registerConfigurable(EasyMock.isA(SimpleSimulator.class));
+		dps.registerConfigurable(EasyMock.isA(SimpleMultiTierApplication.class));
 		EasyMock.expectLastCall().times(2);
 		
 		PowerMock.replay(SimulatorFactory.class);
@@ -831,7 +831,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		loadBalancers[2] = lb3;
 		
 		//Simulator
-		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -929,7 +929,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		loadBalancers[2] = lb3;
 		
 		//Simulator
-		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -1028,7 +1028,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		loadBalancers[2] = lb3;
 		
 		//Simulator
-		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
@@ -1148,7 +1148,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		loadBalancers[2] = lb3;
 		
 		//Simulator
-		SimpleSimulator simulator = EasyMock.createStrictMock(SimpleSimulator.class);
+		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
 		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		

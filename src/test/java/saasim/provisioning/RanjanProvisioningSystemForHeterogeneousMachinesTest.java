@@ -23,7 +23,8 @@ import saasim.cloud.User;
 import saasim.config.Configuration;
 import saasim.io.WorkloadParser;
 import saasim.io.WorkloadParserFactory;
-import saasim.sim.SimpleSimulator;
+import saasim.sim.DynamicConfigurable;
+import saasim.sim.SimpleMultiTierApplication;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.core.EventCheckpointer;
 import saasim.sim.provisioningheuristics.MachineStatistics;
@@ -165,7 +166,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		int totalNumberOfServers = 0;
 		MachineStatistics statistics = new MachineStatistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
-		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
+		SimpleMultiTierApplication configurable = EasyMock.createMock(SimpleMultiTierApplication.class);
 		configurable.addMachine(0, new MachineDescriptor(0, true, MachineType.C1_MEDIUM, 0), true);
 		configurable.setMonitor(EasyMock.isA(Monitor.class));
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
@@ -198,7 +199,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		
 		//Creating a new dps
 		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines();
-		this.dps.registerConfigurable(configurable);
+		this.dps.registerConfigurable(new DynamicConfigurable[]{configurable});
 		this.dps.sendStatistics(0, statistics, 0);
 		
 		PowerMock.verifyAll();
@@ -229,7 +230,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		int totalNumberOfServers = 3;
 		MachineStatistics statistics = new MachineStatistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
-		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
+		SimpleMultiTierApplication configurable = EasyMock.createMock(SimpleMultiTierApplication.class);
 
 		Capture<MachineDescriptor> [] descriptor = new Capture[9];
 		for (int i = 0; i < descriptor.length; i++) {
@@ -272,7 +273,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		
 		//Creating a new dps
 		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines();
-		this.dps.registerConfigurable(configurable);
+		this.dps.registerConfigurable(new DynamicConfigurable[]{configurable});
 		this.dps.sendStatistics(0, statistics, 0);
 		
 		for (int i = 0; i < 5; i++) {
@@ -311,7 +312,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		int totalNumberOfServers = 3;
 		MachineStatistics statistics = new MachineStatistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
-		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
+		SimpleMultiTierApplication configurable = EasyMock.createMock(SimpleMultiTierApplication.class);
 
 		Capture<MachineDescriptor> [] descriptor = new Capture[3];
 		for (int i = 0; i < descriptor.length; i++) {
@@ -347,7 +348,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		
 		//Creating a new dps
 		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines();
-		this.dps.registerConfigurable(configurable);
+		this.dps.registerConfigurable(new DynamicConfigurable[]{configurable});
 		this.dps.sendStatistics(0, statistics, 0);
 		
 		for (int i = 0; i < 3; i++) {
@@ -382,7 +383,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		int totalNumberOfServers = 3;
 		MachineStatistics statistics = new MachineStatistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
-		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
+		SimpleMultiTierApplication configurable = EasyMock.createMock(SimpleMultiTierApplication.class);
 
 		Capture<MachineDescriptor> [] descriptor = new Capture[5];
 		for (int i = 0; i < descriptor.length; i++) {
@@ -421,7 +422,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		
 		//Creating a new dps
 		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines();
-		this.dps.registerConfigurable(configurable);
+		this.dps.registerConfigurable(new DynamicConfigurable[]{configurable});
 		this.dps.sendStatistics(0, statistics, 0);
 		
 		for (int i = 0; i < 3; i++) {
@@ -454,7 +455,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		int totalNumberOfServers = 20;
 		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
-		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);
+		SimpleMultiTierApplication configurable = EasyMock.createMock(SimpleMultiTierApplication.class);
 		configurable.setMonitor(EasyMock.isA(Monitor.class));
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
 		configurable.removeMachine(0, false);
@@ -486,7 +487,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		
 		//Creating a new dps
 		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines();
-		this.dps.registerConfigurable(configurable);
+		this.dps.registerConfigurable(new DynamicConfigurable[]{configurable});
 		
 		//Buying some on-demand machines
 		this.dps.buyMachine(provider, MachineType.M1_SMALL, false);
