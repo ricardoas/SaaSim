@@ -17,6 +17,10 @@ import saasim.sim.jeevent.JECheckpointer;
  */
 public class CleanConfigurationTest {
 	
+	static{
+		System.setProperty("saasim.configuration", "src/test/resources/scenario_01/config.properties");
+	}
+	
 	/**
 	 * Cleans up configuration singleton object.
 	 * 

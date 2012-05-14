@@ -8,6 +8,8 @@ import static saasim.sim.util.SaaSUsersProperties.*;
 import static saasim.sim.util.SimulatorProperties.*;
 import static saasim.util.DataUnit.*;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
@@ -55,7 +57,12 @@ public class Configuration extends ComplexPropertiesConfiguration{
 
 	static{
 		try {
-			buildInstance(DEFAULT_PROPERTIES_FILE_NAME);
+			String customPropertyFile = System.getProperty("saasim.configuration");
+			if(customPropertyFile != null && !customPropertyFile.isEmpty()){
+				buildInstance(customPropertyFile);
+			}else{
+				buildInstance(DEFAULT_PROPERTIES_FILE_NAME);
+			}
 		} catch (ConfigurationException e) {
 			throw new ConfigurationRuntimeException(e);
 		}
