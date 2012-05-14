@@ -21,6 +21,10 @@ import saasim.util.TimeUnit;
  */
 public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8961363221315245638L;
 	private static final String PROP_PREDICTION_WINDOW_SIZE= "dps.urgaonkar.windowsize";
 	private static final String PROP_PERCENTILE = "dps.urgaonkar.percentile";
 	private static final String PROP_ENABLE_PREDICTIVE = "dps.urgaonkar.predictive";

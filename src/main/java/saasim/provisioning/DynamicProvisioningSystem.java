@@ -74,7 +74,7 @@ public class DynamicProvisioningSystem implements DPS{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public final void registerConfigurable(DynamicConfigurable[] configurables) {
+	public final void registerConfigurable(DynamicConfigurable... configurables) {
 		
 		this.configurable = configurables[0];
 		

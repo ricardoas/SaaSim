@@ -30,6 +30,11 @@ import saasim.sim.util.SimulatorProperties;
  */
 public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicProvisioningSystem {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4511114280512130824L;
+
 	private static final int QUANTUM_SIZE = 100;
 
 	protected MachineType[] acceleratorTypes = {MachineType.M1_SMALL};

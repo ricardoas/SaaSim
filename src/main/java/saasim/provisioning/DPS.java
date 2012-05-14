@@ -17,7 +17,7 @@ public interface DPS extends Monitor{
 	 * 
 	 * @param dynamicConfigurables {@link DynamicConfigurable} instances.
 	 */
-	void registerConfigurable(DynamicConfigurable[] dynamicConfigurables);
+	void registerConfigurable(DynamicConfigurable... dynamicConfigurables);
 	
 	/**
 	 * Compute application total utility.

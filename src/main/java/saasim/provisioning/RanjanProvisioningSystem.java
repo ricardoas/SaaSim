@@ -24,6 +24,10 @@ import saasim.util.TimeUnit;
  */
 public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2728028883564701570L;
 	private static String PROP_MACHINE_TYPE = "dps.ranjan.type";  
 	private static String PROP_TARGET_UTILISATION = "dps.ranjan.target";  
 

@@ -15,6 +15,11 @@ import saasim.util.TimeUnit;
 public class EC2UrgaonkarProvisioningSystem extends UrgaonkarProvisioningSystem {
 	
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4904370979372548295L;
+
+	/**
 	 * Default constructor 
 	 */
 	public EC2UrgaonkarProvisioningSystem() {

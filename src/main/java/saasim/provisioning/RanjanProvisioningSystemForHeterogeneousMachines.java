@@ -22,6 +22,10 @@ import saasim.sim.provisioningheuristics.MachineStatistics;
  */
 public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicProvisioningSystem {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7031263666443936866L;
 	private double TARGET_UTILIZATION = 0.66;
 	public static long UTILIZATION_EVALUATION_PERIOD_IN_MILLIS = 1000 * 60 * 5;//in millis
 	
