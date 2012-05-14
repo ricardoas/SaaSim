@@ -8,10 +8,7 @@ import static saasim.sim.util.SaaSUsersProperties.*;
 import static saasim.sim.util.SimulatorProperties.*;
 import static saasim.util.DataUnit.*;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -38,8 +35,8 @@ import saasim.sim.SimpleSimulator;
 import saasim.sim.Simulator;
 import saasim.sim.components.LoadBalancer;
 import saasim.sim.components.TimeSharedMachine;
-import saasim.sim.jeevent.JECheckpointer;
-import saasim.sim.jeevent.JEEventScheduler;
+import saasim.sim.core.EventCheckpointer;
+import saasim.sim.core.EventScheduler;
 import saasim.sim.util.SimulatorFactory;
 import saasim.sim.util.SimulatorProperties;
 import saasim.util.DataUnit;
@@ -48,8 +45,9 @@ import saasim.util.TimeUnit;
 
 
 /**
+ * Simulator configuration loader.
+ * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
- *
  */
 public class Configuration extends ComplexPropertiesConfiguration{
 	
@@ -75,7 +73,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	
 	private int[] priorities;
 	
-	private JEEventScheduler scheduler;
+	private EventScheduler scheduler;
 	private SimulationInfo simulationInfo;
 	private Simulator application;
 	private Provider[] providers;
@@ -103,31 +101,26 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	 */
 	public static void buildInstance(String propertiesFileName) throws ConfigurationException{
 		Locale.setDefault(Locale.US);
-		Logger.getLogger(JECheckpointer.class).debug("CHKP LOAD-in");
+		Logger.getLogger(EventCheckpointer.class).debug("CHKP LOAD-in");
 		instance = new Configuration(propertiesFileName);
 
-		if(JECheckpointer.hasCheckpoint()){
-			try {
-				ObjectInputStream in = JECheckpointer.load();
-				instance.scheduler = (JEEventScheduler) in.readObject();
-				instance.simulationInfo = (SimulationInfo) in.readObject(); 
-				instance.simulationInfo.addDay();
-				instance.scheduler.reset(instance.simulationInfo.getCurrentDayInMillis(), instance.simulationInfo.getCurrentDayInMillis() + TimeUnit.DAY.getMillis());
-				instance.application = (Simulator) in.readObject();
-				instance.providers = (Provider[]) in.readObject();
-				instance.contracts = (Contract[]) in.readObject();
-				instance.users = (User[]) in.readObject();
-				instance.accountingSystem = (AccountingSystem) in.readObject();
-				instance.priorities = (int []) in.readObject();
-				instance.dpsInfo = (DPSInfo) in.readObject();
-				in.close();
-				JECheckpointer.clear();
-			} catch (Exception e) {
-				throw new ConfigurationException(e);
-			}
+		if(EventCheckpointer.hasCheckpoint()){
+			Object[] objects = EventCheckpointer.load();
+			instance.scheduler = (EventScheduler) objects[0];
+			instance.simulationInfo = (SimulationInfo) objects[1]; 
+			instance.simulationInfo.addDay();
+			instance.scheduler.reset(instance.simulationInfo.getCurrentDayInMillis(), instance.simulationInfo.getCurrentDayInMillis() + TimeUnit.DAY.getMillis());
+			instance.application = (Simulator) objects[2];
+			instance.providers = (Provider[]) objects[3];
+			instance.contracts = (Contract[]) objects[4];
+			instance.users = (User[]) objects[5];
+			instance.accountingSystem = (AccountingSystem) objects[6];
+			instance.priorities = (int []) objects[7];
+			instance.dpsInfo = (DPSInfo) objects[8];
+			EventCheckpointer.clear();
 		}else{
 			instance.simulationInfo = new SimulationInfo();
-			instance.scheduler = new JEEventScheduler(TimeUnit.DAY.getMillis());
+			instance.scheduler = new EventScheduler(TimeUnit.DAY.getMillis());
 			instance.application = SimulatorFactory.buildSimulator(Configuration.getInstance().getScheduler());
 			instance.providers = Configuration.getInstance().readProviders();
 			instance.contracts = Configuration.getInstance().readContracts();
@@ -145,7 +138,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 					registerHandlerClass(TimeSharedMachine.class).
 					registerHandlerClass(OverProvisionHeuristic.class);
 		
-		Logger.getLogger(JECheckpointer.class).debug("CHKP LOAD-out " + instance.simulationInfo);
+		Logger.getLogger(EventCheckpointer.class).debug("CHKP LOAD-out " + instance.simulationInfo);
 	}
 	
 	/**
@@ -164,7 +157,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	public void save(){
 		assert instance != null;
 		
-		JECheckpointer.save(scheduler, simulationInfo, application, providers, contracts, users, accountingSystem, priorities, dpsInfo);
+		EventCheckpointer.save(scheduler, simulationInfo, application, providers, contracts, users, accountingSystem, priorities, dpsInfo);
 	}
 
 	/**
@@ -630,7 +623,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 		return this.users;
 	}
 
-	public JEEventScheduler getScheduler() {
+	public EventScheduler getScheduler() {
 		return this.scheduler;
 	}
 

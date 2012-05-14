@@ -20,10 +20,10 @@ import saasim.sim.components.LoadBalancer;
 import saasim.sim.components.Machine;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.components.TimeSharedMachine;
-import saasim.sim.jeevent.JEEvent;
-import saasim.sim.jeevent.JEEventHandler;
-import saasim.sim.jeevent.JEEventScheduler;
-import saasim.sim.jeevent.JEEventType;
+import saasim.sim.core.Event;
+import saasim.sim.core.EventHandler;
+import saasim.sim.core.EventScheduler;
+import saasim.sim.core.EventType;
 import saasim.sim.provisioningheuristics.MachineStatistics;
 import saasim.sim.schedulingheuristics.RoundRobinHeuristic;
 import saasim.sim.schedulingheuristics.SchedulingHeuristic;
@@ -51,8 +51,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 	
 	@Test(expected=AssertionError.class)
 	public void testAddServerWithInexistentTier() {
-		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		
 		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(3);
@@ -68,8 +68,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 	
 	@Test(expected=RuntimeException.class)
 	public void testAddServerWithNullMachine() {
-		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		
 		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(3);
@@ -86,13 +86,13 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testAddServer() {
-		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		
 		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(3);
 		EasyMock.expect(scheduler.now()).andReturn(0L).times(3);
-		Capture<JEEvent> event = new Capture<JEEvent>();
+		Capture<Event> event = new Capture<Event>();
 		scheduler.queueEvent(EasyMock.capture(event));
 		EasyMock.expectLastCall().times(1);
 		
@@ -102,15 +102,15 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
 		simulator.addMachine(0, new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0), false);
-		assertEquals(JEEventType.ADD_SERVER, event.getValue().getType());
+		assertEquals(EventType.ADD_SERVER, event.getValue().getType());
 		
 		EasyMock.verify(monitor, scheduler, handler);
 	}
 	
 	@Test(expected=AssertionError.class)
 	public void testRemoveServerWithInexistentTier() {
-		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		
 		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(3);
@@ -126,8 +126,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testRemoveServerNotUseForce() {
-		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		TimeSharedMachine timeSharedMachine = EasyMock.createStrictMock(TimeSharedMachine.class);
 		SchedulingHeuristic heuristic = EasyMock.createMock(SchedulingHeuristic.class);
@@ -157,8 +157,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 	
 	@Ignore @Test
 	public void testRemoveServerUseForce() {
-		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		TimeSharedMachine timeSharedMachine = EasyMock.createStrictMock(TimeSharedMachine.class);
 		
@@ -172,7 +172,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		timeSharedMachine.shutdownOnFinish();
 		EasyMock.expectLastCall().times(1);
 		
-		Capture<JEEvent> eventTurnedOff = new Capture<JEEvent>();
+		Capture<Event> eventTurnedOff = new Capture<Event>();
 		scheduler.queueEvent(EasyMock.capture(eventTurnedOff));
 		EasyMock.expectLastCall().times(1);
 		
@@ -181,22 +181,22 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
-		JEEvent eventAddServer = new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine);
+		Event eventAddServer = new Event(EventType.ADD_SERVER, handler, 1L, timeSharedMachine);
 //		loadBalancer.handleEvent(eventAddServer);
 		loadBalancer.serverIsUp(timeSharedMachine.getDescriptor());
 		
 		assertTrue(loadBalancer.getServers().size() == 1);
 		simulator.removeMachine(0, true);
 		assertTrue(loadBalancer.getServers().size() == 0);
-		assertEquals(JEEventType.MACHINE_TURNED_OFF, eventTurnedOff.getValue().getType());
+		assertEquals(EventType.MACHINE_TURNED_OFF, eventTurnedOff.getValue().getType());
 		
 		EasyMock.verify(monitor, scheduler, handler, timeSharedMachine);
 	}
 	
 	@Test
 	public void testRemoveServerWithOneMachineAndNotUseForce() {
-		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		TimeSharedMachine timeSharedMachine = EasyMock.createStrictMock(TimeSharedMachine.class);
 		SchedulingHeuristic heuristic = EasyMock.createMock(SchedulingHeuristic.class);
@@ -215,7 +215,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, heuristic, 2, 3);
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
-		JEEvent event = new JEEvent(JEEventType.ADD_SERVER, handler, 1L, descriptor);
+		Event event = new Event(EventType.ADD_SERVER, handler, 1L, descriptor);
 //		loadBalancer.handleEvent(event);
 		loadBalancer.serverIsUp(descriptor);
 		
@@ -225,8 +225,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 	
 	@Ignore @Test
 	public void testRemoveServerWithoutDescriptorAndUseForce() {
-		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		TimeSharedMachine timeSharedMachine = EasyMock.createStrictMock(TimeSharedMachine.class);
 		TimeSharedMachine timeSharedMachine2 = EasyMock.createStrictMock(TimeSharedMachine.class);
@@ -242,7 +242,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		timeSharedMachine2.shutdownOnFinish();
 		EasyMock.expectLastCall().times(1);
 		
-		Capture<JEEvent> eventTurnedOff = new Capture<JEEvent>();
+		Capture<Event> eventTurnedOff = new Capture<Event>();
 		scheduler.queueEvent(EasyMock.capture(eventTurnedOff));
 		EasyMock.expectLastCall().times(1);
 		
@@ -260,7 +260,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		assertTrue(loadBalancer.getServers().size() == 2);
 		simulator.removeMachine(0, true);
 		assertTrue(loadBalancer.getServers().size() == 1);
-		assertEquals(JEEventType.MACHINE_TURNED_OFF, eventTurnedOff.getValue().getType());
+		assertEquals(EventType.MACHINE_TURNED_OFF, eventTurnedOff.getValue().getType());
 		
 		EasyMock.verify(monitor, scheduler, handler, timeSharedMachine);
 	}
@@ -269,8 +269,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 	@Test(expected=AssertionError.class)
 	public void testSetWorkloadParserWithNullWorkload() {
 		WorkloadParser<List<Request>> workloadParser = EasyMock.createStrictMock(WorkloadParser.class);
-		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		
 		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(2);
@@ -288,8 +288,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 	@Test
 	public void testSetWorkloadParser() {
 		WorkloadParser<List<Request>> workloadParser = EasyMock.createStrictMock(WorkloadParser.class);
-		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		TimeSharedMachine timeSharedMachine = EasyMock.createStrictMock(TimeSharedMachine.class);
 		
@@ -297,7 +297,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.expect(handler.getHandlerId()).andReturn(1);
 		EasyMock.expect(scheduler.now()).andReturn(0L);
 		
-		Capture<JEEvent> eventReadWorkload = new Capture<JEEvent>();
+		Capture<Event> eventReadWorkload = new Capture<Event>();
 		scheduler.queueEvent(EasyMock.capture(eventReadWorkload));
 		EasyMock.expectLastCall().times(1);
 		
@@ -311,11 +311,11 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
 		simulator.setWorkloadParser(workloadParser);
-		JEEvent event = new JEEvent(JEEventType.READWORKLOAD, handler, 1L, timeSharedMachine);
+		Event event = new Event(EventType.READWORKLOAD, handler, 1L, timeSharedMachine);
 //		simulator.handleEvent(event);
 		simulator.readWorkload();
 		
-		assertEquals(JEEventType.READWORKLOAD, eventReadWorkload.getValue().getType());
+		assertEquals(EventType.READWORKLOAD, eventReadWorkload.getValue().getType());
 		
 		EasyMock.verify(monitor, scheduler, handler, workloadParser, timeSharedMachine);
 	}
@@ -326,8 +326,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 			Configuration.getInstance().getSimulationInfo().addDay();
 		}
 		
-		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		
 		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(2);
@@ -342,7 +342,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		simulator.setMonitor(monitor);
 		
-		JEEvent event = new JEEvent(JEEventType.CHARGE_USERS, handler, 31 * TimeUnit.DAY.getMillis() - 1);
+		Event event = new Event(EventType.CHARGE_USERS, handler, 31 * TimeUnit.DAY.getMillis() - 1);
 //		simulator.handleEvent(event);
 		simulator.chargeUsers();
 		
@@ -353,8 +353,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 	@Test
 	public void testHandleEventReadWorkload() {
 		WorkloadParser<List<Request>> workloadParser = EasyMock.createStrictMock(WorkloadParser.class);
-		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		TimeSharedMachine timeSharedMachine = EasyMock.createStrictMock(TimeSharedMachine.class);
 		Request request = EasyMock.createStrictMock(Request.class);
@@ -363,7 +363,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(2);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1);
 		
-		Capture<JEEvent> eventReadWorkload = new Capture<JEEvent>();
+		Capture<Event> eventReadWorkload = new Capture<Event>();
 		scheduler.queueEvent(EasyMock.capture(eventReadWorkload));
 		EasyMock.expect(scheduler.now()).andReturn(0L);
 		scheduler.queueEvent(EasyMock.capture(eventReadWorkload));
@@ -381,11 +381,11 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
 		simulator.setWorkloadParser(workloadParser);
-		JEEvent event = new JEEvent(JEEventType.READWORKLOAD, handler, 1L, timeSharedMachine);
+		Event event = new Event(EventType.READWORKLOAD, handler, 1L, timeSharedMachine);
 //		simulator.handleEvent(event);
 		simulator.readWorkload();
 		
-		assertEquals(JEEventType.READWORKLOAD, eventReadWorkload.getValue().getType());
+		assertEquals(EventType.READWORKLOAD, eventReadWorkload.getValue().getType());
 		
 		EasyMock.verify(monitor, scheduler, handler, workloadParser, timeSharedMachine, request);
 	}
@@ -394,8 +394,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 	@Test
 	public void testHandleEventReadWorkloadWithoutMoreRequests() {
 		WorkloadParser<List<Request>> workloadParser = EasyMock.createStrictMock(WorkloadParser.class);
-		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		TimeSharedMachine timeSharedMachine = EasyMock.createStrictMock(TimeSharedMachine.class);
 		Request request = EasyMock.createStrictMock(Request.class);
@@ -403,7 +403,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleSimulator.class))).andReturn(1).times(2);
 		EasyMock.expect(handler.getHandlerId()).andReturn(1);
 		
-		Capture<JEEvent> eventReadWorkload = new Capture<JEEvent>();
+		Capture<Event> eventReadWorkload = new Capture<Event>();
 		scheduler.queueEvent(EasyMock.capture(eventReadWorkload));
 		EasyMock.expectLastCall();
 		
@@ -421,11 +421,11 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		SimpleSimulator simulator =  new SimpleSimulator(scheduler, loadBalancer);
 		
 		simulator.setWorkloadParser(workloadParser);
-		JEEvent event = new JEEvent(JEEventType.READWORKLOAD, handler, 1L, timeSharedMachine);
+		Event event = new Event(EventType.READWORKLOAD, handler, 1L, timeSharedMachine);
 //		simulator.handleEvent(event);
 		simulator.readWorkload();
 		
-		assertEquals(JEEventType.NEWREQUEST, eventReadWorkload.getValue().getType());
+		assertEquals(EventType.NEWREQUEST, eventReadWorkload.getValue().getType());
 		
 		EasyMock.verify(monitor, scheduler, handler, workloadParser, timeSharedMachine, request);
 	}
@@ -434,8 +434,8 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 	@Test
 	public void testHandleEventCollectStatistics() {
 		WorkloadParser<List<Request>> workloadParser = EasyMock.createStrictMock(WorkloadParser.class);
-		JEEventHandler handler = EasyMock.createStrictMock(JEEventHandler.class);
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		TimeSharedMachine timeSharedMachine = EasyMock.createStrictMock(TimeSharedMachine.class);
 		
@@ -443,7 +443,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.expect(handler.getHandlerId()).andReturn(1);
 		EasyMock.expect(scheduler.now()).andReturn(0L).times(1);
 		
-		Capture<JEEvent> eventCollectStatistics = new Capture<JEEvent>();
+		Capture<Event> eventCollectStatistics = new Capture<Event>();
 		scheduler.queueEvent(EasyMock.capture(eventCollectStatistics));
 		EasyMock.expectLastCall().times(1);
 		
@@ -457,21 +457,21 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		simulator.setMonitor(monitor);
 		simulator.setWorkloadParser(workloadParser);
 		
-		JEEvent event = new JEEvent(JEEventType.COLLECT_STATISTICS, handler, 1L, timeSharedMachine);
+		Event event = new Event(EventType.COLLECT_STATISTICS, handler, 1L, timeSharedMachine);
 //		simulator.handleEvent(event);
 		simulator.collectStatistics();
 		
-		assertEquals(JEEventType.COLLECT_STATISTICS, eventCollectStatistics.getValue().getType());
+		assertEquals(EventType.COLLECT_STATISTICS, eventCollectStatistics.getValue().getType());
 		
 		EasyMock.verify(monitor, scheduler, handler, workloadParser, timeSharedMachine);
 	}
 	
 	@Test
 	public void testStartWithoutBeingLastSimulationDay() throws Exception{
-		Capture<JEEvent> firstEvent = new Capture<JEEvent>();
-		Capture<JEEvent> secondEvent = new Capture<JEEvent>();
+		Capture<Event> firstEvent = new Capture<Event>();
+		Capture<Event> secondEvent = new Capture<Event>();
 		
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleSimulator.class))).andReturn(1);
 		EasyMock.expect(scheduler.now()).andReturn(0l);
 		scheduler.queueEvent(EasyMock.capture(firstEvent));
@@ -491,17 +491,17 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		simulator.setMonitor(monitor);
 		simulator.start();
 		
-		assertEquals(JEEventType.READWORKLOAD, firstEvent.getValue().getType());
-		assertEquals(JEEventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
+		assertEquals(EventType.READWORKLOAD, firstEvent.getValue().getType());
+		assertEquals(EventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
 		
 		EasyMock.verify(monitor, loadBalancer, scheduler);
 	}
 	
 	@Test
 	public void testStartInFirstChargeUsersDay() throws Exception{
-		Capture<JEEvent> firstEvent = new Capture<JEEvent>();
-		Capture<JEEvent> secondEvent = new Capture<JEEvent>();
-		Capture<JEEvent> thirdEvent = new Capture<JEEvent>();
+		Capture<Event> firstEvent = new Capture<Event>();
+		Capture<Event> secondEvent = new Capture<Event>();
+		Capture<Event> thirdEvent = new Capture<Event>();
 
 		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
 		while(!info.isChargeDay()){
@@ -510,7 +510,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		assert info.isChargeDay();
 		
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleSimulator.class))).andReturn(1);
 		EasyMock.expect(scheduler.now()).andReturn(0l);
 		scheduler.queueEvent(EasyMock.capture(firstEvent));
@@ -532,18 +532,18 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		simulator.setMonitor(monitor);
 		simulator.start();
 		
-		assertEquals(JEEventType.READWORKLOAD, firstEvent.getValue().getType());
-		assertEquals(JEEventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
-		assertEquals(JEEventType.CHARGE_USERS, thirdEvent.getValue().getType());
+		assertEquals(EventType.READWORKLOAD, firstEvent.getValue().getType());
+		assertEquals(EventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
+		assertEquals(EventType.CHARGE_USERS, thirdEvent.getValue().getType());
 
 		EasyMock.verify(monitor, loadBalancer, scheduler);
 	}
 	
 	@Test
 	public void testStartInOtherChargeUsersDay() throws Exception{
-		Capture<JEEvent> firstEvent = new Capture<JEEvent>();
-		Capture<JEEvent> secondEvent = new Capture<JEEvent>();
-		Capture<JEEvent> thirdEvent = new Capture<JEEvent>();
+		Capture<Event> firstEvent = new Capture<Event>();
+		Capture<Event> secondEvent = new Capture<Event>();
+		Capture<Event> thirdEvent = new Capture<Event>();
 
 		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
 		while(!info.isChargeDay()){
@@ -554,7 +554,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 			info.addDay();
 		}
 		
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleSimulator.class))).andReturn(1);
 		EasyMock.expect(scheduler.now()).andReturn(0l);
 		scheduler.queueEvent(EasyMock.capture(firstEvent));
@@ -575,17 +575,17 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		simulator.setMonitor(monitor);
 		simulator.start();
 		
-		assertEquals(JEEventType.READWORKLOAD, firstEvent.getValue().getType());
-		assertEquals(JEEventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
-		assertEquals(JEEventType.CHARGE_USERS, thirdEvent.getValue().getType());
+		assertEquals(EventType.READWORKLOAD, firstEvent.getValue().getType());
+		assertEquals(EventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
+		assertEquals(EventType.CHARGE_USERS, thirdEvent.getValue().getType());
 
 		EasyMock.verify(monitor, loadBalancer, scheduler);
 	}
 	
 	@Test
 	public void testStartBeingLastSimulationDay() throws Exception{
-		Capture<JEEvent> firstEvent = new Capture<JEEvent>();
-		Capture<JEEvent> secondEvent = new Capture<JEEvent>();
+		Capture<Event> firstEvent = new Capture<Event>();
+		Capture<Event> secondEvent = new Capture<Event>();
 
 		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
 		while(!info.isFinishDay()){
@@ -594,7 +594,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		assert info.isFinishDay();
 		
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleSimulator.class))).andReturn(1);
 		EasyMock.expect(scheduler.now()).andReturn(0l);
 		scheduler.queueEvent(EasyMock.capture(firstEvent));
@@ -614,17 +614,17 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		simulator.setMonitor(monitor);
 		simulator.start();
 		
-		assertEquals(JEEventType.READWORKLOAD, firstEvent.getValue().getType());
-		assertEquals(JEEventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
+		assertEquals(EventType.READWORKLOAD, firstEvent.getValue().getType());
+		assertEquals(EventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
 		
 		EasyMock.verify(monitor, loadBalancer, scheduler);
 	}
 
 	@Test
 	public void testStartBeingChargeDay() throws Exception{
-		Capture<JEEvent> firstEvent = new Capture<JEEvent>();
-		Capture<JEEvent> secondEvent = new Capture<JEEvent>();
-		Capture<JEEvent> thirdEvent = new Capture<JEEvent>();
+		Capture<Event> firstEvent = new Capture<Event>();
+		Capture<Event> secondEvent = new Capture<Event>();
+		Capture<Event> thirdEvent = new Capture<Event>();
 
 		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
 		while(!info.isChargeDay()){
@@ -633,7 +633,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		
 		assert info.isChargeDay();
 		
-		JEEventScheduler scheduler = EasyMock.createMock(JEEventScheduler.class);
+		EventScheduler scheduler = EasyMock.createMock(EventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(SimpleSimulator.class))).andReturn(1);
 		EasyMock.expect(scheduler.now()).andReturn(0l);
 		scheduler.queueEvent(EasyMock.capture(firstEvent));
@@ -653,9 +653,9 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		simulator.setMonitor(monitor);
 		simulator.start();
 		
-		assertEquals(JEEventType.READWORKLOAD, firstEvent.getValue().getType());
-		assertEquals(JEEventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
-		assertEquals(JEEventType.CHARGE_USERS, thirdEvent.getValue().getType());
+		assertEquals(EventType.READWORKLOAD, firstEvent.getValue().getType());
+		assertEquals(EventType.COLLECT_STATISTICS, secondEvent.getValue().getType());
+		assertEquals(EventType.CHARGE_USERS, thirdEvent.getValue().getType());
 		
 		assertEquals(31 * TimeUnit.DAY.getMillis() - 1, thirdEvent.getValue().getScheduledTime());
 		

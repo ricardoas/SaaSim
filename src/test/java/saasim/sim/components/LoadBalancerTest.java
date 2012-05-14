@@ -16,9 +16,9 @@ import saasim.cloud.Request;
 import saasim.config.Configuration;
 import saasim.provisioning.DPS;
 import saasim.provisioning.Monitor;
-import saasim.sim.jeevent.JEEvent;
-import saasim.sim.jeevent.JEEventScheduler;
-import saasim.sim.jeevent.JEEventType;
+import saasim.sim.core.Event;
+import saasim.sim.core.EventScheduler;
+import saasim.sim.core.EventType;
 import saasim.sim.provisioningheuristics.MachineStatistics;
 import saasim.sim.schedulingheuristics.RoundRobinHeuristic;
 import saasim.sim.schedulingheuristics.SchedulingHeuristic;
@@ -37,11 +37,11 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 	public void testAddServerWithSetupDelay(){
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.M1_SMALL, 0);
 		
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(LoadBalancer.class))).andReturn(1);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(TimeSharedMachine.class))).andReturn(2);
 		EasyMock.expect(scheduler.now()).andReturn(0l).times(3);
-		Capture<JEEvent> captured = new Capture<JEEvent>();
+		Capture<Event> captured = new Capture<Event>();
 		scheduler.queueEvent(EasyMock.capture(captured));
 		
 		SchedulingHeuristic schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
@@ -53,8 +53,8 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		lb.addMachine(descriptor, true);
 		assertEquals(0, lb.getServers().size());
 		
-		JEEvent event = captured.getValue();
-		assertEquals(JEEventType.ADD_SERVER, event.getType());
+		Event event = captured.getValue();
+		assertEquals(EventType.ADD_SERVER, event.getType());
 		assertEquals(300000l, event.getScheduledTime());
 		
 		EasyMock.verify(scheduler, schedulingHeuristic);
@@ -64,11 +64,11 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 	public void testAddServerWithoutSetupDelay(){
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.M1_SMALL, 0);
 		
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(LoadBalancer.class))).andReturn(1);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(TimeSharedMachine.class))).andReturn(2);
 		EasyMock.expect(scheduler.now()).andReturn(0l).times(3);
-		Capture<JEEvent> captured = new Capture<JEEvent>();
+		Capture<Event> captured = new Capture<Event>();
 		scheduler.queueEvent(EasyMock.capture(captured));
 		
 		SchedulingHeuristic schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
@@ -80,8 +80,8 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		lb.addMachine(descriptor, false);
 		assertEquals(0, lb.getServers().size());
 		
-		JEEvent event = captured.getValue();
-		assertEquals(JEEventType.ADD_SERVER, event.getType());
+		Event event = captured.getValue();
+		assertEquals(EventType.ADD_SERVER, event.getType());
 		assertEquals(0, event.getScheduledTime());
 		
 		EasyMock.verify(scheduler, schedulingHeuristic);
@@ -134,11 +134,11 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.M1_SMALL, 0);
 		
 		Request request = EasyMock.createStrictMock(Request.class);
-		JEEvent newRequestEvent = EasyMock.createStrictMock(JEEvent.class);
+		Event newRequestEvent = EasyMock.createStrictMock(Event.class);
 		Machine machine = EasyMock.createStrictMock(TimeSharedMachine.class);
 		SchedulingHeuristic schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
 		
-		EasyMock.expect(newRequestEvent.getType()).andReturn(JEEventType.NEWREQUEST).once();
+		EasyMock.expect(newRequestEvent.getType()).andReturn(EventType.NEWREQUEST).once();
 		EasyMock.expect(newRequestEvent.getValue()).andReturn(new Request [] {request}).once();
 		
 		schedulingHeuristic.addMachine(EasyMock.isA(Machine.class));
@@ -153,7 +153,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		
 		LoadBalancer lb = new LoadBalancer(Configuration.getInstance().getScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 1);
 		lb.addMachine(descriptor, false);
-		JEEvent machineIsUpEvent = new JEEvent(JEEventType.ADD_SERVER, lb, 0l, descriptor);
+		Event machineIsUpEvent = new Event(EventType.ADD_SERVER, lb, 0l, descriptor);
 //		lb.handleEvent(machineIsUpEvent);
 //		lb.handleEvent(newRequestEvent);
 		lb.serverIsUp(descriptor);
@@ -170,13 +170,13 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 	@Test
 	public void testHandleEventNewRequestWithNoAvailableMachine(){
 		Request request = EasyMock.createStrictMock(Request.class);
-		JEEvent event = EasyMock.createStrictMock(JEEvent.class);
+		Event event = EasyMock.createStrictMock(Event.class);
 		DPS dps = EasyMock.createStrictMock(DPS.class);
 		dps.requestQueued(0, request, 1);
 		
 		SchedulingHeuristic schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
 		
-		EasyMock.expect(event.getType()).andReturn(JEEventType.NEWREQUEST).once();
+		EasyMock.expect(event.getType()).andReturn(EventType.NEWREQUEST).once();
 		EasyMock.expect(event.getValue()).andReturn(new Request [] {request}).once();
 		
 		EasyMock.expect(schedulingHeuristic.next(EasyMock.isA(Request.class))).andReturn(null);
@@ -222,8 +222,8 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		lb.addMachine(descriptor, true);
 		lb.addMachine(descriptor2, true);
 		
-		JEEvent machineIsUpEvent = new JEEvent(JEEventType.ADD_SERVER, lb, 0l, descriptor);
-		JEEvent machineIsUpEvent2 = new JEEvent(JEEventType.ADD_SERVER, lb, 0l, descriptor2);
+		Event machineIsUpEvent = new Event(EventType.ADD_SERVER, lb, 0l, descriptor);
+		Event machineIsUpEvent2 = new Event(EventType.ADD_SERVER, lb, 0l, descriptor2);
 		
 //		lb.handleEvent(machineIsUpEvent);
 //		lb.handleEvent(machineIsUpEvent2);

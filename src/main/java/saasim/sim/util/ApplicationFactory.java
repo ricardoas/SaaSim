@@ -2,7 +2,7 @@ package saasim.sim.util;
 
 import saasim.config.Configuration;
 import saasim.sim.components.LoadBalancer;
-import saasim.sim.jeevent.JEEventScheduler;
+import saasim.sim.core.EventScheduler;
 
 /**
  * Factory to encapsulate Application creation. An application is composed of tiers, each
@@ -35,10 +35,10 @@ public abstract class ApplicationFactory {
 
 	/**
 	 * Build the application.
-	 * @param scheduler {@link JEEventScheduler} to represent an event scheduler
+	 * @param scheduler {@link EventScheduler} to represent an event scheduler
 	 * @return An array containing the {@link LoadBalancer}s in the builded application.
 	 */
-	public abstract LoadBalancer[] buildApplication(JEEventScheduler scheduler);
+	public abstract LoadBalancer[] buildApplication(EventScheduler scheduler);
 
 	@Deprecated
 	public static void reset() {

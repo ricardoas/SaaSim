@@ -2,7 +2,7 @@ package saasim.sim.util;
 
 import saasim.sim.SimpleSimulator;
 import saasim.sim.Simulator;
-import saasim.sim.jeevent.JEEventScheduler;
+import saasim.sim.core.EventScheduler;
 
 /**
  * This factory builds a {@link Simulator} of the application.
@@ -13,10 +13,10 @@ public class SimulatorFactory {
 	
 	/**
 	 * Builds a {@link Simulator}.
-	 * @param scheduler {@link JEEventScheduler} to represent a event scheduler.
+	 * @param scheduler {@link EventScheduler} to represent a event scheduler.
 	 * @return {@link Simulator} builded.
 	 */
-	public static Simulator buildSimulator(JEEventScheduler scheduler){
+	public static Simulator buildSimulator(EventScheduler scheduler){
 		return new SimpleSimulator(scheduler, ApplicationFactory.getInstance().buildApplication(scheduler));
 	}
 }

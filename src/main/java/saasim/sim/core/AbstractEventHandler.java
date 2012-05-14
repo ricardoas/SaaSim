@@ -1,7 +1,7 @@
 /* JEEventHandler - Decompiled by JODE
  * Visit http://jode.sourceforge.net/
  */
-package saasim.sim.jeevent;
+package saasim.sim.core;
 
 
 
@@ -12,7 +12,7 @@ package saasim.sim.jeevent;
  * @author thiago - thiago@lsd.ufcg.edu.br
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public abstract class JEAbstractEventHandler implements JEEventHandler {
+public abstract class AbstractEventHandler implements EventHandler {
 	
 	/**
 	 * 
@@ -21,12 +21,12 @@ public abstract class JEAbstractEventHandler implements JEEventHandler {
 
 	private int id;
     
-    private JEEventScheduler scheduler;
+    private EventScheduler scheduler;
 
     /**
      * Default empty constructor. Creates and registers a handler in the scheduler.
      */
-    public JEAbstractEventHandler(JEEventScheduler scheduler) {
+    public AbstractEventHandler(EventScheduler scheduler) {
     	
     	this.scheduler = scheduler;
 		this.id = this.scheduler.registerHandler(this);
@@ -36,14 +36,14 @@ public abstract class JEAbstractEventHandler implements JEEventHandler {
      * {@inheritDoc}
      */
     @Override
-	public void send(JEEvent event) {
+	public void send(Event event) {
     	getScheduler().queueEvent(event);
     }
     
     /**
 	 * @return the scheduler
 	 */
-	protected JEEventScheduler getScheduler() {
+	protected EventScheduler getScheduler() {
 		return scheduler;
 	}
 
@@ -79,6 +79,6 @@ public abstract class JEAbstractEventHandler implements JEEventHandler {
 
 		if (this == obj)
 			return true;
-		return id == ((JEAbstractEventHandler) obj).id;
+		return id == ((AbstractEventHandler) obj).id;
 	}
 }

@@ -21,8 +21,8 @@ import saasim.sim.SimpleSimulator;
 import saasim.sim.components.LoadBalancer;
 import saasim.sim.components.Machine;
 import saasim.sim.components.MachineDescriptor;
-import saasim.sim.jeevent.JECheckpointer;
-import saasim.sim.jeevent.JEEventScheduler;
+import saasim.sim.core.EventCheckpointer;
+import saasim.sim.core.EventScheduler;
 import saasim.sim.util.SimulatorProperties;
 import saasim.util.TimeUnit;
 
@@ -43,11 +43,11 @@ public class HistoryBasedHeuristic implements PlanningHeuristic {
 
 	/**
 	 * Default constructor.
-	 * @param scheduler {@link JEEventScheduler} event scheduler
+	 * @param scheduler {@link EventScheduler} event scheduler
 	 * @param monitor {@link Monitor} for reporting information
 	 * @param loadBalancers a set of {@link LoadBalancer}s of the application
 	 */
-	public HistoryBasedHeuristic(JEEventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
+	public HistoryBasedHeuristic(EventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
 		this.monitor = monitor;
 		this.plan = new HashMap<MachineType, Integer>();
 		
@@ -80,7 +80,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic {
 		
 		if(Configuration.getInstance().getSimulationInfo().isFinishDay()){//Simulation finished!
 			calculateMachinesToReserve(config);
-			JECheckpointer.clear();
+			EventCheckpointer.clear();
 			PlanIOHandler.clear();
 			try {
 				PlanIOHandler.createPlanFile(this.plan, Configuration.getInstance().getProviders());
@@ -171,8 +171,8 @@ public class HistoryBasedHeuristic implements PlanningHeuristic {
 
 	private void persisDataToNextRound(LoadBalancer[] loadBalancers, Configuration config) {
 		try {
-			JECheckpointer.save();
-			JECheckpointer.dumpMachineData(this.machineData);
+			EventCheckpointer.save();
+			EventCheckpointer.dumpMachineData(this.machineData);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

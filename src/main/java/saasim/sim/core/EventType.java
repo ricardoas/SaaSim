@@ -1,11 +1,11 @@
-package saasim.sim.jeevent;
+package saasim.sim.core;
 
 /**
  * Event type
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public enum JEEventType {
+public enum EventType {
 	
 	CHARGE_USERS, 
 	PEAK_END, 

@@ -1,7 +1,4 @@
-/* JEEvent - Decompiled by JODE
- * Visit http://jode.sourceforge.net/
- */
-package saasim.sim.jeevent;
+package saasim.sim.core;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -14,7 +11,7 @@ import java.util.Arrays;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public class JEEvent implements Comparable<JEEvent>, Serializable{
+public class Event implements Comparable<Event>, Serializable{
 	
 	/**
 	 * 
@@ -26,7 +23,7 @@ public class JEEvent implements Comparable<JEEvent>, Serializable{
 	private final int eventId;
     private final int targetHandlerId;
     private long scheduledTime;
-    private JEEventType type;
+    private EventType type;
 	private Object[] value;
     
     
@@ -36,7 +33,7 @@ public class JEEvent implements Comparable<JEEvent>, Serializable{
      * @param targetHandler
      * @param scheduledTime
      */
-    public JEEvent(JEEventType type, JEEventHandler targetHandler, long scheduledTime, Object... value) {
+    public Event(EventType type, EventHandler targetHandler, long scheduledTime, Object... value) {
     	
 		this.eventId = eventIdSeed++;
     	
@@ -51,7 +48,7 @@ public class JEEvent implements Comparable<JEEvent>, Serializable{
      * @param event
      * @param targetHandler
      */
-    public JEEvent(JEEvent event, JEEventHandler targetHandler) {
+    public Event(Event event, EventHandler targetHandler) {
 		this(event.getType(), targetHandler, event.getScheduledTime(), event.getValue());
 	}
 
@@ -79,7 +76,7 @@ public class JEEvent implements Comparable<JEEvent>, Serializable{
 	/**
 	 * @return the type
 	 */
-	public JEEventType getType() {
+	public EventType getType() {
 		return type;
 	}
 
@@ -87,7 +84,7 @@ public class JEEvent implements Comparable<JEEvent>, Serializable{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int compareTo(JEEvent o) {
+	public int compareTo(Event o) {
 		int result = (scheduledTime < o.scheduledTime ? -1 : (scheduledTime == o.scheduledTime ? 0 : 1));
 
 		if(result != 0){
@@ -117,7 +114,7 @@ public class JEEvent implements Comparable<JEEvent>, Serializable{
 		
 		if (this == obj)
 			return true;
-		return (eventId == ((JEEvent) obj).eventId);
+		return (eventId == ((Event) obj).eventId);
 	}
 
 	/**

@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import saasim.config.Configuration;
 import saasim.sim.Simulator;
-import saasim.sim.jeevent.JECheckpointer;
+import saasim.sim.core.EventCheckpointer;
 import saasim.util.ValidConfigurationTest;
 
 
@@ -20,7 +20,7 @@ public class SimulatorFactoryTest extends ValidConfigurationTest{
 		Simulator application = Configuration.getInstance().getApplication();
 		assertNotNull(application);
 		
-		JECheckpointer.save();
+		EventCheckpointer.save();
 		
 		buildFullConfiguration();
 		

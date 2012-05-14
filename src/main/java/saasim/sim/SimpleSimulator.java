@@ -9,12 +9,12 @@ import saasim.io.WorkloadParser;
 import saasim.provisioning.Monitor;
 import saasim.sim.components.LoadBalancer;
 import saasim.sim.components.MachineDescriptor;
-import saasim.sim.jeevent.JEAbstractEventHandler;
-import saasim.sim.jeevent.JECheckpointer;
-import saasim.sim.jeevent.JEEvent;
-import saasim.sim.jeevent.JEEventScheduler;
-import saasim.sim.jeevent.JEEventType;
-import saasim.sim.jeevent.JEHandlingPoint;
+import saasim.sim.core.AbstractEventHandler;
+import saasim.sim.core.EventCheckpointer;
+import saasim.sim.core.Event;
+import saasim.sim.core.EventScheduler;
+import saasim.sim.core.EventType;
+import saasim.sim.core.HandlingPoint;
 import saasim.sim.util.SimulatorProperties;
 import saasim.util.SimulationInfo;
 import saasim.util.TimeUnit;
@@ -25,7 +25,7 @@ import saasim.util.TimeUnit;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class SimpleSimulator extends JEAbstractEventHandler implements Simulator, ServiceEntry{
+public class SimpleSimulator extends AbstractEventHandler implements Simulator, ServiceEntry{
 	
 	private static final long MILLIS = TimeUnit.SECOND.getMillis();
 
@@ -54,10 +54,10 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 
 	/**
 	 * Default constructor.
-	 * @param scheduler A {@link JEEventScheduler} to represent a scheduler of {@link SimpleSimulator}.
+	 * @param scheduler A {@link EventScheduler} to represent a scheduler of {@link SimpleSimulator}.
 	 * @param tiers An array containing the tiers of application, see {@link LoadBalancer}.
 	 */
-	public SimpleSimulator(JEEventScheduler scheduler, LoadBalancer... tiers){
+	public SimpleSimulator(EventScheduler scheduler, LoadBalancer... tiers){
 		super(scheduler);
 		this.tiers = tiers;
 		this.numberOfRequests = 0;
@@ -89,25 +89,25 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	 * {@link JEEventType#READWORKLOAD#CHARGE_USERS#ESTIMATE_SERVERS#COLLECT_STATISTICS}. 
 	 */
 	protected void prepareBeforeStart() {
-		send(new JEEvent(JEEventType.READWORKLOAD, this, getScheduler().now()));
+		send(new Event(EventType.READWORKLOAD, this, getScheduler().now()));
 		
 		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
 		if(info.isChargeDay()){
-			send(new JEEvent(JEEventType.CHARGE_USERS, this, info.getCurrentDayInMillis() + JECheckpointer.INTERVAL - 1));
+			send(new Event(EventType.CHARGE_USERS, this, info.getCurrentDayInMillis() + EventCheckpointer.INTERVAL - 1));
 		}
 		
 		monitoringInterval = Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL);
 		
 		if(info.isFirstDay()){
 			if(this.monitor.isOptimal()){ //TODO:"Change this!
-				send(new JEEvent(JEEventType.ESTIMATE_SERVERS, this, getScheduler().now()));
+				send(new Event(EventType.ESTIMATE_SERVERS, this, getScheduler().now()));
 			}else{
-				send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + monitoringInterval));
+				send(new Event(EventType.COLLECT_STATISTICS, this, getScheduler().now() + monitoringInterval));
 			}
 		}
 	}
 	
-	@JEHandlingPoint(JEEventType.READWORKLOAD)
+	@HandlingPoint(EventType.READWORKLOAD)
 	public void readWorkload(){
 		if(workloadParser.hasNext()) {
 			List<Request> list = workloadParser.next();
@@ -119,19 +119,19 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 			}
 			if(workloadParser.hasNext()){
 				long newEventTime = getScheduler().now() + Configuration.getInstance().getParserPageSize().getMillis();
-				send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime));
+				send(new Event(EventType.READWORKLOAD, this, newEventTime));
 			}else{
 				workloadParser.close();
 			}
 		}
 	}
 	
-	@JEHandlingPoint(JEEventType.CHARGE_USERS)
+	@HandlingPoint(EventType.CHARGE_USERS)
 	public void chargeUsers(){
 		this.monitor.chargeUsers(getScheduler().now());
 	}
 	
-	@JEHandlingPoint(JEEventType.COLLECT_STATISTICS)
+	@HandlingPoint(EventType.COLLECT_STATISTICS)
 	public void collectStatistics(){
 		long time = getScheduler().now();
 		for (LoadBalancer loadBalancer : tiers) {
@@ -139,22 +139,22 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 		}
 		peakArrivalRate = 0;
 		numberOfRequests = 0;
-		send(new JEEvent(JEEventType.COLLECT_STATISTICS, this, getScheduler().now() + Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)));
+		send(new Event(EventType.COLLECT_STATISTICS, this, getScheduler().now() + Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL)));
 	}
 	
-	@JEHandlingPoint(JEEventType.ESTIMATE_SERVERS)
+	@HandlingPoint(EventType.ESTIMATE_SERVERS)
 	public void estimateServers(){
 		long currentTime = getScheduler().now();
 		for (LoadBalancer loadBalancer : tiers) {
 			loadBalancer.estimateServers(currentTime);
 		}
-		send(new JEEvent(JEEventType.ESTIMATE_SERVERS, this, getScheduler().now() + 1000 * 60 * 60));//One hour later
+		send(new Event(EventType.ESTIMATE_SERVERS, this, getScheduler().now() + 1000 * 60 * 60));//One hour later
 	}
 	
-	@JEHandlingPoint(JEEventType.NEWREQUEST)
+	@HandlingPoint(EventType.NEWREQUEST)
 	public void newRequest(Request request){
 		if(!isOverloaded(getScheduler().now())){
-			send(new JEEvent(JEEventType.NEWREQUEST, tiers[0], getScheduler().now(), request));
+			send(new Event(EventType.NEWREQUEST, tiers[0], getScheduler().now(), request));
 		}else{
 			monitor.requestQueued(getScheduler().now(), request, -1);
 			tiers[0].registerDrop(request);
@@ -177,12 +177,12 @@ public class SimpleSimulator extends JEAbstractEventHandler implements Simulator
 	}
 
 	/**
-	 * Parse a {@link Request} in a {@link JEEvent}.
+	 * Parse a {@link Request} in a {@link Event}.
 	 * @param request {@link Request} to be parsed in a event.
 	 * @return
 	 */
-	protected JEEvent parseEvent(Request request) {
-		return new JEEvent(JEEventType.NEWREQUEST, this, request.getArrivalTimeInMillis(), request);
+	protected Event parseEvent(Request request) {
+		return new Event(EventType.NEWREQUEST, this, request.getArrivalTimeInMillis(), request);
 	}
 	
 	/**

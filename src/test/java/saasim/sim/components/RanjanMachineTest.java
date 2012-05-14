@@ -12,8 +12,8 @@ import org.junit.Test;
 import saasim.cloud.MachineType;
 import saasim.cloud.Request;
 import saasim.config.Configuration;
-import saasim.sim.jeevent.JEEvent;
-import saasim.sim.jeevent.JEEventScheduler;
+import saasim.sim.core.Event;
+import saasim.sim.core.EventScheduler;
 import saasim.util.ValidConfigurationTest;
 
 
@@ -191,7 +191,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testShutdownWithEmptyMachine(){
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		EasyMock.expect(loadBalancer.getHandlerId()).andReturn(scheduler.registerHandler(loadBalancer));
@@ -215,7 +215,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testShutdownWithNonEmptyMachine(){
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000});
 		
@@ -261,7 +261,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(loadBalancer);
 		
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		TimeSharedMachine machine = new TimeSharedMachine(scheduler, new MachineDescriptor(1, false, MachineType.M1_SMALL, 0), loadBalancer);
 		machine.sendRequest(firstRequest);
@@ -391,7 +391,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		EasyMock.replay(loadBalancer);
 		
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		TimeSharedMachine machine = new TimeSharedMachine(scheduler, descriptor, loadBalancer);
 		assertEquals(Double.NaN, machine.computeUtilisation(scheduler.now()), 0.0001);
@@ -407,12 +407,12 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testComputeUtilisationOfMachineWithRunningRequestAndOneCore(){
 		
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(TimeSharedMachine.class))).andReturn(1);
 		EasyMock.expect(scheduler.now()).andReturn(0l).times(3);
-		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
+		scheduler.queueEvent(EasyMock.isA(Event.class));
 		EasyMock.expect(scheduler.now()).andReturn(100l).times(2);
-		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
+		scheduler.queueEvent(EasyMock.isA(Event.class));
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
@@ -438,12 +438,12 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testComputeUtilisationOfMachineWithRunningRequestAndOneCore2(){
 		
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(TimeSharedMachine.class))).andReturn(1);
 		EasyMock.expect(scheduler.now()).andReturn(0l).times(3);
-		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
+		scheduler.queueEvent(EasyMock.isA(Event.class));
 		EasyMock.expect(scheduler.now()).andReturn(100l).times(2);
-		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
+		scheduler.queueEvent(EasyMock.isA(Event.class));
 		EasyMock.expect(scheduler.now()).andReturn(150l).times(2);
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
@@ -475,12 +475,12 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testComputeUtilisationOfMachineWithRunningRequestAndDualCore(){
 		
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		EasyMock.expect(scheduler.registerHandler(EasyMock.isA(TimeSharedMachine.class))).andReturn(1);
 		EasyMock.expect(scheduler.now()).andReturn(0l).times(3);
-		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
+		scheduler.queueEvent(EasyMock.isA(Event.class));
 		EasyMock.expect(scheduler.now()).andReturn(100l).times(2);
-		scheduler.queueEvent(EasyMock.isA(JEEvent.class));
+		scheduler.queueEvent(EasyMock.isA(Event.class));
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 
@@ -510,7 +510,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testComputeUtilisationOfMachineWithRunningRequestAndQuadCore(){
 		
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 
@@ -530,7 +530,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testComputeUtilisationOfMachineAsRequestFinishesAndOneCore(){
 		
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
@@ -555,7 +555,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testComputeUtilisationOfMachineAsRequestFinishesAndQuadCore(){
 		
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
@@ -580,7 +580,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testComputeUtilisationOfMachineAfterRequestFinishesAndOneCore(){
 		
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
@@ -606,7 +606,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testComputeUtilisationOfMachineAfterRequestFinishesAndQuadCore(){
 		
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
@@ -632,7 +632,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testComputeUtilisationOfMachineAfterRequestFinishesAndOneCore2(){
 		
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		
@@ -657,7 +657,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testComputeUtilisationOfMachineAfterRequestFinishesAndDualCore2(){
 		
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		

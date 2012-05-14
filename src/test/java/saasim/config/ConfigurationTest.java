@@ -14,7 +14,7 @@ import saasim.cloud.MachineType;
 import saasim.cloud.Provider;
 import saasim.planning.heuristic.AGHeuristic;
 import saasim.provisioning.DynamicProvisioningSystem;
-import saasim.sim.jeevent.JECheckpointer;
+import saasim.sim.core.EventCheckpointer;
 import saasim.sim.schedulingheuristics.RoundRobinHeuristic;
 
 
@@ -25,12 +25,12 @@ public class ConfigurationTest {
 		Field field = Configuration.class.getDeclaredField("instance");
 		field.setAccessible(true);
 		field.set(null, null);
-		JECheckpointer.clear();
+		EventCheckpointer.clear();
 	}
 	
 	@After
 	public void tearDown(){
-		JECheckpointer.clear();
+		EventCheckpointer.clear();
 	}
 	
 	@Test(expected=ConfigurationException.class)
@@ -87,7 +87,7 @@ public class ConfigurationTest {
 	@Test
 	public void testBuildInstanceWithValidConfigurationAndPreviousSimData() throws ConfigurationException {
 		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
-		JECheckpointer.save();
+		EventCheckpointer.save();
 		
 		Configuration.buildInstance(PropertiesTesting.VALID_SINGLE_WORKLOAD_FILE);
 		assertNotNull(Configuration.getInstance());

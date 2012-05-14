@@ -2,7 +2,7 @@ package saasim.sim.util;
 
 import saasim.config.Configuration;
 import saasim.sim.components.LoadBalancer;
-import saasim.sim.jeevent.JEEventScheduler;
+import saasim.sim.core.EventScheduler;
 import saasim.sim.schedulingheuristics.SchedulingHeuristic;
 
 /**
@@ -16,7 +16,7 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public LoadBalancer[] buildApplication(JEEventScheduler scheduler) {
+	public LoadBalancer[] buildApplication(EventScheduler scheduler) {
 		Configuration config = Configuration.getInstance();
 		int numOfTiers = config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS);
 		
@@ -33,13 +33,13 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 
 	/**
 	 * Build a {@link LoadBalancer}.
-	 * @param scheduler {@link JEEventScheduler} represent a event scheduler
+	 * @param scheduler {@link EventScheduler} represent a event scheduler
 	 * @param heuristic a {@link SchedulingHeuristic} for this {@link LoadBalancer} 
 	 * @param maxServerPerTier the maximum number of servers per tier 
 	 * @param tier the tier of {@link LoadBalancer}
 	 * @return A builded {@link LoadBalancer}.
 	 */
-	private static LoadBalancer buildLoadBalancer(JEEventScheduler scheduler, Class<?> heuristic,
+	private static LoadBalancer buildLoadBalancer(EventScheduler scheduler, Class<?> heuristic,
 			int maxServerPerTier, int tier) {
 		try {
 			return new LoadBalancer(scheduler, (SchedulingHeuristic) heuristic.newInstance(), 

@@ -7,7 +7,7 @@ import org.junit.Before;
 
 import saasim.config.Configuration;
 import saasim.io.AbstractWorkloadParser;
-import saasim.sim.jeevent.JECheckpointer;
+import saasim.sim.core.EventCheckpointer;
 
 
 /**
@@ -28,7 +28,7 @@ public class CleanConfigurationTest {
 	 */
 	@Before
 	public void setUp() throws Exception{
-		JECheckpointer.clear();
+		EventCheckpointer.clear();
 		
 		Field field = Configuration.class.getDeclaredField("instance");
 		field.setAccessible(true);
@@ -41,7 +41,7 @@ public class CleanConfigurationTest {
 	
 	@AfterClass
 	public static void tearDownAfterClass(){
-		JECheckpointer.clear();
+		EventCheckpointer.clear();
 	}
 
 

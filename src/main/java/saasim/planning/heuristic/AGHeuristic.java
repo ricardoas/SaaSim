@@ -30,7 +30,7 @@ import saasim.planning.util.PlanIOHandler;
 import saasim.planning.util.Summary;
 import saasim.provisioning.Monitor;
 import saasim.sim.components.LoadBalancer;
-import saasim.sim.jeevent.JEEventScheduler;
+import saasim.sim.core.EventScheduler;
 import saasim.sim.util.SimulatorProperties;
 
 
@@ -57,11 +57,11 @@ public class AGHeuristic implements PlanningHeuristic{
 	
 	/**
 	 * Default constructor.
-	 * @param scheduler {@link JEEventScheduler} event scheduler
+	 * @param scheduler {@link EventScheduler} event scheduler
 	 * @param monitor {@link Monitor} for reporting information
 	 * @param loadBalancers a set of {@link LoadBalancer}s of the application
 	 */
-	public AGHeuristic(JEEventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
+	public AGHeuristic(EventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
 		this.types = new ArrayList<MachineType>();
 		this.summaries = new HashMap<User, List<Summary>>();
 	}

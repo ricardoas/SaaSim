@@ -10,7 +10,7 @@ import org.junit.Test;
 import saasim.cloud.Request;
 import saasim.config.Configuration;
 import saasim.config.PropertiesTesting;
-import saasim.sim.jeevent.JECheckpointer;
+import saasim.sim.core.EventCheckpointer;
 import saasim.util.ValidConfigurationTest;
 
 
@@ -146,7 +146,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 		assertEquals(160915, parser.next().getArrivalTimeInMillis());
 		assertEquals(161383, parser.next().getArrivalTimeInMillis());
 		
-		JECheckpointer.save();
+		EventCheckpointer.save();
 		
 		// Second Day
 		buildFullConfiguration();
@@ -158,7 +158,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 		assertEquals(dayInMillis + 160315, parser.next().getArrivalTimeInMillis());
 		assertEquals(dayInMillis + 160915, parser.next().getArrivalTimeInMillis());
 		assertEquals(dayInMillis + 161383, parser.next().getArrivalTimeInMillis());
-		JECheckpointer.save();
+		EventCheckpointer.save();
 		
 		// Third Day
 		buildFullConfiguration();
@@ -169,7 +169,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 		assertEquals(2*dayInMillis + 160315, parser.next().getArrivalTimeInMillis());
 		assertEquals(2*dayInMillis + 160915, parser.next().getArrivalTimeInMillis());
 		assertEquals(2*dayInMillis + 161383, parser.next().getArrivalTimeInMillis());
-		JECheckpointer.save();
+		EventCheckpointer.save();
 		
 		// Fourth Day
 		buildFullConfiguration();
@@ -180,7 +180,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 		assertEquals(3*dayInMillis + 160315, parser.next().getArrivalTimeInMillis());
 		assertEquals(3*dayInMillis + 160915, parser.next().getArrivalTimeInMillis());
 		assertEquals(3*dayInMillis + 161383, parser.next().getArrivalTimeInMillis());
-		JECheckpointer.save();
+		EventCheckpointer.save();
 		
 		// Fifth Day
 		buildFullConfiguration();

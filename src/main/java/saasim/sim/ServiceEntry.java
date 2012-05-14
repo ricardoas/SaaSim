@@ -1,8 +1,8 @@
 package saasim.sim;
 
-import saasim.sim.jeevent.JEEventHandler;
+import saasim.sim.core.EventHandler;
 
-public interface ServiceEntry extends JEEventHandler{
+public interface ServiceEntry extends EventHandler{
 	
 	void config(int d); 
 	

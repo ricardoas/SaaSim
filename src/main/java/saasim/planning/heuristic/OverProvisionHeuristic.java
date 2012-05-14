@@ -17,10 +17,10 @@ import saasim.provisioning.DPS;
 import saasim.provisioning.Monitor;
 import saasim.sim.SimpleSimulator;
 import saasim.sim.components.LoadBalancer;
-import saasim.sim.jeevent.JECheckpointer;
-import saasim.sim.jeevent.JEEvent;
-import saasim.sim.jeevent.JEEventScheduler;
-import saasim.sim.jeevent.JEEventType;
+import saasim.sim.core.EventCheckpointer;
+import saasim.sim.core.Event;
+import saasim.sim.core.EventScheduler;
+import saasim.sim.core.EventType;
 import saasim.sim.util.SimulatorProperties;
 
 
@@ -49,11 +49,11 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 	
 	/**
 	 * Default constructor.
-	 * @param scheduler {@link JEEventScheduler} event scheduler
+	 * @param scheduler {@link EventScheduler} event scheduler
 	 * @param monitor {@link Monitor} for reporting information
 	 * @param loadBalancers a set of {@link LoadBalancer}s of the application
 	 */
-	public OverProvisionHeuristic(JEEventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
+	public OverProvisionHeuristic(EventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
 		super(scheduler, loadBalancers);
 		try{
 			this.maximumNumberOfServers = PlanIOHandler.getNumberOfMachinesFromFile();
@@ -102,7 +102,7 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 		}
 
 		if(Configuration.getInstance().getSimulationInfo().isFinishDay()){//Simulation finished!
-			JECheckpointer.clear();
+			EventCheckpointer.clear();
 			PlanIOHandler.clear();
 			Map<MachineType, Integer> plan = this.getPlan(null);
 			try {
@@ -112,7 +112,7 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 			}
 		}else{
 			try {
-				JECheckpointer.save();
+				EventCheckpointer.save();
 				PlanIOHandler.createNumberOfMachinesFile(this.maximumNumberOfServers, this.nextRequestsCounter, this.requestsMeanDemand);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
@@ -133,7 +133,7 @@ public class OverProvisionHeuristic extends SimpleSimulator implements PlanningH
 			evaluateMaximumNumber();
 			if(workloadParser.hasNext()){
 				long newEventTime = now() + Configuration.getInstance().getParserPageSize().getMillis();
-				send(new JEEvent(JEEventType.READWORKLOAD, this, newEventTime, true));
+				send(new Event(EventType.READWORKLOAD, this, newEventTime, true));
 			}else{
 				workloadParser.close();
 			}

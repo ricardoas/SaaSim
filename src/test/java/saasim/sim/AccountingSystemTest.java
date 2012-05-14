@@ -12,7 +12,7 @@ import saasim.cloud.Provider;
 import saasim.cloud.User;
 import saasim.cloud.UtilityResult;
 import saasim.config.Configuration;
-import saasim.sim.jeevent.JECheckpointer;
+import saasim.sim.core.EventCheckpointer;
 import saasim.util.ValidConfigurationTest;
 
 
@@ -24,13 +24,13 @@ public class AccountingSystemTest extends ValidConfigurationTest {
 	
 	@AfterClass
 	public static void tearDown(){
-		JECheckpointer.clear();
+		EventCheckpointer.clear();
 	}
 
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		JECheckpointer.clear();
+		EventCheckpointer.clear();
 		buildFullConfiguration();
 	}
 

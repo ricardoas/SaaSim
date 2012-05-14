@@ -33,8 +33,8 @@ import saasim.sim.SimpleSimulator;
 import saasim.sim.components.LoadBalancer;
 import saasim.sim.components.Machine;
 import saasim.sim.components.MachineDescriptor;
-import saasim.sim.jeevent.JECheckpointer;
-import saasim.sim.jeevent.JEEventScheduler;
+import saasim.sim.core.EventCheckpointer;
+import saasim.sim.core.EventScheduler;
 import saasim.sim.schedulingheuristics.RoundRobinHeuristic;
 import saasim.sim.util.SaaSAppProperties;
 import saasim.sim.util.SimulatorFactory;
@@ -46,19 +46,19 @@ import saasim.util.ValidConfigurationTest;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore("org.apache.log4j.*")
-@PrepareForTest({SimulatorFactory.class, DPSFactory.class, Configuration.class, PlanIOHandler.class, JECheckpointer.class})
+@PrepareForTest({SimulatorFactory.class, DPSFactory.class, Configuration.class, PlanIOHandler.class, EventCheckpointer.class})
 public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 	
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		buildFullConfiguration();
-		JECheckpointer.clear();
+		EventCheckpointer.clear();
 	}
 	
 	@After
 	public void tearDown(){
-		JECheckpointer.clear();
+		EventCheckpointer.clear();
 	}
 	
 	@Test
@@ -70,7 +70,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
 				types);
 		
-		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders");
+		PowerMock.mockStaticPartial(EventCheckpointer.class, "loadSimulationInfo", "loadProviders");
 		
 		Provider[] providers = new Provider[]{provider};
 		
@@ -107,7 +107,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class))).andReturn(simulator);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -116,9 +116,9 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		PowerMock.replay(SimulatorFactory.class);
 		PowerMock.replayAll(lb1, simulator, dps);
 		
-		JECheckpointer.loadData();
+		EventCheckpointer.loadData();
 		
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);
@@ -127,7 +127,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		assertNotNull(plan);
 		assertEquals(0, plan.size());
 		
-		File output = new File(JECheckpointer.MACHINE_DATA_DUMP);
+		File output = new File(EventCheckpointer.MACHINE_DATA_DUMP);
 		assertFalse(output.exists());
 		
 		PowerMock.verifyAll();
@@ -143,7 +143,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
 				types);
 		
-		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders");
+		PowerMock.mockStaticPartial(EventCheckpointer.class, "loadSimulationInfo", "loadProviders");
 		
 		Provider[] providers = new Provider[]{provider};
 		
@@ -180,7 +180,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class))).andReturn(simulator);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -189,8 +189,8 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		PowerMock.replay(SimulatorFactory.class);
 		PowerMock.replayAll(lb1, simulator, dps);
 
-		JECheckpointer.loadData();
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventCheckpointer.loadData();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);
@@ -199,8 +199,8 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		assertNotNull(plan);
 		assertEquals(0, plan.size());
 		
-		assertTrue(new File(JECheckpointer.MACHINE_DATA_DUMP).exists());
-		assertTrue(new File(JECheckpointer.CHECKPOINT_FILE).exists());
+		assertTrue(new File(EventCheckpointer.MACHINE_DATA_DUMP).exists());
+		assertTrue(new File(EventCheckpointer.CHECKPOINT_FILE).exists());
 		
 		PowerMock.verifyAll();
 	}
@@ -241,7 +241,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
 				types);
 		
-		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders");
+		PowerMock.mockStaticPartial(EventCheckpointer.class, "loadSimulationInfo", "loadProviders");
 		Provider[] providers = new Provider[]{provider};
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
@@ -277,7 +277,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class))).andReturn(simulator);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -286,8 +286,8 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		PowerMock.replay(SimulatorFactory.class);
 		PowerMock.replayAll(machine1, machine2, machine3, lb1, simulator, dps);
 		
-		JECheckpointer.loadData();
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventCheckpointer.loadData();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);
@@ -297,7 +297,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		assertEquals(1, plan.size());
 		assertEquals(3, (int)plan.get(MachineType.M1_SMALL));
 		
-		File output = new File(JECheckpointer.MACHINE_DATA_DUMP);
+		File output = new File(EventCheckpointer.MACHINE_DATA_DUMP);
 		assertFalse(output.exists());
 		
 		PowerMock.verifyAll();
@@ -339,7 +339,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
 				types);
 		
-		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders");
+		PowerMock.mockStaticPartial(EventCheckpointer.class, "loadSimulationInfo", "loadProviders");
 		Provider[] providers = new Provider[]{provider};
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
@@ -375,7 +375,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class))).andReturn(simulator);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -384,8 +384,8 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		PowerMock.replay(SimulatorFactory.class);
 		PowerMock.replayAll(machine1, machine2, machine3, lb1, simulator, dps);
 		
-		JECheckpointer.loadData();
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventCheckpointer.loadData();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);
@@ -394,7 +394,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		assertNotNull(plan);
 		assertEquals(0, plan.size());
 		
-		File output = new File(JECheckpointer.MACHINE_DATA_DUMP);
+		File output = new File(EventCheckpointer.MACHINE_DATA_DUMP);
 		assertFalse(output.exists());
 		
 		PowerMock.verifyAll();
@@ -438,7 +438,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
 				types);
 		
-		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders");
+		PowerMock.mockStaticPartial(EventCheckpointer.class, "loadSimulationInfo", "loadProviders");
 		Provider[] providers = new Provider[]{provider};
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
@@ -474,7 +474,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class))).andReturn(simulator);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -483,8 +483,8 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		PowerMock.replay(SimulatorFactory.class);
 		PowerMock.replayAll(machine1, machine2, machine3, lb1, simulator, dps);
 
-		JECheckpointer.loadData();
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventCheckpointer.loadData();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);
@@ -494,7 +494,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		assertEquals(1, plan.size());
 		assertEquals(1, (int)plan.get(MachineType.C1_MEDIUM));
 		
-		File output = new File(JECheckpointer.MACHINE_DATA_DUMP);
+		File output = new File(EventCheckpointer.MACHINE_DATA_DUMP);
 		assertFalse(output.exists());
 		
 		PowerMock.verifyAll();
@@ -538,7 +538,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
 				types);
 		
-		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders");
+		PowerMock.mockStaticPartial(EventCheckpointer.class, "loadSimulationInfo", "loadProviders");
 		Provider[] providers = new Provider[]{provider};
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
@@ -575,7 +575,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class))).andReturn(simulator);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -584,8 +584,8 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		PowerMock.replay(SimulatorFactory.class);
 		PowerMock.replayAll(machine1, machine2, machine3, lb1, simulator, dps);
 		
-		JECheckpointer.loadData();
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventCheckpointer.loadData();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);
@@ -596,7 +596,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		assertEquals(1, (int)plan.get(MachineType.C1_MEDIUM));
 		assertEquals(1, (int)plan.get(MachineType.M1_XLARGE));
 		
-		File output = new File(JECheckpointer.MACHINE_DATA_DUMP);
+		File output = new File(EventCheckpointer.MACHINE_DATA_DUMP);
 		assertFalse(output.exists());
 		
 		PowerMock.verifyAll();
@@ -669,7 +669,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		PlanIOHandler.clear();
 		PlanIOHandler.createPlanFile(map, providers);
 		
-		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders");
+		PowerMock.mockStaticPartial(EventCheckpointer.class, "loadSimulationInfo", "loadProviders");
 		
 		//Configuration
 		Configuration config = EasyMock.createMock(Configuration.class);
@@ -717,7 +717,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class))).andReturn(simulator);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -727,8 +727,8 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		PowerMock.replay(SimulatorFactory.class);
 		PowerMock.replayAll(machine1, machine2, machine3, lb1, lb2, lb3, simulator, dps);
 		
-		JECheckpointer.loadData();
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventCheckpointer.loadData();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);
@@ -737,7 +737,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		assertNotNull(plan);
 		assertEquals(0, plan.size());
 		
-		File output = new File(JECheckpointer.MACHINE_DATA_DUMP);
+		File output = new File(EventCheckpointer.MACHINE_DATA_DUMP);
 		assertTrue(output.exists());
 		
 		//Second day
@@ -753,7 +753,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		assertEquals(1, (int)plan.get(MachineType.M1_SMALL));
 		assertEquals(1, (int)plan.get(MachineType.M1_LARGE));
 		
-		output = new File(JECheckpointer.MACHINE_DATA_DUMP);
+		output = new File(EventCheckpointer.MACHINE_DATA_DUMP);
 		assertFalse(output.exists());
 		
 		PowerMock.verifyAll();
@@ -792,7 +792,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
 				types);
 		
-		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders");
+		PowerMock.mockStaticPartial(EventCheckpointer.class, "loadSimulationInfo", "loadProviders");
 		Provider[] providers = new Provider[]{provider};
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
@@ -836,7 +836,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class))).andReturn(simulator);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -845,8 +845,8 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		PowerMock.replay(SimulatorFactory.class);
 		PowerMock.replayAll(machine1, machine2, machine3, lb1, lb2, lb3, simulator, dps);
 		
-		JECheckpointer.loadData();
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventCheckpointer.loadData();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);
@@ -892,7 +892,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
 				types);
 		
-		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders");
+		PowerMock.mockStaticPartial(EventCheckpointer.class, "loadSimulationInfo", "loadProviders");
 		Provider[] providers = new Provider[]{provider};
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
@@ -934,7 +934,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class))).andReturn(simulator);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -943,8 +943,8 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		PowerMock.replay(SimulatorFactory.class);
 		PowerMock.replayAll(machine1, machine2, machine3, lb1, lb2, lb3, simulator, dps);
 		
-		JECheckpointer.loadData();
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventCheckpointer.loadData();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);
@@ -953,7 +953,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		assertNotNull(plan);
 		assertEquals(0, plan.size());
 		
-		File output = new File(JECheckpointer.MACHINE_DATA_DUMP);
+		File output = new File(EventCheckpointer.MACHINE_DATA_DUMP);
 		assertFalse(output.exists());
 		
 		PowerMock.verifyAll();
@@ -990,7 +990,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
 				types);
 		
-		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders");
+		PowerMock.mockStaticPartial(EventCheckpointer.class, "loadSimulationInfo", "loadProviders");
 		Provider[] providers = new Provider[]{provider};
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
@@ -1033,7 +1033,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class))).andReturn(simulator);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -1042,8 +1042,8 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		PowerMock.replay(SimulatorFactory.class);
 		PowerMock.replayAll(machine1, machine2, machine3, lb1, lb2, lb3, simulator, dps);
 		
-		JECheckpointer.loadData();
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventCheckpointer.loadData();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);
@@ -1053,7 +1053,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		assertEquals(1, plan.size());
 		assertEquals(1, (int)plan.get(MachineType.M1_SMALL));
 		
-		File output = new File(JECheckpointer.MACHINE_DATA_DUMP);
+		File output = new File(EventCheckpointer.MACHINE_DATA_DUMP);
 		assertFalse(output.exists());
 		
 		PowerMock.verifyAll();
@@ -1107,7 +1107,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		Provider provider = new Provider(1, "p1", 10, 20, 0.15, new long[]{0}, new double[]{0, 0}, new long[]{0}, new double[]{0, 0}, 
 				types);
 		
-		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders");
+		PowerMock.mockStaticPartial(EventCheckpointer.class, "loadSimulationInfo", "loadProviders");
 		Provider[] providers = new Provider[]{provider};
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
@@ -1153,7 +1153,7 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(JEEventScheduler.class))).andReturn(simulator);
+		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -1162,8 +1162,8 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		PowerMock.replay(SimulatorFactory.class);
 		PowerMock.replayAll(machine1, machine2, machine3, machine4, machine5, lb1, lb2, lb3, simulator, dps);
 		
-		JECheckpointer.loadData();
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventCheckpointer.loadData();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
 		HistoryBasedHeuristic heuristic = new HistoryBasedHeuristic(scheduler, dps, loadBalancers);
 		heuristic.findPlan(null, null);

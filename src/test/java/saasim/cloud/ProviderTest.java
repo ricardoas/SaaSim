@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import saasim.config.Configuration;
 import saasim.sim.components.MachineDescriptor;
-import saasim.sim.jeevent.JECheckpointer;
+import saasim.sim.core.EventCheckpointer;
 import saasim.util.DataUnit;
 import saasim.util.ValidConfigurationTest;
 
@@ -28,7 +28,7 @@ public class ProviderTest extends ValidConfigurationTest {
 	@Override
 	public void setUp() throws Exception{
 		super.setUp();
-		JECheckpointer.clear();
+		EventCheckpointer.clear();
 		
 		buildFullConfiguration();
 		amazon = Configuration.getInstance().getProviders()[1];
@@ -37,7 +37,7 @@ public class ProviderTest extends ValidConfigurationTest {
 
 	@After
 	public void tearDown(){
-		JECheckpointer.clear();
+		EventCheckpointer.clear();
 	}
 	
 	/**

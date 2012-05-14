@@ -1,7 +1,7 @@
 /**
  * 
  */
-package saasim.sim.jeevent;
+package saasim.sim.core;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,8 +13,8 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface JEHandlingPoint {
+public @interface HandlingPoint {
 	
-	JEEventType value();
+	EventType value();
 
 }

@@ -23,7 +23,7 @@ import saasim.planning.heuristic.PlanningHeuristic;
 import saasim.planning.util.PlanningHeuristicFactory;
 import saasim.provisioning.Monitor;
 import saasim.sim.components.LoadBalancer;
-import saasim.sim.jeevent.JEEventScheduler;
+import saasim.sim.core.EventScheduler;
 
 
 @RunWith(PowerMockRunner.class)
@@ -43,7 +43,7 @@ public class PlannerTest {
 		Provider[] providers = new Provider[]{prov1};
 		User[] cloudUsers = new User[]{user1};
 		
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		
 		EasyMock.replay(prov1, user1, scheduler, monitor);
@@ -63,7 +63,7 @@ public class PlannerTest {
 		Provider[] providers = new Provider[]{prov1};
 		User[] cloudUsers = null;
 		
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		
 		EasyMock.replay(prov1, user1, scheduler, monitor);
@@ -83,7 +83,7 @@ public class PlannerTest {
 		Provider[] providers = null;
 		User[] cloudUsers = new User[]{user1};
 		
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		
 		EasyMock.replay(prov1, user1, scheduler, monitor);
@@ -107,7 +107,7 @@ public class PlannerTest {
 		Provider[] providers = new Provider[]{prov1};
 		User[] cloudUsers = new User[]{user1};
 		
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		LoadBalancer[] loadBalancers = new LoadBalancer[]{};
 		

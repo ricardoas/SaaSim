@@ -11,11 +11,11 @@ import saasim.cloud.Request;
 import saasim.config.Configuration;
 import saasim.provisioning.Monitor;
 import saasim.sim.ServiceEntry;
-import saasim.sim.jeevent.JEAbstractEventHandler;
-import saasim.sim.jeevent.JEEvent;
-import saasim.sim.jeevent.JEEventScheduler;
-import saasim.sim.jeevent.JEEventType;
-import saasim.sim.jeevent.JEHandlingPoint;
+import saasim.sim.core.AbstractEventHandler;
+import saasim.sim.core.Event;
+import saasim.sim.core.EventScheduler;
+import saasim.sim.core.EventType;
+import saasim.sim.core.HandlingPoint;
 import saasim.sim.provisioningheuristics.MachineStatistics;
 import saasim.sim.schedulingheuristics.AbstractSchedulingHeuristic;
 import saasim.sim.schedulingheuristics.SchedulingHeuristic;
@@ -28,7 +28,7 @@ import saasim.util.TimeUnit;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  * @version 1.0
  */
-public class LoadBalancer extends JEAbstractEventHandler{
+public class LoadBalancer extends AbstractEventHandler{
 	
 	/**
 	 * Version 1.0
@@ -57,7 +57,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	 * @param maxServersAllowed Max number of servers to manage in this layer.
 	 * @param tier the tier of this {@link LoadBalancer} represents
 	 */
-	public LoadBalancer(JEEventScheduler scheduler, SchedulingHeuristic heuristic, int maxServersAllowed, int tier) {
+	public LoadBalancer(EventScheduler scheduler, SchedulingHeuristic heuristic, int maxServersAllowed, int tier) {
 		super(scheduler);
 		this.heuristic = heuristic;
 		this.maxServersAllowed = maxServersAllowed;
@@ -79,7 +79,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		}
 		
 		startingUp.put(descriptor, machine);
-		send(new JEEvent(JEEventType.ADD_SERVER, this, machineUpTime, descriptor));
+		send(new Event(EventType.ADD_SERVER, this, machineUpTime, descriptor));
 	}
 	
 	/**
@@ -91,7 +91,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		return new TimeSharedMachine(getScheduler(), machineDescriptor, this);
 	}
 	
-	@JEHandlingPoint(JEEventType.NEWREQUEST)
+	@HandlingPoint(EventType.NEWREQUEST)
 	public void handleNewRequest(Request request){
 		Machine nextServer = heuristic.next(request);
 		if(nextServer != null){//Reusing an existent machine
@@ -105,7 +105,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		((AbstractSchedulingHeuristic)heuristic).tierStatistics.updateInterarrivalTime(request.getArrivalTimeInMillis());
 	}
 	
-	@JEHandlingPoint(JEEventType.ADD_SERVER)
+	@HandlingPoint(EventType.ADD_SERVER)
 	public void serverIsUp(MachineDescriptor descriptor){
 		Machine machine = startingUp.remove(descriptor);
 		if(machine != null){
@@ -115,7 +115,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 		}
 	}
 	
-	@JEHandlingPoint(JEEventType.MACHINE_TURNED_OFF)
+	@HandlingPoint(EventType.MACHINE_TURNED_OFF)
 	public void serverIsDown(MachineDescriptor descriptor){
 		monitor.machineTurnedOff(descriptor);
 		config(threshold);
@@ -124,7 +124,7 @@ public class LoadBalancer extends JEAbstractEventHandler{
 	/**
 	 * {@inheritDoc}
 	 */
-	@JEHandlingPoint(JEEventType.REQUESTQUEUED)
+	@HandlingPoint(EventType.REQUESTQUEUED)
 	public void requestWasQueued(Request request) {
 		monitor.requestQueued(now(), request, tier);
 	}

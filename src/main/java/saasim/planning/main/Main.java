@@ -7,7 +7,7 @@ import saasim.planning.Planner;
 import saasim.provisioning.DPS;
 import saasim.provisioning.util.DPSFactory;
 import saasim.sim.components.LoadBalancer;
-import saasim.sim.jeevent.JEEventScheduler;
+import saasim.sim.core.EventScheduler;
 
 
 /**
@@ -29,7 +29,7 @@ public class Main {
 			Configuration.buildInstance(args[0]);
 			Configuration.getInstance().enableParserError();
 			
-			JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+			EventScheduler scheduler = Configuration.getInstance().getScheduler();
 			DPS dps = DPSFactory.createDPS();
 			LoadBalancer[] loadBalancers = Configuration.getInstance().getApplication().getTiers();
 			

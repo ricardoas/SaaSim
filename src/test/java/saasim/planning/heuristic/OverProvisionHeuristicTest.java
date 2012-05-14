@@ -30,8 +30,8 @@ import saasim.planning.util.PlanIOHandler;
 import saasim.provisioning.DPS;
 import saasim.provisioning.util.DPSFactory;
 import saasim.sim.components.LoadBalancer;
-import saasim.sim.jeevent.JECheckpointer;
-import saasim.sim.jeevent.JEEventScheduler;
+import saasim.sim.core.EventCheckpointer;
+import saasim.sim.core.EventScheduler;
 import saasim.sim.schedulingheuristics.RoundRobinHeuristic;
 import saasim.sim.util.ApplicationFactory;
 import saasim.sim.util.SaaSAppProperties;
@@ -42,18 +42,18 @@ import saasim.util.TimeUnit;
 
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({WorkloadParserFactory.class, Configuration.class, ApplicationFactory.class, DPSFactory.class, JECheckpointer.class})
+@PrepareForTest({WorkloadParserFactory.class, Configuration.class, ApplicationFactory.class, DPSFactory.class, EventCheckpointer.class})
 public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 	
 	@Before
 	public void setUp(){
-		JECheckpointer.clear();
+		EventCheckpointer.clear();
 		new File(PlanIOHandler.NUMBER_OF_MACHINES_FILE).delete();
 	}
 	
 	@After
 	public void tearDown(){
-		JECheckpointer.clear();
+		EventCheckpointer.clear();
 		new File(PlanIOHandler.NUMBER_OF_MACHINES_FILE).delete();
 	}
 	
@@ -74,7 +74,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		
-		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders");
+		PowerMock.mockStaticPartial(EventCheckpointer.class, "loadSimulationInfo", "loadProviders");
 		
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(10);
 		EasyMock.expect(config.getBoolean(SimulatorProperties.MACHINE_SESSION_AFFINITY, false)).andReturn(false);
@@ -104,9 +104,9 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		PowerMock.replayAll(config, parser, monitor, provider);
 		
-		JECheckpointer.loadData();
+		EventCheckpointer.loadData();
 		
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		LoadBalancer[] loadBalancers = new LoadBalancer[]{};
 		
 		OverProvisionHeuristic heuristic = new OverProvisionHeuristic(scheduler, monitor, loadBalancers);
@@ -119,7 +119,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		int value = plan.get(MachineType.M1_SMALL);
 		assertEquals(0, value);
 		
-		File output = new File(JECheckpointer.CHECKPOINT_FILE);
+		File output = new File(EventCheckpointer.CHECKPOINT_FILE);
 		assertFalse(output.exists());
 		
 		PowerMock.verifyAll();
@@ -180,7 +180,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		SimulationInfo simulationInfo = new SimulationInfo(0, 0, 1);
 		
-		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders");
+		PowerMock.mockStaticPartial(EventCheckpointer.class, "loadSimulationInfo", "loadProviders");
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
@@ -216,9 +216,9 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		PowerMock.replayAll(config, parser, monitor, provider, request, request2, request3, request4, request5,
 				request6, request7, request8, request9);
 		
-		JECheckpointer.loadData();
+		EventCheckpointer.loadData();
 		
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		LoadBalancer[] loadBalancers = new LoadBalancer[]{};
 		
 		OverProvisionHeuristic heuristic = new OverProvisionHeuristic(scheduler, monitor, loadBalancers);
@@ -245,7 +245,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		field.setAccessible(true);
 		assertEquals(66.888889d, (Double)field.get(heuristic), 0.00001d);
 		
-		File output = new File(JECheckpointer.CHECKPOINT_FILE);
+		File output = new File(EventCheckpointer.CHECKPOINT_FILE);
 		assertFalse(output.exists());
 		
 		PowerMock.verifyAll();
@@ -306,7 +306,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		SimulationInfo simulationInfo = new SimulationInfo(0, 0, 1);
 		
-		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders");
+		PowerMock.mockStaticPartial(EventCheckpointer.class, "loadSimulationInfo", "loadProviders");
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
@@ -342,9 +342,9 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		PowerMock.replayAll(config, parser, monitor, provider, request, request2, request3, request4, request5,
 				request6, request7, request8, request9);
 		
-		JECheckpointer.loadData();
+		EventCheckpointer.loadData();
 		
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		LoadBalancer[] loadBalancers = new LoadBalancer[]{};
 		
 		OverProvisionHeuristic heuristic = new OverProvisionHeuristic(scheduler, monitor, loadBalancers);
@@ -371,7 +371,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		field.setAccessible(true);
 		assertEquals(66.888889d, (Double)field.get(heuristic), 0.00001d);
 		
-		File output = new File(JECheckpointer.CHECKPOINT_FILE);
+		File output = new File(EventCheckpointer.CHECKPOINT_FILE);
 		assertFalse(output.exists());
 		
 		PowerMock.verifyAll();
@@ -432,7 +432,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		SimulationInfo simulationInfo = new SimulationInfo(0, 0, 1);
 		
-		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders");
+		PowerMock.mockStaticPartial(EventCheckpointer.class, "loadSimulationInfo", "loadProviders");
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
@@ -468,9 +468,9 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		PowerMock.replayAll(config, parser, monitor, provider, request, request2, request3, request4, request5,
 				request6, request7, request8, request9);
 		
-		JECheckpointer.loadData();
+		EventCheckpointer.loadData();
 		
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		LoadBalancer[] loadBalancers = new LoadBalancer[]{};
 		
 		OverProvisionHeuristic heuristic = new OverProvisionHeuristic(scheduler, monitor, loadBalancers);
@@ -497,7 +497,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		field.setAccessible(true);
 		assertEquals(178d, (Double)field.get(heuristic), 0.00001d);
 		
-		File output = new File(JECheckpointer.CHECKPOINT_FILE);
+		File output = new File(EventCheckpointer.CHECKPOINT_FILE);
 		assertFalse(output.exists());
 		
 		PowerMock.verifyAll();
@@ -563,7 +563,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		SimulationInfo simulationInfo = new SimulationInfo(0, 0, 1);
 		
-		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders");
+		PowerMock.mockStaticPartial(EventCheckpointer.class, "loadSimulationInfo", "loadProviders");
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
@@ -599,9 +599,9 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		PowerMock.replayAll(config, parser, monitor, provider, request, request2, request3, request4, request5,
 				request6, request7, request8, request9);
 		
-		JECheckpointer.loadData();
+		EventCheckpointer.loadData();
 		
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		LoadBalancer[] loadBalancers = new LoadBalancer[]{};
 		
 		OverProvisionHeuristic heuristic = new OverProvisionHeuristic(scheduler, monitor, loadBalancers);
@@ -628,7 +628,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		field.setAccessible(true);
 		assertEquals(153.5556d, (Double)field.get(heuristic), 0.001d);
 		
-		File output = new File(JECheckpointer.CHECKPOINT_FILE);
+		File output = new File(EventCheckpointer.CHECKPOINT_FILE);
 		assertFalse(output.exists());
 		
 		PowerMock.verifyAll();
@@ -689,7 +689,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		SimulationInfo simulationInfo = new SimulationInfo(0, 0, 1);
 		
-		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders");
+		PowerMock.mockStaticPartial(EventCheckpointer.class, "loadSimulationInfo", "loadProviders");
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
@@ -725,9 +725,9 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		PowerMock.replayAll(config, parser, monitor, provider, request, request2, request3, request4, request5,
 				request6, request7, request8, request9);
 		
-		JECheckpointer.loadData();
+		EventCheckpointer.loadData();
 		
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		LoadBalancer[] loadBalancers = new LoadBalancer[]{};
 		
 		OverProvisionHeuristic heuristic = new OverProvisionHeuristic(scheduler, monitor, loadBalancers);
@@ -754,7 +754,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		field.setAccessible(true);
 		assertEquals(178d, (Double)field.get(heuristic), 0.00001d);
 		
-		File output = new File(JECheckpointer.CHECKPOINT_FILE);
+		File output = new File(EventCheckpointer.CHECKPOINT_FILE);
 		assertFalse(output.exists());
 		
 		PowerMock.verifyAll();
@@ -819,7 +819,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		
 		SimulationInfo simulationInfo = new SimulationInfo(0, 0, 1);
 		
-		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders");
+		PowerMock.mockStaticPartial(EventCheckpointer.class, "loadSimulationInfo", "loadProviders");
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
@@ -851,9 +851,9 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		PowerMock.replayAll(config, parser, monitor, provider, request, request2, request3, request4, request5,
 				request6, request7, request8, request9);
 		
-		JECheckpointer.loadData();
+		EventCheckpointer.loadData();
 		
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		LoadBalancer[] loadBalancers = new LoadBalancer[]{};
 		
 		OverProvisionHeuristic heuristic = new OverProvisionHeuristic(scheduler, monitor, loadBalancers);
@@ -880,7 +880,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		field.setAccessible(true);
 		assertEquals(352.22222222d, (Double)field.get(heuristic), 0.00001d);
 		
-		File output = new File(JECheckpointer.CHECKPOINT_FILE);
+		File output = new File(EventCheckpointer.CHECKPOINT_FILE);
 		assertFalse(output.exists());
 		
 		PowerMock.verifyAll();
@@ -981,7 +981,7 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		SimulationInfo firstDayCompletedInfo = new SimulationInfo(1, 0, 2);
 		SimulationInfo secondDayCompletedInfo = new SimulationInfo(2, 0, 2);
 		
-		PowerMock.mockStaticPartial(JECheckpointer.class, "loadSimulationInfo", "loadProviders");
+		PowerMock.mockStaticPartial(EventCheckpointer.class, "loadSimulationInfo", "loadProviders");
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
@@ -1018,9 +1018,9 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 				request6, request7, request8, request9, request10, request11, request12, request13, request14, 
 				request15, request16);
 		
-		JECheckpointer.loadData();
+		EventCheckpointer.loadData();
 		
-		JEEventScheduler scheduler = Configuration.getInstance().getScheduler();
+		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		LoadBalancer[] loadBalancers = new LoadBalancer[]{};
 		
 		//First day
@@ -1047,11 +1047,11 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		field.setAccessible(true);
 		assertEquals(352.22222222d, (Double)field.get(heuristic), 0.00001d);
 		
-		File output = new File(JECheckpointer.CHECKPOINT_FILE);
+		File output = new File(EventCheckpointer.CHECKPOINT_FILE);
 		assertTrue(output.exists());
 		
 		//Second day
-		JECheckpointer.loadData();
+		EventCheckpointer.loadData();
 		
 		scheduler = Configuration.getInstance().getScheduler();
 		loadBalancers = new LoadBalancer[]{};

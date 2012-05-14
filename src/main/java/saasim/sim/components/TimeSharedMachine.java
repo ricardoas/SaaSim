@@ -11,11 +11,11 @@ import java.util.Queue;
 
 import saasim.cloud.Request;
 import saasim.config.Configuration;
-import saasim.sim.jeevent.JEAbstractEventHandler;
-import saasim.sim.jeevent.JEEvent;
-import saasim.sim.jeevent.JEEventScheduler;
-import saasim.sim.jeevent.JEEventType;
-import saasim.sim.jeevent.JEHandlingPoint;
+import saasim.sim.core.AbstractEventHandler;
+import saasim.sim.core.Event;
+import saasim.sim.core.EventScheduler;
+import saasim.sim.core.EventType;
+import saasim.sim.core.HandlingPoint;
 import saasim.sim.util.FastSemaphore;
 import saasim.util.Triple;
 
@@ -26,7 +26,7 @@ import saasim.util.Triple;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  * @version 1.0
  */
-public class TimeSharedMachine extends JEAbstractEventHandler implements Machine{
+public class TimeSharedMachine extends AbstractEventHandler implements Machine{
 	
 	/**
 	 * Version 1.0
@@ -59,7 +59,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	 * @param descriptor Machine descriptor.
 	 * @param loadBalancer {@link LoadBalancer} responsible for this machine.
 	 */
-	public TimeSharedMachine(JEEventScheduler scheduler, MachineDescriptor descriptor, 
+	public TimeSharedMachine(EventScheduler scheduler, MachineDescriptor descriptor, 
 			LoadBalancer loadBalancer) {
 		super(scheduler);
 		this.descriptor = descriptor;
@@ -135,7 +135,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		}else if(canQueue()){
 			this.backlog.add(request);
 		}else{
-			send(new JEEvent(JEEventType.REQUESTQUEUED, getLoadBalancer(), now(), request));
+			send(new Event(EventType.REQUESTQUEUED, getLoadBalancer(), now(), request));
 		}
 	}
 
@@ -149,20 +149,20 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 	}
 
 	/**
-	 * Try to shutdown this {@link Machine}, creating an event {@link JEEventType#MACHINE_TURNED_OFF}.
+	 * Try to shutdown this {@link Machine}, creating an event {@link EventType#MACHINE_TURNED_OFF}.
 	 */
 	protected void tryToShutdown() {
 		if(shutdownOnFinish && !isBusy()){
 			long scheduledTime = now();
 			descriptor.setFinishTimeInMillis(scheduledTime);
-			send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, scheduledTime, descriptor));
+			send(new Event(EventType.MACHINE_TURNED_OFF, this.loadBalancer, scheduledTime, descriptor));
 		}
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
-	@JEHandlingPoint(JEEventType.PREEMPTION)
+	@HandlingPoint(EventType.PREEMPTION)
 	public void handlePreemption(long processedDemand, Request request) {
 		if(!shutdown){
 			this.semaphore.release();
@@ -188,7 +188,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		}else{
 			this.semaphore.release();
 			descriptor.updateTransference(request.getRequestSizeInBytes(), 0);
-			send(new JEEvent(JEEventType.REQUESTQUEUED, getLoadBalancer(), now(), request));
+			send(new Event(EventType.REQUESTQUEUED, getLoadBalancer(), now(), request));
 		}
 	}
 	
@@ -214,7 +214,7 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		Request nextRequest = processorQueue.poll();
 		long nextQuantum = Math.min(nextRequest.getTotalToProcess(), Configuration.getInstance().getPriorities()[nextRequest.getSaasClient()]);
 		lastUpdate = now();
-		send(new JEEvent(JEEventType.PREEMPTION, this, nextQuantum+lastUpdate, nextQuantum, nextRequest));
+		send(new Event(EventType.PREEMPTION, this, nextQuantum+lastUpdate, nextQuantum, nextRequest));
 	}
 	
 	/**
@@ -383,11 +383,11 @@ public class TimeSharedMachine extends JEAbstractEventHandler implements Machine
 		shutdown = true;
 		long scheduledTime = now();
 		descriptor.setFinishTimeInMillis(scheduledTime);
-		send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this.loadBalancer, scheduledTime, descriptor));
+		send(new Event(EventType.MACHINE_TURNED_OFF, this.loadBalancer, scheduledTime, descriptor));
 		
 		for (Request request : processorQueue) {
 			descriptor.updateTransference(request.getRequestSizeInBytes(), 0);
-			send(new JEEvent(JEEventType.REQUESTQUEUED, getLoadBalancer(), now(), request));
+			send(new Event(EventType.REQUESTQUEUED, getLoadBalancer(), now(), request));
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package saasim.sim.jeevent;
+package saasim.sim.core;
 
 import java.io.Serializable;
 
@@ -6,12 +6,12 @@ import java.io.Serializable;
  * 
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
  */
-public interface JEEventHandler extends Serializable{
+public interface EventHandler extends Serializable{
 
 	/**
 	 * @param event
 	 */
-	void send(JEEvent event);
+	void send(Event event);
 
 	/**
 	 * @return

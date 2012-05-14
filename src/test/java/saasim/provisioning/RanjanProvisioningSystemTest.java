@@ -22,7 +22,7 @@ import saasim.io.WorkloadParser;
 import saasim.io.WorkloadParserFactory;
 import saasim.sim.SimpleSimulator;
 import saasim.sim.components.MachineDescriptor;
-import saasim.sim.jeevent.JEEventScheduler;
+import saasim.sim.core.EventScheduler;
 import saasim.sim.provisioningheuristics.MachineStatistics;
 import saasim.sim.util.SaaSAppProperties;
 import saasim.sim.util.SaaSUsersProperties;
@@ -215,7 +215,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		int totalNumberOfServers = 0;
 		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
-		JEEventScheduler scheduler = EasyMock.createStrictMock(JEEventScheduler.class);
+		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		EasyMock.replay(scheduler);
 		
 		SimpleSimulator configurable = EasyMock.createMock(SimpleSimulator.class);

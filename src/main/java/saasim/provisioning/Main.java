@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 
 import saasim.cloud.UtilityResult;
@@ -23,11 +22,9 @@ public class Main {
 	/**
 	 * Entry point.
 	 * 
-	 * @param args Path to the configuration file.
-	 * @throws ConfigurationException Related to problems during configuration loading.
 	 * @throws IOException 
 	 */
-	public static void main(String[] args) throws ConfigurationException, IOException {
+	public static void main(String[] args) throws IOException {
 		
 		if(args.length != 1){
 			System.out.println("Usage: java -cp saasim.jar saasim.provisioning.Main <property file>");

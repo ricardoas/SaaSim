@@ -1,5 +1,6 @@
-package saasim.sim.jeevent;
+package saasim.sim.core;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -7,6 +8,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
@@ -22,7 +26,7 @@ import saasim.util.SimulationInfo;
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
  *
  */
-public class JECheckpointer {
+public class EventCheckpointer {
 
 	public static final String MACHINE_DATA_DUMP = "machineData.txt";
 	public static final String CHECKPOINT_FILE = ".je.dat";
@@ -47,10 +51,10 @@ public class JECheckpointer {
 		ObjectOutputStream out;
 		try {
 			long now = System.currentTimeMillis();
-			Logger.getLogger(JECheckpointer.class).debug("CHKP SAVE-in");
+			Logger.getLogger(EventCheckpointer.class).debug("CHKP SAVE-in");
 			out = new ObjectOutputStream(new FileOutputStream(CHECKPOINT_FILE));
 			out.close();
-			Logger.getLogger(JECheckpointer.class).debug("CHKP SAVE-out " + (System.currentTimeMillis()-now));
+			Logger.getLogger(EventCheckpointer.class).debug("CHKP SAVE-out " + (System.currentTimeMillis()-now));
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -93,20 +97,30 @@ public class JECheckpointer {
 		new File(PROVISIONING_FILE).delete();
 	}
 
-	public static ObjectInputStream load() throws FileNotFoundException, IOException{
-		return new ObjectInputStream(new FileInputStream(CHECKPOINT_FILE));
+	public static ObjectInputStream loadStream() throws FileNotFoundException, IOException{
+		ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(CHECKPOINT_FILE));
+		
+		return objectInputStream;
+	}
+
+	public static Object[] load(){
+		try {
+			ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(CHECKPOINT_FILE));
+		
+			return (Object[]) objectInputStream.readObject();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static void save(Object... objects){
 		ObjectOutputStream out;
 		try {
-			Logger.getLogger(JECheckpointer.class).debug("CHKP SAVE-in");
+			Logger.getLogger(EventCheckpointer.class).debug("CHKP SAVE-in");
 			out = new ObjectOutputStream(new FileOutputStream(CHECKPOINT_FILE));
-			for (Object object : objects) {
-				out.writeObject(object);
-			}
+			out.writeObject(objects);
 			out.close();
-			Logger.getLogger(JECheckpointer.class).debug("CHKP SAVE-out");
+			Logger.getLogger(EventCheckpointer.class).debug("CHKP SAVE-out");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -115,9 +129,8 @@ public class JECheckpointer {
 	@Deprecated
 	public static void loadData() throws ConfigurationException{
 		long now = System.currentTimeMillis();
-		Logger.getLogger(JECheckpointer.class).debug("CHKP LOAD-in");
-		Logger.getLogger(JECheckpointer.class).debug("CHKP LOAD-out " + (System.currentTimeMillis() - now));
+		Logger.getLogger(EventCheckpointer.class).debug("CHKP LOAD-in");
+		Logger.getLogger(EventCheckpointer.class).debug("CHKP LOAD-out " + (System.currentTimeMillis() - now));
 	}
-	
 	
 }

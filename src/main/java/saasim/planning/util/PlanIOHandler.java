@@ -1,6 +1,6 @@
 package saasim.planning.util;
 
-import static saasim.sim.jeevent.JECheckpointer.MACHINE_DATA_DUMP;
+import static saasim.sim.core.EventCheckpointer.MACHINE_DATA_DUMP;
 
 import java.io.BufferedReader;
 import java.io.EOFException;

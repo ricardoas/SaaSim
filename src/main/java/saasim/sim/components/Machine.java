@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Queue;
 
 import saasim.cloud.Request;
-import saasim.sim.jeevent.JEEventHandler;
+import saasim.sim.core.EventHandler;
 import saasim.util.Triple;
 
 
@@ -12,7 +12,7 @@ import saasim.util.Triple;
  * Methods to manage a machine.
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public interface Machine extends JEEventHandler{
+public interface Machine extends EventHandler{
 
 	/**
 	 * @return The {@link LoadBalancer} responsible for this machine.
