@@ -37,6 +37,8 @@ public class SimpleSimulator extends AbstractEventHandler implements Simulator{
 	private DynamicConfigurable[] applications;
 
 	private DPS dps;
+	
+	private SimulationInfo info;
 
 	/**
 	 * Default constructor.
@@ -48,6 +50,7 @@ public class SimpleSimulator extends AbstractEventHandler implements Simulator{
 		this.applications = applications;
 		this.dps = DPSFactory.createDPS();
 		this.dps.registerConfigurable(this.applications);
+		this.info = new SimulationInfo();
 	}
 	
 	/**
@@ -97,5 +100,10 @@ public class SimpleSimulator extends AbstractEventHandler implements Simulator{
 	@Override
 	public DynamicConfigurable[] getApplications() {
 		return applications;
+	}
+
+	@Override
+	public void restore() {
+		this.info.addDay();
 	}
 }

@@ -7,7 +7,6 @@ import java.util.List;
 import saasim.cloud.MachineType;
 import saasim.cloud.Provider;
 import saasim.config.Configuration;
-import saasim.provisioning.util.DPSInfo;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.provisioningheuristics.MachineStatistics;
 import saasim.sim.util.SimulatorProperties;
@@ -43,26 +42,14 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 		super();
 		type = MachineType.valueOf(Configuration.getInstance().getString(PROP_MACHINE_TYPE).toUpperCase());
 		targetUtilisation = Configuration.getInstance().getDouble(PROP_TARGET_UTILISATION);
-		list = loadDPSInfo().list;
-	}
-	
-	/**
-	 * @return {@link DPSInfo}
-	 */
-	protected DPSInfo loadDPSInfo() {
-		DPSInfo info = Configuration.getInstance().getProvisioningInfo();
 		
 		long reactiveTick = TimeUnit.HOUR.getMillis()/Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL);
-		
-		if(info.list == null){
-			info.list = new LinkedList<LinkedList<MachineDescriptor>>();
-			for (int i = 0; i < reactiveTick; i++) {
-				info.list.add(new LinkedList<MachineDescriptor>());
-			}
+		list = new LinkedList<LinkedList<MachineDescriptor>>();
+		for (int i = 0; i < reactiveTick; i++) {
+			list.add(new LinkedList<MachineDescriptor>());
 		}
-		return info;
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */

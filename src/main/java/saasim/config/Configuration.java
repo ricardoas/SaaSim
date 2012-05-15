@@ -51,11 +51,13 @@ import saasim.util.TimeUnit;
  */
 public class Configuration extends ComplexPropertiesConfiguration{
 	
+	private static final String SAASIM_CONFIGURATION_PROP = "saasim.configuration";
+
 	private static final String DEFAULT_PROPERTIES_FILE_NAME = "saasim.properties";
 
 	static{
 		try {
-			String customPropertyFile = System.getProperty("saasim.configuration");
+			String customPropertyFile = System.getProperty(SAASIM_CONFIGURATION_PROP);
 			if(customPropertyFile != null && !customPropertyFile.isEmpty()){
 				buildInstance(customPropertyFile);
 			}else{
@@ -75,7 +77,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	
 	private EventScheduler scheduler;
 	private SimulationInfo simulationInfo;
-	private Simulator application;
+	private Simulator simulator;
 	private Provider[] providers;
 	private Contract[] contracts;
 	private User[] users;
@@ -106,20 +108,19 @@ public class Configuration extends ComplexPropertiesConfiguration{
 
 		if(EventCheckpointer.hasCheckpoint()){
 			Object[] objects = EventCheckpointer.load();
-			instance.scheduler = (EventScheduler) objects[0];
-			instance.simulationInfo = (SimulationInfo) objects[1]; 
-			instance.simulationInfo.addDay();
+			int i = 0;
+			instance.scheduler = (EventScheduler) objects[i++];
 			instance.scheduler.reset(instance.simulationInfo.getCurrentDayInMillis(), instance.simulationInfo.getCurrentDayInMillis() + TimeUnit.DAY.getMillis());
-			instance.providers = (Provider[]) objects[2];
-			instance.contracts = (Contract[]) objects[3];
-			instance.users = (User[]) objects[4];
-			instance.accountingSystem = (AccountingSystem) objects[5];
-			instance.priorities = (int []) objects[6];
-			instance.dpsInfo = (DPSInfo) objects[7];
-			instance.application = (Simulator) objects[8];
+			instance.providers = (Provider[]) objects[i++];
+			instance.contracts = (Contract[]) objects[i++];
+			instance.users = (User[]) objects[i++];
+			instance.accountingSystem = (AccountingSystem) objects[i++];
+			instance.priorities = (int []) objects[i++];
+//			instance.dpsInfo = (DPSInfo) objects[i++];
+			instance.simulator = (Simulator) objects[i++];
+			instance.simulator.restore();
 			EventCheckpointer.clear();
 		}else{
-			instance.simulationInfo = new SimulationInfo();
 			instance.scheduler = new EventScheduler(TimeUnit.DAY.getMillis());
 			instance.providers = Configuration.getInstance().readProviders();
 			instance.contracts = Configuration.getInstance().readContracts();
@@ -129,8 +130,8 @@ public class Configuration extends ComplexPropertiesConfiguration{
 			for (int i = 0; i < instance.priorities.length; i++) {
 				instance.priorities[i] = instance.users[i].getContract().getPriority(); //FIXME Ricardo: don't know if we need this anymore
 			}
-			instance.dpsInfo = new DPSInfo();
-			instance.application = SimulatorFactory.buildSimulator(Configuration.getInstance().getScheduler());
+//			instance.dpsInfo = new DPSInfo();
+			instance.simulator = SimulatorFactory.buildSimulator(Configuration.getInstance().getScheduler());
 		}
 		
 		instance.scheduler.registerHandlerClass(LoadBalancer.class).
@@ -157,7 +158,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	public void save(){
 		assert instance != null;
 		
-		EventCheckpointer.save(scheduler, simulationInfo, application, providers, contracts, users, accountingSystem, priorities, dpsInfo);
+		EventCheckpointer.save(scheduler, simulationInfo, simulator, providers, contracts, users, accountingSystem, priorities, dpsInfo);
 	}
 
 	/**
@@ -608,7 +609,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	}
 
 	public Simulator getSimulator() {
-		return this.application;
+		return this.simulator;
 	}
 
 	public SimulationInfo getSimulationInfo() {

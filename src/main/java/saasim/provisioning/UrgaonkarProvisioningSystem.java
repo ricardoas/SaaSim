@@ -87,7 +87,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 	 * @return {@link DPSInfo}
 	 */
 	protected DPSInfo loadDPSInfo() {
-		DPSInfo info = super.loadDPSInfo();
+		DPSInfo info = null;//super.loadDPSInfo();
 		if(info.stat == null && info.history == null && info.list == null){
 			info.stat = new UrgaonkarStatistics[24];
 			for (int i = 0; i < info.stat.length; i++) {

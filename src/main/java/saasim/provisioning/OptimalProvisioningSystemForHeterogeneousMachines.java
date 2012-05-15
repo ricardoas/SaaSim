@@ -201,9 +201,4 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 			}
 		}
 	}
-
-	@Override
-	protected DPSInfo loadDPSInfo() {
-		return null;
-	}
 }

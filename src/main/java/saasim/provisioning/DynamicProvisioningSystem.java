@@ -14,7 +14,6 @@ import saasim.cloud.UtilityResult;
 import saasim.cloud.UtilityResultEntry;
 import saasim.config.Configuration;
 import saasim.io.WorkloadParserFactory;
-import saasim.provisioning.util.DPSInfo;
 import saasim.sim.AccountingSystem;
 import saasim.sim.DynamicConfigurable;
 import saasim.sim.components.MachineDescriptor;
@@ -59,10 +58,6 @@ public class DynamicProvisioningSystem implements DPS{
 		this.users = Configuration.getInstance().getUsers();
 		this.accountingSystem = Configuration.getInstance().getAccountingSystem();
 		this.maxRT = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME);
-	}
-	
-	protected DPSInfo loadDPSInfo(){
-		return Configuration.getInstance().getProvisioningInfo();
 	}
 	
 	@Override

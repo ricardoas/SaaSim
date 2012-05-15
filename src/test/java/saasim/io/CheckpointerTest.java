@@ -18,7 +18,6 @@ import saasim.config.Configuration;
 import saasim.planning.util.MachineUsageData;
 import saasim.sim.AccountingSystem;
 import saasim.sim.Simulator;
-import saasim.sim.components.LoadBalancer;
 import saasim.sim.core.EventCheckpointer;
 import saasim.sim.core.EventScheduler;
 import saasim.util.SimulationInfo;
@@ -70,7 +69,7 @@ public class CheckpointerTest extends ValidConfigurationTest{
 		assertFalse(file.exists());
 
 		Configuration.getInstance().getScheduler();
-		EventCheckpointer.save(new SimulationInfo(2, 9), null, null, null);
+//		EventCheckpointer.save(new SimulationInfo(2, 9), null, null, null);
 		assertTrue(EventCheckpointer.hasCheckpoint());
 	}
 
@@ -80,7 +79,7 @@ public class CheckpointerTest extends ValidConfigurationTest{
 		assertFalse(file.exists());
 
 		Configuration.getInstance().getScheduler();
-		EventCheckpointer.save(null, new User[] {}, null, null);
+//		EventCheckpointer.save(null, new User[] {}, null, null);
 		assertTrue(file.exists());
 	}
 
@@ -89,7 +88,7 @@ public class CheckpointerTest extends ValidConfigurationTest{
 		file.delete();
 		assertFalse(file.exists());
 
-		EventCheckpointer.save(null, null, new Provider[] {}, null);
+//		EventCheckpointer.save(null, null, new Provider[] {}, null);
 		assertTrue(file.exists());
 	}
 
@@ -98,7 +97,7 @@ public class CheckpointerTest extends ValidConfigurationTest{
 		file.delete();
 		assertFalse(file.exists());
 
-		EventCheckpointer.save(null, null, null, new LoadBalancer[] {});
+//		EventCheckpointer.save(null, null, null, new LoadBalancer[] {});
 		assertTrue(file.exists());
 	}
 
@@ -113,7 +112,7 @@ public class CheckpointerTest extends ValidConfigurationTest{
 	@Test(expected=ConfigurationRuntimeException.class)
 	public void testLoadDataWithoutFile() throws ConfigurationException {
 		assert !file.exists();
-		EventCheckpointer.loadData();
+//		EventCheckpointer.loadData();
 	}
 
 	@Test
@@ -123,7 +122,7 @@ public class CheckpointerTest extends ValidConfigurationTest{
 		writer.write(invalid);
 		writer.close();
 		try{
-			EventCheckpointer.loadData();
+//			EventCheckpointer.loadData();
 			fail("Should fail on loading.");
 		}catch(RuntimeException e){
 			/* catch exception */
@@ -144,7 +143,7 @@ public class CheckpointerTest extends ValidConfigurationTest{
 		EventScheduler schedulerBefore = Configuration.getInstance().getScheduler();
 		SimulationInfo simulationInfoBefore = Configuration.getInstance().getSimulationInfo();
 		User[] usersBefore = Configuration.getInstance().getUsers();
-		EventCheckpointer.save();
+//		EventCheckpointer.save();
 		
 		buildFullConfiguration();
 		

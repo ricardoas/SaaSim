@@ -111,10 +111,4 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 			}
 		}
 	}
-
-	@Override
-	protected DPSInfo loadDPSInfo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

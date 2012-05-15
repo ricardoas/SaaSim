@@ -20,4 +20,6 @@ public interface Simulator{
 	 * @return All simulated applications.
 	 */
 	DynamicConfigurable [] getApplications();
+
+	void restore();
 }

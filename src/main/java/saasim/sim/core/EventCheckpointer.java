@@ -93,12 +93,6 @@ public class EventCheckpointer {
 		new File(PROVISIONING_FILE).delete();
 	}
 
-	public static ObjectInputStream loadStream() throws FileNotFoundException, IOException{
-		ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(CHECKPOINT_FILE));
-		
-		return objectInputStream;
-	}
-
 	public static Object[] load(){
 		try {
 			ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(CHECKPOINT_FILE));
