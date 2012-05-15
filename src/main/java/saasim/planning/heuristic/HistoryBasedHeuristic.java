@@ -71,7 +71,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic {
 		DPS dps = (DPS) this.monitor;
 		SimpleMultiTierApplication simulator = (SimpleMultiTierApplication) Configuration.getInstance().getSimulator();
 		dps.registerConfigurable(new DynamicConfigurable[]{simulator});
-		simulator.start();
+//		simulator.start();
 		
 		//Calculating machines use data
 		LoadBalancer[] loadBalancers = calculateMachinesUsage(simulator);

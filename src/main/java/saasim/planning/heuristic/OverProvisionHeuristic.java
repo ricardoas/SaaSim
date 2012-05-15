@@ -92,7 +92,7 @@ public class OverProvisionHeuristic extends SimpleMultiTierApplication implement
 		}catch(NoSuchElementException e){
 		}
 		
-		this.start();
+//		this.start();
 		
 		//Calculating requests mean demand
 		if(this.requestsMeanDemand == 0d){//first day

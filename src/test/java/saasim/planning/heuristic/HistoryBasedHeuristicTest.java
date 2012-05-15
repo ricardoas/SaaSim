@@ -103,11 +103,11 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//Simulator
 		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
-		simulator.start();
+//		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
+//		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -176,11 +176,11 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//Simulator
 		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
-		simulator.start();
+//		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
+//		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -273,11 +273,11 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//Simulator
 		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
-		simulator.start();
+//		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
+//		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -371,11 +371,11 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//Simulator
 		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
-		simulator.start();
+//		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
+//		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -470,11 +470,11 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//Simulator
 		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
-		simulator.start();
+//		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
+//		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -571,11 +571,11 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//Simulator
 		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
-		simulator.start();
+//		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
+//		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -711,13 +711,13 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//Simulator
 		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
-		simulator.start();
+//		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
-		simulator.start();
+//		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
+//		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -832,11 +832,11 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//Simulator
 		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
-		simulator.start();
+//		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
+//		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -930,11 +930,11 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//Simulator
 		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
-		simulator.start();
+//		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
+//		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -1029,11 +1029,11 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//Simulator
 		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
-		simulator.start();
+//		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
+//		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);
@@ -1149,11 +1149,11 @@ public class HistoryBasedHeuristicTest extends ValidConfigurationTest{
 		
 		//Simulator
 		SimpleMultiTierApplication simulator = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
-		simulator.start();
+//		simulator.start();
 		EasyMock.expect(simulator.getTiers()).andReturn(loadBalancers);
 		
 		PowerMock.mockStatic(SimulatorFactory.class);
-		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
+//		EasyMock.expect(SimulatorFactory.buildSimulator(EasyMock.isA(EventScheduler.class))).andReturn(simulator);
 		
 		//Provisioning system
 		DPS dps = EasyMock.createStrictMock(DPS.class);

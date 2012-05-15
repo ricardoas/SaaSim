@@ -64,6 +64,7 @@ public class SimpleMultiTierApplication extends AbstractEventHandler implements 
 		this.threshold = Integer.MAX_VALUE;
 		this.thresholds = new int[tiers.length];
 		Arrays.fill(thresholds, Integer.MAX_VALUE);
+		monitoringInterval = Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL);
 	}
 	
 	/**
@@ -73,29 +74,6 @@ public class SimpleMultiTierApplication extends AbstractEventHandler implements 
 	public void setWorkloadParser(WorkloadParser<List<Request>> workloadParser) {
 		assert workloadParser != null : "WorkloadParser could not be null! Check your code.";
 		this.workloadParser = workloadParser;
-	}
-	
-	/**
-	 * Prepare the simulator before it start up, starting events like 
-	 * {@link JEEventType#READWORKLOAD#CHARGE_USERS#ESTIMATE_SERVERS#COLLECT_STATISTICS}. 
-	 */
-	protected void prepareBeforeStart() {
-		send(new Event(EventType.READWORKLOAD, this, getScheduler().now()));
-		
-		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
-		if(info.isChargeDay()){
-			send(new Event(EventType.CHARGE_USERS, this, info.getCurrentDayInMillis() + EventCheckpointer.INTERVAL - 1));
-		}
-		
-		monitoringInterval = Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL);
-		
-		if(info.isFirstDay()){
-			if(this.monitor.isOptimal()){ //TODO:"Change this!
-				send(new Event(EventType.ESTIMATE_SERVERS, this, getScheduler().now()));
-			}else{
-				send(new Event(EventType.COLLECT_STATISTICS, this, getScheduler().now() + monitoringInterval));
-			}
-		}
 	}
 	
 	@HandlingPoint(EventType.READWORKLOAD)
