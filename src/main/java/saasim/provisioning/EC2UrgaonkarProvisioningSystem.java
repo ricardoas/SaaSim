@@ -2,6 +2,8 @@ package saasim.provisioning;
 
 import java.util.LinkedList;
 
+import org.apache.commons.configuration.ConfigurationException;
+
 import saasim.provisioning.util.DPSInfo;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.provisioningheuristics.MachineStatistics;
@@ -21,8 +23,9 @@ public class EC2UrgaonkarProvisioningSystem extends UrgaonkarProvisioningSystem 
 
 	/**
 	 * Default constructor 
+	 * @throws ConfigurationException 
 	 */
-	public EC2UrgaonkarProvisioningSystem() {
+	public EC2UrgaonkarProvisioningSystem() throws ConfigurationException {
 		super();
 	}
 

@@ -39,7 +39,8 @@ public class AccountingSystemTest extends ValidConfigurationTest {
 	 */
 	@Test(expected=AssertionError.class)
 	public void testAccountPartialUtility() {
-		Configuration.getInstance().getAccountingSystem().accountPartialUtility(0, null, null, null);
+		Configuration r = Configuration.getInstance();
+		new AccountingSystem(new User[]{},new Provider[]{}).accountPartialUtility(0, null, null);
 	}
 
 	/**
@@ -48,7 +49,8 @@ public class AccountingSystemTest extends ValidConfigurationTest {
 	 */
 	@Test
 	public void testCalculateUtility() {
-		UtilityResult utility = Configuration.getInstance().getAccountingSystem().calculateUtility();
+		Configuration r = Configuration.getInstance();
+		UtilityResult utility = new AccountingSystem(new User[]{},new Provider[]{}).calculateUtility();
 		assertEquals(-17692.5, utility.getUtility(), 0.0);
 	}
 }

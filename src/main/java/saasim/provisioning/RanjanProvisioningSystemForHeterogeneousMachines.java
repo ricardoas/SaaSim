@@ -4,9 +4,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.configuration.ConfigurationException;
+
 import saasim.cloud.MachineType;
 import saasim.cloud.Provider;
-import saasim.provisioning.util.DPSInfo;
 import saasim.sim.provisioningheuristics.MachineStatistics;
 
 
@@ -31,7 +32,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 	
 	protected MachineType[] acceleratorTypes = {MachineType.M1_SMALL};
 
-	public RanjanProvisioningSystemForHeterogeneousMachines() {
+	public RanjanProvisioningSystemForHeterogeneousMachines() throws ConfigurationException {
 		super();
 	}
 	

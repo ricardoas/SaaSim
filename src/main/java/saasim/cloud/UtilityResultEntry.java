@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import saasim.config.Configuration;
+import saasim.sim.util.SaaSPlanProperties;
+
 /**
  * Abstraction used to represent a entry of {@link UtilityResult}.
  * 
@@ -32,11 +35,10 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 	/**
 	 * Default constructor.
 	 * @param time value of current time in millis
-	 * @param contracts 
 	 * @param users an array containing the users in the application
 	 * @param providers an array containing the providers in the application
 	 */
-	public UtilityResultEntry(long time, Contract[] contracts, User[] users, Provider[] providers) {
+	public UtilityResultEntry(long time, User[] users, Provider[] providers) {
 		assert users != null;
 		assert providers != null;
 		
@@ -53,8 +55,10 @@ public class UtilityResultEntry implements Comparable<UtilityResultEntry>, Seria
 		
 		contractEntries = new TreeMap<String, UserEntry>();
 		
-		for (Contract contract : contracts) {
-			contractEntries.put(contract.getName(), new UserEntry(contract.getName()));
+		String[] contractNames = Configuration.getInstance().getStringArray(SaaSPlanProperties.PLAN_NAME);
+		
+		for (String contract : contractNames) {
+			contractEntries.put(contract, new UserEntry(contract));
 		}
 		
 		for (int i = 0; i < numberOfUsers; i++) {

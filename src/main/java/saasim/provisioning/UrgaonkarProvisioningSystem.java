@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.configuration.ConfigurationException;
+
 import saasim.cloud.MachineType;
 import saasim.cloud.Provider;
 import saasim.cloud.Request;
@@ -61,8 +63,9 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 
 	/**
 	 * Default constructor 
+	 * @throws ConfigurationException 
 	 */
-	public UrgaonkarProvisioningSystem() {
+	public UrgaonkarProvisioningSystem() throws ConfigurationException {
 		super();
 		enablePredictive = Configuration.getInstance().getBoolean(PROP_ENABLE_PREDICTIVE, true);
 		enableReactive = Configuration.getInstance().getBoolean(PROP_ENABLE_REACTIVE, true);

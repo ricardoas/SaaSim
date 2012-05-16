@@ -285,7 +285,7 @@ public class PlanningFitnessFunction{// extends FitnessFunction{
 	 * @return The receipt.
 	 */
 	protected double calcReceipt() {
-		UtilityResultEntry resultEntry = new UtilityResultEntry(0, new Contract[]{}, this.cloudUsers, this.cloudProviders);
+		UtilityResultEntry resultEntry = new UtilityResultEntry(0, this.cloudUsers, this.cloudProviders);
 
 		double oneTimeFees = 0d;
 		for(Entry<User, List<Summary>> entry : this.summaries.entrySet()){

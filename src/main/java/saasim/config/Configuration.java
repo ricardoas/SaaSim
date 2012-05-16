@@ -29,8 +29,6 @@ import saasim.cloud.TypeProvider;
 import saasim.cloud.User;
 import saasim.io.ParserIdiom;
 import saasim.planning.heuristic.OverProvisionHeuristic;
-import saasim.provisioning.util.DPSInfo;
-import saasim.sim.AccountingSystem;
 import saasim.sim.SimpleMultiTierApplication;
 import saasim.sim.Simulator;
 import saasim.sim.components.LoadBalancer;
@@ -81,8 +79,6 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	private Provider[] providers;
 	private Contract[] contracts;
 	private User[] users;
-	private AccountingSystem accountingSystem;
-	private DPSInfo dpsInfo;
 
 	
 	/**
@@ -114,9 +110,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 			instance.providers = (Provider[]) objects[i++];
 			instance.contracts = (Contract[]) objects[i++];
 			instance.users = (User[]) objects[i++];
-			instance.accountingSystem = (AccountingSystem) objects[i++];
 			instance.priorities = (int []) objects[i++];
-//			instance.dpsInfo = (DPSInfo) objects[i++];
 			instance.simulator = (Simulator) objects[i++];
 			instance.simulator.restore();
 			EventCheckpointer.clear();
@@ -125,12 +119,10 @@ public class Configuration extends ComplexPropertiesConfiguration{
 			instance.providers = Configuration.getInstance().readProviders();
 			instance.contracts = Configuration.getInstance().readContracts();
 			instance.users = Configuration.getInstance().readUsers();
-			instance.accountingSystem = new AccountingSystem(instance.users, instance.providers);
 			instance.priorities = new int[instance.users.length];
 			for (int i = 0; i < instance.priorities.length; i++) {
 				instance.priorities[i] = instance.users[i].getContract().getPriority(); //FIXME Ricardo: don't know if we need this anymore
 			}
-//			instance.dpsInfo = new DPSInfo();
 			instance.simulator = SimulatorFactory.buildSimulator(Configuration.getInstance().getScheduler());
 		}
 		
@@ -158,7 +150,14 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	public void save(){
 		assert instance != null;
 		
-		EventCheckpointer.save(scheduler, simulationInfo, simulator, providers, contracts, users, accountingSystem, priorities, dpsInfo);
+		EventCheckpointer.save(
+				scheduler, 
+				providers, 
+				contracts, 
+				users, 
+				priorities,
+				simulator
+				);
 	}
 
 	/**
@@ -328,7 +327,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 		return users;
 	}
 
-	private Contract[] readContracts() throws ConfigurationException {
+	public Contract[] readContracts() throws ConfigurationException {
 		
 		int numberOfPlans = getInt(NUMBER_OF_PLANS);
 		
@@ -626,14 +625,6 @@ public class Configuration extends ComplexPropertiesConfiguration{
 
 	public EventScheduler getScheduler() {
 		return this.scheduler;
-	}
-
-	public DPSInfo getProvisioningInfo() {
-		return this.dpsInfo;
-	}
-
-	public AccountingSystem getAccountingSystem() {
-		return this.accountingSystem;
 	}
 
 	public Contract[] getContracts() {

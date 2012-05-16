@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.configuration.ConfigurationException;
+
 import saasim.cloud.MachineType;
 import saasim.cloud.Provider;
 import saasim.config.Configuration;
@@ -37,8 +39,9 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 
 	/**
 	 * Default constructor
+	 * @throws ConfigurationException 
 	 */
-	public RanjanProvisioningSystem() {
+	public RanjanProvisioningSystem() throws ConfigurationException {
 		super();
 		type = MachineType.valueOf(Configuration.getInstance().getString(PROP_MACHINE_TYPE).toUpperCase());
 		targetUtilisation = Configuration.getInstance().getDouble(PROP_TARGET_UTILISATION);

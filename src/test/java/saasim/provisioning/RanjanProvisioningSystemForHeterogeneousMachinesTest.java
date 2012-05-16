@@ -294,11 +294,12 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 	 * large number of servers should be added. The reserved machine type supplies all the demand
 	 * with a lower number of machines than the number of machines purchased at 
 	 * {@link saasim.provisioning.RanjanProvisioningSystemForHeterogeneousMachinesTest#testEvaluateUtilisationWithOnDemandAndReservedServersToBeAdded()}
+	 * @throws ConfigurationException 
 	 * @throws Exception 
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testEvaluateUtilisationWithOnlyReservedServersToBeAdded(){
+	public void testEvaluateUtilisationWithOnlyReservedServersToBeAdded() throws ConfigurationException{
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
@@ -365,11 +366,12 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 	 * large number of servers should be added. The reserved machine type supplies all the demand
 	 * with a lower number of machines than the number of machines purchased at 
 	 * {@link saasim.provisioning.RanjanProvisioningSystemForHeterogeneousMachinesTest#testEvaluateUtilisationWithOnDemandAndReservedServersToBeAdded()}
+	 * @throws ConfigurationException 
 	 * @throws Exception 
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testEvaluateUtilisationWithOnlyReservedServersToBeAdded2(){
+	public void testEvaluateUtilisationWithOnlyReservedServersToBeAdded2() throws ConfigurationException{
 		Configuration config = EasyMock.createStrictMock(Configuration.class);
 		PowerMock.mockStatic(Configuration.class);
 		EasyMock.expect(Configuration.getInstance()).andReturn(config).times(2);
@@ -507,7 +509,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 	}
 	
 	@Test
-	public void testReportQueuedRequest(){
+	public void testReportQueuedRequest() throws ConfigurationException{
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(request.getSaasClient()).andReturn(0).times(2);
 		
@@ -531,7 +533,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 	}
 	
 	@Test
-	public void testReportFinishedRequest(){
+	public void testReportFinishedRequest() throws ConfigurationException{
 		Request request = EasyMock.createStrictMock(Request.class);
 		EasyMock.expect(request.getSaasClient()).andReturn(0);
 		EasyMock.expect(request.getResponseTimeInMillis()).andReturn(0l);

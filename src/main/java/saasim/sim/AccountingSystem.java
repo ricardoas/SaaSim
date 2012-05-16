@@ -2,7 +2,6 @@ package saasim.sim;
 
 import java.io.Serializable;
 
-import saasim.cloud.Contract;
 import saasim.cloud.Provider;
 import saasim.cloud.User;
 import saasim.cloud.UtilityResult;
@@ -34,13 +33,12 @@ public class AccountingSystem implements Serializable{
 	/**
 	 * Calculates the partial utility of application.
 	 * @param currentTimeInMillis the current time in millis
-	 * @param contracts 
 	 * @param users TODO an array of {@link User} containing the users of application
 	 * @param providers TODO an array of {@link Provider} containing the providers of application
 	 * @return A {@link UtilityResultEntry} encapsulating the utility calculated.
 	 */
-	public UtilityResultEntry accountPartialUtility(long currentTimeInMillis, Contract[] contracts, User[] users, Provider[] providers){
-		UtilityResultEntry entry = new UtilityResultEntry(currentTimeInMillis, contracts, users, providers);
+	public UtilityResultEntry accountPartialUtility(long currentTimeInMillis, User[] users, Provider[] providers){
+		UtilityResultEntry entry = new UtilityResultEntry(currentTimeInMillis, users, providers);
 		utilityResult.account(entry);
 		return entry;
 	}

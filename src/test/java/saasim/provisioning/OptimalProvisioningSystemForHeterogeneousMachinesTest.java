@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.lang.reflect.Field;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +34,7 @@ import saasim.util.SimulationInfo;
 public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 	
 	@Test
-	public void testConstructor() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
+	public void testConstructor() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, ConfigurationException{
 		SimulationInfo info = new SimulationInfo(0, 0, 2);
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
@@ -60,7 +61,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 	}
 	
 	@Test
-	public void testIsOptimal(){
+	public void testIsOptimal() throws ConfigurationException{
 		SimulationInfo info = new SimulationInfo(0, 0, 2);
 		
 		Configuration config = EasyMock.createMock(Configuration.class);
@@ -99,7 +100,8 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info);
 		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{provider});
 		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{user});
-		EasyMock.expect(Configuration.getInstance().getAccountingSystem()).andReturn(accounting);
+		Configuration r = Configuration.getInstance();
+		EasyMock.expect(new AccountingSystem(new User[]{},new Provider[]{})).andReturn(accounting);
 
 		GEISTWorkloadParser parser = EasyMock.createMock(GEISTWorkloadParser.class);
 		EasyMock.expect(parser.hasNext()).andReturn(false);
@@ -150,7 +152,8 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info).anyTimes();
 		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{provider});
 		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{user});
-		EasyMock.expect(Configuration.getInstance().getAccountingSystem()).andReturn(accounting);
+		Configuration r = Configuration.getInstance();
+		EasyMock.expect(new AccountingSystem(new User[]{},new Provider[]{})).andReturn(accounting);
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
@@ -199,7 +202,8 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info).anyTimes();
 		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{provider});
 		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{user});
-		EasyMock.expect(Configuration.getInstance().getAccountingSystem()).andReturn(accounting);
+		Configuration r = Configuration.getInstance();
+		EasyMock.expect(new AccountingSystem(new User[]{},new Provider[]{})).andReturn(accounting);
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
@@ -246,7 +250,8 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info).anyTimes();
 		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{provider});
 		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{user});
-		EasyMock.expect(Configuration.getInstance().getAccountingSystem()).andReturn(accounting);
+		Configuration r = Configuration.getInstance();
+		EasyMock.expect(new AccountingSystem(new User[]{},new Provider[]{})).andReturn(accounting);
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
@@ -295,7 +300,8 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info).anyTimes();
 		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{provider});
 		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{user});
-		EasyMock.expect(Configuration.getInstance().getAccountingSystem()).andReturn(accounting);
+		Configuration r = Configuration.getInstance();
+		EasyMock.expect(new AccountingSystem(new User[]{},new Provider[]{})).andReturn(accounting);
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
@@ -342,7 +348,8 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info).anyTimes();
 		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{provider});
 		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{user});
-		EasyMock.expect(Configuration.getInstance().getAccountingSystem()).andReturn(accounting);
+		Configuration r = Configuration.getInstance();
+		EasyMock.expect(new AccountingSystem(new User[]{},new Provider[]{})).andReturn(accounting);
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
@@ -392,7 +399,8 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info).anyTimes();
 		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{provider});
 		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{user});
-		EasyMock.expect(Configuration.getInstance().getAccountingSystem()).andReturn(accounting);
+		Configuration r = Configuration.getInstance();
+		EasyMock.expect(new AccountingSystem(new User[]{},new Provider[]{})).andReturn(accounting);
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
@@ -442,7 +450,8 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info).anyTimes();
 		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{provider});
 		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{user});
-		EasyMock.expect(Configuration.getInstance().getAccountingSystem()).andReturn(accounting);
+		Configuration r = Configuration.getInstance();
+		EasyMock.expect(new AccountingSystem(new User[]{},new Provider[]{})).andReturn(accounting);
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
@@ -494,7 +503,8 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info).anyTimes();
 		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{provider});
 		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{user});
-		EasyMock.expect(Configuration.getInstance().getAccountingSystem()).andReturn(accounting);
+		Configuration r = Configuration.getInstance();
+		EasyMock.expect(new AccountingSystem(new User[]{},new Provider[]{})).andReturn(accounting);
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
@@ -546,7 +556,8 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(info).anyTimes();
 		EasyMock.expect(Configuration.getInstance().getProviders()).andReturn(new Provider[]{provider});
 		EasyMock.expect(Configuration.getInstance().getUsers()).andReturn(new User[]{user});
-		EasyMock.expect(Configuration.getInstance().getAccountingSystem()).andReturn(accounting);
+		Configuration r = Configuration.getInstance();
+		EasyMock.expect(new AccountingSystem(new User[]{},new Provider[]{})).andReturn(accounting);
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		

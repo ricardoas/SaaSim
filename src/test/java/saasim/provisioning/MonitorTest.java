@@ -5,13 +5,17 @@ package saasim.provisioning;
 
 import static org.junit.Assert.assertEquals;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
 import saasim.cloud.MachineType;
+import saasim.cloud.Provider;
 import saasim.cloud.Request;
+import saasim.cloud.User;
 import saasim.cloud.UtilityResult;
 import saasim.config.Configuration;
+import saasim.sim.AccountingSystem;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.provisioningheuristics.MachineStatistics;
 import saasim.util.ValidConfigurationTest;
@@ -92,12 +96,15 @@ public class MonitorTest extends ValidConfigurationTest {
 
 	/**
 	 * Test method for {@link saasim.provisioning.Monitor#chargeUsers(long)}.
+	 * @throws ConfigurationException 
 	 */
 	@Test
-	public void testChargeUsers() {
-		UtilityResult utilityBefore = Configuration.getInstance().getAccountingSystem().calculateUtility();
+	public void testChargeUsers() throws ConfigurationException {
+		Configuration r = Configuration.getInstance();
+		UtilityResult utilityBefore = new AccountingSystem(new User[]{},new Provider[]{}).calculateUtility();
 		new DynamicProvisioningSystem().chargeUsers(0);
-		UtilityResult utilityAfter = Configuration.getInstance().getAccountingSystem().calculateUtility();
+		Configuration r1 = Configuration.getInstance();
+		UtilityResult utilityAfter = new AccountingSystem(new User[]{},new Provider[]{}).calculateUtility();
 		
 		double usersFee = 0;
 		double providersFee = 0;

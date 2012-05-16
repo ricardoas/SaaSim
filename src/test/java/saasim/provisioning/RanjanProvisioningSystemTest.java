@@ -206,7 +206,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 	
 	@SuppressWarnings("unchecked")
 	@Ignore @Test
-	public void testEvaluateUtilisationWithOneServerToBeAddedAndLimitsReached(){
+	public void testEvaluateUtilisationWithOneServerToBeAddedAndLimitsReached() throws ConfigurationException{
 		int reservationLimit = 1;
 		int onDemandLimit = 1;
 
@@ -257,10 +257,11 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 	/**
 	 * This scenarios verifies that after evaluating that nineteen machines should be removed, some calls
 	 * to simulator are performed.
+	 * @throws ConfigurationException 
 	 */
 	@SuppressWarnings("unchecked")
 	@Ignore @Test
-	public void handleEventEvaluateUtilizationWithServersToRemove(){
+	public void handleEventEvaluateUtilizationWithServersToRemove() throws ConfigurationException{
 		int reservationLimit = 3;
 		int onDemandLimit = 3;
 

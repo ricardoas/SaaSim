@@ -41,18 +41,20 @@ public class DynamicProvisioningSystemTest extends ValidConfigurationTest {
 	
 	/**
 	 * Test method for {@link saasim.provisioning.DynamicProvisioningSystem#DynamicProvisioningSystem()}.
+	 * @throws ConfigurationException 
 	 */
 	@Test
-	public void testDynamicProvisioningSystemWithValidConfigurationData() {
+	public void testDynamicProvisioningSystemWithValidConfigurationData() throws ConfigurationException {
 		assertNotNull(new DynamicProvisioningSystem());
 	}
 	
 	/**
 	 * Test method for {@link saasim.provisioning.DPS#registerConfigurable(saasim.sim.DynamicConfigurable)}.
+	 * @throws ConfigurationException 
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testRegisterConfigurableWithMultipleServers() {
+	public void testRegisterConfigurableWithMultipleServers() throws ConfigurationException {
 		Configuration.getInstance().setProperty(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER, "7");
 		
 		DynamicConfigurable configurable = EasyMock.createStrictMock(DynamicConfigurable.class);
@@ -89,9 +91,10 @@ public class DynamicProvisioningSystemTest extends ValidConfigurationTest {
 	/**
 	 * Test method for {@link saasim.provisioning.DPS#calculateUtility()}.
 	 * TODO This test needs redesigning.
+	 * @throws ConfigurationException 
 	 */
 	@Ignore @Test
-	public void testCalculateUtilityWithUsersAndProviders() {
+	public void testCalculateUtilityWithUsersAndProviders() throws ConfigurationException {
 		DynamicProvisioningSystem dps = new DynamicProvisioningSystem();
 		UtilityResult result = dps.calculateUtility();
 		
