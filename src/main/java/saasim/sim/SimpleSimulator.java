@@ -62,7 +62,7 @@ public class SimpleSimulator extends AbstractEventHandler implements Simulator{
 		prepareBeforeStart();
 		getScheduler().start();
 		
-		if(Configuration.getInstance().getSimulationInfo().isFinishDay()){
+		if(info.isFinishDay()){
 			Logger logger = Logger.getLogger(SimpleSimulator.class);
 			logger.info(dps.calculateUtility());
 			logger.debug(Configuration.getInstance().getScheduler().dumpPostMortemEvents());
@@ -79,7 +79,6 @@ public class SimpleSimulator extends AbstractEventHandler implements Simulator{
 	protected void prepareBeforeStart() {
 		send(new Event(EventType.READWORKLOAD, applications[0], getScheduler().now()));
 		
-		SimulationInfo info = Configuration.getInstance().getSimulationInfo();
 		if(info.isChargeDay()){
 			send(new Event(EventType.CHARGE_USERS, applications[0], info.getCurrentDayInMillis() + EventCheckpointer.INTERVAL - 1));
 		}

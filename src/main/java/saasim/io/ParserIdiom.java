@@ -37,7 +37,7 @@ public enum ParserIdiom {
 	@SuppressWarnings("unchecked")
 	public WorkloadParser<Request> getInstance(String string, long shift) {
 		try {
-			return (WorkloadParser<Request>) idiomParserClass.getConstructor(String.class).newInstance(string, shift);
+			return (WorkloadParser<Request>) idiomParserClass.getConstructor(String.class, Long.TYPE).newInstance(string, shift);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
