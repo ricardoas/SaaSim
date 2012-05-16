@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.log4j.Logger;
 
 import saasim.cloud.MachineType;
 import saasim.cloud.Provider;
@@ -107,7 +108,7 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 	public void sendStatistics(long now, MachineStatistics statistics, int tier) {
 		int numberOfServersToAdd = evaluateNumberOfServersForNextInterval(statistics);
 		
-		log.debug(String.format("STAT-RANJAN %d %d %d %s", now, tier, numberOfServersToAdd, statistics));
+		Logger.getLogger(getClass()).debug(String.format("STAT-RANJAN %d %d %d %s", now, tier, numberOfServersToAdd, statistics));
 		
 		LinkedList<MachineDescriptor> availableToTurnOff = list.poll();
 		

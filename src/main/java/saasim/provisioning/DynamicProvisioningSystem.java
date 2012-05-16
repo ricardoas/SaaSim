@@ -13,7 +13,6 @@ import saasim.cloud.User;
 import saasim.cloud.UtilityResult;
 import saasim.cloud.UtilityResultEntry;
 import saasim.config.Configuration;
-import saasim.io.WorkloadParserFactory;
 import saasim.sim.AccountingSystem;
 import saasim.sim.DynamicConfigurable;
 import saasim.sim.components.MachineDescriptor;
@@ -42,8 +41,6 @@ public class DynamicProvisioningSystem implements DPS{
 	
 	protected Provider[] providers;
 	
-	Logger log = Logger.getLogger(getClass());
-
 	private long maxRT;
 	
 	/**
@@ -123,7 +120,7 @@ public class DynamicProvisioningSystem implements DPS{
 	@Override
 	public final void requestFinished(Request request) {
 		assert request.getSaasClient() < users.length:"Unregistered user with ID " + request.getSaasClient() + ". Check configuration files.";
-//		log.debug("REQUEST-RT " + request.getResponseTimeInMillis());
+//		Logger.getLogger(getClass()).debug("REQUEST-RT " + request.getResponseTimeInMillis());
 		if(request.getResponseTimeInMillis() < maxRT){
 			reportFinishedRequest(request);
 		}else{
@@ -152,7 +149,7 @@ public class DynamicProvisioningSystem implements DPS{
 	 */
 	@Override
 	public void sendStatistics(long now, MachineStatistics statistics, int tier) {
-		log.debug(String.format("STAT-STATIC %d %d %s", now, tier, statistics));
+		Logger.getLogger(getClass()).debug(String.format("STAT-STATIC %d %d %s", now, tier, statistics));
 	}
 
 	/**
@@ -179,7 +176,7 @@ public class DynamicProvisioningSystem implements DPS{
 	public void chargeUsers(long currentTimeInMillis) {
 		
 		UtilityResultEntry entry = accountingSystem.accountPartialUtility(currentTimeInMillis, users, providers);
-		log.info(entry);		
+		Logger.getLogger(getClass()).info(entry);		
 	}
 
 	/**
