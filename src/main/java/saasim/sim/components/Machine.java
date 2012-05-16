@@ -1,11 +1,9 @@
 package saasim.sim.components;
 
-import java.util.List;
 import java.util.Queue;
 
 import saasim.cloud.Request;
 import saasim.sim.core.EventHandler;
-import saasim.util.Triple;
 
 
 /**
@@ -59,9 +57,6 @@ public interface Machine extends EventHandler{
 	 */
 	int getNumberOfCores();
 
-	@Deprecated
-	List<Triple<Long, Long, Long>> estimateFinishTime(Request request);
-	
 	/**
 	 * Cancels the shutdown of {@link Machine}.
 	 */

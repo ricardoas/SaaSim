@@ -59,7 +59,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 		this.currentTick = Configuration.getInstance().getSimulationInfo().getCurrentDayInMillis() + tick;
 		this.leftOver = new Request[workloadFiles.length];
 		for(int i = 0; i < workloadFiles.length; i++){
-			this.parsers[i] = new GEISTWorkloadParser(workloadFiles[i]);
+			this.parsers[i] = new GEISTWorkloadParser(workloadFiles[i], 0);
 		}
 		this.SLA = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME);
 		this.nextRequestsCounter = new double[36000];
@@ -148,7 +148,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 			evaluateMachinesToBeAdded(tier, numberOfServersToAdd);
 		}else if(numberOfServersToAdd < 0){
 			for (int i = 0; i < -numberOfServersToAdd; i++) {
-				configurable.removeMachine(tier, false);
+				configurable.removeMachine(tier, null, false);//FIXME machine descriptor
 			}
 		}
 		

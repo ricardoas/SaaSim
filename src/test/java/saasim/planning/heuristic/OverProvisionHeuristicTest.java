@@ -84,8 +84,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
 		EasyMock.expect(config.getApplicationHeuristics()).andReturn(classes);
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER)).andReturn(new int[]{1});
-		EasyMock.expect(config.readProviders()).andReturn(providers);
-		EasyMock.expect(config.readUsers()).andReturn(new User[]{});
+//		EasyMock.expect(config.readProviders()).andReturn(providers);
+//		EasyMock.expect(config.readUsers()).andReturn(new User[]{});
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(new SimulationInfo(1, 0, 1));
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
@@ -191,8 +191,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
 		EasyMock.expect(config.getApplicationHeuristics()).andReturn(classes);
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER)).andReturn(new int[]{1});
-		EasyMock.expect(config.readProviders()).andReturn(providers);
-		EasyMock.expect(config.readUsers()).andReturn(new User[]{});
+//		EasyMock.expect(config.readProviders()).andReturn(providers);
+//		EasyMock.expect(config.readUsers()).andReturn(new User[]{});
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(new SimulationInfo(1, 0, 1));
 		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
@@ -317,8 +317,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
 		EasyMock.expect(config.getApplicationHeuristics()).andReturn(classes);
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER)).andReturn(new int[]{1});
-		EasyMock.expect(config.readProviders()).andReturn(providers);
-		EasyMock.expect(config.readUsers()).andReturn(new User[]{});
+//		EasyMock.expect(config.readProviders()).andReturn(providers);
+//		EasyMock.expect(config.readUsers()).andReturn(new User[]{});
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(new SimulationInfo(1, 0, 1));
 		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
@@ -443,8 +443,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
 		EasyMock.expect(config.getApplicationHeuristics()).andReturn(classes);
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER)).andReturn(new int[]{1});
-		EasyMock.expect(config.readProviders()).andReturn(providers);
-		EasyMock.expect(config.readUsers()).andReturn(new User[]{});
+//		EasyMock.expect(config.readProviders()).andReturn(providers);
+//		EasyMock.expect(config.readUsers()).andReturn(new User[]{});
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(new SimulationInfo(1, 0, 1));
 		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
@@ -574,8 +574,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
 		EasyMock.expect(config.getApplicationHeuristics()).andReturn(classes);
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER)).andReturn(new int[]{1});
-		EasyMock.expect(config.readProviders()).andReturn(providers);
-		EasyMock.expect(config.readUsers()).andReturn(new User[]{});
+//		EasyMock.expect(config.readProviders()).andReturn(providers);
+//		EasyMock.expect(config.readUsers()).andReturn(new User[]{});
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(new SimulationInfo(1, 0, 1));
 		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
@@ -700,8 +700,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
 		EasyMock.expect(config.getApplicationHeuristics()).andReturn(classes);
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER)).andReturn(new int[]{1});
-		EasyMock.expect(config.readProviders()).andReturn(providers);
-		EasyMock.expect(config.readUsers()).andReturn(new User[]{});
+//		EasyMock.expect(config.readProviders()).andReturn(providers);
+//		EasyMock.expect(config.readUsers()).andReturn(new User[]{});
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(new SimulationInfo(1, 0, 1));
 		EasyMock.expect(config.getParserPageSize()).andReturn(TimeUnit.MINUTE);
@@ -830,8 +830,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
 		EasyMock.expect(config.getApplicationHeuristics()).andReturn(classes);
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER)).andReturn(new int[]{1});
-		EasyMock.expect(config.readProviders()).andReturn(providers);
-		EasyMock.expect(config.readUsers()).andReturn(new User[]{});
+//		EasyMock.expect(config.readProviders()).andReturn(providers);
+//		EasyMock.expect(config.readUsers()).andReturn(new User[]{});
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(simulationInfo).times(2);
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(new SimulationInfo(1, 0, 1));
 		EasyMock.expect(config.getLong(SimulatorProperties.PLANNING_PERIOD)).andReturn(1l);
@@ -993,8 +993,8 @@ public class OverProvisionHeuristicTest extends MockedConfigurationTest {
 		Class<?>[] classes = new Class<?>[]{Class.forName(RoundRobinHeuristic.class.getCanonicalName())};
 		EasyMock.expect(config.getApplicationHeuristics()).andReturn(classes);
 		EasyMock.expect(config.getIntegerArray(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER)).andReturn(new int[]{1});
-		EasyMock.expect(config.readProviders()).andReturn(providers);
-		EasyMock.expect(config.readUsers()).andReturn(new User[]{});
+//		EasyMock.expect(config.readProviders()).andReturn(providers);
+//		EasyMock.expect(config.readUsers()).andReturn(new User[]{});
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(initialInfo).times(2);
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(firstDayCompletedInfo).times(3);
 		EasyMock.expect(Configuration.getInstance().getSimulationInfo()).andReturn(secondDayCompletedInfo);

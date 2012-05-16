@@ -22,11 +22,17 @@ import saasim.config.Configuration;
 public class GEISTWorkloadParser extends AbstractWorkloadParser{
 	
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2736759666847950636L;
+
+	/**
 	 * Default constructor
+	 * @param shift TODO
 	 * @param workloads 
 	 */
-	public GEISTWorkloadParser(String workload) {
-		super(workload, Configuration.getInstance().getSimulationInfo().getCurrentDayInMillis());
+	public GEISTWorkloadParser(String workload, long shift) {
+		super(workload, shift);
 	}
 	
 	/**
@@ -34,7 +40,7 @@ public class GEISTWorkloadParser extends AbstractWorkloadParser{
 	 */
 	@Override
 	public WorkloadParser<Request> clone() {
-		return new GEISTWorkloadParser(workload);
+		return new GEISTWorkloadParser(workload, 0);
 	}
 
 	/**

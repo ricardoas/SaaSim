@@ -8,7 +8,6 @@ import saasim.provisioning.DPS;
 import saasim.provisioning.Monitor;
 import saasim.sim.components.LoadBalancer;
 import saasim.sim.components.MachineDescriptor;
-import saasim.sim.schedulingheuristics.SchedulingHeuristic;
 
 
 /**
@@ -32,14 +31,6 @@ public interface DynamicConfigurable extends ServiceEntry{
 	void setWorkloadParser(WorkloadParser<List<Request>> parser);
 
 	/**
-	 * Removes a server from specified tier. The removal policy is determined {@link SchedulingHeuristic}.
-	 * @param tier The tier whose machine will be removed.
-	 * @param force <code>true</code> to remove immediately, and <code>false</code> to stop scheduling and wait
-	 * until machine becomes idle to remove.
-	 */
-	void removeMachine(int tier, boolean force);
-
-	/**
 	 * Removes the server represented by {@link MachineDescriptor} from specified tier. 
 	 * @param force <code>true</code> to remove immediately, and <code>false</code> to stop scheduling and wait
 	 * until machine becomes idle to remove.
@@ -52,13 +43,6 @@ public interface DynamicConfigurable extends ServiceEntry{
 	 */
 	void setMonitor(Monitor monitor);
 
-	/**
-	 * Cancels machine's removal.
-	 * @param tier tier where the machines to be recovered is
-	 * @param numberOfServers number of machines to be recovered
-	 */
-	void cancelMachineRemoval(int tier, int numberOfServers);
-	
 	void config(int tier, double threshold);
 	
 	/**

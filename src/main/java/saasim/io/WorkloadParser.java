@@ -1,6 +1,7 @@
 package saasim.io;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * Common set of features for workload parsers.
@@ -8,7 +9,7 @@ import java.io.IOException;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  * @param <T> To represent the granularity you
  */
-public interface WorkloadParser<T> {
+public interface WorkloadParser<T> extends Serializable{
 
 	/**
 	 * Reads and returns the next portion of data from the workload. Note that
@@ -28,12 +29,6 @@ public interface WorkloadParser<T> {
 	 * Clean the workload.
 	 */
 	public void clear();
-
-	/**
-	 * Modified the number of days already read from workload.
-	 * @param simulatedDays number of days set the simulation
-	 */
-	public void setDaysAlreadyRead(int simulatedDays);
 
 	/**
 	 * Close the workload.

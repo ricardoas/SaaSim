@@ -43,7 +43,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 			evaluateMachinesToBeAdded(tier, numberOfServersToAdd);
 		}else if(numberOfServersToAdd < 0){
 			for (int i = 0; i < -numberOfServersToAdd; i++) {
-				configurable.removeMachine(tier, false);
+				configurable.removeMachine(tier, null, false);//FIXME machine descriptor
 			}
 		}
 	}

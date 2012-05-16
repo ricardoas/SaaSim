@@ -87,45 +87,6 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		EasyMock.verify(scheduler, schedulingHeuristic);
 	}
 	
-	@Test
-	public void testRemoveServer(){
-		MachineDescriptor descriptor = new MachineDescriptor(1, false, MachineType.M1_SMALL, 0);
-		
-		Machine machine = EasyMock.createStrictMock(TimeSharedMachine.class);
-		EasyMock.expect(machine.getDescriptor()).andReturn(descriptor);
-		machine.shutdownOnFinish();
-		EasyMock.expectLastCall().times(1);
-		
-		SchedulingHeuristic schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
-		schedulingHeuristic.addMachine(EasyMock.isA(Machine.class));
-		EasyMock.expect(schedulingHeuristic.removeMachine()).andReturn(machine);
-		
-		EasyMock.replay(schedulingHeuristic, machine);
-
-		LoadBalancer lb = new LoadBalancer(Configuration.getInstance().getScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 1);
-		
-		lb.addMachine(descriptor, false);
-		Configuration.getInstance().getScheduler().start();
-		
-		//Removing a server
-		lb.removeMachine(false);
-		EasyMock.verify(schedulingHeuristic, machine);
-	}
-	
-	@Test
-	public void testRemoveServerThatDoesNotExist(){
-		SchedulingHeuristic schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
-		EasyMock.expect(schedulingHeuristic.removeMachine()).andReturn(null);
-		
-		EasyMock.replay(schedulingHeuristic);
-
-		LoadBalancer lb = new LoadBalancer(Configuration.getInstance().getScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 1);
-		//Removing a server
-		lb.removeMachine(false);
-		
-		EasyMock.verify(schedulingHeuristic);
-	}
-	
 	/**
 	 * Scheduling a new request with one machine artificially chosen by the heuristic
 	 */
@@ -254,30 +215,6 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		//Calculating utilisation
 //		lb.handleEvent(new JEEvent(JEEventType.COLLECT_STATISTICS, lb, 0l, evaluationTime));
 //		lb.collectStatistics(now, timeInterval, numberOfRequests);
-	}
-	
-	@Test
-	public void testHandleEventMachineTurnedOff(){
-		MachineDescriptor machineDescriptor = new MachineDescriptor(1, false, MachineType.C1_XLARGE, 0);
-
-		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
-		monitor.machineTurnedOff(machineDescriptor);
-		EasyMock.expectLastCall().times(1);
-		
-		Machine machine = EasyMock.createMock(Machine.class);
-		SchedulingHeuristic schedulingHeuristic = EasyMock.createStrictMock(SchedulingHeuristic.class);
-		
-		EasyMock.replay(monitor, schedulingHeuristic, machine);
-		
-		LoadBalancer lb = new LoadBalancer(Configuration.getInstance().getScheduler(), schedulingHeuristic, Integer.MAX_VALUE, 0);
-		lb.setMonitor(monitor, null);
-		lb.addMachine(machineDescriptor, false);
-		lb.removeMachine(false);
-		
-//		lb.handleEvent(new JEEvent(JEEventType.MACHINE_TURNED_OFF, lb, 0l, machineDescriptor));
-		lb.serverIsDown(machineDescriptor);
-		
-		EasyMock.verify(monitor, schedulingHeuristic, machine);
 	}
 	
 	@Test

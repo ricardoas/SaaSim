@@ -1,5 +1,7 @@
 package saasim.sim;
 
+import saasim.util.SimulationInfo;
+
 
 
 /**
@@ -22,4 +24,6 @@ public interface Simulator{
 	DynamicConfigurable [] getApplications();
 
 	void restore();
+
+	SimulationInfo getSimulationInfo();
 }

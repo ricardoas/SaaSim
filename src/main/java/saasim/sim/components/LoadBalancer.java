@@ -2,10 +2,8 @@
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import saasim.cloud.Request;
 import saasim.config.Configuration;
@@ -43,7 +41,6 @@ public class LoadBalancer extends AbstractEventHandler{
 	private transient Monitor monitor;
 
 	private Map<MachineDescriptor, Machine> startingUp;
-	private Map<MachineDescriptor, Machine> warmingDown;
 
 	private ServiceEntry sentry;
 
@@ -62,8 +59,7 @@ public class LoadBalancer extends AbstractEventHandler{
 		this.heuristic = heuristic;
 		this.maxServersAllowed = maxServersAllowed;
 		this.tier = tier;
-		startingUp = new HashMap<MachineDescriptor, Machine>();
-		warmingDown = new HashMap<MachineDescriptor, Machine>();
+		this.startingUp = new HashMap<MachineDescriptor, Machine>();
 		this.threshold = Integer.MAX_VALUE;
 	}
 
@@ -188,7 +184,6 @@ public class LoadBalancer extends AbstractEventHandler{
 	 * @param requestQueued {@link Request} queued
 	 */
 	public void reportRequestQueued(Request requestQueued){
-		//heuristic.reportFinishedRequest(requestQueued);
 		monitor.requestQueued(now(), requestQueued, tier);
 	}
 
@@ -201,38 +196,6 @@ public class LoadBalancer extends AbstractEventHandler{
 		monitor.requestFinished(requestFinished);
 	}
 
-	/**
-	 * Remove a specific {@link Machine} to this tier.
-	 * @param force <code>true</code> if use force
-	 */
-	@Deprecated
-	public void removeMachine(boolean force) {
-		Machine machine = null;
-		
-		if(startingUp.isEmpty()){
-			machine = heuristic.removeMachine();
-			if(machine != null){
-				warmingDown.put(machine.getDescriptor(), machine);
-				if(force){
-					//FIXME what can we do with running requests?
-					//send(new JEEvent(JEEventType.MACHINE_TURNED_OFF, this, getScheduler().now(), machine));
-					throw new RuntimeException("Not implemented");
-				}else{
-					machine.shutdownOnFinish();
-				}
-			}
-		}else{
-			Iterator<Entry<MachineDescriptor, Machine>> iterator = startingUp.entrySet().iterator();
-			Entry<MachineDescriptor, Machine> entry = iterator.next();
-			iterator.remove();
-			machine = entry.getValue();
-			
-			entry.getKey().setStartTimeInMillis(now());
-			warmingDown.put(machine.getDescriptor(), machine);
-			machine.shutdownOnFinish();
-		}
-	}
-	
 	/**
 	 * Remove a specific {@link Machine} to this tier.
 	 * @param force <code>true</code> if use force
@@ -251,20 +214,6 @@ public class LoadBalancer extends AbstractEventHandler{
 		}
 	}
 	
-	/**
-	 * Cancels machine's removal.
-	 * @param numberOfMachines number of machines to be recovered
-	 */
-	public void cancelMachineRemoval(int numberOfMachines) {
-		Iterator<Entry<MachineDescriptor, Machine>> iterator = warmingDown.entrySet().iterator();
-		for (int i = 0; i < numberOfMachines; i++) {
-			Entry<MachineDescriptor, Machine> entry = iterator.next();
-			iterator.remove();
-			entry.getValue().cancelShutdown();
-			heuristic.addMachine(entry.getValue());
-		}
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */

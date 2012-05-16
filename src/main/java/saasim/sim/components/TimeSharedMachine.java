@@ -2,11 +2,7 @@ package saasim.sim.components;
 
 import static saasim.sim.util.SimulatorProperties.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 
 import saasim.cloud.Request;
@@ -17,7 +13,6 @@ import saasim.sim.core.EventScheduler;
 import saasim.sim.core.EventType;
 import saasim.sim.core.HandlingPoint;
 import saasim.sim.util.FastSemaphore;
-import saasim.util.Triple;
 
 
 /**
@@ -273,58 +268,6 @@ public class TimeSharedMachine extends AbstractEventHandler implements Machine{
 		return utilisation;
 	}
 	
-	private class Info{
-		private final Request request;
-		private long finishTimeBefore;
-		private long finishTimeAfter;
-		private long processedDemand;
-
-		public Info(Request request) {
-			this.request = request;
-			this.processedDemand = 0;
-			this.finishTimeBefore = 0;
-			this.finishTimeAfter = 0;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getOuterType().hashCode();
-			result = prime * result
-					+ ((request == null) ? 0 : request.hashCode());
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			Info other = (Info) obj;
-			if (!getOuterType().equals(other.getOuterType()))
-				return false;
-			if (request == null) {
-				if (other.request != null)
-					return false;
-			} else if (!request.equals(other.request))
-				return false;
-			return true;
-		}
-
-		private TimeSharedMachine getOuterType() {
-			return TimeSharedMachine.this;
-		}
-
-		@Override
-		public String toString() {
-			return "Info [finishTimeBefore=" + finishTimeBefore + "]";
-		}
-	}
-	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -349,35 +292,6 @@ public class TimeSharedMachine extends AbstractEventHandler implements Machine{
 		return getClass().getName() + ": " + descriptor;
 	}
 	
-	@Override
-	@Deprecated
-	public List<Triple<Long, Long, Long>> estimateFinishTime(Request newRequest) {
-		
-		List<Triple<Long, Long, Long>> executionTimes = new ArrayList<Triple<Long, Long, Long>>();
-		Map<Request, Info> times = new HashMap<Request, Info>();
-		Queue<Request> queue = getProcessorQueue();
-		for (Request request : queue) {
-			times.put(request, new Info(request));
-		}
-		
-		long processedTime = 0;
-		
-		while(!queue.isEmpty()){
-			Request request = queue.poll();
-			int priority = Configuration.getInstance().getPriorities()[request.getSaasClient()];
-			Info info = times.get(request);
-			long demand = Math.min(priority, request.getTotalToProcess()-info.processedDemand);
-			processedTime += demand;
-			info.processedDemand += demand;
-			if(request.getTotalToProcess() - info.processedDemand == 0){
-				info.finishTimeBefore = processedTime;
-			}else{
-				queue.add(request);
-			}
-		}
-		return executionTimes;
-	}
-
 	@Override
 	public void shutdownNow() {
 		shutdown = true;

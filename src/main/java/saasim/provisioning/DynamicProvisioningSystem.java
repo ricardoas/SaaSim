@@ -70,12 +70,7 @@ public class DynamicProvisioningSystem implements DPS{
 		
 		this.configurable = configurables[0];
 		
-		if(Configuration.getInstance().getSimulationInfo().isFirstDay()){
-			addServersToTier(Configuration.getInstance().getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER));
-		}
-		
-		configurable.setWorkloadParser(WorkloadParserFactory.getWorkloadParser());
-		configurable.setMonitor(this);
+		addServersToTier(Configuration.getInstance().getIntegerArray(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER));
 	}
 	
 	/**

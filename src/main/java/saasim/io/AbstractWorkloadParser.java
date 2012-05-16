@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import saasim.cloud.Request;
-import saasim.config.Configuration;
 
 
 /**
@@ -16,12 +15,14 @@ import saasim.config.Configuration;
  */
 public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9167171166836872343L;
+
 	protected static int saasClientIDSeed = 0;
 	
 	private BufferedReader reader;
-	private int currentDay = 0;
-	
-	protected int periodsAlreadyRead = 0;
 	private Request next;
 	
 	protected final int saasClientID;
@@ -40,48 +41,13 @@ public abstract class AbstractWorkloadParser implements WorkloadParser<Request>{
 		
 		this.shift = shift;
 		
-		String workloadFile = readFileToUse(workload);
+		this.saasClientID = saasClientIDSeed++;
 		try {
-			this.saasClientID = saasClientIDSeed++;
-			this.reader = new BufferedReader(new FileReader(workloadFile));//Using normal load file
-			this.next = readNext();
+			this.reader = new BufferedReader(new FileReader(workload));
 		} catch (FileNotFoundException e) {
-			if(workloadFile.isEmpty()){
-				throw new RuntimeException("Blank line in " + workload + " file." , e);
-			}
 			throw new RuntimeException("Problem reading workload file. ", e);
 		}
-	}
-	
-	/**
-	 * Read file to be used for this {@link AbstractWorkloadParser}.
-	 * @param workload The file to read.
-	 * @return The content of file.
-	 */
-	private String readFileToUse(String workload) {
-		this.currentDay = Configuration.getInstance().getSimulationInfo().getCurrentDay();
-		BufferedReader reader = null;
-		try {
-			reader = new BufferedReader(new FileReader(workload));
-			String file = reader.readLine();
-			int currentLine = 0;
-			while(currentLine < this.currentDay){
-				currentLine++;
-				file = reader.readLine();
-			}
-			reader.close();
-			return file == null? "": file;
-		} catch (Exception e) {
-			throw new RuntimeException("Problem reading workload file.", e);
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setDaysAlreadyRead(int simulatedDays){
-		throw new RuntimeException("not yet implemented");
+		this.next = readNext();
 	}
 	
 	/**

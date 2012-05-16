@@ -1,6 +1,5 @@
 package saasim.cloud;
 
-import saasim.config.Configuration;
 
 /**
  * Singleton for ID generation.
@@ -19,7 +18,7 @@ public enum IDGenerator {
 	 * Private constructor
 	 */
 	private IDGenerator(){
-		nextID = Configuration.getInstance().getSimulationInfo().getCurrentDayInMillis();
+		nextID = (long) (Math.random() * Long.MAX_VALUE);
 	}
 	
 	/**

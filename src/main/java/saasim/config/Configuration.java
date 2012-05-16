@@ -74,7 +74,6 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	private int[] priorities;
 	
 	private EventScheduler scheduler;
-	private SimulationInfo simulationInfo;
 	private Simulator simulator;
 	private Provider[] providers;
 	private User[] users;
@@ -105,12 +104,12 @@ public class Configuration extends ComplexPropertiesConfiguration{
 			Object[] objects = EventCheckpointer.load();
 			int i = 0;
 			instance.scheduler = (EventScheduler) objects[i++];
-			instance.scheduler.reset(instance.simulationInfo.getCurrentDayInMillis(), instance.simulationInfo.getCurrentDayInMillis() + TimeUnit.DAY.getMillis());
 			instance.providers = (Provider[]) objects[i++];
 			instance.users = (User[]) objects[i++];
 			instance.priorities = (int []) objects[i++];
 			instance.simulator = (Simulator) objects[i++];
 			instance.simulator.restore();
+			instance.scheduler.reset(instance.simulator.getSimulationInfo().getCurrentDayInMillis(), instance.simulator.getSimulationInfo().getCurrentDayInMillis() + TimeUnit.DAY.getMillis());
 			EventCheckpointer.clear();
 		}else{
 			instance.scheduler = new EventScheduler(TimeUnit.DAY.getMillis());
@@ -128,7 +127,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 					registerHandlerClass(TimeSharedMachine.class).
 					registerHandlerClass(OverProvisionHeuristic.class);
 		
-		Logger.getLogger(EventCheckpointer.class).debug("CHKP LOAD-out " + instance.simulationInfo);
+		Logger.getLogger(EventCheckpointer.class).debug("CHKP LOAD-out " + instance.simulator.getSimulationInfo());
 	}
 	
 	/**
@@ -197,7 +196,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	 * @throws ConfigurationException 
 	 * @throws IOException
 	 */
-	public Provider[] readProviders() throws ConfigurationException{
+	private Provider[] readProviders() throws ConfigurationException{
 		int numberOfProviders = getInt(IAAS_NUMBER_OF_PROVIDERS);
 		
 		String[] names = getStringArray(IAAS_PROVIDER_NAME);
@@ -297,7 +296,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	 * @throws ConfigurationException 
 	 * @throws IOException
 	 */
-	public User[] readUsers() throws ConfigurationException{
+	private User[] readUsers() throws ConfigurationException{
 		int numberOfPlans = getInt(NUMBER_OF_PLANS);
 		
 		Contract[] contracts = readContracts();
@@ -323,7 +322,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 		return users;
 	}
 
-	public Contract[] readContracts() throws ConfigurationException {
+	private Contract[] readContracts() throws ConfigurationException {
 		
 		int numberOfPlans = getInt(NUMBER_OF_PLANS);
 		
@@ -608,7 +607,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	}
 
 	public SimulationInfo getSimulationInfo() {
-		return this.simulationInfo;
+		return this.simulator.getSimulationInfo();
 	}
 
 	public Provider[] getProviders() {

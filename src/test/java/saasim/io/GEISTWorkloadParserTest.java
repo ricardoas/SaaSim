@@ -19,7 +19,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 	@Test
 	public void testTraceWithBlankLine() throws ConfigurationException{
 		buildFullConfiguration();
-		WorkloadParser<Request> parser = new GEISTWorkloadParser(PropertiesTesting.TRACE_WITH_BLANK_LINE);
+		WorkloadParser<Request> parser = new GEISTWorkloadParser(PropertiesTesting.TRACE_WITH_BLANK_LINE, 0);
 		assertTrue(parser.hasNext());
 		assertEquals(1, parser.next().getReqID());
 		assertTrue(parser.hasNext());
@@ -34,7 +34,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 	@Test
 	public void testTraceWithBlankEndLine() throws ConfigurationException{
 		buildFullConfiguration();
-		WorkloadParser<Request> parser = new GEISTWorkloadParser(PropertiesTesting.TRACE_WITH_BLANK_END_LINE);
+		WorkloadParser<Request> parser = new GEISTWorkloadParser(PropertiesTesting.TRACE_WITH_BLANK_END_LINE, 0);
 		assertTrue(parser.hasNext());
 		Request request1 = parser.next();
 		assertEquals(1, request1.getReqID());
@@ -54,7 +54,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 	@Test
 	public void testValidTrace() throws ConfigurationException{
 		buildFullConfiguration();
-		WorkloadParser<Request> parser = new GEISTWorkloadParser(PropertiesTesting.WORKLOAD);
+		WorkloadParser<Request> parser = new GEISTWorkloadParser(PropertiesTesting.WORKLOAD, 0);
 		assertTrue(parser.hasNext());
 		Request request1 = parser.next();
 		assertEquals(1, request1.getReqID());
@@ -78,7 +78,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 		buildFullConfiguration();
 		String workload = PropertiesTesting.WORKLOAD;
 		
-		GEISTWorkloadParser parser = new GEISTWorkloadParser(workload);
+		GEISTWorkloadParser parser = new GEISTWorkloadParser(workload, 0);
 		
 		parser.parseRequest("");
 	}
@@ -88,7 +88,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 		buildFullConfiguration();
 		String workload = PropertiesTesting.WORKLOAD;
 		
-		GEISTWorkloadParser parser = new GEISTWorkloadParser(workload);
+		GEISTWorkloadParser parser = new GEISTWorkloadParser(workload, 0);
 		
 		parser.parseRequest(null);
 	}
@@ -98,7 +98,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 		buildFullConfiguration();
 		String workload = PropertiesTesting.WORKLOAD;
 		
-		GEISTWorkloadParser parser = new GEISTWorkloadParser(workload);
+		GEISTWorkloadParser parser = new GEISTWorkloadParser(workload, 0);
 		
 		parser.parseRequest("10 10 8 7");
 	}
@@ -108,7 +108,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 		buildFullConfiguration();
 		String workloads = PropertiesTesting.WORKLOAD;
 		
-		GEISTWorkloadParser parser = new GEISTWorkloadParser(workloads);
+		GEISTWorkloadParser parser = new GEISTWorkloadParser(workloads, 0);
 		
 		Request request = parser.parseRequest("10 333 16031500 81 400000 10 5 8 1 2");
 		assertNotNull(request);
@@ -138,7 +138,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 	public void testMultipleDaysWithValidWorkload() throws ConfigurationException{
 		// First Day
 		buildFullConfiguration();
-		GEISTWorkloadParser parser = new GEISTWorkloadParser(PropertiesTesting.WORKLOAD);
+		GEISTWorkloadParser parser = new GEISTWorkloadParser(PropertiesTesting.WORKLOAD, 0);
 		
 		assertEquals(160168, parser.next().getArrivalTimeInMillis());
 		assertEquals(160302, parser.next().getArrivalTimeInMillis());
@@ -150,7 +150,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 		
 		// Second Day
 		buildFullConfiguration();
-		parser = new GEISTWorkloadParser(PropertiesTesting.WORKLOAD);
+		parser = new GEISTWorkloadParser(PropertiesTesting.WORKLOAD, 0);
 
 		long dayInMillis = 86400000;
 		assertEquals(dayInMillis + 160168, parser.next().getArrivalTimeInMillis());
@@ -162,7 +162,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 		
 		// Third Day
 		buildFullConfiguration();
-		parser = new GEISTWorkloadParser(PropertiesTesting.WORKLOAD);
+		parser = new GEISTWorkloadParser(PropertiesTesting.WORKLOAD, 0);
 
 		assertEquals(2*dayInMillis + 160168, parser.next().getArrivalTimeInMillis());
 		assertEquals(2*dayInMillis + 160302, parser.next().getArrivalTimeInMillis());
@@ -173,7 +173,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 		
 		// Fourth Day
 		buildFullConfiguration();
-		parser = new GEISTWorkloadParser(PropertiesTesting.WORKLOAD);
+		parser = new GEISTWorkloadParser(PropertiesTesting.WORKLOAD, 0);
 
 		assertEquals(3*dayInMillis + 160168, parser.next().getArrivalTimeInMillis());
 		assertEquals(3*dayInMillis + 160302, parser.next().getArrivalTimeInMillis());
@@ -185,7 +185,7 @@ public class GEISTWorkloadParserTest extends ValidConfigurationTest{
 		// Fifth Day
 		buildFullConfiguration();
 
-		parser = new GEISTWorkloadParser(PropertiesTesting.WORKLOAD);
+		parser = new GEISTWorkloadParser(PropertiesTesting.WORKLOAD, 0);
 		assertEquals(4*dayInMillis + 160168, parser.next().getArrivalTimeInMillis());
 		assertEquals(4*dayInMillis + 160302, parser.next().getArrivalTimeInMillis());
 		assertEquals(4*dayInMillis + 160315, parser.next().getArrivalTimeInMillis());

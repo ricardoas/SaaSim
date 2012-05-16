@@ -4,11 +4,9 @@ import static org.junit.Assert.*;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import saasim.cloud.MachineType;
@@ -17,7 +15,6 @@ import saasim.config.Configuration;
 import saasim.io.WorkloadParser;
 import saasim.provisioning.Monitor;
 import saasim.sim.components.LoadBalancer;
-import saasim.sim.components.Machine;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.components.TimeSharedMachine;
 import saasim.sim.core.Event;
@@ -26,8 +23,6 @@ import saasim.sim.core.EventScheduler;
 import saasim.sim.core.EventType;
 import saasim.sim.provisioningheuristics.MachineStatistics;
 import saasim.sim.schedulingheuristics.RoundRobinHeuristic;
-import saasim.sim.schedulingheuristics.SchedulingHeuristic;
-import saasim.util.SimulationInfo;
 import saasim.util.TimeUnit;
 import saasim.util.ValidConfigurationTest;
 
@@ -105,164 +100,6 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		assertEquals(EventType.ADD_SERVER, event.getValue().getType());
 		
 		EasyMock.verify(monitor, scheduler, handler);
-	}
-	
-	@Test(expected=AssertionError.class)
-	public void testRemoveServerWithInexistentTier() {
-		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
-		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
-		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
-		
-		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleMultiTierApplication.class))).andReturn(1).times(3);
-		
-		EasyMock.replay(monitor, scheduler, handler);
-		
-		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
-		SimpleMultiTierApplication simulator = new SimpleMultiTierApplication(scheduler, loadBalancer);
-		
-		simulator.removeMachine(4, false);
-		EasyMock.verify(monitor, scheduler, handler);
-	}
-	
-	@Test
-	public void testRemoveServerNotUseForce() {
-		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
-		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
-		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
-		TimeSharedMachine timeSharedMachine = EasyMock.createStrictMock(TimeSharedMachine.class);
-		SchedulingHeuristic heuristic = EasyMock.createMock(SchedulingHeuristic.class);
-		
-		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleMultiTierApplication.class))).andReturn(1).times(2);
-		EasyMock.expect(handler.getHandlerId()).andReturn(1);
-
-		heuristic.addMachine(EasyMock.isA(Machine.class));
-		EasyMock.expect(heuristic.removeMachine()).andReturn(timeSharedMachine);
-		
-		MachineDescriptor descriptor = new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0);
-		EasyMock.expect(timeSharedMachine.getDescriptor()).andReturn(descriptor);
-		timeSharedMachine.shutdownOnFinish();
-		EasyMock.expectLastCall().times(1);
-		
-		EasyMock.replay(heuristic, monitor, scheduler, handler, timeSharedMachine);
-		
-		LoadBalancer loadBalancer = new LoadBalancer(scheduler, heuristic, 2, 3);
-		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, loadBalancer);
-		
-//		JEEvent event = new JEEvent(JEEventType.ADD_SERVER, handler, 1L, descriptor);
-		loadBalancer.serverIsUp(descriptor);
-		
-		simulator.removeMachine(0, false);
-		EasyMock.verify(monitor, scheduler, handler, timeSharedMachine);
-	}
-	
-	@Ignore @Test
-	public void testRemoveServerUseForce() {
-		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
-		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
-		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
-		TimeSharedMachine timeSharedMachine = EasyMock.createStrictMock(TimeSharedMachine.class);
-		
-		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleMultiTierApplication.class))).andReturn(1).times(2);
-		EasyMock.expect(scheduler.now()).andReturn(0L).times(3);
-		EasyMock.expect(handler.getHandlerId()).andReturn(1);
-		
-		EasyMock.expect(timeSharedMachine.getDescriptor()).andReturn(new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0)).times(2);
-		Queue<Request> queue = new LinkedList<Request>();
-		EasyMock.expect(timeSharedMachine.getProcessorQueue()).andReturn(queue);
-		timeSharedMachine.shutdownOnFinish();
-		EasyMock.expectLastCall().times(1);
-		
-		Capture<Event> eventTurnedOff = new Capture<Event>();
-		scheduler.queueEvent(EasyMock.capture(eventTurnedOff));
-		EasyMock.expectLastCall().times(1);
-		
-		EasyMock.replay(monitor, scheduler, handler, timeSharedMachine);
-		
-		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
-		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, loadBalancer);
-		
-		Event eventAddServer = new Event(EventType.ADD_SERVER, handler, 1L, timeSharedMachine);
-//		loadBalancer.handleEvent(eventAddServer);
-		loadBalancer.serverIsUp(timeSharedMachine.getDescriptor());
-		
-		assertTrue(loadBalancer.getServers().size() == 1);
-		simulator.removeMachine(0, true);
-		assertTrue(loadBalancer.getServers().size() == 0);
-		assertEquals(EventType.MACHINE_TURNED_OFF, eventTurnedOff.getValue().getType());
-		
-		EasyMock.verify(monitor, scheduler, handler, timeSharedMachine);
-	}
-	
-	@Test
-	public void testRemoveServerWithOneMachineAndNotUseForce() {
-		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
-		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
-		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
-		TimeSharedMachine timeSharedMachine = EasyMock.createStrictMock(TimeSharedMachine.class);
-		SchedulingHeuristic heuristic = EasyMock.createMock(SchedulingHeuristic.class);
-		
-		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleMultiTierApplication.class))).andReturn(1).times(2);
-		EasyMock.expect(handler.getHandlerId()).andReturn(1);
-		
-		MachineDescriptor descriptor = new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0);
-		EasyMock.expect(timeSharedMachine.getDescriptor()).andReturn(descriptor);
-		timeSharedMachine.shutdownOnFinish();
-		EasyMock.expectLastCall().times(1);
-
-		EasyMock.expect(heuristic.removeMachine()).andReturn(timeSharedMachine);
-		EasyMock.replay(monitor, scheduler, handler, timeSharedMachine, heuristic);
-		
-		LoadBalancer loadBalancer = new LoadBalancer(scheduler, heuristic, 2, 3);
-		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, loadBalancer);
-		
-		Event event = new Event(EventType.ADD_SERVER, handler, 1L, descriptor);
-//		loadBalancer.handleEvent(event);
-		loadBalancer.serverIsUp(descriptor);
-		
-		simulator.removeMachine(0, false);
-		EasyMock.verify(monitor, scheduler, handler, timeSharedMachine, heuristic);
-	}
-	
-	@Ignore @Test
-	public void testRemoveServerWithoutDescriptorAndUseForce() {
-		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
-		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
-		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
-		TimeSharedMachine timeSharedMachine = EasyMock.createStrictMock(TimeSharedMachine.class);
-		TimeSharedMachine timeSharedMachine2 = EasyMock.createStrictMock(TimeSharedMachine.class);
-		
-		EasyMock.expect(scheduler.registerHandler(EasyMock.anyObject(SimpleMultiTierApplication.class))).andReturn(1).times(2);
-		EasyMock.expect(scheduler.now()).andReturn(0L).times(4);
-		EasyMock.expect(handler.getHandlerId()).andReturn(1).times(2);
-		
-		EasyMock.expect(timeSharedMachine.getDescriptor()).andReturn(new MachineDescriptor(0, true, MachineType.C1_MEDIUM, 0)).times(3);
-		EasyMock.expect(timeSharedMachine2.getDescriptor()).andReturn(new MachineDescriptor(1, true, MachineType.C1_MEDIUM, 0)).times(4);
-		Queue<Request> queue = new LinkedList<Request>();
-		EasyMock.expect(timeSharedMachine2.getProcessorQueue()).andReturn(queue);
-		timeSharedMachine2.shutdownOnFinish();
-		EasyMock.expectLastCall().times(1);
-		
-		Capture<Event> eventTurnedOff = new Capture<Event>();
-		scheduler.queueEvent(EasyMock.capture(eventTurnedOff));
-		EasyMock.expectLastCall().times(1);
-		
-		EasyMock.replay(monitor, scheduler, handler, timeSharedMachine, timeSharedMachine2);
-		
-		LoadBalancer loadBalancer = new LoadBalancer(scheduler, new RoundRobinHeuristic(), 2, 3);
-		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, loadBalancer);
-		
-//		loadBalancer.handleEvent(new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine));
-//		loadBalancer.handleEvent(new JEEvent(JEEventType.ADD_SERVER, handler, 1L, timeSharedMachine2));
-		
-		loadBalancer.serverIsUp(timeSharedMachine.getDescriptor());
-		loadBalancer.serverIsUp(timeSharedMachine2.getDescriptor());
-		
-		assertTrue(loadBalancer.getServers().size() == 2);
-		simulator.removeMachine(0, true);
-		assertTrue(loadBalancer.getServers().size() == 1);
-		assertEquals(EventType.MACHINE_TURNED_OFF, eventTurnedOff.getValue().getType());
-		
-		EasyMock.verify(monitor, scheduler, handler, timeSharedMachine);
 	}
 	
 	@SuppressWarnings("unchecked")

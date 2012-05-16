@@ -35,8 +35,8 @@ public class SimpleMultiTierApplication extends AbstractEventHandler implements 
 	private LoadBalancer tiers [];
 	private int thresholds [];
 	
-	protected transient WorkloadParser<List<Request>> workloadParser;
-	protected transient Monitor monitor;
+	protected WorkloadParser<List<Request>> workloadParser;
+	protected Monitor monitor;
 
 	private long monitoringInterval;
 
@@ -173,15 +173,6 @@ public class SimpleMultiTierApplication extends AbstractEventHandler implements 
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void removeMachine(int tier, boolean force) {
-		assert tiers.length >= tier : "This tier not exists!";
-		tiers[tier].removeMachine(force);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public LoadBalancer[] getTiers() {
 		return this.tiers;
 	}
@@ -195,14 +186,6 @@ public class SimpleMultiTierApplication extends AbstractEventHandler implements 
 		for (LoadBalancer loadBalancers : tiers) {
 			loadBalancers.setMonitor(monitor, this);
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void cancelMachineRemoval(int tier, int numberOfMachines) {
-		tiers[tier].cancelMachineRemoval(numberOfMachines);
 	}
 
 	@Override

@@ -106,7 +106,7 @@ public class OverProvisionHeuristic extends SimpleMultiTierApplication implement
 			PlanIOHandler.clear();
 			Map<MachineType, Integer> plan = this.getPlan(null);
 			try {
-				PlanIOHandler.createPlanFile(plan, Configuration.getInstance().getProviders());
+				PlanIOHandler.createPlanFile(plan, cloudProviders);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}

@@ -1,12 +1,9 @@
 package saasim.sim;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 
-import saasim.cloud.Request;
 import saasim.config.Configuration;
-import saasim.io.WorkloadParser;
+import saasim.io.WorkloadParserFactory;
 import saasim.provisioning.DPS;
 import saasim.sim.components.LoadBalancer;
 import saasim.sim.core.AbstractEventHandler;
@@ -31,8 +28,6 @@ public class SimpleSimulator extends AbstractEventHandler implements Simulator{
 	 */
 	private static final long serialVersionUID = -8028580648054904982L;
 	
-	protected transient WorkloadParser<List<Request>> workloadParser;
-	
 	private DynamicConfigurable[] applications;
 
 	private DPS dps;
@@ -47,10 +42,16 @@ public class SimpleSimulator extends AbstractEventHandler implements Simulator{
 	 */
 	public SimpleSimulator(EventScheduler scheduler, DPS dps, DynamicConfigurable... applications){
 		super(scheduler);
+		this.info = new SimulationInfo();
 		this.applications = applications;
 		this.dps = dps;
+		
 		this.dps.registerConfigurable(this.applications);
-		this.info = new SimulationInfo();
+		for (DynamicConfigurable dynamicConfigurable : applications) {
+			dynamicConfigurable.setWorkloadParser(WorkloadParserFactory.getWorkloadParser());
+			dynamicConfigurable.setMonitor(this.dps);
+		}
+
 	}
 	
 	/**
@@ -105,5 +106,13 @@ public class SimpleSimulator extends AbstractEventHandler implements Simulator{
 	@Override
 	public void restore() {
 		this.info.addDay();
+		for (DynamicConfigurable configurable : applications) {
+			configurable.setWorkloadParser(WorkloadParserFactory.getWorkloadParser());
+		}
+	}
+
+	@Override
+	public SimulationInfo getSimulationInfo() {
+		return this.info;
 	}
 }

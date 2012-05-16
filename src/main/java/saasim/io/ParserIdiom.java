@@ -31,12 +31,13 @@ public enum ParserIdiom {
 	/**
 	 * Create a unique instance for this {@link ParserIdiom} or returns the existing instance.
 	 * @param string the name of parser class
+	 * @param shift 
 	 * @return The unique instance of {@link ParserIdiom}.
 	 */
 	@SuppressWarnings("unchecked")
-	public WorkloadParser<Request> getInstance(String string) {
+	public WorkloadParser<Request> getInstance(String string, long shift) {
 		try {
-			return (WorkloadParser<Request>) idiomParserClass.getConstructor(String.class).newInstance(string);
+			return (WorkloadParser<Request>) idiomParserClass.getConstructor(String.class).newInstance(string, shift);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

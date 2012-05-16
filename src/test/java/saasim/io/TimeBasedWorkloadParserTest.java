@@ -52,21 +52,6 @@ public class TimeBasedWorkloadParserTest extends ValidConfigurationTest{
 		EasyMock.verify(geistParser);
 	}
 	
-	@Test(expected=RuntimeException.class)
-	public void testSetDaysAlreadyRead(){
-		GEISTWorkloadParser geistParser = EasyMock.createStrictMock(GEISTWorkloadParser.class);
-		GEISTWorkloadParser[] parsers = new GEISTWorkloadParser[]{geistParser};
-		
-		EasyMock.replay(geistParser);
-		
-		TimeBasedWorkloadParser parser = new TimeBasedWorkloadParser(5000, parsers);
-		
-		//Requesting changes
-		parser.setDaysAlreadyRead(120);
-		
-		EasyMock.verify(geistParser);
-	}
-	
 	@Test
 	public void testHasNextWithOneParserHavingEvents(){
 		GEISTWorkloadParser parser1 = EasyMock.createStrictMock(GEISTWorkloadParser.class);

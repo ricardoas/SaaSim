@@ -84,7 +84,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic {
 			EventCheckpointer.clear();
 			PlanIOHandler.clear();
 			try {
-				PlanIOHandler.createPlanFile(this.plan, Configuration.getInstance().getProviders());
+				PlanIOHandler.createPlanFile(this.plan, cloudProviders);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}

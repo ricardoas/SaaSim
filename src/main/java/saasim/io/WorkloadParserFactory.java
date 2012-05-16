@@ -1,6 +1,3 @@
-/**
- * 
- */
 package saasim.io;
 
 import java.util.List;
@@ -10,8 +7,8 @@ import saasim.config.Configuration;
 
 
 /**
+ * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
- *
  */
 public class WorkloadParserFactory {
 	
@@ -23,18 +20,6 @@ public class WorkloadParserFactory {
 		
 		assert pageSize > 0: "Invalid page size";
 		
-		Configuration config = Configuration.getInstance();
-		ParserIdiom parserIdiom = config.getParserIdiom();
-		
-		String[] workloads = config.getWorkloads();
-		
-		@SuppressWarnings("unchecked")
-		WorkloadParser<Request>[] parsers = new WorkloadParser[workloads.length];
-		
-		for (int i = 0; i < workloads.length; i++) {
-			parsers[i] = parserIdiom.getInstance(workloads[i]);
-		}
-		
-		return new TimeBasedWorkloadParser(pageSize, parsers);
+		return new TimeBasedWorkloadParser(pageSize, Configuration.getInstance().getWorkloads());
 	}
 }

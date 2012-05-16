@@ -1,10 +1,13 @@
 package saasim.io;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import saasim.cloud.Request;
 import saasim.config.Configuration;
+import saasim.util.TimeUnit;
 
 
 /**
@@ -14,11 +17,17 @@ import saasim.config.Configuration;
  */
 public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 587196214235851553L;
 	protected final long tick;
 	protected long currentTick;
 
 	protected Request[] leftOver;
 	protected WorkloadParser<Request>[] parsers;
+	private String[] workloads;
+	private int workloadLine;
 	
 	/**
 	 * Default constructor.
@@ -31,8 +40,56 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 		}
 		this.parsers = parser;
 		this.tick = tick;
-		this.currentTick = Configuration.getInstance().getSimulationInfo().getCurrentDayInMillis() + tick;
+		this.currentTick = tick;//Configuration.getInstance().getSimulationInfo().getCurrentDayInMillis() + tick;
 		this.leftOver = new Request[parsers.length];
+	}
+	
+	/**
+	 * Default constructor.
+	 * @param tick a long represent a moment in time
+	 * @param parser an array without specific size, containing {@link WorkloadParser}.
+	 */
+	@SuppressWarnings("unchecked")
+	public TimeBasedWorkloadParser(long tick, String... workloads) {
+		if(workloads.length == 0){
+			throw new RuntimeException("Invalid TimeBasedWorkloadParser: no parsers!");
+		}
+		this.workloads = workloads;
+		this.workloadLine = 0;
+		this.tick = tick;
+		this.currentTick = tick;
+		
+		this.parsers = new WorkloadParser[workloads.length];
+		
+		ParserIdiom idiom = Configuration.getInstance().getParserIdiom();
+		
+		for (int i = 0; i < workloads.length; i++) {
+			parsers[i] = idiom.getInstance(readFileToUse(workloads[i]), 0);
+		}
+
+		this.leftOver = new Request[parsers.length];
+	}
+	
+	/**
+	 * Read file to be used for this {@link AbstractWorkloadParser}.
+	 * @param workload The file to read.
+	 * @return The content of file.
+	 */
+	private String readFileToUse(String workload) {
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader(workload));
+			String file = reader.readLine();
+			int currentLine = 0;
+			while(currentLine < this.workloadLine){
+				currentLine++;
+				file = reader.readLine();
+			}
+			reader.close();
+			return file == null? "": file;
+		} catch (Exception e) {
+			throw new RuntimeException("Problem reading workload file.", e);
+		}
 	}
 	
 	/**
@@ -40,7 +97,13 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	 */
 	@Override
 	public void clear() {
-		throw new RuntimeException("Not yet implemented");
+		workloadLine++;
+		
+		ParserIdiom idiom = Configuration.getInstance().getParserIdiom();
+		
+		for (int i = 0; i < workloads.length; i++) {
+			parsers[i] = idiom.getInstance(readFileToUse(workloads[i]), workloadLine * TimeUnit.DAY.getMillis());
+		}
 	}
 
 	/**
@@ -91,14 +154,6 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void setDaysAlreadyRead(int simulatedDays) {
-		throw new RuntimeException("Not yet implemented");
 	}
 
 	/**
