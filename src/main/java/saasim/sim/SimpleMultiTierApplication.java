@@ -53,11 +53,13 @@ public class SimpleMultiTierApplication extends AbstractEventHandler implements 
 	/**
 	 * Default constructor.
 	 * @param scheduler A {@link EventScheduler} to represent a scheduler of {@link SimpleMultiTierApplication}.
+	 * @param monitor 
 	 * @param tiers An array containing the tiers of application, see {@link LoadBalancer}.
 	 */
-	public SimpleMultiTierApplication(EventScheduler scheduler, LoadBalancer... tiers){
+	public SimpleMultiTierApplication(EventScheduler scheduler, Monitor monitor, LoadBalancer... tiers){
 		super(scheduler);
 		this.tiers = tiers;
+		this.monitor = monitor;
 		this.numberOfRequests = 0;
 		this.threshold = Integer.MAX_VALUE;
 		this.thresholds = new int[tiers.length];
@@ -181,6 +183,7 @@ public class SimpleMultiTierApplication extends AbstractEventHandler implements 
 	 * {@inheritDoc}
 	 */
 	@Override
+	@Deprecated
 	public void setMonitor(Monitor monitor) {
 		this.monitor = monitor;
 		for (LoadBalancer loadBalancers : tiers) {

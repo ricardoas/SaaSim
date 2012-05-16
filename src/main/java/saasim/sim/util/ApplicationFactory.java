@@ -1,6 +1,7 @@
 package saasim.sim.util;
 
 import saasim.config.Configuration;
+import saasim.provisioning.Monitor;
 import saasim.sim.components.LoadBalancer;
 import saasim.sim.core.EventScheduler;
 
@@ -36,9 +37,10 @@ public abstract class ApplicationFactory {
 	/**
 	 * Build the application.
 	 * @param scheduler {@link EventScheduler} to represent an event scheduler
+	 * @param monitor 
 	 * @return An array containing the {@link LoadBalancer}s in the builded application.
 	 */
-	public abstract LoadBalancer[] buildApplication(EventScheduler scheduler);
+	public abstract LoadBalancer[] buildApplication(EventScheduler scheduler, Monitor monitor);
 
 	@Deprecated
 	public static void reset() {

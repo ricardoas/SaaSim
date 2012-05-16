@@ -2,10 +2,13 @@ package saasim.sim.util;
 
 import saasim.cloud.Provider;
 import saasim.cloud.User;
+import saasim.provisioning.DPS;
+import saasim.provisioning.Monitor;
 import saasim.provisioning.util.DPSFactory;
 import saasim.sim.SimpleMultiTierApplication;
 import saasim.sim.SimpleSimulator;
 import saasim.sim.Simulator;
+import saasim.sim.components.LoadBalancer;
 import saasim.sim.core.EventScheduler;
 
 /**
@@ -23,9 +26,14 @@ public class SimulatorFactory {
 	 * @return {@link Simulator} builded.
 	 */
 	public static Simulator buildSimulator(EventScheduler scheduler, User[] users, Provider[] providers){
+		DPS dps = DPSFactory.createDPS(users, providers);
 		return new SimpleSimulator(scheduler, 
-					DPSFactory.createDPS(users, providers), 
+					dps, 
 					new SimpleMultiTierApplication(scheduler, 
-							ApplicationFactory.getInstance().buildApplication(scheduler)));
+							dps, buildApplication(scheduler, dps)));
+	}
+
+	private static LoadBalancer[] buildApplication(EventScheduler scheduler, Monitor monitor) {
+		return ApplicationFactory.getInstance().buildApplication(scheduler, monitor);
 	}
 }

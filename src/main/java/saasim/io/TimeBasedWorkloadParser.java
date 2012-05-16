@@ -25,7 +25,7 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	protected long currentTick;
 
 	protected Request[] leftOver;
-	protected WorkloadParser<Request>[] parsers;
+	protected transient WorkloadParser<Request>[] parsers;
 	private String[] workloads;
 	private int workloadLine;
 	

@@ -38,7 +38,8 @@ public class LoadBalancer extends AbstractEventHandler{
 	private final SchedulingHeuristic heuristic;
 	
 	private final int maxServersAllowed;
-	private transient Monitor monitor;
+	
+	private Monitor monitor;
 
 	private Map<MachineDescriptor, Machine> startingUp;
 
@@ -50,12 +51,14 @@ public class LoadBalancer extends AbstractEventHandler{
 	/**
 	 * Default constructor.
 	 * @param scheduler Event scheduler.
+	 * @param monitor 
 	 * @param heuristic {@link SchedulingHeuristic}
 	 * @param maxServersAllowed Max number of servers to manage in this layer.
 	 * @param tier the tier of this {@link LoadBalancer} represents
 	 */
-	public LoadBalancer(EventScheduler scheduler, SchedulingHeuristic heuristic, int maxServersAllowed, int tier) {
+	public LoadBalancer(EventScheduler scheduler, Monitor monitor, SchedulingHeuristic heuristic, int maxServersAllowed, int tier) {
 		super(scheduler);
+		this.monitor = monitor;
 		this.heuristic = heuristic;
 		this.maxServersAllowed = maxServersAllowed;
 		this.tier = tier;
@@ -174,6 +177,7 @@ public class LoadBalancer extends AbstractEventHandler{
 	 * @param sentry TODO
 	 * @param sentry 
 	 */
+	@Deprecated
 	public void setMonitor(Monitor monitor, ServiceEntry sentry) {
 		this.monitor = monitor;
 		this.sentry = sentry;
