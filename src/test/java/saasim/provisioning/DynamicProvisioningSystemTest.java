@@ -40,12 +40,12 @@ public class DynamicProvisioningSystemTest extends ValidConfigurationTest {
 	}
 	
 	/**
-	 * Test method for {@link saasim.provisioning.DynamicProvisioningSystem#DynamicProvisioningSystem()}.
+	 * Test method for {@link saasim.provisioning.DynamicProvisioningSystem#DynamicProvisioningSystem(User[], Provider[])}.
 	 * @throws ConfigurationException 
 	 */
 	@Test
-	public void testDynamicProvisioningSystemWithValidConfigurationData() throws ConfigurationException {
-		assertNotNull(new DynamicProvisioningSystem());
+	public void testDynamicProvisioningSystemWithValidConfigurationData() {
+		assertNotNull(new DynamicProvisioningSystem(null, null));
 	}
 	
 	/**
@@ -54,7 +54,7 @@ public class DynamicProvisioningSystemTest extends ValidConfigurationTest {
 	 */
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testRegisterConfigurableWithMultipleServers() throws ConfigurationException {
+	public void testRegisterConfigurableWithMultipleServers(){
 		Configuration.getInstance().setProperty(SaaSAppProperties.APPLICATION_INITIAL_SERVER_PER_TIER, "7");
 		
 		DynamicConfigurable configurable = EasyMock.createStrictMock(DynamicConfigurable.class);
@@ -74,7 +74,7 @@ public class DynamicProvisioningSystemTest extends ValidConfigurationTest {
 		
 		EasyMock.replay(configurable);
 		
-		DynamicProvisioningSystem dps = new DynamicProvisioningSystem();
+		DynamicProvisioningSystem dps = new DynamicProvisioningSystem(null, null);
 		dps.registerConfigurable(new DynamicConfigurable[]{configurable});
 		
 		assertEquals(MachineType.C1_MEDIUM, descriptor[0].getValue().getType());
@@ -94,8 +94,8 @@ public class DynamicProvisioningSystemTest extends ValidConfigurationTest {
 	 * @throws ConfigurationException 
 	 */
 	@Ignore @Test
-	public void testCalculateUtilityWithUsersAndProviders() throws ConfigurationException {
-		DynamicProvisioningSystem dps = new DynamicProvisioningSystem();
+	public void testCalculateUtilityWithUsersAndProviders() {
+		DynamicProvisioningSystem dps = new DynamicProvisioningSystem(null, null);
 		UtilityResult result = dps.calculateUtility();
 		
 		UtilityResult currentResult = new UtilityResult(2, 3);

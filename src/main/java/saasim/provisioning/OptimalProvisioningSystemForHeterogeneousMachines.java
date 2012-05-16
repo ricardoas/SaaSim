@@ -4,12 +4,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.math.stat.descriptive.rank.Percentile;
 
 import saasim.cloud.MachineType;
 import saasim.cloud.Provider;
 import saasim.cloud.Request;
+import saasim.cloud.User;
 import saasim.config.Configuration;
 import saasim.io.GEISTWorkloadParser;
 import saasim.io.WorkloadParser;
@@ -50,8 +50,8 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 	private long totalMeanToProcess;
 	private int numberOfRequests;
 
-	public OptimalProvisioningSystemForHeterogeneousMachines() throws ConfigurationException {
-		super();
+	public OptimalProvisioningSystemForHeterogeneousMachines(User[] users, Provider[] providers) {
+		super(users, providers);
 		
 		String[] workloadFiles = Configuration.getInstance().getWorkloads();
 		this.parsers = new WorkloadParser[workloadFiles.length];

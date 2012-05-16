@@ -8,7 +8,6 @@ import saasim.cloud.Request;
 import saasim.config.Configuration;
 import saasim.io.WorkloadParser;
 import saasim.provisioning.DPS;
-import saasim.provisioning.util.DPSFactory;
 import saasim.sim.components.LoadBalancer;
 import saasim.sim.core.AbstractEventHandler;
 import saasim.sim.core.Event;
@@ -43,12 +42,13 @@ public class SimpleSimulator extends AbstractEventHandler implements Simulator{
 	/**
 	 * Default constructor.
 	 * @param scheduler A {@link EventScheduler} to represent a scheduler of {@link SimpleSimulator}.
+	 * @param dps TODO
 	 * @param applications An array containing the tiers of application, see {@link LoadBalancer}.
 	 */
-	public SimpleSimulator(EventScheduler scheduler, DynamicConfigurable... applications){
+	public SimpleSimulator(EventScheduler scheduler, DPS dps, DynamicConfigurable... applications){
 		super(scheduler);
 		this.applications = applications;
-		this.dps = DPSFactory.createDPS();
+		this.dps = dps;
 		this.dps.registerConfigurable(this.applications);
 		this.info = new SimulationInfo();
 	}

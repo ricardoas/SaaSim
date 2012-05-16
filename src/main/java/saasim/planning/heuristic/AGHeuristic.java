@@ -1,6 +1,5 @@
 package saasim.planning.heuristic;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,25 +7,11 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.apache.commons.configuration.ConfigurationException;
-//import org.jgap.Chromosome;
-//import org.jgap.Configuration;
-//import org.jgap.Gene;
-//import org.jgap.Genotype;
-//import org.jgap.IChromosome;
-//import org.jgap.InvalidConfigurationException;
-//import org.jgap.impl.ChromosomePool;
-//import org.jgap.impl.CrossoverOperator;
-//import org.jgap.impl.DefaultConfiguration;
-//import org.jgap.impl.IntegerGene;
-//import org.jgap.impl.MutationOperator;
-//import org.jgap.impl.StockRandomGenerator;
-//import org.jgap.impl.WeightedRouletteSelector;
 
 import saasim.cloud.MachineType;
 import saasim.cloud.Provider;
 import saasim.cloud.User;
 import saasim.planning.io.PlanningWorkloadParser;
-import saasim.planning.util.PlanIOHandler;
 import saasim.planning.util.Summary;
 import saasim.provisioning.Monitor;
 import saasim.sim.components.LoadBalancer;

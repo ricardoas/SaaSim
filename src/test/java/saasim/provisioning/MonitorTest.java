@@ -32,7 +32,7 @@ public class MonitorTest extends ValidConfigurationTest {
 	public void setUp() throws Exception{
 		super.setUp();
 		buildFullConfiguration();
-		monitor = new DynamicProvisioningSystem();
+		monitor = new DynamicProvisioningSystem(null, null);
 	}
 	
 	/**
@@ -99,10 +99,10 @@ public class MonitorTest extends ValidConfigurationTest {
 	 * @throws ConfigurationException 
 	 */
 	@Test
-	public void testChargeUsers() throws ConfigurationException {
+	public void testChargeUsers() {
 		Configuration r = Configuration.getInstance();
 		UtilityResult utilityBefore = new AccountingSystem(new User[]{},new Provider[]{}).calculateUtility();
-		new DynamicProvisioningSystem().chargeUsers(0);
+		new DynamicProvisioningSystem(null, null).chargeUsers(0);
 		Configuration r1 = Configuration.getInstance();
 		UtilityResult utilityAfter = new AccountingSystem(new User[]{},new Provider[]{}).calculateUtility();
 		

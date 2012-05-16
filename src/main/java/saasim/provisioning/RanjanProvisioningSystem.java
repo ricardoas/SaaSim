@@ -8,6 +8,7 @@ import org.apache.commons.configuration.ConfigurationException;
 
 import saasim.cloud.MachineType;
 import saasim.cloud.Provider;
+import saasim.cloud.User;
 import saasim.config.Configuration;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.provisioningheuristics.MachineStatistics;
@@ -39,10 +40,12 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 
 	/**
 	 * Default constructor
+	 * @param users TODO
+	 * @param providers TODO
 	 * @throws ConfigurationException 
 	 */
-	public RanjanProvisioningSystem() throws ConfigurationException {
-		super();
+	public RanjanProvisioningSystem(User[] users, Provider[] providers) {
+		super(users, providers);
 		type = MachineType.valueOf(Configuration.getInstance().getString(PROP_MACHINE_TYPE).toUpperCase());
 		targetUtilisation = Configuration.getInstance().getDouble(PROP_TARGET_UTILISATION);
 		

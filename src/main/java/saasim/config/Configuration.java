@@ -77,7 +77,6 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	private SimulationInfo simulationInfo;
 	private Simulator simulator;
 	private Provider[] providers;
-	private Contract[] contracts;
 	private User[] users;
 
 	
@@ -108,7 +107,6 @@ public class Configuration extends ComplexPropertiesConfiguration{
 			instance.scheduler = (EventScheduler) objects[i++];
 			instance.scheduler.reset(instance.simulationInfo.getCurrentDayInMillis(), instance.simulationInfo.getCurrentDayInMillis() + TimeUnit.DAY.getMillis());
 			instance.providers = (Provider[]) objects[i++];
-			instance.contracts = (Contract[]) objects[i++];
 			instance.users = (User[]) objects[i++];
 			instance.priorities = (int []) objects[i++];
 			instance.simulator = (Simulator) objects[i++];
@@ -117,13 +115,12 @@ public class Configuration extends ComplexPropertiesConfiguration{
 		}else{
 			instance.scheduler = new EventScheduler(TimeUnit.DAY.getMillis());
 			instance.providers = Configuration.getInstance().readProviders();
-			instance.contracts = Configuration.getInstance().readContracts();
 			instance.users = Configuration.getInstance().readUsers();
 			instance.priorities = new int[instance.users.length];
 			for (int i = 0; i < instance.priorities.length; i++) {
 				instance.priorities[i] = instance.users[i].getContract().getPriority(); //FIXME Ricardo: don't know if we need this anymore
 			}
-			instance.simulator = SimulatorFactory.buildSimulator(Configuration.getInstance().getScheduler());
+			instance.simulator = SimulatorFactory.buildSimulator(Configuration.getInstance().getScheduler(), instance.users, instance.providers);
 		}
 		
 		instance.scheduler.registerHandlerClass(LoadBalancer.class).
@@ -153,7 +150,6 @@ public class Configuration extends ComplexPropertiesConfiguration{
 		EventCheckpointer.save(
 				scheduler, 
 				providers, 
-				contracts, 
 				users, 
 				priorities,
 				simulator
@@ -304,7 +300,7 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	public User[] readUsers() throws ConfigurationException{
 		int numberOfPlans = getInt(NUMBER_OF_PLANS);
 		
-		readContracts();
+		Contract[] contracts = readContracts();
 		
 		Map<String, Contract> contractsPerName = new HashMap<String, Contract>();
 		for(int i = 0; i < numberOfPlans; i++){
@@ -625,9 +621,5 @@ public class Configuration extends ComplexPropertiesConfiguration{
 
 	public EventScheduler getScheduler() {
 		return this.scheduler;
-	}
-
-	public Contract[] getContracts() {
-		return this.contracts;
 	}
 }

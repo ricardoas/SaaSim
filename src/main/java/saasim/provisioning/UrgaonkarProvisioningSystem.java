@@ -9,6 +9,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import saasim.cloud.MachineType;
 import saasim.cloud.Provider;
 import saasim.cloud.Request;
+import saasim.cloud.User;
 import saasim.config.Configuration;
 import saasim.provisioning.util.DPSInfo;
 import saasim.sim.components.MachineDescriptor;
@@ -63,10 +64,12 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 
 	/**
 	 * Default constructor 
+	 * @param users TODO
+	 * @param providers TODO
 	 * @throws ConfigurationException 
 	 */
-	public UrgaonkarProvisioningSystem() throws ConfigurationException {
-		super();
+	public UrgaonkarProvisioningSystem(User[] users, Provider[] providers) {
+		super(users, providers);
 		enablePredictive = Configuration.getInstance().getBoolean(PROP_ENABLE_PREDICTIVE, true);
 		enableReactive = Configuration.getInstance().getBoolean(PROP_ENABLE_REACTIVE, true);
 		type = MachineType.valueOf(Configuration.getInstance().getString(PROP_MACHINE_TYPE).toUpperCase());

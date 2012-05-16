@@ -43,7 +43,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 	public void setUp() throws Exception {
 		super.setUp();
 		buildFullConfiguration();
-		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines();
+		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines(null, null);
 	}
 	
 	@Test(expected=NullPointerException.class)
@@ -198,7 +198,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		PowerMock.replayAll(config);
 		
 		//Creating a new dps
-		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines();
+		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines(null, null);
 		this.dps.registerConfigurable(new DynamicConfigurable[]{configurable});
 		this.dps.sendStatistics(0, statistics, 0);
 		
@@ -272,7 +272,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		EasyMock.replay(parser);
 		
 		//Creating a new dps
-		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines();
+		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines(null, null);
 		this.dps.registerConfigurable(new DynamicConfigurable[]{configurable});
 		this.dps.sendStatistics(0, statistics, 0);
 		
@@ -348,7 +348,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		EasyMock.replay(parser);
 		
 		//Creating a new dps
-		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines();
+		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines(null, null);
 		this.dps.registerConfigurable(new DynamicConfigurable[]{configurable});
 		this.dps.sendStatistics(0, statistics, 0);
 		
@@ -423,7 +423,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		EasyMock.replay(parser);
 		
 		//Creating a new dps
-		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines();
+		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines(null, null);
 		this.dps.registerConfigurable(new DynamicConfigurable[]{configurable});
 		this.dps.sendStatistics(0, statistics, 0);
 		
@@ -488,7 +488,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		EasyMock.replay(parser);
 		
 		//Creating a new dps
-		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines();
+		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines(null, null);
 		this.dps.registerConfigurable(new DynamicConfigurable[]{configurable});
 		
 		//Buying some on-demand machines
@@ -526,7 +526,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		PowerMock.replayAll(request, user);
 		
 		//Creating dps
-		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines();
+		this.dps = new RanjanProvisioningSystemForHeterogeneousMachines(null, null);
 		this.dps.requestQueued(0, request, 0);
 		
 		PowerMock.verifyAll();
@@ -552,7 +552,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		PowerMock.replayAll(request, user);
 		
 		//Creating dps
-		RanjanProvisioningSystemForHeterogeneousMachines dps = new RanjanProvisioningSystemForHeterogeneousMachines();
+		RanjanProvisioningSystemForHeterogeneousMachines dps = new RanjanProvisioningSystemForHeterogeneousMachines(null, null);
 		dps.requestFinished(request);
 		
 		PowerMock.verifyAll();

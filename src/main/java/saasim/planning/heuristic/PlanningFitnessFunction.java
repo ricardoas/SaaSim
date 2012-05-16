@@ -6,10 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-//import org.jgap.FitnessFunction;
-//import org.jgap.Gene;
-//import org.jgap.IChromosome;
-
 import saasim.cloud.Contract;
 import saasim.cloud.MachineType;
 import saasim.cloud.Provider;
@@ -18,7 +14,6 @@ import saasim.cloud.UtilityResultEntry;
 import saasim.config.Configuration;
 import saasim.planning.util.Summary;
 import saasim.sim.components.Machine;
-import saasim.sim.util.SaaSAppProperties;
 import saasim.sim.util.SimulatorProperties;
 import saasim.util.SimulationInfo;
 

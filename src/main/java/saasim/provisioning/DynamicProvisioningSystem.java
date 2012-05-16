@@ -45,15 +45,14 @@ public class DynamicProvisioningSystem implements DPS{
 	Logger log = Logger.getLogger(getClass());
 
 	private long maxRT;
-
-
+	
 	/**
 	 * Default constructor.
 	 * @throws ConfigurationException 
 	 */
-	public DynamicProvisioningSystem() throws ConfigurationException {
-		this.providers = Configuration.getInstance().readProviders();
-		this.users = Configuration.getInstance().readUsers();
+	public DynamicProvisioningSystem(User[] users, Provider[] providers){
+		this.providers = providers;
+		this.users = users;
 		this.accountingSystem = new AccountingSystem(users, providers);
 		this.maxRT = Configuration.getInstance().getLong(SaaSAppProperties.APPLICATION_SLA_MAX_RESPONSE_TIME);
 	}

@@ -1,5 +1,8 @@
 package saasim.sim.util;
 
+import saasim.cloud.Provider;
+import saasim.cloud.User;
+import saasim.provisioning.util.DPSFactory;
 import saasim.sim.SimpleMultiTierApplication;
 import saasim.sim.SimpleSimulator;
 import saasim.sim.Simulator;
@@ -15,11 +18,14 @@ public class SimulatorFactory {
 	/**
 	 * Builds a {@link Simulator}.
 	 * @param scheduler {@link EventScheduler} to represent a event scheduler.
+	 * @param users TODO
+	 * @param providers TODO
 	 * @return {@link Simulator} builded.
 	 */
-	public static Simulator buildSimulator(EventScheduler scheduler){
-		return new SimpleSimulator(scheduler, new SimpleMultiTierApplication(
-				scheduler, ApplicationFactory.getInstance().buildApplication(
-						scheduler)));
+	public static Simulator buildSimulator(EventScheduler scheduler, User[] users, Provider[] providers){
+		return new SimpleSimulator(scheduler, 
+					DPSFactory.createDPS(users, providers), 
+					new SimpleMultiTierApplication(scheduler, 
+							ApplicationFactory.getInstance().buildApplication(scheduler)));
 	}
 }

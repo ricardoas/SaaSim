@@ -4,6 +4,8 @@ import java.util.LinkedList;
 
 import org.apache.commons.configuration.ConfigurationException;
 
+import saasim.cloud.Provider;
+import saasim.cloud.User;
 import saasim.provisioning.util.DPSInfo;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.provisioningheuristics.MachineStatistics;
@@ -23,10 +25,12 @@ public class EC2UrgaonkarProvisioningSystem extends UrgaonkarProvisioningSystem 
 
 	/**
 	 * Default constructor 
+	 * @param users TODO
+	 * @param providers TODO
 	 * @throws ConfigurationException 
 	 */
-	public EC2UrgaonkarProvisioningSystem() throws ConfigurationException {
-		super();
+	public EC2UrgaonkarProvisioningSystem(User[] users, Provider[] providers) throws ConfigurationException {
+		super(users, providers);
 	}
 
 	@Override

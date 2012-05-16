@@ -37,7 +37,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 	public void setUp() throws Exception {
 		super.setUp();
 		buildFullRanjanConfiguration();
-		this.dps = new RanjanProvisioningSystem();
+		this.dps = new RanjanProvisioningSystem(null, null);
 	}
 	
 	@Test(expected=NullPointerException.class)
@@ -195,7 +195,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		PowerMock.replay(WorkloadParserFactory.class);
 		EasyMock.replay(parser);
 		
-		this.dps = new RanjanProvisioningSystem();
+		this.dps = new RanjanProvisioningSystem(null, null);
 		this.dps.registerConfigurable(new DynamicConfigurable[]{configurable});
 		this.dps.sendStatistics(0, statistics, 0);
 		
@@ -241,7 +241,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		PowerMock.replay(Configuration.class);
 		EasyMock.replay(config);
 		
-		this.dps = new RanjanProvisioningSystem();
+		this.dps = new RanjanProvisioningSystem(null, null);
 		//AccountingSystem system = new AccountingSystem(0, 1);
 		//system.buyMachine();
 		//system.buyMachine();
@@ -305,7 +305,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		//accountingSystem.buyMachine();
 		//accountingSystem.buyMachine();
 		
-		this.dps = new RanjanProvisioningSystem();
+		this.dps = new RanjanProvisioningSystem(null, null);
 		this.dps.registerConfigurable(new DynamicConfigurable[]{configurable});
 		//this.dps.setAccountingSystem(accountingSystem);
 		this.dps.sendStatistics(0, statistics, 0);

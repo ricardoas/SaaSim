@@ -10,13 +10,11 @@ import saasim.provisioning.Monitor;
 import saasim.sim.components.LoadBalancer;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.core.AbstractEventHandler;
-import saasim.sim.core.EventCheckpointer;
 import saasim.sim.core.Event;
 import saasim.sim.core.EventScheduler;
 import saasim.sim.core.EventType;
 import saasim.sim.core.HandlingPoint;
 import saasim.sim.util.SimulatorProperties;
-import saasim.util.SimulationInfo;
 import saasim.util.TimeUnit;
 
 
