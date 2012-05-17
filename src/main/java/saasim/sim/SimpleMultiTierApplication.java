@@ -57,24 +57,6 @@ public class SimpleMultiTierApplication extends AbstractEventHandler implements 
 	 * Default constructor.
 	 * @param scheduler A {@link EventScheduler} to represent a scheduler of {@link SimpleMultiTierApplication}.
 	 * @param monitor 
-	 * @param tiers An array containing the tiers of application, see {@link LoadBalancer}.
-	 */
-	@Deprecated
-	public SimpleMultiTierApplication(EventScheduler scheduler, Monitor monitor, LoadBalancer... tiers){
-		super(scheduler);
-		this.tiers = buildApplication(scheduler, monitor);
-		this.monitor = monitor;
-		this.numberOfRequests = 0;
-		this.threshold = Integer.MAX_VALUE;
-		this.thresholds = new int[tiers.length];
-		Arrays.fill(thresholds, Integer.MAX_VALUE);
-		monitoringInterval = Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL);
-	}
-	
-	/**
-	 * Default constructor.
-	 * @param scheduler A {@link EventScheduler} to represent a scheduler of {@link SimpleMultiTierApplication}.
-	 * @param monitor 
 	 */
 	public SimpleMultiTierApplication(EventScheduler scheduler, Monitor monitor){
 		super(scheduler);

@@ -95,6 +95,7 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	/**
 	 * {@inheritDoc}
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void clear() {
 		workloadLine++;

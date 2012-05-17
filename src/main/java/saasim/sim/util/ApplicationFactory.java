@@ -1,10 +1,9 @@
 package saasim.sim.util;
 
+import saasim.config.AppArchitectureValues;
 import saasim.config.Configuration;
 import saasim.provisioning.DPS;
-import saasim.provisioning.Monitor;
 import saasim.sim.DynamicConfigurable;
-import saasim.sim.components.LoadBalancer;
 import saasim.sim.core.EventScheduler;
 
 /**
@@ -24,6 +23,7 @@ public abstract class ApplicationFactory {
 	 * Builds and gets the single instance of this factory.
 	 * @return the single instance of {@link ApplicationFactory}.
 	 */
+	@Deprecated
 	public static ApplicationFactory getInstance() {
 		if(instance == null){
 			String className = Configuration.getInstance().getString(SaaSAppProperties.APPLICATION_FACTORY);
@@ -36,19 +36,13 @@ public abstract class ApplicationFactory {
 		return instance;
 	}
 
-	/**
-	 * Build the application.
-	 * @param scheduler {@link EventScheduler} to represent an event scheduler
-	 * @param monitor 
-	 * @return An array containing the {@link LoadBalancer}s in the builded application.
-	 */
-	@Deprecated
-	public abstract LoadBalancer[] buildApplication(EventScheduler scheduler, Monitor monitor);
-
-	public abstract DynamicConfigurable buildApplication(EventScheduler scheduler, DPS provisioningSystem);
-
-	@Deprecated
-	public static void reset() {
-		// TODO Auto-generated method stub
+	public DynamicConfigurable buildApplication(EventScheduler scheduler,
+			DPS dps) {
+		
+		try {
+			return (DynamicConfigurable) AppArchitectureValues.MULTITIER.getClass().getConstructors()[0].newInstance(scheduler, dps);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

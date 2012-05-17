@@ -54,7 +54,7 @@ public class OverProvisionHeuristic extends SimpleMultiTierApplication implement
 	 * @param loadBalancers a set of {@link LoadBalancer}s of the application
 	 */
 	public OverProvisionHeuristic(EventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
-		super(scheduler, monitor, loadBalancers);
+		super(scheduler, monitor);
 		try{
 			this.maximumNumberOfServers = PlanIOHandler.getNumberOfMachinesFromFile();
 		}catch(Exception e){

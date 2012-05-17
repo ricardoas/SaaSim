@@ -40,7 +40,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
 		EasyMock.replay(loadBalancer);
 		
-		assertNotNull(new SimpleMultiTierApplication(Configuration.getInstance().getScheduler(), null, loadBalancer));
+		assertNotNull(new SimpleMultiTierApplication(Configuration.getInstance().getScheduler(), null));
 		EasyMock.verify(loadBalancer);
 	}
 	
@@ -55,7 +55,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, scheduler, handler);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleMultiTierApplication simulator = new SimpleMultiTierApplication(scheduler, monitor, loadBalancer);
+		SimpleMultiTierApplication simulator = new SimpleMultiTierApplication(scheduler, monitor);
 		
 		simulator.addMachine(4, new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0), false);
 		EasyMock.verify(monitor, scheduler, handler);
@@ -73,7 +73,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, scheduler, handler);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleMultiTierApplication simulator = new SimpleMultiTierApplication(scheduler, monitor, loadBalancer);
+		SimpleMultiTierApplication simulator = new SimpleMultiTierApplication(scheduler, monitor);
 		
 		simulator.addMachine(0, null, false);
 		EasyMock.verify(monitor, scheduler, handler);
@@ -94,7 +94,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, scheduler, handler);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, monitor, loadBalancer);
+		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, monitor);
 		
 		simulator.addMachine(0, new MachineDescriptor(0, false, MachineType.C1_MEDIUM, 0), false);
 		assertEquals(EventType.ADD_SERVER, event.getValue().getType());
@@ -115,7 +115,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, scheduler, handler, workloadParser);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, monitor, loadBalancer);
+		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, monitor);
 		simulator.setWorkloadParser(null);
 		
 		EasyMock.verify(monitor, scheduler, handler, workloadParser);
@@ -145,7 +145,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, scheduler, handler, workloadParser, timeSharedMachine);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, monitor, loadBalancer);
+		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, monitor);
 		
 		simulator.setWorkloadParser(workloadParser);
 		Event event = new Event(EventType.READWORKLOAD, handler, 1L, timeSharedMachine);
@@ -176,7 +176,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, scheduler, handler);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, monitor, loadBalancer);
+		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, monitor);
 		simulator.setMonitor(monitor);
 		
 		Event event = new Event(EventType.CHARGE_USERS, handler, 31 * TimeUnit.DAY.getMillis() - 1);
@@ -215,7 +215,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, scheduler, handler, workloadParser, timeSharedMachine, request);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, monitor, loadBalancer);
+		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, monitor);
 		
 		simulator.setWorkloadParser(workloadParser);
 		Event event = new Event(EventType.READWORKLOAD, handler, 1L, timeSharedMachine);
@@ -255,7 +255,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, scheduler, handler, workloadParser, timeSharedMachine, request);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, monitor, loadBalancer);
+		SimpleMultiTierApplication simulator =  new SimpleMultiTierApplication(scheduler, monitor);
 		
 		simulator.setWorkloadParser(workloadParser);
 		Event event = new Event(EventType.READWORKLOAD, handler, 1L, timeSharedMachine);
@@ -290,7 +290,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		EasyMock.replay(monitor, scheduler, handler, workloadParser, timeSharedMachine);
 		
 		LoadBalancer loadBalancer = new LoadBalancer(scheduler, monitor, new RoundRobinHeuristic(), 2, 3);
-		SimpleMultiTierApplication simulator = new SimpleMultiTierApplication(scheduler, monitor, loadBalancer);
+		SimpleMultiTierApplication simulator = new SimpleMultiTierApplication(scheduler, monitor);
 		simulator.setMonitor(monitor);
 		simulator.setWorkloadParser(workloadParser);
 		

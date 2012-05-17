@@ -47,6 +47,7 @@ public class SimpleSimulator extends AbstractEventHandler implements Simulator{
 	 * @param dps TODO
 	 * @param applications An array containing the tiers of application, see {@link LoadBalancer}.
 	 */
+	@SuppressWarnings("unchecked")
 	public SimpleSimulator(EventScheduler scheduler, DPS dps, DynamicConfigurable... applications){
 		super(scheduler);
 		this.info = new SimulationInfo();
