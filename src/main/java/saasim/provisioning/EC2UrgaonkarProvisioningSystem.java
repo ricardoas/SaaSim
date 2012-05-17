@@ -6,7 +6,6 @@ import org.apache.commons.configuration.ConfigurationException;
 
 import saasim.cloud.Provider;
 import saasim.cloud.User;
-import saasim.provisioning.util.DPSInfo;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.provisioningheuristics.MachineStatistics;
 import saasim.util.TimeUnit;
@@ -34,8 +33,7 @@ public class EC2UrgaonkarProvisioningSystem extends UrgaonkarProvisioningSystem 
 	}
 
 	@Override
-	protected LinkedList<LinkedList<MachineDescriptor>> buildMachineList(
-			DPSInfo info) {
+	protected LinkedList<LinkedList<MachineDescriptor>> buildMachineList() {
 		LinkedList<LinkedList<MachineDescriptor>> machineList = new LinkedList<LinkedList<MachineDescriptor>>();
 		for (int i = 0; i < TimeUnit.HOUR.getMillis()/(reactiveTickInSeconds*1000); i++) {
 			machineList.add(new LinkedList<MachineDescriptor>());

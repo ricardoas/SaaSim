@@ -14,6 +14,8 @@ import saasim.sim.core.Event;
 import saasim.sim.core.EventScheduler;
 import saasim.sim.core.EventType;
 import saasim.sim.core.HandlingPoint;
+import saasim.sim.schedulingheuristics.SchedulingHeuristic;
+import saasim.sim.util.SaaSAppProperties;
 import saasim.sim.util.SimulatorProperties;
 import saasim.util.TimeUnit;
 
@@ -36,6 +38,7 @@ public class SimpleMultiTierApplication extends AbstractEventHandler implements 
 	private int thresholds [];
 	
 	protected WorkloadParser<List<Request>> workloadParser;
+	
 	protected Monitor monitor;
 
 	private long monitoringInterval;
@@ -56,9 +59,10 @@ public class SimpleMultiTierApplication extends AbstractEventHandler implements 
 	 * @param monitor 
 	 * @param tiers An array containing the tiers of application, see {@link LoadBalancer}.
 	 */
+	@Deprecated
 	public SimpleMultiTierApplication(EventScheduler scheduler, Monitor monitor, LoadBalancer... tiers){
 		super(scheduler);
-		this.tiers = tiers;
+		this.tiers = buildApplication(scheduler, monitor);
 		this.monitor = monitor;
 		this.numberOfRequests = 0;
 		this.threshold = Integer.MAX_VALUE;
@@ -66,6 +70,57 @@ public class SimpleMultiTierApplication extends AbstractEventHandler implements 
 		Arrays.fill(thresholds, Integer.MAX_VALUE);
 		monitoringInterval = Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL);
 	}
+	
+	/**
+	 * Default constructor.
+	 * @param scheduler A {@link EventScheduler} to represent a scheduler of {@link SimpleMultiTierApplication}.
+	 * @param monitor 
+	 */
+	public SimpleMultiTierApplication(EventScheduler scheduler, Monitor monitor){
+		super(scheduler);
+		this.tiers = buildApplication(scheduler, monitor);
+		this.monitor = monitor;
+		this.numberOfRequests = 0;
+		this.threshold = Integer.MAX_VALUE;
+		this.thresholds = new int[tiers.length];
+		Arrays.fill(thresholds, Integer.MAX_VALUE);
+		monitoringInterval = Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL);
+	}
+	
+	private LoadBalancer[] buildApplication(EventScheduler scheduler, Monitor monitor) {
+		Configuration config = Configuration.getInstance();
+		int numOfTiers = config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS);
+		
+		Class<?>[] heuristicClasses = config.getApplicationHeuristics();
+		int [] maxServerPerTier = config.getIntegerArray(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER);
+
+		LoadBalancer [] loadBalancers = new LoadBalancer[numOfTiers];
+		
+		for (int i = 0; i < numOfTiers; i++) {
+			loadBalancers[i] = buildLoadBalancer(scheduler, monitor, heuristicClasses[i], maxServerPerTier[i], i);
+		}
+		return loadBalancers;
+	}
+
+	/**
+	 * Build a {@link LoadBalancer}.
+	 * @param scheduler {@link EventScheduler} represent a event scheduler
+	 * @param monitor 
+	 * @param heuristic a {@link SchedulingHeuristic} for this {@link LoadBalancer} 
+	 * @param maxServerPerTier the maximum number of servers per tier 
+	 * @param tier the tier of {@link LoadBalancer}
+	 * @return A builded {@link LoadBalancer}.
+	 */
+	private LoadBalancer buildLoadBalancer(EventScheduler scheduler, Monitor monitor, Class<?> heuristic,
+			int maxServerPerTier, int tier) {
+		try {
+			return new LoadBalancer(scheduler, this, monitor, (SchedulingHeuristic) heuristic.newInstance(), 
+					   maxServerPerTier, tier);
+		} catch (Exception e) {
+			throw new RuntimeException("Something went wrong when loading "+ heuristic, e);
+		}
+	}
+
 	
 	/**
 	 * {@inheritDoc}

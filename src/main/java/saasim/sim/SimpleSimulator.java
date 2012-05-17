@@ -55,15 +55,12 @@ public class SimpleSimulator extends AbstractEventHandler implements Simulator{
 		
 		this.dps.registerConfigurable(this.applications);
 		
+		this.parsers = new WorkloadParser[applications.length];
+		
 		for (int i = 0; i < applications.length; i++) {
 			parsers[i] = WorkloadParserFactory.getWorkloadParser();
 			applications[i].setWorkloadParser(parsers[i]);
-			applications[i].setMonitor(this.dps);
-			
 		}
-		for (DynamicConfigurable dynamicConfigurable : applications) {
-		}
-
 	}
 	
 	/**
@@ -117,9 +114,13 @@ public class SimpleSimulator extends AbstractEventHandler implements Simulator{
 	@Override
 	public void restore() {
 		this.info.addDay();
-		for (DynamicConfigurable configurable : applications) {
-			configurable.setWorkloadParser(WorkloadParserFactory.getWorkloadParser());
+		
+		for (WorkloadParser<List<Request>> parser : parsers) {
+			parser.clear();
 		}
+//		for (DynamicConfigurable configurable : applications) {
+//			configurable.setWorkloadParser(WorkloadParserFactory.getWorkloadParser());
+//		}
 	}
 
 	@Override

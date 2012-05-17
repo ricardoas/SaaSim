@@ -1,7 +1,10 @@
 package saasim.sim.util;
 
 import saasim.config.Configuration;
+import saasim.provisioning.DPS;
 import saasim.provisioning.Monitor;
+import saasim.sim.DynamicConfigurable;
+import saasim.sim.SimpleMultiTierApplication;
 import saasim.sim.components.LoadBalancer;
 import saasim.sim.core.EventScheduler;
 import saasim.sim.schedulingheuristics.SchedulingHeuristic;
@@ -49,6 +52,13 @@ public class SimpleApplicationFactory extends ApplicationFactory {
 		} catch (Exception e) {
 			throw new RuntimeException("Something went wrong when loading "+ heuristic, e);
 		}
+	}
+
+	@Override
+	public DynamicConfigurable buildApplication(EventScheduler scheduler,
+			DPS dps) {
+		
+		return new SimpleMultiTierApplication(scheduler, dps);
 	}
 
 }

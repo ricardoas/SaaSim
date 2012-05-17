@@ -12,7 +12,6 @@ import saasim.cloud.Provider;
 import saasim.cloud.Request;
 import saasim.cloud.User;
 import saasim.config.Configuration;
-import saasim.provisioning.util.DPSInfo;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.provisioningheuristics.MachineStatistics;
 import saasim.sim.util.SimulatorProperties;
@@ -81,32 +80,18 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 		percentile = Configuration.getInstance().getDouble(PROP_PERCENTILE, DEFAULT_PERCENTILE);
 		forceShutdown = Configuration.getInstance().getBoolean(PROP_FORCE_SHUTDOWN, false);
 		
-		DPSInfo info = loadDPSInfo();
-		
-		list = info.list;
-		stat = info.stat;
-		last = info.history;
+		stat = new UrgaonkarStatistics[24];
+		for (int i = 0; i < stat.length; i++) {
+			stat[i] = new UrgaonkarStatistics(responseTime, predictiveTick, percentile, windowSize);
+		}
+		last = new UrgaonkarHistory();
+		list = buildMachineList();
+
 		lost = 0;
 		after = 0;
 	}
 
-	/**
-	 * @return {@link DPSInfo}
-	 */
-	protected DPSInfo loadDPSInfo() {
-		DPSInfo info = null;//super.loadDPSInfo();
-		if(info.stat == null && info.history == null && info.list == null){
-			info.stat = new UrgaonkarStatistics[24];
-			for (int i = 0; i < info.stat.length; i++) {
-				info.stat[i] = new UrgaonkarStatistics(responseTime, predictiveTick, percentile, windowSize);
-			}
-			info.history = new UrgaonkarHistory();
-			info.list = buildMachineList(info);
-		}
-		return info;
-	}
-
-	protected LinkedList<LinkedList<MachineDescriptor>> buildMachineList(DPSInfo info) {
+	protected LinkedList<LinkedList<MachineDescriptor>> buildMachineList() {
 		LinkedList<LinkedList<MachineDescriptor>> machineList = new LinkedList<LinkedList<MachineDescriptor>>();
 		machineList.add(new LinkedList<MachineDescriptor>());
 		return machineList;

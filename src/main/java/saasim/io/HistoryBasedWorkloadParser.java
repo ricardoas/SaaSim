@@ -15,6 +15,11 @@ import saasim.util.TimeUnit;
  */
 public class HistoryBasedWorkloadParser extends TimeBasedWorkloadParser {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1264664080670986778L;
+
 	private static final int DEFAULT_WINDOW_SIZE = 2;
 	
 	private LinkedBlockingQueue<List<Request>> history;

@@ -99,6 +99,10 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	public void clear() {
 		workloadLine++;
 		
+		currentTick = workloadLine * TimeUnit.DAY.getMillis() + tick;
+		
+		this.parsers = new WorkloadParser[workloads.length];
+		
 		ParserIdiom idiom = Configuration.getInstance().getParserIdiom();
 		
 		for (int i = 0; i < workloads.length; i++) {

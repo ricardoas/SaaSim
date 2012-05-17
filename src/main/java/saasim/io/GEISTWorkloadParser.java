@@ -3,7 +3,6 @@ package saasim.io;
 import java.util.StringTokenizer;
 
 import saasim.cloud.Request;
-import saasim.config.Configuration;
 
 
 /**

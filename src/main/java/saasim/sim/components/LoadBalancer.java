@@ -47,7 +47,6 @@ public class LoadBalancer extends AbstractEventHandler{
 
 	private double threshold;
 
-	
 	/**
 	 * Default constructor.
 	 * @param scheduler Event scheduler.
@@ -58,6 +57,17 @@ public class LoadBalancer extends AbstractEventHandler{
 	 */
 	public LoadBalancer(EventScheduler scheduler, Monitor monitor, SchedulingHeuristic heuristic, int maxServersAllowed, int tier) {
 		super(scheduler);
+		this.monitor = monitor;
+		this.heuristic = heuristic;
+		this.maxServersAllowed = maxServersAllowed;
+		this.tier = tier;
+		this.startingUp = new HashMap<MachineDescriptor, Machine>();
+		this.threshold = Integer.MAX_VALUE;
+	}
+
+	public LoadBalancer(EventScheduler scheduler, ServiceEntry entry, Monitor monitor, SchedulingHeuristic heuristic, int maxServersAllowed, int tier) {
+		super(scheduler);
+		this.sentry = entry;
 		this.monitor = monitor;
 		this.heuristic = heuristic;
 		this.maxServersAllowed = maxServersAllowed;
