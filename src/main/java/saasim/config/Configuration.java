@@ -28,11 +28,7 @@ import saasim.cloud.RunTimeSLAContract;
 import saasim.cloud.TypeProvider;
 import saasim.cloud.User;
 import saasim.io.ParserIdiom;
-import saasim.planning.heuristic.OverProvisionHeuristic;
-import saasim.sim.SimpleMultiTierApplication;
 import saasim.sim.Simulator;
-import saasim.sim.components.LoadBalancer;
-import saasim.sim.components.TimeSharedMachine;
 import saasim.sim.core.EventCheckpointer;
 import saasim.sim.core.EventScheduler;
 import saasim.sim.util.SimulatorFactory;
@@ -53,25 +49,10 @@ public class Configuration extends ComplexPropertiesConfiguration{
 
 	private static final String DEFAULT_PROPERTIES_FILE_NAME = "saasim.properties";
 
-	static{
-		try {
-			String customPropertyFile = System.getProperty(SAASIM_CONFIGURATION_PROP);
-			if(customPropertyFile != null && !customPropertyFile.isEmpty()){
-				buildInstance(customPropertyFile);
-			}else{
-				buildInstance(DEFAULT_PROPERTIES_FILE_NAME);
-			}
-		} catch (ConfigurationException e) {
-			throw new ConfigurationRuntimeException(e);
-		}
-	}
-	
 	/**
 	 * Unique instance.
 	 */
 	private static Configuration instance;
-	
-	private int[] priorities;
 	
 	private EventScheduler scheduler;
 	private Simulator simulator;
@@ -89,6 +70,24 @@ public class Configuration extends ComplexPropertiesConfiguration{
 		super(propertiesFileName);
 		verifyProperties();
 	}
+	
+	
+
+	/**
+	 * Builds the single instance of this configuration.
+	 * @param propertiesFileName
+	 * @throws ConfigurationException
+	 */
+	public static void buildInstance() throws ConfigurationException{
+		Locale.setDefault(Locale.US);
+		
+		String customPropertyFile = System.getProperty(SAASIM_CONFIGURATION_PROP);
+		if(customPropertyFile != null && !customPropertyFile.isEmpty()){
+			buildInstance(customPropertyFile);
+		}else{
+			buildInstance(DEFAULT_PROPERTIES_FILE_NAME);
+		}
+	}
 
 	/**
 	 * Builds the single instance of this configuration.
@@ -96,7 +95,6 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	 * @throws ConfigurationException
 	 */
 	public static void buildInstance(String propertiesFileName) throws ConfigurationException{
-		Locale.setDefault(Locale.US);
 		Logger.getLogger(EventCheckpointer.class).debug("CHKP LOAD-in");
 		instance = new Configuration(propertiesFileName);
 
@@ -106,28 +104,16 @@ public class Configuration extends ComplexPropertiesConfiguration{
 			instance.scheduler = (EventScheduler) objects[i++];
 			instance.providers = (Provider[]) objects[i++];
 			instance.users = (User[]) objects[i++];
-			instance.priorities = (int []) objects[i++];
 			instance.simulator = (Simulator) objects[i++];
-			instance.simulator.restore();
-			instance.scheduler.reset(instance.simulator.getSimulationInfo().getCurrentDayInMillis(), instance.simulator.getSimulationInfo().getCurrentDayInMillis() + TimeUnit.DAY.getMillis());
 			EventCheckpointer.clear();
 		}else{
 			instance.scheduler = new EventScheduler(TimeUnit.DAY.getMillis());
 			instance.providers = Configuration.getInstance().readProviders();
 			instance.users = Configuration.getInstance().readUsers();
-			instance.priorities = new int[instance.users.length];
-			for (int i = 0; i < instance.priorities.length; i++) {
-				instance.priorities[i] = instance.users[i].getContract().getPriority(); //FIXME Ricardo: don't know if we need this anymore
-			}
 			instance.simulator = SimulatorFactory.buildSimulator(Configuration.getInstance().getScheduler(), instance.users, instance.providers);
 		}
 		
-		instance.scheduler.registerHandlerClass(LoadBalancer.class).
-					registerHandlerClass(SimpleMultiTierApplication.class).
-					registerHandlerClass(TimeSharedMachine.class).
-					registerHandlerClass(OverProvisionHeuristic.class);
-		
-		Logger.getLogger(EventCheckpointer.class).debug("CHKP LOAD-out " + instance.simulator.getSimulationInfo());
+		Logger.getLogger(EventCheckpointer.class).debug("CHKP LOAD-out");
 	}
 	
 	/**
@@ -150,7 +136,6 @@ public class Configuration extends ComplexPropertiesConfiguration{
 				scheduler, 
 				providers, 
 				users, 
-				priorities,
 				simulator
 				);
 	}
@@ -592,10 +577,6 @@ public class Configuration extends ComplexPropertiesConfiguration{
 			workloads = workloadFilesWithErrors;
 		}
 		return workloads;
-	}
-
-	public int[] getPriorities() {
-		return priorities;
 	}
 
 	public void enableParserError() {

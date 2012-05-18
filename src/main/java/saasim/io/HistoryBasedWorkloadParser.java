@@ -43,7 +43,7 @@ public class HistoryBasedWorkloadParser extends TimeBasedWorkloadParser {
 	 */
 	@SuppressWarnings("unchecked")
 	public HistoryBasedWorkloadParser(WorkloadParser<Request> parser, TimeUnit tick, int windowSize) {
-		super(tick.getMillis(), parser);//FIXME remove null
+		super(tick.getMillis());//FIXME add workload files...
 		this.history = new LinkedBlockingQueue<List<Request>>(windowSize);
 	}
 	

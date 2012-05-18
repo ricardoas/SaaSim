@@ -6,6 +6,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 
 import saasim.config.Configuration;
+import saasim.config.PropertiesTesting;
 import saasim.io.AbstractWorkloadParser;
 import saasim.sim.core.EventCheckpointer;
 
@@ -16,10 +17,6 @@ import saasim.sim.core.EventCheckpointer;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public class CleanConfigurationTest {
-	
-	static{
-		System.setProperty("saasim.configuration", "src/test/resources/scenario_01/config.properties");
-	}
 	
 	/**
 	 * Cleans up configuration singleton object.

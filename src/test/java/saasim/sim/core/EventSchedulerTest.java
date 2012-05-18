@@ -54,65 +54,6 @@ public class EventSchedulerTest extends ValidConfigurationTest {
 		EasyMock.verify(handler);
 	}
 
-	@Ignore @Test
-	public void testQueueEventWithRegisteredHandler() {
-		
-		final EventScheduler scheduler = new EventScheduler(EventCheckpointer.INTERVAL);
-		final AbstractEventHandler handler = EasyMock.createStrictMock(AbstractEventHandler.class);
-		EasyMock.expect(handler.getHandlerId()).andAnswer(new IAnswer<Integer>() {
-			@Override
-			public Integer answer() {
-				return scheduler.registerHandler(handler);
-			}
-		}).once();
-//		handler.handleEvent(EasyMock.isA(JEEvent.class));
-		EasyMock.expectLastCall().once();
-		EasyMock.replay(handler);
-		
-		scheduler.queueEvent(new Event(EventType.READWORKLOAD, handler, 1000));
-		scheduler.start();
-		
-		EasyMock.verify(handler);
-	}
-	
-	@Ignore @Test(expected=AssertionError.class)
-	public void testQueueEventWithNegativeTime() {
-		final AbstractEventHandler handler = EasyMock.createStrictMock(AbstractEventHandler.class);
-		final EventScheduler scheduler = new EventScheduler(EventCheckpointer.INTERVAL);
-		EasyMock.expect(handler.getHandlerId()).andAnswer(new IAnswer<Integer>() {
-			@Override
-			public Integer answer() {
-				return scheduler.registerHandler(handler);
-			}
-		}).once();
-//		handler.handleEvent(EasyMock.isA(JEEvent.class));
-		EasyMock.expectLastCall().once();
-		EasyMock.replay(handler);
-		
-		assertEquals(0, scheduler.now());
-		scheduler.queueEvent(new Event(EventType.READWORKLOAD, handler, -1));
-	}
-	
-	@Ignore @Test
-	public void testQueueEventAfterEndTime() {
-		final EventScheduler scheduler = new EventScheduler(3600);
-		final AbstractEventHandler handler = EasyMock.createStrictMock(AbstractEventHandler.class);
-		EasyMock.expect(handler.getHandlerId()).andAnswer(new IAnswer<Integer>() {
-			@Override
-			public Integer answer() {
-				return scheduler.registerHandler(handler);
-			}
-		}).times(3);
-//		handler.handleEvent(EasyMock.isA(JEEvent.class));
-		EasyMock.expectLastCall().times(2);
-		EasyMock.replay(handler);
-		
-		//Queuing past event
-		scheduler.queueEvent(new Event(EventType.READWORKLOAD, handler, 1000));
-		scheduler.queueEvent(new Event(EventType.READWORKLOAD, handler, 3600));
-		scheduler.queueEvent(new Event(EventType.READWORKLOAD, handler, 3601));
-	}
-
 	@Test
 	public void testCancelEvent() {
 		
@@ -143,53 +84,25 @@ public class EventSchedulerTest extends ValidConfigurationTest {
 		assertEquals(3600000, scheduler.now());
 	}
 	
-	@Ignore @Test(expected=RuntimeException.class)
-	public void testQueueEventWithPastEvent() {
+	@Test
+	public void testResetAfterOneDay(){
+		EventScheduler scheduler = new EventScheduler(86400000);
 		
-		final EventScheduler scheduler = new EventScheduler(3600000L);
-		final AbstractEventHandler handler = EasyMock.createStrictMock(AbstractEventHandler.class);
-		EasyMock.expect(handler.getHandlerId()).andAnswer(new IAnswer<Integer>() {
-			@Override
-			public Integer answer() {
-				return scheduler.registerHandler(handler);
+		AbstractEventHandler handler = new AbstractEventHandler(scheduler) {
+			
+			@HandlingPoint(EventType.ADD_SERVER)
+			public void doSomething(){
+				
 			}
-		}).once();
-//		handler.handleEvent(EasyMock.isA(JEEvent.class));
-		EasyMock.expectLastCall().once();
-		EasyMock.replay(handler);
+
+		};
+		scheduler.registerHandler(handler);
+		
+		scheduler.queueEvent(new Event(EventType.ADD_SERVER, handler, 0));
 		
 		scheduler.start();
-		assertEquals(3600000, scheduler.now());
 		
-		//Queuing past event
-		scheduler.queueEvent(new Event(EventType.READWORKLOAD, handler, 1));
+		
+		
 	}
-	
-	@Ignore@Test
-	public void testExecutingEventsAndCheckingCurrentTime() {
-		
-		final EventScheduler scheduler = new EventScheduler(3600000L);
-		final AbstractEventHandler handler = EasyMock.createStrictMock(AbstractEventHandler.class);
-		EasyMock.expect(handler.getHandlerId()).andAnswer(new IAnswer<Integer>() {
-			@Override
-			public Integer answer() {
-				return scheduler.registerHandler(handler);
-			}
-		}).times(2);
-//		handler.handleEvent(EasyMock.isA(JEEvent.class));
-		EasyMock.expectLastCall().times(2);
-		EasyMock.replay(handler);
-		
-		//Queuing past event
-		scheduler.queueEvent(new Event(EventType.READWORKLOAD, handler, 1000));
-		scheduler.queueEvent(new Event(EventType.READWORKLOAD, handler, 55000));
-
-		scheduler.start();
-		assertEquals(55000, scheduler.now());
-		
-		EasyMock.verify(handler);
-	}
-	
-	
-
 }

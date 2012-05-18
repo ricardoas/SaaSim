@@ -34,40 +34,14 @@ public class TimeBasedWorkloadParser implements WorkloadParser<List<Request>>{
 	 * @param tick a long represent a moment in time
 	 * @param parser an array without specific size, containing {@link WorkloadParser}.
 	 */
-	public TimeBasedWorkloadParser(long tick, WorkloadParser<Request>... parser) {
-		if(parser.length == 0){
-			throw new RuntimeException("Invalid TimeBasedWorkloadParser: no parsers!");
-		}
-		this.parsers = parser;
-		this.tick = tick;
-		this.currentTick = tick;//Configuration.getInstance().getSimulationInfo().getCurrentDayInMillis() + tick;
-		this.leftOver = new Request[parsers.length];
-	}
-	
-	/**
-	 * Default constructor.
-	 * @param tick a long represent a moment in time
-	 * @param parser an array without specific size, containing {@link WorkloadParser}.
-	 */
-	@SuppressWarnings("unchecked")
 	public TimeBasedWorkloadParser(long tick, String... workloads) {
 		if(workloads.length == 0){
 			throw new RuntimeException("Invalid TimeBasedWorkloadParser: no parsers!");
 		}
 		this.workloads = workloads;
-		this.workloadLine = 0;
+		this.workloadLine = -1;
 		this.tick = tick;
-		this.currentTick = tick;
-		
-		this.parsers = new WorkloadParser[workloads.length];
-		
-		ParserIdiom idiom = Configuration.getInstance().getParserIdiom();
-		
-		for (int i = 0; i < workloads.length; i++) {
-			parsers[i] = idiom.getInstance(readFileToUse(workloads[i]), 0);
-		}
-
-		this.leftOver = new Request[parsers.length];
+		this.leftOver = new Request[workloads.length];
 	}
 	
 	/**

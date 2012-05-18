@@ -87,6 +87,12 @@ public class SimpleSimulator extends AbstractEventHandler implements Simulator{
 	 * {@link JEEventType#READWORKLOAD#CHARGE_USERS#ESTIMATE_SERVERS#COLLECT_STATISTICS}. 
 	 */
 	protected void prepareBeforeStart() {
+		this.info.addDay();
+		
+		for (WorkloadParser<List<Request>> parser : parsers) {
+			parser.clear();
+		}
+		
 		send(new Event(EventType.READWORKLOAD, applications[0], getScheduler().now()));
 		
 		if(info.isChargeDay()){
@@ -110,18 +116,6 @@ public class SimpleSimulator extends AbstractEventHandler implements Simulator{
 	@Override
 	public DynamicConfigurable[] getApplications() {
 		return applications;
-	}
-
-	@Override
-	public void restore() {
-		this.info.addDay();
-		
-		for (WorkloadParser<List<Request>> parser : parsers) {
-			parser.clear();
-		}
-//		for (DynamicConfigurable configurable : applications) {
-//			configurable.setWorkloadParser(WorkloadParserFactory.getWorkloadParser());
-//		}
 	}
 
 	@Override

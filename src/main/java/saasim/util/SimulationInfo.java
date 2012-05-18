@@ -32,7 +32,7 @@ public class SimulationInfo implements Serializable{
 	 * Default constructor.
 	 */
 	public SimulationInfo() {
-		this.currentDay = 0;
+		this.currentDay = -DAY_IN_MILLIS;
 		this.finishDay = (Configuration.getInstance().getLong(SimulatorProperties.PLANNING_PERIOD)-1) * DAY_IN_MILLIS;
 	}
 	

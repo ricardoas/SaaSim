@@ -24,6 +24,6 @@ public class SimulatorFactory {
 	 */
 	public static Simulator buildSimulator(EventScheduler scheduler, User[] users, Provider[] providers){
 		DPS dps = DPSFactory.createDPS(users, providers);
-		return new SimpleSimulator(scheduler, dps, ApplicationFactory.getInstance().buildApplication(scheduler, dps));
+		return new SimpleSimulator(scheduler, dps, ApplicationFactory.buildApplication(scheduler, dps));
 	}
 }

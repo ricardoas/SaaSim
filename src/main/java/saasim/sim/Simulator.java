@@ -23,7 +23,5 @@ public interface Simulator{
 	 */
 	DynamicConfigurable [] getApplications();
 
-	void restore();
-
 	SimulationInfo getSimulationInfo();
 }

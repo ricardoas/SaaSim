@@ -36,11 +36,11 @@ public abstract class ApplicationFactory {
 		return instance;
 	}
 
-	public DynamicConfigurable buildApplication(EventScheduler scheduler,
+	public static DynamicConfigurable buildApplication(EventScheduler scheduler,
 			DPS dps) {
 		
 		try {
-			return (DynamicConfigurable) AppArchitectureValues.MULTITIER.getClass().getConstructors()[0].newInstance(scheduler, dps);
+			return (DynamicConfigurable) Class.forName(AppArchitectureValues.MULTITIER.getClassName()).getConstructors()[0].newInstance(scheduler, dps);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

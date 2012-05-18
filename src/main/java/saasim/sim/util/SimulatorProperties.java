@@ -19,6 +19,7 @@ public class SimulatorProperties {
 	public static final String MACHINE_BACKLOG_SIZE = "machine.backlogsize";
 	public static final String MACHINE_SESSION_AFFINITY = "machine.session";
 	public static final String MACHINE_SESSION_TIMEOUT = "machine.session.timeout";
+	public static final String MACHINE_QUANTUM = "machine.psquantum";
 	
 	public static final String PLANNING_HEURISTIC = "planning.heuristic";
 	public static final String PLANNING_PERIOD = "planning.period";

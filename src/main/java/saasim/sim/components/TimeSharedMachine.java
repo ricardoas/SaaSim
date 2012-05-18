@@ -47,6 +47,8 @@ public class TimeSharedMachine extends AbstractEventHandler implements Machine{
 	private long maxOnQueue;
 
 	private boolean shutdown;
+
+	private long quantum;
 	
 	/**
 	 * Default constructor.
@@ -73,6 +75,10 @@ public class TimeSharedMachine extends AbstractEventHandler implements Machine{
 		this.backlog = new LinkedList<Request>();
 		this.maxOnQueue = maxThreads - NUMBER_OF_CORES;
 		this.shutdown = false;
+		this.quantum = Configuration.getInstance().getLong(MACHINE_QUANTUM, Long.MAX_VALUE);
+		if(this.quantum == 0){
+			this.quantum = Long.MAX_VALUE;
+		}
 	}
 	
 	/**
@@ -207,7 +213,7 @@ public class TimeSharedMachine extends AbstractEventHandler implements Machine{
 	 */
 	protected void scheduleNext() {
 		Request nextRequest = processorQueue.poll();
-		long nextQuantum = Math.min(nextRequest.getTotalToProcess(), Configuration.getInstance().getPriorities()[nextRequest.getSaasClient()]);
+		long nextQuantum = Math.min(nextRequest.getTotalToProcess(), quantum);
 		lastUpdate = now();
 		send(new Event(EventType.PREEMPTION, this, nextQuantum+lastUpdate, nextQuantum, nextRequest));
 	}

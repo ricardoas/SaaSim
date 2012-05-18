@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeSet;
 
-import saasim.config.Configuration;
+import saasim.util.TimeUnit;
 
 
 /**
@@ -41,18 +41,11 @@ public class EventScheduler implements Serializable{
 		this.handlerMap = new HashMap<Integer, EventHandler>();
 		this.eventSet = new TreeSet<Event>();
 		this.random = new Random();
-		reset(0, simulationEnd);
-    }
-    
-    /**
-	 * @param l
-	 */
-	public void reset(long simulationStart, long simulationEnd) {
-		this.now = simulationStart;
+		this.now = 0;
 		this.simulationEnd = simulationEnd;
 		this.handlingMethods = new HashMap<Class<?>, Map<EventType,Method>>();
-	}
-
+    }
+    
 	/**
      * Add a new event to the queue. Duplicates are not allowed.
      * @param event A new event.
@@ -113,13 +106,12 @@ public class EventScheduler implements Serializable{
      */
     public void start() {
     	
-    	this.now = Configuration.getInstance().getSimulationInfo().getCurrentDayInMillis();
-    	
 		if (!eventSet.isEmpty()) {
 			schedule();
-		}else{
-			this.now = simulationEnd;
+			
 		}
+		this.now = simulationEnd;
+		this.simulationEnd += TimeUnit.DAY.getMillis();
     }
 
 	public String dumpPostMortemEvents() {
@@ -217,6 +209,10 @@ public class EventScheduler implements Serializable{
 	}
 
 	public EventScheduler registerHandlerClass(Class<?> handlerClass) {
+		if(handlingMethods == null){
+			handlingMethods = new HashMap<Class<?>, Map<EventType,Method>>();
+		}
+
 		if(!handlingMethods.containsKey(handlerClass)){
 			handlingMethods.put(handlerClass, extractHandlers(handlerClass, new HashMap<EventType, Method>()));
 		}
