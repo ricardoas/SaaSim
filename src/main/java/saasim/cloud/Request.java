@@ -241,4 +241,11 @@ public class Request implements Serializable{
 		result = prime * result + saasClient;
 		return result;
 	}
+	
+	public void changeDemand(double factor){
+		for (int i = 0; i < cpuDemandInMillis.length; i++) {
+			cpuDemandInMillis[i] *= factor; 
+		}
+	}
+	
 }

@@ -30,8 +30,8 @@ public class SimpleSimulator extends AbstractEventHandler implements Simulator{
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -8028580648054904982L;
-	
+	private static final long serialVersionUID = -7402078758847784377L;
+
 	private DynamicConfigurable[] applications;
 
 	private WorkloadParser<List<Request>>[] parsers;
@@ -39,8 +39,7 @@ public class SimpleSimulator extends AbstractEventHandler implements Simulator{
 	private DPS dps;
 	
 	private SimulationInfo info;
-
-
+	
 	/**
 	 * Default constructor.
 	 * @param scheduler A {@link EventScheduler} to represent a scheduler of {@link SimpleSimulator}.
@@ -69,15 +68,18 @@ public class SimpleSimulator extends AbstractEventHandler implements Simulator{
 	 */
 	@Override
 	public void start() {
+		Configuration config = Configuration.getInstance();
+		
 		prepareBeforeStart();
 		getScheduler().start();
 		
 		if(info.isFinishDay()){
 			Logger logger = Logger.getLogger(SimpleSimulator.class);
 			logger.info(dps.calculateUtility());
-			logger.debug(Configuration.getInstance().getScheduler().dumpPostMortemEvents());
+			logger.debug(config.getScheduler().dumpPostMortemEvents());
+			config.clean();
 		}else{//Persisting dump
-			Configuration.getInstance().save();
+			config.save();
 		}
 
 	}

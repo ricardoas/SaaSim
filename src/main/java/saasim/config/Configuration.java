@@ -105,7 +105,6 @@ public class Configuration extends ComplexPropertiesConfiguration{
 			instance.providers = (Provider[]) objects[i++];
 			instance.users = (User[]) objects[i++];
 			instance.simulator = (Simulator) objects[i++];
-			EventCheckpointer.clear();
 		}else{
 			instance.scheduler = new EventScheduler(TimeUnit.DAY.getMillis());
 			instance.providers = Configuration.getInstance().readProviders();
@@ -132,12 +131,17 @@ public class Configuration extends ComplexPropertiesConfiguration{
 	public void save(){
 		assert instance != null;
 		
+		EventCheckpointer.clear();
 		EventCheckpointer.save(
 				scheduler, 
 				providers, 
 				users, 
 				simulator
 				);
+	}
+
+	public void clean() {
+		EventCheckpointer.clear();
 	}
 
 	/**
