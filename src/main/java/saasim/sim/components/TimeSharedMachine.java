@@ -139,10 +139,10 @@ public class TimeSharedMachine extends AbstractEventHandler implements Machine{
 	public void sendRequest(Request request) {
 		if(canRun()){
 			if(this.enableCorrectionFactor && this.processorQueue.isEmpty()){
-				request.changeDemand(Math.max(1, 1.961530 -0.003983* (now()-lastUpdate)));
-//				if(now() - lastUpdate> correctionFactorIddleness){
-//					request.changeDemand(correctionFactorValue);
-//				}
+//				request.changeDemand(Math.max(1, 1.961530 -0.003983* (now()-lastUpdate)));
+				if(now() - lastUpdate> correctionFactorIddleness){
+					request.changeDemand(correctionFactorValue);
+				}
 			}
 			this.processorQueue.add(request);
 			request.assignTo(descriptor.getType());
