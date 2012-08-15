@@ -49,6 +49,7 @@ public class Request implements Serializable{
 		this.responseSizeInBytes = responseSizeInBytes;
 		this.cpuDemandInMillis = cpuDemandInMillis;
 		this.totalProcessed = 0;
+		this.factor = 1;
 	}
 
 	/**
