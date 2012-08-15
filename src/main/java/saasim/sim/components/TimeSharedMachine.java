@@ -71,7 +71,7 @@ public class TimeSharedMachine extends AbstractEventHandler implements Machine{
 		this.lastUtilisationCalcTime = scheduler.now();
 		this.totalTimeUsed = 0;
 		this.totalTimeUsedInLastPeriod = 0;
-		this.lastUpdate = scheduler.now();
+		this.lastUpdate = -1000;//FIXME scheduler.now();
 		this.NUMBER_OF_CORES = descriptor.getType().getNumberOfCores();
 		this.semaphore = new FastSemaphore(this.NUMBER_OF_CORES);
 		this.maxThreads = Long.MAX_VALUE;
@@ -138,7 +138,7 @@ public class TimeSharedMachine extends AbstractEventHandler implements Machine{
 	@Override
 	public void sendRequest(Request request) {
 		if(canRun()){
-			if(this.enableCorrectionFactor && this.processorQueue.isEmpty()){
+			if(this.enableCorrectionFactor && this.processorQueue.isEmpty() && this.semaphore.availablePermits() == this.NUMBER_OF_CORES){
 				if(now() - lastUpdate> correctionFactorIddleness){
 					request.changeDemand(correctionFactorValue);
 				}else{

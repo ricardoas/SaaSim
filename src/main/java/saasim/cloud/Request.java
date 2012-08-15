@@ -27,6 +27,7 @@ public class Request implements Serializable{
 	private long totalProcessed;
 	private MachineType value;
 	private long finishTimeInMillis;
+	private double factor;
 	
 	/**
 	 * Default constructor.
@@ -159,6 +160,13 @@ public class Request implements Serializable{
 	}
 	
 	/**
+	 * @return the factor
+	 */
+	public double getFactor() {
+		return factor;
+	}
+
+	/**
 	 * Set the finish time to a new value.
 	 * @param finishTimeInMillis The value set the actual finish time.
 	 */
@@ -243,6 +251,7 @@ public class Request implements Serializable{
 	}
 	
 	public void changeDemand(double factor){
+		this.factor = factor;
 		for (int i = 0; i < cpuDemandInMillis.length; i++) {
 			cpuDemandInMillis[i] *= factor; 
 		}

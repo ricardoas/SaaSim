@@ -120,7 +120,7 @@ public class DynamicProvisioningSystem implements DPS{
 	@Override
 	public final void requestFinished(Request request) {
 		assert request.getSaasClient() < users.length:"Unregistered user with ID " + request.getSaasClient() + ". Check configuration files.";
-		Logger.getLogger(getClass()).debug("REQUEST-RT " + request.getArrivalTimeInMillis() + " " + request.getResponseTimeInMillis());
+		Logger.getLogger(getClass()).debug("REQUEST-RT " + request.getArrivalTimeInMillis() + " " + request.getResponseTimeInMillis() + " " +  request.getTotalProcessed() + " " + request.getFactor());
 		if(request.getResponseTimeInMillis() < maxRT){
 			reportFinishedRequest(request);
 		}else{
