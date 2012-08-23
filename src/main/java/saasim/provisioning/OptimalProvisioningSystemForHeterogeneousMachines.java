@@ -13,7 +13,7 @@ import saasim.cloud.User;
 import saasim.config.Configuration;
 import saasim.io.GEISTWorkloadParser;
 import saasim.io.WorkloadParser;
-import saasim.sim.provisioningheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.MachineStatistics;
 import saasim.sim.util.SaaSAppProperties;
 import saasim.sim.util.SimulatorProperties;
 

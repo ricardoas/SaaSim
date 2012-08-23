@@ -6,7 +6,6 @@ import java.util.List;
 import saasim.cloud.Request;
 import saasim.sim.components.Machine;
 import saasim.sim.components.MachineDescriptor;
-import saasim.sim.provisioningheuristics.MachineStatistics;
 
 
 /**

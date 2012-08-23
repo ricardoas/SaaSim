@@ -17,7 +17,7 @@ import saasim.cloud.UtilityResult;
 import saasim.config.Configuration;
 import saasim.sim.AccountingSystem;
 import saasim.sim.components.MachineDescriptor;
-import saasim.sim.provisioningheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.MachineStatistics;
 import saasim.util.ValidConfigurationTest;
 
 
@@ -65,7 +65,7 @@ public class MonitorTest extends ValidConfigurationTest {
 	}
 
 	/**
-	 * Test method for {@link saasim.provisioning.Monitor#sendStatistics(long, saasim.sim.provisioningheuristics.MachineStatistics, int)}.
+	 * Test method for {@link saasim.provisioning.Monitor#sendStatistics(long, saasim.sim.schedulingheuristics.MachineStatistics, int)}.
 	 */
 	@Test
 	public void testEvaluateUtilisation() {

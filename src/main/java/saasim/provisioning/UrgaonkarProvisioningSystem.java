@@ -13,7 +13,7 @@ import saasim.cloud.Request;
 import saasim.cloud.User;
 import saasim.config.Configuration;
 import saasim.sim.components.MachineDescriptor;
-import saasim.sim.provisioningheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.MachineStatistics;
 import saasim.sim.util.SimulatorProperties;
 import saasim.util.TimeUnit;
 

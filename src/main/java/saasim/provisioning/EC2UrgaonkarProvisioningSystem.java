@@ -7,7 +7,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import saasim.cloud.Provider;
 import saasim.cloud.User;
 import saasim.sim.components.MachineDescriptor;
-import saasim.sim.provisioningheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.MachineStatistics;
 import saasim.util.TimeUnit;
 
 

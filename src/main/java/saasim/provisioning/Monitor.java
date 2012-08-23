@@ -5,7 +5,7 @@ import java.io.Serializable;
 import saasim.cloud.Request;
 import saasim.sim.components.Machine;
 import saasim.sim.components.MachineDescriptor;
-import saasim.sim.provisioningheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.MachineStatistics;
 
 /**
  * Application monitor. Interface for reporting information.

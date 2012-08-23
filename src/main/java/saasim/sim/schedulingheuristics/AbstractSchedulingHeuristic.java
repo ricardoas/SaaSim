@@ -10,7 +10,6 @@ import saasim.cloud.Request;
 import saasim.config.Configuration;
 import saasim.sim.components.Machine;
 import saasim.sim.components.MachineDescriptor;
-import saasim.sim.provisioningheuristics.MachineStatistics;
 import saasim.sim.util.SimulatorProperties;
 
 

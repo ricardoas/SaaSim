@@ -24,7 +24,7 @@ import saasim.sim.DynamicConfigurable;
 import saasim.sim.SimpleMultiTierApplication;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.core.EventScheduler;
-import saasim.sim.provisioningheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.MachineStatistics;
 import saasim.sim.util.SaaSAppProperties;
 import saasim.sim.util.SaaSUsersProperties;
 import saasim.util.ValidConfigurationTest;

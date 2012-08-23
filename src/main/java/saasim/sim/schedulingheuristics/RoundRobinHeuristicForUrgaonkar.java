@@ -3,7 +3,6 @@
  */
 package saasim.sim.schedulingheuristics;
 
-import saasim.sim.provisioningheuristics.MachineStatistics;
 import saasim.util.TimeUnit;
 
 

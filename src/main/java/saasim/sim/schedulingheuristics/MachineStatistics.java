@@ -1,4 +1,4 @@
-package saasim.sim.provisioningheuristics;
+package saasim.sim.schedulingheuristics;
 
 import java.io.Serializable;
 

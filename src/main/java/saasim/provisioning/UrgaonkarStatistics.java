@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 import org.apache.commons.math.stat.descriptive.rank.Percentile;
 
-import saasim.sim.provisioningheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.MachineStatistics;
 
 
 public class UrgaonkarStatistics implements Serializable{

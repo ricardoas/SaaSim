@@ -19,7 +19,7 @@ import saasim.provisioning.Monitor;
 import saasim.sim.core.Event;
 import saasim.sim.core.EventScheduler;
 import saasim.sim.core.EventType;
-import saasim.sim.provisioningheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.MachineStatistics;
 import saasim.sim.schedulingheuristics.RoundRobinHeuristic;
 import saasim.sim.schedulingheuristics.SchedulingHeuristic;
 import saasim.util.ValidConfigurationTest;

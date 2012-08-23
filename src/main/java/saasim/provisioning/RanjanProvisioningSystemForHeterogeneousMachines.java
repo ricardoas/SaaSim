@@ -7,7 +7,7 @@ import java.util.List;
 import saasim.cloud.MachineType;
 import saasim.cloud.Provider;
 import saasim.cloud.User;
-import saasim.sim.provisioningheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.MachineStatistics;
 
 
 /**

@@ -16,7 +16,7 @@ import saasim.config.Configuration;
 import saasim.sim.AccountingSystem;
 import saasim.sim.DynamicConfigurable;
 import saasim.sim.components.MachineDescriptor;
-import saasim.sim.provisioningheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.MachineStatistics;
 import saasim.sim.util.SaaSAppProperties;
 
 

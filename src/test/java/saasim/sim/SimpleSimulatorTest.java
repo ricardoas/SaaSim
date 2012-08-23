@@ -21,7 +21,7 @@ import saasim.sim.core.Event;
 import saasim.sim.core.EventHandler;
 import saasim.sim.core.EventScheduler;
 import saasim.sim.core.EventType;
-import saasim.sim.provisioningheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.MachineStatistics;
 import saasim.sim.schedulingheuristics.RoundRobinHeuristic;
 import saasim.util.TimeUnit;
 import saasim.util.ValidConfigurationTest;
