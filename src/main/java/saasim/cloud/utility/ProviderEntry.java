@@ -1,6 +1,9 @@
-package saasim.cloud;
+package saasim.cloud.utility;
 
 import java.io.Serializable;
+
+import saasim.cloud.Provider;
+import saasim.cloud.TypeProvider;
 
 
 /**

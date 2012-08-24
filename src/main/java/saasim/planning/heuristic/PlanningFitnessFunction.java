@@ -10,7 +10,7 @@ import saasim.cloud.Contract;
 import saasim.cloud.MachineType;
 import saasim.cloud.Provider;
 import saasim.cloud.User;
-import saasim.cloud.UtilityResultEntry;
+import saasim.cloud.utility.UtilityResultEntry;
 import saasim.config.Configuration;
 import saasim.planning.util.Summary;
 import saasim.sim.components.Machine;

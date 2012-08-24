@@ -8,6 +8,7 @@ import static org.junit.Assert.*;
 import org.apache.commons.configuration.ConfigurationException;
 import org.junit.Test;
 
+import saasim.cloud.utility.TypeProviderEntry;
 import saasim.sim.components.MachineDescriptor;
 import saasim.util.TimeUnit;
 import saasim.util.ValidConfigurationTest;

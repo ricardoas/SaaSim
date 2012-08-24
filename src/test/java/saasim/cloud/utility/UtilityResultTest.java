@@ -1,9 +1,10 @@
-package saasim.cloud;
+package saasim.cloud.utility;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import saasim.cloud.utility.UtilityResult;
 import saasim.util.CleanConfigurationTest;
 
 public class UtilityResultTest extends CleanConfigurationTest {

@@ -1,6 +1,9 @@
-package saasim.cloud;
+package saasim.cloud.utility;
 
 import java.io.Serializable;
+
+import saasim.cloud.MachineType;
+import saasim.cloud.TypeProvider;
 
 /**
  * Abstraction used to represent a entry of one {@link TypeProvider}.
@@ -18,7 +21,7 @@ public class TypeProviderEntry implements Serializable{
 	long reservedCPUHours;
 	double reservedCost;
 	double monitoringCost;
-	double cost;
+	public double cost;
 
 	/**
 	 * Default constructor.

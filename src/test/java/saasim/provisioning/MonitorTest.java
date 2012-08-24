@@ -13,7 +13,7 @@ import saasim.cloud.MachineType;
 import saasim.cloud.Provider;
 import saasim.cloud.Request;
 import saasim.cloud.User;
-import saasim.cloud.UtilityResult;
+import saasim.cloud.utility.UtilityResult;
 import saasim.config.Configuration;
 import saasim.sim.AccountingSystem;
 import saasim.sim.components.MachineDescriptor;

@@ -1,6 +1,9 @@
-package saasim.cloud;
+package saasim.cloud.utility;
 
 import java.io.Serializable;
+
+import saasim.cloud.Contract;
+import saasim.cloud.User;
 
 /**
  * Abstraction used to represent a entry of one {@link User}.

@@ -1,7 +1,7 @@
 package saasim.provisioning;
 
 
-import saasim.cloud.UtilityResult;
+import saasim.cloud.utility.UtilityResult;
 import saasim.sim.DynamicConfigurable;
 
 /**

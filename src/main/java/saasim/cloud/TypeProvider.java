@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import saasim.cloud.utility.TypeProviderEntry;
 import saasim.sim.components.MachineDescriptor;
 import saasim.util.TimeUnit;
 

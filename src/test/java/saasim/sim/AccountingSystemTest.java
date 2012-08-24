@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import saasim.cloud.Provider;
 import saasim.cloud.User;
-import saasim.cloud.UtilityResult;
+import saasim.cloud.utility.UtilityResult;
 import saasim.config.Configuration;
 import saasim.sim.core.EventCheckpointer;
 import saasim.util.ValidConfigurationTest;

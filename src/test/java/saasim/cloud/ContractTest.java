@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import saasim.cloud.utility.UserEntry;
 import saasim.config.Configuration;
 import saasim.util.DataUnit;
 import saasim.util.TimeUnit;

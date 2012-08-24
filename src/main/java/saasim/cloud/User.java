@@ -2,6 +2,8 @@ package saasim.cloud;
 
 import java.io.Serializable;
 
+import saasim.cloud.utility.UserEntry;
+
 
 /**
  * Class representing a SaaS client. For a user that generates request using an application see

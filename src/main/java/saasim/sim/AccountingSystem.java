@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 import saasim.cloud.Provider;
 import saasim.cloud.User;
-import saasim.cloud.UtilityResult;
-import saasim.cloud.UtilityResultEntry;
+import saasim.cloud.utility.UtilityResult;
+import saasim.cloud.utility.UtilityResultEntry;
 
 
 /**

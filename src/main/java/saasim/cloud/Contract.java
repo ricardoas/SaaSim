@@ -3,6 +3,7 @@ package saasim.cloud;
 import java.io.Serializable;
 import java.util.Arrays;
 
+import saasim.cloud.utility.UserEntry;
 import saasim.util.CostCalculus;
 
 

@@ -1,6 +1,9 @@
-package saasim.cloud;
+package saasim.cloud.utility;
 
 import java.io.Serializable;
+
+import saasim.cloud.Provider;
+import saasim.cloud.User;
 
 /**
  * Abstraction to represent a calculated utility for the application. 

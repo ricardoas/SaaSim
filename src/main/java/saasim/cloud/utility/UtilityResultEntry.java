@@ -1,10 +1,12 @@
-package saasim.cloud;
+package saasim.cloud.utility;
 
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import saasim.cloud.Provider;
+import saasim.cloud.User;
 import saasim.config.Configuration;
 import saasim.sim.util.SaaSPlanProperties;
 

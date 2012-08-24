@@ -1,9 +1,13 @@
-package saasim.cloud;
+package saasim.cloud.utility;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import saasim.cloud.MachineType;
+import saasim.cloud.Provider;
+import saasim.cloud.User;
+import saasim.cloud.utility.UtilityResultEntry;
 import saasim.sim.components.MachineDescriptor;
 import saasim.util.CleanConfigurationTest;
 
