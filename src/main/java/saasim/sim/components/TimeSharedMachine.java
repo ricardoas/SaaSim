@@ -59,6 +59,8 @@ public class TimeSharedMachine extends AbstractEventHandler implements Machine{
 	private double a;
 
 	private double b;
+
+	private Object concurrencyCorrectionFactor;
 	
 	/**
 	 * Default constructor.
@@ -91,6 +93,7 @@ public class TimeSharedMachine extends AbstractEventHandler implements Machine{
 		}
 		this.enableCorrectionFactor = Configuration.getInstance().getBoolean(MACHINE_ENABLE_CORRECTION_FACTOR, false);
 		if(enableCorrectionFactor){
+			this.concurrencyCorrectionFactor = Configuration.getInstance().getBoolean(MACHINE_CORRECTION_FACTOR_CONCURRENCY, false);
 			this.correctionFactorIddleness = Configuration.getInstance().getLong(MACHINE_CORRECTION_FACTOR_IDLENESS, 0);
 			this.correctionFactorValue = Configuration.getInstance().getDouble(MACHINE_CORRECTION_FACTOR_VALUE, 1);
 			this.a = Configuration.getInstance().getDouble(MACHINE_CORRECTION_FACTOR_A, 1);
@@ -145,6 +148,7 @@ public class TimeSharedMachine extends AbstractEventHandler implements Machine{
 	public void sendRequest(Request request) {
 		if(canRun()){
 			if(this.enableCorrectionFactor && this.processorQueue.isEmpty() && this.semaphore.availablePermits() == this.NUMBER_OF_CORES){
+				
 				if(now() - lastUpdate> correctionFactorIddleness){
 					request.changeDemand(correctionFactorValue);
 				}else{

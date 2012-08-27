@@ -21,6 +21,7 @@ public class SimulatorProperties {
 	public static final String MACHINE_SESSION_TIMEOUT = "machine.session.timeout";
 	public static final String MACHINE_QUANTUM = "machine.psquantum";
 	public static final String MACHINE_ENABLE_CORRECTION_FACTOR = "machine.cf";
+	public static final String MACHINE_CORRECTION_FACTOR_CONCURRENCY = "machine.cf.concurrency";
 	public static final String MACHINE_CORRECTION_FACTOR_IDLENESS = "machine.cf.idleness";
 	public static final String MACHINE_CORRECTION_FACTOR_VALUE = "machine.cf.value";
 	public static final String MACHINE_CORRECTION_FACTOR_A = "machine.cf.a";
