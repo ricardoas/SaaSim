@@ -13,6 +13,7 @@ public class AccessLogParser {
 		long arrival;
 		double demand = 0;
 		int simblings;
+		int concurrencyCounter;
 		
 		public Request(long arrival) {
 			this.arrival = arrival;
@@ -64,6 +65,9 @@ public class AccessLogParser {
 		int tomcatThread=0;
 		int monitor = 1;
 		
+		int concurrencyCounter = 0;
+		long prevArrival = -1000;
+		
 		for (Event event : events) {
 			if(event.start){
 				
@@ -74,6 +78,16 @@ public class AccessLogParser {
 					request.demand += d;
 				}
 				event.r.simblings = requests.size();
+				if(requests.size() == 0){
+					if(event.r.arrival - prevArrival < 40){
+						concurrencyCounter++;
+					}else{
+						concurrencyCounter = 0;
+					}
+				}else{
+					concurrencyCounter++;
+				}
+				event.r.concurrencyCounter = concurrencyCounter;
 				requests.add(event.r);
 			}else{
 				double d = (1.0 * event.time - previousTime)/(requests.size()*monitor+tomcatThread);
@@ -83,11 +97,12 @@ public class AccessLogParser {
 					request.demand += d;
 					if(request.equals(event.r)){
 						it.remove();
-						System.out.println("1 1 " + (request.arrival) + " 1 1 " + (long)Math.round(request.demand) + " " + request.simblings);
+						System.out.println("1 1 " + (request.arrival) + " 1 1 " + (long)Math.round(request.demand) + " " + request.simblings + " " + request.concurrencyCounter);
 					}
 				}
 			}
 			previousTime = event.time;
+			prevArrival = previousTime;
 		}
 	}
 
