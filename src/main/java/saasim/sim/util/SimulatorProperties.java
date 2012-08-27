@@ -22,6 +22,7 @@ public class SimulatorProperties {
 	public static final String MACHINE_QUANTUM = "machine.psquantum";
 	public static final String MACHINE_ENABLE_CORRECTION_FACTOR = "machine.cf";
 	public static final String MACHINE_CORRECTION_FACTOR_CONCURRENCY = "machine.cf.concurrency";
+	public static final String MACHINE_CORRECTION_FACTOR_CONCURRENCY_VALUES = "machine.cf.concurrency.values";
 	public static final String MACHINE_CORRECTION_FACTOR_IDLENESS = "machine.cf.idleness";
 	public static final String MACHINE_CORRECTION_FACTOR_VALUE = "machine.cf.value";
 	public static final String MACHINE_CORRECTION_FACTOR_A = "machine.cf.a";

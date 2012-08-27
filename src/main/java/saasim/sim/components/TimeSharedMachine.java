@@ -60,7 +60,9 @@ public class TimeSharedMachine extends AbstractEventHandler implements Machine{
 
 	private double b;
 
-	private Object concurrencyCorrectionFactor;
+	private boolean concurrencyCorrectionFactor;
+
+	private CorrectionFactor correctionFactor;
 	
 	/**
 	 * Default constructor.
@@ -94,10 +96,14 @@ public class TimeSharedMachine extends AbstractEventHandler implements Machine{
 		this.enableCorrectionFactor = Configuration.getInstance().getBoolean(MACHINE_ENABLE_CORRECTION_FACTOR, false);
 		if(enableCorrectionFactor){
 			this.concurrencyCorrectionFactor = Configuration.getInstance().getBoolean(MACHINE_CORRECTION_FACTOR_CONCURRENCY, false);
-			this.correctionFactorIddleness = Configuration.getInstance().getLong(MACHINE_CORRECTION_FACTOR_IDLENESS, 0);
-			this.correctionFactorValue = Configuration.getInstance().getDouble(MACHINE_CORRECTION_FACTOR_VALUE, 1);
-			this.a = Configuration.getInstance().getDouble(MACHINE_CORRECTION_FACTOR_A, 1);
-			this.b = Configuration.getInstance().getDouble(MACHINE_CORRECTION_FACTOR_B, 0);
+			if(concurrencyCorrectionFactor){
+				this.correctionFactor = new ConcurrencyCorrectionFactor(Configuration.getInstance().getDoubleArray(MACHINE_CORRECTION_FACTOR_CONCURRENCY_VALUES));
+			}else{
+				this.correctionFactorIddleness = Configuration.getInstance().getLong(MACHINE_CORRECTION_FACTOR_IDLENESS, 0);
+				this.correctionFactorValue = Configuration.getInstance().getDouble(MACHINE_CORRECTION_FACTOR_VALUE, 1);
+				this.a = Configuration.getInstance().getDouble(MACHINE_CORRECTION_FACTOR_A, 1);
+				this.b = Configuration.getInstance().getDouble(MACHINE_CORRECTION_FACTOR_B, 0);
+			}
 		}
 	}
 	
@@ -147,12 +153,16 @@ public class TimeSharedMachine extends AbstractEventHandler implements Machine{
 	@Override
 	public void sendRequest(Request request) {
 		if(canRun()){
-			if(this.enableCorrectionFactor && this.processorQueue.isEmpty() && this.semaphore.availablePermits() == this.NUMBER_OF_CORES){
+			if(this.enableCorrectionFactor){
 				
-				if(now() - lastUpdate> correctionFactorIddleness){
-					request.changeDemand(correctionFactorValue);
-				}else{
-					request.changeDemand(Math.max(1, a+b* (now()-lastUpdate)));
+				request.changeDemand(correctionFactor.getFactor(this.NUMBER_OF_CORES - this.semaphore.availablePermits()));
+				
+				if ( this.processorQueue.isEmpty() && this.semaphore.availablePermits() == this.NUMBER_OF_CORES){
+					if(now() - lastUpdate> correctionFactorIddleness){
+						request.changeDemand(correctionFactorValue);
+					}else{
+						request.changeDemand(Math.max(1, a+b* (now()-lastUpdate)));
+					}
 				}
 			}
 			this.processorQueue.add(request);
