@@ -1,11 +1,9 @@
-package saasim.sim;
+package saasim.cloud.utility;
 
 import java.io.Serializable;
 
 import saasim.cloud.Provider;
 import saasim.cloud.User;
-import saasim.cloud.utility.UtilityResult;
-import saasim.cloud.utility.UtilityResultEntry;
 
 
 /**

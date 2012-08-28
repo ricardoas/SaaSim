@@ -14,9 +14,9 @@ import org.junit.Test;
 
 import saasim.cloud.Provider;
 import saasim.cloud.User;
+import saasim.cloud.utility.AccountingSystem;
 import saasim.config.Configuration;
 import saasim.planning.util.MachineUsageData;
-import saasim.sim.AccountingSystem;
 import saasim.sim.Simulator;
 import saasim.sim.core.EventCheckpointer;
 import saasim.sim.core.EventScheduler;

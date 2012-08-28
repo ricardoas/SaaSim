@@ -25,6 +25,8 @@ public class ConcurrencyCorrectionFactor implements CorrectionFactor {
 			}
 		}
 		
+		previousArrival = arrival;
+		
 		if(memory >= values.length){
 			return values[values.length-1];
 		}

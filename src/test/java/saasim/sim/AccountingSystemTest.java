@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import saasim.cloud.Provider;
 import saasim.cloud.User;
+import saasim.cloud.utility.AccountingSystem;
 import saasim.cloud.utility.UtilityResult;
 import saasim.config.Configuration;
 import saasim.sim.core.EventCheckpointer;
@@ -35,7 +36,7 @@ public class AccountingSystemTest extends ValidConfigurationTest {
 	}
 
 	/**
-	 * Test method for {@link saasim.sim.AccountingSystem#accountPartialUtility(long, User[], Provider[])}.
+	 * Test method for {@link saasim.cloud.utility.AccountingSystem#accountPartialUtility(long, User[], Provider[])}.
 	 */
 	@Test(expected=AssertionError.class)
 	public void testAccountPartialUtility() {
@@ -44,7 +45,7 @@ public class AccountingSystemTest extends ValidConfigurationTest {
 	}
 
 	/**
-	 * Test method for {@link saasim.sim.AccountingSystem#calculateUtility()}.
+	 * Test method for {@link saasim.cloud.utility.AccountingSystem#calculateUtility()}.
 	 * Utility cost based on reservation plan.
 	 */
 	@Test
