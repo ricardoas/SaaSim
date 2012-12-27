@@ -1,0 +1,11 @@
+saas.number=2
+
+saas.user.id=client1
+saas.user.plan=diamond
+saas.user.storage=5120000
+saas.user.workload=src/test/resources/workload/user1_workload.trc
+
+saas.user.id=client2
+saas.user.plan=diamond
+saas.user.storage=10240000
+saas.user.workload=src/test/resources/workload/user2_workload.trc

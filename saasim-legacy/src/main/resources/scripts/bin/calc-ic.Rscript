@@ -1,0 +1,17 @@
+#!/usr/bin/Rscript
+
+args <- commandArgs(TRUE)
+
+input_file=args[1]
+conf_level=as.numeric(args[2])
+
+data <- read.table(input_file)$V1
+
+conf_level=0.5+(conf_level/2)
+med=mean(data)
+z=qnorm(conf_level)
+n=z*(sd(data)/sqrt(length(data)))
+upper=med + n
+down=med - n   
+
+cat(med, upper, down, '\n')

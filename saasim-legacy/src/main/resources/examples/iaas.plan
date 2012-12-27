@@ -1,0 +1,11 @@
+# Reserved instances
+ 
+# provider 1 
+#iaas.plan.name=amazon
+#iaas.plan.types=m1_small|m1_large
+#iaas.plan.reservation=19|7
+
+# provider 2 
+#iaas.plan.name=
+#iaas.plan.types=
+#iaas.plan.reservation=

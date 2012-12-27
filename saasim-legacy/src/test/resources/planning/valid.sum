@@ -1,0 +1,5 @@
+arrival.rate=10.0, 20.0, 30.0
+cpu.demand=2000, 1500, 4000
+service.demand=500, 500, 600
+user.think=5, 5, 5
+users.number=10, 20, 30

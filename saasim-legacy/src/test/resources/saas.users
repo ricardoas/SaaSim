@@ -1,0 +1,6 @@
+saas.number=1
+
+saas.user.id=client1
+saas.user.plan=diamond
+saas.user.storage=5120000
+saas.user.workload=src/test/resources/power.trc
