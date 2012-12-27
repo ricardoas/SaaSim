@@ -1,0 +1,46 @@
+iaas.number=3
+
+#Provider 1
+iaas.provider.name=rackspace
+iaas.provider.ondemand_cpu_cost=0.085|0.12
+iaas.provider.ondemandLimit=20
+iaas.provider.reserved_cpu_cost=0.03|0.13
+iaas.provider.reservationLimit=100
+iaas.provider.oneYearFee=1000|1500
+iaas.provider.threeYearsFee=2500|3500
+iaas.provider.types=m1.small|m1.large
+iaas.provider.monit=0.15
+iaas.provider.transIn=100
+iaas.provider.costsTransIn=0.10|0.09
+iaas.provider.transOut=200
+iaas.provider.costsTransOut=0.10|0.09
+
+#Provider 2 (true values)
+iaas.provider.name=amazon
+iaas.provider.types=m1.small|m1.large|m1.xlarge
+iaas.provider.ondemand_cpu_cost=0.085|0.34|0.68
+iaas.provider.ondemandLimit=20
+iaas.provider.reserved_cpu_cost=0.03|0.12|0.24
+iaas.provider.reservationLimit=100
+iaas.provider.oneYearFee=227.5|910|1820
+iaas.provider.threeYearsFee=350|1400|2800
+iaas.provider.monit=0.15
+iaas.provider.transIn=0
+iaas.provider.costsTransIn=0|0
+iaas.provider.transOut=1|10240|51200|153600
+iaas.provider.costsTransOut=0|0.12|0.09|0.07|0.05
+
+#Provider 3
+iaas.provider.name=gogrid
+iaas.provider.ondemand_cpu_cost=0.085|0.12
+iaas.provider.ondemandLimit=5
+iaas.provider.reserved_cpu_cost=0.03|0.13
+iaas.provider.reservationLimit=10
+iaas.provider.oneYearFee=1000|1500
+iaas.provider.threeYearsFee=2500|3500
+iaas.provider.monit=0.1
+iaas.provider.transIn=10
+iaas.provider.costsTransIn=0.1|0.0
+iaas.provider.transOut=20
+iaas.provider.costsTransOut=0.1|0.0
+iaas.provider.types=c1.medium|m1.large

@@ -1,0 +1,5 @@
+saas.number=1
+
+saas.user.plan=diamond
+saas.user.storage=1024
+saas.user.workload=workload.trc

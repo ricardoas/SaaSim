@@ -1,0 +1,53 @@
+#!/usr/bin/Rscript
+
+args <- commandArgs(TRUE)
+
+filename=args[1]
+
+clientID = as.numeric(strsplit(filename, split='\\.|_')[[1]][2])
+
+size <- as.integer(c(100*1:9,1000*1:9,10000*1:9,100000*1:9))
+
+p1=.405
+p2=.187/(1-.405)
+p3=.174/(1-.405-.187)
+p4=.102/(1-.405-.187-.174)
+p5=.0808/(1-.405-.187-.174-.102)
+p6=(1-.405-.187-.174-.102-.0808)
+
+cpu <- function(){
+	if(!rbinom(1,1,p1)){
+		if(!rbinom(1,1,p2)){
+			if(!rbinom(1,1,p3)){
+				if(!rbinom(1,1,p4)){
+					if(!rbinom(1,1,p5)){
+						30
+					}else{ 170 }	
+				}else{ 50 }
+			}else{ 570 }
+		}else{ 10 }
+	}else{ 11 }
+}
+
+
+trace <- read.table(filename)
+
+modified = trace
+
+
+modified$V1 <- as.integer(clientID)
+modified$V2 <- as.integer(trace$V1)
+modified$V3 <- as.integer(round(trace$V2 * 1000))
+modified$V4 <- as.integer(trace$V3)
+modified$V5 <- size[as.numeric(substring(trace$V6, 15, 18))]
+tmp <- array(dim=length(modified$V6))
+for(i in 1:length(trace$V1)){tmp[i]=cpu()}
+modified$V6 <- as.integer(tmp)
+modified$V8 <- modified$V7 <- as.integer(round(tmp/2))
+# c1.*: modified$V10 <- modified$V9 <- as.integer(round(tmp/2.5))
+# m2.*: modified$V13 <- modified$V12 <- modified$V11 <- as.integer(round(tmp/3.25))
+# t1.*: modified$V14 <- as.integer(round(tmp/2))
+
+modified <- modified[modified$V3 < 86400000,]
+
+write.table(modified, file=filename, append=FALSE, row.names=FALSE, col.names=FALSE)

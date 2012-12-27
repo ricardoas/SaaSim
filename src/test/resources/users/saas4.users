@@ -1,0 +1,7 @@
+saas.number=2
+#saas.peak.period=2
+saas.user.plan=platinum
+saas.user.storage=5120000
+
+saas.normal=./norm
+saas.peak=./peak
