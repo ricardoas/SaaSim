@@ -12,7 +12,7 @@ import saasim.cloud.Provider;
 import saasim.cloud.User;
 import saasim.config.Configuration;
 import saasim.sim.components.MachineDescriptor;
-import saasim.sim.schedulingheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.Statistics;
 import saasim.sim.util.SimulatorProperties;
 import saasim.util.TimeUnit;
 
@@ -105,7 +105,7 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void sendStatistics(long now, MachineStatistics statistics, int tier) {
+	public void sendStatistics(long now, Statistics statistics, int tier) {
 		int numberOfServersToAdd = evaluateNumberOfServersForNextInterval(statistics);
 		
 		Logger.getLogger(getClass()).debug(String.format("STAT-RANJAN %d %d %d %s", now, tier, numberOfServersToAdd, statistics));
@@ -137,10 +137,10 @@ public class RanjanProvisioningSystem extends DynamicProvisioningSystem {
 	/**
 	 * Decides how many machines are needed to buy (release) according to collected statistics.
 	 * 
-	 * @param statistics {@link MachineStatistics}
+	 * @param statistics {@link Statistics}
 	 * @return The number of machines to buy, if positive, or to release, otherwise. 
 	 */
-	protected int evaluateNumberOfServersForNextInterval(MachineStatistics statistics) {
+	protected int evaluateNumberOfServersForNextInterval(Statistics statistics) {
 		assert statistics.totalNumberOfActiveServers != 0;
 		assert statistics.requestCompletions != 0;
 		

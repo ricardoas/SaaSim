@@ -7,7 +7,7 @@ import java.util.List;
 import saasim.cloud.MachineType;
 import saasim.cloud.Provider;
 import saasim.cloud.User;
-import saasim.sim.schedulingheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.Statistics;
 
 
 /**
@@ -36,7 +36,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 	}
 	
 	@Override
-	public void sendStatistics(long now, MachineStatistics statistics, int tier) {
+	public void sendStatistics(long now, Statistics statistics, int tier) {
 		long numberOfServersToAdd = evaluateNumberOfServersForNextInterval(statistics);
 		
 		if(numberOfServersToAdd > 0){
@@ -48,7 +48,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachines extends DynamicPro
 		}
 	}
 
-	public long evaluateNumberOfServersForNextInterval(MachineStatistics statistics) {
+	public long evaluateNumberOfServersForNextInterval(Statistics statistics) {
 		double averageUtilisation = statistics.averageUtilisation;
 		double d;
 		if(statistics.requestCompletions == 0){

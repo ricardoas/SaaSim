@@ -13,7 +13,7 @@ import saasim.cloud.Request;
 import saasim.cloud.User;
 import saasim.config.Configuration;
 import saasim.sim.components.MachineDescriptor;
-import saasim.sim.schedulingheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.Statistics;
 import saasim.sim.util.SimulatorProperties;
 import saasim.util.TimeUnit;
 
@@ -101,7 +101,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void sendStatistics(long now, MachineStatistics statistics, int tier) {
+	public void sendStatistics(long now, Statistics statistics, int tier) {
 
 		boolean predictiveRound = now % predictiveTickInMillis == 0;
 		
@@ -198,7 +198,7 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 		list.add(availableToTurnOff);
 	}
 
-	protected int removeMachine(MachineStatistics statistics, int tier,
+	protected int removeMachine(Statistics statistics, int tier,
 			LinkedList<MachineDescriptor> availableToTurnOff, int serversToAdd) {
 		return 0;
 	}
@@ -227,9 +227,9 @@ public class UrgaonkarProvisioningSystem extends DynamicProvisioningSystem {
 	
 	/**
 	 * Calculate peak arrival rate a single server can handle.
-	 * @param statistics {@link MachineStatistics}
+	 * @param statistics {@link Statistics}
 	 */
-	private double getPeakArrivalRatePerServer(MachineStatistics statistics) {
+	private double getPeakArrivalRatePerServer(Statistics statistics) {
 		
 		return 1.0/(statistics.averageST + (statistics.calcVarST() + statistics.calcVarIAT())/(2 * (1.0*responseTime - statistics.averageST)));
 	}

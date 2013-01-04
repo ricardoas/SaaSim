@@ -24,7 +24,7 @@ import saasim.sim.DynamicConfigurable;
 import saasim.sim.SimpleMultiTierApplication;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.core.EventScheduler;
-import saasim.sim.schedulingheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.Statistics;
 import saasim.sim.util.SaaSAppProperties;
 import saasim.sim.util.SaaSUsersProperties;
 import saasim.util.ValidConfigurationTest;
@@ -56,7 +56,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		long totalRequestsArrivals = 10;
 		long totalRequestsCompletions = 10;
 		int totalNumberOfServers = 1;
-		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
+		Statistics statistics = new Statistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		assertEquals(1, this.dps.evaluateNumberOfServersForNextInterval(statistics));
 	}
@@ -73,7 +73,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		long totalRequestsArrivals = 55;
 		long totalRequestsCompletions = 15;
 		int totalNumberOfServers = 3;
-		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
+		Statistics statistics = new Statistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		assertEquals(47, this.dps.evaluateNumberOfServersForNextInterval(statistics));
 	}
@@ -90,7 +90,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		long totalRequestsArrivals = 333;
 		long totalRequestsCompletions = 279;
 		int totalNumberOfServers = 20;
-		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
+		Statistics statistics = new Statistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 
 		assertEquals(198, this.dps.evaluateNumberOfServersForNextInterval(statistics));
 	}
@@ -107,7 +107,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		long totalRequestsArrivals = 100;
 		long totalRequestsCompletions = 100;
 		int totalNumberOfServers = 20;
-		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
+		Statistics statistics = new Statistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 
 		assertEquals(-13, this.dps.evaluateNumberOfServersForNextInterval(statistics));
 	}
@@ -124,7 +124,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		long totalRequestsArrivals = 0;
 		long totalRequestsCompletions = 0;
 		int totalNumberOfServers = 20;
-		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
+		Statistics statistics = new Statistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 
 		this.dps.evaluateNumberOfServersForNextInterval(statistics);
 	}
@@ -141,7 +141,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		long totalRequestsArrivals = 100;
 		long totalRequestsCompletions = 0;
 		int totalNumberOfServers = 0;
-		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
+		Statistics statistics = new Statistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		assertEquals(1, this.dps.evaluateNumberOfServersForNextInterval(statistics));
 	}
@@ -162,7 +162,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		long totalRequestsArrivals = 100;
 		long totalRequestsCompletions = 0;
 		int totalNumberOfServers = 0;
-		MachineStatistics statistics = new MachineStatistics(totalUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
+		Statistics statistics = new Statistics(totalUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		SimpleMultiTierApplication configurable = EasyMock.createStrictMock(SimpleMultiTierApplication.class);
 		configurable.setWorkloadParser(EasyMock.isA(WorkloadParser.class));
@@ -214,7 +214,7 @@ public class RanjanProvisioningSystemTest extends ValidConfigurationTest {
 		long totalRequestsArrivals = 100;
 		long totalRequestsCompletions = 0;
 		int totalNumberOfServers = 0;
-		MachineStatistics statistics = new MachineStatistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
+		Statistics statistics = new Statistics(totalUtilization, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		EventScheduler scheduler = EasyMock.createStrictMock(EventScheduler.class);
 		EasyMock.replay(scheduler);

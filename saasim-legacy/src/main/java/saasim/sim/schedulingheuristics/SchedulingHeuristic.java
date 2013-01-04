@@ -50,9 +50,9 @@ public interface SchedulingHeuristic extends Serializable{
 	/**
 	 * Gets the statics about all machines in the application.
 	 * @param eventTime the time to compute utilisation of machines
-	 * @return A {@link MachineStatistics} encapsulating the statics of all machines.
+	 * @return A {@link Statistics} encapsulating the statics of all machines.
 	 */
-	MachineStatistics getStatistics(long eventTime);
+	Statistics getStatistics(long eventTime);
 
 	/**
 	 * Gets the {@link Machine}s  in the application.

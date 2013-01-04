@@ -21,7 +21,7 @@ import saasim.sim.core.Event;
 import saasim.sim.core.EventHandler;
 import saasim.sim.core.EventScheduler;
 import saasim.sim.core.EventType;
-import saasim.sim.schedulingheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.Statistics;
 import saasim.sim.schedulingheuristics.RoundRobinHeuristic;
 import saasim.util.TimeUnit;
 import saasim.util.ValidConfigurationTest;
@@ -284,7 +284,7 @@ public class SimpleSimulatorTest extends ValidConfigurationTest {
 		scheduler.queueEvent(EasyMock.capture(eventCollectStatistics));
 		EasyMock.expectLastCall().times(1);
 		
-		monitor.sendStatistics(1, new MachineStatistics(0, 0, 0, 0), 3);
+		monitor.sendStatistics(1, new Statistics(0, 0, 0, 0), 3);
 		EasyMock.expectLastCall().times(1);
 		
 		EasyMock.replay(monitor, scheduler, handler, workloadParser, timeSharedMachine);

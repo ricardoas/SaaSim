@@ -5,7 +5,7 @@ import java.io.Serializable;
 import saasim.cloud.Request;
 import saasim.sim.components.Machine;
 import saasim.sim.components.MachineDescriptor;
-import saasim.sim.schedulingheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.Statistics;
 
 /**
  * Application monitor. Interface for reporting information.
@@ -29,12 +29,12 @@ public interface Monitor extends Serializable{
 	void requestQueued(long timeMilliSeconds, Request request, int tier);
 
 	/**
-	 * Send the calculated statistics coming from {@link MachineStatistics}.
+	 * Send the calculated statistics coming from {@link Statistics}.
 	 * @param timeMilliSeconds the time when send statistics
-	 * @param statistics {@link MachineStatistics} encapsulating the statitiscs
+	 * @param statistics {@link Statistics} encapsulating the statitiscs
 	 * @param tier the tier of machine
 	 */
-	void sendStatistics(long timeMilliSeconds, MachineStatistics statistics, int tier);
+	void sendStatistics(long timeMilliSeconds, Statistics statistics, int tier);
 
 	/**
 	 * Report when a specific {@link Machine} was shutdown.

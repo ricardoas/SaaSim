@@ -16,7 +16,7 @@ import saasim.cloud.utility.UtilityResultEntry;
 import saasim.config.Configuration;
 import saasim.sim.DynamicConfigurable;
 import saasim.sim.components.MachineDescriptor;
-import saasim.sim.schedulingheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.Statistics;
 import saasim.sim.util.SaaSAppProperties;
 
 
@@ -148,7 +148,7 @@ public class DynamicProvisioningSystem implements DPS{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void sendStatistics(long now, MachineStatistics statistics, int tier) {
+	public void sendStatistics(long now, Statistics statistics, int tier) {
 		Logger.getLogger(getClass()).debug(String.format("STAT-STATIC %d %d %s", now, tier, statistics));
 	}
 

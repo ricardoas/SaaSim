@@ -13,7 +13,7 @@ import saasim.cloud.User;
 import saasim.config.Configuration;
 import saasim.io.GEISTWorkloadParser;
 import saasim.io.WorkloadParser;
-import saasim.sim.schedulingheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.Statistics;
 import saasim.sim.util.SaaSAppProperties;
 import saasim.sim.util.SimulatorProperties;
 
@@ -72,7 +72,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachines extends DynamicPr
 	}
 	
 	@Override
-	public void sendStatistics(long now, MachineStatistics statistics, int tier) {
+	public void sendStatistics(long now, Statistics statistics, int tier) {
 		
 		if(this.nextRequestsCounter != null){
 			this.currentRequestsCounter = this.nextRequestsCounter;

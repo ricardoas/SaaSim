@@ -5,7 +5,7 @@ import java.util.Arrays;
 
 import org.apache.commons.math.stat.descriptive.rank.Percentile;
 
-import saasim.sim.schedulingheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.Statistics;
 
 
 public class UrgaonkarStatistics implements Serializable{
@@ -43,7 +43,7 @@ public class UrgaonkarStatistics implements Serializable{
 	 * Predictive tick statistics
 	 * @param statistics
 	 */
-	public void add(MachineStatistics statistics) {
+	public void add(Statistics statistics) {
 		
 		arrivalRate[index++ % arrivalRate.length] = statistics.getPeakArrivalRateInTier();
 		

@@ -23,7 +23,7 @@ import saasim.io.WorkloadParser;
 import saasim.sim.SimpleMultiTierApplication;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.core.EventCheckpointer;
-import saasim.sim.schedulingheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.Statistics;
 import saasim.sim.util.SaaSAppProperties;
 import saasim.sim.util.SimulatorProperties;
 import saasim.util.SimulationInfo;
@@ -108,7 +108,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 		
 		PowerMock.expectNew(GEISTWorkloadParser.class, PropertiesTesting.WORKLOAD).andReturn(parser);
 		
-		MachineStatistics statistics = EasyMock.createMock(MachineStatistics.class);
+		Statistics statistics = EasyMock.createMock(Statistics.class);
 		
 		PowerMock.replayAll(config, provider, user, accounting, parser, statistics);
 		
@@ -157,7 +157,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
-		MachineStatistics statistics = new MachineStatistics(0.5, 100, 100, 0);
+		Statistics statistics = new Statistics(0.5, 100, 100, 0);
 		OptimalProvisioningSystemForHeterogeneousMachines op = new OptimalProvisioningSystemForHeterogeneousMachines(null, null);
 		op.configurable = configurable;
 		op.sendStatistics(0, statistics, 0);
@@ -207,7 +207,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
-		MachineStatistics statistics = new MachineStatistics(0.5, 100, 100, 0);
+		Statistics statistics = new Statistics(0.5, 100, 100, 0);
 		OptimalProvisioningSystemForHeterogeneousMachines op = new OptimalProvisioningSystemForHeterogeneousMachines(null, null);
 		op.configurable = configurable;
 		op.sendStatistics(0, statistics, 0);
@@ -255,7 +255,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
-		MachineStatistics statistics = new MachineStatistics(0.5, 100, 100, 0);
+		Statistics statistics = new Statistics(0.5, 100, 100, 0);
 		OptimalProvisioningSystemForHeterogeneousMachines op = new OptimalProvisioningSystemForHeterogeneousMachines(null, null);
 		op.configurable = configurable;
 		op.sendStatistics(0, statistics, 0);
@@ -305,7 +305,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
-		MachineStatistics statistics = new MachineStatistics(0.5, 100, 100, 0);
+		Statistics statistics = new Statistics(0.5, 100, 100, 0);
 		OptimalProvisioningSystemForHeterogeneousMachines op = new OptimalProvisioningSystemForHeterogeneousMachines(null, null);
 		op.configurable = configurable;
 		op.sendStatistics(0, statistics, 0);
@@ -353,7 +353,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
-		MachineStatistics statistics = new MachineStatistics(0.5, 100, 100, 0);
+		Statistics statistics = new Statistics(0.5, 100, 100, 0);
 		OptimalProvisioningSystemForHeterogeneousMachines op = new OptimalProvisioningSystemForHeterogeneousMachines(null, null);
 		op.configurable = configurable;
 		op.sendStatistics(0, statistics, 0);
@@ -404,7 +404,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
-		MachineStatistics statistics = new MachineStatistics(0.5, 100, 100, 0);
+		Statistics statistics = new Statistics(0.5, 100, 100, 0);
 		OptimalProvisioningSystemForHeterogeneousMachines op = new OptimalProvisioningSystemForHeterogeneousMachines(null, null);
 		op.configurable = configurable;
 		op.sendStatistics(0, statistics, 0);
@@ -455,7 +455,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
-		MachineStatistics statistics = new MachineStatistics(0.5, 100, 100, 0);
+		Statistics statistics = new Statistics(0.5, 100, 100, 0);
 		OptimalProvisioningSystemForHeterogeneousMachines op = new OptimalProvisioningSystemForHeterogeneousMachines(null, null);
 		op.configurable = configurable;
 		op.sendStatistics(0, statistics, 0);
@@ -508,7 +508,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
-		MachineStatistics statistics = new MachineStatistics(0.5, 100, 100, 0);
+		Statistics statistics = new Statistics(0.5, 100, 100, 0);
 		OptimalProvisioningSystemForHeterogeneousMachines op = new OptimalProvisioningSystemForHeterogeneousMachines(null, null);
 		op.configurable = configurable;
 		op.sendStatistics(0, statistics, 0);
@@ -561,7 +561,7 @@ public class OptimalProvisioningSystemForHeterogeneousMachinesTest {
 
 		PowerMock.replayAll(config, provider, user, accounting, machineDescriptor, configurable);
 		
-		MachineStatistics statistics = new MachineStatistics(0.5, 100, 100, 0);
+		Statistics statistics = new Statistics(0.5, 100, 100, 0);
 		OptimalProvisioningSystemForHeterogeneousMachines op = new OptimalProvisioningSystemForHeterogeneousMachines(null, null);
 		op.configurable = configurable;
 		op.sendStatistics(0, statistics, 0);

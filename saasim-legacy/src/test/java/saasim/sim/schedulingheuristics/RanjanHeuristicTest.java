@@ -31,7 +31,7 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testConstruction(){
-		MachineStatistics statistics = heuristic.getStatistics(0);
+		Statistics statistics = heuristic.getStatistics(0);
 		assertEquals(0, statistics.requestArrivals);
 		assertEquals(0, statistics.requestCompletions);
 	}
@@ -376,7 +376,7 @@ public class RanjanHeuristicTest extends ValidConfigurationTest {
 		EasyMock.verify(request);
 		
 		//Resetting counters
-		MachineStatistics statistics = heuristic.getStatistics(time);
+		Statistics statistics = heuristic.getStatistics(time);
 		assertEquals(0, statistics.requestArrivals);
 		assertEquals(0, statistics.requestCompletions);
 	}

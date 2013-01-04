@@ -51,7 +51,7 @@ public abstract class AbstractSchedulingHeuristic implements SchedulingHeuristic
 	
 	private final boolean enableSessionAffinity;
 	
-	public MachineStatistics tierStatistics;
+	public Statistics tierStatistics;
 
 	/**
 	 * Default constructor
@@ -69,7 +69,7 @@ public abstract class AbstractSchedulingHeuristic implements SchedulingHeuristic
 	protected void resetCounters() {
 		arrivalCounter = 0;
 		finishedCounter = 0;
-		tierStatistics = new MachineStatistics();
+		tierStatistics = new Statistics();
 	}
 
 	@Override
@@ -112,7 +112,7 @@ public abstract class AbstractSchedulingHeuristic implements SchedulingHeuristic
 	}
 	
 	@Override
-	public MachineStatistics getStatistics(long eventTime) {
+	public Statistics getStatistics(long eventTime) {
 		double averageUtilisation = 0d;
 		
 		for(Machine machine : machines){
@@ -130,7 +130,7 @@ public abstract class AbstractSchedulingHeuristic implements SchedulingHeuristic
 		tierStatistics.requestCompletions = finishedRequestsCounter;
 		tierStatistics.totalNumberOfActiveServers = machines.size();
 		
-		MachineStatistics stat = tierStatistics;
+		Statistics stat = tierStatistics;
 		stat.totalNumberOfActiveServers = getNumberOfMachines();
 
 		resetCounters();

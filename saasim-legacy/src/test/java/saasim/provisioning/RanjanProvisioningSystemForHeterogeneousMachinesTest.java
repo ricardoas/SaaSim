@@ -27,7 +27,7 @@ import saasim.sim.DynamicConfigurable;
 import saasim.sim.SimpleMultiTierApplication;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.core.EventCheckpointer;
-import saasim.sim.schedulingheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.Statistics;
 import saasim.sim.util.SaaSAppProperties;
 import saasim.util.ValidConfigurationTest;
 
@@ -62,7 +62,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		long totalRequestsArrivals = 10;
 		long totalRequestsCompletions = 10;
 		int totalNumberOfServers = 1;
-		MachineStatistics statistics = new MachineStatistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
+		Statistics statistics = new Statistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		assertEquals(1, this.dps.evaluateNumberOfServersForNextInterval(statistics));
 	}
@@ -79,7 +79,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		long totalRequestsArrivals = 55;
 		long totalRequestsCompletions = 15;
 		int totalNumberOfServers = 3;
-		MachineStatistics statistics = new MachineStatistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
+		Statistics statistics = new Statistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		assertEquals(14, this.dps.evaluateNumberOfServersForNextInterval(statistics));
 	}
@@ -96,7 +96,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		long totalRequestsArrivals = 333;
 		long totalRequestsCompletions = 279;
 		int totalNumberOfServers = 20;
-		MachineStatistics statistics = new MachineStatistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
+		Statistics statistics = new Statistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		assertEquals(-9, this.dps.evaluateNumberOfServersForNextInterval(statistics));
 	}
@@ -113,7 +113,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		long totalRequestsArrivals = 100;
 		long totalRequestsCompletions = 100;
 		int totalNumberOfServers = 20;
-		MachineStatistics statistics = new MachineStatistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
+		Statistics statistics = new Statistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		assertEquals(-19, this.dps.evaluateNumberOfServersForNextInterval(statistics));
 	}
@@ -128,7 +128,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		long totalRequestsArrivals = 0;
 		long totalRequestsCompletions = 0;
 		int totalNumberOfServers = 20;
-		MachineStatistics statistics = new MachineStatistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
+		Statistics statistics = new Statistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		assertEquals(-20, this.dps.evaluateNumberOfServersForNextInterval(statistics));
 	}
@@ -144,7 +144,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		long totalRequestsArrivals = 100;
 		long totalRequestsCompletions = 0;
 		int totalNumberOfServers = 0;
-		MachineStatistics statistics = new MachineStatistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
+		Statistics statistics = new Statistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		assertEquals(1, this.dps.evaluateNumberOfServersForNextInterval(statistics));
 	}
@@ -164,7 +164,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		long totalRequestsArrivals = 100;
 		long totalRequestsCompletions = 0;
 		int totalNumberOfServers = 0;
-		MachineStatistics statistics = new MachineStatistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
+		Statistics statistics = new Statistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		SimpleMultiTierApplication configurable = EasyMock.createMock(SimpleMultiTierApplication.class);
 		configurable.addMachine(0, new MachineDescriptor(0, true, MachineType.C1_MEDIUM, 0), true);
@@ -228,7 +228,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		long totalRequestsArrivals = 55;
 		long totalRequestsCompletions = 15;
 		int totalNumberOfServers = 3;
-		MachineStatistics statistics = new MachineStatistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
+		Statistics statistics = new Statistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		SimpleMultiTierApplication configurable = EasyMock.createMock(SimpleMultiTierApplication.class);
 
@@ -311,7 +311,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		long totalRequestsArrivals = 55;
 		long totalRequestsCompletions = 15;
 		int totalNumberOfServers = 3;
-		MachineStatistics statistics = new MachineStatistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
+		Statistics statistics = new Statistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		SimpleMultiTierApplication configurable = EasyMock.createMock(SimpleMultiTierApplication.class);
 
@@ -383,7 +383,7 @@ public class RanjanProvisioningSystemForHeterogeneousMachinesTest extends ValidC
 		long totalRequestsArrivals = 55;
 		long totalRequestsCompletions = 15;
 		int totalNumberOfServers = 3;
-		MachineStatistics statistics = new MachineStatistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
+		Statistics statistics = new Statistics(averageUtilisation, totalRequestsArrivals, totalRequestsCompletions, totalNumberOfServers);
 		
 		SimpleMultiTierApplication configurable = EasyMock.createMock(SimpleMultiTierApplication.class);
 

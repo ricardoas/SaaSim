@@ -7,7 +7,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import saasim.cloud.Provider;
 import saasim.cloud.User;
 import saasim.sim.components.MachineDescriptor;
-import saasim.sim.schedulingheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.Statistics;
 import saasim.util.TimeUnit;
 
 
@@ -41,7 +41,7 @@ public class EC2UrgaonkarProvisioningSystem extends UrgaonkarProvisioningSystem 
 		return machineList;
 	}
 	
-	protected int removeMachine(MachineStatistics statistics, int tier,
+	protected int removeMachine(Statistics statistics, int tier,
 			LinkedList<MachineDescriptor> availableToTurnOff, int serversToAdd) {
 		int normalizedServersToAdd;
 		normalizedServersToAdd = (int) Math.ceil(1.0*serversToAdd/type.getNumberOfCores());

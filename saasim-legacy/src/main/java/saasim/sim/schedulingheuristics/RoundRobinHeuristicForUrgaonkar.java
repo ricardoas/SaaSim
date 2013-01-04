@@ -31,16 +31,16 @@ public class RoundRobinHeuristicForUrgaonkar extends RoundRobinHeuristic {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public MachineStatistics getStatistics(long eventTime) {
+	public Statistics getStatistics(long eventTime) {
 		
-		MachineStatistics statistics = tierStatistics;
+		Statistics statistics = tierStatistics;
 		statistics.totalNumberOfActiveServers = getNumberOfMachines();
 		
 		if( eventTime % predictionTickInMillis == 0 ){
 			resetCounters();
-			tierStatistics = new MachineStatistics();
+			tierStatistics = new Statistics();
 		}else{
-			tierStatistics = new MachineStatistics(statistics);
+			tierStatistics = new Statistics(statistics);
 		}
 		
 		return statistics;

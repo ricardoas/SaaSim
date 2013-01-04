@@ -19,7 +19,7 @@ import saasim.provisioning.Monitor;
 import saasim.sim.core.Event;
 import saasim.sim.core.EventScheduler;
 import saasim.sim.core.EventType;
-import saasim.sim.schedulingheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.Statistics;
 import saasim.sim.schedulingheuristics.RoundRobinHeuristic;
 import saasim.sim.schedulingheuristics.SchedulingHeuristic;
 import saasim.util.ValidConfigurationTest;
@@ -161,7 +161,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		double utilisation2 = 0.5;
 		long totalArrivals = 100l;
 		long totalCompletions = 100l;
-		MachineStatistics machineStatistics = new MachineStatistics((utilisation1+utilisation2)/2, totalArrivals, totalCompletions, 2);
+		Statistics machineStatistics = new Statistics((utilisation1+utilisation2)/2, totalArrivals, totalCompletions, 2);
 		
 		//Mocking machines actions
 		MachineDescriptor descriptor = new MachineDescriptor(0, false, MachineType.M1_SMALL, 0);
@@ -207,7 +207,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 		EasyMock.replay(schedulingHeuristic);
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
-		monitor.sendStatistics(0, new MachineStatistics(0, totalArrivals, totalCompletions, 0), 0);
+		monitor.sendStatistics(0, new Statistics(0, totalArrivals, totalCompletions, 0), 0);
 		EasyMock.replay(monitor);
 		
 		LoadBalancer lb = new LoadBalancer(Configuration.getInstance().getScheduler(), null, schedulingHeuristic, Integer.MAX_VALUE, 0);
@@ -238,7 +238,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testEstimateServersWithoutServers(){
-		Capture<MachineStatistics> captured = new Capture<MachineStatistics>();
+		Capture<Statistics> captured = new Capture<Statistics>();
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		monitor.sendStatistics(EasyMock.anyLong(), EasyMock.capture(captured), EasyMock.anyInt());
@@ -262,7 +262,7 @@ public class LoadBalancerTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testEstimateServersWithServers() throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException{
-		Capture<MachineStatistics> captured = new Capture<MachineStatistics>();
+		Capture<Statistics> captured = new Capture<Statistics>();
 		
 		Monitor monitor = EasyMock.createStrictMock(Monitor.class);
 		monitor.sendStatistics(EasyMock.anyLong(), EasyMock.capture(captured), EasyMock.anyInt());

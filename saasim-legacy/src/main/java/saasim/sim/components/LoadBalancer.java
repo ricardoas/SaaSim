@@ -15,7 +15,7 @@ import saasim.sim.core.EventScheduler;
 import saasim.sim.core.EventType;
 import saasim.sim.core.HandlingPoint;
 import saasim.sim.schedulingheuristics.AbstractSchedulingHeuristic;
-import saasim.sim.schedulingheuristics.MachineStatistics;
+import saasim.sim.schedulingheuristics.Statistics;
 import saasim.sim.schedulingheuristics.SchedulingHeuristic;
 import saasim.sim.util.SaaSAppProperties;
 import saasim.util.TimeUnit;
@@ -144,7 +144,7 @@ public class LoadBalancer extends AbstractEventHandler{
 	 * @param eventTime the time of event
 	 */
 	public void estimateServers(long eventTime) {
-		MachineStatistics statistics = new MachineStatistics(0, 0, 0, heuristic.getNumberOfMachines());
+		Statistics statistics = new Statistics(0, 0, 0, heuristic.getNumberOfMachines());
 		monitor.sendStatistics(eventTime, statistics, tier);
 	}
 
@@ -157,7 +157,7 @@ public class LoadBalancer extends AbstractEventHandler{
 	 * @param peakArrivalRate Peak arrival rate during last session
 	 */
 	public void collectStatistics(long now, long timeInterval, int numberOfRequests, int peakArrivalRate) {
-		MachineStatistics statistics = heuristic.getStatistics(now);
+		Statistics statistics = heuristic.getStatistics(now);
 		statistics.requestArrivals += numberOfRequests;
 		statistics.observationPeriod = timeInterval / TimeUnit.SECOND.getMillis();
 		statistics.peakArrivalRate = peakArrivalRate;
