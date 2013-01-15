@@ -33,9 +33,9 @@ public interface Monitor extends Serializable{
 
 	/**
 	 * Report when a specific {@link Machine} was shutdown.
-	 * @param machineDescriptor {@link MachineDescriptor} turned off.
+	 * @param machineDescriptor {@link InstanceDescriptor} turned off.
 	 */
-	void machineTurnedOff(MachineDescriptor machineDescriptor);
+	void machineTurnedOff(InstanceDescriptor machineDescriptor);
 
 	/**
 	 * Report the calculated utility to users.

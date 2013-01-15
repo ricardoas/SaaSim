@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
@@ -39,7 +40,7 @@ public final class EventCheckpointer {
 	/**
 	 * It renames the checkpoint file.
 	 */
-	public static void rename(){
+	private static void rename(){
 		new File(CHECKPOINT_FILE).renameTo(new File(CHECKPOINT_FILE + "." + new Date().toString().replaceAll(" ", "_") ));
 	}
 
@@ -47,12 +48,12 @@ public final class EventCheckpointer {
 	 * @return Load all saved objects. All possible exceptions were encapsulated in an {@link RuntimeException}.
 	 * This is a horrible programming practice, we know. But we'd like a fast working solution. 
 	 */
-	public static Object[] load(){
+	public static Serializable[] load(){
 		Logger.getLogger(EventCheckpointer.class).debug("CHKP LOAD-in");
 		ObjectInputStream objectInputStream = null;
 		try {
 			objectInputStream = new ObjectInputStream(new FileInputStream(CHECKPOINT_FILE));
-			Object[] objects = (Object[]) objectInputStream.readObject();
+			Serializable[] objects = (Serializable[]) objectInputStream.readObject();
 			objectInputStream.close();
 			rename();
 			Logger.getLogger(EventCheckpointer.class).debug("CHKP LOAD-out");
@@ -66,7 +67,7 @@ public final class EventCheckpointer {
 	 * @param objects Save all objects. All possible exceptions were encapsulated in an {@link RuntimeException}.
 	 * This is a horrible programming practice, we know. But we'd like a fast working solution. 
 	 */
-	public static void save(Object... objects){
+	public static void save(Serializable... objects){
 		ObjectOutputStream out;
 		try {
 			Logger.getLogger(EventCheckpointer.class).debug("CHKP SAVE-in");

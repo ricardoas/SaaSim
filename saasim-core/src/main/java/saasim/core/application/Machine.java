@@ -22,10 +22,10 @@ public interface Machine extends EventHandler{
 	Queue<Request> getProcessorQueue();
 
 	/**
-	 * @return The descriptor of this machine. Refer to {@link MachineDescriptor} to 
+	 * @return The descriptor of this machine. Refer to {@link InstanceDescriptor} to 
 	 * detailed information.
 	 */
-	MachineDescriptor getDescriptor();
+	InstanceDescriptor getDescriptor();
 
 	/**
 	 * Send a new {@link Request} to be processed by this machine.

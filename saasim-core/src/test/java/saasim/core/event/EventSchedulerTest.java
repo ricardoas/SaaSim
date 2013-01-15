@@ -136,7 +136,7 @@ public class EventSchedulerTest extends CleanConfigurationTest{
 	
 	@Test(expected=AssertionError.class)
 	public void testCleanAndRegisterHandlerClassesWithNullParam(){
-		Class<?> handlerClazz = null;
+		Class<? extends EventHandler> handlerClazz = null;
 		scheduler.clearAndRegisterHandlerClasses(handlerClazz);
 	}
 	

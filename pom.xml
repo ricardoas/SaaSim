@@ -14,5 +14,6 @@
 	<modules>
 		<module>saasim-legacy</module>
 		<module>saasim-core</module>
+		<module>saasim-ext</module>
 	</modules>
 </project>

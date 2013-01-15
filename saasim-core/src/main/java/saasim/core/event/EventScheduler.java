@@ -150,7 +150,7 @@ public final class EventScheduler implements Serializable{
 	 * @param handlerClasses Handler classes
 	 * @return This scheduler
 	 */
-	public EventScheduler clearAndRegisterHandlerClasses(Class<?>... handlerClasses) {
+	public EventScheduler clearAndRegisterHandlerClasses(Class<? extends EventHandler>... handlerClasses) {
 		
 		assert handlerClasses != null : "Can't register null annotation. Check your code!";
 		assert handlerClasses.length != 0 : "You must register at least one event annotation. Check your code!";
@@ -158,7 +158,7 @@ public final class EventScheduler implements Serializable{
 
 		handlingMethods = new HashMap<Class<?>, Map<Class<? extends Annotation>,Method>>();
 		
-		for (Class<?> clazz : handlerClasses) {
+		for (Class<? extends EventHandler> clazz : handlerClasses) {
 			Map<Class<? extends Annotation>, Method> map = extractHandlers(clazz, new HashMap<Class<? extends Annotation>, Method>());
 			
 			assert !map.isEmpty() : "Class " + clazz + " has no methods signed with any of the event types you've registered.";
@@ -169,7 +169,7 @@ public final class EventScheduler implements Serializable{
 		return this;
 	}
 	
-	private Map<Class<? extends Annotation>, Method> extractHandlers(Class<?> clazz, HashMap<Class<? extends Annotation>, Method> hashMap) {
+	private Map<Class<? extends Annotation>, Method> extractHandlers(Class<? extends EventHandler> clazz, HashMap<Class<? extends Annotation>, Method> hashMap) {
 		
 		for (Class<? extends Annotation> eventType : eventTypes) {
 			Set<Method> methods = ReflectionUtils.getAllMethods(clazz, ReflectionUtils.withAnnotation(eventType));

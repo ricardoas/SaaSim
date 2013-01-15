@@ -15,7 +15,8 @@ public enum TimeUnit {
 	TWO_HOURS(2 * 60 * MINUTE.getMillis()),
 	DAY(24 * HOUR.getMillis()),
 	MONTH(30 * DAY.getMillis()),
-	YEAR(365 * DAY.getMillis());
+	YEAR(365 * DAY.getMillis()),
+	THREE_YEARS(3 * YEAR.getMillis());
 	
 	private final long timeInMillis;
 	

@@ -1,6 +1,5 @@
 package saasim.core.sim;
 
-import saasim.core.application.DynamicallyConfigurable;
 import saasim.core.event.EventHandler;
 
 /**
@@ -23,9 +22,4 @@ public interface Simulator extends EventHandler{
 	 */
 	void start();
 
-	/**
-	 * 
-	 * @return All simulated applications.
-	 */
-	DynamicallyConfigurable [] getApplications();
 }

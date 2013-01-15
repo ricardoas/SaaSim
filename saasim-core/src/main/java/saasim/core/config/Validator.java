@@ -1,4 +1,4 @@
-package saasim.config;
+package saasim.core.config;
 
 import org.apache.commons.configuration.ConfigurationException;
 

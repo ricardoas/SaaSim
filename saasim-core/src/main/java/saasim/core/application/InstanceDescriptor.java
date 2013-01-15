@@ -1,5 +1,5 @@
 package saasim.core.application;
 
-public class MachineDescriptor {
+public class InstanceDescriptor {
 
 }

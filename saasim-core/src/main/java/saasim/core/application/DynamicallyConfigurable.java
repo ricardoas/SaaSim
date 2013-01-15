@@ -15,9 +15,9 @@ public interface DynamicallyConfigurable extends ServiceEntry{
 	/**
 	 * Add a new server to the infrastructure
 	 * @param tier The application tier which the new machine will serve.
-	 * @param machineDescriptor {@link MachineDescriptor} of the new server.
+	 * @param machineDescriptor {@link InstanceDescriptor} of the new server.
 	 */
-	void addMachine(int tier, MachineDescriptor machineDescriptor);
+	void addMachine(int tier, InstanceDescriptor machineDescriptor);
 	
 	/**
 	 * Set the {@link WorkloadParser}.
@@ -26,11 +26,11 @@ public interface DynamicallyConfigurable extends ServiceEntry{
 	void setWorkloadParser(WorkloadParser<List<Request>> parser);
 
 	/**
-	 * Removes the server represented by {@link MachineDescriptor} from specified tier. 
+	 * Removes the server represented by {@link InstanceDescriptor} from specified tier. 
 	 * @param force <code>true</code> to remove immediately, and <code>false</code> to stop scheduling and wait
 	 * until machine becomes idle to remove.
 	 */
-	void removeMachine(int tier, MachineDescriptor descriptor, boolean force);
+	void removeMachine(int tier, InstanceDescriptor descriptor, boolean force);
 
 	/**
 	 * Set the {@link Monitor} of application.
