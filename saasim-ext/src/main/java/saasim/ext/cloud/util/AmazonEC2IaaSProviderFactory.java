@@ -53,52 +53,52 @@ public class AmazonEC2IaaSProviderFactory extends IaaSProviderFactory {
 		
 		for(int i = 0; i < numberOfProviders; i++){
 			
-			List<TypeProvider> types = new ArrayList<TypeProvider>();
-			
-			int providerIndex = providersWithPlan.indexOf(names[i]);
-			List<InstanceType> typeList = null;
-			
-			if(providerIndex != -1){
-				typeList = Arrays.asList(machines[providerIndex]);
-			}
-			
-			if(machinesType[i].length != onDemandCpuCosts[i].length){
-				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TYPES + " and " + IAAS_PROVIDER_ONDEMAND_CPU_COST);
-			}
-		
-			if(machinesType[i].length != reservedCpuCosts[i].length){
-				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TYPES + " and " + IAAS_PROVIDER_RESERVED_CPU_COST);
-			}
-		
-			if(machinesType[i].length != reservationOneYearFees[i].length){
-				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TYPES + " and " + IAAS_PROVIDER_ONE_YEAR_FEE);
-			}
-		
-			if(machinesType[i].length != reservationThreeYearsFees[i].length){
-				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TYPES + " and " + IAAS_PROVIDER_THREE_YEARS_FEE);
-			}
-		
-			for (int j = 0; j < machinesType[i].length; j++) {
-				long reservation = 0;
-				if(typeList != null){
-					int index = typeList.indexOf(machinesType[i][j]);
-					reservation = (index == -1)? 0: reservations[providerIndex][index];
-				}
-				types.add(new TypeProvider(i, machinesType[i][j], onDemandCpuCosts[i][j], reservedCpuCosts[i][j], 
-						reservationOneYearFees[i][j], reservationThreeYearsFees[i][j], reservation));
-			}
-			
-			if(transferInLimits[i].length != transferInCosts[i].length - 1){
-				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TRANSFER_IN + " and " + IAAS_PROVIDER_COST_TRANSFER_IN);
-			}
-		
-			if(transferOutLimits[i].length != transferOutCosts[i].length - 1){
-				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TRANSFER_OUT + " and " + IAAS_PROVIDER_COST_TRANSFER_OUT);
-			}
-			
-			providers[i] = new AmazonEC2(i, names[i], onDemandLimits[i],
-							reservedLimits[i], monitoringCosts[i], transferInLimits[i], 
-							transferInCosts[i], transferOutLimits[i], transferOutCosts[i], types);
+//			List<TypeProvider> types = new ArrayList<TypeProvider>();
+//			
+//			int providerIndex = providersWithPlan.indexOf(names[i]);
+//			List<InstanceType> typeList = null;
+//			
+//			if(providerIndex != -1){
+//				typeList = Arrays.asList(machines[providerIndex]);
+//			}
+//			
+//			if(machinesType[i].length != onDemandCpuCosts[i].length){
+//				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TYPES + " and " + IAAS_PROVIDER_ONDEMAND_CPU_COST);
+//			}
+//		
+//			if(machinesType[i].length != reservedCpuCosts[i].length){
+//				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TYPES + " and " + IAAS_PROVIDER_RESERVED_CPU_COST);
+//			}
+//		
+//			if(machinesType[i].length != reservationOneYearFees[i].length){
+//				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TYPES + " and " + IAAS_PROVIDER_ONE_YEAR_FEE);
+//			}
+//		
+//			if(machinesType[i].length != reservationThreeYearsFees[i].length){
+//				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TYPES + " and " + IAAS_PROVIDER_THREE_YEARS_FEE);
+//			}
+//		
+//			for (int j = 0; j < machinesType[i].length; j++) {
+//				long reservation = 0;
+//				if(typeList != null){
+//					int index = typeList.indexOf(machinesType[i][j]);
+//					reservation = (index == -1)? 0: reservations[providerIndex][index];
+//				}
+//				types.add(new InstanceProvider(i, machinesType[i][j], onDemandCpuCosts[i][j], reservedCpuCosts[i][j], 
+//						reservationOneYearFees[i][j], reservationThreeYearsFees[i][j], reservation));
+//			}
+//			
+//			if(transferInLimits[i].length != transferInCosts[i].length - 1){
+//				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TRANSFER_IN + " and " + IAAS_PROVIDER_COST_TRANSFER_IN);
+//			}
+//		
+//			if(transferOutLimits[i].length != transferOutCosts[i].length - 1){
+//				throw new ConfigurationException("Check values of " + IAAS_PROVIDER_TRANSFER_OUT + " and " + IAAS_PROVIDER_COST_TRANSFER_OUT);
+//			}
+//			
+//			providers[i] = new AmazonEC2(i, names[i], onDemandLimits[i],
+//							reservedLimits[i], monitoringCosts[i], transferInLimits[i], 
+//							transferInCosts[i], transferOutLimits[i], transferOutCosts[i], types);
 		}
 		
 		return providers;
