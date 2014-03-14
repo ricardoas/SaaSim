@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
  */
 public final class EventCheckpointer {
 
-	public static final String CHECKPOINT_FILE = ".saasim.dat";
+	public static final String CHECKPOINT_FILE = ".saasim.ckp";
 	
 	/**
 	 * Check if there's a previous checkpoint available to read. Such operation consists in check if there

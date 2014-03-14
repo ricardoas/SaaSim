@@ -50,11 +50,10 @@ public class SimpleSimulator implements Simulator {
 	
 
 	/**
+	 * @param configuration 
 	 * 
 	 */
-	public SimpleSimulator() {
-		
-		config = Configuration.getInstance();
+	public SimpleSimulator(Configuration config) {
 		
 		if(EventCheckpointer.hasCheckpoint()){
 			Iterator<Serializable> iterator = Arrays.asList(EventCheckpointer.load()).iterator();

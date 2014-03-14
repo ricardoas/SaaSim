@@ -1,6 +1,7 @@
 import java.io.IOException;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.SystemConfiguration;
 
 import saasim.core.application.ApplicationFactory;
 import saasim.core.config.Configuration;
@@ -18,15 +19,11 @@ public class Main {
 	public static void main(String[] args) throws ConfigurationException {
 
 		if (args.length != 0) {
-			System.out.println("Usage: java <-Dsaasim.properties=path_to_file> -cp <path-to-jar-files> Main");
+			System.out.println("Usage: java -cp <path-to-jar-files> Main config.properties");
 			System.exit(1);
 		}
 
-		Configuration.buildInstance();
-
-		new SimpleSimulator().start();
-		
-		ApplicationFactory.getInstance().buildApplication();
+		new SimpleSimulator(new Configuration()).start();
 	}
 
 }
