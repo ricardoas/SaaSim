@@ -12,7 +12,6 @@ import org.junit.Test;
 
 import saasim.core.CleanConfigurationTest;
 import saasim.core.TestConfigurationBuilder;
-import saasim.core.config.Configuration;
 import saasim.core.util.FastSemaphore;
 
 @SuppressWarnings("unchecked")
@@ -103,7 +102,7 @@ public class EventSchedulerTest extends CleanConfigurationTest{
 	public void setUp() throws Exception {
 		super.setUp();
 		TestConfigurationBuilder.buildConfiguration01();
-		scheduler = Configuration.getInstance().getScheduler();
+		scheduler = new EventScheduler(0);
 	}
 	
 	@Override

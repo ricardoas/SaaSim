@@ -41,8 +41,8 @@ public final class EventScheduler implements Serializable{
     	this.random = new Random(seed);
     	this.now = 0;
 		this.eventSet = new TreeSet<Event>();
-		this.handlingMethods = new HashMap<Class<?>, Map<Class<? extends Annotation>,Method>>();
 		this.eventTypes = new ArrayList<Class<? extends Annotation>>();
+		this.handlingMethods = new HashMap<Class<?>, Map<Class<? extends Annotation>,Method>>();
     }
     
 	/**
@@ -169,10 +169,12 @@ public final class EventScheduler implements Serializable{
 		return this;
 	}
 	
-	private Map<Class<? extends Annotation>, Method> extractHandlers(Class<? extends EventHandler> clazz, HashMap<Class<? extends Annotation>, Method> hashMap) {
+	private Map<Class<? extends Annotation>, Method> extractHandlers(Class<? extends EventHandler> handlerClass) {
+		
+		HashMap<Class<? extends Annotation>, Method> hashMap = new HashMap<Class<? extends Annotation>, Method>();
 		
 		for (Class<? extends Annotation> eventType : eventTypes) {
-			Set<Method> methods = ReflectionUtils.getAllMethods(clazz, ReflectionUtils.withAnnotation(eventType));
+			Set<Method> methods = ReflectionUtils.getAllMethods(handlerClass, ReflectionUtils.withAnnotation(eventType));
 			
 			if(!methods.isEmpty()){
 				hashMap.put(eventType, methods.iterator().next());
@@ -194,5 +196,21 @@ public final class EventScheduler implements Serializable{
 		
 		eventTypes = new ArrayList<Class<? extends Annotation>>(Arrays.asList(eventType));
 		return this;
+	}
+
+	public void setup(String[] events, String[] handlers) {
+		
+		List<Class<? extends Annotation>> eventTypes = new ArrayList<Class<? extends Annotation>>();
+		
+		for (String event : events) {
+			eventTypes.add((Class<? extends Annotation>) Class.forName(event));
+		}
+		
+		List<Class<? extends EventHandler>> handlersClasses = new ArrayList<Class<? extends EventHandler>>();
+		for (String handler : handlers) {
+			Class<? extends EventHandler> handlerClass = (Class<? extends EventHandler>) Class.forName(handler);
+		}
+		
+		clearAndRegisterHandlerClasses(handlerClasses)
 	}
 }
