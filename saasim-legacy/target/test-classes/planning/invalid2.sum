@@ -1,0 +1,4 @@
+arrival.rate=10.0
+cpu.demand=1000
+service.demand=500
+users.number=10

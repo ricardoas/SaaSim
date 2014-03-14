@@ -1,0 +1,25 @@
+saas.plan.number=2
+
+#First plan
+saas.plan.name=p1
+saas.plan.priority=0
+saas.plan.price=100.00
+saas.plan.setup=5.55
+saas.plan.cpu_lim=10
+saas.plan.ex_cpu=1.00
+saas.plan.transfer_lim=50|100
+saas.plan.ex_transfer=0.5|1.5
+saas.plan.storage_lim=5120
+saas.plan.ex_storage=0.005
+
+#Second plan
+saas.plan.name=p2
+saas.plan.priority=1
+saas.plan.price=250
+saas.plan.setup=1.11
+saas.plan.cpu_lim=55
+saas.plan.ex_cpu=2
+saas.plan.transfer_lim=100
+saas.plan.ex_transfer=0|3.3
+saas.plan.storage_lim=5120
+saas.plan.ex_storage=0.005
