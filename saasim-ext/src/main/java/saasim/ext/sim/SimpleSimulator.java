@@ -17,6 +17,7 @@ import saasim.core.provisioning.DPS;
 import saasim.core.provisioning.DPSFactory;
 import saasim.core.sim.Simulator;
 import saasim.core.util.TimeUnit;
+import saasim.ext.application.ApplicationFactory;
 
 /**
  * Simple implementation of a {@link Simulator} composed by:<br>
