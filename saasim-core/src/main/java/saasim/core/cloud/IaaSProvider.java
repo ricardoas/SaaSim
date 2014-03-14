@@ -2,7 +2,7 @@ package saasim.core.cloud;
 
 import java.io.Serializable;
 
-import saasim.core.application.InstanceDescriptor;
+import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.util.TimeUnit;
 
 /**

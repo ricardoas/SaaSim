@@ -245,26 +245,4 @@ public class SimpleMultiTierApplication extends AbstractEventHandler implements 
 			this.threshold = requestAcceptanceRate;
 		}
 	}
-	
-	public static void main(String[] args) {
-		Date date = new Date(1337834609666L);
-		Date date2 = new Date(112, 04, 23);
-		date2.setHours(12);
-		date2.setMinutes(32);
-		date2.setSeconds(51);
-		Date date3 = new Date(0);
-		Calendar greg = GregorianCalendar.getInstance();
-		greg.set(2012, 4, 23, 12, 0, 0);
-		date3 = greg.getTime();
-//		date3.setHours(5);
-//		date3.setMinutes(32);
-//		date3.setSeconds(51);
-		
-		System.out.println(new SimpleDateFormat().format(date));
-		System.out.println(date.getTime());
-		System.out.println(new SimpleDateFormat().format(date2));
-		System.out.println(date2.getTime());
-		System.out.println(new SimpleDateFormat().format(date3));
-		System.out.println(date3.getTime());
-	}
 }

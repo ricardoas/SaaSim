@@ -1,8 +1,8 @@
 package saasim.ext.cloud;
 
-import saasim.core.application.InstanceDescriptor;
 import saasim.core.cloud.IaaSProvider;
 import saasim.core.cloud.InstanceType;
+import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.util.TimeUnit;
 
 public class AmazonEC2 implements IaaSProvider {

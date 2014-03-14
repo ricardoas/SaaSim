@@ -2,6 +2,7 @@ import java.io.IOException;
 
 import org.apache.commons.configuration.ConfigurationException;
 
+import saasim.core.application.ApplicationFactory;
 import saasim.core.config.Configuration;
 import saasim.ext.sim.SimpleSimulator;
 
@@ -24,6 +25,8 @@ public class Main {
 		Configuration.buildInstance();
 
 		new SimpleSimulator().start();
+		
+		ApplicationFactory.getInstance().buildApplication();
 	}
 
 }
