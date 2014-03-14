@@ -9,9 +9,7 @@ import java.util.Arrays;
  * Each timed action in the simulation environment is modeled as an {@link Event}. Events are composed by
  * an id, a target handler id, a <code>long</code> time stamp, a type and arguments to forward to the handler.
  *
- * @author thiago - thiago@lsd.ufcg.edu.br
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
- *
  */
 public final class Event implements Comparable<Event>, Serializable{
 	
