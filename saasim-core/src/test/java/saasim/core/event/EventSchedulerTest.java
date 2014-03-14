@@ -113,14 +113,14 @@ public class EventSchedulerTest extends CleanConfigurationTest{
 	}
 	
 	@Test(expected=AssertionError.class)
-	public void testClearAndRegisterAnnotationsWithEmptyParam(){
-		scheduler.clearAndRegisterAnnotations();
+	public void testClearAndRegisterAnnotationsWithEmptyParam() throws ClassNotFoundException{
+		scheduler.setup(new String[0], new String[0]);
 	}
 	
 	@Test(expected=AssertionError.class)
 	public void testClearAndRegisterAnnotationsWithNullParam(){
 		Class<? extends Annotation> annotation = null;
-		scheduler.clearAndRegisterAnnotations(annotation);
+		scheduler.setup({""}, new String[0]);
 	}
 	
 	@Test(expected=AssertionError.class)
