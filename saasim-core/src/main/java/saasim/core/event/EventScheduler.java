@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +11,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.reflections.ReflectionUtils;
 
 
@@ -29,7 +29,7 @@ public final class EventScheduler implements Serializable{
 	private long simulationEnd;
     private TreeSet<Event> eventSet;
 	private Random random;
-	private transient List<Class<? extends Annotation>> eventTypes;
+//	private transient List<Class<? extends Annotation>> eventTypes;
 	private transient Map<Class<?>,Map<Class<? extends Annotation>, Method>> handlingMethods;
 	
     /**
@@ -41,7 +41,6 @@ public final class EventScheduler implements Serializable{
     	this.random = new Random(seed);
     	this.now = 0;
 		this.eventSet = new TreeSet<Event>();
-		this.eventTypes = new ArrayList<Class<? extends Annotation>>();
 		this.handlingMethods = new HashMap<Class<?>, Map<Class<? extends Annotation>,Method>>();
     }
     
@@ -146,51 +145,38 @@ public final class EventScheduler implements Serializable{
 
 
 	@SuppressWarnings("unchecked")
-	public void setup(String[] events, String[] handlers) throws ClassNotFoundException {
+	public void setup(String[] events, String[] handlers) throws ConfigurationException {
 		
-		List<Class<? extends Annotation>> eventTypes = new ArrayList<>();
-		
-		for (String event : events) {
-			eventTypes.add((Class<? extends Annotation>) Class.forName(event));
-		}
-		
-		handlingMethods = new HashMap<Class<?>, Map<Class<? extends Annotation>,Method>>();
-		
-		for (String handler : handlers) {
-			Class<?> handlerClass = Class.forName(handler);
+		try {
+			List<Class<? extends Annotation>> eventTypes = new ArrayList<>();
 			
-			assert handlerClass != null;
+			for (String event : events) {
+					eventTypes.add((Class<? extends Annotation>) Class.forName(event));
+			}
 			
-			Map<Class<? extends Annotation>, Method> map = extractHandlers(handlerClass);
+			handlingMethods = new HashMap<Class<?>, Map<Class<? extends Annotation>,Method>>();
 			
-			assert !map.isEmpty() : "Class " + handlerClass + " has no methods signed with any of the event types you've registered.";
-			
-			handlingMethods.put(handlerClass, map);
+			for (String handler : handlers) {
+				Class<?> handlerClass = Class.forName(handler);
+				
+				assert handlerClass != null;
+				
+				Map<Class<? extends Annotation>, Method> map = extractHandlers(eventTypes, handlerClass);
+				
+				assert !map.isEmpty() : "Class " + handlerClass + " has no methods signed with any of the event types you've registered.";
+				
+				handlingMethods.put(handlerClass, map);
+			}
+		} catch (ClassNotFoundException e) {
+			throw new ConfigurationException(e);
 		}
 		
 	}
 
-	private EventScheduler clearAndRegisterHandlerClasses(List<Class<? extends EventHandler>> handlerClasses) {
-		
-		assert handlerClasses != null : "Can't register null annotation. Check your code!";
-		assert handlerClasses.size() != 0 : "You must register at least one event annotation. Check your code!";
-		assert !Arrays.asList(handlerClasses).contains(null) : "Can't register null annotation. Check your code!";
-		
-		handlingMethods = new HashMap<Class<?>, Map<Class<? extends Annotation>,Method>>();
-		
-		for (Class<? extends EventHandler> clazz : handlerClasses) {
-			Map<Class<? extends Annotation>, Method> map = extractHandlers(clazz);
-			
-			assert !map.isEmpty() : "Class " + clazz + " has no methods signed with any of the event types you've registered.";
-			
-			handlingMethods.put(clazz, map);
-		}
-		
-		return this;
-	}
-	
-	private Map<Class<? extends Annotation>, Method> extractHandlers(Class<? extends EventHandler> handlerClass) {
-		
+	@SuppressWarnings("unchecked")
+	private Map<Class<? extends Annotation>, Method> extractHandlers(
+			List<Class<? extends Annotation>> eventTypes, Class<?> handlerClass) {
+
 		HashMap<Class<? extends Annotation>, Method> hashMap = new HashMap<Class<? extends Annotation>, Method>();
 		
 		for (Class<? extends Annotation> eventType : eventTypes) {

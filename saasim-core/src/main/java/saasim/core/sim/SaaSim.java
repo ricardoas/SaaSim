@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import javax.security.auth.callback.ConfirmationCallback;
-
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 
@@ -58,8 +56,9 @@ public class SaaSim implements Simulator {
 
 	/**
 	 * @param configuration 
+	 * @throws ConfigurationException 
 	 */
-	public SaaSim(Configuration config) {
+	public SaaSim(Configuration config) throws ConfigurationException {
 		
 		this.config = config;
 		
@@ -82,9 +81,6 @@ public class SaaSim implements Simulator {
 		String[] events = config.getStringArray("simulation.events");
 		String[] handlers = config.getStringArray("simulation.handlers");
 		this.scheduler.setup(events, handlers);
-		
-		this.scheduler.clearAndRegisterAnnotations();
-		this.scheduler.clearAndRegisterHandlerClasses();
 	}
 
 	private void readWorkload() {

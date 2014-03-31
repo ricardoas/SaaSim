@@ -1,9 +1,7 @@
 import java.io.IOException;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.SystemConfiguration;
 
-import saasim.core.application.ApplicationFactory;
 import saasim.core.config.Configuration;
 import saasim.core.sim.SaaSim;
 
