@@ -16,7 +16,7 @@ public interface HorizontallyScalableTier extends Tier{
 	 * 
 	 * @param machineDescriptor {@link InstanceDescriptor} of the new server.
 	 */
-	void scaleUp(InstanceDescriptor machineDescriptor);
+	void scaleIn(InstanceDescriptor machineDescriptor);
 	
 	/**
 	 * Scales down this tier.
@@ -24,6 +24,6 @@ public interface HorizontallyScalableTier extends Tier{
 	 * @param force <code>true</code> to remove immediately, and <code>false</code> to stop scheduling and wait
 	 * until machine becomes idle to remove.
 	 */
-	void scaleDown(InstanceDescriptor descriptor, boolean force);
+	void scaleOut(InstanceDescriptor descriptor, boolean force);
 
 }

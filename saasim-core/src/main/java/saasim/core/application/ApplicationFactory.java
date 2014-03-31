@@ -20,9 +20,9 @@ public abstract class ApplicationFactory {
 	 * 
 	 * @return {@link ApplicationFactory} instance ready to assemble.
 	 */
-	public static ApplicationFactory getInstance() {
+	public static ApplicationFactory getInstance(Configuration config) {
 		if(instance == null){
-			String className = Configuration.getInstance().getString(SaaSAppProperties.APPLICATION_FACTORY);
+			String className = config.getString(SaaSAppProperties.APPLICATION_FACTORY);
 			try {
 				instance = (ApplicationFactory) Class.forName(className).newInstance();
 			} catch (Exception e) {

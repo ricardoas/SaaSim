@@ -151,6 +151,7 @@ public final class EventScheduler implements Serializable{
 			List<Class<? extends Annotation>> eventTypes = new ArrayList<>();
 			
 			for (String event : events) {
+					assert event != null && !event.isEmpty(): "Are you serious?";
 					eventTypes.add((Class<? extends Annotation>) Class.forName(event));
 			}
 			
@@ -159,7 +160,7 @@ public final class EventScheduler implements Serializable{
 			for (String handler : handlers) {
 				Class<?> handlerClass = Class.forName(handler);
 				
-				assert handlerClass != null;
+				assert handlerClass != null && !handler.isEmpty(): "Are you serious?";
 				
 				Map<Class<? extends Annotation>, Method> map = extractHandlers(eventTypes, handlerClass);
 				
