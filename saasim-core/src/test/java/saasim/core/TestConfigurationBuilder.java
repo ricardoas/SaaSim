@@ -17,7 +17,7 @@ public final class TestConfigurationBuilder{
 
 
 	public static void buildConfiguration01() throws ConfigurationException{
-		Configuration.buildInstance(SCENARIO_01);
+		new Configuration(SCENARIO_01);
 	}
 
 //	public static void buildFullConfiguration() throws ConfigurationException{

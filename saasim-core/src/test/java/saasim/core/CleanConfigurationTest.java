@@ -1,14 +1,11 @@
 package saasim.core;
 
-import java.lang.reflect.Field;
-
 import org.apache.log4j.BasicConfigurator;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
-import saasim.core.config.Configuration;
 import saasim.core.event.EventCheckpointer;
 
 
@@ -33,9 +30,9 @@ public class CleanConfigurationTest {
 	@Before
 	public void setUp() throws Exception{
 		
-		Field field = Configuration.class.getDeclaredField("instance");
-		field.setAccessible(true);
-		field.set(null, null);
+//		Field field = Configuration.class.getDeclaredField("instance");
+//		field.setAccessible(true);
+//		field.set(null, null);
 		
 //		FIXME UNCOMMENT ME AFTER IMPLEMENTING AbstractWorkloadParser 
 //		field = AbstractWorkloadParser.class.getDeclaredField("saasClientIDSeed");

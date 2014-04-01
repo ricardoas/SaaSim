@@ -14,11 +14,11 @@ public class DPSFactory {
 	 * @param initargs 
 	 * @return
 	 */
-	public static DPS createDPS(Object... initargs){
-		Class<?> clazz = Configuration.getInstance().getDPSHeuristicClass();
+	public static DPS createDPS(Configuration config){
+		Class<?> clazz = config.getDPSHeuristicClass();
 		
 		try {
-			return (DPS) clazz.getDeclaredConstructors()[0].newInstance(initargs);
+			return (DPS) clazz.getDeclaredConstructors()[0].newInstance();
 		} catch (Exception e) {
 			throw new RuntimeException("Something went wrong when loading "+ clazz.getCanonicalName(), e);
 		}

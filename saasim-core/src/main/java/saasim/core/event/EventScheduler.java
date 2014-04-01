@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +11,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.reflections.ReflectionUtils;
 
 
@@ -29,7 +29,7 @@ public final class EventScheduler implements Serializable{
 	private long simulationEnd;
     private TreeSet<Event> eventSet;
 	private Random random;
-	private transient List<Class<? extends Annotation>> eventTypes;
+//	private transient List<Class<? extends Annotation>> eventTypes;
 	private transient Map<Class<?>,Map<Class<? extends Annotation>, Method>> handlingMethods;
 	
     /**
@@ -42,7 +42,6 @@ public final class EventScheduler implements Serializable{
     	this.now = 0;
 		this.eventSet = new TreeSet<Event>();
 		this.handlingMethods = new HashMap<Class<?>, Map<Class<? extends Annotation>,Method>>();
-		this.eventTypes = new ArrayList<Class<? extends Annotation>>();
     }
     
 	/**
@@ -144,35 +143,45 @@ public final class EventScheduler implements Serializable{
 		return this.now;
 	}
 
-	/**
-	 * Cleans handlers records and registers new handler classes. It search each class for methods annotated with
-	 * previous event types registered.
-	 * @param handlerClasses Handler classes
-	 * @return This scheduler
-	 */
-	public EventScheduler clearAndRegisterHandlerClasses(Class<? extends EventHandler>... handlerClasses) {
-		
-		assert handlerClasses != null : "Can't register null annotation. Check your code!";
-		assert handlerClasses.length != 0 : "You must register at least one event annotation. Check your code!";
-		assert !Arrays.asList(handlerClasses).contains(null) : "Can't register null annotation. Check your code!";
 
-		handlingMethods = new HashMap<Class<?>, Map<Class<? extends Annotation>,Method>>();
+	@SuppressWarnings("unchecked")
+	public void setup(String[] events, String[] handlers) throws ConfigurationException {
 		
-		for (Class<? extends EventHandler> clazz : handlerClasses) {
-			Map<Class<? extends Annotation>, Method> map = extractHandlers(clazz, new HashMap<Class<? extends Annotation>, Method>());
+		try {
+			List<Class<? extends Annotation>> eventTypes = new ArrayList<>();
 			
-			assert !map.isEmpty() : "Class " + clazz + " has no methods signed with any of the event types you've registered.";
+			for (String event : events) {
+					assert event != null && !event.isEmpty(): "Are you serious?";
+					eventTypes.add((Class<? extends Annotation>) Class.forName(event));
+			}
 			
-			handlingMethods.put(clazz, map);
+			handlingMethods = new HashMap<Class<?>, Map<Class<? extends Annotation>,Method>>();
+			
+			for (String handler : handlers) {
+				Class<?> handlerClass = Class.forName(handler);
+				
+				assert handlerClass != null && !handler.isEmpty(): "Are you serious?";
+				
+				Map<Class<? extends Annotation>, Method> map = extractHandlers(eventTypes, handlerClass);
+				
+				assert !map.isEmpty() : "Class " + handlerClass + " has no methods signed with any of the event types you've registered.";
+				
+				handlingMethods.put(handlerClass, map);
+			}
+		} catch (ClassNotFoundException e) {
+			throw new ConfigurationException(e);
 		}
-
-		return this;
+		
 	}
-	
-	private Map<Class<? extends Annotation>, Method> extractHandlers(Class<? extends EventHandler> clazz, HashMap<Class<? extends Annotation>, Method> hashMap) {
+
+	@SuppressWarnings("unchecked")
+	private Map<Class<? extends Annotation>, Method> extractHandlers(
+			List<Class<? extends Annotation>> eventTypes, Class<?> handlerClass) {
+
+		HashMap<Class<? extends Annotation>, Method> hashMap = new HashMap<Class<? extends Annotation>, Method>();
 		
 		for (Class<? extends Annotation> eventType : eventTypes) {
-			Set<Method> methods = ReflectionUtils.getAllMethods(clazz, ReflectionUtils.withAnnotation(eventType));
+			Set<Method> methods = ReflectionUtils.getAllMethods(handlerClass, ReflectionUtils.withAnnotation(eventType));
 			
 			if(!methods.isEmpty()){
 				hashMap.put(eventType, methods.iterator().next());
@@ -180,19 +189,5 @@ public final class EventScheduler implements Serializable{
 		}
 		
 		return hashMap;
-	}
-
-	/**
-	 * Cleans annotation records and register new ones. 
-	 * @param eventType {@link Annotation} classes used as event types.
-	 * @return This scheduler.
-	 */
-	public EventScheduler clearAndRegisterAnnotations(Class<? extends Annotation>... eventType) {
-		assert eventType != null : "Can't register null annotation. Check your code!";
-		assert eventType.length != 0 : "You must register at least one event annotation. Check your code!";
-		assert !Arrays.asList(eventType).contains(null) : "Can't register null annotation. Check your code!";
-		
-		eventTypes = new ArrayList<Class<? extends Annotation>>(Arrays.asList(eventType));
-		return this;
 	}
 }

@@ -16,4 +16,7 @@
 		<module>saasim-core</module>
 		<module>saasim-ext</module>
 	</modules>
+	<prerequisites>
+		<maven>2.2.1</maven>
+	</prerequisites>
 </project>

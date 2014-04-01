@@ -12,18 +12,17 @@ import saasim.core.infrastructure.InstanceDescriptor;
 public interface HorizontallyScalableTier extends Tier{
 	
 	/**
-	 * Scales up this tier.
+	 * Adds a new instance to this {@link Tier}
 	 * 
 	 * @param machineDescriptor {@link InstanceDescriptor} of the new server.
 	 */
-	void scaleUp(InstanceDescriptor machineDescriptor);
+	void scaleIn(InstanceDescriptor machineDescriptor);
 	
 	/**
-	 * Scales down this tier.
+	 * Removes the instance described by {@link InstanceDescriptor} from this {@link Tier}.
 	 *  
-	 * @param force <code>true</code> to remove immediately, and <code>false</code> to stop scheduling and wait
-	 * until machine becomes idle to remove.
+	 * @param force <code>true</code> to remove immediately, otherwise to gracefully remove it.
 	 */
-	void scaleDown(InstanceDescriptor descriptor, boolean force);
+	void scaleOut(InstanceDescriptor descriptor, boolean force);
 
 }
