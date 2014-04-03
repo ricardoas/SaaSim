@@ -9,5 +9,8 @@ package saasim.core.cloud.utility;
  */
 public interface UtilityFunction {
 
+	/**
+	 * @return
+	 */
 	double getUtility();
 }
