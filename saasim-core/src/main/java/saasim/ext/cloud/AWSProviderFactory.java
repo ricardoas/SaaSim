@@ -1,5 +1,6 @@
-package saasim.core.application;
+package saasim.ext.cloud;
 
+import saasim.core.cloud.IaaSProvider;
 import saasim.core.config.AbstractFactory;
 
 
@@ -8,7 +9,7 @@ import saasim.core.config.AbstractFactory;
  *  
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class SingleTierApplicationFactory extends AbstractFactory<Application> {
+public class AWSProviderFactory extends AbstractFactory<IaaSProvider> {
 
 	/**
 	 * {@inheritDoc}
@@ -16,7 +17,7 @@ public class SingleTierApplicationFactory extends AbstractFactory<Application> {
 	 * @see saasim.core.config.AbstractFactory#build()
 	 */
 	@Override
-	public Application build(Object... args) {
-		return new SingleTierApplication();
+	public IaaSProvider build(Object... args) {
+		return new AmazonEC2();
 	}
 }

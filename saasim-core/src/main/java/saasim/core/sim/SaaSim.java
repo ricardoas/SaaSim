@@ -7,9 +7,12 @@ import java.util.Iterator;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 
+import saasim.core.application.Application;
+import saasim.core.application.SingleTierApplicationFactory;
 import saasim.core.application.Tier;
 import saasim.core.cloud.IaaSProvider;
 import saasim.core.cloud.utility.UtilityFunction;
+import saasim.core.config.AbstractFactory;
 import saasim.core.config.Configuration;
 import saasim.core.event.EventCheckpointer;
 import saasim.core.event.EventScheduler;
@@ -37,13 +40,13 @@ public class SaaSim implements Simulator {
 	private static final long serialVersionUID = 2617169446354857178L;
 	private EventScheduler scheduler;
 	private Configuration config;
-	private Tier[] applications;
 	private DPS dps;
 //	private RS rs;
 	private UtilityFunction utilityFunction;
 	
 	
-	private IaaSProvider[] iaasProviders;
+	private IaaSProvider iaasProvider;
+	private Application application;
 	
 	/**
 	 * Default constructor
@@ -64,18 +67,20 @@ public class SaaSim implements Simulator {
 		
 		if(EventCheckpointer.hasCheckpoint()){
 			Iterator<Serializable> iterator = Arrays.asList(EventCheckpointer.load()).iterator();
-			scheduler = (EventScheduler) iterator.next();
-
-			//			applications = (Tier[]) iterator.next();
-//			dps = (DPS) iterator.next();
-		}else{
-			scheduler = new EventScheduler(config.getLong("random.seed", 0));
 			
-//			iaasProviders = IaaSProviderFactory.getInstance().buildIaaSProviders();
-//
-//			dps = DPSFactory.createDPS(iaasProviders);
-//			applications = ApplicationFactory.buildApplication(scheduler, dps);
-//			readWorkload();
+			scheduler = (EventScheduler) iterator.next();
+			iaasProvider = (IaaSProvider) iterator.next();
+			dps = (DPS) iterator.next();
+			application = (Application) iterator.next();
+
+		}else{
+			
+			scheduler = new EventScheduler(config.getLong("random.seed", 0));
+			iaasProvider = config.getIaaSProvidersFactory().build();
+			dps = config.getDPSFactory().build(iaasProvider);
+			application = config.getApplicationFactory().build(scheduler, dps);
+			
+			readWorkload();
 		}
 		
 		String[] events = config.getStringArray("simulation.events");
@@ -84,9 +89,7 @@ public class SaaSim implements Simulator {
 	}
 
 	private void readWorkload() {
-		for (Tier application : applications) {
 //			scheduler.queueEvent(application, null, scheduler.now());
-		}
 	}
 
 	@Override

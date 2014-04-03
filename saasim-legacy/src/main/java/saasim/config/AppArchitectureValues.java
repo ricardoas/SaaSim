@@ -1,21 +1,19 @@
-package saasim.core.application;
+package saasim.config;
+
+import saasim.sim.SimpleMultiTierApplication;
+
 
 /**
- * Application types.
+ * Values of application heuristic.
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public enum ApplicationType {
+public enum AppArchitectureValues {
 	
 	/**
-	 * Vanilla type. Application with single tier.
+	 * Heuristic to choose servers in a Round Robin method.
 	 */
-	SINGLE_TIER(""),
-
-	/**
-	 * Multitier pipeline application
-	 */
-	MULTI_TIER(""),
+	MULTITIER(SimpleMultiTierApplication.class.getCanonicalName()), 
 	
 	/**
 	 * 
@@ -28,7 +26,7 @@ public enum ApplicationType {
 	 * Default private constructor.
 	 * @param className the name of heuristic class.
 	 */
-	private ApplicationType(String className){
+	private AppArchitectureValues(String className){
 		this.className = className;
 	}
 

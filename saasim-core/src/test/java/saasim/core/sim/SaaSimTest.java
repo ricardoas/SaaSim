@@ -93,7 +93,7 @@ public class SaaSimTest {
 	/**
 	 * Test method for {@link saasim.core.sim.SaaSim#SaaSim(saasim.core.config.Configuration)}.
 	 */
-	@Test
+	@Test@Ignore
 	public void testSaaSimConfiguration() {
 		fail("Not yet implemented");
 	}
@@ -101,7 +101,7 @@ public class SaaSimTest {
 	/**
 	 * Test method for {@link saasim.core.sim.SaaSim#start()}.
 	 */
-	@Test
+	@Test@Ignore
 	public void testStart() {
 		fail("Not yet implemented");
 	}
