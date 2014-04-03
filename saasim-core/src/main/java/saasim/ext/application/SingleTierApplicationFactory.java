@@ -1,5 +1,6 @@
-package saasim.core.application;
+package saasim.ext.application;
 
+import saasim.core.application.Application;
 import saasim.core.config.AbstractFactory;
 
 

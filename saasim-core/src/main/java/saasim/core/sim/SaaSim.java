@@ -8,7 +8,6 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 
 import saasim.core.application.Application;
-import saasim.core.application.SingleTierApplicationFactory;
 import saasim.core.application.Tier;
 import saasim.core.cloud.IaaSProvider;
 import saasim.core.cloud.utility.UtilityFunction;
@@ -18,6 +17,7 @@ import saasim.core.event.EventCheckpointer;
 import saasim.core.event.EventScheduler;
 import saasim.core.provisioning.DPS;
 import saasim.core.util.TimeUnit;
+import saasim.ext.application.SingleTierApplicationFactory;
 
 /**
  * Simple implementation of a {@link Simulator} composed by:<br>

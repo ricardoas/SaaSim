@@ -1,5 +1,11 @@
-package saasim.core.application;
+package saasim.ext.application;
 
+import saasim.core.application.Application;
+import saasim.core.application.HorizontallyScalableTier;
+import saasim.core.application.Request;
+import saasim.core.application.Response;
+import saasim.core.application.ResponseListener;
+import saasim.core.application.Tier;
 import saasim.core.infrastructure.InstanceDescriptor;
 
 /**
