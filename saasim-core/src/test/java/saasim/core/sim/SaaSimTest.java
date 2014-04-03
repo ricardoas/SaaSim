@@ -55,6 +55,7 @@ public class SaaSimTest {
 	 */
 	@After
 	public void tearDown() throws Exception {
+		assert !new File(".saasim.dat").exists() || new File(".saasim.dat").delete(): "Unwanted file saasim.properties on root directory. Please delete it!";
 	}
 
 	/**
