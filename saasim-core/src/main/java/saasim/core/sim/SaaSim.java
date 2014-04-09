@@ -11,13 +11,11 @@ import saasim.core.application.Application;
 import saasim.core.application.Tier;
 import saasim.core.cloud.IaaSProvider;
 import saasim.core.cloud.utility.UtilityFunction;
-import saasim.core.config.AbstractFactory;
 import saasim.core.config.Configuration;
 import saasim.core.event.EventCheckpointer;
 import saasim.core.event.EventScheduler;
 import saasim.core.provisioning.DPS;
 import saasim.core.util.TimeUnit;
-import saasim.ext.application.SingleTierApplicationFactory;
 
 /**
  * Simple implementation of a {@link Simulator} composed by:<br>
@@ -49,15 +47,6 @@ public class SaaSim implements Simulator {
 	private Application application;
 	
 	/**
-	 * Default constructor
-	 * 
-	 * @throws ConfigurationException when no default configuration is provided.
-	 */
-	public SaaSim() throws ConfigurationException {
-		this(new Configuration());
-	}
-
-	/**
 	 * @param configuration 
 	 * @throws ConfigurationException 
 	 */
@@ -76,7 +65,7 @@ public class SaaSim implements Simulator {
 		}else{
 			
 			scheduler = new EventScheduler(config.getLong("random.seed", 0));
-			iaasProvider = config.getIaaSProvidersFactory().build();
+			iaasProvider = config.getIaaSProvidersFactory().build(config);
 			dps = config.getDPSFactory().build(iaasProvider);
 			application = config.getApplicationFactory().build(scheduler, dps);
 			

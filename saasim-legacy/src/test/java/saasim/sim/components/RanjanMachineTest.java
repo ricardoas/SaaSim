@@ -46,7 +46,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testSmallRequestExecutionWithSingleCoreMachine(){
 	
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 		Capture<Request> captured = new Capture<Request>();
 		loadBalancer.reportRequestFinished(EasyMock.capture(captured));
 		EasyMock.replay(loadBalancer);
@@ -74,7 +74,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testBigRequestExecutionWithSingleCoreMachine(){
 		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 		Capture<Request> captured = new Capture<Request>();
 		loadBalancer.reportRequestFinished(EasyMock.capture(captured));
 		EasyMock.replay(loadBalancer);
@@ -101,7 +101,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		Request request3 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000});
 		Request request4 = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000});
 		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 		loadBalancer.reportRequestFinished(request);
 		loadBalancer.reportRequestFinished(request2);
 		loadBalancer.reportRequestFinished(request3);
@@ -149,7 +149,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		Request request3 = new Request(3, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000, 5000});
 		Request request4 = new Request(4, 0, 0, 0, 10, 100, new long[]{5000, 5000, 5000, 5000, 5000});
 		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 		loadBalancer.reportRequestFinished(request);
 		loadBalancer.reportRequestFinished(request2);
 		loadBalancer.reportRequestFinished(request3);
@@ -193,7 +193,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	public void testShutdownWithEmptyMachine(){
 		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 		EasyMock.expect(loadBalancer.getHandlerId()).andReturn(scheduler.registerHandler(loadBalancer));
 		Capture<MachineDescriptor> captured = new Capture<MachineDescriptor>();
 		loadBalancer.serverIsDown(EasyMock.capture(captured));
@@ -219,7 +219,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		Request request = new Request(0, 0, 0, 0, 10, 100, new long[]{5000, 5000});
 		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 		loadBalancer.reportRequestFinished(request);
 		EasyMock.expect(loadBalancer.getHandlerId()).andReturn(scheduler.registerHandler(loadBalancer));
 		Capture<MachineDescriptor> captured = new Capture<MachineDescriptor>();
@@ -247,7 +247,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	 */
 	@Test
 	public void testHandlePreemptionWithMoreRequestThanCanRunWithOneCore(){
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 		
 		Request firstRequest = new Request(1, 0, 0, 0, 10, 100, new long[]{50, 50});
 		Request secondRequest = new Request(2, 0, 0, 0, 10, 100, new long[]{200, 200});
@@ -289,7 +289,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testReportLostRequestWithSingleCoreMachine(){
 
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 	
 		Request firstRequest = new Request(0, 0, 0, 0, 100, 100, new long[]{50, 50});
 		Request secondRequest = new Request(1, 0, 0, 0, 100, 100, new long[]{100, 100});
@@ -339,7 +339,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testReportLostRequestWithMultiCoreMachine(){
 	
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 	
 		Request firstRequest = new Request(0, 0, 0, 0, 100, 100, new long[]{50, 50, 50, 50, 50});
 		Request secondRequest = new Request(1, 0, 0, 0, 100, 100, new long[]{100, 100, 100, 100, 100});
@@ -388,7 +388,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	@Test
 	public void testComputeUtilisationOfEmptyMachine(){
 		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 		EasyMock.replay(loadBalancer);
 		
 		EventScheduler scheduler = Configuration.getInstance().getScheduler();
@@ -414,7 +414,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		EasyMock.expect(scheduler.now()).andReturn(100l).times(2);
 		scheduler.queueEvent(EasyMock.isA(Event.class));
 		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 		
 		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{150, 150});
 
@@ -446,7 +446,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		scheduler.queueEvent(EasyMock.isA(Event.class));
 		EasyMock.expect(scheduler.now()).andReturn(150l).times(2);
 		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 		loadBalancer.reportRequestFinished(EasyMock.isA(Request.class));
 		
 		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{150, 150});
@@ -482,7 +482,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		EasyMock.expect(scheduler.now()).andReturn(100l).times(2);
 		scheduler.queueEvent(EasyMock.isA(Event.class));
 		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 
 		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{150, 150, 150});
 
@@ -512,7 +512,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 
 		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50, 50, 50, 50, 50});
 		
@@ -532,7 +532,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 		
 		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50, 50});
 		
@@ -557,7 +557,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 		
 		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50, 50, 50, 50, 50});
 		
@@ -582,7 +582,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 		
 		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50, 50});
 		
@@ -608,7 +608,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 		
 		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50, 50, 50, 50, 50});
 		
@@ -634,7 +634,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 		
 		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50, 50});
 		
@@ -659,7 +659,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 		
 		EventScheduler scheduler = Configuration.getInstance().getScheduler();
 		
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 		
 		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50, 50, 50});
 		
@@ -682,7 +682,7 @@ public class RanjanMachineTest extends ValidConfigurationTest {
 	
 	@Test
 	public void testMachineIsBusyAfterRequestFinishes(){
-		LoadBalancer loadBalancer = EasyMock.createStrictMock(LoadBalancer.class);
+		SimpleLoadBalancerWithAdmissionControl loadBalancer = EasyMock.createStrictMock(SimpleLoadBalancerWithAdmissionControl.class);
 		
 		Request request = new Request(0, 0, 0, 0, 100L, 100000L, new long[]{50, 50, 50});
 		

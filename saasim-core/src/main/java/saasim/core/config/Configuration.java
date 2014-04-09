@@ -9,17 +9,9 @@ import saasim.core.provisioning.DPS;
 
 public class Configuration extends PropertiesConfiguration{
 
-	private static final String DEFAULT_CONFIG_FILEPATH = "saasim.properties";
-
 	/**
-	 * Default empty constructor
-	 * @throws ConfigurationException 
-	 */
-	public Configuration() throws ConfigurationException {
-		this(DEFAULT_CONFIG_FILEPATH);
-	}
-	
-	/**
+	 * Default constructor
+	 * 
 	 * @param propertiesFilepath
 	 * @throws ConfigurationException
 	 */

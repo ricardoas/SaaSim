@@ -9,6 +9,7 @@ import saasim.planning.heuristic.PlanningHeuristic;
 import saasim.planning.util.PlanningHeuristicFactory;
 import saasim.provisioning.Monitor;
 import saasim.sim.components.LoadBalancer;
+import saasim.sim.components.SimpleLoadBalancerWithAdmissionControl;
 import saasim.sim.core.EventScheduler;
 
 
@@ -29,7 +30,7 @@ public class Planner {
 	 * Default constructor.
 	 * @param scheduler {@link EventScheduler} represents a event scheduler
 	 * @param monitor {@link Monitor} which works for reporting information
-	 * @param loadBalancers an array containing a {@link LoadBalancer}s for the application
+	 * @param loadBalancers an array containing a {@link SimpleLoadBalancerWithAdmissionControl}s for the application
 	 * @param providers an array containing the providers of the application
 	 * @param cloudUsers an array containing the users of the application
 	 */

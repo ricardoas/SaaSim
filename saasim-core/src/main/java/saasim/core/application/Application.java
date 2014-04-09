@@ -1,6 +1,7 @@
 package saasim.core.application;
 
 import saasim.core.event.EventHandler;
+import saasim.core.provisioning.TierConfiguration;
 
 /**
  * Application abstraction.
@@ -8,7 +9,9 @@ import saasim.core.event.EventHandler;
  */
 public interface Application extends EventHandler{
 	
-	void config(int d);
+	void config(TierConfiguration... tierConfiguration);
 
 	void process(Request request, ResponseListener callback);
+	
+	int getNumberOfTiers();
 }

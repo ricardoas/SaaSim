@@ -17,6 +17,7 @@ import saasim.provisioning.DPS;
 import saasim.provisioning.Monitor;
 import saasim.sim.SimpleMultiTierApplication;
 import saasim.sim.components.LoadBalancer;
+import saasim.sim.components.SimpleLoadBalancerWithAdmissionControl;
 import saasim.sim.core.Event;
 import saasim.sim.core.EventCheckpointer;
 import saasim.sim.core.EventScheduler;
@@ -51,7 +52,7 @@ public class OverProvisionHeuristic extends SimpleMultiTierApplication implement
 	 * Default constructor.
 	 * @param scheduler {@link EventScheduler} event scheduler
 	 * @param monitor {@link Monitor} for reporting information
-	 * @param loadBalancers a set of {@link LoadBalancer}s of the application
+	 * @param loadBalancers a set of {@link SimpleLoadBalancerWithAdmissionControl}s of the application
 	 */
 	public OverProvisionHeuristic(EventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
 		super(scheduler, monitor);

@@ -3,10 +3,9 @@ package saasim.ext.application;
 import saasim.core.application.Application;
 import saasim.core.application.HorizontallyScalableTier;
 import saasim.core.application.Request;
-import saasim.core.application.Response;
 import saasim.core.application.ResponseListener;
 import saasim.core.application.Tier;
-import saasim.core.infrastructure.InstanceDescriptor;
+import saasim.core.provisioning.TierConfiguration;
 
 /**
  * Single tier application.
@@ -18,35 +17,21 @@ public class SingleTierApplication implements Application {
 	private Tier tier;
 
 	public SingleTierApplication() {
-		tier = new HorizontallyScalableTier() {
-			
-			@Override
-			public Response process(Request request) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public void scaleIn(InstanceDescriptor machineDescriptor) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void scaleOut(InstanceDescriptor descriptor, boolean force) {
-				// TODO Auto-generated method stub
-				
-			}
-		};
-	}
-
-	@Override
-	public void config(int d) {
-
+		tier = new HorizontallyScalableTier();
 	}
 
 	@Override
 	public void process(Request request, ResponseListener callback) {
 		
+	}
+
+	@Override
+	public void config(TierConfiguration... tierConfiguration) {
+		tier.config(tierConfiguration[0]);
+	}
+
+	@Override
+	public int getNumberOfTiers() {
+		return 1;
 	}
 }

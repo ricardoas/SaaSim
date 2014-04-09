@@ -7,7 +7,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import saasim.config.Configuration;
 import saasim.planning.heuristic.OverProvisionHeuristic;
 import saasim.sim.SimpleMultiTierApplication;
-import saasim.sim.components.LoadBalancer;
+import saasim.sim.components.SimpleLoadBalancerWithAdmissionControl;
 import saasim.sim.components.TimeSharedMachine;
 
 /**
@@ -35,7 +35,7 @@ public class Main {
 		Configuration.buildInstance();
 
 		Configuration.getInstance().getScheduler()
-				.registerHandlerClass(LoadBalancer.class)
+				.registerHandlerClass(SimpleLoadBalancerWithAdmissionControl.class)
 				.registerHandlerClass(SimpleMultiTierApplication.class)
 				.registerHandlerClass(TimeSharedMachine.class)
 				.registerHandlerClass(OverProvisionHeuristic.class);

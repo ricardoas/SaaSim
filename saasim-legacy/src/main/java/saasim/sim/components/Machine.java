@@ -13,7 +13,7 @@ import saasim.sim.core.EventHandler;
 public interface Machine extends EventHandler{
 
 	/**
-	 * @return The {@link LoadBalancer} responsible for this machine.
+	 * @return The {@link SimpleLoadBalancerWithAdmissionControl} responsible for this machine.
 	 */
 	LoadBalancer getLoadBalancer();
 

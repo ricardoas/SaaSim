@@ -2,6 +2,7 @@ package saasim.ext.cloud;
 
 import saasim.core.cloud.IaaSProvider;
 import saasim.core.config.AbstractFactory;
+import saasim.core.config.Configuration;
 
 
 /**
@@ -18,6 +19,6 @@ public class AWSProviderFactory extends AbstractFactory<IaaSProvider> {
 	 */
 	@Override
 	public IaaSProvider build(Object... args) {
-		return new AmazonEC2();
+		return new AmazonEC2((Configuration) args[0]);
 	}
 }

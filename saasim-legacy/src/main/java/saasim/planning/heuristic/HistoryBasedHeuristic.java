@@ -20,6 +20,7 @@ import saasim.provisioning.Monitor;
 import saasim.sim.DynamicConfigurable;
 import saasim.sim.SimpleMultiTierApplication;
 import saasim.sim.components.LoadBalancer;
+import saasim.sim.components.SimpleLoadBalancerWithAdmissionControl;
 import saasim.sim.components.Machine;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.core.EventCheckpointer;
@@ -46,7 +47,7 @@ public class HistoryBasedHeuristic implements PlanningHeuristic {
 	 * Default constructor.
 	 * @param scheduler {@link EventScheduler} event scheduler
 	 * @param monitor {@link Monitor} for reporting information
-	 * @param loadBalancers a set of {@link LoadBalancer}s of the application
+	 * @param loadBalancers a set of {@link SimpleLoadBalancerWithAdmissionControl}s of the application
 	 */
 	public HistoryBasedHeuristic(EventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
 		this.monitor = monitor;
@@ -183,12 +184,12 @@ public class HistoryBasedHeuristic implements PlanningHeuristic {
 	 * Calculates the usage of machines to make the planning, and for this, updating the usage of the {@link MachineUsageData}
 	 * in this {@link HistoryBasedHeuristic}.
 	 * @param simulator {@link SimpleMultiTierApplication} to use for recovered the tiers of application.
-	 * @return A set of {@link LoadBalancer}s of the application.
+	 * @return A set of {@link SimpleLoadBalancerWithAdmissionControl}s of the application.
 	 */
 	private LoadBalancer[] calculateMachinesUsage(SimpleMultiTierApplication simulator) {
-		LoadBalancer[] loadBalancers = simulator.getTiers();
+		SimpleLoadBalancerWithAdmissionControl[] loadBalancers = simulator.getTiers();
 		
-		for(LoadBalancer lb : loadBalancers){
+		for(SimpleLoadBalancerWithAdmissionControl lb : loadBalancers){
 			List<Machine> servers = lb.getServers();
 			for(Machine server : servers){
 				MachineDescriptor descriptor = server.getDescriptor();

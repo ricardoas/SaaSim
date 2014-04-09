@@ -12,6 +12,7 @@ import saasim.config.Configuration;
 import saasim.io.WorkloadParser;
 import saasim.provisioning.Monitor;
 import saasim.sim.components.LoadBalancer;
+import saasim.sim.components.SimpleLoadBalancerWithAdmissionControl;
 import saasim.sim.components.MachineDescriptor;
 import saasim.sim.core.AbstractEventHandler;
 import saasim.sim.core.Event;
@@ -38,7 +39,7 @@ public class SimpleMultiTierApplication extends AbstractEventHandler implements 
 	 */
 	private static final long serialVersionUID = -8028580648054904982L;
 	
-	private LoadBalancer tiers [];
+	private SimpleLoadBalancerWithAdmissionControl tiers [];
 	private int thresholds [];
 	
 	protected WorkloadParser<List<Request>> workloadParser;
@@ -73,14 +74,14 @@ public class SimpleMultiTierApplication extends AbstractEventHandler implements 
 		monitoringInterval = Configuration.getInstance().getLong(SimulatorProperties.DPS_MONITOR_INTERVAL);
 	}
 	
-	private LoadBalancer[] buildApplication(EventScheduler scheduler, Monitor monitor) {
+	private SimpleLoadBalancerWithAdmissionControl[] buildApplication(EventScheduler scheduler, Monitor monitor) {
 		Configuration config = Configuration.getInstance();
 		int numOfTiers = config.getInt(SaaSAppProperties.APPLICATION_NUM_OF_TIERS);
 		
 		Class<?>[] heuristicClasses = config.getApplicationHeuristics();
 		int [] maxServerPerTier = config.getIntegerArray(SaaSAppProperties.APPLICATION_MAX_SERVER_PER_TIER);
 
-		LoadBalancer [] loadBalancers = new LoadBalancer[numOfTiers];
+		SimpleLoadBalancerWithAdmissionControl [] loadBalancers = new SimpleLoadBalancerWithAdmissionControl[numOfTiers];
 		
 		for (int i = 0; i < numOfTiers; i++) {
 			loadBalancers[i] = buildLoadBalancer(scheduler, monitor, heuristicClasses[i], maxServerPerTier[i], i);
@@ -89,18 +90,18 @@ public class SimpleMultiTierApplication extends AbstractEventHandler implements 
 	}
 
 	/**
-	 * Build a {@link LoadBalancer}.
+	 * Build a {@link SimpleLoadBalancerWithAdmissionControl}.
 	 * @param scheduler {@link EventScheduler} represent a event scheduler
 	 * @param monitor 
-	 * @param heuristic a {@link SchedulingHeuristic} for this {@link LoadBalancer} 
+	 * @param heuristic a {@link SchedulingHeuristic} for this {@link SimpleLoadBalancerWithAdmissionControl} 
 	 * @param maxServerPerTier the maximum number of servers per tier 
-	 * @param tier the tier of {@link LoadBalancer}
-	 * @return A builded {@link LoadBalancer}.
+	 * @param tier the tier of {@link SimpleLoadBalancerWithAdmissionControl}
+	 * @return A builded {@link SimpleLoadBalancerWithAdmissionControl}.
 	 */
-	private LoadBalancer buildLoadBalancer(EventScheduler scheduler, Monitor monitor, Class<?> heuristic,
+	private SimpleLoadBalancerWithAdmissionControl buildLoadBalancer(EventScheduler scheduler, Monitor monitor, Class<?> heuristic,
 			int maxServerPerTier, int tier) {
 		try {
-			return new LoadBalancer(scheduler, this, monitor, (SchedulingHeuristic) heuristic.newInstance(), 
+			return new SimpleLoadBalancerWithAdmissionControl(scheduler, this, monitor, (SchedulingHeuristic) heuristic.newInstance(), 
 					   maxServerPerTier, tier);
 		} catch (Exception e) {
 			throw new RuntimeException("Something went wrong when loading "+ heuristic, e);
@@ -155,7 +156,7 @@ public class SimpleMultiTierApplication extends AbstractEventHandler implements 
 	@HandlingPoint(EventType.ESTIMATE_SERVERS)
 	public void estimateServers(){
 		long currentTime = getScheduler().now();
-		for (LoadBalancer loadBalancer : tiers) {
+		for (SimpleLoadBalancerWithAdmissionControl loadBalancer : tiers) {
 			loadBalancer.estimateServers(currentTime);
 		}
 		send(new Event(EventType.ESTIMATE_SERVERS, this, getScheduler().now() + 1000 * 60 * 60));//One hour later
@@ -216,7 +217,7 @@ public class SimpleMultiTierApplication extends AbstractEventHandler implements 
 	 * {@inheritDoc}
 	 */
 	@Override
-	public LoadBalancer[] getTiers() {
+	public SimpleLoadBalancerWithAdmissionControl[] getTiers() {
 		return this.tiers;
 	}
 
@@ -227,7 +228,7 @@ public class SimpleMultiTierApplication extends AbstractEventHandler implements 
 	@Deprecated
 	public void setMonitor(Monitor monitor) {
 		this.monitor = monitor;
-		for (LoadBalancer loadBalancers : tiers) {
+		for (SimpleLoadBalancerWithAdmissionControl loadBalancers : tiers) {
 			loadBalancers.setMonitor(monitor, this);
 		}
 	}

@@ -8,6 +8,7 @@ import saasim.planning.heuristic.OverProvisionHeuristic;
 import saasim.planning.heuristic.PlanningHeuristic;
 import saasim.provisioning.Monitor;
 import saasim.sim.components.LoadBalancer;
+import saasim.sim.components.SimpleLoadBalancerWithAdmissionControl;
 import saasim.sim.core.EventScheduler;
 
 
@@ -23,7 +24,7 @@ public class PlanningHeuristicFactory {
 	 * Creates a specific {@link PlanningHeuristic}.
 	 * @param scheduler {@link EventScheduler} an event scheduler.
 	 * @param monitor {@link Monitor} to reporting information
-	 * @param loadBalancers an array of {@link LoadBalancer} to be used in the application
+	 * @param loadBalancers an array of {@link SimpleLoadBalancerWithAdmissionControl} to be used in the application
 	 * @return A builded {@link PlanningHeuristic} recovered from a configuration instance.
 	 */
 	public static PlanningHeuristic createHeuristic(EventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){

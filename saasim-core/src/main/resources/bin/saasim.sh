@@ -4,12 +4,4 @@ for lib in lib/*; do
 	CLASSPATH="$CLASSPATH:$lib"
 done
 
-if [ -f ".je.dat" ]; then
-	rm .je.dat
-fi 
-
-java -server -cp $CLASSPATH saasim.provisioning.Main $*
-
-while [ -f ".je.dat" ] ; do
-	java -server -cp $CLASSPATH saasim.provisioning.Main $*
-done
+java -server -cp $CLASSPATH Main $*

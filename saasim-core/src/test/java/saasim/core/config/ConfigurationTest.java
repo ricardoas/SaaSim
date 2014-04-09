@@ -22,7 +22,7 @@ public class ConfigurationTest {
 	 */
 	@Test(expected=ConfigurationException.class)
 	public void testConfigurationWithoutFile() throws ConfigurationException {
-		new Configuration();
+		new Configuration("saasim.properties");
 	}
 
 	/**
@@ -33,7 +33,7 @@ public class ConfigurationTest {
 	@Test
 	public void testConfigurationWithEmptyFile() throws ConfigurationException, IOException {
 		assert new File("saasim.properties").createNewFile(): "Could not create a file for testing purposes, verify permission.";
-		new Configuration();
+		new Configuration("saasim.properties");
 		assert new File("saasim.properties").delete(): "Could not delete file for testing purposes, verify permission.";
 	}
 

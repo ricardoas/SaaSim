@@ -1,7 +1,7 @@
 package saasim.core.provisioning;
 
 
-import saasim.core.application.Tier;
+import saasim.core.application.Application;
 import saasim.core.cloud.utility.UtilityFunction;
 
 /**
@@ -12,12 +12,12 @@ import saasim.core.cloud.utility.UtilityFunction;
 public interface DPS{
 	
 	/**
-	 * Registers new applications to provision. Subsequent calls override 
-	 * previously configured applications. Be sure to call it only once.
+	 * Registers new {@link Application}s to provision. Subsequent calls override 
+	 * previously configured applications. Be sure to call it only once unless you really know what you're doing!
 	 * 
-	 * @param dynamicConfigurables {@link Tier} instances.
+	 * @param dynamically configurables {@link Application} applications.
 	 */
-	void registerConfigurable(Tier... dynamicConfigurables);
+	void registerConfigurable(Application... applications);
 	
 	/**
 	 * Compute application total utility.

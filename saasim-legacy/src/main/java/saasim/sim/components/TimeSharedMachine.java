@@ -30,7 +30,7 @@ public class TimeSharedMachine extends AbstractEventHandler implements Machine{
 	
 	protected int NUMBER_OF_CORES = 1;
 
-	protected LoadBalancer loadBalancer;
+	protected SimpleLoadBalancerWithAdmissionControl loadBalancer;
 	protected final Queue<Request> processorQueue;
 	protected final MachineDescriptor descriptor;
 	protected boolean shutdownOnFinish;
@@ -68,10 +68,10 @@ public class TimeSharedMachine extends AbstractEventHandler implements Machine{
 	 * Default constructor.
 	 * @param scheduler Event scheduler.
 	 * @param descriptor Machine descriptor.
-	 * @param loadBalancer {@link LoadBalancer} responsible for this machine.
+	 * @param loadBalancer {@link SimpleLoadBalancerWithAdmissionControl} responsible for this machine.
 	 */
 	public TimeSharedMachine(EventScheduler scheduler, MachineDescriptor descriptor, 
-			LoadBalancer loadBalancer) {
+			SimpleLoadBalancerWithAdmissionControl loadBalancer) {
 		super(scheduler);
 		this.descriptor = descriptor;
 		this.loadBalancer = loadBalancer;
@@ -110,7 +110,7 @@ public class TimeSharedMachine extends AbstractEventHandler implements Machine{
 	 * {@inheritDoc}
 	 */
 	@Override
-	public LoadBalancer getLoadBalancer() {
+	public SimpleLoadBalancerWithAdmissionControl getLoadBalancer() {
 		return loadBalancer;
 	}
 

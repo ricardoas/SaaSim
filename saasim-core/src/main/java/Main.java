@@ -8,6 +8,8 @@ import saasim.core.sim.SaaSim;
 
 public class Main {
 	
+	private static final String DEFAULT_CONFIG_FILEPATH = "saasim.properties";
+
 	/**
 	 * Entry point.
 	 * 
@@ -16,12 +18,14 @@ public class Main {
 	 */
 	public static void main(String[] args) throws ConfigurationException {
 
-		if (args.length != 0) {
-			System.out.println("Usage: java -cp <path-to-jar-files> Main config.properties");
+		if (args.length < 0 || args.length > 1) {
+			System.out.println("Usage: java -cp <path-to-jar-files> Main [config.properties]");
 			System.exit(1);
 		}
+		
+		String configFilePath = args.length == 1? args[0]: DEFAULT_CONFIG_FILEPATH;
 
-		new SaaSim(new Configuration()).start();
+		new SaaSim(new Configuration(configFilePath)).start();
 	}
 
 }

@@ -15,6 +15,7 @@ import saasim.planning.io.PlanningWorkloadParser;
 import saasim.planning.util.Summary;
 import saasim.provisioning.Monitor;
 import saasim.sim.components.LoadBalancer;
+import saasim.sim.components.SimpleLoadBalancerWithAdmissionControl;
 import saasim.sim.core.EventScheduler;
 import saasim.sim.util.SimulatorProperties;
 
@@ -37,7 +38,7 @@ public class OptimalHeuristic implements PlanningHeuristic{
 	 * Default constructor.
 	 * @param scheduler {@link EventScheduler} event scheduler
 	 * @param monitor {@link Monitor} for reporting information
-	 * @param loadBalancers a set of {@link LoadBalancer}s of the application
+	 * @param loadBalancers a set of {@link SimpleLoadBalancerWithAdmissionControl}s of the application
 	 */
 	public OptimalHeuristic(EventScheduler scheduler, Monitor monitor, LoadBalancer[] loadBalancers){
 		this.types = new ArrayList<MachineType>();

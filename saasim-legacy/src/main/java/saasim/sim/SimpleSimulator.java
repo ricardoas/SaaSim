@@ -9,7 +9,7 @@ import saasim.config.Configuration;
 import saasim.io.WorkloadParser;
 import saasim.io.WorkloadParserFactory;
 import saasim.provisioning.DPS;
-import saasim.sim.components.LoadBalancer;
+import saasim.sim.components.SimpleLoadBalancerWithAdmissionControl;
 import saasim.sim.core.AbstractEventHandler;
 import saasim.sim.core.Event;
 import saasim.sim.core.EventCheckpointer;
@@ -44,7 +44,7 @@ public class SimpleSimulator extends AbstractEventHandler implements Simulator{
 	 * Default constructor.
 	 * @param scheduler A {@link EventScheduler} to represent a scheduler of {@link SimpleSimulator}.
 	 * @param dps TODO
-	 * @param applications An array containing the tiers of application, see {@link LoadBalancer}.
+	 * @param applications An array containing the tiers of application, see {@link SimpleLoadBalancerWithAdmissionControl}.
 	 */
 	@SuppressWarnings("unchecked")
 	public SimpleSimulator(EventScheduler scheduler, DPS dps, DynamicConfigurable... applications){
