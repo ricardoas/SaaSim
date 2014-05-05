@@ -65,8 +65,10 @@ public class SaaSim implements Simulator {
 		}else{
 			
 			scheduler = new EventScheduler(config.getLong("random.seed", 0));
-			iaasProvider = config.getIaaSProvidersFactory().build(config);
-			dps = config.getDPSFactory().build(iaasProvider);
+			iaasProvider = config.getInjector().getInstance(IaaSProvider.class);
+			
+//			iaasProvider = config.getIaaSProvidersFactory().build(config);
+			dps = config.getDPSFactory().build(config, iaasProvider);
 			application = config.getApplicationFactory().build(scheduler, dps);
 			
 			readWorkload();

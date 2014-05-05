@@ -3,7 +3,9 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -189,5 +191,14 @@ public final class EventScheduler implements Serializable{
 		}
 		
 		return hashMap;
+	}
+	
+	public static void main(String[] args) throws ClassNotFoundException, IOException {
+		Enumeration<URL> resources = EventScheduler.class.getClassLoader().getResources( "saasim.ext.event.*");
+		while (resources.hasMoreElements()) {
+			URL url = (URL) resources.nextElement();
+			System.out.println(url.toString());
+		}
+		
 	}
 }

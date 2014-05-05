@@ -8,6 +8,11 @@ import saasim.core.util.TimeUnit;
 
 public class AmazonEC2 implements IaaSProvider {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public AmazonEC2(Configuration config) {
 		
 	}

@@ -14,6 +14,10 @@ import saasim.core.provisioning.TierConfiguration;
  */
 public class SingleTierApplication implements Application {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Tier tier;
 
 	public SingleTierApplication() {
