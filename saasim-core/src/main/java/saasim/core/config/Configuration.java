@@ -7,12 +7,7 @@ import saasim.core.application.Application;
 import saasim.core.cloud.IaaSProvider;
 import saasim.core.provisioning.DPS;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-
 public class Configuration extends PropertiesConfiguration{
-
-	private final Injector injector;
 
 	/**
 	 * Default constructor
@@ -22,13 +17,8 @@ public class Configuration extends PropertiesConfiguration{
 	 */
 	public Configuration(String propertiesFilepath) throws ConfigurationException {
 		super(propertiesFilepath);
-		injector = Guice.createInjector(new BillingModule());
 	}
 	
-	public Injector getInjector(){
-		return injector;
-	}
-
 	@SuppressWarnings("unchecked")
 	public AbstractFactory<IaaSProvider> getIaaSProvidersFactory() throws ConfigurationException {
 		
@@ -56,4 +46,5 @@ public class Configuration extends PropertiesConfiguration{
 			throw new ConfigurationException("Erro instantiating " + name, e);
 		}
 	}
+
 }

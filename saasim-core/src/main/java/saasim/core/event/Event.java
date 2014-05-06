@@ -1,130 +1,49 @@
 package saasim.core.event;
 
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.util.Arrays;
-
 
 /**
- * Each timed action in the simulation environment is modeled as an {@link Event}. Events are composed by
- * an id, a target handler id, a <code>long</code> time stamp, a type and arguments to forward to the handler.
- *
+ * Scheduled event.
+ * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public final class Event implements Comparable<Event>, Serializable{
+public abstract class Event implements Comparable<Event>{
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1977642650443631889L;
-
+	
 	private static int idSeed = 0;
-	
+
 	private final int id;
-	private EventHandler target;
-	private Class<? extends Annotation> type;
-    private long timestamp;
-    private EventPriority priority;
-	private Object[] arguments;
-	
-	
-	/**
-	 * Constructor of Event with {@link EventPriority} set to DEFAULT.
-	 * @param target
-	 * @param type
-	 * @param timestamp
-	 * @param arguments
-	 * @return
-	 */
-	public Event(EventHandler target, Class<? extends Annotation> type,
-			long timestamp, Object... arguments) {
-		this(target, type, timestamp, EventPriority.DEFAULT, arguments);
-	}
-
+	private final long scheduledTime;
 
 	/**
+	 * Default constructor
 	 * 
-	 * @param target
-	 * @param type
-	 * @param timestamp
-	 * @param priority
-	 * @param arguments
+	 * @param scheduledTime time to trigger this {@link Event}
 	 */
-	public Event(EventHandler target, Class<? extends Annotation> type,
-			long timestamp, EventPriority priority, Object... arguments) {
-
-		
-		assert type != null;
-    	assert target  != null;
-    	assert timestamp >= 0;
-    	assert priority != null;
-
+	public Event(long scheduledTime) {
 		this.id = idSeed++;
-		this.target = target;
-		this.type = type;
-		this.timestamp = timestamp;
-		this.priority = priority;
-		this.arguments = arguments;
+		this.scheduledTime = scheduledTime;
 	}
 	
 	/**
-	 * @return the id
+	 * @return time to trigger this {@link Event}
 	 */
-	public int getId() {
-		return id;
+	public long getScheduledTime() {
+		return scheduledTime;
 	}
-
+	
 	/**
-	 * @return the target
+	 * Perform an action
 	 */
-	public EventHandler getTarget() {
-		return target;
-	}
-
-	/**
-	 * @return the type
-	 */
-	public Class<? extends Annotation> getType() {
-		return type;
-	}
-
-	/**
-	 * @return the timestamp
-	 */
-	public long getTimestamp() {
-		return timestamp;
-	}
-
-	/**
-	 * @return the priority
-	 */
-	public EventPriority getPriority() {
-		return priority;
-	}
-
-	/**
-	 * @return the arguments
-	 */
-	public Object[] getArguments() {
-		return arguments;
-	}
+	public abstract void trigger();
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public int compareTo(Event o) {
-		int result = (timestamp < o.timestamp ? -1 : (timestamp == o.timestamp ? 0 : 1));
-
-		if(result != 0){
-			return result;
-		}
-		
-		result = priority.compareTo(o.priority);
-		
-		return result != 0? result: id - o.id;
+		return Long.compare(scheduledTime, o.scheduledTime);
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -140,16 +59,17 @@ public final class Event implements Comparable<Event>, Serializable{
 	public boolean equals(Object obj) {
 		assert (obj != null): "Can't compare with null object.";
 		assert (getClass() != obj.getClass()): "Can't compare with a different class object.";
-		
+
 		if (this == obj)
 			return true;
 		return (id == ((Event) obj).id);
 	}
 
-	@Override
-	public String toString() {
-		return "[TIME=" + timestamp + ", ID="
-				+ id + ", Handler=" + target
-				+ ", TYPE=" + type + ", V=" + Arrays.toString(arguments) + "]";
+	/**
+	 * @return <code>true</code> when this {@link Event} is scheduled to trigger before time given as parameter.
+	 */
+	public boolean happensBefore(long time) {
+		return scheduledTime <= time;
 	}
+
 }

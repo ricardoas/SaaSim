@@ -2,11 +2,11 @@ import java.io.IOException;
 
 import org.apache.commons.configuration.ConfigurationException;
 
-import saasim.core.config.Configuration;
-import saasim.core.sim.SaaSim;
+import saasim.core.sim.Simulator;
 
+import com.google.inject.Guice;
 
-public class Main {
+public class MainWithGuice {
 	
 	private static final String DEFAULT_CONFIG_FILEPATH = "saasim.properties";
 
@@ -23,9 +23,7 @@ public class Main {
 			System.exit(1);
 		}
 		
-		String configFilePath = args.length == 1? args[0]: DEFAULT_CONFIG_FILEPATH;
-
-//		new SaaSim(new Configuration(configFilePath)).start();
+		Guice.createInjector(new SaaSimModule(args.length == 1? args[0]: DEFAULT_CONFIG_FILEPATH)).getInstance(Simulator.class).start();
 	}
 
 }

@@ -1,5 +1,7 @@
 package saasim.ext.provisioning;
 
+import com.google.inject.Inject;
+
 import saasim.core.application.Application;
 import saasim.core.cloud.IaaSProvider;
 import saasim.core.cloud.InstanceType;
@@ -16,7 +18,10 @@ public class StaticProvisioningSystem implements DPS {
 	private Configuration config;
 	private IaaSProvider provider;
 
+	@Inject
 	public StaticProvisioningSystem(Configuration config, IaaSProvider provider) {
+		System.out
+				.println("StaticProvisioningSystem.StaticProvisioningSystem() config="+config + " provider=" + provider);
 		this.config = config;
 		this.provider = provider;
 	}

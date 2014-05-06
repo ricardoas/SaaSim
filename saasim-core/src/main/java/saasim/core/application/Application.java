@@ -9,6 +9,8 @@ import saasim.core.provisioning.TierConfiguration;
  */
 public interface Application extends EventHandler{
 	
+	public static String READWORKLOADEVENT = ""; 
+	
 	void config(TierConfiguration... tierConfiguration);
 
 	void process(Request request, ResponseListener callback);

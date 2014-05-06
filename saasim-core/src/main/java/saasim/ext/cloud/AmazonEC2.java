@@ -6,6 +6,8 @@ import saasim.core.config.Configuration;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.util.TimeUnit;
 
+import com.google.inject.Inject;
+
 public class AmazonEC2 implements IaaSProvider {
 
 	/**
@@ -13,8 +15,9 @@ public class AmazonEC2 implements IaaSProvider {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	@Inject
 	public AmazonEC2(Configuration config) {
-		
+		System.out.println("AmazonEC2.AmazonEC2() config="+ config);
 	}
 
 	@Override
