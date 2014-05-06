@@ -47,8 +47,12 @@ public final class EventScheduler implements Serializable{
 		this.eventSet = new TreeSet<Event>();
     }
         
-    public void queueEvent(Event eventCall) {
-		eventSet.add(eventCall);
+    /**
+     * Add event to the queue.
+     * @param event new {@link Event} to queue.
+     */
+    public void queueEvent(Event event) {
+		eventSet.add(event);
 	}
 
     /**

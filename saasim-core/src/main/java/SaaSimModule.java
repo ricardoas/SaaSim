@@ -1,5 +1,6 @@
 import org.apache.commons.configuration.ConfigurationException;
 
+import saasim.core.application.Application;
 import saasim.core.cloud.IaaSProvider;
 import saasim.core.config.Configuration;
 import saasim.core.event.EventScheduler;
@@ -22,25 +23,24 @@ public class SaaSimModule extends AbstractModule {
 		this.configFilePath = configFilePath;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void configure() {
 		
 		bind(EventScheduler.class).in(Singleton.class);
 		
-		bind(Simulator.class).to(SaaSim.class);
+		bind(SaaSim.class);
 		
-		extracted();
+		bind(IaaSProvider.class).to((Class<? extends IaaSProvider>) loadFactory(provideConfiguration().getString("iaas.class"))).in(Singleton.class);
 		
-		bind(DPS.class).to(StaticProvisioningSystem.class).in(Singleton.class);
+		bind(DPS.class).to((Class<? extends DPS>) loadFactory(provideConfiguration().getString("dps.class"))).in(Singleton.class);
+		
+		bind(Application.class).to((Class<? extends Application>) loadFactory(provideConfiguration().getString("application.class"))).in(Singleton.class);
+		
+		
 	}
 
-	protected void extracted() {
-		
-		bind(IaaSProvider.class).to((Class<? extends IaaSProvider>) loadFactory(provideConfiguration().getString("iaas.factory"))).in(Singleton.class);
-	}
-	
 	private Class<?> loadFactory(String name){
-		
 		try {
 			return Class.forName(name);
 		} catch (ClassNotFoundException e) {

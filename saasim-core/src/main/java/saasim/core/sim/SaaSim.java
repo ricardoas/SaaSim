@@ -14,6 +14,7 @@ import saasim.core.event.EventCheckpointer;
 import saasim.core.event.EventScheduler;
 import saasim.core.provisioning.DPS;
 import saasim.core.util.TimeUnit;
+import saasim.sim.core.EventType;
 
 import com.google.inject.Inject;
 
@@ -30,20 +31,18 @@ import com.google.inject.Inject;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  * 
  */
-public class SaaSim implements Simulator {
+public class SaaSim{
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 2617169446354857178L;
-	private EventScheduler scheduler;
 	private Configuration config;
-	private DPS dps;
-	// private RS rs;
-	private UtilityFunction utilityFunction;
-
+	private EventScheduler scheduler;
 	private IaaSProvider iaasProvider;
+	private DPS dps;
 	private Application application;
+	private WorkloadGenerator workloadGenerator;
 
 	/**
 	 * @param configuration
@@ -51,53 +50,28 @@ public class SaaSim implements Simulator {
 	 */
 	@Inject
 	public SaaSim(Configuration config, EventScheduler scheduler,
-			IaaSProvider iaasProvider, DPS dps) throws ConfigurationException {
+			IaaSProvider iaasProvider, DPS dps, Application application, WorkloadGenerator workloadGenerator) throws ConfigurationException {
 
-		System.out.println("SaaSim.SaaSim() config=" + config + " provider="
-				+ iaasProvider + " dps=" + dps);
 		this.config = config;
 		this.scheduler = scheduler;
 		this.iaasProvider = iaasProvider;
+		this.application = application;
 		this.dps = dps;
-		readWorkload();
-
-	}
-
-	private void readWorkload() {
-		final Request request = null;
+		this.workloadGenerator = workloadGenerator;
 		
-		scheduler.queueEvent(new Event(scheduler.now()) {
-			@Override
-			public void trigger() {
-				application.process(request, null);
-			}
-		});
+		this.dps.registerConfigurable(application);
 	}
 
 	@Override
 	public void start() {
+		
+		scheduler.queueEvent(new Event(scheduler.now()){
+			@Override
+			public void trigger() {
+				workloadGenerator.start();
+			}
+		});
 
-		long simulationEnd = config.getLong("saasim.end")
-				* TimeUnit.valueOf(
-						config.getString("saasim.end.unit",
-								TimeUnit.DAY.toString())).getMillis();
-
-		long checkpointAt = simulationEnd;
-		if (config.getBoolean("saasim.checkpoint", false)) {
-			long checkpointInterval = TimeUnit.valueOf(
-					config.getString("saasim.checkpoint.unit",
-							TimeUnit.DAY.toString())).getMillis();
-			checkpointAt = scheduler.now() + simulationEnd / checkpointInterval;
-		}
-
-		scheduler.start(checkpointAt);
-
-		if (scheduler.now() < simulationEnd) {
-			EventCheckpointer.save(scheduler);
-		} else {
-			Logger logger = Logger.getLogger(SaaSim.class);
-			logger.info(utilityFunction);
-			// logger.debug(config.getScheduler().dumpPostMortemEvents());
-		}
+		scheduler.start(config.getLong("saasim.end"));
 	}
 }
