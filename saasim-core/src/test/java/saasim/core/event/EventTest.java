@@ -12,8 +12,14 @@ public class EventTest {
 	public void testCompareToWithDifferentTimes(){
 		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
 		EasyMock.replay(handler);
-		OldEvent eventA = new OldEvent(handler, TestEvent.class, 1000);
-		OldEvent eventB = new OldEvent(handler, TestEvent.class, 2000);
+		Event eventA = new Event(1000){
+			@Override
+			public void trigger() {
+			}};
+		Event eventB = new Event(2000){
+			@Override
+			public void trigger() {
+			}};
 		assertEquals(-1, eventA.compareTo(eventB));
 		assertEquals(1, eventB.compareTo(eventA));
 		EasyMock.verify(handler);
@@ -23,8 +29,14 @@ public class EventTest {
 	public void testCompareToWithSameTimeDifferentPriority(){
 		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
 		EasyMock.replay(handler);
-		OldEvent eventA = new OldEvent(handler, TestEvent.class, 1000, EventPriority.VERY_HIGH);
-		OldEvent eventB = new OldEvent(handler, TestEvent.class, 1000, EventPriority.VERY_LOW);
+		Event eventA = new Event(1000, EventPriority.VERY_HIGH){
+			@Override
+			public void trigger() {
+			}};
+		Event eventB = new Event(1000, EventPriority.VERY_LOW){
+			@Override
+			public void trigger() {
+			}};
 		assertEquals(-6, eventA.compareTo(eventB));
 		assertEquals(6, eventB.compareTo(eventA));
 		EasyMock.verify(handler);
@@ -34,8 +46,14 @@ public class EventTest {
 	public void testCompareToWithSameTimeAndPriority(){
 		EventHandler handler = EasyMock.createStrictMock(EventHandler.class);
 		EasyMock.replay(handler);
-		OldEvent eventA = new OldEvent(handler, TestEvent.class, 1000, EventPriority.DEFAULT);
-		OldEvent eventB = new OldEvent(handler, TestEvent.class, 1000, EventPriority.DEFAULT);
+		Event eventA = new Event(1000, EventPriority.DEFAULT){
+			@Override
+			public void trigger() {
+			}};
+		Event eventB = new Event(1000, EventPriority.DEFAULT){
+			@Override
+			public void trigger() {
+			}};
 		assertEquals(-1, eventA.compareTo(eventB));
 		assertEquals(1, eventB.compareTo(eventA));
 		EasyMock.verify(handler);

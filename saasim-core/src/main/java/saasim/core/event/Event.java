@@ -1,6 +1,7 @@
 package saasim.core.event;
 
 
+
 /**
  * Scheduled event.
  * 
@@ -13,6 +14,7 @@ public abstract class Event implements Comparable<Event>{
 
 	private final int id;
 	private final long scheduledTime;
+	private EventPriority priority;
 
 	/**
 	 * Default constructor
@@ -20,10 +22,15 @@ public abstract class Event implements Comparable<Event>{
 	 * @param scheduledTime time to trigger this {@link Event}
 	 */
 	public Event(long scheduledTime) {
-		this.id = idSeed++;
-		this.scheduledTime = scheduledTime;
+		this(scheduledTime, EventPriority.DEFAULT);
 	}
 	
+	public Event(long scheduledTime, EventPriority priority) {
+		this.id = idSeed++;
+		this.scheduledTime = scheduledTime;
+		this.priority = priority;
+	}
+
 	/**
 	 * @return time to trigger this {@link Event}
 	 */
@@ -41,7 +48,14 @@ public abstract class Event implements Comparable<Event>{
 	 */
 	@Override
 	public int compareTo(Event o) {
-		return Long.compare(scheduledTime, o.scheduledTime);
+		int result = Long.compare(scheduledTime, o.scheduledTime);
+		
+		if(result != 0){
+			return result;
+		}
+
+		result = priority.compareTo(o.priority);
+		return result != 0? result: Integer.compare(id, o.id);
 	}
 
 	/**
