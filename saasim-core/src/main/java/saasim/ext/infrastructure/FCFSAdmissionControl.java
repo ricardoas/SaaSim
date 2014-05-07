@@ -6,6 +6,8 @@ import java.util.Queue;
 import org.apache.commons.configuration.Configuration;
 
 import saasim.core.application.Request;
+import saasim.core.event.Event;
+import saasim.core.event.EventScheduler;
 import saasim.core.infrastructure.AdmissionControl;
 import saasim.core.infrastructure.LoadBalancer;
 import saasim.core.infrastructure.Monitor;
@@ -23,13 +25,15 @@ public class FCFSAdmissionControl implements AdmissionControl {
 	private int acceptanceRate;
 	private int frequency;
 	private Monitor monitor;
+	private EventScheduler scheduler;
 	
 	/**
 	 * Default constructor
 	 */
 	@Inject
-	public FCFSAdmissionControl(Configuration configuration, Monitor monitor) {
+	public FCFSAdmissionControl(EventScheduler scheduler, Configuration configuration, Monitor monitor) {
 		this.monitor = monitor;
+		this.scheduler = scheduler;
 		
 		this.acceptedQueue = new LinkedList<>();
 		this.acceptanceRate = Integer.MAX_VALUE;
@@ -37,7 +41,7 @@ public class FCFSAdmissionControl implements AdmissionControl {
 	}
 
 	@Override
-	public void process(long timestamp, LoadBalancer loadBalancer) {
+	public void process(long timestamp, final LoadBalancer loadBalancer) {
 		int counter = 0;
 		
 		while(!acceptedQueue.isEmpty()){
@@ -53,7 +57,12 @@ public class FCFSAdmissionControl implements AdmissionControl {
 			}
 		}
 		
-		//send list of requests to loadbalancer
+		scheduler.queueEvent(new Event(scheduler.now() + frequency) {
+			@Override
+			public void trigger() {
+				process(scheduler.now(), loadBalancer);
+			}
+		});
 	}
 
 	@Override
