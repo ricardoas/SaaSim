@@ -1,11 +1,8 @@
 package saasim.ext.application;
 
 import saasim.core.application.Application;
-import saasim.core.application.HorizontallyScalableTier;
 import saasim.core.application.Request;
 import saasim.core.application.Tier;
-import saasim.core.infrastructure.AdmissionControl;
-import saasim.core.infrastructure.Monitor;
 import saasim.core.provisioning.TierConfiguration;
 
 import com.google.inject.Inject;
@@ -22,21 +19,16 @@ public class SingleTierApplication implements Application {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private Monitor monitor;
-	
-	private AdmissionControl control;
 	private Tier tier;
 
 	@Inject
-	public SingleTierApplication(Monitor monitor, AdmissionControl control) {
-		this.monitor = monitor;
-		this.tier = new HorizontallyScalableTier();
-		this.control = control;
+	public SingleTierApplication(Tier tier) {
+		this.tier = tier;
 	}
 
 	@Override
 	public void queue(Request request) {
-		
+		this.tier.queue(request);
 	}
 
 	@Override

@@ -4,14 +4,38 @@ import saasim.core.application.Request;
 
 public interface LoadBalancer {
 	
-
 	/**
-	 * Add a new {@link InstanceDescriptor} to this tier.
+	 * Send request to {@link LoadBalancer} processing queue.
+	 * @param request new {@link Request}
+	 */
+	void queue(Request request);
+
+	/** 
+	 * Registers a new {@link Machine} to this {@link LoadBalancer} according to {@link InstanceDescriptor}.
 	 * @param useStartUpDelay <code>true</code> if use start up delay
 	 */
 	void addMachine(InstanceDescriptor descriptor, boolean useStartUpDelay);
 
-	void process(Request request);
+	/**
+	 * Removes a specific {@link Machine} from this {@link LoadBalancer}.
+	 * @param force <code>true</code> if use force
+	 */
+	void removeMachine(InstanceDescriptor descriptor, boolean force);
+
+	/**
+	 * Removes a specific {@link Machine} from this {@link LoadBalancer}.
+	 * @param force <code>true</code> if use force
+	 */
+	void reconfigureMachine(InstanceDescriptor descriptor, boolean force);
+
+
+	
+	
+	
+	
+	/********************************************/
+
+
 
 	void registerDrop(Request request);
 
@@ -47,11 +71,6 @@ public interface LoadBalancer {
 	 */
 	void reportRequestFinished(Request requestFinished);
 
-	/**
-	 * Remove a specific {@link Machine} to this tier.
-	 * @param force <code>true</code> if use force
-	 */
-	void removeMachine(InstanceDescriptor descriptor, boolean force);
 
 	void config(double threshold);
 

@@ -7,14 +7,16 @@ import saasim.core.provisioning.TierConfiguration;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public interface Tier{
+public interface Tier {
 	
 	/**
 	 * @param request {@link Request} to process.
-	 * @param responseListener TODO
 	 */
-	void process(Request request, ResponseListener responseListener);
+	void queue(Request request);
 
+	/**
+	 * @param tierConfiguration new {@link TierConfiguration}.
+	 */
 	void config(TierConfiguration tierConfiguration);
 	
 }

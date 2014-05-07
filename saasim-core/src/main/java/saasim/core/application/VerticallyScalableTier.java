@@ -1,6 +1,12 @@
 package saasim.core.application;
 
+import com.google.inject.Inject;
+
+import saasim.core.event.EventScheduler;
+import saasim.core.infrastructure.AdmissionControl;
 import saasim.core.infrastructure.InstanceDescriptor;
+import saasim.core.infrastructure.LoadBalancer;
+import saasim.core.infrastructure.Machine;
 import saasim.core.provisioning.TierConfiguration;
 
 
@@ -12,15 +18,19 @@ import saasim.core.provisioning.TierConfiguration;
  */
 public class VerticallyScalableTier extends AbstractTier{
 	
+	@Inject
+	public VerticallyScalableTier(EventScheduler scheduler,
+			AdmissionControl admissionControl, LoadBalancer loadBalancer) {
+		super(scheduler, admissionControl, loadBalancer);
+	}
+
 	@Override
 	public void config(TierConfiguration tierConfiguration) {
 		
 		switch (tierConfiguration.getAction()) {
 		case INCREASE:
-			scaleUp(tierConfiguration.getDescriptors(), tierConfiguration.isForce());
-			break;
 		case DECREASE:
-			scaleDown(tierConfiguration.getDescriptors(), tierConfiguration.isForce());
+			reconfigure(tierConfiguration.getDescriptors(), tierConfiguration.isForce());
 			break;
 		default:
 			throw new RuntimeException("Unknown action of configuration!");
@@ -28,25 +38,13 @@ public class VerticallyScalableTier extends AbstractTier{
 	}
 	
 	/**
-	 * Scales up this tier.
+	 * Scales up or down a {@link Machine}.
 	 * 
 	 * @param machineDescriptor {@link InstanceDescriptor} of the new server.
 	 */
-	private void scaleUp(InstanceDescriptor[] instanceDescriptors, boolean force){
+	private void reconfigure(InstanceDescriptor[] instanceDescriptors, boolean force){
 		for (InstanceDescriptor instanceDescriptor : instanceDescriptors) {
-			loadBalancer.addMachine(instanceDescriptor, !force);
-		}
-	}
-	
-	/**
-	 * Scales down this tier.
-	 *  
-	 * @param force <code>true</code> to remove immediately, and <code>false</code> to stop scheduling and wait
-	 * until machine becomes idle to remove.
-	 */
-	private void scaleDown(InstanceDescriptor[] instanceDescriptors, boolean force){
-		for (InstanceDescriptor instanceDescriptor : instanceDescriptors) {
-			loadBalancer.removeMachine(instanceDescriptor, force);
+			loadBalancer.reconfigureMachine(instanceDescriptor, !force);
 		}
 	}
 }

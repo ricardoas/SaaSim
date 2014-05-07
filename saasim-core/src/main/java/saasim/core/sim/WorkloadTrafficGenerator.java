@@ -20,7 +20,7 @@ import com.google.inject.Inject;
  */
 public class WorkloadTrafficGenerator {
 	
-	private static final int DEFAULT_BUFFER_SIZE = 1000;
+	private static final int DEFAULT_BUFFER_SIZE = 60 * 1000;
 	private final EventScheduler scheduler;
 	private final Application application;
 	private final List<TraceReader<Request>> parsers;
@@ -45,7 +45,7 @@ public class WorkloadTrafficGenerator {
 			parsers.add(readerFactory.create(string, parsers.size()));
 		}
 		
-		this.bufferSize = DEFAULT_BUFFER_SIZE;
+		this.bufferSize = configuration.getInt("trace.generator.buffer", DEFAULT_BUFFER_SIZE);
 	}
 
 	/**

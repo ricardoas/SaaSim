@@ -12,18 +12,26 @@ import saasim.core.application.Request;
 public interface Monitor extends Serializable{
 	
 	/**
+	 * Report when a specific {@link Request} was lost.
+	 * TODO Report which tier was responsible for loosing this request.
+	 * 
+	 * @param request {@link Request} that was lost
+	 */
+	void requestFailed(Request request);
+
+	
+	
+	
+	
+	/********************************************/
+	
+	
+	/**
 	 * Report when a specific {@link Request} has been finished.
 	 * @param requestFinished A {@link Request} finished.
 	 */
 	void requestFinished(Request requestFinished);
 	
-	/**
-	 * Report when a specific {@link Request} was lost. 
-	 * @param timeMilliSeconds the time when the {@link Request} was lost
-	 * @param request {@link Request} that was lost
-	 * @param tier the tier of machine
-	 */
-	void requestQueued(long timeMilliSeconds, Request request, int tier);
 
 	/**
 	 * Send the calculated statistics coming from {@link Statistics}.

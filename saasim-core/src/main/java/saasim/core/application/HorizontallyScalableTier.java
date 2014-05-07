@@ -1,6 +1,11 @@
 package saasim.core.application;
 
+import com.google.inject.Inject;
+
+import saasim.core.event.EventScheduler;
+import saasim.core.infrastructure.AdmissionControl;
 import saasim.core.infrastructure.InstanceDescriptor;
+import saasim.core.infrastructure.LoadBalancer;
 import saasim.core.provisioning.TierConfiguration;
 
 
@@ -12,6 +17,12 @@ import saasim.core.provisioning.TierConfiguration;
  */
 public class HorizontallyScalableTier extends AbstractTier implements Tier{
 	
+	@Inject
+	public HorizontallyScalableTier(EventScheduler scheduler,
+			AdmissionControl admissionControl, LoadBalancer loadBalancer) {
+		super(scheduler, admissionControl, loadBalancer);
+	}
+
 	@Override
 	public void config(TierConfiguration tierConfiguration) {
 		

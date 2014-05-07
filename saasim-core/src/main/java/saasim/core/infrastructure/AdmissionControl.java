@@ -1,9 +1,13 @@
 package saasim.core.infrastructure;
 
+import saasim.core.application.Request;
+
 public interface AdmissionControl {
 	
-	boolean canProcess();
+	void process(long timestamp, LoadBalancer loadBalancer);
 	
-	void config();
+	void updatePolicy();
+
+	boolean queue(Request request);
 
 }
