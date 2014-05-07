@@ -2,7 +2,7 @@ import java.io.IOException;
 
 import org.apache.commons.configuration.ConfigurationException;
 
-import saasim.core.sim.Simulator;
+import saasim.core.sim.SaaSim;
 
 import com.google.inject.Guice;
 
@@ -23,7 +23,7 @@ public class MainWithGuice {
 			System.exit(1);
 		}
 		
-		Guice.createInjector(new SaaSimModule(args.length == 1? args[0]: DEFAULT_CONFIG_FILEPATH)).getInstance(Simulator.class).start();
+		Guice.createInjector(new SaaSimModule(args.length == 1? args[0]: DEFAULT_CONFIG_FILEPATH)).getInstance(SaaSim.class).start();
 	}
 
 }

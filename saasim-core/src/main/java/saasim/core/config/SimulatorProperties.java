@@ -1,6 +1,5 @@
 package saasim.core.config;
 
-import saasim.core.sim.Simulator;
 
 /**
  * This class containing the properties to use in {@link Simulator}.

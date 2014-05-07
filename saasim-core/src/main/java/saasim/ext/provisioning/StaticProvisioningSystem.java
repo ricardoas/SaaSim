@@ -20,8 +20,6 @@ public class StaticProvisioningSystem implements DPS {
 
 	@Inject
 	public StaticProvisioningSystem(Configuration config, IaaSProvider provider) {
-		System.out
-				.println("StaticProvisioningSystem.StaticProvisioningSystem() config="+config + " provider=" + provider);
 		this.config = config;
 		this.provider = provider;
 	}
@@ -29,7 +27,7 @@ public class StaticProvisioningSystem implements DPS {
 	@Override
 	public void registerConfigurable(Application... applications) {
 		this.applications = applications;
-		setUp();
+//		setUp();
 	}
 
 	protected void setUp() {

@@ -17,7 +17,7 @@ public class AmazonEC2 implements IaaSProvider {
 
 	@Inject
 	public AmazonEC2(Configuration config) {
-		System.out.println("AmazonEC2.AmazonEC2() config="+ config);
+		
 	}
 
 	@Override
