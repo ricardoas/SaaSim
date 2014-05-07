@@ -10,6 +10,20 @@ import saasim.core.application.Request;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
 public interface Machine{
+	
+	void reconfigure(InstanceDescriptor descriptor);
+	
+	/**
+	 * Send a new {@link Request} to be processed by this machine.
+	 * @param request a new {@link Request} to be processed by this machine.
+	 */
+	void queue(Request request);
+	
+	
+	
+	
+	
+	/************************************************/
 
 	/**
 	 * @return The {@link LoadBalancer} responsible for this machine.
@@ -26,12 +40,6 @@ public interface Machine{
 	 * detailed information.
 	 */
 	InstanceDescriptor getDescriptor();
-
-	/**
-	 * Send a new {@link Request} to be processed by this machine.
-	 * @param request a new {@link Request} to be processed by this machine.
-	 */
-	void sendRequest(Request request);
 
 	/**
 	 * Send a shutdown signal to the machine.

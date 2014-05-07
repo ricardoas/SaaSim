@@ -1,8 +1,6 @@
 package saasim.sim.components;
 
 import saasim.cloud.Request;
-import saasim.sim.core.EventType;
-import saasim.sim.core.HandlingPoint;
 
 public interface LoadBalancer {
 
