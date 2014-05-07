@@ -1,3 +1,4 @@
+package saasim.core.sim;
 import org.apache.commons.configuration.ConfigurationException;
 
 import saasim.core.application.Application;
@@ -10,24 +11,39 @@ import saasim.core.io.TraceParcer;
 import saasim.core.io.TraceReader;
 import saasim.core.io.TraceReaderFactory;
 import saasim.core.provisioning.DPS;
-import saasim.core.sim.SaaSim;
 import saasim.ext.io.LineBasedTraceReader;
 
 import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 
+/**
+ * {@link Guice} module, binding interfaces to implementations as configured at properties file. 
+ * 
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ */
 public class SaaSimModule extends AbstractModule {
 
-	private String configFilePath;
+	private final String configFilePath;
 
+	/**
+	 * Default constructor.
+	 * 
+	 * @param configFilePath path to configuration file.
+	 */
 	public SaaSimModule(String configFilePath) {
 		this.configFilePath = configFilePath;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @see com.google.inject.AbstractModule#configure()
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void configure() {
@@ -36,22 +52,27 @@ public class SaaSimModule extends AbstractModule {
 		
 		bind(SaaSim.class);
 		
-		bind(IaaSProvider.class).to((Class<? extends IaaSProvider>) loadFactory(provideConfiguration().getString("iaas.class"))).in(Singleton.class);
+		bind(IaaSProvider.class).to((Class<? extends IaaSProvider>) load(provideConfiguration().getString("iaas.class"))).in(Singleton.class);
 		
-		bind(DPS.class).to((Class<? extends DPS>) loadFactory(provideConfiguration().getString("dps.class"))).in(Singleton.class);
+		bind(DPS.class).to((Class<? extends DPS>) load(provideConfiguration().getString("dps.class"))).in(Singleton.class);
 		
-		bind(Application.class).to((Class<? extends Application>) loadFactory(provideConfiguration().getString("application.class"))).in(Singleton.class);
+		bind(Application.class).to((Class<? extends Application>) load(provideConfiguration().getString("application.class"))).in(Singleton.class);
 		
-		bind(Monitor.class).to((Class<? extends Monitor>) loadFactory(provideConfiguration().getString("monitor.class"))).in(Singleton.class);
+		bind(Monitor.class).to((Class<? extends Monitor>) load(provideConfiguration().getString("monitor.class"))).in(Singleton.class);
 		
-		bind(TraceParcer.class).to((Class<? extends TraceParcer>) loadFactory(provideConfiguration().getString("trace.parser.class"))).in(Singleton.class);
+		bind(TraceParcer.class).to((Class<? extends TraceParcer>) load(provideConfiguration().getString("trace.parser.class"))).in(Singleton.class);
 		
 		install(new FactoryModuleBuilder()
 	     .implement(new TypeLiteral<TraceReader<Request>>() {}, LineBasedTraceReader.class)
 	     .build(new TypeLiteral<TraceReaderFactory<Request>>() {}));
 	}
 
-	private Class<?> loadFactory(String name){
+	/**
+	 * Load {@link Class} from name.
+	 * @param name {@link Class} name.
+	 * @return a {@link Class} instance.
+	 */
+	private Class<?> load(String name){
 		try {
 			return Class.forName(name);
 		} catch (ClassNotFoundException e) {
@@ -60,6 +81,9 @@ public class SaaSimModule extends AbstractModule {
 	}
 
 	
+	/**
+	 * @return A {@link Configuration} instance.
+	 */
 	@Provides
 	@Singleton
 	Configuration provideConfiguration(){

@@ -1,7 +1,6 @@
 package saasim.core.event;
 
 
-
 /**
  * Scheduled event.
  * 
@@ -17,7 +16,7 @@ public abstract class Event implements Comparable<Event>{
 	private EventPriority priority;
 
 	/**
-	 * Default constructor
+	 * Builds a {@link Event} with {@link EventPriority#DEFAULT} as event priority. 
 	 * 
 	 * @param scheduledTime time to trigger this {@link Event}
 	 */
@@ -25,6 +24,11 @@ public abstract class Event implements Comparable<Event>{
 		this(scheduledTime, EventPriority.DEFAULT);
 	}
 	
+	/**
+	 * Default constructor.
+	 * @param scheduledTime time to trigger this {@link Event}
+	 * @param priority {@link EventPriority}
+	 */
 	public Event(long scheduledTime, EventPriority priority) {
 		this.id = idSeed++;
 		this.scheduledTime = scheduledTime;
@@ -39,10 +43,17 @@ public abstract class Event implements Comparable<Event>{
 	}
 	
 	/**
+	 * @return <code>true</code> when this {@link Event} is scheduled to trigger before time given as parameter.
+	 */
+	public boolean happensBefore(long time) {
+		return scheduledTime <= time;
+	}
+
+	/**
 	 * Perform an action
 	 */
 	public abstract void trigger();
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -53,11 +64,11 @@ public abstract class Event implements Comparable<Event>{
 		if(result != 0){
 			return result;
 		}
-
+		
 		result = priority.compareTo(o.priority);
 		return result != 0? result: Integer.compare(id, o.id);
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -65,7 +76,7 @@ public abstract class Event implements Comparable<Event>{
 	public int hashCode() {
 		return id;
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -73,17 +84,10 @@ public abstract class Event implements Comparable<Event>{
 	public boolean equals(Object obj) {
 		assert (obj != null): "Can't compare with null object.";
 		assert (getClass() != obj.getClass()): "Can't compare with a different class object.";
-
+		
 		if (this == obj)
 			return true;
 		return (id == ((Event) obj).id);
 	}
-
-	/**
-	 * @return <code>true</code> when this {@link Event} is scheduled to trigger before time given as parameter.
-	 */
-	public boolean happensBefore(long time) {
-		return scheduledTime <= time;
-	}
-
+	
 }

@@ -3,7 +3,6 @@ package saasim.core.sim;
 import org.apache.commons.configuration.ConfigurationException;
 
 import saasim.core.application.Application;
-import saasim.core.application.Tier;
 import saasim.core.cloud.IaaSProvider;
 import saasim.core.config.Configuration;
 import saasim.core.event.Event;
@@ -13,17 +12,9 @@ import saasim.core.provisioning.DPS;
 import com.google.inject.Inject;
 
 /**
- * Simple implementation of a {@link Simulator} composed by:<br>
- * <ul>
- * <li>a set of {@link Tier} applications;</li>
- * <li>one {@link EventScheduler}</li>
- * <li></li>
- * <li></li>
- * <li></li>
- * </ul>
+ * SaaSim main class. It builds and glues all other components.
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
- * 
  */
 public class SaaSim{
 
@@ -35,14 +26,22 @@ public class SaaSim{
 	private WorkloadTrafficGenerator workloadGenerator;
 
 	/**
-	 * @param configuration
+	 * Default constructor.
+	 * 
+	 * @param configuration {@link Configuration} instance.
+	 * @param scheduler {@link Event} queue manager.
+	 * @param iaasProvider {@link IaaSProvider} instance.
+	 * @param dps provisioner instance.
+	 * @param application {@link Application} being simulated.
+	 * @param workloadGenerator traffic generator.
+	 * 
 	 * @throws ConfigurationException
 	 */
 	@Inject
-	public SaaSim(Configuration config, EventScheduler scheduler,
+	public SaaSim(Configuration configuration, EventScheduler scheduler,
 			IaaSProvider iaasProvider, DPS dps, Application application, WorkloadTrafficGenerator workloadGenerator) throws ConfigurationException {
 
-		this.config = config;
+		this.config = configuration;
 		this.scheduler = scheduler;
 		this.iaasProvider = iaasProvider;
 		this.application = application;
@@ -52,6 +51,9 @@ public class SaaSim{
 		this.dps.registerConfigurable(application);
 	}
 
+	/**
+	 * Start simulation
+	 */
 	public void start() {
 		
 		scheduler.queueEvent(new Event(scheduler.now()){

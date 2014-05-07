@@ -13,6 +13,11 @@ import saasim.core.io.TraceReaderFactory;
 
 import com.google.inject.Inject;
 
+/**
+ * it generates workload to {@link Application}.
+ * 
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ */
 public class WorkloadTrafficGenerator {
 	
 	private static final int DEFAULT_BUFFER_SIZE = 1000;
@@ -21,6 +26,14 @@ public class WorkloadTrafficGenerator {
 	private final List<TraceReader<Request>> parsers;
 	private final int bufferSize;
 
+	/**
+	 * Default constructor.
+	 * 
+	 * @param configuration {@link Configuration} instance.
+	 * @param scheduler {@link Event} queue manager.
+	 * @param application {@link Application} being simulated.
+	 * @param readerFactory {@link TraceReader} factory object.
+	 */
 	@Inject
 	public WorkloadTrafficGenerator(Configuration configuration, EventScheduler scheduler, Application application, TraceReaderFactory<Request> readerFactory) {
 		this.scheduler = scheduler;
@@ -35,6 +48,9 @@ public class WorkloadTrafficGenerator {
 		this.bufferSize = DEFAULT_BUFFER_SIZE;
 	}
 
+	/**
+	 * Start load generation.
+	 */
 	public void start(){
 		long counter = scheduler.now() + bufferSize;
 		

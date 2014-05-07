@@ -3,14 +3,13 @@ package saasim.core.infrastructure;
 import java.util.Queue;
 
 import saasim.core.application.Request;
-import saasim.core.event.EventHandler;
 
 
 /**
  * Methods to manage a machine.
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public interface Machine extends EventHandler{
+public interface Machine{
 
 	/**
 	 * @return The {@link LoadBalancer} responsible for this machine.

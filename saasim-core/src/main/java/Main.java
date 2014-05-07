@@ -1,8 +1,15 @@
-import java.io.IOException;
-
 import org.apache.commons.configuration.ConfigurationException;
 
+import saasim.core.sim.SaaSim;
+import saasim.core.sim.SaaSimModule;
 
+import com.google.inject.Guice;
+
+/**
+ * Entry point.
+ * 
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ */
 public class Main {
 	
 	private static final String DEFAULT_CONFIG_FILEPATH = "saasim.properties";
@@ -10,8 +17,8 @@ public class Main {
 	/**
 	 * Entry point.
 	 * 
-	 * @throws IOException
-	 * @throws ConfigurationException
+	 * @param args path to configuration file.
+	 * @throws ConfigurationException check your configuration file!
 	 */
 	public static void main(String[] args) throws ConfigurationException {
 
@@ -20,9 +27,7 @@ public class Main {
 			System.exit(1);
 		}
 		
-		String configFilePath = args.length == 1? args[0]: DEFAULT_CONFIG_FILEPATH;
-
-//		new SaaSim(new Configuration(configFilePath)).start();
+		Guice.createInjector(new SaaSimModule(args.length == 1? args[0]: DEFAULT_CONFIG_FILEPATH)).getInstance(SaaSim.class).start();
 	}
 
 }

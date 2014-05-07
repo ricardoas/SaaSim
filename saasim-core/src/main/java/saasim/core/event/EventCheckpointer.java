@@ -16,7 +16,10 @@ import org.apache.log4j.Logger;
  * loaded in a consequent execution it is automatically renamed to include current time in its name.
  * 
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
+ * 
+ * @deprecated Checkpoint is not supported yet.
  */
+@Deprecated
 public final class EventCheckpointer {
 
 	public static final String CHECKPOINT_FILE = ".saasim.ckp";

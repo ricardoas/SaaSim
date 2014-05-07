@@ -6,8 +6,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
-import saasim.core.event.EventCheckpointer;
-
 
 /**
  * Super class of tests which do not need a configuration
@@ -19,7 +17,6 @@ public class CleanConfigurationTest {
 	@BeforeClass
 	public static void setUpBeforeClass(){
 		BasicConfigurator.configure();
-		EventCheckpointer.clear();
 	}
 
 	/**
@@ -29,24 +26,13 @@ public class CleanConfigurationTest {
 	 */
 	@Before
 	public void setUp() throws Exception{
-		
-//		Field field = Configuration.class.getDeclaredField("instance");
-//		field.setAccessible(true);
-//		field.set(null, null);
-		
-//		FIXME UNCOMMENT ME AFTER IMPLEMENTING AbstractWorkloadParser 
-//		field = AbstractWorkloadParser.class.getDeclaredField("saasClientIDSeed");
-//		field.setAccessible(true);
-//		field.set(null, 0);
 	}
 	
 	@After
 	public void tearDown() {
-		EventCheckpointer.clear();
 	}
 
 	@AfterClass
 	public static void tearDownAfterClass(){
-		EventCheckpointer.clear();
 	}
 }
