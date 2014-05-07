@@ -13,7 +13,7 @@ public interface Application extends EventHandler{
 	
 	void config(TierConfiguration... tierConfiguration);
 
-	void process(Request request, ResponseListener callback);
+	void queue(Request request);
 	
 	int getNumberOfTiers();
 }

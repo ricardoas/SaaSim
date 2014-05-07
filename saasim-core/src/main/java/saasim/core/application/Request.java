@@ -8,4 +8,6 @@ package saasim.core.application;
  */
 public interface Request {
 
+	long getArrivalTimeInMillis();
+
 }

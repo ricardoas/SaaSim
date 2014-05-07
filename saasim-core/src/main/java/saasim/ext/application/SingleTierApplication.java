@@ -1,14 +1,13 @@
 package saasim.ext.application;
 
-import com.google.inject.Inject;
-
 import saasim.core.application.Application;
 import saasim.core.application.HorizontallyScalableTier;
 import saasim.core.application.Request;
-import saasim.core.application.ResponseListener;
 import saasim.core.application.Tier;
 import saasim.core.infrastructure.Monitor;
 import saasim.core.provisioning.TierConfiguration;
+
+import com.google.inject.Inject;
 
 /**
  * Single tier application.
@@ -32,7 +31,7 @@ public class SingleTierApplication implements Application {
 	}
 
 	@Override
-	public void process(Request request, ResponseListener callback) {
+	public void queue(Request request) {
 		
 	}
 

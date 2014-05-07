@@ -2,6 +2,7 @@ package saasim.ext.application;
 
 import saasim.core.application.Application;
 import saasim.core.config.AbstractFactory;
+import saasim.core.infrastructure.Monitor;
 
 
 /**
@@ -18,6 +19,6 @@ public class SingleTierApplicationFactory extends AbstractFactory<Application> {
 	 */
 	@Override
 	public Application build(Object... args) {
-		return new SingleTierApplication();
+		return new SingleTierApplication((Monitor) args[0]);
 	}
 }
