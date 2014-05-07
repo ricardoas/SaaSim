@@ -20,7 +20,6 @@ public class SaaSim{
 
 	private Configuration config;
 	private EventScheduler scheduler;
-	private IaaSProvider iaasProvider;
 	private DPS dps;
 	private Application application;
 	private WorkloadTrafficGenerator workloadGenerator;
@@ -38,17 +37,15 @@ public class SaaSim{
 	 * @throws ConfigurationException
 	 */
 	@Inject
-	public SaaSim(Configuration configuration, EventScheduler scheduler,
-			IaaSProvider iaasProvider, DPS dps, Application application, WorkloadTrafficGenerator workloadGenerator) throws ConfigurationException {
+	public SaaSim(Configuration configuration, EventScheduler scheduler, DPS dps, Application application, WorkloadTrafficGenerator workloadGenerator) throws ConfigurationException {
 
 		this.config = configuration;
 		this.scheduler = scheduler;
-		this.iaasProvider = iaasProvider;
 		this.application = application;
 		this.dps = dps;
 		this.workloadGenerator = workloadGenerator;
 		
-		this.dps.registerConfigurable(application);
+		this.dps.registerConfigurable(this.application);
 	}
 
 	/**
