@@ -1,12 +1,10 @@
 package saasim.core.application;
 
-import com.google.inject.Inject;
-
-import saasim.core.event.EventScheduler;
 import saasim.core.infrastructure.AdmissionControl;
 import saasim.core.infrastructure.InstanceDescriptor;
-import saasim.core.infrastructure.LoadBalancer;
 import saasim.core.provisioning.TierConfiguration;
+
+import com.google.inject.Inject;
 
 
 
@@ -18,9 +16,8 @@ import saasim.core.provisioning.TierConfiguration;
 public class HorizontallyScalableTier extends AbstractTier implements Tier{
 	
 	@Inject
-	public HorizontallyScalableTier(EventScheduler scheduler,
-			AdmissionControl admissionControl, LoadBalancer loadBalancer) {
-		super(scheduler, admissionControl, loadBalancer);
+	public HorizontallyScalableTier(AdmissionControl admissionControl) {
+		super(admissionControl);
 	}
 
 	@Override
@@ -46,7 +43,7 @@ public class HorizontallyScalableTier extends AbstractTier implements Tier{
 	 */
 	private void scaleIn(InstanceDescriptor[] instanceDescriptors, boolean force){
 		for (InstanceDescriptor instanceDescriptor : instanceDescriptors) {
-			loadBalancer.addMachine(instanceDescriptor, !force);
+			admissionControl.getLoadBalancer().addMachine(instanceDescriptor, !force);
 		}
 	}
 	
@@ -57,7 +54,7 @@ public class HorizontallyScalableTier extends AbstractTier implements Tier{
 	 */
 	private void scaleOut(InstanceDescriptor[] instanceDescriptors, boolean force){
 		for (InstanceDescriptor instanceDescriptor : instanceDescriptors) {
-			loadBalancer.removeMachine(instanceDescriptor, force);
+			admissionControl.getLoadBalancer().removeMachine(instanceDescriptor, force);
 		}
 	}
 

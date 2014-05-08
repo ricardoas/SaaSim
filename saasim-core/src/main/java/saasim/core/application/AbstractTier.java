@@ -1,9 +1,7 @@
 package saasim.core.application;
 
-import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
 import saasim.core.infrastructure.AdmissionControl;
-import saasim.core.infrastructure.LoadBalancer;
 
 /**
  * Abstract implementation of {@link Tier}. It only defines {@link Request} processing methods.
@@ -12,8 +10,7 @@ import saasim.core.infrastructure.LoadBalancer;
  */
 public abstract class AbstractTier implements Tier{
 
-	private AdmissionControl admissionControl;
-	protected LoadBalancer loadBalancer;
+	protected AdmissionControl admissionControl;
 	
 	/**
 	 * Default constructor
@@ -21,16 +18,8 @@ public abstract class AbstractTier implements Tier{
 	 * @param admissionControl {@link AdmissionControl}.
 	 * @param loadBalancer
 	 */
-	public AbstractTier(final EventScheduler scheduler, AdmissionControl admissionControl, final LoadBalancer loadBalancer) {
+	public AbstractTier(AdmissionControl admissionControl) {
 		this.admissionControl = admissionControl;
-		this.loadBalancer = loadBalancer;
-		
-		scheduler.queueEvent(new Event(scheduler.now()) {
-			@Override
-			public void trigger() {
-				AbstractTier.this.admissionControl.process(scheduler.now(), loadBalancer);
-			}
-		});
 	}
 
 	/**

@@ -10,4 +10,15 @@ public interface Request {
 
 	long getArrivalTimeInMillis();
 
+	long getArrivalTimeInSeconds();
+	
+	long getCPUTimeDemandInMillis();
+
+	void updateServiceTime(long cpuTimeDemandInMillis);
+
+	void setFinishTime(long finishTimeInMillis);
+
+	long getResponseTimeInMillis();
+	
+
 }

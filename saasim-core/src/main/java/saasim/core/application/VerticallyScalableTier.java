@@ -1,13 +1,11 @@
 package saasim.core.application;
 
-import com.google.inject.Inject;
-
-import saasim.core.event.EventScheduler;
 import saasim.core.infrastructure.AdmissionControl;
 import saasim.core.infrastructure.InstanceDescriptor;
-import saasim.core.infrastructure.LoadBalancer;
 import saasim.core.infrastructure.Machine;
 import saasim.core.provisioning.TierConfiguration;
+
+import com.google.inject.Inject;
 
 
 
@@ -19,9 +17,8 @@ import saasim.core.provisioning.TierConfiguration;
 public class VerticallyScalableTier extends AbstractTier{
 	
 	@Inject
-	public VerticallyScalableTier(EventScheduler scheduler,
-			AdmissionControl admissionControl, LoadBalancer loadBalancer) {
-		super(scheduler, admissionControl, loadBalancer);
+	public VerticallyScalableTier(AdmissionControl admissionControl) {
+		super(admissionControl);
 	}
 
 	@Override
@@ -44,7 +41,7 @@ public class VerticallyScalableTier extends AbstractTier{
 	 */
 	private void reconfigure(InstanceDescriptor[] instanceDescriptors, boolean force){
 		for (InstanceDescriptor instanceDescriptor : instanceDescriptors) {
-			loadBalancer.reconfigureMachine(instanceDescriptor, !force);
+			admissionControl.getLoadBalancer().reconfigureMachine(instanceDescriptor, !force);
 		}
 	}
 }
