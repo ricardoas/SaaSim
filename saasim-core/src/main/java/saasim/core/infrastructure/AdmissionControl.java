@@ -4,10 +4,10 @@ import saasim.core.application.Request;
 
 public interface AdmissionControl {
 	
-	void process(long timestamp, LoadBalancer loadBalancer);
-	
 	void updatePolicy();
 
-	boolean queue(Request request);
+	void queue(Request request);
+
+	LoadBalancer getLoadBalancer();
 
 }

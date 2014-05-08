@@ -1,13 +1,7 @@
 package saasim.ext.infrastructure;
 
-import java.util.LinkedList;
-import java.util.Queue;
-
-import org.apache.commons.configuration.Configuration;
-
 import saasim.core.application.Request;
-import saasim.core.event.Event;
-import saasim.core.event.EventScheduler;
+import saasim.core.config.Configuration;
 import saasim.core.infrastructure.AdmissionControl;
 import saasim.core.infrastructure.LoadBalancer;
 import saasim.core.infrastructure.Monitor;
@@ -21,61 +15,48 @@ import com.google.inject.Inject;
  */
 public class FCFSAdmissionControl implements AdmissionControl {
 	
-	private final Queue<Request> acceptedQueue;
 	private int acceptanceRate;
-	private int frequency;
 	private Monitor monitor;
-	private EventScheduler scheduler;
+	
+	private int counter;
+	private long currentTimeSlot;
+	private LoadBalancer loadBalancer;
 	
 	/**
 	 * Default constructor
 	 */
 	@Inject
-	public FCFSAdmissionControl(EventScheduler scheduler, Configuration configuration, Monitor monitor) {
+	public FCFSAdmissionControl(LoadBalancer loadBalancer, Configuration configuration, Monitor monitor) {
+		this.loadBalancer = loadBalancer;
 		this.monitor = monitor;
-		this.scheduler = scheduler;
 		
-		this.acceptedQueue = new LinkedList<>();
-		this.acceptanceRate = Integer.MAX_VALUE;
-		this.frequency = configuration.getInt("admissioncontrol.frquency");
-	}
-
-	@Override
-	public void process(long timestamp, final LoadBalancer loadBalancer) {
-		int counter = 0;
-		
-		while(!acceptedQueue.isEmpty()){
-			if(acceptedQueue.peek().getArrivalTimeInMillis() != timestamp){
-				break;
-			}
-			
-			if(counter < acceptanceRate){
-				loadBalancer.queue(acceptedQueue.poll());
-				counter++;
-			}else{
-				monitor.requestFailed(acceptedQueue.poll());
-			}
-		}
-		
-		scheduler.queueEvent(new Event(scheduler.now() + frequency) {
-			@Override
-			public void trigger() {
-				process(scheduler.now(), loadBalancer);
-			}
-		});
+		this.acceptanceRate = configuration.getInt("admissioncontrol.acceptancerate", Integer.MAX_VALUE);
+		this.currentTimeSlot = -1;
+		this.counter = 0;
 	}
 
 	@Override
 	public void updatePolicy() {
-
+		// TODO Change acceptanceRate on demand
 	}
 
 	@Override
-	public boolean queue(Request request) {
-		if(acceptedQueue.size() >= acceptanceRate){
-			return false;
+	public void queue(Request request) {
+		
+		
+		if(request.getArrivalTimeInSeconds() != currentTimeSlot){
+			counter = 0;
 		}
-		return acceptedQueue.add(request);
+		
+		if(counter++ < acceptanceRate){
+			loadBalancer.queue(request);
+		}else{
+			monitor.requestFailed(request);
+		}
 	}
 
+	@Override
+	public LoadBalancer getLoadBalancer() {
+		return loadBalancer;
+	}
 }

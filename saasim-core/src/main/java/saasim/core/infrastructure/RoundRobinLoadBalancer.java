@@ -1,24 +1,48 @@
 package saasim.core.infrastructure;
 
+import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.TreeMap;
+import java.util.Map;
 
 import saasim.core.application.Request;
+import saasim.core.event.Event;
+import saasim.core.event.EventPriority;
+import saasim.core.event.EventScheduler;
+import saasim.ext.infrastructure.SingleQueueMachine;
 
+import com.google.inject.Inject;
+
+/**
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ */
 public class RoundRobinLoadBalancer implements LoadBalancer {
 	
-	private TreeMap<InstanceDescriptor, Machine> machines;
-	private LinkedList<InstanceDescriptor> roundRobinQueue;
+	private final EventScheduler scheduler;
+	private final Map<InstanceDescriptor, Machine> machines;
+	private final LinkedList<InstanceDescriptor> roundRobinQueue;
 	
 	private int roundRobinIndex;
-	
+	private MachineFactory machineFactory;
 
-	public RoundRobinLoadBalancer() {
-		this.machines = new TreeMap<>();
+	/**
+	 * Default constructor.
+	 * @param scheduler {@link EventScheduler}
+	 */
+	@Inject
+	public RoundRobinLoadBalancer(EventScheduler scheduler, MachineFactory machineFactory) {
+		this.scheduler = scheduler;
+		this.machineFactory = machineFactory;
+		this.machines = new HashMap<>();
+		this.roundRobinQueue = new LinkedList<InstanceDescriptor>();
 		this.roundRobinIndex = -1;
 	}
 	
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @see saasim.core.infrastructure.LoadBalancer#queue(saasim.core.application.Request)
+	 */
 	@Override
 	public void queue(Request request) {
 		machines.get(getNextAvailableMachine()).queue(request);
@@ -32,13 +56,29 @@ public class RoundRobinLoadBalancer implements LoadBalancer {
 	}
 
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @see saasim.core.infrastructure.LoadBalancer#addMachine(saasim.core.infrastructure.InstanceDescriptor, boolean)
+	 */
 	@Override
-	public void addMachine(InstanceDescriptor descriptor,
+	public void addMachine(final InstanceDescriptor descriptor,
 			boolean useStartUpDelay) {
-		machines.put(descriptor, null);
-		roundRobinQueue.add(descriptor);
+		final Machine machine = machineFactory.create(descriptor);
+		scheduler.queueEvent(new Event(useStartUpDelay?machine.getStartUpDelay():0L, EventPriority.HIGH) {
+			@Override
+			public void trigger() {
+				machines.put(descriptor, machine);
+				roundRobinQueue.add(descriptor);
+			}
+		});
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @see saasim.core.infrastructure.LoadBalancer#removeMachine(saasim.core.infrastructure.InstanceDescriptor, boolean)
+	 */
 	@Override
 	public void removeMachine(InstanceDescriptor descriptor, boolean force) {
 		machines.remove(descriptor);
@@ -50,6 +90,11 @@ public class RoundRobinLoadBalancer implements LoadBalancer {
 		roundRobinQueue.remove(index);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @see saasim.core.infrastructure.LoadBalancer#reconfigureMachine(saasim.core.infrastructure.InstanceDescriptor, boolean)
+	 */
 	@Override
 	public void reconfigureMachine(InstanceDescriptor descriptor, boolean force) {
 		Machine machine = machines.remove(descriptor);
@@ -59,6 +104,13 @@ public class RoundRobinLoadBalancer implements LoadBalancer {
 		roundRobinQueue.set(roundRobinQueue.indexOf(descriptor), descriptor);
 	}
 
+	
+	
+	
+	
+	
+	
+	
 	@Override
 	public void registerDrop(Request request) {
 		// TODO Auto-generated method stub

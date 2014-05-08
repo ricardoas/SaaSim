@@ -1,7 +1,5 @@
 package saasim.core.infrastructure;
 
-import java.util.List;
-
 import saasim.core.application.Request;
 
 /**
@@ -9,14 +7,8 @@ import saasim.core.application.Request;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public interface Monitor{
+public interface Aggregator{
 	
-	/**
-	 * Report when a specific {@link Request} has been finished.
-	 * @param requestFinished A {@link Request} finished.
-	 */
-	void requestFinished(Request requestFinished);
-
 	/**
 	 * Report when a specific {@link Request} was lost.
 	 * TODO Report which tier was responsible for loosing this request.
@@ -25,10 +17,38 @@ public interface Monitor{
 	 */
 	void requestFailed(Request request);
 
-	List<Statistics> collectSamples();	
+	/**
+	 * 
+	 * 
+	 * @param monitor
+	 */
+	void registerMonitor(Monitor monitor);
+
+	/**
+	 * Report when a specific {@link Request} has been finished.
+	 * @param requestFinished A {@link Request} finished.
+	 */
+	void requestFinished(Request requestFinished);
+	
+	void report();
 	
 	/********************************************/
 	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	/**
+	 * Send the calculated statistics coming from {@link Statistics}.
+	 * @param statistics {@link Statistics} encapsulating the statitiscs
+	 */
+	void sendStatistics(Statistics statistics);
+
 	/**
 	 * Report when a specific {@link Machine} was shutdown.
 	 * @param machineDescriptor {@link InstanceDescriptor} turned off.
@@ -46,6 +66,11 @@ public interface Monitor{
 	 * @return
 	 */
 	boolean isOptimal();
+
+	void registerInterestedInStatistics(AggregatorListener listener);
+
+
+
 
 
 }

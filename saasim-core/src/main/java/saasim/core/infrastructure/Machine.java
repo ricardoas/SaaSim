@@ -20,7 +20,7 @@ public interface Machine{
 	void queue(Request request);
 	
 	
-	
+	long getStartUpDelay();
 	
 	
 	/************************************************/
