@@ -27,7 +27,7 @@ public class StaticProvisioningSystem implements DPS {
 	@Override
 	public void registerConfigurable(Application... applications) {
 		this.applications = applications;
-//		setUp();
+		setUp();
 	}
 
 	protected void setUp() {

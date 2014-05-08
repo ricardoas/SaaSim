@@ -28,8 +28,7 @@ public class AmazonEC2 implements IaaSProvider {
 
 	@Override
 	public InstanceDescriptor acquire(InstanceType instanceType) {
-		// TODO Auto-generated method stub
-		return null;
+		return new InstanceDescriptor(instanceType);
 	}
 
 	@Override

@@ -1,4 +1,5 @@
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.log4j.BasicConfigurator;
 
 import saasim.core.sim.SaaSim;
 import saasim.core.sim.SaaSimModule;
@@ -21,6 +22,8 @@ public class Main {
 	 * @throws ConfigurationException check your configuration file!
 	 */
 	public static void main(String[] args) throws ConfigurationException {
+		
+		BasicConfigurator.configure();
 
 		if (args.length < 0 || args.length > 1) {
 			System.out.println("Usage: java -cp <path-to-jar-files> Main [config.properties]");

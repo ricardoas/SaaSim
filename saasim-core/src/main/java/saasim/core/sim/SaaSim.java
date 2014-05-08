@@ -1,6 +1,7 @@
 package saasim.core.sim;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.log4j.Logger;
 
 import saasim.core.application.Application;
 import saasim.core.cloud.IaaSProvider;
@@ -53,6 +54,9 @@ public class SaaSim{
 	 */
 	public void start() {
 		
+		long start = System.currentTimeMillis();
+		Logger.getLogger(SaaSim.class).debug("SIMULATION START " + start);
+		
 		scheduler.queueEvent(new Event(scheduler.now()){
 			@Override
 			public void trigger() {
@@ -60,5 +64,8 @@ public class SaaSim{
 			}
 		});
 		scheduler.start(config.getLong("simulation.time"));
+
+		Logger.getLogger(SaaSim.class).debug("SIMULATION END " + System.currentTimeMillis());
+		Logger.getLogger(SaaSim.class).debug("SIMULATION DURATION " + (System.currentTimeMillis()-start));
 	}
 }

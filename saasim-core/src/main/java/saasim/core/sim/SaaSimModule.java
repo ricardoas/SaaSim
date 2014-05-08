@@ -2,15 +2,24 @@ package saasim.core.sim;
 import org.apache.commons.configuration.ConfigurationException;
 
 import saasim.core.application.Application;
+import saasim.core.application.HorizontallyScalableTier;
 import saasim.core.application.Request;
+import saasim.core.application.Tier;
 import saasim.core.cloud.IaaSProvider;
 import saasim.core.config.Configuration;
 import saasim.core.event.EventScheduler;
+import saasim.core.infrastructure.AdmissionControl;
+import saasim.core.infrastructure.Aggregator;
+import saasim.core.infrastructure.LoadBalancer;
+import saasim.core.infrastructure.Machine;
+import saasim.core.infrastructure.MachineFactory;
 import saasim.core.infrastructure.Monitor;
+import saasim.core.infrastructure.RoundRobinLoadBalancer;
 import saasim.core.io.TraceParcer;
 import saasim.core.io.TraceReader;
 import saasim.core.io.TraceReaderFactory;
 import saasim.core.provisioning.DPS;
+import saasim.ext.infrastructure.FCFSAdmissionControl;
 import saasim.ext.io.LineBasedTraceReader;
 
 import com.google.inject.AbstractModule;
@@ -58,13 +67,26 @@ public class SaaSimModule extends AbstractModule {
 		
 		bind(Application.class).to((Class<? extends Application>) load(provideConfiguration().getString("application.class"))).in(Singleton.class);
 		
-		bind(Monitor.class).to((Class<? extends Monitor>) load(provideConfiguration().getString("monitor.class"))).in(Singleton.class);
+		bind(Monitor.class).to((Class<? extends Monitor>) load(provideConfiguration().getString("monitor.class")));
+		
+		bind(Aggregator.class).to((Class<? extends Aggregator>) load(provideConfiguration().getString("aggregator.class"))).in(Singleton.class);
 		
 		bind(TraceParcer.class).to((Class<? extends TraceParcer>) load(provideConfiguration().getString("trace.parser.class"))).in(Singleton.class);
 		
 		install(new FactoryModuleBuilder()
 	     .implement(new TypeLiteral<TraceReader<Request>>() {}, LineBasedTraceReader.class)
 	     .build(new TypeLiteral<TraceReaderFactory<Request>>() {}));
+		
+		bind(Tier.class).to(HorizontallyScalableTier.class);
+		
+		bind(AdmissionControl.class).to(FCFSAdmissionControl.class);
+		
+		bind(LoadBalancer.class).to(RoundRobinLoadBalancer.class);
+		
+		install(new FactoryModuleBuilder()
+	     .implement(Machine.class, (Class<? extends Machine>) load(provideConfiguration().getString("machine.class")))
+	     .build(MachineFactory.class));
+		
 	}
 
 	/**
