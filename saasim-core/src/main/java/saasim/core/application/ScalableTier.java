@@ -1,7 +1,8 @@
 package saasim.core.application;
 
-import saasim.core.infrastructure.AdmissionControl;
 import saasim.core.infrastructure.InstanceDescriptor;
+import saasim.core.infrastructure.LoadBalancer;
+import saasim.core.infrastructure.Machine;
 import saasim.core.provisioning.TierConfiguration;
 
 import com.google.inject.Inject;
@@ -13,11 +14,11 @@ import com.google.inject.Inject;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class HorizontallyScalableTier extends AbstractTier implements Tier{
+public class ScalableTier extends AbstractTier implements Tier{
 	
 	@Inject
-	public HorizontallyScalableTier(AdmissionControl admissionControl) {
-		super(admissionControl);
+	public ScalableTier(LoadBalancer loadBalancer) {
+		super(loadBalancer);
 	}
 
 	@Override
@@ -30,6 +31,8 @@ public class HorizontallyScalableTier extends AbstractTier implements Tier{
 		case DECREASE:
 			scaleOut(tierConfiguration.getDescriptors(), tierConfiguration.isForce());
 			break;
+		case CONFIGURE_MACHINE:
+			reconfigure(tierConfiguration.getDescriptors(), tierConfiguration.isForce());
 		default:
 			throw new RuntimeException("Unknown action of configuration!");
 		}
@@ -43,7 +46,7 @@ public class HorizontallyScalableTier extends AbstractTier implements Tier{
 	 */
 	private void scaleIn(InstanceDescriptor[] instanceDescriptors, boolean force){
 		for (InstanceDescriptor instanceDescriptor : instanceDescriptors) {
-			admissionControl.getLoadBalancer().addMachine(instanceDescriptor, !force);
+			getLoadBalancer().addMachine(instanceDescriptor, !force);
 		}
 	}
 	
@@ -54,8 +57,18 @@ public class HorizontallyScalableTier extends AbstractTier implements Tier{
 	 */
 	private void scaleOut(InstanceDescriptor[] instanceDescriptors, boolean force){
 		for (InstanceDescriptor instanceDescriptor : instanceDescriptors) {
-			admissionControl.getLoadBalancer().removeMachine(instanceDescriptor, force);
+			getLoadBalancer().removeMachine(instanceDescriptor, force);
 		}
 	}
-
+	
+	/**
+	 * Scales up or down a {@link Machine}.
+	 * 
+	 * @param machineDescriptor {@link InstanceDescriptor} of the new server.
+	 */
+	private void reconfigure(InstanceDescriptor[] instanceDescriptors, boolean force){
+		for (InstanceDescriptor instanceDescriptor : instanceDescriptors) {
+			getLoadBalancer().reconfigureMachine(instanceDescriptor, !force);
+		}
+	}
 }

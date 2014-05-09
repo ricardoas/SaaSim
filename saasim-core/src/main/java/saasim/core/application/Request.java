@@ -20,5 +20,7 @@ public interface Request {
 
 	long getResponseTimeInMillis();
 	
+	ResponseListener getResponseListener();
 
+	void setResponseListener(ResponseListener listener);
 }

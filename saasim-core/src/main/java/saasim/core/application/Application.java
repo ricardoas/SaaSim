@@ -7,11 +7,11 @@ import saasim.core.provisioning.TierConfiguration;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public interface Application{
+public interface Application extends ResponseListener{
 	
 	public static String READWORKLOADEVENT = ""; 
 	
-	void config(TierConfiguration... tierConfiguration);
+	void config(TierConfiguration tierConfiguration);
 
 	/**
 	 * Queue {@link Request} at this {@link Application}.

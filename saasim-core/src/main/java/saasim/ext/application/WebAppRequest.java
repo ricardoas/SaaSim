@@ -1,6 +1,10 @@
 package saasim.ext.application;
 
+import java.util.Deque;
+import java.util.LinkedList;
+
 import saasim.core.application.Request;
+import saasim.core.application.ResponseListener;
 
 public class WebAppRequest implements Request {
 	
@@ -14,6 +18,7 @@ public class WebAppRequest implements Request {
 	
 	private long serviceTimeInMillis;
 	private long finishTimeInMillis;
+	private Deque<ResponseListener> listeners;
 
 	public WebAppRequest(long id, int tenantID, int userID, long arrivalTimeInMillis, long requestSizeInBytes,
 			long responseSizeInBytes, long[] demand) {
@@ -27,6 +32,7 @@ public class WebAppRequest implements Request {
 				
 				this.serviceTimeInMillis = 0;
 				this.finishTimeInMillis = 0;
+				this.listeners = new LinkedList<>();
 	}
 
 	@Override
@@ -57,6 +63,16 @@ public class WebAppRequest implements Request {
 	@Override
 	public long getResponseTimeInMillis() {
 		return finishTimeInMillis - arrivalTimeInMillis;
+	}
+
+	@Override
+	public ResponseListener getResponseListener() {
+		return listeners.pop();
+	}
+
+	@Override
+	public void setResponseListener(ResponseListener listener) {
+		listeners.push(listener);
 	}
 
 }
