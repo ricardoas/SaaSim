@@ -40,7 +40,6 @@ public class GEISTParser implements TraceParcer{
 		while(tokenizer.hasMoreTokens()){
 			demand[index++] = Long.parseLong(tokenizer.nextToken());
 		}
-		
 		return new WebAppRequest(reqID, tenantID, userID, arrivalTimeInMillis,
 				requestSizeInBytes, responseSizeInBytes, demand);
 	}

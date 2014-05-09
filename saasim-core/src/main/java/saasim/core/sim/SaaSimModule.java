@@ -2,14 +2,14 @@ package saasim.core.sim;
 import org.apache.commons.configuration.ConfigurationException;
 
 import saasim.core.application.Application;
-import saasim.core.application.HorizontallyScalableTier;
+import saasim.core.application.ScalableTier;
 import saasim.core.application.Request;
 import saasim.core.application.Tier;
 import saasim.core.cloud.IaaSProvider;
 import saasim.core.config.Configuration;
 import saasim.core.event.EventScheduler;
 import saasim.core.infrastructure.AdmissionControl;
-import saasim.core.infrastructure.Aggregator;
+import saasim.core.infrastructure.MonitorPublisher;
 import saasim.core.infrastructure.LoadBalancer;
 import saasim.core.infrastructure.Machine;
 import saasim.core.infrastructure.MachineFactory;
@@ -67,9 +67,9 @@ public class SaaSimModule extends AbstractModule {
 		
 		bind(Application.class).to((Class<? extends Application>) load(provideConfiguration().getString("application.class"))).in(Singleton.class);
 		
-		bind(Monitor.class).to((Class<? extends Monitor>) load(provideConfiguration().getString("monitor.class")));
+		bind(Monitor.class).to((Class<? extends Monitor>) load(provideConfiguration().getString("aggregator.monitor.class"))).in(Singleton.class);
 		
-		bind(Aggregator.class).to((Class<? extends Aggregator>) load(provideConfiguration().getString("aggregator.class"))).in(Singleton.class);
+		bind(MonitorPublisher.class).to((Class<? extends MonitorPublisher>) load(provideConfiguration().getString("aggregator.class"))).in(Singleton.class);
 		
 		bind(TraceParcer.class).to((Class<? extends TraceParcer>) load(provideConfiguration().getString("trace.parser.class"))).in(Singleton.class);
 		
@@ -77,7 +77,7 @@ public class SaaSimModule extends AbstractModule {
 	     .implement(new TypeLiteral<TraceReader<Request>>() {}, LineBasedTraceReader.class)
 	     .build(new TypeLiteral<TraceReaderFactory<Request>>() {}));
 		
-		bind(Tier.class).to(HorizontallyScalableTier.class);
+		bind(Tier.class).to(ScalableTier.class);
 		
 		bind(AdmissionControl.class).to(FCFSAdmissionControl.class);
 		
