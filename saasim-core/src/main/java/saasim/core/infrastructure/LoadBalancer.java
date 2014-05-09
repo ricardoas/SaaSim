@@ -1,8 +1,9 @@
 package saasim.core.infrastructure;
 
 import saasim.core.application.Request;
+import saasim.core.application.ResponseListener;
 
-public interface LoadBalancer {
+public interface LoadBalancer extends ResponseListener{
 	
 	/**
 	 * Send request to {@link LoadBalancer} processing queue.
@@ -28,11 +29,6 @@ public interface LoadBalancer {
 	 */
 	void reconfigureMachine(InstanceDescriptor descriptor, boolean force);
 
-
-	
-	
-	
-	
 	/********************************************/
 
 
@@ -73,5 +69,7 @@ public interface LoadBalancer {
 
 
 	void config(double threshold);
+
+	
 
 }

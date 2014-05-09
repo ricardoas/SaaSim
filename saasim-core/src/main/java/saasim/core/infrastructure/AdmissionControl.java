@@ -2,12 +2,9 @@ package saasim.core.infrastructure;
 
 import saasim.core.application.Request;
 
-public interface AdmissionControl {
+public interface AdmissionControl{
+	
+	boolean canAccept(Request request);
 	
 	void updatePolicy();
-
-	void queue(Request request);
-
-	LoadBalancer getLoadBalancer();
-
 }

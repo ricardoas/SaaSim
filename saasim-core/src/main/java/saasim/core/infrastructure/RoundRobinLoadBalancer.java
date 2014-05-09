@@ -5,10 +5,10 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import saasim.core.application.Request;
+import saasim.core.application.Response;
 import saasim.core.event.Event;
 import saasim.core.event.EventPriority;
 import saasim.core.event.EventScheduler;
-import saasim.ext.infrastructure.SingleQueueMachine;
 
 import com.google.inject.Inject;
 
@@ -104,7 +104,11 @@ public class RoundRobinLoadBalancer implements LoadBalancer {
 		roundRobinQueue.set(roundRobinQueue.indexOf(descriptor), descriptor);
 	}
 
-	
+	@Override
+	public void processDone(Request request, Response response) {
+		request.getResponseListener().processDone(request, null);
+	}
+
 	
 	
 	
@@ -159,5 +163,12 @@ public class RoundRobinLoadBalancer implements LoadBalancer {
 		// TODO Auto-generated method stub
 
 	}
+
+
+
+
+
+
+
 
 }

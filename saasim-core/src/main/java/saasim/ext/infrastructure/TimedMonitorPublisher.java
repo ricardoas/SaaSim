@@ -3,30 +3,30 @@ package saasim.ext.infrastructure;
 import java.util.ArrayList;
 import java.util.List;
 
-import saasim.core.application.Request;
 import saasim.core.config.Configuration;
 import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
-import saasim.core.infrastructure.Aggregator;
+import saasim.core.infrastructure.MonitorPublisher;
 import saasim.core.infrastructure.AggregatorListener;
-import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.infrastructure.Monitor;
 import saasim.core.infrastructure.Statistics;
 
 import com.google.inject.Inject;
 
-public class AverageAggregator implements Aggregator {
+public class TimedMonitorPublisher implements MonitorPublisher {
 	
-	private List<Monitor> monitors;
-	private long timeBetweenReports;
+	private Monitor monitor;
 	private List<AggregatorListener> listeners;
+	private long timeBetweenReports;
+	private EventScheduler scheduler;
 
 	@Inject
-	public AverageAggregator(Configuration configuration, EventScheduler scheduler) {
-		monitors = new ArrayList<>();
+	public TimedMonitorPublisher(Configuration configuration, EventScheduler scheduler, Monitor monitor) {
+		this.scheduler = scheduler;
+		this.monitor = monitor;
 		listeners = new ArrayList<>();
 		
-		timeBetweenReports = configuration.getLong("monitor.monitor.timebetweenreports");
+		timeBetweenReports = configuration.getLong("aggregator.timebetweenreports");
 		
 		scheduler.queueEvent(new Event(scheduler.now()+timeBetweenReports){
 			@Override
@@ -37,69 +37,22 @@ public class AverageAggregator implements Aggregator {
 	}
 	
 	@Override
-	public void registerMonitor(Monitor monitor) {
-		monitors.add(monitor);
-	}
-	
-	@Override
-	public void registerInterestedInStatistics(AggregatorListener listener) {
+	public void subscribe(AggregatorListener listener) {
 		listeners.add(listener);
 	}
 	
 	@Override
 	public void report() {
-		List<Statistics> statistics = new ArrayList<>();
-		for (Monitor monitor : monitors) {
-			List<Statistics> samples = monitor.collectSamples();
-			statistics.add(aggregate(samples));
-		}
-		
+		Statistics statistics = monitor.collect();
 		for (AggregatorListener listener : listeners) {
-			listener.report(aggregate(statistics));
+			listener.report(statistics);
 		}
+		scheduler.queueEvent(new Event(scheduler.now()+timeBetweenReports){
+			@Override
+			public void trigger() {
+				report();
+			}
+		});
 	}
-
-	private Statistics aggregate(List<Statistics> samples) {
-		return null;
-	}
-
-	@Override
-	public void requestFinished(Request requestFinished) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void sendStatistics(Statistics statistics) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void machineTurnedOff(InstanceDescriptor machineDescriptor) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void chargeUsers(long currentTimeInMillis) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public boolean isOptimal() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void requestFailed(Request request) {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
 
 }

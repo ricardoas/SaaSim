@@ -3,13 +3,15 @@ package saasim.core.infrastructure;
 import java.util.Queue;
 
 import saasim.core.application.Request;
+import saasim.core.application.ResponseListener;
+import saasim.core.application.Tier;
 
 
 /**
  * Methods to manage a machine.
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public interface Machine{
+public interface Machine extends ResponseListener{
 	
 	void reconfigure(InstanceDescriptor descriptor);
 	
@@ -19,16 +21,29 @@ public interface Machine{
 	 */
 	void queue(Request request);
 	
-	
 	long getStartUpDelay();
 	
+	Tier getNextTier();
+	
+	void setNextTier(Tier nextTier);
+	
+	boolean isShutdown();
+	
+	boolean shouldForward();
+	
+//	void setLoadBalancer(LoadBalancer loadBalancer);
+//
+//	/**
+//	 * @return The {@link LoadBalancer} responsible for this machine.
+//	 */
+//	LoadBalancer getLoadBalancer();
 	
 	/************************************************/
 
-	/**
-	 * @return The {@link LoadBalancer} responsible for this machine.
-	 */
-	LoadBalancer getLoadBalancer();
+	
+	
+	
+	
 
 	/**
 	 * @return The {@link Queue} of {@link Request}s this machine is serving.
@@ -70,4 +85,9 @@ public interface Machine{
 	void cancelShutdown();
 
 	void shutdownNow();
+
+
+	
+	
+	
 }

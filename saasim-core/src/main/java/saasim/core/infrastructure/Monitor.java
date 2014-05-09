@@ -1,7 +1,5 @@
 package saasim.core.infrastructure;
 
-import java.util.List;
-
 import saasim.core.application.Request;
 
 /**
@@ -11,6 +9,10 @@ import saasim.core.application.Request;
  */
 public interface Monitor{
 	
+	void requestArrived(Request request);
+	
+	void requestRejected(Request request);
+
 	/**
 	 * Report when a specific {@link Request} has been finished.
 	 * @param requestFinished A {@link Request} finished.
@@ -23,9 +25,26 @@ public interface Monitor{
 	 * 
 	 * @param request {@link Request} that was lost
 	 */
-	void requestFailed(Request request);
+	void requestFailedAtMachine(Request request, InstanceDescriptor descriptor);
 
-	List<Statistics> collectSamples();	
+	
+	
+	
+	
+	
+	
+	
+	
+	void requestRejectedAtLoadBalancer(Request request, int tier);
+	
+	void requestAcceptedAtLoadBalancer(Request request, int tier);
+
+	Statistics collect();
+	
+	void reset(int numberOfTiers);
+	
+	
+	
 	
 	/********************************************/
 	
@@ -33,19 +52,17 @@ public interface Monitor{
 	 * Report when a specific {@link Machine} was shutdown.
 	 * @param machineDescriptor {@link InstanceDescriptor} turned off.
 	 */
-	void machineTurnedOff(InstanceDescriptor machineDescriptor);
+	@Deprecated void machineTurnedOff(InstanceDescriptor machineDescriptor);
 
 	/**
 	 * Report the calculated utility to users.
 	 * @param currentTimeInMillis the current time in milliseconds
 	 */
-	void chargeUsers(long currentTimeInMillis);
+	@Deprecated void chargeUsers(long currentTimeInMillis);
 
 	/**
 	 * 
 	 * @return
 	 */
-	boolean isOptimal();
-
-
+	@Deprecated boolean isOptimal();
 }
