@@ -39,7 +39,7 @@ public interface Monitor{
 	
 	void requestAcceptedAtLoadBalancer(Request request, int tier);
 
-	Statistics collect();
+	Statistics collect(long now, long elapsedTime);
 	
 	void reset(int numberOfTiers);
 	

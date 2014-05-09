@@ -1,17 +1,8 @@
 package saasim.core.infrastructure;
 
-import saasim.core.cloud.InstanceType;
+public interface InstanceDescriptor {
+	
+	int getNumberOfCPUCores();
 
-public class InstanceDescriptor {
-
-	private InstanceType type;
-
-	public InstanceDescriptor(InstanceType instanceType) {
-		this.type = instanceType;
-	}
-
-	public int getNumberOfCPUCores() {
-		return type.getNumberOfCores();
-	}
 
 }
