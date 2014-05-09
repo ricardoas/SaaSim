@@ -1,16 +1,16 @@
 package saasim.ext.provisioning;
 
-import com.google.inject.Inject;
-
 import saasim.core.application.Application;
 import saasim.core.cloud.IaaSProvider;
-import saasim.core.cloud.InstanceType;
 import saasim.core.cloud.utility.UtilityFunction;
 import saasim.core.config.Configuration;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.provisioning.ConfigurationAction;
 import saasim.core.provisioning.DPS;
 import saasim.core.provisioning.TierConfiguration;
+import saasim.ext.cloud.InstanceType;
+
+import com.google.inject.Inject;
 
 public class StaticProvisioningSystem implements DPS {
 	

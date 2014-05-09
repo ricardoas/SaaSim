@@ -13,7 +13,7 @@ import saasim.core.config.Configuration;
  */
 public final class TestConfigurationBuilder{
 	
-	private static final String SCENARIO_01 = "src/test/resources/scenario_01/config.properties";
+	private static final String SCENARIO_01 = "src/test/resources/single_tier_01/config.properties";
 
 
 	public static void buildConfiguration01() throws ConfigurationException{

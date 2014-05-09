@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.util.TimeUnit;
+import saasim.ext.cloud.InstanceType;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br

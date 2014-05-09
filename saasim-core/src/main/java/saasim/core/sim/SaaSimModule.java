@@ -2,24 +2,26 @@ package saasim.core.sim;
 import org.apache.commons.configuration.ConfigurationException;
 
 import saasim.core.application.Application;
-import saasim.core.application.ScalableTier;
 import saasim.core.application.Request;
+import saasim.core.application.ScalableTier;
 import saasim.core.application.Tier;
 import saasim.core.cloud.IaaSProvider;
 import saasim.core.config.Configuration;
 import saasim.core.event.EventScheduler;
 import saasim.core.infrastructure.AdmissionControl;
-import saasim.core.infrastructure.MonitorPublisher;
 import saasim.core.infrastructure.LoadBalancer;
 import saasim.core.infrastructure.Machine;
 import saasim.core.infrastructure.MachineFactory;
 import saasim.core.infrastructure.Monitor;
-import saasim.core.infrastructure.RoundRobinLoadBalancer;
+import saasim.core.infrastructure.MonitoringService;
+import saasim.core.infrastructure.MonitoringServiceConsumer;
 import saasim.core.io.TraceParcer;
 import saasim.core.io.TraceReader;
 import saasim.core.io.TraceReaderFactory;
 import saasim.core.provisioning.DPS;
+import saasim.ext.infrastructure.DefaultOutputWriter;
 import saasim.ext.infrastructure.FCFSAdmissionControl;
+import saasim.ext.infrastructure.RoundRobinLoadBalancer;
 import saasim.ext.io.LineBasedTraceReader;
 
 import com.google.inject.AbstractModule;
@@ -67,10 +69,10 @@ public class SaaSimModule extends AbstractModule {
 		
 		bind(Application.class).to((Class<? extends Application>) load(provideConfiguration().getString("application.class"))).in(Singleton.class);
 		
-		bind(Monitor.class).to((Class<? extends Monitor>) load(provideConfiguration().getString("aggregator.monitor.class"))).in(Singleton.class);
+		bind(Monitor.class).to((Class<? extends Monitor>) load(provideConfiguration().getString("monitoring.monitor.class"))).in(Singleton.class);
 		
-		bind(MonitorPublisher.class).to((Class<? extends MonitorPublisher>) load(provideConfiguration().getString("aggregator.class"))).in(Singleton.class);
-		
+		bind(MonitoringService.class).to((Class<? extends MonitoringService>) load(provideConfiguration().getString("monitoring.service.class"))).in(Singleton.class);
+				
 		bind(TraceParcer.class).to((Class<? extends TraceParcer>) load(provideConfiguration().getString("trace.parser.class"))).in(Singleton.class);
 		
 		install(new FactoryModuleBuilder()
@@ -87,6 +89,7 @@ public class SaaSimModule extends AbstractModule {
 	     .implement(Machine.class, (Class<? extends Machine>) load(provideConfiguration().getString("machine.class")))
 	     .build(MachineFactory.class));
 		
+		bind(MonitoringServiceConsumer.class).to(DefaultOutputWriter.class).in(Singleton.class);
 	}
 
 	/**

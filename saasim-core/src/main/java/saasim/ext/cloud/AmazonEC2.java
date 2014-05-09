@@ -1,7 +1,6 @@
 package saasim.ext.cloud;
 
 import saasim.core.cloud.IaaSProvider;
-import saasim.core.cloud.InstanceType;
 import saasim.core.config.Configuration;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.util.TimeUnit;
@@ -23,12 +22,11 @@ public class AmazonEC2 implements IaaSProvider {
 	@Override
 	public void makeReservation(InstanceType instanceType, TimeUnit duration) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public InstanceDescriptor acquire(InstanceType instanceType) {
-		return new InstanceDescriptor(instanceType);
+		return new AmazonInstanceDescriptor(instanceType);
 	}
 
 	@Override

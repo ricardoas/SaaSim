@@ -1,4 +1,4 @@
-package saasim.core.cloud;
+package saasim.ext.cloud;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br

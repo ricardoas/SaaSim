@@ -8,9 +8,8 @@ import saasim.core.cloud.IaaSProvider;
 import saasim.core.config.Configuration;
 import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
-import saasim.core.infrastructure.AggregatorListener;
-import saasim.core.infrastructure.MonitorPublisher;
-import saasim.core.infrastructure.Statistics;
+import saasim.core.infrastructure.MonitoringService;
+import saasim.core.infrastructure.MonitoringServiceConsumer;
 import saasim.core.provisioning.DPS;
 
 import com.google.inject.Inject;
@@ -20,14 +19,14 @@ import com.google.inject.Inject;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class SaaSim implements AggregatorListener{
+public class SaaSim{
 
 	private Configuration config;
 	private EventScheduler scheduler;
 	private DPS dps;
 	private Application application;
 	private WorkloadTrafficGenerator workloadGenerator;
-	private MonitorPublisher feed;
+	private MonitoringService feed;
 
 	/**
 	 * Default constructor.
@@ -42,18 +41,16 @@ public class SaaSim implements AggregatorListener{
 	 * @throws ConfigurationException
 	 */
 	@Inject
-	public SaaSim(Configuration configuration, EventScheduler scheduler, DPS dps, Application application, WorkloadTrafficGenerator workloadGenerator, MonitorPublisher feed) throws ConfigurationException {
+	public SaaSim(Configuration configuration, EventScheduler scheduler, DPS dps, Application application, WorkloadTrafficGenerator workloadGenerator, MonitoringService feed, MonitoringServiceConsumer consumer) throws ConfigurationException {
 
 		this.config = configuration;
 		this.scheduler = scheduler;
 		this.application = application;
 		
-		
-		
 		this.dps = dps;
 		this.workloadGenerator = workloadGenerator;
 		this.feed = feed;
-		this.feed.subscribe(this);
+		this.feed.subscribe(consumer);
 		
 		this.dps.registerConfigurable(this.application);
 	}
@@ -75,12 +72,6 @@ public class SaaSim implements AggregatorListener{
 		scheduler.start(config.getLong("simulation.time"));
 
 		Logger.getLogger(SaaSim.class).debug("SIMULATION END " + System.currentTimeMillis());
-		
 		Logger.getLogger(SaaSim.class).debug("SIMULATION DURATION " + (System.currentTimeMillis()-start));
-	}
-
-	@Override
-	public void report(Statistics statistics) {
-		System.out.println(statistics);
 	}
 }
