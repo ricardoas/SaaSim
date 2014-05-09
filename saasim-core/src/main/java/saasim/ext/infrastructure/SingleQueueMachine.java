@@ -80,7 +80,7 @@ public class SingleQueueMachine implements Machine {
 		
 		if(!backlog.isEmpty()){
 			final Request newRequest = backlog.poll();
-			scheduler.queueEvent(new Event(scheduler.now() + newRequest.getArrivalTimeInMillis()) {
+			scheduler.queueEvent(new Event(scheduler.now() + newRequest.getCPUTimeDemandInMillis()) {
 				@Override
 				public void trigger() {
 					SingleQueueMachine.this.run(newRequest);

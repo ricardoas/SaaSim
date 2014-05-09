@@ -75,4 +75,9 @@ public class WebAppRequest implements Request {
 		listeners.push(listener);
 	}
 
+	@Override
+	public long getID() {
+		return id;
+	}
+
 }

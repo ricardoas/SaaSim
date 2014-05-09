@@ -23,4 +23,6 @@ public interface Request {
 	ResponseListener getResponseListener();
 
 	void setResponseListener(ResponseListener listener);
+
+	long getID();
 }
