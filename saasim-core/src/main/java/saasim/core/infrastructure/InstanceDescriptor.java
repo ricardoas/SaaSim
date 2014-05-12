@@ -11,7 +11,7 @@ public interface InstanceDescriptor {
 	
 	boolean isOn();
 
-	void turnOff();
+	void turnOff(long now);
 
 	void setMachine(Machine machine);
 

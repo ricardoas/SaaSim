@@ -5,11 +5,11 @@ import saasim.core.application.Application;
 import saasim.core.cloud.utility.UtilityFunction;
 
 /**
- * Dynamic Provisioning System interface.
+ * Provisioning System interface.
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public interface DPS{
+public interface ProvisioningSystem{
 	
 	/**
 	 * Registers new {@link Application}s to provision. Subsequent calls override 

@@ -10,7 +10,7 @@ import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
 import saasim.core.infrastructure.MonitoringService;
 import saasim.core.infrastructure.MonitoringServiceConsumer;
-import saasim.core.provisioning.DPS;
+import saasim.core.provisioning.ProvisioningSystem;
 
 import com.google.inject.Inject;
 
@@ -24,7 +24,7 @@ public class SaaSim{
 	public static final String SAASIM_SIMULATION_TIME = "simulation.time";
 	private Configuration config;
 	private EventScheduler scheduler;
-	private DPS dps;
+	private ProvisioningSystem dps;
 	private Application application;
 	private WorkloadTrafficGenerator workloadGenerator;
 	private MonitoringService feed;
@@ -42,7 +42,7 @@ public class SaaSim{
 	 * @throws ConfigurationException
 	 */
 	@Inject
-	public SaaSim(Configuration configuration, EventScheduler scheduler, DPS dps, Application application, WorkloadTrafficGenerator workloadGenerator, MonitoringService feed, MonitoringServiceConsumer consumer) throws ConfigurationException {
+	public SaaSim(Configuration configuration, EventScheduler scheduler, ProvisioningSystem dps, Application application, WorkloadTrafficGenerator workloadGenerator, MonitoringService feed, MonitoringServiceConsumer consumer) throws ConfigurationException {
 
 		this.config = configuration;
 		this.scheduler = scheduler;

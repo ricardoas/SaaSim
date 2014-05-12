@@ -6,7 +6,7 @@ public class TierConfiguration {
 	
 	private final int tierID;	
 	private final ConfigurationAction action;
-	private final InstanceDescriptor[] descriptors;
+	private final InstanceDescriptor descriptor;
 	private final boolean force;
 	
 	/**
@@ -16,10 +16,10 @@ public class TierConfiguration {
 	 * @param descriptors
 	 * @param force
 	 */
-	public TierConfiguration(int tierID, ConfigurationAction action, InstanceDescriptor[] descriptors, boolean force) {
+	public TierConfiguration(int tierID, ConfigurationAction action, InstanceDescriptor descriptors, boolean force) {
 		this.tierID = tierID;
 		this.action = action;
-		this.descriptors = descriptors;
+		this.descriptor = descriptors;
 		this.force = force;
 	}
 	
@@ -31,8 +31,8 @@ public class TierConfiguration {
 		return action;
 	}
 
-	public InstanceDescriptor[] getDescriptors() {
-		return descriptors;
+	public InstanceDescriptor getDescriptor() {
+		return descriptor;
 	}
 
 	public boolean isForce() {

@@ -4,15 +4,13 @@ import saasim.core.application.Application;
 import saasim.core.cloud.IaaSProvider;
 import saasim.core.cloud.utility.UtilityFunction;
 import saasim.core.config.Configuration;
-import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.provisioning.ConfigurationAction;
-import saasim.core.provisioning.DPS;
+import saasim.core.provisioning.ProvisioningSystem;
 import saasim.core.provisioning.TierConfiguration;
-import saasim.ext.cloud.aws.AWSInstanceType;
 
 import com.google.inject.Inject;
 
-public class StaticProvisioningSystem implements DPS {
+public class StaticProvisioningSystem implements ProvisioningSystem {
 	
 	private Application[] applications;
 	private Configuration config;
@@ -38,11 +36,11 @@ public class StaticProvisioningSystem implements DPS {
 			
 			for (int i = 0; i < numberOfTiers; i++) {
 				int numberOfReplicas = Integer.valueOf(startNumberOfReplicas[i]);
-				InstanceDescriptor[] descriptors = new InstanceDescriptor[numberOfReplicas];
 				for (int j = 0; j < numberOfReplicas; j++) {
-					descriptors[j] = provider.acquire(AWSInstanceType.valueOf(vmTypePerTier[i]));
+					if(provider.canAcquire(vmTypePerTier[i])){
+						application.configure(new TierConfiguration(i, ConfigurationAction.INCREASE, provider.acquire(vmTypePerTier[i]), true));
+					}
 				}
-				application.configure(new TierConfiguration(i, ConfigurationAction.INCREASE, descriptors, true));
 			}
 		}
 	}

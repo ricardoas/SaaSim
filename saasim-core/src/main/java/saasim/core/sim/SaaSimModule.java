@@ -5,6 +5,7 @@ import saasim.core.application.Application;
 import saasim.core.application.Request;
 import saasim.core.application.ScalableTier;
 import saasim.core.application.Tier;
+import saasim.core.cloud.IaaSCustomer;
 import saasim.core.cloud.IaaSProvider;
 import saasim.core.config.Configuration;
 import saasim.core.event.EventScheduler;
@@ -18,7 +19,8 @@ import saasim.core.infrastructure.MonitoringServiceConsumer;
 import saasim.core.io.TraceParcer;
 import saasim.core.io.TraceReader;
 import saasim.core.io.TraceReaderFactory;
-import saasim.core.provisioning.DPS;
+import saasim.core.provisioning.ProvisioningSystem;
+import saasim.ext.cloud.LoggerIaaSCustomer;
 import saasim.ext.infrastructure.DefaultOutputWriter;
 import saasim.ext.infrastructure.FCFSAdmissionControl;
 import saasim.ext.infrastructure.RoundRobinLoadBalancer;
@@ -72,7 +74,7 @@ public class SaaSimModule extends AbstractModule {
 		
 		bind(IaaSProvider.class).to((Class<? extends IaaSProvider>) load(provideConfiguration().getString(IAAS_CLASS))).in(Singleton.class);
 		
-		bind(DPS.class).to((Class<? extends DPS>) load(provideConfiguration().getString(DPS_CLASS))).in(Singleton.class);
+		bind(ProvisioningSystem.class).to((Class<? extends ProvisioningSystem>) load(provideConfiguration().getString(DPS_CLASS))).in(Singleton.class);
 		
 		bind(Application.class).to((Class<? extends Application>) load(provideConfiguration().getString(APPLICATION_CLASS))).in(Singleton.class);
 		
@@ -91,6 +93,8 @@ public class SaaSimModule extends AbstractModule {
 		bind(AdmissionControl.class).to(FCFSAdmissionControl.class);
 		
 		bind(LoadBalancer.class).to(RoundRobinLoadBalancer.class);
+		
+		bind(IaaSCustomer.class).to(LoggerIaaSCustomer.class).in(Singleton.class);;
 		
 		install(new FactoryModuleBuilder()
 	     .implement(Machine.class, (Class<? extends Machine>) load(provideConfiguration().getString(MACHINE_CLASS)))

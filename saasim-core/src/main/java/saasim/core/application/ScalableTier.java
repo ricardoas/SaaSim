@@ -41,13 +41,13 @@ public class ScalableTier extends AbstractTier{
 		
 		switch (tierConfiguration.getAction()) {
 		case INCREASE:
-			scaleIn(tierConfiguration.getDescriptors(), tierConfiguration.isForce());
+			scaleIn(tierConfiguration.getDescriptor(), tierConfiguration.isForce());
 			break;
 		case DECREASE:
-			scaleOut(tierConfiguration.getDescriptors(), tierConfiguration.isForce());
+			scaleOut(tierConfiguration.getDescriptor(), tierConfiguration.isForce());
 			break;
 		case CONFIGURE_MACHINE:
-			reconfigure(tierConfiguration.getDescriptors(), tierConfiguration.isForce());
+			reconfigure(tierConfiguration.getDescriptor(), tierConfiguration.isForce());
 		default:
 			throw new RuntimeException("Unknown action of configuration!");
 		}
@@ -59,10 +59,8 @@ public class ScalableTier extends AbstractTier{
 	 * @param machineDescriptor {@link InstanceDescriptor} of the new server.
 	 * @param force <code>true</code> to add immediately, otherwise there is a boot/set up time. 
 	 */
-	private void scaleIn(InstanceDescriptor[] instanceDescriptors, boolean force){
-		for (InstanceDescriptor instanceDescriptor : instanceDescriptors) {
-			this.loadBalancer.addMachine(instanceDescriptor, !force);
-		}
+	private void scaleIn(InstanceDescriptor instanceDescriptor, boolean force){
+		this.loadBalancer.addMachine(instanceDescriptor, !force);
 	}
 	
 	/**
@@ -70,10 +68,8 @@ public class ScalableTier extends AbstractTier{
 	 *  
 	 * @param force <code>true</code> to remove immediately, otherwise to gracefully remove it.
 	 */
-	private void scaleOut(InstanceDescriptor[] instanceDescriptors, boolean force){
-		for (InstanceDescriptor instanceDescriptor : instanceDescriptors) {
-			this.loadBalancer.removeMachine(instanceDescriptor, force);
-		}
+	private void scaleOut(InstanceDescriptor instanceDescriptor, boolean force){
+		this.loadBalancer.removeMachine(instanceDescriptor, force);
 	}
 	
 	/**
@@ -81,9 +77,7 @@ public class ScalableTier extends AbstractTier{
 	 * 
 	 * @param machineDescriptor {@link InstanceDescriptor} of the new server.
 	 */
-	private void reconfigure(InstanceDescriptor[] instanceDescriptors, boolean force){
-		for (InstanceDescriptor instanceDescriptor : instanceDescriptors) {
-			this.loadBalancer.reconfigureMachine(instanceDescriptor, !force);
-		}
+	private void reconfigure(InstanceDescriptor instanceDescriptor, boolean force){
+		this.loadBalancer.reconfigureMachine(instanceDescriptor, !force);
 	}
 }

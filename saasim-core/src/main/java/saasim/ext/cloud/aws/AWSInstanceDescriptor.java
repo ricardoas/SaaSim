@@ -12,9 +12,16 @@ public class AWSInstanceDescriptor implements InstanceDescriptor {
 	private AWSInstanceType type;
 	private boolean on;
 	private Machine machine;
+	private boolean reserved;
+	private long startTime;
+	private long finishTime;
+	private long lastBillingTime;
 
-	public AWSInstanceDescriptor(AWSInstanceType instanceType) {
+	public AWSInstanceDescriptor(AWSInstanceType instanceType, boolean reserved, long startTime) {
 		this.type = instanceType;
+		this.reserved = reserved;
+		this.startTime = startTime;
+		this.lastBillingTime = startTime;
 		this.on = true;
 	}
 
@@ -30,9 +37,10 @@ public class AWSInstanceDescriptor implements InstanceDescriptor {
 
 
 	@Override
-	public void turnOff() {
+	public void turnOff(long now) {
 		on = false;
-		this.machine.shutdown();
+		finishTime = now;
+		machine.shutdown();
 	}
 
 	@Override
