@@ -39,10 +39,10 @@ public class SingleQueueMachine implements Machine {
 		this.monitor = monitor;
 		
 		this.scheduler = scheduler;
-		this.startUpDelay = configuration.getLong("machine.setuptime");
+		this.startUpDelay = configuration.getLong(MACHINE_SETUPTIME);
 		this.backlog = new LinkedList<>();
 		this.forwarded = new LinkedList<>();
-		this.maxBacklogSize = configuration.getInt("machine.backlogsize");
+		this.maxBacklogSize = configuration.getInt(MACHINE_BACKLOGSIZE);
 		this.semaphore = new FastSemaphore(this.descriptor.getNumberOfCPUCores());
 	}
 	

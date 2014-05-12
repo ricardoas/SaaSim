@@ -11,6 +11,9 @@ import saasim.core.application.Tier;
  */
 public interface Machine extends ResponseListener{
 	
+	public static final String MACHINE_BACKLOGSIZE = "machine.backlogsize";
+	public static final String MACHINE_SETUPTIME = "machine.setuptime";
+
 	void reconfigure(InstanceDescriptor descriptor);
 	
 	/**

@@ -43,7 +43,7 @@ public class EventSchedulerTest{
 	public void setUp() throws Exception {
 		configurationMock = EasyMock.createStrictMock(Configuration.class);
 
-		EasyMock.expect(configurationMock.getLong("random.seed")).andReturn(0L).once();
+		EasyMock.expect(configurationMock.getLong(EventScheduler.EVENT_SCHEDULER_RANDOM_SEED)).andReturn(0L).once();
 		EasyMock.replay(configurationMock);
 		
 		Guice.createInjector(new AbstractModule() {

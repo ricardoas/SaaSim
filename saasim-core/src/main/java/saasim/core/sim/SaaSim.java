@@ -21,6 +21,7 @@ import com.google.inject.Inject;
  */
 public class SaaSim{
 
+	public static final String SAASIM_SIMULATION_TIME = "simulation.time";
 	private Configuration config;
 	private EventScheduler scheduler;
 	private DPS dps;
@@ -69,7 +70,7 @@ public class SaaSim{
 				workloadGenerator.start();
 			}
 		});
-		scheduler.start(config.getLong("simulation.time"));
+		scheduler.start(config.getLong(SAASIM_SIMULATION_TIME));
 
 		Logger.getLogger(SaaSim.class).debug("SIMULATION END " + System.currentTimeMillis());
 		Logger.getLogger(SaaSim.class).debug("SIMULATION DURATION " + (System.currentTimeMillis()-start));

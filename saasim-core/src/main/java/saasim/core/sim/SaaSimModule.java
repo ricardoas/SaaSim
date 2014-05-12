@@ -39,6 +39,13 @@ import com.google.inject.assistedinject.FactoryModuleBuilder;
  */
 public class SaaSimModule extends AbstractModule {
 
+	public static final String MACHINE_CLASS = "machine.class";
+	public static final String MONITORING_SERVICE_CLASS = "monitoring.service.class";
+	public static final String TRACE_PARSER_CLASS = "trace.parser.class";
+	public static final String MONITORING_MONITOR_CLASS = "monitoring.monitor.class";
+	public static final String APPLICATION_CLASS = "application.class";
+	public static final String DPS_CLASS = "dps.class";
+	public static final String IAAS_CLASS = "iaas.class";
 	private final String configFilePath;
 
 	/**
@@ -63,17 +70,17 @@ public class SaaSimModule extends AbstractModule {
 		
 		bind(SaaSim.class);
 		
-		bind(IaaSProvider.class).to((Class<? extends IaaSProvider>) load(provideConfiguration().getString("iaas.class"))).in(Singleton.class);
+		bind(IaaSProvider.class).to((Class<? extends IaaSProvider>) load(provideConfiguration().getString(IAAS_CLASS))).in(Singleton.class);
 		
-		bind(DPS.class).to((Class<? extends DPS>) load(provideConfiguration().getString("dps.class"))).in(Singleton.class);
+		bind(DPS.class).to((Class<? extends DPS>) load(provideConfiguration().getString(DPS_CLASS))).in(Singleton.class);
 		
-		bind(Application.class).to((Class<? extends Application>) load(provideConfiguration().getString("application.class"))).in(Singleton.class);
+		bind(Application.class).to((Class<? extends Application>) load(provideConfiguration().getString(APPLICATION_CLASS))).in(Singleton.class);
 		
-		bind(Monitor.class).to((Class<? extends Monitor>) load(provideConfiguration().getString("monitoring.monitor.class"))).in(Singleton.class);
+		bind(Monitor.class).to((Class<? extends Monitor>) load(provideConfiguration().getString(MONITORING_MONITOR_CLASS))).in(Singleton.class);
 		
-		bind(MonitoringService.class).to((Class<? extends MonitoringService>) load(provideConfiguration().getString("monitoring.service.class"))).in(Singleton.class);
+		bind(MonitoringService.class).to((Class<? extends MonitoringService>) load(provideConfiguration().getString(MONITORING_SERVICE_CLASS))).in(Singleton.class);
 				
-		bind(TraceParcer.class).to((Class<? extends TraceParcer>) load(provideConfiguration().getString("trace.parser.class"))).in(Singleton.class);
+		bind(TraceParcer.class).to((Class<? extends TraceParcer>) load(provideConfiguration().getString(TRACE_PARSER_CLASS))).in(Singleton.class);
 		
 		install(new FactoryModuleBuilder()
 	     .implement(new TypeLiteral<TraceReader<Request>>() {}, LineBasedTraceReader.class)
@@ -86,7 +93,7 @@ public class SaaSimModule extends AbstractModule {
 		bind(LoadBalancer.class).to(RoundRobinLoadBalancer.class);
 		
 		install(new FactoryModuleBuilder()
-	     .implement(Machine.class, (Class<? extends Machine>) load(provideConfiguration().getString("machine.class")))
+	     .implement(Machine.class, (Class<? extends Machine>) load(provideConfiguration().getString(MACHINE_CLASS)))
 	     .build(MachineFactory.class));
 		
 		bind(MonitoringServiceConsumer.class).to(DefaultOutputWriter.class).in(Singleton.class);

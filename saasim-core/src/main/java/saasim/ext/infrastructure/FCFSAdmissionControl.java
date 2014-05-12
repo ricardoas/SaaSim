@@ -23,7 +23,7 @@ public class FCFSAdmissionControl implements AdmissionControl {
 	@Inject
 	public FCFSAdmissionControl(Configuration configuration) {
 		
-		this.acceptanceRate = configuration.getInt("admissioncontrol.acceptancerate", Integer.MAX_VALUE);
+		this.acceptanceRate = configuration.getInt(ADMISSIONCONTROL_ACCEPTANCERATE, Integer.MAX_VALUE);
 		this.currentTimeSlot = -1;
 		this.counter = 0;
 	}

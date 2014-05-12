@@ -20,6 +20,11 @@ import com.google.inject.Inject;
  */
 public class WorkloadTrafficGenerator {
 	
+	public static final String TRACE_GENERATOR_BUFFER = "trace.generator.buffer";
+
+	//FIXME seems to be in the wrong place
+	public static final String SAAS_TENANT_TRACE = "saas.tenant.trace";
+	
 	private static final int DEFAULT_BUFFER_SIZE = 60 * 1000;
 	private final EventScheduler scheduler;
 	private final Application application;
@@ -39,13 +44,13 @@ public class WorkloadTrafficGenerator {
 		this.scheduler = scheduler;
 		this.application = application;
 		
-		String[] fileNames = configuration.getStringArray("saas.tenant.trace");
+		String[] fileNames = configuration.getStringArray(SAAS_TENANT_TRACE);
 		parsers = new ArrayList<>();
 		for (String string : fileNames) {
 			parsers.add(readerFactory.create(string, parsers.size()));
 		}
 		
-		this.bufferSize = configuration.getInt("trace.generator.buffer", DEFAULT_BUFFER_SIZE);
+		this.bufferSize = configuration.getInt(TRACE_GENERATOR_BUFFER, DEFAULT_BUFFER_SIZE);
 	}
 
 	/**

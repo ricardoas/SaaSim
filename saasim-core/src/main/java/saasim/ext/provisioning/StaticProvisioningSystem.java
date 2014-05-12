@@ -33,8 +33,8 @@ public class StaticProvisioningSystem implements DPS {
 	protected void setUp() {
 		for (Application application : applications) {
 			int numberOfTiers = application.getNumberOfTiers();
-			String[] startNumberOfReplicas = config.getStringArray("application.tier.replicas");
-			String[] vmTypePerTier = config.getStringArray("application.tier.vmtype");
+			String[] startNumberOfReplicas = config.getStringArray(Application.APPLICATION_TIER_REPLICAS);
+			String[] vmTypePerTier = config.getStringArray(Application.APPLICATION_TIER_VMTYPE);
 			
 			for (int i = 0; i < numberOfTiers; i++) {
 				int numberOfReplicas = Integer.valueOf(startNumberOfReplicas[i]);

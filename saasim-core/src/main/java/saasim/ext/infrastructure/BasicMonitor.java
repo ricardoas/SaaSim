@@ -1,5 +1,6 @@
 package saasim.ext.infrastructure;
 
+import saasim.core.application.Application;
 import saasim.core.application.Request;
 import saasim.core.config.Configuration;
 import saasim.core.infrastructure.InstanceDescriptor;
@@ -20,7 +21,7 @@ public class BasicMonitor implements Monitor {
 
 	@Inject
 	public BasicMonitor(Configuration configuration) {
-		reset(configuration.getInt("application.tier"));
+		reset(configuration.getInt(Application.APPLICATION_TIER));
 	}
 
 	@Override

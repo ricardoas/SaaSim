@@ -17,6 +17,8 @@ import com.google.inject.Inject;
  */
 public final class EventScheduler implements Serializable{
 	
+	public static final String EVENT_SCHEDULER_RANDOM_SEED = "random.seed";
+
 	private static final long serialVersionUID = -5091449738303689646L;
 	
 	private long now;
@@ -29,20 +31,8 @@ public final class EventScheduler implements Serializable{
      * @param seed 
      * @throws IOException 
      */
-    @Deprecated
-    public EventScheduler(long seed){
-    	this.random = new Random(seed);
-    	this.now = 0;
-		this.eventSet = new TreeSet<Event>();
-    }
-    
-    /**
-     * Default constructor.
-     * @param seed 
-     * @throws IOException 
-     */
    @Inject public EventScheduler(Configuration config){
-    	this.random = new Random(config.getLong("random.seed"));
+    	this.random = new Random(config.getLong(EVENT_SCHEDULER_RANDOM_SEED));
     	this.now = 0;
 		this.eventSet = new TreeSet<Event>();
     }

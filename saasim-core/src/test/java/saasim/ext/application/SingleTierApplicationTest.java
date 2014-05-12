@@ -94,7 +94,7 @@ public class SingleTierApplicationTest {
 	@Test
 	public final void testCanQueue() {
 		
-		EasyMock.expect(configuration.getLong("random.seed")).andReturn(0L).once();
+		EasyMock.expect(configuration.getLong(EventScheduler.EVENT_SCHEDULER_RANDOM_SEED)).andReturn(0L).once();
 		
 		monitor.requestArrived(request);
 		EasyMock.expect(control.canAccept(request)).andReturn(true);
@@ -111,7 +111,7 @@ public class SingleTierApplicationTest {
 	@Test
 	public final void testCannotQueue() {
 		
-		EasyMock.expect(configuration.getLong("random.seed")).andReturn(0L).once();
+		EasyMock.expect(configuration.getLong(EventScheduler.EVENT_SCHEDULER_RANDOM_SEED)).andReturn(0L).once();
 		
 		monitor.requestArrived(request);
 		EasyMock.expect(control.canAccept(request)).andReturn(false);

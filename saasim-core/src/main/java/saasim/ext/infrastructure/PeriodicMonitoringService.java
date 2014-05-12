@@ -26,7 +26,7 @@ public class PeriodicMonitoringService implements MonitoringService {
 		this.monitor = monitor;
 		listeners = new ArrayList<>();
 		
-		timeBetweenReports = configuration.getLong("monitoring.service.timebetweenreports");
+		timeBetweenReports = configuration.getLong(MONITORING_SERVICE_TIMEBETWEENREPORTS);
 		
 		scheduler.queueEvent(new Event(scheduler.now()+timeBetweenReports){
 			@Override

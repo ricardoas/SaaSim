@@ -9,6 +9,10 @@ import saasim.core.provisioning.TierConfiguration;
  */
 public interface Application extends ResponseListener{
 	
+	public static final String APPLICATION_TIER = "application.tier";
+	public static final String APPLICATION_TIER_VMTYPE = "application.tier.vmtype";
+	public static final String APPLICATION_TIER_REPLICAS = "application.tier.replicas";
+
 	/**
 	 * TODO what about admission control configuration?
 	 * @param tierConfiguration A configuration to be executed.
