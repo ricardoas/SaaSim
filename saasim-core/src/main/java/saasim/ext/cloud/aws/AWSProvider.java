@@ -3,7 +3,7 @@ package saasim.ext.cloud.aws;
 import java.util.HashSet;
 import java.util.Set;
 
-import saasim.core.cloud.BillingInfo;
+import saasim.core.cloud.IaaSBillingInfo;
 import saasim.core.cloud.IaaSCustomer;
 import saasim.core.cloud.IaaSProvider;
 import saasim.core.config.Configuration;
@@ -33,7 +33,7 @@ public class AWSProvider implements IaaSProvider {
 	private AWSReservation reservation;
 	private Set<InstanceDescriptor> running;
 	private IaaSCustomer customer;
-	private BillingInfo billingInfo;
+	private IaaSBillingInfo billingInfo;
 
 	@Inject
 	public AWSProvider(Configuration configuration, EventScheduler scheduler, IaaSCustomer customer) {

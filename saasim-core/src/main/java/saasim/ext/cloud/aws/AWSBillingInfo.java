@@ -1,9 +1,9 @@
 package saasim.ext.cloud.aws;
 
-import saasim.core.cloud.BillingInfo;
+import saasim.core.cloud.IaaSBillingInfo;
 import saasim.core.infrastructure.InstanceDescriptor;
 
-public class AWSBillingInfo implements BillingInfo {
+public class AWSBillingInfo implements IaaSBillingInfo {
 	
 
 	private long ondemandHours;
