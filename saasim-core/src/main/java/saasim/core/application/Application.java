@@ -9,9 +9,11 @@ import saasim.core.provisioning.TierConfiguration;
  */
 public interface Application extends ResponseListener{
 	
-	public static String READWORKLOADEVENT = ""; 
-	
-	void config(TierConfiguration tierConfiguration);
+	/**
+	 * TODO what about admission control configuration?
+	 * @param tierConfiguration A configuration to be executed.
+	 */
+	void configure(TierConfiguration tierConfiguration);
 
 	/**
 	 * Queue {@link Request} at this {@link Application}.
@@ -19,5 +21,8 @@ public interface Application extends ResponseListener{
 	 */
 	void queue(Request request);
 	
+	/**
+	 * @return the number of {@link Tier}s.
+	 */
 	int getNumberOfTiers();
 }

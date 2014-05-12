@@ -44,7 +44,7 @@ public class SingleTierApplication implements Application {
 	}
 
 	@Override
-	public void config(TierConfiguration configuration) {
+	public void configure(TierConfiguration configuration) {
 		tiers[configuration.getTierID()].config(configuration);
 	}
 

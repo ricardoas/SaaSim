@@ -42,7 +42,7 @@ public class StaticProvisioningSystem implements DPS {
 				for (int j = 0; j < numberOfReplicas; j++) {
 					descriptors[j] = provider.acquire(InstanceType.valueOf(vmTypePerTier[i]));
 				}
-				application.config(new TierConfiguration(i, ConfigurationAction.INCREASE, descriptors, true));
+				application.configure(new TierConfiguration(i, ConfigurationAction.INCREASE, descriptors, true));
 			}
 		}
 	}
