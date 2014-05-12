@@ -1,9 +1,9 @@
-package saasim.ext.cloud;
+package saasim.ext.cloud.aws;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public enum InstanceType {
+public enum AWSInstanceType {
 
 	M1_SMALL	(1, 	1), 
 	M1_LARGE	(2, 	2), 
@@ -24,7 +24,7 @@ public enum InstanceType {
 	 * @param power Core relative power
 	 * @param numberOfCores Number of identical cores.
 	 */
-	private InstanceType(double power, int numberOfCores) {
+	private AWSInstanceType(double power, int numberOfCores) {
 		this.cpuPower = power;
 		this.numberOfCPU = numberOfCores;
 	}

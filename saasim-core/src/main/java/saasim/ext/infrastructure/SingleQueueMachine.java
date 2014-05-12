@@ -29,19 +29,21 @@ public class SingleQueueMachine implements Machine {
 	private EventScheduler scheduler;
 	private FastSemaphore semaphore;
 	private Tier nextTier;
-	private boolean shutdown;
+	private Queue<Request> forwarded;
 	
 	@Inject
 	public SingleQueueMachine(@Assisted InstanceDescriptor descriptor, Monitor monitor, EventScheduler scheduler, Configuration configuration) {
 		this.descriptor = descriptor;
+		this.descriptor.setMachine(this);
+		
 		this.monitor = monitor;
 		
 		this.scheduler = scheduler;
 		this.startUpDelay = configuration.getLong("machine.setuptime");
 		this.backlog = new LinkedList<>();
+		this.forwarded = new LinkedList<>();
 		this.maxBacklogSize = configuration.getInt("machine.backlogsize");
 		this.semaphore = new FastSemaphore(this.descriptor.getNumberOfCPUCores());
-		this.shutdown = false;
 	}
 	
 	@Override
@@ -51,6 +53,7 @@ public class SingleQueueMachine implements Machine {
 
 	@Override
 	public void queue(final Request request) {
+		
 		if(backlog.size() < maxBacklogSize){
 			if(semaphore.tryAcquire()){
 				scheduler.queueEvent(new Event(scheduler.now() + request.getCPUTimeDemandInMillis()) {
@@ -69,13 +72,11 @@ public class SingleQueueMachine implements Machine {
 	
 	protected void run(Request request) {
 		
-		request.updateServiceTime(request.getCPUTimeDemandInMillis());
-		
-		if(getNextTier() != null && shouldForward()){
-			request.setResponseListener(this);
-			getNextTier().queue(request);
+		if(!descriptor.isOn()){
+			monitor.requestFailedAtMachine(request, descriptor);
 		}else{
-			processDone(request, null);
+			request.updateServiceTime(request.getCPUTimeDemandInMillis());
+			forward(request, null);
 		}
 		
 		if(!backlog.isEmpty()){
@@ -90,6 +91,17 @@ public class SingleQueueMachine implements Machine {
 			semaphore.release();
 		}
 	}
+
+	private void forward(Request request, Response response) {
+		if(getNextTier() != null && shouldForward()){
+			request.setResponseListener(this);
+			getNextTier().queue(request);
+			forwarded.add(request);
+		}else{
+			request.getResponseListener().processDone(request, response);
+		}
+	}
+
 
 	@Override
 	public boolean shouldForward() {
@@ -108,15 +120,12 @@ public class SingleQueueMachine implements Machine {
 
 	@Override
 	public void processDone(Request request, Response response) {
-		if(isShutdown()){
+		forwarded.remove(request);
+
+		if(!descriptor.isOn()){
 			monitor.requestFailedAtMachine(request, descriptor);
 		}else{
-			if(getNextTier() != null && shouldForward()){
-				request.setResponseListener(this);
-				getNextTier().queue(request);
-			}else{
-				request.getResponseListener().processDone(request, response);
-			}
+			forward(request, response);
 		}
 	}
 
@@ -127,56 +136,10 @@ public class SingleQueueMachine implements Machine {
 	}
 
 	@Override
-	public boolean isShutdown() {
-		return shutdown;
+	public void shutdown() {
+		for (Request request : backlog) {
+			monitor.requestFailedAtMachine(request, descriptor);
+		}
+		backlog.clear();
 	}
-
-	@Override
-	public Queue<Request> getProcessorQueue() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public InstanceDescriptor getDescriptor() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void shutdownOnFinish() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public double computeUtilisation(long timeInMillis) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public long getTotalTimeUsed() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int getNumberOfCores() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void cancelShutdown() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void shutdownNow() {
-		// TODO Auto-generated method stub
-
-	}
-
 }

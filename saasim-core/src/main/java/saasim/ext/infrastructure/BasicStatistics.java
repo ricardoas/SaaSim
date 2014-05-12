@@ -10,7 +10,7 @@ import saasim.core.infrastructure.Statistics;
 public class BasicStatistics implements Statistics{
 	
 	
-	private int accepted;
+	private int arrived;
 	private int rejected;
 	private int finished;
 	private int failed;
@@ -19,11 +19,11 @@ public class BasicStatistics implements Statistics{
 	private long now;
 	private long elapsedTimeInSeconds;
 
-	public BasicStatistics(long now, long elapsedTime, int accepted, int rejected, int finished,
+	public BasicStatistics(long now, long elapsedTime, int arrived, int rejected, int finished,
 			int failed, double averageResponseTime, int[] rejectedAtLoadBalancer) {
 				this.now = now;
 				this.elapsedTimeInSeconds = elapsedTime / 1000;
-				this.accepted = accepted;
+				this.arrived = arrived;
 				this.rejected = rejected;
 				this.finished = finished;
 				this.failed = failed;
@@ -36,9 +36,9 @@ public class BasicStatistics implements Statistics{
 		StringBuilder sb = new StringBuilder();
 		sb.append(now);
 		sb.append(',');
-		sb.append(accepted);
+		sb.append(arrived);
 		sb.append(',');
-		sb.append(1.0*accepted/elapsedTimeInSeconds);
+		sb.append(1.0*arrived/elapsedTimeInSeconds);
 		sb.append(',');
 		sb.append(rejected);
 		sb.append(',');

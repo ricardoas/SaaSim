@@ -1,4 +1,4 @@
-package saasim.ext.cloud;
+package saasim.ext.cloud.aws;
 
 import saasim.core.cloud.IaaSProvider;
 import saasim.core.config.Configuration;
@@ -7,7 +7,7 @@ import saasim.core.util.TimeUnit;
 
 import com.google.inject.Inject;
 
-public class AmazonEC2 implements IaaSProvider {
+public class AWSProvider implements IaaSProvider {
 
 	/**
 	 * 
@@ -15,18 +15,18 @@ public class AmazonEC2 implements IaaSProvider {
 	private static final long serialVersionUID = 1L;
 
 	@Inject
-	public AmazonEC2(Configuration config) {
+	public AWSProvider(Configuration config) {
 		
 	}
 
 	@Override
-	public void makeReservation(InstanceType instanceType, TimeUnit duration) {
+	public void makeReservation(AWSInstanceType instanceType, TimeUnit duration) {
 		// TODO Auto-generated method stub
 	}
 
 	@Override
-	public InstanceDescriptor acquire(InstanceType instanceType) {
-		return new AmazonInstanceDescriptor(instanceType);
+	public InstanceDescriptor acquire(AWSInstanceType instanceType) {
+		return new AWSInstanceDescriptor(instanceType);
 	}
 
 	@Override

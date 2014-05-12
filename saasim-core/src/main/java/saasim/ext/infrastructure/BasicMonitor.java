@@ -62,39 +62,4 @@ public class BasicMonitor implements Monitor {
 			InstanceDescriptor descriptor) {
 		failed++;
 	}
-	
-	@Override
-	public void requestRejectedAtLoadBalancer(Request request, int tier) {
-		rejectedAtLoadBalancer[tier]++;
-	}
-
-	
-	
-	
-	
-	
-	@Override
-	public void requestAcceptedAtLoadBalancer(Request request, int tier) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void machineTurnedOff(InstanceDescriptor machineDescriptor) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void chargeUsers(long currentTimeInMillis) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public boolean isOptimal() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 }

@@ -4,7 +4,7 @@ import java.util.LinkedList;
 
 import saasim.core.application.Request;
 import saasim.core.event.EventScheduler;
-import saasim.core.infrastructure.AbstractLoadbalancer;
+import saasim.core.infrastructure.AbstractLoadBalancer;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.infrastructure.Machine;
 import saasim.core.infrastructure.MachineFactory;
@@ -14,7 +14,7 @@ import com.google.inject.Inject;
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class RoundRobinLoadBalancer extends AbstractLoadbalancer {
+public class RoundRobinLoadBalancer extends AbstractLoadBalancer {
 	
 	private final LinkedList<InstanceDescriptor> roundRobinQueue;
 	private int roundRobinIndex;

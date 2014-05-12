@@ -9,13 +9,13 @@ import saasim.core.event.Event;
 import saasim.core.event.EventPriority;
 import saasim.core.event.EventScheduler;
 
-public abstract class AbstractLoadbalancer implements LoadBalancer{
+public abstract class AbstractLoadBalancer implements LoadBalancer{
 
 	protected final EventScheduler scheduler;
 	protected final Map<InstanceDescriptor, Machine> machines;
 	protected MachineFactory machineFactory;
 
-	public AbstractLoadbalancer(EventScheduler scheduler, MachineFactory machineFactory) {
+	public AbstractLoadBalancer(EventScheduler scheduler, MachineFactory machineFactory) {
 		this.scheduler = scheduler;
 		this.machineFactory = machineFactory;
 		this.machines = new HashMap<>();
@@ -30,6 +30,7 @@ public abstract class AbstractLoadbalancer implements LoadBalancer{
 	public void addMachine(final InstanceDescriptor descriptor,
 			boolean useStartUpDelay) {
 		final Machine machine = machineFactory.create(descriptor);
+		
 		scheduler.queueEvent(new Event(useStartUpDelay?machine.getStartUpDelay():0L, EventPriority.HIGH) {
 			@Override
 			public void trigger() {
@@ -48,7 +49,11 @@ public abstract class AbstractLoadbalancer implements LoadBalancer{
 	 */
 	@Override
 	public void removeMachine(InstanceDescriptor descriptor, boolean force) {
-		machines.remove(descriptor);
+		if(force){
+			machines.remove(descriptor);
+		}else{
+			//TODO wait until session is over
+		}
 	}
 
 	/**
