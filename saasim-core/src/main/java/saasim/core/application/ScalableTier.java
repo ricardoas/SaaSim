@@ -14,12 +14,27 @@ import com.google.inject.Inject;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class ScalableTier extends AbstractTier implements Tier{
+public class ScalableTier extends AbstractTier{
 	
+	protected final LoadBalancer loadBalancer;
+
 	@Inject
 	public ScalableTier(LoadBalancer loadBalancer) {
-		super(loadBalancer);
+		super();
+		this.loadBalancer = loadBalancer;
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @see saasim.core.application.Tier#queue(saasim.core.application.Request)
+	 */
+	@Override
+	public void queue(Request request) {
+		request.setResponseListener(this);
+		this.loadBalancer.queue(request);
+	}
+
 
 	@Override
 	public void config(TierConfiguration tierConfiguration) {
@@ -46,7 +61,7 @@ public class ScalableTier extends AbstractTier implements Tier{
 	 */
 	private void scaleIn(InstanceDescriptor[] instanceDescriptors, boolean force){
 		for (InstanceDescriptor instanceDescriptor : instanceDescriptors) {
-			getLoadBalancer().addMachine(instanceDescriptor, !force);
+			this.loadBalancer.addMachine(instanceDescriptor, !force);
 		}
 	}
 	
@@ -57,7 +72,7 @@ public class ScalableTier extends AbstractTier implements Tier{
 	 */
 	private void scaleOut(InstanceDescriptor[] instanceDescriptors, boolean force){
 		for (InstanceDescriptor instanceDescriptor : instanceDescriptors) {
-			getLoadBalancer().removeMachine(instanceDescriptor, force);
+			this.loadBalancer.removeMachine(instanceDescriptor, force);
 		}
 	}
 	
@@ -68,7 +83,7 @@ public class ScalableTier extends AbstractTier implements Tier{
 	 */
 	private void reconfigure(InstanceDescriptor[] instanceDescriptors, boolean force){
 		for (InstanceDescriptor instanceDescriptor : instanceDescriptors) {
-			getLoadBalancer().reconfigureMachine(instanceDescriptor, !force);
+			this.loadBalancer.reconfigureMachine(instanceDescriptor, !force);
 		}
 	}
 }

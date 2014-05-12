@@ -1,6 +1,5 @@
 package saasim.core.application;
 
-import saasim.core.infrastructure.LoadBalancer;
 import saasim.core.provisioning.TierConfiguration;
 
 /**
@@ -19,7 +18,5 @@ public interface Tier extends ResponseListener{
 	 * @param tierConfiguration new {@link TierConfiguration}.
 	 */
 	void config(TierConfiguration tierConfiguration);
-	
-	LoadBalancer getLoadBalancer();
 	
 }
