@@ -6,11 +6,9 @@ import saasim.core.infrastructure.InstanceDescriptor;
 public class AWSBillingInfo implements IaaSBillingInfo {
 	
 
-	private long ondemandHours;
-	private long reservationHours;
-	private double setUpFee;
-	private double onDemandFee;
-	private double reservationFee;
+	private double totalFee;
+
+	private StringBuilder sb = new StringBuilder();
 	
 	public AWSBillingInfo() {
 		reset();
@@ -19,33 +17,25 @@ public class AWSBillingInfo implements IaaSBillingInfo {
 	
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append(ondemandHours);
-		sb.append(',');
-		sb.append(reservationHours);
-		sb.append(',');
-		sb.append(setUpFee);
-		sb.append(',');
-		sb.append(onDemandFee);
-		sb.append(',');
-		sb.append(reservationFee);
+		
 		sb.append('\n');
+		sb.append("TOTAL=");
+		sb.append(totalFee);
+		sb.append('\n');
+		
 		return sb.toString();
 	}
 
 
 	@Override
 	public void reset() {
-		ondemandHours = 0;
-		reservationHours = 0;
-		setUpFee = 0;
-		onDemandFee = 0;
-		reservationFee = 0;
+		totalFee = 0;
+		sb = new StringBuilder();
 	}
 
 
 	@Override
-	public void account(InstanceDescriptor descriptor) {
-		
+	public void account(InstanceDescriptor descriptor, long now) {
+		totalFee += descriptor.reportUsage(sb, now);
 	}
 }

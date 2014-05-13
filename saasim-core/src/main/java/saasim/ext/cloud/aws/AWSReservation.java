@@ -19,12 +19,12 @@ public class AWSReservation {
 
 	private IaaSBillingInfo billingInfo;
 
-	public AWSReservation(Configuration configuration, IaaSBillingInfo billingInfo) {
+	public AWSReservation(Configuration configuration, IaaSBillingInfo billingInfo, Map<String, AWSInstanceType> types) {
 		this.billingInfo = billingInfo;
 		this.reservation = new HashMap<>();
 		this.running = new HashSet<>();
 		
-		for (AWSInstanceType type : AWSInstanceType.values()) {
+		for (AWSInstanceType type : types.values()) {
 			//FIXME LOAD PLAN AND FILL RESERVATION AND PUSH INTO STACK
 			reservation.put(type, new LinkedList<AWSInstanceDescriptor>());
 		}
@@ -40,8 +40,8 @@ public class AWSReservation {
 		return descriptor;
 	}
 
-	public void release(InstanceDescriptor descriptor) {
-		billingInfo.account(descriptor);
+	public void release(InstanceDescriptor descriptor, long now) {
+		billingInfo.account(descriptor, now);
 		running.remove(descriptor);
 	}
 

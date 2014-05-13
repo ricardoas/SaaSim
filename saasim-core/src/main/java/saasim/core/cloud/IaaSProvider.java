@@ -9,6 +9,9 @@ import saasim.core.infrastructure.InstanceDescriptor;
  */
 public interface IaaSProvider extends Serializable {
 	
+	public static final String IAAS_TIMEBETWEENBILLING = "iaas.timebetweenbilling";
+	public static final String IAAS_QUOTA = "iaas.quota";
+	
 	InstanceDescriptor acquire(String instanceType);
 	
 	boolean canAcquire(String instanceType);

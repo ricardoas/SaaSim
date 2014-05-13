@@ -6,5 +6,5 @@ public interface IaaSBillingInfo {
 
 	void reset();
 
-	void account(InstanceDescriptor descriptor);
+	void account(InstanceDescriptor descriptor, long now);
 }

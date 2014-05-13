@@ -1,52 +1,111 @@
 package saasim.ext.cloud.aws;
 
+import saasim.core.cloud.InstanceType;
+
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public enum AWSInstanceType {
+public class AWSInstanceType implements InstanceType{
 
-	M1_SMALL	(1, 	1), 
-	M1_LARGE	(2, 	2), 
-	M1_XLARGE	(2, 	4), 
-	C1_MEDIUM	(2.5, 	2), 
-	C1_XLARGE	(2.5, 	8), 
-	M2_XLARGE	(3.25, 	2), 
-	M2_2XLARGE	(3.25, 	4), 
-	M2_4XLARGE	(3.25, 	4), 
-	T1_MICRO	(2, 	1);
+	private String typeName;
+	private int processor;
+	private double ecu;
+	private double memory;
+	private double storage;
+	private double lightUpfront;
+	private double lightHourly;
+	private double mediumUpfront;
+	private double mediumHourly;
+	private double heavyUpfront;
+	private double heavyHourly;
+	private double hourly;
 
-	private final double cpuPower;
-	private final int numberOfCPU;
-
-	/**
-	 * Default constructor.
-	 * 
-	 * @param power Core relative power
-	 * @param numberOfCores Number of identical cores.
-	 */
-	private AWSInstanceType(double power, int numberOfCores) {
-		this.cpuPower = power;
-		this.numberOfCPU = numberOfCores;
+	public AWSInstanceType(String typeName, String processor, String ecu, String memory, String storage, String hourly, String 
+				lightUpfront, String lightHourly, String mediumUpfront, String mediumHourly, String heavyUpfront, String heavyHourly) {
+					this.typeName = typeName;
+					this.processor = Integer.valueOf(processor);
+					this.ecu = Double.valueOf(ecu);
+					this.memory = Double.valueOf(memory);
+					this.storage = Double.valueOf(storage);
+					this.hourly = Double.valueOf(hourly);
+					this.lightUpfront = Double.valueOf(lightUpfront);
+					this.lightHourly = Double.valueOf(lightHourly);
+					this.mediumUpfront = Double.valueOf(mediumUpfront);
+					this.mediumHourly = Double.valueOf(mediumHourly);
+					this.heavyUpfront = Double.valueOf(heavyUpfront);
+					this.heavyHourly = Double.valueOf(heavyHourly);
 	}
 
-	/**
-	 * @return the relative power of each core.
-	 */
-	public double getPower() {
-		return cpuPower;
+	@Override
+	public int getNumberOFCPU() {
+		return processor;
 	}
 
-	/**
-	 * @return the number of cores
-	 */
-	public int getNumberOfCores() {
-		return numberOfCPU;
+	public double getHourly() {
+		return hourly;
 	}
 
-	/**
-	 * @return Relative power of machine types
-	 */
+	@Override
 	public double getRelativePower() {
-		return getPower() * getNumberOfCores();
+		return 1;
 	}
+
+	public String getTypeNames() {
+		return typeName;
+	}
+
+	public double getEcus() {
+		return ecu;
+	}
+
+	public double getMemories() {
+		return memory;
+	}
+
+	public double getStorages() {
+		return storage;
+	}
+
+	public double getLightUpfront() {
+		return lightUpfront;
+	}
+
+	public double getLightHourly() {
+		return lightHourly;
+	}
+
+	public double getMediumUpfront() {
+		return mediumUpfront;
+	}
+
+	public double getMediumHourly() {
+		return mediumHourly;
+	}
+
+	public double getHeavyUpfront() {
+		return heavyUpfront;
+	}
+
+	public double getHeavyHourly() {
+		return heavyHourly;
+	}
+
+	@Override
+	public int hashCode() {
+		return typeName.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		return typeName.equals(((AWSInstanceType) obj).typeName);
+	}
+	
+	@Override
+	public String toString() {
+		return typeName;
+	}
+	
+	
 }

@@ -15,4 +15,8 @@ public interface InstanceDescriptor {
 
 	void setMachine(Machine machine);
 
+	double reportUsage(StringBuilder report, long now);
+
+	void turnOn(long now);
+
 }
