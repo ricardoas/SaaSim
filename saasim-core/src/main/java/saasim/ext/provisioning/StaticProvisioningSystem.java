@@ -4,9 +4,8 @@ import saasim.core.application.Application;
 import saasim.core.cloud.IaaSProvider;
 import saasim.core.cloud.utility.UtilityFunction;
 import saasim.core.config.Configuration;
-import saasim.core.provisioning.ConfigurationAction;
+import saasim.core.provisioning.ApplicationConfiguration;
 import saasim.core.provisioning.ProvisioningSystem;
-import saasim.core.provisioning.TierConfiguration;
 
 import com.google.inject.Inject;
 
@@ -38,7 +37,11 @@ public class StaticProvisioningSystem implements ProvisioningSystem {
 				int numberOfReplicas = Integer.valueOf(startNumberOfReplicas[i]);
 				for (int j = 0; j < numberOfReplicas; j++) {
 					if(provider.canAcquire(vmTypePerTier[i])){
-						application.configure(new TierConfiguration(i, ConfigurationAction.INCREASE, provider.acquire(vmTypePerTier[i]), true));
+						config.setProperty(ApplicationConfiguration.TIER_ID, i);
+						config.setProperty(ApplicationConfiguration.ACTION, ApplicationConfiguration.ACTION_INCREASE);
+						config.setProperty(ApplicationConfiguration.INSTANCE_DESCRIPTOR, provider.acquire(vmTypePerTier[i]));
+						config.setProperty(ApplicationConfiguration.FORCE, true);
+						application.configure();
 					}
 				}
 			}

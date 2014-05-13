@@ -1,9 +1,15 @@
 package saasim.core.application;
 
+import static saasim.core.provisioning.ApplicationConfiguration.ACTION;
+import static saasim.core.provisioning.ApplicationConfiguration.ACTION_DECREASE;
+import static saasim.core.provisioning.ApplicationConfiguration.ACTION_INCREASE;
+import static saasim.core.provisioning.ApplicationConfiguration.ACTION_RECONFIGURE;
+import static saasim.core.provisioning.ApplicationConfiguration.FORCE;
+import static saasim.core.provisioning.ApplicationConfiguration.INSTANCE_DESCRIPTOR;
+import saasim.core.config.Configuration;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.infrastructure.LoadBalancer;
 import saasim.core.infrastructure.Machine;
-import saasim.core.provisioning.TierConfiguration;
 
 import com.google.inject.Inject;
 
@@ -17,10 +23,12 @@ import com.google.inject.Inject;
 public class ScalableTier extends AbstractTier{
 	
 	protected final LoadBalancer loadBalancer;
+	private Configuration configuration;
 
 	@Inject
-	public ScalableTier(LoadBalancer loadBalancer) {
+	public ScalableTier(Configuration configuration, LoadBalancer loadBalancer) {
 		super();
+		this.configuration = configuration;
 		this.loadBalancer = loadBalancer;
 	}
 	
@@ -34,20 +42,20 @@ public class ScalableTier extends AbstractTier{
 		request.setResponseListener(this);
 		this.loadBalancer.queue(request);
 	}
-
-
+	
 	@Override
-	public void config(TierConfiguration tierConfiguration) {
+	public void configure() {
 		
-		switch (tierConfiguration.getAction()) {
-		case INCREASE:
-			scaleIn(tierConfiguration.getDescriptor(), tierConfiguration.isForce());
+		System.out.println(this.configuration.getProperty(INSTANCE_DESCRIPTOR));
+		switch (configuration.getString(ACTION)) {
+		case ACTION_INCREASE:
+			scaleIn((InstanceDescriptor) this.configuration.getProperty(INSTANCE_DESCRIPTOR), configuration.getBoolean(FORCE));
 			break;
-		case DECREASE:
-			scaleOut(tierConfiguration.getDescriptor(), tierConfiguration.isForce());
+		case ACTION_DECREASE:
+			scaleOut((InstanceDescriptor) configuration.getProperty(INSTANCE_DESCRIPTOR), configuration.getBoolean(FORCE));
 			break;
-		case CONFIGURE_MACHINE:
-			reconfigure(tierConfiguration.getDescriptor(), tierConfiguration.isForce());
+		case ACTION_RECONFIGURE:
+			reconfigure((InstanceDescriptor) configuration.getProperty(INSTANCE_DESCRIPTOR), configuration.getBoolean(FORCE));
 		default:
 			throw new RuntimeException("Unknown action of configuration!");
 		}

@@ -8,7 +8,7 @@ import saasim.core.config.Configuration;
 import saasim.core.event.EventScheduler;
 import saasim.core.infrastructure.AdmissionControl;
 import saasim.core.infrastructure.Monitor;
-import saasim.core.provisioning.TierConfiguration;
+import saasim.core.provisioning.ApplicationConfiguration;
 
 import com.google.inject.Inject;
 
@@ -19,13 +19,16 @@ import com.google.inject.Inject;
  */
 public class SingleTierApplication implements Application {
 	
+	
 	private AdmissionControl control;
 	private Tier[] tiers;
 	private Monitor monitor;
 	private EventScheduler scheduler;
+	private Configuration configuration;
 
 	@Inject
 	public SingleTierApplication(Configuration configuration, EventScheduler scheduler, AdmissionControl control, Monitor monitor, Tier tier) {
+		this.configuration = configuration;
 		this.scheduler = scheduler;
 		this.control = control;
 		this.monitor = monitor;
@@ -44,8 +47,11 @@ public class SingleTierApplication implements Application {
 	}
 
 	@Override
-	public void configure(TierConfiguration configuration) {
-		tiers[configuration.getTierID()].config(configuration);
+	public void configure() {
+		if(ApplicationConfiguration.ACTION_ADMISSION_CONTROL.equals(configuration.getProperty(ApplicationConfiguration.ACTION))){
+			control.updatePolicy();
+		}
+		tiers[configuration.getInt(ApplicationConfiguration.TIER_ID)].configure();
 	}
 
 	@Override

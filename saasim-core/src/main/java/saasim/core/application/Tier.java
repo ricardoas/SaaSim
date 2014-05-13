@@ -1,6 +1,5 @@
 package saasim.core.application;
 
-import saasim.core.provisioning.TierConfiguration;
 
 /**
  * Configurable application tier.
@@ -15,8 +14,8 @@ public interface Tier extends ResponseListener{
 	void queue(Request request);
 
 	/**
-	 * @param tierConfiguration new {@link TierConfiguration}.
+	 * 
 	 */
-	void config(TierConfiguration tierConfiguration);
+	void configure();
 	
 }

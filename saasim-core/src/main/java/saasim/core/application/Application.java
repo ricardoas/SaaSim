@@ -1,6 +1,5 @@
 package saasim.core.application;
 
-import saasim.core.provisioning.TierConfiguration;
 
 /**
  * Application abstraction.
@@ -15,9 +14,9 @@ public interface Application extends ResponseListener{
 
 	/**
 	 * TODO what about admission control configuration?
-	 * @param tierConfiguration A configuration to be executed.
+	 * @param configuration A configuration to be executed.
 	 */
-	void configure(TierConfiguration tierConfiguration);
+	void configure();
 
 	/**
 	 * Queue {@link Request} at this {@link Application}.
