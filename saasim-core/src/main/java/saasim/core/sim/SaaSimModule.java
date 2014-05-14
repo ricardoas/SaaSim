@@ -2,6 +2,7 @@ package saasim.core.sim;
 import org.apache.commons.configuration.ConfigurationException;
 
 import saasim.core.application.Application;
+import saasim.core.application.ApplicationFactory;
 import saasim.core.application.Request;
 import saasim.core.application.ScalableTier;
 import saasim.core.application.Tier;
@@ -20,6 +21,8 @@ import saasim.core.io.TraceParcer;
 import saasim.core.io.TraceReader;
 import saasim.core.io.TraceReaderFactory;
 import saasim.core.provisioning.ProvisioningSystem;
+import saasim.core.saas.Tenant;
+import saasim.core.saas.TenantFactory;
 import saasim.ext.cloud.LoggerIaaSCustomer;
 import saasim.ext.infrastructure.DefaultOutputWriter;
 import saasim.ext.infrastructure.FCFSAdmissionControl;
@@ -48,6 +51,7 @@ public class SaaSimModule extends AbstractModule {
 	public static final String APPLICATION_CLASS = "application.class";
 	public static final String DPS_CLASS = "dps.class";
 	public static final String IAAS_CLASS = "iaas.class";
+	public static final String TENANT_CLASS = "saas.tenant.class";
 	private final String configFilePath;
 
 	/**
@@ -76,7 +80,14 @@ public class SaaSimModule extends AbstractModule {
 		
 		bind(ProvisioningSystem.class).to((Class<? extends ProvisioningSystem>) load(provideConfiguration().getString(DPS_CLASS))).in(Singleton.class);
 		
-		bind(Application.class).to((Class<? extends Application>) load(provideConfiguration().getString(APPLICATION_CLASS))).in(Singleton.class);
+//		bind(Application.class).to((Class<? extends Application>) load(provideConfiguration().getString(APPLICATION_CLASS))).in(Singleton.class);
+		install(new FactoryModuleBuilder()
+	     .implement(Application.class, (Class<? extends Application>) load(provideConfiguration().getString(APPLICATION_CLASS)))
+	     .build(ApplicationFactory.class));
+		
+		install(new FactoryModuleBuilder()
+	     .implement(Tenant.class, (Class<? extends Tenant>) load(provideConfiguration().getString(TENANT_CLASS)))
+	     .build(TenantFactory.class));
 		
 		bind(Monitor.class).to((Class<? extends Monitor>) load(provideConfiguration().getString(MONITORING_MONITOR_CLASS))).in(Singleton.class);
 		
@@ -101,6 +112,7 @@ public class SaaSimModule extends AbstractModule {
 	     .build(MachineFactory.class));
 		
 		bind(MonitoringServiceConsumer.class).to(DefaultOutputWriter.class).in(Singleton.class);
+		
 	}
 
 	/**

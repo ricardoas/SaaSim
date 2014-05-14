@@ -27,7 +27,7 @@ public class WorkloadTrafficGenerator {
 	
 	private static final int DEFAULT_BUFFER_SIZE = 60 * 1000;
 	private final EventScheduler scheduler;
-	private final Application application;
+	private Application application;
 	private final List<TraceReader<Request>> parsers;
 	private final int bufferSize;
 
@@ -40,9 +40,8 @@ public class WorkloadTrafficGenerator {
 	 * @param readerFactory {@link TraceReader} factory object.
 	 */
 	@Inject
-	public WorkloadTrafficGenerator(Configuration globalConf, EventScheduler scheduler, Application application, TraceReaderFactory<Request> readerFactory) {
+	public WorkloadTrafficGenerator(Configuration globalConf, EventScheduler scheduler, TraceReaderFactory<Request> readerFactory) {
 		this.scheduler = scheduler;
-		this.application = application;
 		
 		String[] fileNames = globalConf.getStringArray(SAAS_TENANT_TRACE);
 		parsers = new ArrayList<>();
@@ -83,6 +82,11 @@ public class WorkloadTrafficGenerator {
 				start();
 			}
 		});
+	}
+	
+	public void setApplication(Application application){
+		this.application = application;
+		
 	}
 
 }
