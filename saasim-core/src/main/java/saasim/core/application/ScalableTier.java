@@ -23,12 +23,10 @@ import com.google.inject.Inject;
 public class ScalableTier extends AbstractTier{
 	
 	protected final LoadBalancer loadBalancer;
-	private Configuration configuration;
 
 	@Inject
-	public ScalableTier(Configuration configuration, LoadBalancer loadBalancer) {
+	public ScalableTier(LoadBalancer loadBalancer) {
 		super();
-		this.configuration = configuration;
 		this.loadBalancer = loadBalancer;
 	}
 	
@@ -44,12 +42,11 @@ public class ScalableTier extends AbstractTier{
 	}
 	
 	@Override
-	public void configure() {
+	public void configure(Configuration configuration) {
 		
-		System.out.println(this.configuration.getProperty(INSTANCE_DESCRIPTOR));
 		switch (configuration.getString(ACTION)) {
 		case ACTION_INCREASE:
-			scaleIn((InstanceDescriptor) this.configuration.getProperty(INSTANCE_DESCRIPTOR), configuration.getBoolean(FORCE));
+			scaleIn((InstanceDescriptor) configuration.getProperty(INSTANCE_DESCRIPTOR), configuration.getBoolean(FORCE));
 			break;
 		case ACTION_DECREASE:
 			scaleOut((InstanceDescriptor) configuration.getProperty(INSTANCE_DESCRIPTOR), configuration.getBoolean(FORCE));

@@ -34,23 +34,23 @@ public class WorkloadTrafficGenerator {
 	/**
 	 * Default constructor.
 	 * 
-	 * @param configuration {@link Configuration} instance.
+	 * @param globalConf {@link Configuration} instance.
 	 * @param scheduler {@link Event} queue manager.
 	 * @param application {@link Application} being simulated.
 	 * @param readerFactory {@link TraceReader} factory object.
 	 */
 	@Inject
-	public WorkloadTrafficGenerator(Configuration configuration, EventScheduler scheduler, Application application, TraceReaderFactory<Request> readerFactory) {
+	public WorkloadTrafficGenerator(Configuration globalConf, EventScheduler scheduler, Application application, TraceReaderFactory<Request> readerFactory) {
 		this.scheduler = scheduler;
 		this.application = application;
 		
-		String[] fileNames = configuration.getStringArray(SAAS_TENANT_TRACE);
+		String[] fileNames = globalConf.getStringArray(SAAS_TENANT_TRACE);
 		parsers = new ArrayList<>();
 		for (String string : fileNames) {
 			parsers.add(readerFactory.create(string, parsers.size()));
 		}
 		
-		this.bufferSize = configuration.getInt(TRACE_GENERATOR_BUFFER, DEFAULT_BUFFER_SIZE);
+		this.bufferSize = globalConf.getInt(TRACE_GENERATOR_BUFFER, DEFAULT_BUFFER_SIZE);
 	}
 
 	/**

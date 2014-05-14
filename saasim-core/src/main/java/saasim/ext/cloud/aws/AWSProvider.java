@@ -51,11 +51,11 @@ public class AWSProvider implements IaaSProvider {
 	private Map<String,AWSInstanceType> types;
 
 	@Inject
-	public AWSProvider(Configuration configuration, EventScheduler scheduler, IaaSCustomer customer) {
+	public AWSProvider(Configuration globalConf, EventScheduler scheduler, IaaSCustomer customer) {
 		this.scheduler = scheduler;
 		this.customer = customer;
-		this.timeBetweenBilling = configuration.getLong(IAAS_TIMEBETWEENBILLING);
-		this.quota = configuration.getInt(IAAS_QUOTA);
+		this.timeBetweenBilling = globalConf.getLong(IAAS_TIMEBETWEENBILLING);
+		this.quota = globalConf.getInt(IAAS_QUOTA);
 		this.running = new HashSet<>();
 		
 		billingInfo = new AWSBillingInfo();
@@ -67,9 +67,9 @@ public class AWSProvider implements IaaSProvider {
 			}
 		});
 		
-		this.types = parseInstanceTypes(configuration);
+		this.types = parseInstanceTypes(globalConf);
 		
-		this.reservation = new AWSReservation(configuration, billingInfo, types);
+		this.reservation = new AWSReservation(globalConf, billingInfo, types);
 	}
 
 	private Map<String, AWSInstanceType> parseInstanceTypes(Configuration configuration) {

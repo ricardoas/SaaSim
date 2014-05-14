@@ -24,11 +24,9 @@ public class SingleTierApplication implements Application {
 	private Tier[] tiers;
 	private Monitor monitor;
 	private EventScheduler scheduler;
-	private Configuration configuration;
 
 	@Inject
-	public SingleTierApplication(Configuration configuration, EventScheduler scheduler, AdmissionControl control, Monitor monitor, Tier tier) {
-		this.configuration = configuration;
+	public SingleTierApplication(EventScheduler scheduler, AdmissionControl control, Monitor monitor, Tier tier) {
 		this.scheduler = scheduler;
 		this.control = control;
 		this.monitor = monitor;
@@ -47,11 +45,11 @@ public class SingleTierApplication implements Application {
 	}
 
 	@Override
-	public void configure() {
+	public void configure(Configuration configuration) {
 		if(ApplicationConfiguration.ACTION_ADMISSION_CONTROL.equals(configuration.getProperty(ApplicationConfiguration.ACTION))){
-			control.updatePolicy();
+			control.updatePolicy(configuration);
 		}
-		tiers[configuration.getInt(ApplicationConfiguration.TIER_ID)].configure();
+		tiers[configuration.getInt(ApplicationConfiguration.TIER_ID)].configure(configuration);
 	}
 
 	@Override

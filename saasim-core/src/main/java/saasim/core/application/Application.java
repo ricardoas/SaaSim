@@ -1,5 +1,7 @@
 package saasim.core.application;
 
+import saasim.core.config.Configuration;
+
 
 /**
  * Application abstraction.
@@ -13,10 +15,9 @@ public interface Application extends ResponseListener{
 	public static final String APPLICATION_TIER_REPLICAS = "application.tier.replicas";
 
 	/**
-	 * TODO what about admission control configuration?
 	 * @param configuration A configuration to be executed.
 	 */
-	void configure();
+	void configure(Configuration configuration);
 
 	/**
 	 * Queue {@link Request} at this {@link Application}.

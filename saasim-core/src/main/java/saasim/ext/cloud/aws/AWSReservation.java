@@ -19,7 +19,7 @@ public class AWSReservation {
 
 	private IaaSBillingInfo billingInfo;
 
-	public AWSReservation(Configuration configuration, IaaSBillingInfo billingInfo, Map<String, AWSInstanceType> types) {
+	public AWSReservation(Configuration globalConf, IaaSBillingInfo billingInfo, Map<String, AWSInstanceType> types) {
 		this.billingInfo = billingInfo;
 		this.reservation = new HashMap<>();
 		this.running = new HashSet<>();

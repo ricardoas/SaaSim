@@ -31,8 +31,8 @@ public final class EventScheduler implements Serializable{
      * @param seed 
      * @throws IOException 
      */
-   @Inject public EventScheduler(Configuration config){
-    	this.random = new Random(config.getLong(EVENT_SCHEDULER_RANDOM_SEED));
+   @Inject public EventScheduler(Configuration globalConf){
+    	this.random = new Random(globalConf.getLong(EVENT_SCHEDULER_RANDOM_SEED));
     	this.now = 0;
 		this.eventSet = new TreeSet<Event>();
     }

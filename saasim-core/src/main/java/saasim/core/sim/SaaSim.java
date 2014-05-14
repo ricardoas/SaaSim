@@ -22,17 +22,17 @@ import com.google.inject.Inject;
 public class SaaSim{
 
 	public static final String SAASIM_SIMULATION_TIME = "simulation.time";
-	private Configuration config;
 	private EventScheduler scheduler;
 	private ProvisioningSystem dps;
 	private Application application;
 	private WorkloadTrafficGenerator workloadGenerator;
 	private MonitoringService feed;
+	private long simulationTime;
 
 	/**
 	 * Default constructor.
 	 * 
-	 * @param configuration {@link Configuration} instance.
+	 * @param globalConf {@link Configuration} instance.
 	 * @param scheduler {@link Event} queue manager.
 	 * @param iaasProvider {@link IaaSProvider} instance.
 	 * @param dps provisioner instance.
@@ -42,9 +42,8 @@ public class SaaSim{
 	 * @throws ConfigurationException
 	 */
 	@Inject
-	public SaaSim(Configuration configuration, EventScheduler scheduler, ProvisioningSystem dps, Application application, WorkloadTrafficGenerator workloadGenerator, MonitoringService feed, MonitoringServiceConsumer consumer) throws ConfigurationException {
+	public SaaSim(Configuration globalConf, EventScheduler scheduler, ProvisioningSystem dps, Application application, WorkloadTrafficGenerator workloadGenerator, MonitoringService feed, MonitoringServiceConsumer consumer) throws ConfigurationException {
 
-		this.config = configuration;
 		this.scheduler = scheduler;
 		this.application = application;
 		
@@ -54,6 +53,7 @@ public class SaaSim{
 		this.feed.subscribe(consumer);
 		
 		this.dps.registerConfigurable(this.application);
+		this.simulationTime = globalConf.getLong(SAASIM_SIMULATION_TIME);
 	}
 
 	/**
@@ -70,7 +70,7 @@ public class SaaSim{
 				workloadGenerator.start();
 			}
 		});
-		scheduler.start(config.getLong(SAASIM_SIMULATION_TIME));
+		scheduler.start(simulationTime);
 
 		Logger.getLogger(SaaSim.class).debug("SIMULATION END " + System.currentTimeMillis());
 		Logger.getLogger(SaaSim.class).debug("SIMULATION DURATION " + (System.currentTimeMillis()-start));

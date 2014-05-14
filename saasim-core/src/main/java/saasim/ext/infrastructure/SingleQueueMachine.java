@@ -32,17 +32,17 @@ public class SingleQueueMachine implements Machine {
 	private Queue<Request> forwarded;
 	
 	@Inject
-	public SingleQueueMachine(@Assisted InstanceDescriptor descriptor, Monitor monitor, EventScheduler scheduler, Configuration configuration) {
+	public SingleQueueMachine(@Assisted InstanceDescriptor descriptor, Monitor monitor, EventScheduler scheduler, Configuration globalConf) {
 		this.descriptor = descriptor;
 		this.descriptor.setMachine(this);
 		
 		this.monitor = monitor;
 		
 		this.scheduler = scheduler;
-		this.startUpDelay = configuration.getLong(MACHINE_SETUPTIME);
+		this.startUpDelay = globalConf.getLong(MACHINE_SETUPTIME);
 		this.backlog = new LinkedList<>();
 		this.forwarded = new LinkedList<>();
-		this.maxBacklogSize = configuration.getInt(MACHINE_BACKLOGSIZE);
+		this.maxBacklogSize = globalConf.getInt(MACHINE_BACKLOGSIZE);
 		this.semaphore = new FastSemaphore(this.descriptor.getNumberOfCPUCores());
 	}
 	

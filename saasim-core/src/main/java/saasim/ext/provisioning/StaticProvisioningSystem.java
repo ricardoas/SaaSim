@@ -12,13 +12,15 @@ import com.google.inject.Inject;
 public class StaticProvisioningSystem implements ProvisioningSystem {
 	
 	private Application[] applications;
-	private Configuration config;
 	private IaaSProvider provider;
+	private String[] startNumberOfReplicas;
+	private String[] vmTypePerTier;
 
 	@Inject
-	public StaticProvisioningSystem(Configuration config, IaaSProvider provider) {
-		this.config = config;
+	public StaticProvisioningSystem(Configuration globalConf, IaaSProvider provider) {
 		this.provider = provider;
+		startNumberOfReplicas = globalConf.getStringArray(Application.APPLICATION_TIER_REPLICAS);
+		vmTypePerTier = globalConf.getStringArray(Application.APPLICATION_TIER_VMTYPE);
 	}
 
 	@Override
@@ -29,19 +31,16 @@ public class StaticProvisioningSystem implements ProvisioningSystem {
 
 	protected void setUp() {
 		for (Application application : applications) {
-			int numberOfTiers = application.getNumberOfTiers();
-			String[] startNumberOfReplicas = config.getStringArray(Application.APPLICATION_TIER_REPLICAS);
-			String[] vmTypePerTier = config.getStringArray(Application.APPLICATION_TIER_VMTYPE);
-			
-			for (int i = 0; i < numberOfTiers; i++) {
-				int numberOfReplicas = Integer.valueOf(startNumberOfReplicas[i]);
-				for (int j = 0; j < numberOfReplicas; j++) {
-					if(provider.canAcquire(vmTypePerTier[i])){
-						config.setProperty(ApplicationConfiguration.TIER_ID, i);
+			for (int tierID = 0; tierID < startNumberOfReplicas.length; tierID++) {
+				int numberOfReplicas = Integer.valueOf(startNumberOfReplicas[tierID]);
+				while(numberOfReplicas-- > 0){
+					if(provider.canAcquire(vmTypePerTier[tierID])){
+						Configuration config = new Configuration();
+						config.setProperty(ApplicationConfiguration.TIER_ID, tierID);
 						config.setProperty(ApplicationConfiguration.ACTION, ApplicationConfiguration.ACTION_INCREASE);
-						config.setProperty(ApplicationConfiguration.INSTANCE_DESCRIPTOR, provider.acquire(vmTypePerTier[i]));
+						config.setProperty(ApplicationConfiguration.INSTANCE_DESCRIPTOR, provider.acquire(vmTypePerTier[tierID]));
 						config.setProperty(ApplicationConfiguration.FORCE, true);
-						application.configure();
+						application.configure(config);
 					}
 				}
 			}

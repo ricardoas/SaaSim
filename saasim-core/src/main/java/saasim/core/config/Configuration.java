@@ -14,4 +14,14 @@ public class Configuration extends PropertiesConfiguration{
 	public Configuration(String propertiesFilepath) throws ConfigurationException {
 		super(propertiesFilepath);
 	}
+
+	/**
+	 * Default constructor
+	 * 
+	 * @param propertiesFilepath
+	 * @throws ConfigurationException
+	 */
+	public Configuration(){
+		super();
+	}
 }

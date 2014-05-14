@@ -20,8 +20,8 @@ public class BasicMonitor implements Monitor {
 	private int[] rejectedAtLoadBalancer;
 
 	@Inject
-	public BasicMonitor(Configuration configuration) {
-		reset(configuration.getInt(Application.APPLICATION_TIER));
+	public BasicMonitor(Configuration globalConf) {
+		reset(globalConf.getInt(Application.APPLICATION_TIER));
 	}
 
 	@Override

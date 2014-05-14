@@ -1,6 +1,7 @@
 package saasim.core.infrastructure;
 
 import saasim.core.application.Request;
+import saasim.core.config.Configuration;
 
 public interface AdmissionControl{
 	
@@ -8,5 +9,5 @@ public interface AdmissionControl{
 
 	boolean canAccept(Request request);
 	
-	void updatePolicy();
+	void updatePolicy(Configuration configuration);
 }

@@ -21,12 +21,12 @@ public class PeriodicMonitoringService implements MonitoringService {
 	private EventScheduler scheduler;
 
 	@Inject
-	public PeriodicMonitoringService(Configuration configuration, EventScheduler scheduler, Monitor monitor) {
+	public PeriodicMonitoringService(Configuration globalConf, EventScheduler scheduler, Monitor monitor) {
 		this.scheduler = scheduler;
 		this.monitor = monitor;
 		listeners = new ArrayList<>();
 		
-		timeBetweenReports = configuration.getLong(MONITORING_SERVICE_TIMEBETWEENREPORTS);
+		timeBetweenReports = globalConf.getLong(MONITORING_SERVICE_TIMEBETWEENREPORTS);
 		
 		scheduler.queueEvent(new Event(scheduler.now()+timeBetweenReports){
 			@Override

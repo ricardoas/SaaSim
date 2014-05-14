@@ -16,19 +16,17 @@ public class FCFSAdmissionControl implements AdmissionControl {
 	private int acceptanceRate;
 	private long currentTimeSlot;
 	private int counter;
-	private Configuration configuration;
 	
 	/**
 	 * Default constructor
 	 */
 	@Inject
-	public FCFSAdmissionControl(Configuration configuration) {
+	public FCFSAdmissionControl(Configuration globalConf) {
 		
-		this.configuration = configuration;
 		this.currentTimeSlot = -1;
 		this.counter = 0;
 		
-		updatePolicy();
+		updatePolicy(globalConf);
 	}
 
 	@Override
@@ -42,7 +40,7 @@ public class FCFSAdmissionControl implements AdmissionControl {
 	}
 
 	@Override
-	public void updatePolicy() {
+	public void updatePolicy(Configuration configuration) {
 		this.acceptanceRate = configuration.getInt(ADMISSIONCONTROL_ACCEPTANCERATE, Integer.MAX_VALUE);
 	}
 }
