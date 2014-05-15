@@ -69,7 +69,7 @@ public class SingleTierApplicationTest {
 		Guice.createInjector(new AbstractModule() {
 		      @Override 
 		      protected void configure() {
-		    	  bind(Application.class).to(SingleTierApplication.class);
+		    	  bind(Application.class).to(TieredApplication.class);
 		          bind(Monitor.class).toInstance(monitor);
 		          bind(AdmissionControl.class).toInstance(control);
 		          bind(Tier.class).toInstance(tier);
@@ -89,7 +89,7 @@ public class SingleTierApplicationTest {
 	}
 
 	/**
-	 * Test method for {@link saasim.ext.application.SingleTierApplication#queue(saasim.core.application.Request)}.
+	 * Test method for {@link saasim.ext.application.TieredApplication#queue(saasim.core.application.Request)}.
 	 */
 	@Test
 	public final void testCanQueue() {
@@ -106,7 +106,7 @@ public class SingleTierApplicationTest {
 	}
 
 	/**
-	 * Test method for {@link saasim.ext.application.SingleTierApplication#queue(saasim.core.application.Request)}.
+	 * Test method for {@link saasim.ext.application.TieredApplication#queue(saasim.core.application.Request)}.
 	 */
 	@Test
 	public final void testCannotQueue() {
@@ -122,7 +122,7 @@ public class SingleTierApplicationTest {
 	}
 
 	/**
-	 * Test method for {@link saasim.ext.application.SingleTierApplication#configure(saasim.core.provisioning.TierConfiguration)}.
+	 * Test method for {@link saasim.ext.application.TieredApplication#configure(saasim.core.provisioning.TierConfiguration)}.
 	 */
 	@Test
 	public final void testConfig() {
@@ -130,7 +130,7 @@ public class SingleTierApplicationTest {
 	}
 
 	/**
-	 * Test method for {@link saasim.ext.application.SingleTierApplication#processDone(saasim.core.application.Request, saasim.core.application.Response)}.
+	 * Test method for {@link saasim.ext.application.TieredApplication#processDone(saasim.core.application.Request, saasim.core.application.Response)}.
 	 */
 	@Test
 	public final void testProcessDone() {

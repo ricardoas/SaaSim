@@ -109,12 +109,23 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 
 	private long tick;
 
+	private String[] startNumberOfReplicas;
+
+	private String[] vmTypePerTier;
+
+	private double targetUtilisation;
+
 	@Inject
 	public RanjanProvisioningSystem(EventScheduler scheduler, Configuration globalConf, Provider provider) {
 		this.scheduler = scheduler;
 		this.configuration = globalConf;
 		this.provider = provider;
 		this.pool = new ArrayList<RanjanReconfigurablePool>();
+		
+		this.startNumberOfReplicas = globalConf.getStringArray(Application.APPLICATION_TIER_REPLICAS);
+		this.vmTypePerTier = globalConf.getStringArray(Application.APPLICATION_TIER_VMTYPE);
+		this.targetUtilisation = this.configuration.getDouble(RANJAN_TARGET_UTILISATION);
+
 		
 		scheduler.queueEvent(new Event(tick){
 			@Override
@@ -139,15 +150,11 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 	@Override
 	public void registerConfigurable(Application... applications) {
 		
-		String vmType = this.configuration.getStringArray(Application.APPLICATION_TIER_VMTYPE)[0];
-		int startNumberOfReplicas = Integer.valueOf(this.configuration.getStringArray(Application.APPLICATION_TIER_REPLICAS)[0]);
-		double targetUtilisation = Double.valueOf(this.configuration.getStringArray(RANJAN_TARGET_UTILISATION)[0]);
-		
 		for (Application application : applications) {
-			for (int i = 0; i < application.getNumberOfTiers(); i++) {
+			for (int i = 0; i < startNumberOfReplicas.length; i++) {
 				List<InstanceDescriptor> vmPool = new ArrayList<>();
-				for (int j = 0; j < startNumberOfReplicas; j++) {
-					InstanceDescriptor instance = provider.acquire(vmType);
+				for (int j = 0; j < Integer.valueOf(startNumberOfReplicas[i]); j++) {
+					InstanceDescriptor instance = provider.acquire(vmTypePerTier[i]);
 					Configuration config = new Configuration();
 					config.setProperty(ApplicationConfiguration.TIER_ID, i);
 					config.setProperty(ApplicationConfiguration.ACTION, ApplicationConfiguration.ACTION_INCREASE);
@@ -156,7 +163,7 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 					application.configure(config);
 					vmPool.add(instance);
 				}
-				pool.add(new RanjanReconfigurablePool(provider, application, i, vmType, vmPool, targetUtilisation));
+				pool.add(new RanjanReconfigurablePool(provider, application, i, vmTypePerTier[i], vmPool, targetUtilisation));
 			}
 		}
 	}
