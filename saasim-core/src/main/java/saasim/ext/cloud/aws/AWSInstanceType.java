@@ -1,6 +1,6 @@
 package saasim.ext.cloud.aws;
 
-import saasim.core.cloud.InstanceType;
+import saasim.core.iaas.InstanceType;
 
 /**
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br

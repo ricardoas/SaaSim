@@ -6,10 +6,10 @@ import saasim.core.application.ApplicationFactory;
 import saasim.core.application.Request;
 import saasim.core.application.ScalableTier;
 import saasim.core.application.Tier;
-import saasim.core.cloud.IaaSCustomer;
-import saasim.core.cloud.IaaSProvider;
 import saasim.core.config.Configuration;
 import saasim.core.event.EventScheduler;
+import saasim.core.iaas.Customer;
+import saasim.core.iaas.Provider;
 import saasim.core.infrastructure.AdmissionControl;
 import saasim.core.infrastructure.LoadBalancer;
 import saasim.core.infrastructure.Machine;
@@ -76,7 +76,7 @@ public class SaaSimModule extends AbstractModule {
 		
 		bind(SaaSim.class);
 		
-		bind(IaaSProvider.class).to((Class<? extends IaaSProvider>) load(provideConfiguration().getString(IAAS_CLASS))).in(Singleton.class);
+		bind(Provider.class).to((Class<? extends Provider>) load(provideConfiguration().getString(IAAS_CLASS))).in(Singleton.class);
 		
 		bind(ProvisioningSystem.class).to((Class<? extends ProvisioningSystem>) load(provideConfiguration().getString(DPS_CLASS))).in(Singleton.class);
 		
@@ -105,7 +105,7 @@ public class SaaSimModule extends AbstractModule {
 		
 		bind(LoadBalancer.class).to(RoundRobinLoadBalancer.class);
 		
-		bind(IaaSCustomer.class).to(LoggerIaaSCustomer.class).in(Singleton.class);;
+		bind(Customer.class).to(LoggerIaaSCustomer.class).in(Singleton.class);;
 		
 		install(new FactoryModuleBuilder()
 	     .implement(Machine.class, (Class<? extends Machine>) load(provideConfiguration().getString(MACHINE_CLASS)))

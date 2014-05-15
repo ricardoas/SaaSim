@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import saasim.core.application.Application;
-import saasim.core.cloud.IaaSProvider;
 import saasim.core.cloud.utility.UtilityFunction;
 import saasim.core.config.Configuration;
 import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
+import saasim.core.iaas.Provider;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.infrastructure.Statistics;
 import saasim.core.provisioning.ApplicationConfiguration;
@@ -34,7 +34,7 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 		private String vmType;
 		private List<InstanceDescriptor> vmPool;
 
-		public RanjanReconfigurablePool(IaaSProvider provider, Application application, int tierID,
+		public RanjanReconfigurablePool(Provider provider, Application application, int tierID,
 				String vmType, List<InstanceDescriptor> vmPool,
 				double targetUtilisation) {
 					this.application = application;
@@ -101,7 +101,7 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 	private static String RANJAN_TARGET_UTILISATION = "dps.ranjan.target";  
 
 	private Configuration configuration;
-	private IaaSProvider provider;
+	private Provider provider;
 
 	private List<RanjanReconfigurablePool> pool;
 
@@ -110,7 +110,7 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 	private long tick;
 
 	@Inject
-	public RanjanProvisioningSystem(EventScheduler scheduler, Configuration globalConf, IaaSProvider provider) {
+	public RanjanProvisioningSystem(EventScheduler scheduler, Configuration globalConf, Provider provider) {
 		this.scheduler = scheduler;
 		this.configuration = globalConf;
 		this.provider = provider;

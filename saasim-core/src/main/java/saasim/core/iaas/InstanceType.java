@@ -1,4 +1,4 @@
-package saasim.core.cloud;
+package saasim.core.iaas;
 
 public interface InstanceType {
 	

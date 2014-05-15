@@ -1,9 +1,9 @@
 package saasim.ext.provisioning;
 
 import saasim.core.application.Application;
-import saasim.core.cloud.IaaSProvider;
 import saasim.core.cloud.utility.UtilityFunction;
 import saasim.core.config.Configuration;
+import saasim.core.iaas.Provider;
 import saasim.core.provisioning.ApplicationConfiguration;
 import saasim.core.provisioning.ProvisioningSystem;
 
@@ -12,12 +12,12 @@ import com.google.inject.Inject;
 public class StaticProvisioningSystem implements ProvisioningSystem {
 	
 	private Application[] applications;
-	private IaaSProvider provider;
+	private Provider provider;
 	private String[] startNumberOfReplicas;
 	private String[] vmTypePerTier;
 
 	@Inject
-	public StaticProvisioningSystem(Configuration globalConf, IaaSProvider provider) {
+	public StaticProvisioningSystem(Configuration globalConf, Provider provider) {
 		this.provider = provider;
 		startNumberOfReplicas = globalConf.getStringArray(Application.APPLICATION_TIER_REPLICAS);
 		vmTypePerTier = globalConf.getStringArray(Application.APPLICATION_TIER_VMTYPE);

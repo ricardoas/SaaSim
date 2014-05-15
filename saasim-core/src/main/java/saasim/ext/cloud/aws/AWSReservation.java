@@ -7,8 +7,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import saasim.core.cloud.IaaSBillingInfo;
 import saasim.core.config.Configuration;
+import saasim.core.iaas.BillingInfo;
 import saasim.core.infrastructure.InstanceDescriptor;
 
 public class AWSReservation {
@@ -17,9 +17,9 @@ public class AWSReservation {
 	
 	private Set<InstanceDescriptor> running;
 
-	private IaaSBillingInfo billingInfo;
+	private BillingInfo billingInfo;
 
-	public AWSReservation(Configuration globalConf, IaaSBillingInfo billingInfo, Map<String, AWSInstanceType> types) {
+	public AWSReservation(Configuration globalConf, BillingInfo billingInfo, Map<String, AWSInstanceType> types) {
 		this.billingInfo = billingInfo;
 		this.reservation = new HashMap<>();
 		this.running = new HashSet<>();

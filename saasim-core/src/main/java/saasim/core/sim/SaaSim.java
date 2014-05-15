@@ -5,10 +5,10 @@ import org.apache.log4j.Logger;
 
 import saasim.core.application.Application;
 import saasim.core.application.ApplicationFactory;
-import saasim.core.cloud.IaaSProvider;
 import saasim.core.config.Configuration;
 import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
+import saasim.core.iaas.Provider;
 import saasim.core.infrastructure.MonitoringService;
 import saasim.core.infrastructure.MonitoringServiceConsumer;
 import saasim.core.provisioning.ProvisioningSystem;
@@ -36,7 +36,7 @@ public class SaaSim{
 	 * 
 	 * @param globalConf {@link Configuration} instance.
 	 * @param scheduler {@link Event} queue manager.
-	 * @param iaasProvider {@link IaaSProvider} instance.
+	 * @param iaasProvider {@link Provider} instance.
 	 * @param dps provisioner instance.
 	 * @param application {@link Application} being simulated.
 	 * @param workloadGenerator traffic generator.

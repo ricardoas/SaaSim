@@ -1,8 +1,8 @@
-package saasim.core.cloud;
+package saasim.core.iaas;
 
 import saasim.core.infrastructure.InstanceDescriptor;
 
-public interface IaaSBillingInfo {
+public interface BillingInfo {
 
 	void reset();
 

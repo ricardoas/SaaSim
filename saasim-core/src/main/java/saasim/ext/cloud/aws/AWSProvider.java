@@ -5,17 +5,17 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import saasim.core.cloud.IaaSBillingInfo;
-import saasim.core.cloud.IaaSCustomer;
-import saasim.core.cloud.IaaSProvider;
 import saasim.core.config.Configuration;
 import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
+import saasim.core.iaas.BillingInfo;
+import saasim.core.iaas.Customer;
+import saasim.core.iaas.Provider;
 import saasim.core.infrastructure.InstanceDescriptor;
 
 import com.google.inject.Inject;
 
-public class AWSProvider implements IaaSProvider {
+public class AWSProvider implements Provider {
 	
 	public static final String IAAS_AWS_HEAVY_HOURLY = "iaas.aws.heavy.hourly";
 	public static final String IAAS_AWS_HEAVY_UPFRONT = "iaas.aws.heavy.upfront";
@@ -45,13 +45,13 @@ public class AWSProvider implements IaaSProvider {
 	private int quota;
 	private AWSReservation reservation;
 	private Set<InstanceDescriptor> running;
-	private IaaSCustomer customer;
-	private IaaSBillingInfo billingInfo;
+	private Customer customer;
+	private BillingInfo billingInfo;
 	
 	private Map<String,AWSInstanceType> types;
 
 	@Inject
-	public AWSProvider(Configuration globalConf, EventScheduler scheduler, IaaSCustomer customer) {
+	public AWSProvider(Configuration globalConf, EventScheduler scheduler, Customer customer) {
 		this.scheduler = scheduler;
 		this.customer = customer;
 		this.timeBetweenBilling = globalConf.getLong(IAAS_TIMEBETWEENBILLING);
