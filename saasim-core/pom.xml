@@ -38,7 +38,10 @@
 				<version>2.4</version>
 				<configuration>
 					<excludes>
+						<exclude>**/bin/</exclude>
+						<exclude>**/examples/</exclude>
 						<exclude>log4j.properties</exclude>
+						<exclude>README</exclude>
 					</excludes>
 				</configuration>
 			</plugin>

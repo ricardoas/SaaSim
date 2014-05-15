@@ -23,13 +23,6 @@
 				<include>*</include>
 			</includes>
 		</fileSet>
-		<fileSet>
-			<outputDirectory></outputDirectory>
-			<directory>src/main/java</directory>
-			<includes>
-				<include>log4j.properties</include>
-			</includes>
-		</fileSet>
 	</fileSets>
 	<dependencySets>
 		<dependencySet>
