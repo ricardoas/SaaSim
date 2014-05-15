@@ -33,11 +33,6 @@ public class AWSProvider implements Provider {
 		ONDEMAND, LIGHT, MEDIUM, HEAVY, SPOT
 	}
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
 	private long timeBetweenBilling;
 
 	private EventScheduler scheduler;

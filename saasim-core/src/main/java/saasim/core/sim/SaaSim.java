@@ -9,8 +9,6 @@ import saasim.core.config.Configuration;
 import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
 import saasim.core.iaas.Provider;
-import saasim.core.infrastructure.MonitoringService;
-import saasim.core.infrastructure.MonitoringServiceConsumer;
 import saasim.core.provisioning.ProvisioningSystem;
 import saasim.core.saas.Tenant;
 import saasim.core.saas.TenantFactory;
@@ -27,7 +25,6 @@ public class SaaSim{
 	public static final String SAASIM_SIMULATION_TIME = "simulation.time";
 	private EventScheduler scheduler;
 	private ProvisioningSystem dps;
-	private MonitoringService feed;
 	private long simulationTime;
 	private Tenant[] tenants;
 
@@ -44,13 +41,11 @@ public class SaaSim{
 	 * @throws ConfigurationException
 	 */
 	@Inject
-	public SaaSim(Configuration globalConf, EventScheduler scheduler, ProvisioningSystem dps, ApplicationFactory factory, MonitoringService feed, MonitoringServiceConsumer consumer, TenantFactory tenantFactory) throws ConfigurationException {
+	public SaaSim(Configuration globalConf, EventScheduler scheduler, ProvisioningSystem dps, ApplicationFactory factory, TenantFactory tenantFactory) throws ConfigurationException {
 
 		this.scheduler = scheduler;
 		
 		this.dps = dps;
-		this.feed = feed;
-		this.feed.subscribe(consumer);
 		
 		int numberOfTenants = globalConf.getInt(Tenant.SAAS_TENANT_NUMBER);
 		this.tenants = new Tenant[numberOfTenants];

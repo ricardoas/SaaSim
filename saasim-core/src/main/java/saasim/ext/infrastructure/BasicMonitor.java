@@ -5,6 +5,7 @@ import saasim.core.application.Request;
 import saasim.core.config.Configuration;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.infrastructure.Monitor;
+import saasim.core.infrastructure.MonitoringService;
 import saasim.core.infrastructure.Statistics;
 
 import com.google.inject.Inject;
@@ -20,8 +21,9 @@ public class BasicMonitor implements Monitor {
 	private int[] rejectedAtLoadBalancer;
 
 	@Inject
-	public BasicMonitor(Configuration globalConf) {
+	public BasicMonitor(Configuration globalConf, MonitoringService service) {
 		reset(globalConf.getInt(Application.APPLICATION_TIER));
+		service.register(this);
 	}
 
 	@Override

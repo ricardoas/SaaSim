@@ -16,7 +16,6 @@ import saasim.core.infrastructure.Machine;
 import saasim.core.infrastructure.MachineFactory;
 import saasim.core.infrastructure.Monitor;
 import saasim.core.infrastructure.MonitoringService;
-import saasim.core.infrastructure.MonitoringServiceConsumer;
 import saasim.core.io.TraceParcer;
 import saasim.core.io.TraceReader;
 import saasim.core.io.TraceReaderFactory;
@@ -24,7 +23,6 @@ import saasim.core.provisioning.ProvisioningSystem;
 import saasim.core.saas.Tenant;
 import saasim.core.saas.TenantFactory;
 import saasim.ext.iaas.LoggerIaaSCustomer;
-import saasim.ext.infrastructure.DefaultOutputWriter;
 import saasim.ext.infrastructure.FCFSAdmissionControl;
 import saasim.ext.infrastructure.RoundRobinLoadBalancer;
 import saasim.ext.io.LineBasedTraceReader;
@@ -88,7 +86,7 @@ public class SaaSimModule extends AbstractModule {
 	     .implement(Tenant.class, (Class<? extends Tenant>) load(provideConfiguration().getString(TENANT_CLASS)))
 	     .build(TenantFactory.class));
 		
-		bind(Monitor.class).to((Class<? extends Monitor>) load(provideConfiguration().getString(MONITORING_MONITOR_CLASS))).in(Singleton.class);
+		bind(Monitor.class).to((Class<? extends Monitor>) load(provideConfiguration().getString(MONITORING_MONITOR_CLASS)));
 		
 		bind(MonitoringService.class).to((Class<? extends MonitoringService>) load(provideConfiguration().getString(MONITORING_SERVICE_CLASS))).in(Singleton.class);
 				
@@ -113,8 +111,6 @@ public class SaaSimModule extends AbstractModule {
 		install(new FactoryModuleBuilder()
 	     .implement(WorkloadTrafficGenerator.class, WorkloadTrafficGenerator.class)
 	     .build(WorkloadTrafficGeneratorFactory.class));
-		
-		bind(MonitoringServiceConsumer.class).to(DefaultOutputWriter.class).in(Singleton.class);
 	}
 
 	/**

@@ -13,12 +13,18 @@
 			<directory>src/main/resources</directory>
 			<includes>
 				<include>examples/**</include>
-				<include>log4j.properties</include>
 			</includes>
 		</fileSet>
 		<fileSet>
 			<outputDirectory></outputDirectory>
 			<directory>src/main/resources/bin</directory>
+			<includes>
+				<include>*</include>
+			</includes>
+		</fileSet>
+		<fileSet>
+			<outputDirectory></outputDirectory>
+			<directory>src/main/resources/production</directory>
 			<includes>
 				<include>*</include>
 			</includes>

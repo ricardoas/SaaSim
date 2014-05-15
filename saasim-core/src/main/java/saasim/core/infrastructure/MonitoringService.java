@@ -10,8 +10,8 @@ public interface MonitoringService{
 	
 	public static final String MONITORING_SERVICE_TIMEBETWEENREPORTS = "monitoring.service.timebetweenreports";
 
-	void report();
-
-	void subscribe(MonitoringServiceConsumer consumer);
+	void register(Monitor monitor);
+	
+	Statistics getStatistics();
 
 }
