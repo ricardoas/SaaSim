@@ -6,6 +6,10 @@ import java.util.LinkedList;
 import saasim.core.application.Request;
 import saasim.core.application.ResponseListener;
 
+/**
+ * Web application {@link Request}. 
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ */
 public class WebAppRequest implements Request {
 	
 	private final long arrivalTimeInMillis;
@@ -20,6 +24,17 @@ public class WebAppRequest implements Request {
 	private long finishTimeInMillis;
 	private Deque<ResponseListener> listeners;
 
+	/**
+	 * Default constructor.
+	 * 
+	 * @param id
+	 * @param tenantID
+	 * @param userID
+	 * @param arrivalTimeInMillis
+	 * @param requestSizeInBytes
+	 * @param responseSizeInBytes
+	 * @param demand
+	 */
 	public WebAppRequest(long id, int tenantID, int userID, long arrivalTimeInMillis, long requestSizeInBytes,
 			long responseSizeInBytes, long[] demand) {
 				this.id = id;

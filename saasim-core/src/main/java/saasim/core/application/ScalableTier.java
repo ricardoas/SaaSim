@@ -16,7 +16,7 @@ import com.google.inject.Inject;
 
 
 /**
- * This tier can scale horizontally.
+ * {@link Tier} able to scale the infrastructure up, down, in or out.
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
@@ -24,6 +24,10 @@ public class ScalableTier extends AbstractTier{
 	
 	protected final LoadBalancer loadBalancer;
 
+	/**
+	 * Default constructor
+	 * @param loadBalancer A {@link LoadBalancer}.
+	 */
 	@Inject
 	public ScalableTier(LoadBalancer loadBalancer) {
 		super();
@@ -41,6 +45,11 @@ public class ScalableTier extends AbstractTier{
 		this.loadBalancer.queue(request);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @see saasim.core.application.Tier#configure(saasim.core.config.Configuration)
+	 */
 	@Override
 	public void configure(Configuration configuration) {
 		
@@ -78,7 +87,7 @@ public class ScalableTier extends AbstractTier{
 	}
 	
 	/**
-	 * Scales up or down a {@link Machine}.
+	 * Reconfigures a {@link Machine}.
 	 * 
 	 * @param machineDescriptor {@link InstanceDescriptor} of the new server.
 	 */

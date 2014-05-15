@@ -15,18 +15,15 @@ public interface Application extends ResponseListener{
 	public static final String APPLICATION_TIER_REPLICAS = "application.tier.replicas";
 
 	/**
-	 * @param configuration A configuration to be executed.
+	 * Reconfigure this {@link Application}
+	 * @param configuration new {@link Configuration}
 	 */
 	void configure(Configuration configuration);
 
 	/**
 	 * Queue {@link Request} at this {@link Application}.
+	 * 
 	 * @param request new {@link Request}
 	 */
 	void queue(Request request);
-	
-	/**
-	 * @return the number of {@link Tier}s.
-	 */
-	int getNumberOfTiers();
 }

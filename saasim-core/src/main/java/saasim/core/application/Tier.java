@@ -11,12 +11,15 @@ import saasim.core.config.Configuration;
 public interface Tier extends ResponseListener{
 	
 	/**
+	 * It queues a request at this {@link Tier}'s processing queue.
+	 * 
 	 * @param request {@link Request} to process.
 	 */
 	void queue(Request request);
 
 	/**
-	 * @param configuration 
+	 * It sends a reconfiguration scheme to this {@link Tier}.
+	 * @param configuration new {@link Configuration}
 	 */
 	void configure(Configuration configuration);
 	
