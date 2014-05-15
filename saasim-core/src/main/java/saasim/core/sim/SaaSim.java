@@ -86,14 +86,10 @@ public class SaaSim{
 		long start = System.currentTimeMillis();
 		Logger.getLogger(SaaSim.class).debug("SIMULATION START " + start);
 		
-		scheduler.queueEvent(new Event(scheduler.now()){
-			@Override
-			public void trigger() {
-				for (Tenant tenant : tenants) {
-					tenant.start();
-				}
-			}
-		});
+		for (Tenant tenant : tenants) {
+			tenant.start();
+		}
+		
 		scheduler.start(simulationTime);
 
 		Logger.getLogger(SaaSim.class).debug("SIMULATION END " + System.currentTimeMillis());

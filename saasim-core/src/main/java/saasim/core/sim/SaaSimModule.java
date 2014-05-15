@@ -80,7 +80,6 @@ public class SaaSimModule extends AbstractModule {
 		
 		bind(ProvisioningSystem.class).to((Class<? extends ProvisioningSystem>) load(provideConfiguration().getString(DPS_CLASS))).in(Singleton.class);
 		
-//		bind(Application.class).to((Class<? extends Application>) load(provideConfiguration().getString(APPLICATION_CLASS))).in(Singleton.class);
 		install(new FactoryModuleBuilder()
 	     .implement(Application.class, (Class<? extends Application>) load(provideConfiguration().getString(APPLICATION_CLASS)))
 	     .build(ApplicationFactory.class));
@@ -110,6 +109,10 @@ public class SaaSimModule extends AbstractModule {
 		install(new FactoryModuleBuilder()
 	     .implement(Machine.class, (Class<? extends Machine>) load(provideConfiguration().getString(MACHINE_CLASS)))
 	     .build(MachineFactory.class));
+		
+		install(new FactoryModuleBuilder()
+	     .implement(WorkloadTrafficGenerator.class, WorkloadTrafficGenerator.class)
+	     .build(WorkloadTrafficGeneratorFactory.class));
 		
 		bind(MonitoringServiceConsumer.class).to(DefaultOutputWriter.class).in(Singleton.class);
 	}

@@ -47,7 +47,7 @@ public class SaaSimTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		config = new Configuration("src/test/resources/single_tier_01/config.properties");
+		config = new Configuration("src/test/resources/single_tenant_single_tier_configuration.properties");
 	}
 
 	/**

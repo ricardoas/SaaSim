@@ -1,8 +1,5 @@
 package saasim.core.sim;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import saasim.core.application.Application;
 import saasim.core.application.Request;
 import saasim.core.config.Configuration;
@@ -10,8 +7,10 @@ import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
 import saasim.core.io.TraceReader;
 import saasim.core.io.TraceReaderFactory;
+import saasim.core.saas.Tenant;
 
 import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 
 /**
  * it generates workload to {@link Application}.
@@ -22,13 +21,10 @@ public class WorkloadTrafficGenerator {
 	
 	public static final String TRACE_GENERATOR_BUFFER = "trace.generator.buffer";
 
-	//FIXME seems to be in the wrong place
-	public static final String SAAS_TENANT_TRACE = "saas.tenant.trace";
-	
 	private static final int DEFAULT_BUFFER_SIZE = 60 * 1000;
 	private final EventScheduler scheduler;
 	private Application application;
-	private final List<TraceReader<Request>> parsers;
+	private final TraceReader<Request> parser;
 	private final int bufferSize;
 
 	/**
@@ -40,14 +36,11 @@ public class WorkloadTrafficGenerator {
 	 * @param readerFactory {@link TraceReader} factory object.
 	 */
 	@Inject
-	public WorkloadTrafficGenerator(Configuration globalConf, EventScheduler scheduler, TraceReaderFactory<Request> readerFactory) {
+	public WorkloadTrafficGenerator(Configuration globalConf, EventScheduler scheduler, TraceReaderFactory<Request> readerFactory, @Assisted Application application, @Assisted int tenantID) {
 		this.scheduler = scheduler;
+		this.application = application;
 		
-		String[] fileNames = globalConf.getStringArray(SAAS_TENANT_TRACE);
-		parsers = new ArrayList<>();
-		for (String string : fileNames) {
-			parsers.add(readerFactory.create(string, parsers.size()));
-		}
+		this.parser = readerFactory.create(globalConf.getStringArray(Tenant.SAAS_TENANT_TRACE)[tenantID], tenantID);
 		
 		this.bufferSize = globalConf.getInt(TRACE_GENERATOR_BUFFER, DEFAULT_BUFFER_SIZE);
 	}
@@ -58,23 +51,21 @@ public class WorkloadTrafficGenerator {
 	public void start(){
 		long counter = scheduler.now() + bufferSize;
 		
-		for (TraceReader<Request> parser : parsers) {
-			long timestamp;
-			do{
-				final Request r = parser.next();
-				if(r == null){
-					break;
+		long timestamp;
+		do{
+			final Request r = parser.next();
+			if(r == null){
+				break;
+			}
+			timestamp = r.getArrivalTimeInMillis();
+			scheduler.queueEvent(new Event(r.getArrivalTimeInMillis()) {
+				@Override
+				public void trigger() {
+					application.queue(r);
+
 				}
-				timestamp = r.getArrivalTimeInMillis();
-				scheduler.queueEvent(new Event(r.getArrivalTimeInMillis()) {
-					@Override
-					public void trigger() {
-						application.queue(r);
-						
-					}
-				});
-			}while(timestamp <= counter);
-		}
+			});
+		}while(timestamp <= counter);
 		
 		scheduler.queueEvent(new Event(counter) {
 			@Override
@@ -82,11 +73,6 @@ public class WorkloadTrafficGenerator {
 				start();
 			}
 		});
-	}
-	
-	public void setApplication(Application application){
-		this.application = application;
-		
 	}
 
 }
