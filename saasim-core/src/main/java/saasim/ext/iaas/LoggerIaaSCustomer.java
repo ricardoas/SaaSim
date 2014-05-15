@@ -1,4 +1,4 @@
-package saasim.ext.cloud;
+package saasim.ext.iaas;
 
 import org.apache.log4j.Logger;
 

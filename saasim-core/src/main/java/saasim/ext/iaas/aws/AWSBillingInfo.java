@@ -1,4 +1,4 @@
-package saasim.ext.cloud.aws;
+package saasim.ext.iaas.aws;
 
 import saasim.core.iaas.BillingInfo;
 import saasim.core.infrastructure.InstanceDescriptor;

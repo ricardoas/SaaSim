@@ -23,7 +23,7 @@ import saasim.core.io.TraceReaderFactory;
 import saasim.core.provisioning.ProvisioningSystem;
 import saasim.core.saas.Tenant;
 import saasim.core.saas.TenantFactory;
-import saasim.ext.cloud.LoggerIaaSCustomer;
+import saasim.ext.iaas.LoggerIaaSCustomer;
 import saasim.ext.infrastructure.DefaultOutputWriter;
 import saasim.ext.infrastructure.FCFSAdmissionControl;
 import saasim.ext.infrastructure.RoundRobinLoadBalancer;
@@ -112,7 +112,6 @@ public class SaaSimModule extends AbstractModule {
 	     .build(MachineFactory.class));
 		
 		bind(MonitoringServiceConsumer.class).to(DefaultOutputWriter.class).in(Singleton.class);
-		
 	}
 
 	/**

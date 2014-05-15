@@ -1,4 +1,4 @@
-package saasim.ext.cloud.aws;
+package saasim.ext.iaas.aws;
 
 import java.util.HashMap;
 import java.util.HashSet;

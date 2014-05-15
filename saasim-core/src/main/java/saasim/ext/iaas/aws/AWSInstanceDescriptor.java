@@ -1,8 +1,8 @@
-package saasim.ext.cloud.aws;
+package saasim.ext.iaas.aws;
 
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.infrastructure.Machine;
-import saasim.ext.cloud.aws.AWSProvider.MarketType;
+import saasim.ext.iaas.aws.AWSProvider.MarketType;
 
 /**
  * instance descriptor as seen by AWS
