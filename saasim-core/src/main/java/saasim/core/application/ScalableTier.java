@@ -1,11 +1,11 @@
 package saasim.core.application;
 
-import static saasim.core.provisioning.ApplicationConfiguration.ACTION;
-import static saasim.core.provisioning.ApplicationConfiguration.ACTION_DECREASE;
-import static saasim.core.provisioning.ApplicationConfiguration.ACTION_INCREASE;
-import static saasim.core.provisioning.ApplicationConfiguration.ACTION_RECONFIGURE;
-import static saasim.core.provisioning.ApplicationConfiguration.FORCE;
-import static saasim.core.provisioning.ApplicationConfiguration.INSTANCE_DESCRIPTOR;
+import static saasim.core.config.Configuration.ACTION;
+import static saasim.core.config.Configuration.ACTION_DECREASE;
+import static saasim.core.config.Configuration.ACTION_INCREASE;
+import static saasim.core.config.Configuration.ACTION_RECONFIGURE;
+import static saasim.core.config.Configuration.FORCE;
+import static saasim.core.config.Configuration.INSTANCE_DESCRIPTOR;
 import saasim.core.config.Configuration;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.infrastructure.LoadBalancer;

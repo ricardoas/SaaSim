@@ -4,7 +4,6 @@ import saasim.core.application.Application;
 import saasim.core.cloud.utility.UtilityFunction;
 import saasim.core.config.Configuration;
 import saasim.core.iaas.Provider;
-import saasim.core.provisioning.ApplicationConfiguration;
 import saasim.core.provisioning.ProvisioningSystem;
 
 import com.google.inject.Inject;
@@ -36,10 +35,10 @@ public class StaticProvisioningSystem implements ProvisioningSystem {
 				while(numberOfReplicas-- > 0){
 					if(provider.canAcquire(vmTypePerTier[tierID])){
 						Configuration config = new Configuration();
-						config.setProperty(ApplicationConfiguration.TIER_ID, tierID);
-						config.setProperty(ApplicationConfiguration.ACTION, ApplicationConfiguration.ACTION_INCREASE);
-						config.setProperty(ApplicationConfiguration.INSTANCE_DESCRIPTOR, provider.acquire(vmTypePerTier[tierID]));
-						config.setProperty(ApplicationConfiguration.FORCE, true);
+						config.setProperty(Configuration.TIER_ID, tierID);
+						config.setProperty(Configuration.ACTION, Configuration.ACTION_INCREASE);
+						config.setProperty(Configuration.INSTANCE_DESCRIPTOR, provider.acquire(vmTypePerTier[tierID]));
+						config.setProperty(Configuration.FORCE, true);
 						application.configure(config);
 					}
 				}

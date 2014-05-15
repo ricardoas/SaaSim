@@ -11,7 +11,6 @@ import saasim.core.event.EventScheduler;
 import saasim.core.iaas.Provider;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.infrastructure.Statistics;
-import saasim.core.provisioning.ApplicationConfiguration;
 import saasim.core.provisioning.ProvisioningSystem;
 
 import com.google.inject.Inject;
@@ -52,10 +51,10 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 					InstanceDescriptor instance = vmPool.remove(0);
 					instance.turnOff(scheduler.now());
 					Configuration config = new Configuration();
-					config.setProperty(ApplicationConfiguration.TIER_ID, tierID);
-					config.setProperty(ApplicationConfiguration.ACTION, ApplicationConfiguration.ACTION_DECREASE);
-					config.setProperty(ApplicationConfiguration.INSTANCE_DESCRIPTOR, instance);
-					config.setProperty(ApplicationConfiguration.FORCE, true);
+					config.setProperty(Configuration.TIER_ID, tierID);
+					config.setProperty(Configuration.ACTION, Configuration.ACTION_DECREASE);
+					config.setProperty(Configuration.INSTANCE_DESCRIPTOR, instance);
+					config.setProperty(Configuration.FORCE, true);
 					application.configure(config);
 				}
 			}else{
@@ -63,10 +62,10 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 					if(provider.canAcquire(vmType)){
 						InstanceDescriptor instance = provider.acquire(vmType);
 						Configuration config = new Configuration();
-						config.setProperty(ApplicationConfiguration.TIER_ID, tierID);
-						config.setProperty(ApplicationConfiguration.ACTION, ApplicationConfiguration.ACTION_INCREASE);
-						config.setProperty(ApplicationConfiguration.INSTANCE_DESCRIPTOR, instance);
-						config.setProperty(ApplicationConfiguration.FORCE, true);
+						config.setProperty(Configuration.TIER_ID, tierID);
+						config.setProperty(Configuration.ACTION, Configuration.ACTION_INCREASE);
+						config.setProperty(Configuration.INSTANCE_DESCRIPTOR, instance);
+						config.setProperty(Configuration.FORCE, true);
 						application.configure(config);
 						vmPool.add(instance);
 					}
@@ -156,10 +155,10 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 				for (int j = 0; j < Integer.valueOf(startNumberOfReplicas[i]); j++) {
 					InstanceDescriptor instance = provider.acquire(vmTypePerTier[i]);
 					Configuration config = new Configuration();
-					config.setProperty(ApplicationConfiguration.TIER_ID, i);
-					config.setProperty(ApplicationConfiguration.ACTION, ApplicationConfiguration.ACTION_INCREASE);
-					config.setProperty(ApplicationConfiguration.INSTANCE_DESCRIPTOR, instance);
-					config.setProperty(ApplicationConfiguration.FORCE, true);
+					config.setProperty(Configuration.TIER_ID, i);
+					config.setProperty(Configuration.ACTION, Configuration.ACTION_INCREASE);
+					config.setProperty(Configuration.INSTANCE_DESCRIPTOR, instance);
+					config.setProperty(Configuration.FORCE, true);
 					application.configure(config);
 					vmPool.add(instance);
 				}

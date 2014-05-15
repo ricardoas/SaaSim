@@ -8,7 +8,6 @@ import saasim.core.config.Configuration;
 import saasim.core.event.EventScheduler;
 import saasim.core.infrastructure.AdmissionControl;
 import saasim.core.infrastructure.Monitor;
-import saasim.core.provisioning.ApplicationConfiguration;
 
 /**
  * Tiered application. It queues incoming requests according to {@link AdmissionControl} policy.
@@ -60,10 +59,10 @@ public abstract class TieredApplication implements Application {
 	 */
 	@Override
 	public void configure(Configuration configuration) {
-		if(ApplicationConfiguration.ACTION_ADMISSION_CONTROL.equals(configuration.getProperty(ApplicationConfiguration.ACTION))){
+		if(Configuration.ACTION_ADMISSION_CONTROL.equals(configuration.getProperty(Configuration.ACTION))){
 			control.updatePolicy(configuration);
 		}
-		tiers[configuration.getInt(ApplicationConfiguration.TIER_ID)].configure(configuration);
+		tiers[configuration.getInt(Configuration.TIER_ID)].configure(configuration);
 	}
 
 	/**
