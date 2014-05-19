@@ -6,10 +6,15 @@ import static saasim.core.config.Configuration.ACTION_INCREASE;
 import static saasim.core.config.Configuration.ACTION_RECONFIGURE;
 import static saasim.core.config.Configuration.FORCE;
 import static saasim.core.config.Configuration.INSTANCE_DESCRIPTOR;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import saasim.core.config.Configuration;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.infrastructure.LoadBalancer;
 import saasim.core.infrastructure.Machine;
+import saasim.core.infrastructure.MonitoringService;
 
 import com.google.inject.Inject;
 
@@ -29,9 +34,10 @@ public class ScalableTier extends AbstractTier{
 	 * @param loadBalancer A {@link LoadBalancer}.
 	 */
 	@Inject
-	public ScalableTier(LoadBalancer loadBalancer) {
+	public ScalableTier(LoadBalancer loadBalancer, MonitoringService monitor) {
 		super();
 		this.loadBalancer = loadBalancer;
+		monitor.setMonitorable(this);
 	}
 	
 	/**
@@ -94,4 +100,10 @@ public class ScalableTier extends AbstractTier{
 	private void reconfigure(InstanceDescriptor instanceDescriptor, boolean force){
 		this.loadBalancer.reconfigureMachine(instanceDescriptor, !force);
 	}
+	
+	@Override
+	public Map<String, Double> collect(long now, long elapsedTime) {
+		return new HashMap<String, Double>();
+	}
+
 }

@@ -1,12 +1,14 @@
 package saasim.core.application;
 
+import saasim.core.infrastructure.Monitorable;
+
 
 /**
  * Abstract implementation of {@link Tier}. It only defines {@link Request} processing methods.
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public abstract class AbstractTier implements Tier{
+public abstract class AbstractTier implements Tier, Monitorable{
 
 	/**
 	 * {@inheritDoc}

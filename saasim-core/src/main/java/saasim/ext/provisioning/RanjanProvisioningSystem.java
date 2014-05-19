@@ -2,6 +2,9 @@ package saasim.ext.provisioning;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 
 import saasim.core.application.Application;
 import saasim.core.cloud.utility.UtilityFunction;
@@ -10,7 +13,7 @@ import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
 import saasim.core.iaas.Provider;
 import saasim.core.infrastructure.InstanceDescriptor;
-import saasim.core.infrastructure.Statistics;
+import saasim.core.infrastructure.MonitoringService;
 import saasim.core.provisioning.ProvisioningSystem;
 
 import com.google.inject.Inject;
@@ -29,22 +32,18 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 	private class RanjanReconfigurablePool {
 
 		private Application application;
-		private int tierID;
-		private String vmType;
 		private List<InstanceDescriptor> vmPool;
+		private int tierID;
 
-		public RanjanReconfigurablePool(Provider provider, Application application, int tierID,
-				String vmType, List<InstanceDescriptor> vmPool,
-				double targetUtilisation) {
-					this.application = application;
-					this.tierID = tierID;
-					this.vmType = vmType;
-					this.vmPool = vmPool;
+		public RanjanReconfigurablePool( Application application, int tierID, List<InstanceDescriptor> vmPool) {
+			this.application = application;
+			this.tierID = tierID;
+			this.vmPool = vmPool;
 		}
 
-		public void reconfigure() {
+		public void reconfigure(Map<String, SummaryStatistics> statistics) {
 			
-			int delta = evaluateNumberOfServersForNextInterval();
+			int delta = evaluateNumberOfServersForNextInterval(statistics);
 			
 			if(delta < 0){
 				for (int i = 0; i < -delta; i++) {
@@ -59,8 +58,8 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 				}
 			}else{
 				for (int i = 0; i < delta; i++) {
-					if(provider.canAcquire(vmType)){
-						InstanceDescriptor instance = provider.acquire(vmType);
+					if(provider.canAcquire(vmTypePerTier[tierID])){
+						InstanceDescriptor instance = provider.acquire(vmTypePerTier[tierID]);
 						Configuration config = new Configuration();
 						config.setProperty(Configuration.TIER_ID, tierID);
 						config.setProperty(Configuration.ACTION, Configuration.ACTION_INCREASE);
@@ -75,12 +74,13 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 		
 		/**
 		 * Decides how many machines are needed to buy (release) according to collected statistics.
+		 * @param statistics 
+		 * @param statistics 
 		 * 
 		 * @param statistics {@link Statistics}
 		 * @return The number of machines to buy, if positive, or to release, otherwise. 
 		 */
-		private int evaluateNumberOfServersForNextInterval() {
-			
+		private int evaluateNumberOfServersForNextInterval(Map<String, SummaryStatistics> statistics) {
 			
 			
 			return 0;
@@ -92,8 +92,6 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 //			
 //			return Math.max(1, newNumberOfServers) - statistics.totalNumberOfActiveServers;
 		}
-
-
 	}
 
 
@@ -114,11 +112,14 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 
 	private double targetUtilisation;
 
+	private MonitoringService monitoringService;
+
 	@Inject
-	public RanjanProvisioningSystem(EventScheduler scheduler, Configuration globalConf, Provider provider) {
+	public RanjanProvisioningSystem(EventScheduler scheduler, Configuration globalConf, Provider provider, MonitoringService monitoringService) {
 		this.scheduler = scheduler;
 		this.configuration = globalConf;
 		this.provider = provider;
+		this.monitoringService = monitoringService;
 		this.pool = new ArrayList<RanjanReconfigurablePool>();
 		
 		this.startNumberOfReplicas = globalConf.getStringArray(Application.APPLICATION_TIER_REPLICAS);
@@ -135,8 +136,9 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 	}
 
 	protected void evaluate() {
+		Map<String, SummaryStatistics> statistics = monitoringService.getStatistics();
 		for (RanjanReconfigurablePool element : pool) {
-			element.reconfigure();
+			element.reconfigure(statistics);
 		}
 		scheduler.queueEvent(new Event(scheduler.now() + tick){
 			@Override
@@ -150,19 +152,19 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 	public void registerConfigurable(Application... applications) {
 		
 		for (Application application : applications) {
-			for (int i = 0; i < startNumberOfReplicas.length; i++) {
+			for (int tierID = 0; tierID < startNumberOfReplicas.length; tierID++) {
 				List<InstanceDescriptor> vmPool = new ArrayList<>();
-				for (int j = 0; j < Integer.valueOf(startNumberOfReplicas[i]); j++) {
-					InstanceDescriptor instance = provider.acquire(vmTypePerTier[i]);
+				for (int j = 0; j < Integer.valueOf(startNumberOfReplicas[tierID]); j++) {
+					InstanceDescriptor instance = provider.acquire(vmTypePerTier[tierID]);
 					Configuration config = new Configuration();
-					config.setProperty(Configuration.TIER_ID, i);
+					config.setProperty(Configuration.TIER_ID, tierID);
 					config.setProperty(Configuration.ACTION, Configuration.ACTION_INCREASE);
 					config.setProperty(Configuration.INSTANCE_DESCRIPTOR, instance);
 					config.setProperty(Configuration.FORCE, true);
 					application.configure(config);
 					vmPool.add(instance);
 				}
-				pool.add(new RanjanReconfigurablePool(provider, application, i, vmTypePerTier[i], vmPool, targetUtilisation));
+				pool.add(new RanjanReconfigurablePool(application, tierID, vmPool));
 			}
 		}
 	}

@@ -1,5 +1,10 @@
 package saasim.core.infrastructure;
 
+import java.util.Map;
+
+import org.apache.commons.math.stat.descriptive.SummaryStatistics;
+
+
 
 /**
  * Application monitor. Interface for reporting information.
@@ -10,8 +15,7 @@ public interface MonitoringService{
 	
 	public static final String MONITORING_SERVICE_TIMEBETWEENREPORTS = "monitoring.service.timebetweenreports";
 
-	void register(Monitor monitor);
+	Map<String, SummaryStatistics> getStatistics();
 	
-	Statistics getStatistics();
-
+	void setMonitorable(Monitorable monitorable);
 }

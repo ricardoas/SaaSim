@@ -1,31 +1,27 @@
 package saasim.ext.saas;
 
 import saasim.core.application.Application;
-import saasim.core.config.Configuration;
-import saasim.core.event.EventScheduler;
 import saasim.core.saas.Tenant;
-import saasim.core.sim.WorkloadTrafficGenerator;
-import saasim.core.sim.WorkloadTrafficGeneratorFactory;
+import saasim.core.sim.TrafficGenerator;
+import saasim.core.sim.TrafficGeneratorFactory;
 
 import com.google.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
 
 public class SimpleTenant implements Tenant {
 	
 	private static int IDGEN = 0;
 	
-	private WorkloadTrafficGenerator trafficGenerator;
-
 	private final int id;
+	private final TrafficGenerator trafficGenerator;
 
 	@Inject
-	public SimpleTenant(@Assisted Application application, Configuration globalConf, EventScheduler scheduler, WorkloadTrafficGeneratorFactory factory) {
+	public SimpleTenant(TrafficGeneratorFactory factory) {
 		this.id = IDGEN++;
-		this.trafficGenerator = factory.create(application, this.id);
+		this.trafficGenerator = factory.create(this.id);
 	}
 
 	@Override
-	public void start() {
+	public void setUp() {
 		trafficGenerator.start();
 	}
 
@@ -34,4 +30,8 @@ public class SimpleTenant implements Tenant {
 		return id;
 	}
 	
+	@Override
+	public Application getApplication() {
+		return trafficGenerator.getApplication();
+	}
 }

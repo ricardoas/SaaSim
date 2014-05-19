@@ -15,10 +15,12 @@ public abstract class AbstractLoadBalancer implements LoadBalancer{
 	protected final Map<InstanceDescriptor, Machine> machines;
 	protected MachineFactory machineFactory;
 
-	public AbstractLoadBalancer(EventScheduler scheduler, MachineFactory machineFactory) {
+	public AbstractLoadBalancer(EventScheduler scheduler, MonitoringService monitor, MachineFactory machineFactory) {
 		this.scheduler = scheduler;
 		this.machineFactory = machineFactory;
 		this.machines = new HashMap<>();
+		
+		monitor.setMonitorable(this);
 	}
 	
 	/**
@@ -71,6 +73,11 @@ public abstract class AbstractLoadBalancer implements LoadBalancer{
 	@Override
 	public void processDone(Request request, Response response) {
 		request.getResponseListener().processDone(request, response);
+	}
+	
+	@Override
+	public Map<String, Double> collect(long now, long elapsedTime) {
+		return new HashMap<String, Double>();
 	}
 
 }

@@ -19,7 +19,7 @@ import saasim.core.application.Tier;
 import saasim.core.config.Configuration;
 import saasim.core.event.EventScheduler;
 import saasim.core.infrastructure.AdmissionControl;
-import saasim.core.infrastructure.Monitor;
+import saasim.core.infrastructure.MonitoringService;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -35,7 +35,7 @@ public class SingleTierApplicationTest {
 	@Inject
 	private Application application;
 	
-	private Monitor monitor;
+	private MonitoringService monitor;
 	private AdmissionControl control;
 	private Tier tier;
 	private Request request;
@@ -61,7 +61,7 @@ public class SingleTierApplicationTest {
 	@Before
 	public void setUp() throws Exception {
 		configuration = EasyMock.createStrictMock(Configuration.class);
-		monitor = EasyMock.createStrictMock(Monitor.class);
+		monitor = EasyMock.createStrictMock(MonitoringService.class);
 		control = EasyMock.createStrictMock(AdmissionControl.class);
 		tier = EasyMock.createStrictMock(Tier.class);
 		request = EasyMock.createStrictMock(Request.class);
@@ -70,7 +70,7 @@ public class SingleTierApplicationTest {
 		      @Override 
 		      protected void configure() {
 		    	  bind(Application.class).to(TieredApplication.class);
-		          bind(Monitor.class).toInstance(monitor);
+		          bind(MonitoringService.class).toInstance(monitor);
 		          bind(AdmissionControl.class).toInstance(control);
 		          bind(Tier.class).toInstance(tier);
 		          bind(Configuration.class).toInstance(configuration);
@@ -96,7 +96,7 @@ public class SingleTierApplicationTest {
 		
 		EasyMock.expect(configuration.getLong(EventScheduler.EVENT_SCHEDULER_RANDOM_SEED)).andReturn(0L).once();
 		
-		monitor.requestArrived(request);
+//		monitor.requestArrived(request);
 		EasyMock.expect(control.canAccept(request)).andReturn(true);
 		request.setResponseListener(application);
 		tier.queue(request);
@@ -113,9 +113,9 @@ public class SingleTierApplicationTest {
 		
 		EasyMock.expect(configuration.getLong(EventScheduler.EVENT_SCHEDULER_RANDOM_SEED)).andReturn(0L).once();
 		
-		monitor.requestArrived(request);
+//		monitor.requestArrived(request);
 		EasyMock.expect(control.canAccept(request)).andReturn(false);
-		monitor.requestRejected(request);
+//		monitor.requestRejected(request);
 		EasyMock.replay(monitor, control, tier, configuration, request);
 		
 		application.queue(request);

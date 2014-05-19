@@ -8,6 +8,8 @@ package saasim.core.application;
  */
 public interface Request {
 
+	int getTenantID();
+
 	long getArrivalTimeInMillis();
 
 	long getArrivalTimeInSeconds();

@@ -2,7 +2,6 @@ package saasim.core.sim;
 import org.apache.commons.configuration.ConfigurationException;
 
 import saasim.core.application.Application;
-import saasim.core.application.ApplicationFactory;
 import saasim.core.application.Request;
 import saasim.core.application.ScalableTier;
 import saasim.core.application.Tier;
@@ -14,7 +13,6 @@ import saasim.core.infrastructure.AdmissionControl;
 import saasim.core.infrastructure.LoadBalancer;
 import saasim.core.infrastructure.Machine;
 import saasim.core.infrastructure.MachineFactory;
-import saasim.core.infrastructure.Monitor;
 import saasim.core.infrastructure.MonitoringService;
 import saasim.core.io.TraceParcer;
 import saasim.core.io.TraceReader;
@@ -78,15 +76,11 @@ public class SaaSimModule extends AbstractModule {
 		
 		bind(ProvisioningSystem.class).to((Class<? extends ProvisioningSystem>) load(provideConfiguration().getString(DPS_CLASS))).in(Singleton.class);
 		
-		install(new FactoryModuleBuilder()
-	     .implement(Application.class, (Class<? extends Application>) load(provideConfiguration().getString(APPLICATION_CLASS)))
-	     .build(ApplicationFactory.class));
+		bind(Application.class).to((Class<? extends Application>) load(provideConfiguration().getString(APPLICATION_CLASS)));
 		
 		install(new FactoryModuleBuilder()
 	     .implement(Tenant.class, (Class<? extends Tenant>) load(provideConfiguration().getString(TENANT_CLASS)))
 	     .build(TenantFactory.class));
-		
-		bind(Monitor.class).to((Class<? extends Monitor>) load(provideConfiguration().getString(MONITORING_MONITOR_CLASS)));
 		
 		bind(MonitoringService.class).to((Class<? extends MonitoringService>) load(provideConfiguration().getString(MONITORING_SERVICE_CLASS))).in(Singleton.class);
 				
@@ -109,8 +103,8 @@ public class SaaSimModule extends AbstractModule {
 	     .build(MachineFactory.class));
 		
 		install(new FactoryModuleBuilder()
-	     .implement(WorkloadTrafficGenerator.class, WorkloadTrafficGenerator.class)
-	     .build(WorkloadTrafficGeneratorFactory.class));
+	     .implement(TrafficGenerator.class, TrafficGenerator.class)
+	     .build(TrafficGeneratorFactory.class));
 	}
 
 	/**

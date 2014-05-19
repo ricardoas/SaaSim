@@ -1,7 +1,9 @@
 package saasim.ext.infrastructure;
 
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
+import java.util.TreeMap;
 
 import saasim.core.application.Request;
 import saasim.core.application.Response;
@@ -11,7 +13,7 @@ import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.infrastructure.Machine;
-import saasim.core.infrastructure.Monitor;
+import saasim.core.infrastructure.MonitoringService;
 import saasim.core.util.FastSemaphore;
 
 import com.google.inject.Inject;
@@ -24,19 +26,20 @@ public class SingleQueueMachine implements Machine {
 	private long startUpDelay;
 	
 	private Queue<Request> backlog;
-	private Monitor monitor;
 	private int maxBacklogSize;
 	private EventScheduler scheduler;
 	private FastSemaphore semaphore;
 	private Tier nextTier;
 	private Queue<Request> forwarded;
+	private int arrived;
+	private int failed;
 	
 	@Inject
-	public SingleQueueMachine(@Assisted InstanceDescriptor descriptor, Monitor monitor, EventScheduler scheduler, Configuration globalConf) {
+	public SingleQueueMachine(@Assisted InstanceDescriptor descriptor, MonitoringService monitor, EventScheduler scheduler, Configuration globalConf) {
 		this.descriptor = descriptor;
 		this.descriptor.setMachine(this);
 		
-		this.monitor = monitor;
+		monitor.setMonitorable(this);
 		
 		this.scheduler = scheduler;
 		this.startUpDelay = globalConf.getLong(MACHINE_SETUPTIME);
@@ -54,6 +57,8 @@ public class SingleQueueMachine implements Machine {
 	@Override
 	public void queue(final Request request) {
 		
+		arrived++;
+		
 		if(backlog.size() < maxBacklogSize){
 			if(semaphore.tryAcquire()){
 				scheduler.queueEvent(new Event(scheduler.now() + request.getCPUTimeDemandInMillis()) {
@@ -66,14 +71,16 @@ public class SingleQueueMachine implements Machine {
 				backlog.add(request);
 			}
 		}else{
-			monitor.requestFailedAtMachine(request, descriptor);
+			failed++;
+			request.getResponseListener().processDone(request, null);
 		}
 	}
 	
 	protected void run(Request request) {
 		
 		if(!descriptor.isOn()){
-			monitor.requestFailedAtMachine(request, descriptor);
+			failed++;
+			request.getResponseListener().processDone(request, null);
 		}else{
 			request.updateServiceTime(request.getCPUTimeDemandInMillis());
 			forward(request, null);
@@ -123,7 +130,8 @@ public class SingleQueueMachine implements Machine {
 		forwarded.remove(request);
 
 		if(!descriptor.isOn()){
-			monitor.requestFailedAtMachine(request, descriptor);
+			failed++;
+			request.getResponseListener().processDone(request, null);
 		}else{
 			forward(request, response);
 		}
@@ -138,8 +146,22 @@ public class SingleQueueMachine implements Machine {
 	@Override
 	public void shutdown() {
 		for (Request request : backlog) {
-			monitor.requestFailedAtMachine(request, descriptor);
+			failed++;
+			request.getResponseListener().processDone(request, null);
 		}
 		backlog.clear();
+	}
+
+	@Override
+	public Map<String,Double> collect(long now, long elapsedTime) {
+		Map<String, Double> info = new TreeMap<>();
+		
+		info.put("arrivalrate", (double) arrived);
+		info.put("failurerate", (double) failed);
+		
+		arrived = 0;
+		failed = 0;
+		
+		return info;
 	}
 }

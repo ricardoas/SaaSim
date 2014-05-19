@@ -1,5 +1,7 @@
 package saasim.core.saas;
 
+import saasim.core.application.Application;
+
 public interface Tenant {
 	
 	public static String SAAS_TENANT_NUMBER = "saas.tenant.number";
@@ -11,9 +13,11 @@ public interface Tenant {
 	
 	public static final String SAAS_TENANT_TRACE = "saas.tenant.trace";
 	
-	void start();
+	void setUp();
 
 	int getID();
+
+	Application getApplication();
 	
 	
 }

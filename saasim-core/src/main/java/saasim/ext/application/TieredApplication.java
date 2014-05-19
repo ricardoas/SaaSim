@@ -1,5 +1,8 @@
 package saasim.ext.application;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import saasim.core.application.Application;
 import saasim.core.application.Request;
 import saasim.core.application.Response;
@@ -7,33 +10,39 @@ import saasim.core.application.Tier;
 import saasim.core.config.Configuration;
 import saasim.core.event.EventScheduler;
 import saasim.core.infrastructure.AdmissionControl;
-import saasim.core.infrastructure.Monitor;
+import saasim.core.infrastructure.Monitorable;
+import saasim.core.infrastructure.MonitoringService;
 
 /**
  * Tiered application. It queues incoming requests according to {@link AdmissionControl} policy.
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public abstract class TieredApplication implements Application {
+public abstract class TieredApplication implements Application, Monitorable {
 	
 	private AdmissionControl control;
 	private Tier[] tiers;
-	private Monitor monitor;
 	private EventScheduler scheduler;
+	
+	private int arrived;
+	private int rejected;
+	private int finished;
+	private int failed;
 
 	/**
 	 * Default constructor.
 	 * 
 	 * @param scheduler {@link EventScheduler}
 	 * @param control {@link AdmissionControl}
-	 * @param monitor {@link Monitor}
+	 * @param monitor {@link MonitoringService}
 	 * @param tiers instances of {@link Tier}.
 	 */
-	public TieredApplication(EventScheduler scheduler, AdmissionControl control, Monitor monitor, Tier... tiers) {
+	public TieredApplication(EventScheduler scheduler, AdmissionControl control, MonitoringService monitor, Tier... tiers) {
 		this.scheduler = scheduler;
 		this.control = control;
-		this.monitor = monitor;
 		this.tiers = tiers;
+		
+		monitor.setMonitorable(this);
 	}
 
 	/**
@@ -43,12 +52,12 @@ public abstract class TieredApplication implements Application {
 	 */
 	@Override
 	public void queue(Request request) {
-		monitor.requestArrived(request);
+		arrived++;
 		if(control.canAccept(request)){
 			request.setResponseListener(this);
 			this.tiers[0].queue(request);
 		}else{
-			monitor.requestRejected(request);
+			rejected++;
 		}
 	}
 
@@ -72,7 +81,28 @@ public abstract class TieredApplication implements Application {
 	 */
 	@Override
 	public void processDone(Request request, Response response) {
-		request.setFinishTime(scheduler.now());
-		monitor.requestFinished(request);
+		if(response == null){
+			failed++;
+		}else{
+			request.setFinishTime(scheduler.now());
+			finished++;
+		}
+	}
+	
+	@Override
+	public Map<String, Double> collect(long now, long elapsedTime) {
+		Map<String, Double> info = new TreeMap<>();
+		
+		info.put("arrivalrate", (double) arrived);
+		info.put("failurerate", (double) failed);
+		info.put("droprate", (double) rejected);
+		info.put("finishrate", (double) finished);
+		
+		arrived = 0;
+		failed = 0;
+		rejected = 0;
+		finished = 0;
+		
+		return info;
 	}
 }

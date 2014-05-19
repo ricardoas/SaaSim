@@ -17,13 +17,13 @@ import com.google.inject.assistedinject.Assisted;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class WorkloadTrafficGenerator {
+public class TrafficGenerator {
 	
 	public static final String TRACE_GENERATOR_BUFFER = "trace.generator.buffer";
 
 	private static final int DEFAULT_BUFFER_SIZE = 60 * 1000;
 	private final EventScheduler scheduler;
-	private Application application;
+	private final Application application;
 	private final TraceReader<Request> parser;
 	private final int bufferSize;
 
@@ -36,12 +36,10 @@ public class WorkloadTrafficGenerator {
 	 * @param readerFactory {@link TraceReader} factory object.
 	 */
 	@Inject
-	public WorkloadTrafficGenerator(Configuration globalConf, EventScheduler scheduler, TraceReaderFactory<Request> readerFactory, @Assisted Application application, @Assisted int tenantID) {
+	public TrafficGenerator(Configuration globalConf, EventScheduler scheduler, TraceReaderFactory<Request> readerFactory, Application application, @Assisted int tenantID) {
 		this.scheduler = scheduler;
 		this.application = application;
-		
 		this.parser = readerFactory.create(globalConf.getStringArray(Tenant.SAAS_TENANT_TRACE)[tenantID], tenantID);
-		
 		this.bufferSize = globalConf.getInt(TRACE_GENERATOR_BUFFER, DEFAULT_BUFFER_SIZE);
 	}
 
@@ -73,6 +71,10 @@ public class WorkloadTrafficGenerator {
 				start();
 			}
 		});
+	}
+
+	public Application getApplication() {
+		return application;
 	}
 
 }

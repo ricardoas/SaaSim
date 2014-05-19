@@ -8,6 +8,7 @@ import saasim.core.infrastructure.AbstractLoadBalancer;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.infrastructure.Machine;
 import saasim.core.infrastructure.MachineFactory;
+import saasim.core.infrastructure.MonitoringService;
 
 import com.google.inject.Inject;
 
@@ -24,8 +25,8 @@ public class RoundRobinLoadBalancer extends AbstractLoadBalancer {
 	 * @param scheduler {@link EventScheduler}
 	 */
 	@Inject
-	public RoundRobinLoadBalancer(EventScheduler scheduler, MachineFactory machineFactory) {
-		super(scheduler, machineFactory);
+	public RoundRobinLoadBalancer(EventScheduler scheduler, MachineFactory machineFactory, MonitoringService monitor) {
+		super(scheduler, monitor, machineFactory);
 		this.roundRobinQueue = new LinkedList<InstanceDescriptor>();
 		this.roundRobinIndex = -1;
 	}

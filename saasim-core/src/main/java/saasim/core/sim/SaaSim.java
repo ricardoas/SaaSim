@@ -4,7 +4,6 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 
 import saasim.core.application.Application;
-import saasim.core.application.ApplicationFactory;
 import saasim.core.config.Configuration;
 import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
@@ -33,15 +32,14 @@ public class SaaSim{
 	 * 
 	 * @param globalConf {@link Configuration} instance.
 	 * @param scheduler {@link Event} queue manager.
-	 * @param iaasProvider {@link Provider} instance.
 	 * @param dps provisioner instance.
+	 * @param iaasProvider {@link Provider} instance.
 	 * @param application {@link Application} being simulated.
 	 * @param workloadGenerator traffic generator.
-	 * 
 	 * @throws ConfigurationException
 	 */
 	@Inject
-	public SaaSim(Configuration globalConf, EventScheduler scheduler, ProvisioningSystem dps, ApplicationFactory factory, TenantFactory tenantFactory) throws ConfigurationException {
+	public SaaSim(Configuration globalConf, EventScheduler scheduler, ProvisioningSystem dps, TenantFactory tenantFactory) throws ConfigurationException {
 
 		this.scheduler = scheduler;
 		
@@ -50,24 +48,9 @@ public class SaaSim{
 		int numberOfTenants = globalConf.getInt(Tenant.SAAS_TENANT_NUMBER);
 		this.tenants = new Tenant[numberOfTenants];
 
-		switch(globalConf.getString(Tenant.SAAS_TENANT_MODE)){
-
-		case Tenant.SAAS_TENANT_MODE_ARCHITECTURE: // one application and several tenants one provisioner
-			Application singleApplication = factory.create();
-			this.dps.registerConfigurable(singleApplication);
-			while(numberOfTenants-- > 0){
-				tenants[numberOfTenants] = tenantFactory.create(singleApplication);
-			}
-			break;
-		case Tenant.SAAS_TENANT_MODE_VIRTUALIZED: // one application+provisioner per tenant
-			while(numberOfTenants-- > 0){
-				Application tenantApplication = factory.create();
-				this.dps.registerConfigurable(tenantApplication);
-				tenants[numberOfTenants] = tenantFactory.create(tenantApplication);
-			}
-			break;
-		default:
-			throw new ConfigurationException();
+		while(numberOfTenants-- > 0){
+			this.tenants[numberOfTenants] = tenantFactory.create();
+			this.dps.registerConfigurable(tenants[numberOfTenants].getApplication());
 		}
 		
 		this.simulationTime = globalConf.getLong(SAASIM_SIMULATION_TIME);
@@ -82,7 +65,7 @@ public class SaaSim{
 		Logger.getLogger(SaaSim.class).debug("SIMULATION START " + start);
 		
 		for (Tenant tenant : tenants) {
-			tenant.start();
+			tenant.setUp();
 		}
 		
 		scheduler.start(simulationTime);

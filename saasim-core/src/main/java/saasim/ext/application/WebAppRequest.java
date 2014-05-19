@@ -95,4 +95,9 @@ public class WebAppRequest implements Request {
 		return id;
 	}
 
+	@Override
+	public int getTenantID() {
+		return tenantID;
+	}
+
 }

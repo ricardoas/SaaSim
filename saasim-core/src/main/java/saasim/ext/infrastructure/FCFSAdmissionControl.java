@@ -29,6 +29,11 @@ public class FCFSAdmissionControl implements AdmissionControl {
 		updatePolicy(globalConf);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @see saasim.core.infrastructure.AdmissionControl#canAccept(saasim.core.application.Request)
+	 */
 	@Override
 	public boolean canAccept(Request request) {
 		
@@ -39,6 +44,11 @@ public class FCFSAdmissionControl implements AdmissionControl {
 		return (counter++ < acceptanceRate);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @see saasim.core.infrastructure.AdmissionControl#updatePolicy(saasim.core.config.Configuration)
+	 */
 	@Override
 	public void updatePolicy(Configuration configuration) {
 		this.acceptanceRate = configuration.getInt(ADMISSIONCONTROL_ACCEPTANCERATE, Integer.MAX_VALUE);
