@@ -1,9 +1,10 @@
 package saasim.ext.saas;
 
+import java.io.FileNotFoundException;
+
 import saasim.core.application.Application;
+import saasim.core.io.TrafficGenerator;
 import saasim.core.saas.Tenant;
-import saasim.core.sim.TrafficGenerator;
-import saasim.core.sim.TrafficGeneratorFactory;
 
 import com.google.inject.Inject;
 
@@ -15,9 +16,9 @@ public class SimpleTenant implements Tenant {
 	private final TrafficGenerator trafficGenerator;
 
 	@Inject
-	public SimpleTenant(TrafficGeneratorFactory factory) {
+	public SimpleTenant(TrafficGenerator trafficGenerator) throws FileNotFoundException {
+		this.trafficGenerator = trafficGenerator;
 		this.id = IDGEN++;
-		this.trafficGenerator = factory.create(this.id);
 	}
 
 	@Override

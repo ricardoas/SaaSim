@@ -7,7 +7,6 @@ import java.util.TreeMap;
 
 import saasim.core.application.Request;
 import saasim.core.application.Response;
-import saasim.core.application.Tier;
 import saasim.core.config.Configuration;
 import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
@@ -29,7 +28,6 @@ public class SingleQueueMachine implements Machine {
 	private int maxBacklogSize;
 	private EventScheduler scheduler;
 	private FastSemaphore semaphore;
-	private Tier nextTier;
 	private Queue<Request> forwarded;
 	private int arrived;
 	private int failed;
@@ -59,8 +57,8 @@ public class SingleQueueMachine implements Machine {
 		
 		arrived++;
 		
-		if(backlog.size() < maxBacklogSize){
-			if(semaphore.tryAcquire()){
+		if(backlog.size() < maxBacklogSize){ //can wait
+			if(semaphore.tryAcquire()){ //can run
 				scheduler.queueEvent(new Event(scheduler.now() + request.getCPUTimeDemandInMillis()) {
 					@Override
 					public void trigger() {
@@ -70,7 +68,7 @@ public class SingleQueueMachine implements Machine {
 			}else{
 				backlog.add(request);
 			}
-		}else{
+		}else{ // cannot wait
 			failed++;
 			request.getResponseListener().processDone(request, null);
 		}
@@ -78,15 +76,16 @@ public class SingleQueueMachine implements Machine {
 	
 	protected void run(Request request) {
 		
-		if(!descriptor.isOn()){
+		if(!descriptor.isOn()){ //machine turned off
 			failed++;
 			request.getResponseListener().processDone(request, null);
-		}else{
+		}else{ // machine on
 			request.updateServiceTime(request.getCPUTimeDemandInMillis());
-			forward(request, null);
+			forward(request);
 		}
 		
-		if(!backlog.isEmpty()){
+		
+		if(!backlog.isEmpty()){ // poll another request from queue
 			final Request newRequest = backlog.poll();
 			scheduler.queueEvent(new Event(scheduler.now() + newRequest.getCPUTimeDemandInMillis()) {
 				@Override
@@ -94,25 +93,29 @@ public class SingleQueueMachine implements Machine {
 					SingleQueueMachine.this.run(newRequest);
 				}
 			});
-		}else{
+		}else{ // release cpu core
 			semaphore.release();
 		}
 	}
 
-	private void forward(Request request, Response response) {
-		if(getNextTier() != null && shouldForward()){
+	private void forward(Request request) {
+		if(shouldForward(request)){
 			request.setResponseListener(this);
-			getNextTier().queue(request);
+			request.forward();
+			descriptor.getApplication().queue(request);
 			forwarded.add(request);
 		}else{
-			request.getResponseListener().processDone(request, response);
+//			request.rollback();
+			request.getResponseListener().processDone(request, new Response() {});
 		}
 	}
 
 
-	@Override
-	public boolean shouldForward() {
-		return false;
+	private boolean shouldForward(Request request) {
+		request.forward();
+		boolean forward = request.getCPUTimeDemandInMillis() > 0;
+		request.rollback();
+		return forward;
 	}
 
 	@Override
@@ -121,26 +124,16 @@ public class SingleQueueMachine implements Machine {
 	}
 	
 	@Override
-	public Tier getNextTier() {
-		return nextTier;
-	}
-
-	@Override
 	public void processDone(Request request, Response response) {
 		forwarded.remove(request);
+		request.rollback();
 
 		if(!descriptor.isOn()){
 			failed++;
 			request.getResponseListener().processDone(request, null);
 		}else{
-			forward(request, response);
+			request.getResponseListener().processDone(request, new Response() {});
 		}
-	}
-
-
-	@Override
-	public void setNextTier(Tier nextTier) {
-		this.nextTier = nextTier;
 	}
 
 	@Override

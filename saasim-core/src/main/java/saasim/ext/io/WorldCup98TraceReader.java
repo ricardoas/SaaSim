@@ -6,11 +6,9 @@ import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 
 import saasim.core.application.Request;
-import saasim.core.io.TraceParcer;
 import saasim.core.io.TraceReader;
 
 import com.google.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
 
 
 /**
@@ -18,14 +16,13 @@ import com.google.inject.assistedinject.Assisted;
  * 
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class WorldCup98TraceReader implements TraceReader<Request>{
+public class WorldCup98TraceReader implements TraceReader{
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private TraceParcer workloadParser;
 	private GZIPInputStream reader;
 
 	private int tenantID;
@@ -38,17 +35,7 @@ public class WorldCup98TraceReader implements TraceReader<Request>{
 	 * @param fileName 
 	 */
 	@Inject
-	public WorldCup98TraceReader(@Assisted String fileName, @Assisted int tenantID, TraceParcer traceParser) {
-		this.tenantID = tenantID;
-		this.workloadParser = traceParser;
-		
-		try {
-			this.reader = new GZIPInputStream(new FileInputStream(fileName));
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Problem reading workload file. ", e);
-		} catch (IOException e) {
-			throw new RuntimeException("Problem reading workload file. ", e);
-		}
+	public WorldCup98TraceReader() {
 	}
 	
 	/**
@@ -73,7 +60,7 @@ public class WorldCup98TraceReader implements TraceReader<Request>{
 
 			long uint = ((long) (first << 24 | second << 16 | third << 8 | fourth)) & 0xFFFFFFFFL;
 
-			return workloadParser.parseRequest(null, tenantID);
+			return null;//workloadParser.parseRequest(null, tenantID);
 		} catch (IOException e) {
 			return null;
 		}
@@ -88,6 +75,19 @@ public class WorldCup98TraceReader implements TraceReader<Request>{
 			this.reader.close();
 		} catch (IOException e) {
 			throw new RuntimeException("Problem closing workload file.", e);
+		}
+	}
+
+	@Override
+	public void setUp(String file, int tenantID) throws FileNotFoundException {
+		this.tenantID = tenantID;
+
+		try {
+			this.reader = new GZIPInputStream(new FileInputStream(file));
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException("Problem reading workload file. ", e);
+		} catch (IOException e) {
+			throw new RuntimeException("Problem reading workload file. ", e);
 		}
 	}
 }

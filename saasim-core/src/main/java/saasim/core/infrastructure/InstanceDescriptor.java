@@ -1,5 +1,7 @@
 package saasim.core.infrastructure;
 
+import saasim.core.application.Application;
+
 /**
  * Instance descriptor abstraction. This is the machine as seen by an instance provider.
  * 
@@ -18,5 +20,9 @@ public interface InstanceDescriptor {
 	double reportUsage(StringBuilder report, long now);
 
 	void turnOn(long now);
+
+	Application getApplication();
+
+	void setApplication(Application application);
 
 }

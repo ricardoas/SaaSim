@@ -6,11 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import saasim.core.application.Request;
-import saasim.core.io.TraceParcer;
 import saasim.core.io.TraceReader;
-
-import com.google.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
 
 
 /**
@@ -18,37 +14,22 @@ import com.google.inject.assistedinject.Assisted;
  * 
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class LineBasedTraceReader implements TraceReader<Request>{
+public abstract class LineBasedTraceReader implements TraceReader{
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	
-	private TraceParcer workloadParser;
 	private BufferedReader reader;
+	protected int tenantID;
 
-	private int tenantID;
-
-	/**
-	 * Default constructor.
-	 * 
-	 * @param filename workload file name
-	 * @param traceParser translate trace lines into {@link Request}s.
-	 * @param fileName 
-	 */
-	@Inject
-	public LineBasedTraceReader(@Assisted String fileName, @Assisted int tenantID, TraceParcer traceParser) {
-		this.tenantID = tenantID;
-		this.workloadParser = traceParser;
+	public LineBasedTraceReader() {
 		
-		try {
-			this.reader = new BufferedReader(new FileReader(fileName));
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException("Problem reading workload file. ", e);
-		}
 	}
 	
+	@Override
+	public void setUp(String fileName, int tenantID) throws FileNotFoundException {
+		this.tenantID = tenantID;
+		this.reader = new BufferedReader(new FileReader(fileName));
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -57,11 +38,13 @@ public class LineBasedTraceReader implements TraceReader<Request>{
 		String line;
 		try {
 			line = reader.readLine();
-			return line == null? null: workloadParser.parseRequest(line, tenantID);
+			return line == null? null: parseRequest(line);
 		} catch (Exception e) {
 			throw new RuntimeException("Problem reading workload file.", e);
 		}
 	}
+
+	protected abstract Request parseRequest(String line);
 
 	/**
 	 * {@inheritDoc}

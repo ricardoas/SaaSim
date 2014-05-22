@@ -1,6 +1,7 @@
 package saasim.core.application;
 
 import saasim.core.config.Configuration;
+import saasim.core.infrastructure.Monitorable;
 
 
 /**
@@ -8,11 +9,12 @@ import saasim.core.config.Configuration;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public interface Application extends ResponseListener{
+public interface Application extends Monitorable{
 	
 	public static final String APPLICATION_TIER_VMTYPE = "application.tier.vmtype";
-	public static final String APPLICATION_TIER_REPLICAS = "application.tier.replicas";
-
+	public static final String APPLICATION_TIER_INIT = "application.tier.init";
+	public static final String APPLICATION_TIER_NUMBER = "application.tier.number";
+	
 	/**
 	 * Reconfigure this {@link Application}
 	 * @param configuration new {@link Configuration}
@@ -25,4 +27,6 @@ public interface Application extends ResponseListener{
 	 * @param request new {@link Request}
 	 */
 	void queue(Request request);
+	
+	int getID();
 }

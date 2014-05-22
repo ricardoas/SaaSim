@@ -9,8 +9,8 @@ import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
 import saasim.core.iaas.Provider;
 import saasim.core.provisioning.ProvisioningSystem;
+import saasim.core.saas.ASP;
 import saasim.core.saas.Tenant;
-import saasim.core.saas.TenantFactory;
 
 import com.google.inject.Inject;
 
@@ -23,9 +23,8 @@ public class SaaSim{
 
 	public static final String SAASIM_SIMULATION_TIME = "simulation.time";
 	private EventScheduler scheduler;
-	private ProvisioningSystem dps;
 	private long simulationTime;
-	private Tenant[] tenants;
+	private ASP asp;
 
 	/**
 	 * Default constructor.
@@ -39,19 +38,11 @@ public class SaaSim{
 	 * @throws ConfigurationException
 	 */
 	@Inject
-	public SaaSim(Configuration globalConf, EventScheduler scheduler, ProvisioningSystem dps, TenantFactory tenantFactory) throws ConfigurationException {
+	public SaaSim(Configuration globalConf, EventScheduler scheduler, ASP asp) throws ConfigurationException {
 
 		this.scheduler = scheduler;
 		
-		this.dps = dps;
-		
-		int numberOfTenants = globalConf.getInt(Tenant.SAAS_TENANT_NUMBER);
-		this.tenants = new Tenant[numberOfTenants];
-
-		while(numberOfTenants-- > 0){
-			this.tenants[numberOfTenants] = tenantFactory.create();
-			this.dps.registerConfigurable(tenants[numberOfTenants].getApplication());
-		}
+		this.asp = asp;
 		
 		this.simulationTime = globalConf.getLong(SAASIM_SIMULATION_TIME);
 	}
@@ -64,9 +55,7 @@ public class SaaSim{
 		long start = System.currentTimeMillis();
 		Logger.getLogger(SaaSim.class).debug("SIMULATION START " + start);
 		
-		for (Tenant tenant : tenants) {
-			tenant.setUp();
-		}
+		asp.setUp();
 		
 		scheduler.start(simulationTime);
 

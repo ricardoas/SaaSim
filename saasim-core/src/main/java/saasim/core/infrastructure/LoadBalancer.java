@@ -1,9 +1,8 @@
 package saasim.core.infrastructure;
 
 import saasim.core.application.Request;
-import saasim.core.application.ResponseListener;
 
-public interface LoadBalancer extends ResponseListener{
+public interface LoadBalancer{
 	
 	/**
 	 * Send request to {@link LoadBalancer} processing queue.
@@ -13,15 +12,15 @@ public interface LoadBalancer extends ResponseListener{
 
 	/** 
 	 * Registers a new {@link Machine} to this {@link LoadBalancer} according to {@link InstanceDescriptor}.
+	 * @param machine TODO
 	 * @param useStartUpDelay <code>true</code> if use start up delay
 	 */
-	void addMachine(InstanceDescriptor descriptor, boolean useStartUpDelay);
+	void addMachine(InstanceDescriptor descriptor, Machine machine, boolean useStartUpDelay);
 
 	/**
 	 * Removes a specific {@link Machine} from this {@link LoadBalancer}.
-	 * @param force <code>true</code> if use force
 	 */
-	void removeMachine(InstanceDescriptor descriptor, boolean force);
+	void removeMachine(InstanceDescriptor descriptor);
 
 	/**
 	 * Removes a specific {@link Machine} from this {@link LoadBalancer}.

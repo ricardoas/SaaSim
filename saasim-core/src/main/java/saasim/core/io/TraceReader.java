@@ -1,7 +1,9 @@
 package saasim.core.io;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Serializable;
+
+import saasim.core.application.Request;
 
 /**
  * Common set of features for workload parsers.
@@ -9,7 +11,7 @@ import java.io.Serializable;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  * @param <T> To represent the granularity you want to read.
  */
-public interface TraceReader<T> extends Serializable{
+public interface TraceReader{
 
 	/**
 	 * Reads and returns the next portion of data from the workload. Note that
@@ -17,11 +19,13 @@ public interface TraceReader<T> extends Serializable{
 	 * @return
 	 * @throws RuntimeException when {@link IOException} is launched. 
 	 */
-	public T next();
+	public Request next();
 
 	/**
 	 * Close the workload.
 	 */
 	public void close();
+
+	void setUp(String file, int tenantID) throws FileNotFoundException;
 
 }

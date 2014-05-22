@@ -20,6 +20,7 @@ import saasim.core.config.Configuration;
 import saasim.core.event.EventScheduler;
 import saasim.core.infrastructure.AdmissionControl;
 import saasim.core.infrastructure.MonitoringService;
+import saasim.ext.application.web.TieredApplication;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -89,7 +90,7 @@ public class SingleTierApplicationTest {
 	}
 
 	/**
-	 * Test method for {@link saasim.ext.application.TieredApplication#queue(saasim.core.application.Request)}.
+	 * Test method for {@link saasim.ext.application.web.TieredApplication#queue(saasim.core.application.Request)}.
 	 */
 	@Test
 	public final void testCanQueue() {
@@ -98,7 +99,7 @@ public class SingleTierApplicationTest {
 		
 //		monitor.requestArrived(request);
 		EasyMock.expect(control.canAccept(request)).andReturn(true);
-		request.setResponseListener(application);
+//		request.setResponseListener(application);
 		tier.queue(request);
 		EasyMock.replay(monitor, control, tier, configuration, request);
 		
@@ -106,7 +107,7 @@ public class SingleTierApplicationTest {
 	}
 
 	/**
-	 * Test method for {@link saasim.ext.application.TieredApplication#queue(saasim.core.application.Request)}.
+	 * Test method for {@link saasim.ext.application.web.TieredApplication#queue(saasim.core.application.Request)}.
 	 */
 	@Test
 	public final void testCannotQueue() {
@@ -122,7 +123,7 @@ public class SingleTierApplicationTest {
 	}
 
 	/**
-	 * Test method for {@link saasim.ext.application.TieredApplication#configure(saasim.core.provisioning.TierConfiguration)}.
+	 * Test method for {@link saasim.ext.application.web.TieredApplication#configure(saasim.core.provisioning.TierConfiguration)}.
 	 */
 	@Test
 	public final void testConfig() {
@@ -130,7 +131,7 @@ public class SingleTierApplicationTest {
 	}
 
 	/**
-	 * Test method for {@link saasim.ext.application.TieredApplication#processDone(saasim.core.application.Request, saasim.core.application.Response)}.
+	 * Test method for {@link saasim.ext.application.web.TieredApplication#processDone(saasim.core.application.Request, saasim.core.application.Response)}.
 	 */
 	@Test
 	public final void testProcessDone() {

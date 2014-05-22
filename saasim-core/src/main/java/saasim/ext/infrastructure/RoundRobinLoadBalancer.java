@@ -7,8 +7,6 @@ import saasim.core.event.EventScheduler;
 import saasim.core.infrastructure.AbstractLoadBalancer;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.infrastructure.Machine;
-import saasim.core.infrastructure.MachineFactory;
-import saasim.core.infrastructure.MonitoringService;
 
 import com.google.inject.Inject;
 
@@ -25,8 +23,8 @@ public class RoundRobinLoadBalancer extends AbstractLoadBalancer {
 	 * @param scheduler {@link EventScheduler}
 	 */
 	@Inject
-	public RoundRobinLoadBalancer(EventScheduler scheduler, MachineFactory machineFactory, MonitoringService monitor) {
-		super(scheduler, monitor, machineFactory);
+	public RoundRobinLoadBalancer(EventScheduler scheduler) {
+		super(scheduler);
 		this.roundRobinQueue = new LinkedList<InstanceDescriptor>();
 		this.roundRobinIndex = -1;
 	}
@@ -48,28 +46,27 @@ public class RoundRobinLoadBalancer extends AbstractLoadBalancer {
 		roundRobinIndex = (++roundRobinIndex) % machines.size();
 		return roundRobinQueue.get(roundRobinIndex);
 	}
-
-
+	
 	@Override
-	protected void machineTurnedOn(InstanceDescriptor descriptor, Machine machine) {
-		machines.put(descriptor, machine);
+	public void addMachine(InstanceDescriptor descriptor, Machine machine,
+			boolean useStartUpDelay) {
+		super.addMachine(descriptor, machine, useStartUpDelay);
 		roundRobinQueue.add(descriptor);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @see saasim.core.infrastructure.LoadBalancer#removeMachine(saasim.ext.cloud.InstanceDescriptor, boolean)
+	 * @see saasim.core.infrastructure.LoadBalancer#removeMachine(saasim.ext.cloud.InstanceDescriptor)
 	 */
 	@Override
-	public void removeMachine(InstanceDescriptor descriptor, boolean force) {
-		super.removeMachine(descriptor, force);
-		
+	public void removeMachine(InstanceDescriptor descriptor) {
 		int index = roundRobinQueue.indexOf(descriptor);
 		if(index <= roundRobinIndex){
 			roundRobinIndex--;
 		}
 		roundRobinQueue.remove(index);
+		super.removeMachine(descriptor);
 	}
 
 	/**

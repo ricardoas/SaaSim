@@ -1,5 +1,6 @@
 package saasim.ext.iaas.aws;
 
+import saasim.core.application.Application;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.infrastructure.Machine;
 import saasim.ext.iaas.aws.AWSProvider.MarketType;
@@ -18,6 +19,7 @@ public class AWSInstanceDescriptor implements InstanceDescriptor {
 	private long finishTime;
 	private long lastBillingTime;
 	private boolean setup;
+	private Application application;
 
 	public AWSInstanceDescriptor(AWSInstanceType instanceType, MarketType market, long creationTime) {
 		this.type = instanceType;
@@ -103,5 +105,15 @@ public class AWSInstanceDescriptor implements InstanceDescriptor {
 		total += reportInfo[8];
 		total += reportInfo[10];
 		return total;
+	}
+
+	@Override
+	public Application getApplication() {
+		return application;
+	}
+
+	@Override
+	public void setApplication(Application application) {
+		this.application = application;
 	}
 }

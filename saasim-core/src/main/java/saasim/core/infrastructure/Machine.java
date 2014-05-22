@@ -2,7 +2,6 @@ package saasim.core.infrastructure;
 
 import saasim.core.application.Request;
 import saasim.core.application.ResponseListener;
-import saasim.core.application.Tier;
 
 
 /**
@@ -23,12 +22,6 @@ public interface Machine extends ResponseListener{
 	void queue(Request request);
 	
 	long getStartUpDelay();
-	
-	Tier getNextTier();
-	
-	void setNextTier(Tier nextTier);
-	
-	boolean shouldForward();
 	
 	void shutdown();
 }

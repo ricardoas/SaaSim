@@ -6,7 +6,9 @@ data <- read.table(args[1])
 
 data[,c(7, 8, 9, 10, 11)] <- 0
 
-colnames(data) <- c("user", "id", "time", "reqsize", "respsize", "old", "web", "web.resp", "app", "app.resp", "db")
+#colnames(data) <- c("user", "id", "time", "reqsize", "respsize", "old", "web", "web.resp", "app", "app.resp", "db")
+
+colnames(data) <- c("user", "id", "time", "reqsize", "respsize", "old", "web", "app", "db", "web.resp", "app.resp")
 
 data$web <- round(rexp(n=nrow(data), rate=1/10))
 

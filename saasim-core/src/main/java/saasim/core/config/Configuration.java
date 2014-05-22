@@ -10,6 +10,7 @@ public class Configuration extends PropertiesConfiguration{
 
 	public static final String TIER_ID = "default.tier.id";
 	public static final String INSTANCE_DESCRIPTOR = "default.tier.descriptor";
+	public static final String MACHINE = "default.tier.machine";
 	public static final String FORCE = "default.tier.force";
 	public static final String ACTION =  "default.action";
 	
@@ -59,4 +60,39 @@ public class Configuration extends PropertiesConfiguration{
 		super(url);
 	}
 	
+	public int[] getIntegerArray(String propertyName) {
+		String[] stringArray = getStringArray(propertyName);
+		int [] values = new int[stringArray.length];
+		for (int i = 0; i < values.length; i++) {
+			values[i] = Integer.valueOf(stringArray[i]);
+		}
+		return values;
+	}
+
+	public long[] getLongArray(String propertyName) {
+		String[] stringValues = getStringArray(propertyName);
+		long [] values = new long[stringValues.length];
+		for (int i = 0; i < values.length; i++) {
+			values[i] = Long.valueOf(stringValues[i]);
+		}
+		return values;
+	}
+
+	public double[] getDoubleArray(String propertyName) {
+		String[] stringValues = getStringArray(propertyName);
+		double [] values = new double[stringValues.length];
+		for (int i = 0; i < values.length; i++) {
+			values[i] = Double.valueOf(stringValues[i]);
+		}
+		return values;
+	}
+
+	public boolean[] getBooleanArray(String propertyName) {
+		String[] stringValues = getStringArray(propertyName);
+		boolean [] values = new boolean[stringValues.length];
+		for (int i = 0; i < values.length; i++) {
+			values[i] = Boolean.valueOf(stringValues[i]);
+		}
+		return values;
+	}
 }

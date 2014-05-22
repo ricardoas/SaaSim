@@ -14,7 +14,7 @@ public interface ProvisioningSystem{
 	/**
 	 * Registers new {@link Application}s to provision. Subsequent calls override 
 	 * previously configured applications. Be sure to call it only once unless you really know what you're doing!
-	 * 
+	 * FIXME deal with duplicated application
 	 * @param dynamically configurables {@link Application} applications.
 	 */
 	void registerConfigurable(Application... applications);

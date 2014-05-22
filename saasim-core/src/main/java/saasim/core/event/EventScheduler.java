@@ -7,6 +7,7 @@ import java.util.TreeSet;
 import saasim.core.config.Configuration;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 
 /**
@@ -15,6 +16,7 @@ import com.google.inject.Inject;
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  * @version 4.0.0
  */
+@Singleton
 public final class EventScheduler implements Serializable{
 	
 	public static final String EVENT_SCHEDULER_RANDOM_SEED = "random.seed";

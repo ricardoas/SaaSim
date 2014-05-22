@@ -8,7 +8,7 @@ import saasim.core.config.Configuration;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public interface Tier extends ResponseListener{
+public interface Tier{
 	
 	/**
 	 * It queues a request at this {@link Tier}'s processing queue.
@@ -22,5 +22,9 @@ public interface Tier extends ResponseListener{
 	 * @param configuration new {@link Configuration}
 	 */
 	void configure(Configuration configuration);
+	
+	int getID();
+
+	void setID(int id);
 	
 }

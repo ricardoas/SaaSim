@@ -27,4 +27,10 @@ public interface Request {
 	void setResponseListener(ResponseListener listener);
 
 	long getID();
+
+	int getCurrentTier();
+
+	void forward();
+
+	void rollback();
 }

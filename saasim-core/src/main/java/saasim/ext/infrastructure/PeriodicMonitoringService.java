@@ -7,7 +7,6 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.apache.commons.math.stat.descriptive.SummaryStatistics;
-import org.apache.log4j.Logger;
 
 import saasim.core.config.Configuration;
 import saasim.core.event.Event;
@@ -21,7 +20,6 @@ public class PeriodicMonitoringService implements MonitoringService {
 	
 	private long timeBetweenReports;
 	private EventScheduler scheduler;
-	private Logger logger = Logger.getLogger(MonitoringService.class);
 	private List<Monitorable> monitorableObjects;
 	
 	protected Map<String, SummaryStatistics> metrics;
@@ -43,6 +41,11 @@ public class PeriodicMonitoringService implements MonitoringService {
 	
 	protected void collect() {
 		
+		if(!metrics.containsKey("TIME")){
+			metrics.put("TIME", new SummaryStatistics());
+		}
+		metrics.get("TIME").addValue(scheduler.now());
+
 		for (Monitorable monitorable : monitorableObjects) {
 			Map<String, Double> collect = monitorable.collect(scheduler.now(), timeBetweenReports);
 			for (Entry<String, Double> sample : collect.entrySet()) {
@@ -52,8 +55,6 @@ public class PeriodicMonitoringService implements MonitoringService {
 				metrics.get(sample.getKey()).addValue(sample.getValue());
 			}
 		}
-		
-		logger.info(metrics);
 		
 		scheduler.queueEvent(new Event(scheduler.now()+timeBetweenReports){
 			@Override
@@ -65,7 +66,9 @@ public class PeriodicMonitoringService implements MonitoringService {
 
 	@Override
 	public Map<String, SummaryStatistics> getStatistics() {
-		return metrics;
+		Map<String, SummaryStatistics> result = metrics;
+		metrics = new TreeMap<>();
+		return result;
 	}
 
 	@Override

@@ -4,6 +4,7 @@ import saasim.core.sim.SaaSim;
 import saasim.core.sim.SaaSimModule;
 
 import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 /**
  * Entry point.
@@ -27,7 +28,9 @@ public class Main {
 			System.exit(1);
 		}
 		
-		Guice.createInjector(new SaaSimModule(args.length == 1? args[0]: DEFAULT_CONFIG_FILEPATH)).getInstance(SaaSim.class).start();
+		SaaSimModule module = new SaaSimModule(args.length == 1? args[0]: DEFAULT_CONFIG_FILEPATH);
+		
+		Guice.createInjector(module).getInstance(SaaSim.class).start();
 	}
 
 }
