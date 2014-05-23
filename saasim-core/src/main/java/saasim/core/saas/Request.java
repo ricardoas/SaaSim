@@ -33,4 +33,8 @@ public interface Request {
 	void forward();
 
 	void rollback();
+
+	void pushArrival(long now);
+
+	long popArrival();
 }

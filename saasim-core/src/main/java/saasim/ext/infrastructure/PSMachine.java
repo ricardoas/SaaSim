@@ -20,7 +20,7 @@ import saasim.core.util.FastSemaphore;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 
-public class SingleQueueMachine implements Machine, ResponseListener, Monitorable {
+public class PSMachine implements Machine, ResponseListener, Monitorable {
 	
 	
 	private InstanceDescriptor descriptor;
@@ -30,13 +30,13 @@ public class SingleQueueMachine implements Machine, ResponseListener, Monitorabl
 	private int maxBacklogSize;
 	private EventScheduler scheduler;
 	private FastSemaphore semaphore;
-	private Queue<Request> forwarded;
 	private int arrived;
 	private int failed;
 	private long busy_time;
+	private Queue<Request> processingQueue;
 	
 	@Inject
-	public SingleQueueMachine(@Assisted InstanceDescriptor descriptor, MonitoringService monitor, EventScheduler scheduler, Configuration globalConf) {
+	public PSMachine(@Assisted InstanceDescriptor descriptor, MonitoringService monitor, EventScheduler scheduler, Configuration globalConf) {
 		this.descriptor = descriptor;
 		this.descriptor.setMachine(this);
 		
@@ -45,8 +45,9 @@ public class SingleQueueMachine implements Machine, ResponseListener, Monitorabl
 		this.scheduler = scheduler;
 		this.startUpDelay = globalConf.getLong(MACHINE_SETUPTIME);
 		this.backlog = new LinkedList<>();
-		this.forwarded = new LinkedList<>();
 		this.maxBacklogSize = globalConf.getInt(MACHINE_BACKLOGSIZE);
+		this.processingQueue = new LinkedList<Request>();
+		
 		this.semaphore = new FastSemaphore(this.descriptor.getNumberOfCPUCores());
 		
 		resetStatistics();
@@ -72,9 +73,11 @@ public class SingleQueueMachine implements Machine, ResponseListener, Monitorabl
 				scheduler.queueEvent(new Event(scheduler.now() + request.getCPUTimeDemandInMillis()) {
 					@Override
 					public void trigger() {
-						SingleQueueMachine.this.run(request);
+						PSMachine.this.run(request);
 					}
 				});
+			}else if(processingQueue.size() == maxBacklogSize){
+				
 			}else{
 				backlog.add(request);
 			}
@@ -101,7 +104,7 @@ public class SingleQueueMachine implements Machine, ResponseListener, Monitorabl
 			scheduler.queueEvent(new Event(scheduler.now() + newRequest.getCPUTimeDemandInMillis()) {
 				@Override
 				public void trigger() {
-					SingleQueueMachine.this.run(newRequest);
+					PSMachine.this.run(newRequest);
 				}
 			});
 		}else{ // release cpu core

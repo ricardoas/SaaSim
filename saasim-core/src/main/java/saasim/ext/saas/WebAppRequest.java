@@ -24,6 +24,7 @@ public class WebAppRequest implements Request {
 	private long finishTimeInMillis;
 	private Deque<ResponseListener> listeners;
 	private int tier;
+	private long arrival[];
 
 	/**
 	 * Default constructor.
@@ -50,6 +51,7 @@ public class WebAppRequest implements Request {
 				this.serviceTimeInMillis = 0;
 				this.finishTimeInMillis = 0;
 				this.listeners = new LinkedList<>();
+				this.arrival = new long[demand.length];
 	}
 
 	@Override
@@ -115,6 +117,16 @@ public class WebAppRequest implements Request {
 	@Override
 	public void rollback() {
 		tier--;
+	}
+
+	@Override
+	public void pushArrival(long arrival) {
+		this.arrival[tier] = arrival;
+	}
+
+	@Override
+	public long popArrival() {
+		return this.arrival[tier];
 	}
 
 }

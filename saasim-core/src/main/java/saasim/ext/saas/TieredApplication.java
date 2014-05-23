@@ -40,7 +40,7 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 	private int finished;
 	private int failed;
 	
-	private int [] arrival_counter, rejection_counter, failure_counter, finish_counter;
+	private long [] arrival_counter, rejection_counter, failure_counter, finish_counter, response_time;
 
 	private MachineFactory machineFactory;
 	
@@ -68,10 +68,11 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 	}
 
 	private void resetStatistics() {
-		this.arrival_counter = new int[this.tiers.length];
-		this.rejection_counter = new int[this.tiers.length];
-		this.failure_counter = new int[this.tiers.length];
-		this.finish_counter = new int[this.tiers.length];
+		this.arrival_counter = new long[this.tiers.length];
+		this.rejection_counter = new long[this.tiers.length];
+		this.failure_counter = new long[this.tiers.length];
+		this.finish_counter = new long[this.tiers.length];
+		this.response_time = new long[this.tiers.length];
 	}
 
 	private Tier[] assembleTiers(Configuration globalConf, Provider<Tier> tierFactory) {
@@ -95,6 +96,7 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 			request.getResponseListener().processDone(request, new Response() {});
 		}else{
 			arrival_counter[request.getCurrentTier()]++;
+			request.pushArrival(scheduler.now());
 			
 			if(control.canAccept(request)){
 				request.setResponseListener(this);
@@ -135,6 +137,7 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 			failure_counter[request.getCurrentTier()]++;
 		}else{
 			finish_counter[request.getCurrentTier()]++;
+			response_time[request.getCurrentTier()] += (scheduler.now() - request.popArrival());
 		}
 		
 		if(request.getCurrentTier() != 0){
@@ -145,14 +148,21 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 	
 	@Override
 	public Map<String, Double> collect(long now, long elapsedTime) {
-		List<Integer> list = new ArrayList<Integer>();
+		System.out.println();
+		System.out.println();
 		for (int i = 0; i < arrival_counter.length; i++) {
-			list.add(arrival_counter[i]);
-			list.add(failure_counter[i]);
-			list.add(rejection_counter[i]);
-			list.add(finish_counter[i]);
+			List<Double> list = new ArrayList<Double>();
+			
+			list.add((double) arrival_counter[i]);
+			list.add((double) failure_counter[i]);
+			list.add((double) rejection_counter[i]);
+			list.add((double) finish_counter[i]);
+			list.add((double) (finish_counter[i] == 0?0:response_time[i]/finish_counter[i]));
+			
+			System.out.print(list.toString());
+			System.out.print("  ");
 		}
-		System.out.println(list.toString().substring(1, list.toString().length()-1));
+		System.out.println();
 		
 		Map<String, Double> info = new TreeMap<>();
 		
