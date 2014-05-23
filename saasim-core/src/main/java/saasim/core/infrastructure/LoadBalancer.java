@@ -1,6 +1,6 @@
 package saasim.core.infrastructure;
 
-import saasim.core.application.Request;
+import saasim.core.saas.Request;
 
 public interface LoadBalancer{
 	

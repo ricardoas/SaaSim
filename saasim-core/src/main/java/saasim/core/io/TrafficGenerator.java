@@ -1,6 +1,6 @@
 package saasim.core.io;
 
-import saasim.core.application.Application;
+import saasim.core.saas.Application;
 
 public interface TrafficGenerator {
 

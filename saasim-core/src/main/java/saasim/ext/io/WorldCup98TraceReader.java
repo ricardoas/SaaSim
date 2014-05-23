@@ -5,8 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 
-import saasim.core.application.Request;
 import saasim.core.io.TraceReader;
+import saasim.core.saas.Request;
 
 import com.google.inject.Inject;
 

@@ -1,8 +1,8 @@
 package saasim.ext.iaas.aws;
 
-import saasim.core.application.Application;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.infrastructure.Machine;
+import saasim.core.saas.Application;
 import saasim.ext.iaas.aws.AWSProvider.MarketType;
 
 /**

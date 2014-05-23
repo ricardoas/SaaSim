@@ -1,22 +1,22 @@
 package saasim.core.sim;
 import org.apache.commons.configuration.ConfigurationException;
 
-import saasim.core.application.Application;
-import saasim.core.application.Tier;
 import saasim.core.config.Configuration;
 import saasim.core.event.EventScheduler;
 import saasim.core.iaas.Customer;
+import saasim.core.iaas.MonitoringService;
 import saasim.core.iaas.Provider;
 import saasim.core.infrastructure.AdmissionControl;
 import saasim.core.infrastructure.LoadBalancer;
 import saasim.core.infrastructure.Machine;
 import saasim.core.infrastructure.MachineFactory;
-import saasim.core.infrastructure.MonitoringService;
 import saasim.core.io.TraceReader;
 import saasim.core.io.TrafficGenerator;
 import saasim.core.provisioning.ProvisioningSystem;
 import saasim.core.saas.ASP;
+import saasim.core.saas.Application;
 import saasim.core.saas.Tenant;
+import saasim.core.saas.Tier;
 import saasim.ext.iaas.LoggerIaaSCustomer;
 import saasim.ext.saas.MultiTenantASP;
 

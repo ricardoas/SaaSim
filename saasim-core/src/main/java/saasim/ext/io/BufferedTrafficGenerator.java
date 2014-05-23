@@ -2,13 +2,13 @@ package saasim.ext.io;
 
 import java.io.FileNotFoundException;
 
-import saasim.core.application.Application;
-import saasim.core.application.Request;
 import saasim.core.config.Configuration;
 import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
 import saasim.core.io.TraceReader;
 import saasim.core.io.TrafficGenerator;
+import saasim.core.saas.Application;
+import saasim.core.saas.Request;
 import saasim.core.saas.Tenant;
 
 import com.google.inject.Inject;

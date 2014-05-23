@@ -1,6 +1,6 @@
 package saasim.core.infrastructure;
 
-import saasim.core.application.Application;
+import saasim.core.saas.Application;
 
 /**
  * Instance descriptor abstraction. This is the machine as seen by an instance provider.

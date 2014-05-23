@@ -2,8 +2,8 @@ package saasim.ext.saas;
 
 import java.io.FileNotFoundException;
 
-import saasim.core.application.Application;
 import saasim.core.io.TrafficGenerator;
+import saasim.core.saas.Application;
 import saasim.core.saas.Tenant;
 
 import com.google.inject.Inject;

@@ -1,16 +1,10 @@
 package saasim.core.sim;
 
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 
-import saasim.core.application.Application;
 import saasim.core.config.Configuration;
-import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
-import saasim.core.iaas.Provider;
-import saasim.core.provisioning.ProvisioningSystem;
 import saasim.core.saas.ASP;
-import saasim.core.saas.Tenant;
 
 import com.google.inject.Inject;
 
@@ -31,17 +25,14 @@ public class SaaSim{
 	 * 
 	 * @param globalConf {@link Configuration} instance.
 	 * @param scheduler {@link Event} queue manager.
-	 * @param dps provisioner instance.
-	 * @param iaasProvider {@link Provider} instance.
-	 * @param application {@link Application} being simulated.
-	 * @param workloadGenerator traffic generator.
-	 * @throws ConfigurationException
+	 * @param asp {@ ASP} (Application Service Provider) instance.
+	 */
+	/**
 	 */
 	@Inject
-	public SaaSim(Configuration globalConf, EventScheduler scheduler, ASP asp) throws ConfigurationException {
+	public SaaSim(Configuration globalConf, EventScheduler scheduler, ASP asp){
 
 		this.scheduler = scheduler;
-		
 		this.asp = asp;
 		
 		this.simulationTime = globalConf.getLong(SAASIM_SIMULATION_TIME);

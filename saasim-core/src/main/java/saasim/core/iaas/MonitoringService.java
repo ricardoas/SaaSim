@@ -1,4 +1,4 @@
-package saasim.core.infrastructure;
+package saasim.core.iaas;
 
 import java.util.Map;
 

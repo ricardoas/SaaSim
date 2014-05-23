@@ -5,20 +5,22 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 
-import saasim.core.application.Request;
-import saasim.core.application.Response;
 import saasim.core.config.Configuration;
 import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
+import saasim.core.iaas.Monitorable;
+import saasim.core.iaas.MonitoringService;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.infrastructure.Machine;
-import saasim.core.infrastructure.MonitoringService;
+import saasim.core.saas.Request;
+import saasim.core.saas.Response;
+import saasim.core.saas.ResponseListener;
 import saasim.core.util.FastSemaphore;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 
-public class SingleQueueMachine implements Machine {
+public class SingleQueueMachine implements Machine, ResponseListener, Monitorable {
 	
 	
 	private InstanceDescriptor descriptor;

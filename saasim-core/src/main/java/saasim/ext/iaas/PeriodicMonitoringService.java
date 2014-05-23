@@ -1,4 +1,4 @@
-package saasim.ext.infrastructure;
+package saasim.ext.iaas;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +11,8 @@ import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 import saasim.core.config.Configuration;
 import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
-import saasim.core.infrastructure.Monitorable;
-import saasim.core.infrastructure.MonitoringService;
+import saasim.core.iaas.Monitorable;
+import saasim.core.iaas.MonitoringService;
 
 import com.google.inject.Inject;
 

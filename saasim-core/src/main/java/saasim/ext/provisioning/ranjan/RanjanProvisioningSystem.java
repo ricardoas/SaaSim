@@ -7,15 +7,15 @@ import java.util.Map;
 import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 import org.apache.log4j.Logger;
 
-import saasim.core.application.Application;
 import saasim.core.cloud.utility.UtilityFunction;
 import saasim.core.config.Configuration;
 import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
+import saasim.core.iaas.MonitoringService;
 import saasim.core.iaas.Provider;
 import saasim.core.infrastructure.InstanceDescriptor;
-import saasim.core.infrastructure.MonitoringService;
 import saasim.core.provisioning.ProvisioningSystem;
+import saasim.core.saas.Application;
 
 import com.google.inject.Inject;
 

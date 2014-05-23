@@ -1,4 +1,4 @@
-package saasim.core.application;
+package saasim.core.saas;
 
 
 /**

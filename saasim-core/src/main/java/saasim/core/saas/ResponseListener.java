@@ -1,13 +1,12 @@
-package saasim.core.application;
+package saasim.core.saas;
 
-import saasim.core.infrastructure.Monitorable;
 
 /**
  * {@link Request} sender. It waits until someone process the {@link Request} and sends a {@link Response} back.
  *  
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public interface ResponseListener extends Monitorable{
+public interface ResponseListener{
 	
 	/**
 	 * {@link Request} processing is done.

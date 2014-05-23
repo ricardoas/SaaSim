@@ -1,8 +1,11 @@
 package saasim.ext.infrastructure;
 
-import saasim.core.application.Request;
+import java.util.Arrays;
+
 import saasim.core.config.Configuration;
 import saasim.core.infrastructure.AdmissionControl;
+import saasim.core.saas.Application;
+import saasim.core.saas.Request;
 
 import com.google.inject.Inject;
 
@@ -13,9 +16,11 @@ import com.google.inject.Inject;
  */
 public class FCFSAdmissionControl implements AdmissionControl {
 	
-	private int acceptanceRate;
 	private long currentTimeSlot;
-	private int counter;
+	
+	private int [] acceptanceRate;
+	private int [] counter;
+	
 	
 	/**
 	 * Default constructor
@@ -23,8 +28,11 @@ public class FCFSAdmissionControl implements AdmissionControl {
 	@Inject
 	public FCFSAdmissionControl(Configuration globalConf) {
 		
+		int numberOfTiers = globalConf.getInt(Application.APPLICATION_TIER_NUMBER);
+		this.counter = new int[numberOfTiers];
+		this.acceptanceRate = new int[numberOfTiers];
+		
 		this.currentTimeSlot = -1;
-		this.counter = 0;
 		
 		updatePolicy(globalConf);
 	}
@@ -32,16 +40,19 @@ public class FCFSAdmissionControl implements AdmissionControl {
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @see saasim.core.infrastructure.AdmissionControl#canAccept(saasim.core.application.Request)
+	 * @see saasim.core.infrastructure.AdmissionControl#canAccept(saasim.core.saas.Request)
 	 */
 	@Override
 	public boolean canAccept(Request request) {
 		
+		int currentTier = request.getCurrentTier();
+		
 		if(request.getArrivalTimeInSeconds() != currentTimeSlot){
-			counter = 0;
+			currentTimeSlot = request.getArrivalTimeInSeconds();
+			Arrays.fill(counter, 0);
 		}
 		
-		return (counter++ < acceptanceRate);
+		return (counter[currentTier]++ < acceptanceRate[currentTier]);
 	}
 
 	/**
@@ -51,6 +62,7 @@ public class FCFSAdmissionControl implements AdmissionControl {
 	 */
 	@Override
 	public void updatePolicy(Configuration configuration) {
-		this.acceptanceRate = configuration.getInt(ADMISSIONCONTROL_ACCEPTANCERATE, Integer.MAX_VALUE);
+		Arrays.fill(this.acceptanceRate, Integer.MAX_VALUE);
+		this.acceptanceRate [0] = configuration.getInt(ADMISSIONCONTROL_ACCEPTANCERATE);
 	}
 }

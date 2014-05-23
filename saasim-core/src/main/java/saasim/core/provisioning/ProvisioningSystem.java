@@ -1,8 +1,8 @@
 package saasim.core.provisioning;
 
 
-import saasim.core.application.Application;
 import saasim.core.cloud.utility.UtilityFunction;
+import saasim.core.saas.Application;
 
 /**
  * Provisioning System interface.

@@ -1,8 +1,7 @@
-package saasim.ext.application;
+package saasim.ext.saas;
 
-import saasim.core.application.Request;
-import saasim.core.application.Tier;
-import saasim.core.infrastructure.Monitorable;
+import saasim.core.saas.Request;
+import saasim.core.saas.Tier;
 
 
 /**

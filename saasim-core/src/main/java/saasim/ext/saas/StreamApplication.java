@@ -1,16 +1,16 @@
-package saasim.ext.application.stream;
+package saasim.ext.saas;
 
 import java.util.Map;
 import java.util.TreeMap;
 
-import saasim.core.application.Application;
-import saasim.core.application.Request;
-import saasim.core.application.Tier;
 import saasim.core.config.Configuration;
 import saasim.core.event.EventScheduler;
+import saasim.core.iaas.Monitorable;
+import saasim.core.iaas.MonitoringService;
 import saasim.core.infrastructure.AdmissionControl;
-import saasim.core.infrastructure.Monitorable;
-import saasim.core.infrastructure.MonitoringService;
+import saasim.core.saas.Application;
+import saasim.core.saas.Request;
+import saasim.core.saas.Tier;
 
 /**
  * Tiered application. It queues incoming requests according to {@link AdmissionControl} policy.
@@ -52,7 +52,7 @@ public abstract class StreamApplication implements Application, Monitorable {
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @see saasim.core.application.Application#queue(saasim.core.application.Request)
+	 * @see saasim.core.saas.Application#queue(saasim.core.saas.Request)
 	 */
 	@Override
 	public void queue(Request request) {
@@ -67,7 +67,7 @@ public abstract class StreamApplication implements Application, Monitorable {
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @see saasim.core.application.Application#configure(saasim.core.config.Configuration)
+	 * @see saasim.core.saas.Application#configure(saasim.core.config.Configuration)
 	 */
 	@Override
 	public void configure(Configuration configuration) {

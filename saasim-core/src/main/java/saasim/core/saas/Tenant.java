@@ -1,6 +1,5 @@
 package saasim.core.saas;
 
-import saasim.core.application.Application;
 
 public interface Tenant {
 	

@@ -1,14 +1,13 @@
 package saasim.core.infrastructure;
 
-import saasim.core.application.Request;
-import saasim.core.application.ResponseListener;
+import saasim.core.saas.Request;
 
 
 /**
  * Methods to manage a machine.
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public interface Machine extends ResponseListener{
+public interface Machine{
 	
 	public static final String MACHINE_BACKLOGSIZE = "machine.backlogsize";
 	public static final String MACHINE_SETUPTIME = "machine.setuptime";

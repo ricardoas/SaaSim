@@ -2,11 +2,11 @@ package saasim.ext.infrastructure;
 
 import java.util.LinkedList;
 
-import saasim.core.application.Request;
 import saasim.core.event.EventScheduler;
 import saasim.core.infrastructure.AbstractLoadBalancer;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.infrastructure.Machine;
+import saasim.core.saas.Request;
 
 import com.google.inject.Inject;
 
@@ -33,7 +33,7 @@ public class RoundRobinLoadBalancer extends AbstractLoadBalancer {
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @see saasim.core.infrastructure.LoadBalancer#queue(saasim.core.application.Request)
+	 * @see saasim.core.infrastructure.LoadBalancer#queue(saasim.core.saas.Request)
 	 */
 	@Override
 	public void queue(Request request) {

@@ -1,10 +1,10 @@
-package saasim.ext.application.web;
+package saasim.ext.saas;
 
 import java.util.Deque;
 import java.util.LinkedList;
 
-import saasim.core.application.Request;
-import saasim.core.application.ResponseListener;
+import saasim.core.saas.Request;
+import saasim.core.saas.ResponseListener;
 
 /**
  * Web application {@link Request}. 

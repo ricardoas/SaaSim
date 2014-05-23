@@ -1,24 +1,23 @@
-package saasim.ext.application.web;
+package saasim.ext.saas;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import saasim.core.application.Application;
-import saasim.core.application.Request;
-import saasim.core.application.Response;
-import saasim.core.application.ResponseListener;
-import saasim.core.application.Tier;
 import saasim.core.config.Configuration;
 import saasim.core.event.EventScheduler;
+import saasim.core.iaas.Monitorable;
+import saasim.core.iaas.MonitoringService;
 import saasim.core.infrastructure.AdmissionControl;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.infrastructure.Machine;
 import saasim.core.infrastructure.MachineFactory;
-import saasim.core.infrastructure.Monitorable;
-import saasim.core.infrastructure.MonitoringService;
+import saasim.core.saas.Application;
+import saasim.core.saas.Request;
+import saasim.core.saas.Response;
+import saasim.core.saas.ResponseListener;
+import saasim.core.saas.Tier;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -87,7 +86,7 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @see saasim.core.application.Application#queue(saasim.core.application.Request)
+	 * @see saasim.core.saas.Application#queue(saasim.core.saas.Request)
 	 */
 	@Override
 	public void queue(Request request) {
@@ -109,7 +108,7 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @see saasim.core.application.Application#configure(saasim.core.config.Configuration)
+	 * @see saasim.core.saas.Application#configure(saasim.core.config.Configuration)
 	 */
 	@Override
 	public void configure(Configuration configuration) {
@@ -128,7 +127,7 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @see saasim.core.application.ResponseListener#processDone(saasim.core.application.Request, saasim.core.application.Response)
+	 * @see saasim.core.saas.ResponseListener#processDone(saasim.core.saas.Request, saasim.core.saas.Response)
 	 */
 	@Override
 	public void processDone(Request request, Response response) {

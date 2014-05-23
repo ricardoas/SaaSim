@@ -5,8 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
-import saasim.core.application.Request;
 import saasim.core.io.TraceReader;
+import saasim.core.saas.Request;
 
 
 /**

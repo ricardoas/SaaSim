@@ -3,7 +3,7 @@ package saasim.core.io;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import saasim.core.application.Request;
+import saasim.core.saas.Request;
 
 /**
  * Common set of features for workload parsers.

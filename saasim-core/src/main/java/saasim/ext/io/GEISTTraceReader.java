@@ -1,7 +1,7 @@
 package saasim.ext.io;
 
-import saasim.core.application.Request;
-import saasim.ext.application.web.WebAppRequest;
+import saasim.core.saas.Request;
+import saasim.ext.saas.WebAppRequest;
 
 public class GEISTTraceReader extends LineBasedTraceReader {
 

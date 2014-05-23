@@ -1,7 +1,6 @@
-package saasim.core.application;
+package saasim.core.saas;
 
 import saasim.core.config.Configuration;
-import saasim.core.infrastructure.Monitorable;
 
 
 /**
@@ -9,7 +8,7 @@ import saasim.core.infrastructure.Monitorable;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public interface Application extends Monitorable{
+public interface Application{
 	
 	public static final String APPLICATION_TIER_VMTYPE = "application.tier.vmtype";
 	public static final String APPLICATION_TIER_INIT = "application.tier.init";

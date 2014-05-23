@@ -1,11 +1,11 @@
 package saasim.core.infrastructure;
 
-import saasim.core.application.Request;
 import saasim.core.config.Configuration;
+import saasim.core.saas.Request;
 
 public interface AdmissionControl{
 	
-	public static final String ADMISSIONCONTROL_ACCEPTANCERATE = "admissioncontrol.acceptancerate";
+	public static final String ADMISSIONCONTROL_ACCEPTANCERATE = "application.admissioncontrol.acceptancerate";
 
 	boolean canAccept(Request request);
 	
