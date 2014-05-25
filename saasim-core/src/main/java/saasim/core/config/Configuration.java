@@ -4,8 +4,14 @@ import java.io.File;
 import java.net.URL;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.ConversionException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 
+/**
+ * {@link PropertiesConfiguration} subclass adding ability to read primitive types from property file.
+ * 
+ * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
+ */
 public class Configuration extends PropertiesConfiguration{
 
 	public static final String TIER_ID = "default.tier.id";
@@ -60,8 +66,22 @@ public class Configuration extends PropertiesConfiguration{
 		super(url);
 	}
 	
-	public int[] getIntegerArray(String propertyName) {
-		String[] stringArray = getStringArray(propertyName);
+	/**
+	 * Get an array of <code>int</code> associated with the given configuration key.
+     * If the key doesn't map to an existing object, an empty array is returned.
+     * 
+     * @param key The configuration key.
+     * @return The associated <code>int</code> array if key is found.
+     *
+     * @throws ConversionException is thrown if the key maps to an
+     *         object that is not a <code>int</code>/list of <code>int</code>.
+     *         
+     * @see #getStringArray(String)
+     * @see #setListDelimiter(char)
+     * @see #setDelimiterParsingDisabled(boolean)
+	 */
+	public int[] getIntegerArray(String key) {
+		String[] stringArray = getStringArray(key);
 		int [] values = new int[stringArray.length];
 		for (int i = 0; i < values.length; i++) {
 			values[i] = Integer.valueOf(stringArray[i]);
