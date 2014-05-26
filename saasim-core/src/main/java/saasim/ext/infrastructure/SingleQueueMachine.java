@@ -5,11 +5,12 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 
+import org.apache.commons.math.stat.descriptive.SummaryStatistics;
+
 import saasim.core.config.Configuration;
 import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
 import saasim.core.iaas.Monitorable;
-import saasim.core.iaas.MonitoringService;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.infrastructure.Machine;
 import saasim.core.saas.Request;
@@ -30,22 +31,18 @@ public class SingleQueueMachine implements Machine, ResponseListener, Monitorabl
 	private int maxBacklogSize;
 	private EventScheduler scheduler;
 	private FastSemaphore semaphore;
-	private Queue<Request> forwarded;
 	private int arrived;
 	private int failed;
 	private long busy_time;
 	
 	@Inject
-	public SingleQueueMachine(@Assisted InstanceDescriptor descriptor, MonitoringService monitor, EventScheduler scheduler, Configuration globalConf) {
+	public SingleQueueMachine(@Assisted InstanceDescriptor descriptor, EventScheduler scheduler, Configuration globalConf) {
 		this.descriptor = descriptor;
 		this.descriptor.setMachine(this);
-		
-		monitor.setMonitorable(this);
 		
 		this.scheduler = scheduler;
 		this.startUpDelay = globalConf.getLong(MACHINE_SETUPTIME);
 		this.backlog = new LinkedList<>();
-		this.forwarded = new LinkedList<>();
 		this.maxBacklogSize = globalConf.getInt(MACHINE_BACKLOGSIZE);
 		this.semaphore = new FastSemaphore(this.descriptor.getNumberOfCPUCores());
 		
@@ -53,7 +50,9 @@ public class SingleQueueMachine implements Machine, ResponseListener, Monitorabl
 	}
 	
 	private void resetStatistics() {
-		this.busy_time = 0;
+		busy_time = 0;
+		arrived = 0;
+		failed = 0;
 	}
 
 	
@@ -172,4 +171,23 @@ public class SingleQueueMachine implements Machine, ResponseListener, Monitorabl
 		
 		return info;
 	}
+
+	public Map<String,SummaryStatistics> new_collect(long now, long elapsedTime) {
+		Map<String, SummaryStatistics> info = new TreeMap<>();
+		info.put("arrived", buildSummary(arrived));
+		info.put("failed", buildSummary(failed));
+		info.put("util", buildSummary(1.0* busy_time/(descriptor.getNumberOfCPUCores()*elapsedTime)));
+		
+		resetStatistics();
+		
+		return info;
+	}
+	
+	private SummaryStatistics buildSummary(double value) {
+		SummaryStatistics statistics;
+		statistics = new SummaryStatistics();
+		statistics.addValue(value);
+		return statistics;
+	}
+
 }

@@ -4,9 +4,12 @@ import saasim.core.cloud.utility.UtilityFunction;
 import saasim.core.config.Configuration;
 import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
+import saasim.core.iaas.Monitorable;
 import saasim.core.iaas.MonitoringService;
 import saasim.core.iaas.Provider;
 import saasim.core.infrastructure.InstanceDescriptor;
+import saasim.core.infrastructure.Machine;
+import saasim.core.infrastructure.MachineFactory;
 import saasim.core.provisioning.ProvisioningSystem;
 import saasim.core.saas.Application;
 
@@ -21,12 +24,14 @@ public class StaticProvisioningSystem implements ProvisioningSystem {
 	private long tick;
 	private MonitoringService monitoringService;
 	private EventScheduler scheduler;
+	private MachineFactory machineFactory;
 
 	@Inject
-	public StaticProvisioningSystem(EventScheduler scheduler, Configuration globalConf, Provider provider, MonitoringService monitoringService) {
+	public StaticProvisioningSystem(EventScheduler scheduler, Configuration globalConf, Provider provider, MonitoringService monitoringService, MachineFactory machineFactory) {
 		this.scheduler = scheduler;
 		this.provider = provider;
 		this.monitoringService = monitoringService;
+		this.machineFactory = machineFactory;
 		startNumberOfReplicas = globalConf.getStringArray(Application.APPLICATION_TIER_INIT);
 		vmTypePerTier = globalConf.getStringArray(Application.APPLICATION_TIER_VMTYPE);
 		tick = globalConf.getLong(MonitoringService.MONITORING_SERVICE_TIMEBETWEENREPORTS);
@@ -59,18 +64,22 @@ public class StaticProvisioningSystem implements ProvisioningSystem {
 
 	protected void setUp() {
 		for (Application application : applications) {
+			monitoringService.setMonitorable((Monitorable) application);
 			for (int tierID = 0; tierID < startNumberOfReplicas.length; tierID++) {
 				int numberOfReplicas = Integer.valueOf(startNumberOfReplicas[tierID]);
 				while(numberOfReplicas-- > 0){
 					if(provider.canAcquire(vmTypePerTier[tierID])){
 						InstanceDescriptor descriptor = provider.acquire(vmTypePerTier[tierID]);
 						descriptor.setApplication(application);
+						Machine machine = machineFactory.create(descriptor);
+						monitoringService.setMonitorable((Monitorable) machine);
 						
 						Configuration config = new Configuration();
 						config.setProperty(Configuration.TIER_ID, tierID);
 						config.setProperty(Configuration.ACTION, Configuration.ACTION_INCREASE);
 						config.setProperty(Configuration.INSTANCE_DESCRIPTOR, descriptor);
 						config.setProperty(Configuration.FORCE, true);
+						config.setProperty(Configuration.MACHINE, machine);
 						application.configure(config);
 					}
 				}

@@ -10,6 +10,7 @@ import saasim.core.saas.Request;
 public interface Machine{
 	
 	public static final String MACHINE_BACKLOGSIZE = "machine.backlogsize";
+	public static final String MACHINE_THREADSIZE = "machine.numberofthreads";
 	public static final String MACHINE_SETUPTIME = "machine.setuptime";
 
 	void reconfigure(InstanceDescriptor descriptor);

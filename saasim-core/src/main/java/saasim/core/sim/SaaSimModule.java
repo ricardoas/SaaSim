@@ -105,7 +105,7 @@ public class SaaSimModule extends AbstractModule {
 		
 		bind(ProvisioningSystem.class).to((Class<? extends ProvisioningSystem>) load(configuration.getString(DPS_CLASS))).in(Singleton.class);
 		
-		bind(MonitoringService.class).to((Class<? extends MonitoringService>) load(configuration.getString(MONITORING_SERVICE_CLASS))).in(Singleton.class);
+		bind(MonitoringService.class).to((Class<? extends MonitoringService>) load(configuration.getString(MONITORING_SERVICE_CLASS)));
 		
 		bind(Customer.class).to(LoggerIaaSCustomer.class).in(Singleton.class);;
 		

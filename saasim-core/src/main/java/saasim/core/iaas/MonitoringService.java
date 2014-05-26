@@ -11,7 +11,7 @@ import org.apache.commons.math.stat.descriptive.SummaryStatistics;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public interface MonitoringService{
+public interface MonitoringService extends Monitorable{
 	
 	public static final String MONITORING_SERVICE_TIMEBETWEENREPORTS = "monitoring.service.timebetweenreports";
 

@@ -34,7 +34,7 @@ public class PeriodicMonitoringService implements MonitoringService {
 		scheduler.queueEvent(new Event(scheduler.now()+timeBetweenReports){
 			@Override
 			public void trigger() {
-				collect();
+				gather();
 			}
 		});
 	}
@@ -75,5 +75,42 @@ public class PeriodicMonitoringService implements MonitoringService {
 	public void setMonitorable(Monitorable monitorable) {
 		monitorableObjects.add(monitorable);
 	}
+
+	@Override
+	public Map<String, Double> collect(long now, long elapsedTime) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<String, SummaryStatistics> new_collect(long now, long elapsedTime) {
+		return metrics;
+	}
+	
+	protected void gather() {
+		if(!metrics.containsKey("TIME")){
+			metrics.put("TIME", new SummaryStatistics());
+		}
+		metrics.get("TIME").addValue(scheduler.now());
+
+		for (Monitorable monitorable : monitorableObjects) {
+			Map<String, SummaryStatistics> collect = monitorable.new_collect(scheduler.now(), timeBetweenReports);
+			for (Entry<String, SummaryStatistics> sample : collect.entrySet()) {
+				if(!metrics.containsKey(sample.getKey())){
+					metrics.put(sample.getKey(), new SummaryStatistics());
+				}
+				SummaryStatistics.copy(sample.getValue(), metrics.get(sample.getKey()));
+			}
+		}
+		
+		scheduler.queueEvent(new Event(scheduler.now()+timeBetweenReports){
+			@Override
+			public void trigger() {
+				gather();
+			}
+		});
+	}
+
+
 
 }

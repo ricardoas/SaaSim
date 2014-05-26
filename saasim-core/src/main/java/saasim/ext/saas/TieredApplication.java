@@ -5,14 +5,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.commons.math.stat.descriptive.SummaryStatistics;
+
 import saasim.core.config.Configuration;
 import saasim.core.event.EventScheduler;
 import saasim.core.iaas.Monitorable;
-import saasim.core.iaas.MonitoringService;
 import saasim.core.infrastructure.AdmissionControl;
-import saasim.core.infrastructure.InstanceDescriptor;
-import saasim.core.infrastructure.Machine;
-import saasim.core.infrastructure.MachineFactory;
 import saasim.core.saas.Application;
 import saasim.core.saas.Request;
 import saasim.core.saas.Response;
@@ -42,29 +40,23 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 	
 	private long [] arrival_counter, rejection_counter, failure_counter, finish_counter, response_time;
 
-	private MachineFactory machineFactory;
-	
 	private static int idSeed = 0;
 
 	/**
 	 * Default constructor.
-	 * 
 	 * @param scheduler {@link EventScheduler}
 	 * @param control {@link AdmissionControl}
-	 * @param monitor {@link MonitoringService}
 	 * @param tiers instances of {@link Tier}.
 	 */
 	@Inject
-	public TieredApplication(Configuration globalConf, EventScheduler scheduler, AdmissionControl control, MonitoringService monitor, MachineFactory machineFactory, Provider<Tier> tierFactory) {
+	public TieredApplication(Configuration globalConf, EventScheduler scheduler, AdmissionControl control, Provider<Tier> tierFactory) {
 		this.scheduler = scheduler;
 		this.control = control;
-		this.machineFactory = machineFactory;
 		this.tiers = assembleTiers(globalConf, tierFactory);
 		
 		resetStatistics();
 		
 		this.id = idSeed++;
-		monitor.setMonitorable(this);
 	}
 
 	private void resetStatistics() {
@@ -117,10 +109,6 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 		if(Configuration.ACTION_ADMISSION_CONTROL.equals(configuration.getProperty(Configuration.ACTION))){
 			control.updatePolicy(configuration);
 		}else {
-			if(Configuration.ACTION_INCREASE.equals(configuration.getProperty(Configuration.ACTION))){
-				Machine machine = machineFactory.create((InstanceDescriptor) configuration.getProperty(Configuration.INSTANCE_DESCRIPTOR));
-				configuration.setProperty(Configuration.MACHINE, machine);
-			}
 			tiers[configuration.getInt(Configuration.TIER_ID)].configure(configuration);
 		}
 		
@@ -184,5 +172,28 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 	@Override
 	public int getID() {
 		return id;
+	}
+
+	@Override
+	public Map<String, SummaryStatistics> new_collect(long now, long elapsedTime) {
+		Map<String, SummaryStatistics> info = new TreeMap<>();
+		
+		for (int i = 0; i < arrival_counter.length; i++) {
+			info.put("arrival_" + i, buildSummary(arrival_counter[i]));
+			info.put("failure_" + i, buildSummary(failure_counter[i]));
+			info.put("rejection_" + i, buildSummary(rejection_counter[i]));
+			info.put("finish_" + i, buildSummary(finish_counter[i]));
+			info.put("rt_" + i, buildSummary(finish_counter[i] == 0?0:response_time[i]/finish_counter[i]));
+		}
+		
+		resetStatistics();
+		return info;
+	}
+
+	private SummaryStatistics buildSummary(double value) {
+		SummaryStatistics statistics;
+		statistics = new SummaryStatistics();
+		statistics.addValue(value);
+		return statistics;
 	}
 }

@@ -20,7 +20,7 @@ public class WebAppRequest implements Request {
 	private final long responseSizeInBytes;
 	private final long[] demand;
 	
-	private long serviceTimeInMillis;
+	private long serviceTimeInMillis[];
 	private long finishTimeInMillis;
 	private Deque<ResponseListener> listeners;
 	private int tier;
@@ -48,7 +48,7 @@ public class WebAppRequest implements Request {
 				this.demand = demand;
 				this.tier = 0;
 				
-				this.serviceTimeInMillis = 0;
+				this.serviceTimeInMillis = new long[demand.length];
 				this.finishTimeInMillis = 0;
 				this.listeners = new LinkedList<>();
 				this.arrival = new long[demand.length];
@@ -66,12 +66,12 @@ public class WebAppRequest implements Request {
 
 	@Override
 	public long getCPUTimeDemandInMillis() {
-		return (tier == demand.length)? -1: demand[tier];
+		return (tier == demand.length)? -1: demand[tier] - serviceTimeInMillis[tier];
 	}
 
 	@Override
 	public void updateServiceTime(long cpuTimeDemandInMillis) {
-		this.serviceTimeInMillis += cpuTimeDemandInMillis;
+		this.serviceTimeInMillis[tier] += cpuTimeDemandInMillis;
 	}
 
 	@Override
@@ -128,5 +128,16 @@ public class WebAppRequest implements Request {
 	public long popArrival() {
 		return this.arrival[tier];
 	}
+	
+	@Override
+	public int hashCode() {
+		return (int)(id ^ (id >>> 32));
+	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		return id == ((WebAppRequest) obj).id;
+	}
 }
