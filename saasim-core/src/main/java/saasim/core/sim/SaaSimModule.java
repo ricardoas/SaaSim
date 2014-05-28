@@ -98,14 +98,13 @@ public class SaaSimModule extends AbstractModule {
 			bind(LoadBalancer.class).to((Class<? extends LoadBalancer>) load(configuration.getString(LOADBALANCER_CLASS)));
 		}
 		
-		
-		
-		
-		bind(Provider.class).to((Class<? extends Provider>) load(configuration.getString(IAAS_CLASS))).in(Singleton.class);
-		
-		bind(ProvisioningSystem.class).to((Class<? extends ProvisioningSystem>) load(configuration.getString(DPS_CLASS))).in(Singleton.class);
+		bind(Provider.class).to((Class<? extends Provider>) load(configuration.getString(IAAS_CLASS)));
 		
 		bind(MonitoringService.class).to((Class<? extends MonitoringService>) load(configuration.getString(MONITORING_SERVICE_CLASS)));
+		
+	
+		bind(ProvisioningSystem.class).to((Class<? extends ProvisioningSystem>) load(configuration.getString(DPS_CLASS))).in(Singleton.class);
+		
 		
 		bind(Customer.class).to(LoggerIaaSCustomer.class).in(Singleton.class);;
 		

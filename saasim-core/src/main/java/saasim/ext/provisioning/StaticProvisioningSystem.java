@@ -14,7 +14,9 @@ import saasim.core.provisioning.ProvisioningSystem;
 import saasim.core.saas.Application;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
+@Singleton
 public class StaticProvisioningSystem implements ProvisioningSystem {
 	
 	private Application[] applications;

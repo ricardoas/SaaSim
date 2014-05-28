@@ -14,7 +14,9 @@ import saasim.core.iaas.Provider;
 import saasim.core.infrastructure.InstanceDescriptor;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
+@Singleton
 public class AWSProvider implements Provider {
 	
 	public static final String IAAS_AWS_HEAVY_HOURLY = "iaas.aws.heavy.hourly";

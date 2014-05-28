@@ -45,6 +45,7 @@ public class PeriodicMonitoringService implements MonitoringService {
 			metrics.put("TIME", new SummaryStatistics());
 		}
 		metrics.get("TIME").addValue(scheduler.now());
+		
 
 		for (Monitorable monitorable : monitorableObjects) {
 			Map<String, Double> collect = monitorable.collect(scheduler.now(), timeBetweenReports);
@@ -110,7 +111,5 @@ public class PeriodicMonitoringService implements MonitoringService {
 			}
 		});
 	}
-
-
 
 }

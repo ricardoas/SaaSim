@@ -22,6 +22,7 @@ import saasim.core.provisioning.ProvisioningSystem;
 import saasim.core.saas.Application;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 
 /**
@@ -32,6 +33,7 @@ import com.google.inject.Inject;
  * 
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
  */
+@Singleton
 public class RanjanProvisioningSystem implements ProvisioningSystem {
 	
 	private class RanjanReconfigurablePool {
@@ -39,6 +41,7 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 		private List<InstanceDescriptor> vmPool;
 		private int tierID;
 		private MonitoringService poolMonitor;
+		private Map<String, SummaryStatistics> statistics;
 
 		public RanjanReconfigurablePool(Application application, int tierID, MonitoringService poolMonitor, List<InstanceDescriptor> vmPool) {
 			this.poolMonitor = poolMonitor;
@@ -65,14 +68,7 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 			}else{
 				for (int i = 0; i < delta; i++) {
 					if(provider.canAcquire(vmTypePerTier[tierID])){
-						InstanceDescriptor instance = provider.acquire(vmTypePerTier[tierID]);
-						Configuration config = new Configuration();
-						config.setProperty(Configuration.TIER_ID, tierID);
-						config.setProperty(Configuration.ACTION, Configuration.ACTION_INCREASE);
-						config.setProperty(Configuration.INSTANCE_DESCRIPTOR, instance);
-						config.setProperty(Configuration.FORCE, true);
-						application.configure(config);
-						vmPool.add(instance);
+						buyMachine(application, tierID, vmPool, poolMonitor);
 					}
 				}
 			}
@@ -88,9 +84,24 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 		 */
 		private int evaluateNumberOfServersForNextInterval() {
 			
-			Map<String, SummaryStatistics> statistics = poolMonitor.getStatistics();
+			statistics = poolMonitor.getStatistics();
 			
+			printStatistics();
+			
+			double finished_requests = statistics.get("finish_" + tierID).getMean();
+			double arrived_requests = statistics.get("arrived").getSum();
+			int number_of_active_servers = (int)statistics.get("arrived").getN();
+			
+			double d = statistics.get("util").getMean() / finished_requests;
+			double u_dash = Math.max(arrived_requests, finished_requests) * d;
+			int n_dash = (int) Math.ceil( u_dash * number_of_active_servers / targetUtilisation[tierID] );
+			return Math.max(1, n_dash) - number_of_active_servers;
+		}
+		
+		public void printStatistics(){
 			List<Double> results = new ArrayList<>();
+			results.add((double) application.getID());
+			results.add((double) tierID);
 			results.add(statistics.get("TIME").getMax());
 			results.add(statistics.get("arrival_" + tierID).getSum());
 			results.add(statistics.get("failure_" + tierID).getSum());
@@ -105,20 +116,10 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 			results.add(statistics.get("bq").getMean());
 			results.add(statistics.get("ap").getMean());
 			results.add(statistics.get("at").getMean());
+			results.add((double) statistics.get("util").getN());
 			
-			System.out.println(results);
-			
-			
-//			Logger.getLogger(ProvisioningSystem.class).info((long)statistics.get("TIME").getMax()+","+(long)statistics.get(application.getID()+"_arrivalrate").getMean()+","+(long)statistics.get(application.getID()+"_arrivalrate").getMean());
-
-			return 0;
-//			
-//			double d = statistics.averageUtilisation / statistics.requestCompletions;
-//			
-//			double u_lign = Math.max(statistics.requestArrivals, statistics.requestCompletions) * d;
-//			int newNumberOfServers = (int) Math.ceil( u_lign * statistics.totalNumberOfActiveServers / targetUtilisation );
-//			
-//			return Math.max(1, newNumberOfServers) - statistics.totalNumberOfActiveServers;
+			String logEntry = results.toString();
+			Logger.getLogger(ProvisioningSystem.class).info(logEntry.substring(1, logEntry.length()-1));
 		}
 	}
 
@@ -196,25 +197,30 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 				MonitoringService poolMonitor = monitoringServiceProvider.get();
 				poolMonitor.setMonitorable(applicationMonitor);
 				for (int j = 0; j < Integer.valueOf(startNumberOfReplicas[tierID]); j++) {
-					InstanceDescriptor instance = provider.acquire(vmTypePerTier[tierID]);
-					instance.setApplication(application);
-					Machine machine = machineFactory.create(instance);
-					poolMonitor.setMonitorable((Monitorable) machine);
-					
-					Configuration config = new Configuration();
-					config.setProperty(Configuration.TIER_ID, tierID);
-					config.setProperty(Configuration.ACTION, Configuration.ACTION_INCREASE);
-					config.setProperty(Configuration.INSTANCE_DESCRIPTOR, instance);
-					config.setProperty(Configuration.FORCE, true);
-					config.setProperty(Configuration.MACHINE, machine);
-					application.configure(config);
-					vmPool.add(instance);
+					buyMachine(application, tierID, vmPool, poolMonitor);
 				}
 				if(enable[tierID]){
 					reconfigurableSets.add(new RanjanReconfigurablePool(application, tierID, poolMonitor, vmPool));
 				}
 			}
 		}
+	}
+
+	private void buyMachine(Application application, int tierID,
+			List<InstanceDescriptor> vmPool, MonitoringService poolMonitor) {
+		InstanceDescriptor instance = provider.acquire(vmTypePerTier[tierID]);
+		instance.setApplication(application);
+		Machine machine = machineFactory.create(instance);
+		poolMonitor.setMonitorable((Monitorable) machine);
+		
+		Configuration config = new Configuration();
+		config.setProperty(Configuration.TIER_ID, tierID);
+		config.setProperty(Configuration.ACTION, Configuration.ACTION_INCREASE);
+		config.setProperty(Configuration.INSTANCE_DESCRIPTOR, instance);
+		config.setProperty(Configuration.FORCE, true);
+		config.setProperty(Configuration.MACHINE, machine);
+		application.configure(config);
+		vmPool.add(instance);
 	}
 
 	@Override
