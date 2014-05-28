@@ -158,14 +158,9 @@ public class SingleQueueMachine implements Machine, ResponseListener, Monitorabl
 	@Override
 	public Map<String,Double> collect(long now, long elapsedTime) {
 		Map<String, Double> info = new TreeMap<>();
-		
+		info.put("arrived", 1.0*arrived);
+		info.put("failed", 1.0*failed);
 		info.put("util", 1.0* busy_time/(descriptor.getNumberOfCPUCores()*elapsedTime));
-		info.put("arrivalrate", (double) arrived);
-		info.put("failurerate", (double) failed);
-		
-		System.out.print(" m="+ (int)(100 *info.get("util")));
-		arrived = 0;
-		failed = 0;
 		
 		resetStatistics();
 		

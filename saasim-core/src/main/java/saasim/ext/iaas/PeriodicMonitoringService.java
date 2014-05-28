@@ -24,17 +24,20 @@ public class PeriodicMonitoringService implements MonitoringService {
 	
 	protected Map<String, SummaryStatistics> metrics;
 
+	private List<MonitoringService> children;
+
 	@Inject
 	public PeriodicMonitoringService(Configuration globalConf, EventScheduler scheduler) {
 		this.scheduler = scheduler;
 		this.monitorableObjects = new ArrayList<>();
 		this.timeBetweenReports = globalConf.getLong(MONITORING_SERVICE_TIMEBETWEENREPORTS);
 		this.metrics = new TreeMap<>();
+		this.children = new ArrayList<>();
 		
 		scheduler.queueEvent(new Event(scheduler.now()+timeBetweenReports){
 			@Override
 			public void trigger() {
-				gather();
+				new_gather();
 			}
 		});
 	}
@@ -67,32 +70,27 @@ public class PeriodicMonitoringService implements MonitoringService {
 
 	@Override
 	public Map<String, SummaryStatistics> getStatistics() {
-		Map<String, SummaryStatistics> result = metrics;
-		metrics = new TreeMap<>();
-		return result;
+		return metrics;
 	}
-
+	
 	@Override
 	public void setMonitorable(Monitorable monitorable) {
 		monitorableObjects.add(monitorable);
 	}
 
 	@Override
-	public Map<String, Double> collect(long now, long elapsedTime) {
-		// TODO Auto-generated method stub
-		return null;
+	public void addChildMonitoringService(MonitoringService service) {
+		children.add(service);
 	}
 
-	@Override
-	public Map<String, SummaryStatistics> new_collect(long now, long elapsedTime) {
-		return metrics;
-	}
-	
 	protected void gather() {
+		metrics = new TreeMap<>();
+
 		if(!metrics.containsKey("TIME")){
 			metrics.put("TIME", new SummaryStatistics());
 		}
 		metrics.get("TIME").addValue(scheduler.now());
+		
 
 		for (Monitorable monitorable : monitorableObjects) {
 			Map<String, SummaryStatistics> collect = monitorable.new_collect(scheduler.now(), timeBetweenReports);
@@ -108,6 +106,35 @@ public class PeriodicMonitoringService implements MonitoringService {
 			@Override
 			public void trigger() {
 				gather();
+			}
+		});
+	}
+
+	protected void new_gather() {
+		if(!metrics.containsKey("TIME")){
+			metrics.put("TIME", new SummaryStatistics());
+		}
+		metrics.get("TIME").addValue(scheduler.now());
+		
+
+		for (Monitorable monitorable : monitorableObjects) {
+			Map<String, Double> collect = monitorable.collect(scheduler.now(), timeBetweenReports);
+			for (Entry<String, Double> sample : collect.entrySet()) {
+				if(!metrics.containsKey(sample.getKey())){
+					metrics.put(sample.getKey(), new SummaryStatistics());
+				}
+				metrics.get(sample.getKey()).addValue(sample.getValue());
+			}
+		}
+		
+		for (MonitoringService child : children) {
+			metrics.putAll(child.getStatistics());
+		}
+		
+		scheduler.queueEvent(new Event(scheduler.now()+timeBetweenReports){
+			@Override
+			public void trigger() {
+				new_gather();
 			}
 		});
 	}

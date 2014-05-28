@@ -55,16 +55,16 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 			int delta = evaluateNumberOfServersForNextInterval();
 			
 			if(delta < 0){
-				for (int i = 0; i < -delta; i++) {
-					InstanceDescriptor instance = vmPool.remove(0);
-					instance.turnOff(scheduler.now());
-					Configuration config = new Configuration();
-					config.setProperty(Configuration.TIER_ID, tierID);
-					config.setProperty(Configuration.ACTION, Configuration.ACTION_DECREASE);
-					config.setProperty(Configuration.INSTANCE_DESCRIPTOR, instance);
-					config.setProperty(Configuration.FORCE, true);
-					application.configure(config);
-				}
+//				for (int i = 0; i < -delta; i++) {
+//					InstanceDescriptor instance = vmPool.remove(0);
+//					instance.turnOff(scheduler.now());
+//					Configuration config = new Configuration();
+//					config.setProperty(Configuration.TIER_ID, tierID);
+//					config.setProperty(Configuration.ACTION, Configuration.ACTION_DECREASE);
+//					config.setProperty(Configuration.INSTANCE_DESCRIPTOR, instance);
+//					config.setProperty(Configuration.FORCE, true);
+//					application.configure(config);
+//				}
 			}else{
 				for (int i = 0; i < delta; i++) {
 					if(provider.canAcquire(vmTypePerTier[tierID])){
@@ -195,7 +195,7 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 			for (int tierID = 0; tierID < startNumberOfReplicas.length; tierID++) {
 				List<InstanceDescriptor> vmPool = new ArrayList<>();
 				MonitoringService poolMonitor = monitoringServiceProvider.get();
-				poolMonitor.setMonitorable(applicationMonitor);
+				poolMonitor.addChildMonitoringService(applicationMonitor);
 				for (int j = 0; j < Integer.valueOf(startNumberOfReplicas[tierID]); j++) {
 					buyMachine(application, tierID, vmPool, poolMonitor);
 				}

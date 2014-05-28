@@ -193,8 +193,6 @@ public class RoundRobinMachine implements Machine, ResponseListener, Monitorable
 
 	@Override
 	public Map<String,Double> collect(long now, long elapsedTime) {
-		Map<String, Double> info = new TreeMap<>();
-		
 		long busy_debt = 0;
 		
 		Set<Entry<Request,Long>> entrySet = runningNow.entrySet();
@@ -204,13 +202,16 @@ public class RoundRobinMachine implements Machine, ResponseListener, Monitorable
 			busy_time += now - start;
 			busy_debt += (start + d) - now;
 		}
+
 		
+		Map<String, Double> info = new TreeMap<>();
+		info.put("arrived", 1.0*arrived);
+		info.put("failed", 1.0*failed);
 		info.put("util", 1.0* busy_time/(descriptor.getNumberOfCPUCores()*elapsedTime));
-		info.put("arrivalrate", (double) arrived);
-		info.put("failurerate", (double) failed);
-		
-		System.out.print(" [util="+ (int)(100 *info.get("util")) + " pq=" + processingQueue.size() + " bq=" + backlog.size() + " r=" + processorTokens.availablePermits() + " t=" + threadTokens.availablePermits() + "]" );
-		
+		info.put("pq", 1.0*processingQueue.size());
+		info.put("bq", 1.0*backlog.size());
+		info.put("ap", 1.0*processorTokens.availablePermits());
+		info.put("at", 1.0*threadTokens.availablePermits());
 		
 		resetStatistics(busy_debt);
 		
