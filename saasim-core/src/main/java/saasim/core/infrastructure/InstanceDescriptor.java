@@ -25,4 +25,6 @@ public interface InstanceDescriptor {
 
 	void setApplication(Application application);
 
+	Machine getMachine();
+
 }

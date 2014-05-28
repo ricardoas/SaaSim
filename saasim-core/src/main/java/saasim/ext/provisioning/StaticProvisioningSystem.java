@@ -66,28 +66,35 @@ public class StaticProvisioningSystem implements ProvisioningSystem {
 
 	protected void setUp() {
 		for (Application application : applications) {
-			monitoringService.setMonitorable((Monitorable) application);
+			monitoringService.register((Monitorable) application);
 			for (int tierID = 0; tierID < startNumberOfReplicas.length; tierID++) {
 				int numberOfReplicas = Integer.valueOf(startNumberOfReplicas[tierID]);
 				while(numberOfReplicas-- > 0){
 					if(provider.canAcquire(vmTypePerTier[tierID])){
-						InstanceDescriptor descriptor = provider.acquire(vmTypePerTier[tierID]);
-						descriptor.setApplication(application);
-						Machine machine = machineFactory.create(descriptor);
-						monitoringService.setMonitorable((Monitorable) machine);
-						
-						Configuration config = new Configuration();
-						config.setProperty(Configuration.TIER_ID, tierID);
-						config.setProperty(Configuration.ACTION, Configuration.ACTION_INCREASE);
-						config.setProperty(Configuration.INSTANCE_DESCRIPTOR, descriptor);
-						config.setProperty(Configuration.FORCE, true);
-						config.setProperty(Configuration.MACHINE, machine);
-						application.configure(config);
+						acquireInstance(application, tierID, monitoringService);
 					}
 				}
 			}
 		}
 	}
+	
+	private InstanceDescriptor acquireInstance(Application application, int tierID, MonitoringService monitoringService) {
+		InstanceDescriptor instance = provider.acquire(vmTypePerTier[tierID]);
+		
+		Machine machine = machineFactory.create(instance);
+		instance.setApplication(application);
+
+		monitoringService.register((Monitorable) machine);
+
+		Configuration config = new Configuration();
+		config.setProperty(Configuration.TIER_ID, tierID);
+		config.setProperty(Configuration.ACTION, Configuration.ACTION_INCREASE);
+		config.setProperty(Configuration.MACHINE, machine);
+		application.configure(config);
+		
+		return instance;
+	}
+
 
 	@Override
 	public UtilityFunction calculateUtility() {

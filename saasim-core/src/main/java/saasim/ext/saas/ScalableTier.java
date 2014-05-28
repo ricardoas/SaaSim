@@ -4,8 +4,6 @@ import static saasim.core.config.Configuration.ACTION;
 import static saasim.core.config.Configuration.ACTION_DECREASE;
 import static saasim.core.config.Configuration.ACTION_INCREASE;
 import static saasim.core.config.Configuration.ACTION_RECONFIGURE;
-import static saasim.core.config.Configuration.FORCE;
-import static saasim.core.config.Configuration.INSTANCE_DESCRIPTOR;
 import static saasim.core.config.Configuration.MACHINE;
 import saasim.core.config.Configuration;
 import saasim.core.infrastructure.InstanceDescriptor;
@@ -57,13 +55,13 @@ public class ScalableTier extends AbstractTier{
 		
 		switch (configuration.getString(ACTION)) {
 		case ACTION_INCREASE:
-			scaleIn((InstanceDescriptor) configuration.getProperty(INSTANCE_DESCRIPTOR), (Machine) configuration.getProperty(MACHINE), configuration.getBoolean(FORCE));
+			scaleIn((Machine) configuration.getProperty(MACHINE));
 			break;
 		case ACTION_DECREASE:
-			scaleOut((InstanceDescriptor) configuration.getProperty(INSTANCE_DESCRIPTOR), configuration.getBoolean(FORCE));
+			scaleOut((Machine) configuration.getProperty(MACHINE));
 			break;
 		case ACTION_RECONFIGURE:
-			reconfigure((InstanceDescriptor) configuration.getProperty(INSTANCE_DESCRIPTOR), configuration.getBoolean(FORCE));
+			reconfigure((Machine) configuration.getProperty(MACHINE));
 		default:
 			throw new RuntimeException("Unknown action of configuration!");
 		}
@@ -72,28 +70,26 @@ public class ScalableTier extends AbstractTier{
 	/**
 	 * Adds a new instance to this {@link Tier}
 	 * @param machine TODO
-	 * @param force <code>true</code> to add immediately, otherwise there is a boot/set up time. 
 	 * @param machineDescriptor {@link InstanceDescriptor} of the new server.
 	 */
-	private void scaleIn(InstanceDescriptor instanceDescriptor, Machine machine, boolean force){
-		this.loadBalancer.addMachine(instanceDescriptor, machine, !force);
+	private void scaleIn(Machine machine){
+		this.loadBalancer.addMachine(machine);
 	}
 	
 	/**
 	 * Removes the instance described by {@link InstanceDescriptor} from this {@link Tier}.
-	 *  
-	 * @param force <code>true</code> to remove immediately, otherwise to gracefully remove it.
+	 * @param machine TODO
 	 */
-	private void scaleOut(InstanceDescriptor instanceDescriptor, boolean force){
-		this.loadBalancer.removeMachine(instanceDescriptor);
+	private void scaleOut(Machine machine){
+		this.loadBalancer.removeMachine(machine);
 	}
 	
 	/**
 	 * Reconfigures a {@link Machine}.
-	 * 
+	 * @param machine TODO
 	 * @param machineDescriptor {@link InstanceDescriptor} of the new server.
 	 */
-	private void reconfigure(InstanceDescriptor instanceDescriptor, boolean force){
-		this.loadBalancer.reconfigureMachine(instanceDescriptor, !force);
+	private void reconfigure(Machine machine){
+		this.loadBalancer.reconfigureMachine(machine);
 	}
 }

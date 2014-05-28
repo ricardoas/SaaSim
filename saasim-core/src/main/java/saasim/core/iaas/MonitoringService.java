@@ -17,7 +17,10 @@ public interface MonitoringService{
 
 	Map<String, SummaryStatistics> getStatistics();
 	
-	void setMonitorable(Monitorable monitorable);
+	void register(Monitorable monitorable);
 
+	void unregister(Monitorable machine);
+	
 	void addChildMonitoringService(MonitoringService child);
+
 }

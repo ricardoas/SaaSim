@@ -8,8 +8,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.commons.math.stat.descriptive.SummaryStatistics;
-
 import saasim.core.config.Configuration;
 import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
@@ -217,38 +215,4 @@ public class RoundRobinMachine implements Machine, ResponseListener, Monitorable
 		
 		return info;
 	}
-	
-	public Map<String,SummaryStatistics> new_collect(long now, long elapsedTime) {
-		long busy_debt = 0;
-		
-		Set<Entry<Request,Long>> entrySet = runningNow.entrySet();
-		for (Entry<Request, Long> entry : entrySet) {
-			long start = entry.getValue();
-			long d = Math.min(quantum, entry.getKey().getCPUTimeDemandInMillis());
-			busy_time += now - start;
-			busy_debt += (start + d) - now;
-		}
-
-		
-		Map<String, SummaryStatistics> info = new TreeMap<>();
-		info.put("arrived", buildSummary(arrived));
-		info.put("failed", buildSummary(failed));
-		info.put("util", buildSummary(1.0* busy_time/(descriptor.getNumberOfCPUCores()*elapsedTime)));
-		info.put("pq", buildSummary(processingQueue.size()));
-		info.put("bq", buildSummary(backlog.size()));
-		info.put("ap", buildSummary(processorTokens.availablePermits()));
-		info.put("at", buildSummary(threadTokens.availablePermits()));
-		
-		resetStatistics(busy_debt);
-		
-		return info;
-	}
-
-	private SummaryStatistics buildSummary(double value) {
-		SummaryStatistics statistics;
-		statistics = new SummaryStatistics();
-		statistics.addValue(value);
-		return statistics;
-	}
-
 }

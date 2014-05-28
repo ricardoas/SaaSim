@@ -46,7 +46,7 @@ public abstract class StreamApplication implements Application, Monitorable {
 		this.tiers = tiers;
 		this.id = idSeed ++;
 		
-		monitor.setMonitorable(this);
+		monitor.register(this);
 	}
 
 	/**

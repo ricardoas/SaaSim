@@ -5,8 +5,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.TreeMap;
 
-import org.apache.commons.math.stat.descriptive.SummaryStatistics;
-
 import saasim.core.config.Configuration;
 import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
@@ -166,23 +164,4 @@ public class SingleQueueMachine implements Machine, ResponseListener, Monitorabl
 		
 		return info;
 	}
-
-	public Map<String,SummaryStatistics> new_collect(long now, long elapsedTime) {
-		Map<String, SummaryStatistics> info = new TreeMap<>();
-		info.put("arrived", buildSummary(arrived));
-		info.put("failed", buildSummary(failed));
-		info.put("util", buildSummary(1.0* busy_time/(descriptor.getNumberOfCPUCores()*elapsedTime)));
-		
-		resetStatistics();
-		
-		return info;
-	}
-	
-	private SummaryStatistics buildSummary(double value) {
-		SummaryStatistics statistics;
-		statistics = new SummaryStatistics();
-		statistics.addValue(value);
-		return statistics;
-	}
-
 }

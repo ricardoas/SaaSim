@@ -3,7 +3,6 @@ package saasim.ext.iaas.aws;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.infrastructure.Machine;
 import saasim.core.saas.Application;
-import saasim.ext.iaas.aws.AWSProvider.MarketType;
 
 /**
  * instance descriptor as seen by AWS
@@ -14,14 +13,14 @@ public class AWSInstanceDescriptor implements InstanceDescriptor {
 	private AWSInstanceType type;
 	private boolean on;
 	private Machine machine;
-	private MarketType market;
+	private AWSMarket market;
 	private long creationTime;
 	private long finishTime;
 	private long lastBillingTime;
 	private boolean setup;
 	private Application application;
 
-	public AWSInstanceDescriptor(AWSInstanceType instanceType, MarketType market, long creationTime) {
+	public AWSInstanceDescriptor(AWSInstanceType instanceType, AWSMarket market, long creationTime) {
 		this.type = instanceType;
 		this.market = market;
 		this.creationTime = creationTime;
@@ -62,6 +61,11 @@ public class AWSInstanceDescriptor implements InstanceDescriptor {
 		
 		double[] reportInfo = new double[11];
 		
+		reportInfo[0] = finishTime == 0? now - lastBillingTime: finishTime - lastBillingTime;
+		reportInfo[1] = setup? market.getHeavyUpfront(): 0;
+		reportInfo[2] = reportInfo[0] * type.getHeavyHourly();
+
+		
 		switch (market) {
 		case HEAVY:
 			reportInfo[2] = finishTime == 0? now - lastBillingTime: finishTime - lastBillingTime;
@@ -89,6 +93,8 @@ public class AWSInstanceDescriptor implements InstanceDescriptor {
 		
 		setup = false;
 		
+		report.append(market);
+		report.append(',');
 		report.append(type);
 		for (double info : reportInfo) {
 			report.append(',');
@@ -115,5 +121,14 @@ public class AWSInstanceDescriptor implements InstanceDescriptor {
 	@Override
 	public void setApplication(Application application) {
 		this.application = application;
+	}
+
+	@Override
+	public Machine getMachine() {
+		return machine;
+	}
+
+	public AWSInstanceType getType() {
+		return type;
 	}
 }

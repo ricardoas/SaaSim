@@ -4,19 +4,12 @@ import static saasim.core.config.Configuration.ACTION;
 import static saasim.core.config.Configuration.ACTION_DECREASE;
 import static saasim.core.config.Configuration.ACTION_INCREASE;
 import static saasim.core.config.Configuration.ACTION_RECONFIGURE;
-import static saasim.core.config.Configuration.FORCE;
-import static saasim.core.config.Configuration.INSTANCE_DESCRIPTOR;
-
-import java.util.Map;
-import java.util.TreeMap;
-
+import static saasim.core.config.Configuration.MACHINE;
 import saasim.core.config.Configuration;
-import saasim.core.iaas.MonitoringService;
 import saasim.core.infrastructure.InstanceDescriptor;
 import saasim.core.infrastructure.LoadBalancer;
 import saasim.core.infrastructure.Machine;
 import saasim.core.saas.Request;
-import saasim.core.saas.Response;
 import saasim.core.saas.Tier;
 
 import com.google.inject.Inject;
@@ -61,10 +54,10 @@ public class SimpleTier extends AbstractTier{
 		
 		switch (configuration.getString(ACTION)) {
 		case ACTION_RECONFIGURE:
-			reconfigure((InstanceDescriptor) configuration.getProperty(INSTANCE_DESCRIPTOR), configuration.getBoolean(FORCE));
+			reconfigure((Machine) configuration.getProperty(MACHINE));
 		case ACTION_INCREASE:
 			if(server == null){
-				scaleIn((InstanceDescriptor) configuration.getProperty(INSTANCE_DESCRIPTOR), configuration.getBoolean(FORCE));
+				scaleIn((Machine) configuration.getProperty(MACHINE));
 			}
 			break;
 		case ACTION_DECREASE:
@@ -79,7 +72,7 @@ public class SimpleTier extends AbstractTier{
 	 * @param machineDescriptor {@link InstanceDescriptor} of the new server.
 	 * @param force <code>true</code> to add immediately, otherwise there is a boot/set up time. 
 	 */
-	private void scaleIn(InstanceDescriptor instanceDescriptor, boolean force){
+	private void scaleIn(Machine machine){
 		
 	}
 	
@@ -88,7 +81,7 @@ public class SimpleTier extends AbstractTier{
 	 * 
 	 * @param machineDescriptor {@link InstanceDescriptor} of the new server.
 	 */
-	private void reconfigure(InstanceDescriptor instanceDescriptor, boolean force){
+	private void reconfigure(Machine machine){
 		
 	}
 }

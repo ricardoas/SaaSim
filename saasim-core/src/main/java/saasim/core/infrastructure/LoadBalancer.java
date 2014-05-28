@@ -13,18 +13,17 @@ public interface LoadBalancer{
 	/** 
 	 * Registers a new {@link Machine} to this {@link LoadBalancer} according to {@link InstanceDescriptor}.
 	 * @param machine TODO
-	 * @param useStartUpDelay <code>true</code> if use start up delay
 	 */
-	void addMachine(InstanceDescriptor descriptor, Machine machine, boolean useStartUpDelay);
+	void addMachine(Machine machine);
 
 	/**
 	 * Removes a specific {@link Machine} from this {@link LoadBalancer}.
+	 * @param machine TODO
 	 */
-	void removeMachine(InstanceDescriptor descriptor);
+	void removeMachine(Machine machine);
 
 	/**
-	 * Removes a specific {@link Machine} from this {@link LoadBalancer}.
-	 * @param force <code>true</code> if use force
+	 * Updates {@link LoadBalancer} policy of changes in {@link Machine}'s configuration
 	 */
-	void reconfigureMachine(InstanceDescriptor descriptor, boolean force);
+	void reconfigureMachine(Machine machine);
 }

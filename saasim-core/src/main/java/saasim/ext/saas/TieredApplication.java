@@ -3,8 +3,6 @@ package saasim.ext.saas;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.commons.math.stat.descriptive.SummaryStatistics;
-
 import saasim.core.config.Configuration;
 import saasim.core.event.EventScheduler;
 import saasim.core.iaas.Monitorable;
@@ -30,11 +28,6 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 	private final Tier[] tiers;
 	private final EventScheduler scheduler;
 	private final int id;
-	
-	private int arrived;
-	private int rejected;
-	private int finished;
-	private int failed;
 	
 	private long [] arrival_counter, rejection_counter, failure_counter, finish_counter, response_time;
 
@@ -151,28 +144,5 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 	@Override
 	public int getID() {
 		return id;
-	}
-
-	@Override
-	public Map<String, SummaryStatistics> new_collect(long now, long elapsedTime) {
-		Map<String, SummaryStatistics> info = new TreeMap<>();
-		
-		for (int i = 0; i < arrival_counter.length; i++) {
-			info.put("arrival_" + i, buildSummary(arrival_counter[i]));
-			info.put("failure_" + i, buildSummary(failure_counter[i]));
-			info.put("rejection_" + i, buildSummary(rejection_counter[i]));
-			info.put("finish_" + i, buildSummary(finish_counter[i]));
-			info.put("rt_" + i, buildSummary(finish_counter[i] == 0?0:response_time[i]/finish_counter[i]));
-		}
-		
-		resetStatistics();
-		return info;
-	}
-
-	private SummaryStatistics buildSummary(double value) {
-		SummaryStatistics statistics;
-		statistics = new SummaryStatistics();
-		statistics.addValue(value);
-		return statistics;
 	}
 }
