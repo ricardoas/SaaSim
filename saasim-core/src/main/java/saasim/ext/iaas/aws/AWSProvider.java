@@ -92,10 +92,6 @@ public class AWSProvider implements Provider {
 
 	protected void reportBilling() {
 		
-		for (AWSMarket market : markets) {
-			market.reportBilling();
-		}
-		
 		customer.reportIaaSUsage(billingInfo);
 		billingInfo.reset();
 		

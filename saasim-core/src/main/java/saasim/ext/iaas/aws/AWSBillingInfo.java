@@ -1,7 +1,6 @@
 package saasim.ext.iaas.aws;
 
 import saasim.core.iaas.BillingInfo;
-import saasim.core.infrastructure.InstanceDescriptor;
 
 public class AWSBillingInfo implements BillingInfo {
 	
@@ -33,9 +32,22 @@ public class AWSBillingInfo implements BillingInfo {
 		sb = new StringBuilder();
 	}
 
-
 	@Override
-	public void account(InstanceDescriptor descriptor, long now) {
-		totalFee += descriptor.reportUsage(sb, now);
+	public void account(long time, String market, String type, String id, long uptime,
+			double fee) {
+		sb.append(time);
+		sb.append(',');
+		sb.append(market);
+		sb.append(',');
+		sb.append(type);		
+		sb.append(',');
+		sb.append(id);		
+		sb.append(',');
+		sb.append(uptime);		
+		sb.append(',');
+		sb.append(fee);		
+		sb.append('\n');
+		
+		totalFee += fee;
 	}
 }

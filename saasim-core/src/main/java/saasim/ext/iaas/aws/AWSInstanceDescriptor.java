@@ -13,16 +13,17 @@ public class AWSInstanceDescriptor implements InstanceDescriptor {
 	private AWSInstanceType type;
 	private boolean on;
 	private Machine machine;
-	private AWSMarket market;
 	private long creationTime;
 	private long finishTime;
 	private long lastBillingTime;
 	private boolean setup;
 	private Application application;
+	private static int SEED = 0;
+	private int id;
 
-	public AWSInstanceDescriptor(AWSInstanceType instanceType, AWSMarket market, long creationTime) {
+	public AWSInstanceDescriptor(AWSInstanceType instanceType, long creationTime) {
+		this.id = SEED++;
 		this.type = instanceType;
-		this.market = market;
 		this.creationTime = creationTime;
 		this.on = true;
 		this.setup = true;
@@ -57,63 +58,6 @@ public class AWSInstanceDescriptor implements InstanceDescriptor {
 	}
 
 	@Override
-	public double reportUsage(StringBuilder report, long now) {
-		
-		double[] reportInfo = new double[11];
-		
-		reportInfo[0] = finishTime == 0? now - lastBillingTime: finishTime - lastBillingTime;
-		reportInfo[1] = setup? market.getHeavyUpfront(): 0;
-		reportInfo[2] = reportInfo[0] * type.getHeavyHourly();
-
-		
-		switch (market) {
-		case HEAVY:
-			reportInfo[2] = finishTime == 0? now - lastBillingTime: finishTime - lastBillingTime;
-			reportInfo[3] = setup? type.getHeavyUpfront(): 0;
-			reportInfo[4] = reportInfo[0] * type.getHeavyHourly();
-			break;
-		case LIGHT:
-			reportInfo[5] = finishTime == 0? now - lastBillingTime: finishTime - lastBillingTime;
-			reportInfo[6] = setup? type.getLightUpfront(): 0;
-			reportInfo[7] = reportInfo[5] * type.getLightHourly();
-			break;
-		case MEDIUM:
-			reportInfo[8] = finishTime == 0? now - lastBillingTime: finishTime - lastBillingTime;
-			reportInfo[9] = setup? type.getMediumUpfront(): 0;
-			reportInfo[10] = reportInfo[8] * type.getMediumHourly();
-			break;
-		case ONDEMAND:
-			reportInfo[0] = Math.ceil(1.0*(finishTime == 0? now - lastBillingTime: finishTime - lastBillingTime)/3600000);
-			reportInfo[1] = reportInfo[0] * type.getHourly();
-			break;
-		case SPOT:
-		default:
-			break;
-		}
-		
-		setup = false;
-		
-		report.append(market);
-		report.append(',');
-		report.append(type);
-		for (double info : reportInfo) {
-			report.append(',');
-			report.append(info);
-		}
-		report.append('\n');
-		
-		double total = 0.0;
-		total += reportInfo[1];
-		total += reportInfo[2];
-		total += reportInfo[4];
-		total += reportInfo[5];
-		total += reportInfo[7];
-		total += reportInfo[8];
-		total += reportInfo[10];
-		return total;
-	}
-
-	@Override
 	public Application getApplication() {
 		return application;
 	}
@@ -130,5 +74,15 @@ public class AWSInstanceDescriptor implements InstanceDescriptor {
 
 	public AWSInstanceType getType() {
 		return type;
+	}
+	
+	@Override
+	public String toString() {
+		return Long.toString(id);
+	}
+
+	@Override
+	public long getFinishTime() {
+		return finishTime;
 	}
 }

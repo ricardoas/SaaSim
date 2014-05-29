@@ -31,7 +31,7 @@ public class AWSInstanceType implements InstanceType{
 		return ecu;
 	}
 
-	public String getNames() {
+	public String getName() {
 		return name;
 	}
 

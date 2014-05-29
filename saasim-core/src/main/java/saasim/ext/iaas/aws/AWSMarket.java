@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import saasim.core.event.Event;
 import saasim.core.event.EventScheduler;
 import saasim.core.iaas.BillingInfo;
 import saasim.core.infrastructure.InstanceDescriptor;
@@ -25,11 +26,17 @@ public class AWSMarket{
 
 	private Map<AWSInstanceType, Integer> indexMapping;
 
+	private double[] upfront;
+
+	private double[] hourly;
+
 
 	public AWSMarket(EventScheduler scheduler, BillingInfo billingInfo, String name, AWSInstanceType[] types, double[] upfront, double[] hourly, int quota, int[] plan) {
 		this.scheduler = scheduler;
 		this.billingInfo = billingInfo;
 		this.name = name;
+		this.upfront = upfront;
+		this.hourly = hourly;
 		this.quota = quota;
 		this.typeQuota = plan;
 		
@@ -39,6 +46,7 @@ public class AWSMarket{
 			quota = 0;
 			for (int i = 0; i < typeQuota.length; i++) {
 				quota += typeQuota[i];
+				billingInfo.account(scheduler.now(), name, types[i].getName(), "UPFRONT", 0, upfront[i] * typeQuota[i]);
 			}
 		}else{
 			typeQuota = new int[types.length];
@@ -52,31 +60,45 @@ public class AWSMarket{
 	}
 
 	public AWSInstanceDescriptor acquire(AWSInstanceType type) {
-		AWSInstanceDescriptor descriptor = new AWSInstanceDescriptor(type, this, scheduler.now());
+		final AWSInstanceDescriptor descriptor = new AWSInstanceDescriptor(type, scheduler.now());
 		running.add(descriptor);
 		
 		typeQuota[indexMapping.get(descriptor.getType())]--;
 		quota--;
 
+		scheduler.queueEvent(new Event(scheduler.now() + 3600000){
+			@Override
+			public void trigger() {
+				accountMachine(descriptor);
+			}
+		});
+		
 		return descriptor;
+	}
+
+	protected void accountMachine(final AWSInstanceDescriptor descriptor) {
+		long uptime = descriptor.isOn()?3600000:3600000 + descriptor.getFinishTime() - scheduler.now();
+		
+		billingInfo.account(scheduler.now(), name, descriptor.getType().toString(), descriptor.toString(), uptime, hourly[indexMapping.get(descriptor.getType())]);
+		
+		if(descriptor.isOn()){
+			scheduler.queueEvent(new Event(scheduler.now() + 3600000){
+				@Override
+				public void trigger() {
+					accountMachine(descriptor);
+				}
+			});
+		}
 	}
 
 	public void release(AWSInstanceDescriptor descriptor) {
 		running.remove(descriptor);
 		descriptor.turnOff(scheduler.now());
-		billingInfo.account(descriptor, scheduler.now());
-		
 		typeQuota[indexMapping.get(descriptor.getType())]++;
 		quota++;
 	}
 	
 	public boolean canAcquire(AWSInstanceType type) {
 		return quota != 0 && typeQuota[indexMapping.get(type)] != 0;
-	}
-
-	public void reportBilling() {
-		for (InstanceDescriptor instance : running) {
-			billingInfo.account(instance, scheduler.now());
-		}
 	}
 }
