@@ -109,6 +109,9 @@ public class AWSProvider implements Provider {
 
 		for (AWSMarket market: markets) {
 			if(market.canAcquire(type)){
+				if(market.toString().equals("heavy")){
+					System.out.println(market);
+				}
 				return market.acquire(type);
 			}
 		}
@@ -117,10 +120,9 @@ public class AWSProvider implements Provider {
 
 	@Override
 	public void release(InstanceDescriptor descriptor) {
-
-		for (AWSMarket market: markets) {
-			market.release((AWSInstanceDescriptor) descriptor);
-		}
+		
+		AWSInstanceDescriptor awsDescriptor = (AWSInstanceDescriptor) descriptor;
+		awsDescriptor.getMarket().release(awsDescriptor);
 	}
 
 	@Override

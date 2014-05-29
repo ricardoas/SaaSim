@@ -43,10 +43,12 @@ public class AWSMarket{
 		this.running = new HashSet<>();
 		
 		if(typeQuota.length != 0){
-			quota = 0;
+			this.quota = 0;
 			for (int i = 0; i < typeQuota.length; i++) {
-				quota += typeQuota[i];
-				billingInfo.account(scheduler.now(), name, types[i].getName(), "UPFRONT", 0, upfront[i] * typeQuota[i]);
+				this.quota += typeQuota[i];
+				if(typeQuota[i] != 0){
+					billingInfo.account(scheduler.now(), name, types[i].getName(), "UPFRONT", 0, upfront[i] * typeQuota[i]);
+				}
 			}
 		}else{
 			typeQuota = new int[types.length];
@@ -60,7 +62,7 @@ public class AWSMarket{
 	}
 
 	public AWSInstanceDescriptor acquire(AWSInstanceType type) {
-		final AWSInstanceDescriptor descriptor = new AWSInstanceDescriptor(type, scheduler.now());
+		final AWSInstanceDescriptor descriptor = new AWSInstanceDescriptor(type, this, scheduler.now());
 		running.add(descriptor);
 		
 		typeQuota[indexMapping.get(descriptor.getType())]--;
@@ -100,5 +102,10 @@ public class AWSMarket{
 	
 	public boolean canAcquire(AWSInstanceType type) {
 		return quota != 0 && typeQuota[indexMapping.get(type)] != 0;
+	}
+	
+	@Override
+	public String toString() {
+		return name;
 	}
 }

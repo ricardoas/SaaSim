@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 
 import saasim.core.cloud.utility.UtilityFunction;
 import saasim.core.config.Configuration;
+import saasim.core.deprovisioning.DeprovisioningSystem;
 import saasim.core.event.Event;
 import saasim.core.event.EventPriority;
 import saasim.core.event.EventScheduler;
@@ -56,17 +57,21 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 			
 			if(delta < 0){
 				for (int i = 0; i < -delta; i++) {
-					releaseInstance(application, tierID, poolMonitor, vmPool.remove(0));
+					InstanceDescriptor machineToTurnOff = deprovisioningSystem.chooseMachineToTurnOff(vmPool);
+					if(machineToTurnOff != null){
+						vmPool.remove(machineToTurnOff);
+						releaseInstance(application, tierID, poolMonitor, machineToTurnOff);
+					}
 				}
 			}else{
 				for (int i = 0; i < delta; i++) {
-					System.out.println(provider.canAcquire(vmTypePerTier[tierID]));
 					if(provider.canAcquire(vmTypePerTier[tierID])){
 						vmPool.add(acquireInstance(application, tierID, poolMonitor));
 					}
 				}
 			}
 		}
+
 
 		
 		/**
@@ -121,11 +126,11 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 	}
 
 
-	private static final String RANJAN_ENABLE = "dps.ranjan.enable";
+	private static final String RANJAN_ENABLE = "provisioning.ranjan.enable";
 	
-	private static final String RANJAN_TICK = "dps.ranjan.tick";
+	private static final String RANJAN_TICK = "provisioning.ranjan.tick";
 	
-	private static String RANJAN_TARGET_UTILISATION = "dps.ranjan.target";  
+	private static String RANJAN_TARGET_UTILISATION = "provisioning.ranjan.target";  
 
 	private Provider provider;
 
@@ -147,12 +152,15 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 
 	private MachineFactory machineFactory;
 
+	private DeprovisioningSystem deprovisioningSystem;
+
 	@Inject
-	public RanjanProvisioningSystem(EventScheduler scheduler, Configuration globalConf, Provider provider, MachineFactory machineFactory, com.google.inject.Provider<MonitoringService> monitoringService) {
+	public RanjanProvisioningSystem(EventScheduler scheduler, Configuration globalConf, Provider provider, MachineFactory machineFactory, com.google.inject.Provider<MonitoringService> monitoringService, DeprovisioningSystem deprovisioningSystem) {
 		this.scheduler = scheduler;
 		this.provider = provider;
 		this.machineFactory = machineFactory;
 		this.monitoringServiceProvider = monitoringService;
+		this.deprovisioningSystem = deprovisioningSystem;
 		this.reconfigurableSets = new ArrayList<RanjanReconfigurablePool>();
 		
 		this.startNumberOfReplicas = globalConf.getIntegerArray(Application.APPLICATION_TIER_INIT);
@@ -232,7 +240,6 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 		config.setProperty(Configuration.MACHINE, machine);
 		application.configure(config);
 	}
-
 
 	@Override
 	public UtilityFunction calculateUtility() {

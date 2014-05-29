@@ -20,8 +20,10 @@ public class AWSInstanceDescriptor implements InstanceDescriptor {
 	private Application application;
 	private static int SEED = 0;
 	private int id;
+	private AWSMarket market;
 
-	public AWSInstanceDescriptor(AWSInstanceType instanceType, long creationTime) {
+	public AWSInstanceDescriptor(AWSInstanceType instanceType, AWSMarket market, long creationTime) {
+		this.market = market;
 		this.id = SEED++;
 		this.type = instanceType;
 		this.creationTime = creationTime;
@@ -76,6 +78,10 @@ public class AWSInstanceDescriptor implements InstanceDescriptor {
 		return type;
 	}
 	
+	public AWSMarket getMarket() {
+		return market;
+	}
+	
 	@Override
 	public String toString() {
 		return Long.toString(id);
@@ -85,4 +91,11 @@ public class AWSInstanceDescriptor implements InstanceDescriptor {
 	public long getFinishTime() {
 		return finishTime;
 	}
+
+	@Override
+	public long getCreationTime() {
+		return creationTime;
+	}
+	
+	
 }

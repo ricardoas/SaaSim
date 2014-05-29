@@ -26,4 +26,6 @@ public interface InstanceDescriptor {
 	Machine getMachine();
 
 	long getFinishTime();
+
+	long getCreationTime();
 }

@@ -5,7 +5,7 @@ import org.apache.log4j.Logger;
 import saasim.core.iaas.BillingInfo;
 import saasim.core.iaas.Customer;
 
-public class LoggerIaaSCustomer implements Customer {
+public class LoggerCustomer implements Customer {
 
 	@Override
 	public void reportIaaSUsage(BillingInfo bill) {

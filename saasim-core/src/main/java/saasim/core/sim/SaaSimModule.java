@@ -2,6 +2,7 @@ package saasim.core.sim;
 import org.apache.commons.configuration.ConfigurationException;
 
 import saasim.core.config.Configuration;
+import saasim.core.deprovisioning.DeprovisioningSystem;
 import saasim.core.event.EventScheduler;
 import saasim.core.iaas.Customer;
 import saasim.core.iaas.MonitoringService;
@@ -17,7 +18,7 @@ import saasim.core.saas.ASP;
 import saasim.core.saas.Application;
 import saasim.core.saas.Tenant;
 import saasim.core.saas.Tier;
-import saasim.ext.iaas.LoggerIaaSCustomer;
+import saasim.ext.iaas.LoggerCustomer;
 import saasim.ext.saas.MultiTenantASP;
 
 import com.google.inject.AbstractModule;
@@ -46,7 +47,8 @@ public class SaaSimModule extends AbstractModule {
 	public static final String MACHINE_CLASS = "machine.class";
 	public static final String MONITORING_SERVICE_CLASS = "monitoring.service.class";
 	public static final String MONITORING_MONITOR_CLASS = "monitoring.monitor.class";
-	public static final String DPS_CLASS = "dps.class";
+	public static final String PROVISIONING_SYSTEM_CLASS = "provisioning.class";
+	public static final String DEPROVISIONING_SYSTEM_CLASS = "deprovisioning.class";
 	public static final String IAAS_CLASS = "iaas.class";
 	private final Configuration configuration;
 
@@ -102,15 +104,17 @@ public class SaaSimModule extends AbstractModule {
 		
 		bind(MonitoringService.class).to((Class<? extends MonitoringService>) load(configuration.getString(MONITORING_SERVICE_CLASS)));
 		
-	
-		bind(ProvisioningSystem.class).to((Class<? extends ProvisioningSystem>) load(configuration.getString(DPS_CLASS))).in(Singleton.class);
-		
-		
-		bind(Customer.class).to(LoggerIaaSCustomer.class).in(Singleton.class);;
+		bind(Customer.class).to(LoggerCustomer.class).in(Singleton.class);;
 		
 		install(new FactoryModuleBuilder()
 	     .implement(Machine.class, (Class<? extends Machine>) load(configuration.getString(MACHINE_CLASS)))
 	     .build(MachineFactory.class));
+		
+		bind(ProvisioningSystem.class).to((Class<? extends ProvisioningSystem>) load(configuration.getString(PROVISIONING_SYSTEM_CLASS)));
+		
+		if(configuration.containsKey(DEPROVISIONING_SYSTEM_CLASS)){
+			bind(DeprovisioningSystem.class).to((Class<? extends DeprovisioningSystem>) load(configuration.getString(DEPROVISIONING_SYSTEM_CLASS)));
+		}
 	}
 
 	/**
