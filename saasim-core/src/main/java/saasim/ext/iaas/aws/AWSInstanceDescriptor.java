@@ -52,6 +52,7 @@ public class AWSInstanceDescriptor implements InstanceDescriptor {
 	public void turnOn(long now) {
 		on = true;
 		lastBillingTime = now;
+		creationTime = now;
 	}
 
 	@Override

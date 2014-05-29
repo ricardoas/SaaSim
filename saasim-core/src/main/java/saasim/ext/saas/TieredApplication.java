@@ -131,8 +131,8 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 		
 		for (int i = 0; i < arrival_counter.length; i++) {
 			info.put("arrival_" + i, 1.0*arrival_counter[i]);
-			info.put("failure_" + i, 1.0*failure_counter[i]);
 			info.put("rejection_" + i, 1.0*rejection_counter[i]);
+			info.put("failure_" + i, 1.0*failure_counter[i]);
 			info.put("finish_" + i, 1.0*finish_counter[i]);
 			info.put("rt_" + i, finish_counter[i] == 0?0:1.0*response_time[i]/finish_counter[i]);
 		}

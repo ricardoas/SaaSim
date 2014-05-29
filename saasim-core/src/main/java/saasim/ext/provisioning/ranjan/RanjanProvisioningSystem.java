@@ -43,32 +43,63 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 		private int tierID;
 		private MonitoringService poolMonitor;
 		private Map<String, SummaryStatistics> statistics;
+		
+		private SummaryStatistics arrived;
+		private SummaryStatistics finished;
+		private SummaryStatistics util;
+		private SummaryStatistics n;
+		private SummaryStatistics time;
 
 		public RanjanReconfigurablePool(Application application, int tierID, MonitoringService poolMonitor, List<InstanceDescriptor> vmPool) {
 			this.poolMonitor = poolMonitor;
 			this.application = application;
 			this.tierID = tierID;
 			this.vmPool = vmPool;
+			
+			this.arrived = new SummaryStatistics();
+			this.finished = new SummaryStatistics();
+			this.util = new SummaryStatistics();
+			this.n = new SummaryStatistics();
+			this.time = new SummaryStatistics();
 		}
 
 		public void reconfigure() {
 			
-			int delta = evaluateNumberOfServersForNextInterval();
+			statistics = poolMonitor.getStatistics();
+			printStatistics();
+		
+			long now = (long) statistics.get("TIME").getMean();
 			
-			if(delta < 0){
-				for (int i = 0; i < -delta; i++) {
-					InstanceDescriptor machineToTurnOff = deprovisioningSystem.chooseMachineToTurnOff(vmPool);
-					if(machineToTurnOff != null){
-						vmPool.remove(machineToTurnOff);
-						releaseInstance(application, tierID, poolMonitor, machineToTurnOff);
+			time.addValue( now );
+			arrived.addValue( statistics.get("arrival_" + tierID).getMean() );
+			finished.addValue( statistics.get("finish_" + tierID).getMean() );
+			util.addValue( statistics.get("util").getMean() );
+			n.addValue( statistics.get("util").getN() );
+
+			if(now % tick == 0){
+				int delta = evaluateNumberOfServersForNextInterval();
+
+				if(delta < 0){
+					for (int i = 0; i < -delta; i++) {
+						InstanceDescriptor machineToTurnOff = deprovisioningSystem.chooseMachineToTurnOff(vmPool);
+						if(machineToTurnOff != null){
+							vmPool.remove(machineToTurnOff);
+							releaseInstance(application, tierID, poolMonitor, machineToTurnOff);
+						}
+					}
+				}else{
+					for (int i = 0; i < delta; i++) {
+						if(provider.canAcquire(vmTypePerTier[tierID])){
+							vmPool.add(acquireInstance(application, tierID, poolMonitor));
+						}
 					}
 				}
-			}else{
-				for (int i = 0; i < delta; i++) {
-					if(provider.canAcquire(vmTypePerTier[tierID])){
-						vmPool.add(acquireInstance(application, tierID, poolMonitor));
-					}
-				}
+				
+				arrived = new SummaryStatistics();
+				finished = new SummaryStatistics();
+				util = new SummaryStatistics();
+				n = new SummaryStatistics();
+				time = new SummaryStatistics();;
 			}
 		}
 
@@ -84,16 +115,12 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 		 */
 		private int evaluateNumberOfServersForNextInterval() {
 			
-			statistics = poolMonitor.getStatistics();
+			double finished_requests = finished.getSum();
+			double arrived_requests = arrived.getSum();
+			int number_of_active_servers = (int) n.getMax();
+			double u = util.getMean();
 			
-			printStatistics();
-			
-			double finished_requests = statistics.get("finish_" + tierID).getMean();
-			double arrived_requests = statistics.get("arrival_" + tierID).getMean();
-			int number_of_active_servers = (int)statistics.get("util").getN();
-			double util = statistics.get("util").getMean();
-			
-			double d = util / finished_requests;
+			double d = u / finished_requests;
 			double u_dash = Math.max(arrived_requests, finished_requests) * d;
 			int n_dash = (int) Math.ceil( u_dash * number_of_active_servers / targetUtilisation[tierID] );
 			return Math.max(1, n_dash) - number_of_active_servers;
@@ -109,9 +136,9 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 			sb.append(", ");
 			sb.append((long)statistics.get("arrival_" + tierID).getSum());
 			sb.append(", ");
-			sb.append((long)statistics.get("failure_" + tierID).getSum());
-			sb.append(", ");
 			sb.append((long)statistics.get("rejection_" + tierID).getSum());
+			sb.append(", ");
+			sb.append((long)statistics.get("failure_" + tierID).getSum());
 			sb.append(", ");
 			sb.append((long)statistics.get("finish_" + tierID).getSum());
 			sb.append(", ");
@@ -154,6 +181,8 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 
 	private DeprovisioningSystem deprovisioningSystem;
 
+	private long monitoringtick;
+
 	@Inject
 	public RanjanProvisioningSystem(EventScheduler scheduler, Configuration globalConf, Provider provider, MachineFactory machineFactory, com.google.inject.Provider<MonitoringService> monitoringService, DeprovisioningSystem deprovisioningSystem) {
 		this.scheduler = scheduler;
@@ -168,9 +197,10 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 		this.targetUtilisation = globalConf.getDoubleArray(RANJAN_TARGET_UTILISATION);
 		this.enable = globalConf.getBooleanArray(RANJAN_ENABLE);
 		this.tick = globalConf.getLong(RANJAN_TICK);
+		this.monitoringtick = globalConf.getLong(MonitoringService.MONITORING_SERVICE_TIMEBETWEENREPORTS);
 				
 				
-		scheduler.queueEvent(new Event(tick, EventPriority.LOW){
+		scheduler.queueEvent(new Event(monitoringtick, EventPriority.LOW){
 			@Override
 			public void trigger() {
 				evaluate();
@@ -182,7 +212,7 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 		for (RanjanReconfigurablePool reconfigurableSet : reconfigurableSets) {
 			reconfigurableSet.reconfigure();
 		}
-		scheduler.queueEvent(new Event(scheduler.now() + tick, EventPriority.LOW){
+		scheduler.queueEvent(new Event(scheduler.now() + monitoringtick, EventPriority.LOW){
 			@Override
 			public void trigger() {
 				evaluate();
@@ -211,34 +241,47 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 		}
 	}
 
-	private InstanceDescriptor acquireInstance(Application application, int tierID, MonitoringService monitoringService) {
+	private InstanceDescriptor acquireInstance(final Application application, int tierID, MonitoringService monitoringService) {
 		InstanceDescriptor instance = provider.acquire(vmTypePerTier[tierID]);
 		
 		Machine machine = machineFactory.create(instance);
 		instance.setApplication(application);
 
 		monitoringService.register((Monitorable) machine);
-
-		Configuration config = new Configuration();
+		
+		final Configuration config = new Configuration();
 		config.setProperty(Configuration.TIER_ID, tierID);
 		config.setProperty(Configuration.ACTION, Configuration.ACTION_INCREASE);
 		config.setProperty(Configuration.MACHINE, machine);
-		application.configure(config);
+
+		scheduler.queueEvent(new Event(scheduler.now() + machine.getStartUpDelay()) {
+			@Override
+			public void trigger() {
+				application.configure(config);
+			}
+		});
+
 		
 		return instance;
 	}
 	
-	private void releaseInstance(Application application, int tierID, MonitoringService monitoringService, InstanceDescriptor instance) {
-		provider.release(instance);
+	private void releaseInstance(Application application, int tierID, final MonitoringService monitoringService, final InstanceDescriptor instance) {
 		
 		Machine machine = instance.getMachine();
-		monitoringService.unregister((Monitorable)  machine);
 		
 		Configuration config = new Configuration();
 		config.setProperty(Configuration.TIER_ID, tierID);
 		config.setProperty(Configuration.ACTION, Configuration.ACTION_DECREASE);
 		config.setProperty(Configuration.MACHINE, machine);
 		application.configure(config);
+		
+		scheduler.queueEvent(new Event(scheduler.now() + machine.getStartUpDelay()) {
+			@Override
+			public void trigger() {
+				provider.release(instance);
+				monitoringService.unregister((Monitorable)  instance.getMachine());
+			}
+		});
 	}
 
 	@Override
