@@ -5,6 +5,8 @@ import saasim.ext.saas.WebAppRequest;
 
 public class CSVTraceReader extends LineBasedTraceReader {
 
+	private static int SEED = 0;
+
 	public CSVTraceReader() {
 		super();
 	}
@@ -21,7 +23,7 @@ public class CSVTraceReader extends LineBasedTraceReader {
 		int index = 0;
 		
 		int userID = Integer.parseInt(tokens[index++]);
-		long reqID = Long.parseLong(tokens[index++]);
+		long reqID = SEED++;
 		long arrivalTimeInMillis = Long.parseLong(tokens[index++]);
 		long requestSizeInBytes = Long.parseLong(tokens[index++]);
 		long responseSizeInBytes = Long.parseLong(tokens[index++]);

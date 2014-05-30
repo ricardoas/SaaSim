@@ -25,6 +25,10 @@ import com.google.inject.assistedinject.Assisted;
 public class RoundRobinMachine implements Machine, ResponseListener, Monitorable {
 	
 	
+	private static final int DEFAULT_MACHINE_QUANTUM = 20;
+
+	private static final String MACHINE_QUANTUM = "machine.roundrobin.quantum";
+	
 	private InstanceDescriptor descriptor;
 	private long startUpDelay;
 	
@@ -48,7 +52,7 @@ public class RoundRobinMachine implements Machine, ResponseListener, Monitorable
 		this.scheduler = scheduler;
 		this.startUpDelay = globalConf.getLong(MACHINE_SETUPTIME);
 		this.maxBacklogSize = globalConf.getInt(MACHINE_BACKLOGSIZE);
-		this.quantum = 10;
+		this.quantum = globalConf.getInt(MACHINE_QUANTUM, DEFAULT_MACHINE_QUANTUM);
 		
 		this.backlog = new LinkedList<>();
 		this.processingQueue = new LinkedList<>();
