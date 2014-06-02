@@ -7,6 +7,7 @@ import saasim.core.config.Configuration;
 import saasim.core.event.EventScheduler;
 import saasim.core.iaas.Monitorable;
 import saasim.core.infrastructure.AdmissionControl;
+import saasim.core.saas.ASP;
 import saasim.core.saas.Application;
 import saasim.core.saas.Request;
 import saasim.core.saas.Response;
@@ -23,15 +24,15 @@ import com.google.inject.Provider;
  */
 public class TieredApplication implements Application, Monitorable, ResponseListener {
 	
+	private static int idSeed = 0;
 	
 	private final AdmissionControl control;
 	private final Tier[] tiers;
 	private final EventScheduler scheduler;
 	private final int id;
-	
+	private final ASP asp;
 	private long [] arrival_counter, rejection_counter, failure_counter, finish_counter, response_time;
 
-	private static int idSeed = 0;
 
 	/**
 	 * Default constructor.
@@ -40,9 +41,10 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 	 * @param tiers instances of {@link Tier}.
 	 */
 	@Inject
-	public TieredApplication(Configuration globalConf, EventScheduler scheduler, AdmissionControl control, Provider<Tier> tierFactory) {
+	public TieredApplication(Configuration globalConf, EventScheduler scheduler, AdmissionControl control, Provider<Tier> tierFactory, ASP asp) {
 		this.scheduler = scheduler;
 		this.control = control;
+		this.asp = asp;
 		this.tiers = assembleTiers(globalConf, tierFactory);
 		
 		resetStatistics();
@@ -86,6 +88,7 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 				this.tiers[request.getCurrentTier()].queue(request);
 			}else{
 				rejection_counter[request.getCurrentTier()]++;
+				asp.failed(request);
 			}
 		}
 	}
@@ -114,14 +117,21 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 	public void processDone(Request request, Response response) {
 		if(response == null){
 			failure_counter[request.getCurrentTier()]++;
+			if(request.getCurrentTier() == 0){
+				asp.failed(request);
+			}else{
+				request.getResponseListener().processDone(request, response);
+			}
 		}else{
 			finish_counter[request.getCurrentTier()]++;
 			response_time[request.getCurrentTier()] += (scheduler.now() - request.popArrival());
-		}
-		
-		if(request.getCurrentTier() != 0){
-			request.setFinishTime(scheduler.now());
-			request.getResponseListener().processDone(request, response);
+			
+			if(request.getCurrentTier() == 0){
+				request.setFinishTime(scheduler.now());
+				asp.finished(request);
+			}else{
+				request.getResponseListener().processDone(request, response);
+			}
 		}
 	}
 	

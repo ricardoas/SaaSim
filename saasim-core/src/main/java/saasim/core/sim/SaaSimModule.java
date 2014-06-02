@@ -38,6 +38,7 @@ public class SaaSimModule extends AbstractModule {
 	public static final String TRACE_PARSER_CLASS = "trace.reader.class";
 	public static final String TRAFFIC_GENERATOR_CLASS = "traffic.generator.class";
 	
+	public static final String ASP_CLASS = "asp.class";
 	public static final String TENANT_CLASS = "saas.tenant.class";
 	public static final String APPLICATION_CLASS = "application.class";
 	public static final String TIER_CLASS = "application.tier.class";
@@ -82,7 +83,7 @@ public class SaaSimModule extends AbstractModule {
 		bind(TrafficGenerator.class).to((Class<? extends TrafficGenerator>) load(configuration.getString(TRAFFIC_GENERATOR_CLASS)));
 
 		// APPLICATION
-		bind(ASP.class).to(MultiTenantASP.class);
+		bind(ASP.class).to((Class<? extends ASP>) load(configuration.getString(ASP_CLASS)));
 		
 		bind(Tenant.class).to((Class<? extends Tenant>) load(configuration.getString(TENANT_CLASS)));
 		

@@ -148,7 +148,7 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 			sb.append(", ");
 			sb.append((long)statistics.get("util").getN());
 			
-			Logger.getLogger(ProvisioningSystem.class).info(sb.toString());
+			LOGGER.info(sb.toString());
 		}
 	}
 
@@ -158,6 +158,8 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 	private static final String RANJAN_TICK = "provisioning.ranjan.tick";
 	
 	private static String RANJAN_TARGET_UTILISATION = "provisioning.ranjan.target";  
+
+	private static final Logger LOGGER = Logger.getLogger(ProvisioningSystem.class);
 
 	private Provider provider;
 

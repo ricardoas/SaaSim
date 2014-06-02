@@ -17,6 +17,4 @@ public interface Tenant {
 	int getID();
 
 	Application getApplication();
-	
-	
 }
