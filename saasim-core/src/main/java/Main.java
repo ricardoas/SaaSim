@@ -4,7 +4,6 @@ import saasim.core.sim.SaaSim;
 import saasim.core.sim.SaaSimModule;
 
 import com.google.inject.Guice;
-import com.google.inject.Injector;
 
 /**
  * Entry point.

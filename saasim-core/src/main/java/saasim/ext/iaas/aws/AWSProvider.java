@@ -109,9 +109,6 @@ public class AWSProvider implements Provider {
 
 		for (AWSMarket market: markets) {
 			if(market.canAcquire(type)){
-				if(market.toString().equals("heavy")){
-					System.out.println(market);
-				}
 				return market.acquire(type);
 			}
 		}
