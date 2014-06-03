@@ -1,5 +1,9 @@
 #!/bin/bash
 
+for i in output*; do
+
+cd ${i}/saasim
+
 lines=`wc -l saas.log | awk '{print $1}'`
 
 result=`R --slave --vanilla <<EOF
@@ -11,4 +15,7 @@ result=`R --slave --vanilla <<EOF
 	cat(quantile(data[,2], .95))
 EOF`
 
-echo $result
+echo $result > rt.log
+
+cd  ../..
+done
