@@ -12,9 +12,10 @@
 	</properties>
 	<packaging>pom</packaging>
 	<modules>
-		<module>saasim-legacy</module>
 		<module>saasim-core</module>
-		
+		<module>saasim-quid</module>
+		<module>saasim-ext</module>
+		<module>saasim-dist</module>
 	</modules>
 	<prerequisites>
 		<maven>2.2.1</maven>

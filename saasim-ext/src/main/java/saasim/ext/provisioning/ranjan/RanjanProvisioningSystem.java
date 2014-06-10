@@ -74,9 +74,9 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 			arrived.addValue( statistics.get("arrival_" + tierID).getMean() );
 			finished.addValue( statistics.get("finish_" + tierID).getMean() );
 			util.addValue( statistics.get("util").getMean() );
-			n.addValue( statistics.get("util").getN() );
+			n.addValue( vmPool.size() );
 
-			if(now % tick == 0){
+			if(now % tick == 0 && now > warmup){
 				int delta = evaluateNumberOfServersForNextInterval();
 
 				if(delta < 0){
@@ -123,6 +123,7 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 			double d = u / finished_requests;
 			double u_dash = Math.max(arrived_requests, finished_requests) * d;
 			int n_dash = (int) Math.ceil( u_dash * number_of_active_servers / targetUtilisation[tierID] );
+			
 			return Math.max(1, n_dash) - number_of_active_servers;
 		}
 		
@@ -157,6 +158,8 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 	
 	private static final String RANJAN_TICK = "provisioning.ranjan.tick";
 	
+	private static final String RANJAN_WARMUP = "provisioning.ranjan.warmup";
+	
 	private static String RANJAN_TARGET_UTILISATION = "provisioning.ranjan.target";  
 
 	private static final Logger LOGGER = Logger.getLogger(ProvisioningSystem.class);
@@ -168,6 +171,8 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 	private EventScheduler scheduler;
 
 	private long tick;
+
+	private long warmup;
 
 	private int[] startNumberOfReplicas;
 
@@ -199,6 +204,7 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 		this.targetUtilisation = globalConf.getDoubleArray(RANJAN_TARGET_UTILISATION);
 		this.enable = globalConf.getBooleanArray(RANJAN_ENABLE);
 		this.tick = globalConf.getLong(RANJAN_TICK);
+		this.warmup = globalConf.getLong(RANJAN_WARMUP);
 		this.monitoringtick = globalConf.getLong(MonitoringService.MONITORING_SERVICE_TIMEBETWEENREPORTS);
 				
 				

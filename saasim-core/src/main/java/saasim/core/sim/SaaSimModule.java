@@ -18,13 +18,10 @@ import saasim.core.saas.ASP;
 import saasim.core.saas.Application;
 import saasim.core.saas.Tenant;
 import saasim.core.saas.Tier;
-import saasim.ext.iaas.LoggerCustomer;
-import saasim.ext.saas.MultiTenantASP;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Provides;
-import com.google.inject.Singleton;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 
@@ -47,6 +44,7 @@ public class SaaSimModule extends AbstractModule {
 	
 	public static final String MACHINE_CLASS = "machine.class";
 	public static final String MONITORING_SERVICE_CLASS = "monitoring.service.class";
+	public static final String CUSTOMER_CLASS = "customer.class";
 	public static final String MONITORING_MONITOR_CLASS = "monitoring.monitor.class";
 	public static final String PROVISIONING_SYSTEM_CLASS = "provisioning.class";
 	public static final String DEPROVISIONING_SYSTEM_CLASS = "deprovisioning.class";
@@ -105,7 +103,7 @@ public class SaaSimModule extends AbstractModule {
 		
 		bind(MonitoringService.class).to((Class<? extends MonitoringService>) load(configuration.getString(MONITORING_SERVICE_CLASS)));
 		
-		bind(Customer.class).to(LoggerCustomer.class).in(Singleton.class);;
+		bind(Customer.class).to((Class<? extends Customer>) load(configuration.getString(CUSTOMER_CLASS)));
 		
 		install(new FactoryModuleBuilder()
 	     .implement(Machine.class, (Class<? extends Machine>) load(configuration.getString(MACHINE_CLASS)))
