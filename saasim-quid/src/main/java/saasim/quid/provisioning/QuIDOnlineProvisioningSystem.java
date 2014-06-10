@@ -1,4 +1,4 @@
-package saasim.ext.provisioning.ranjan;
+package saasim.quid.provisioning;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,15 +27,15 @@ import com.google.inject.Singleton;
 
 
 /**
- * Simple implementation of QuID algorithm as depicted in: 
+ * Simple implementation of QuID-online algorithm as depicted in: 
  * <a href='http://dx.doi.org/10.1109/IWQoS.2002.1006569'>http://dx.doi.org/10.1109/IWQoS.2002.1006569<a>
  * <br>
- * This implementation is not ready to handle the problem of heterogeneous machines.
+ * This implementation is not ready to handle pool of heterogeneous instances.
  * 
  * @author Ricardo Araújo Santos - ricardo@lsd.ufcg.edu.br
  */
 @Singleton
-public class RanjanProvisioningSystem implements ProvisioningSystem {
+public class QuIDOnlineProvisioningSystem implements ProvisioningSystem {
 	
 	private class RanjanReconfigurablePool {
 		private Application application;
@@ -47,7 +47,6 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 		private SummaryStatistics arrived;
 		private SummaryStatistics finished;
 		private SummaryStatistics util;
-		private SummaryStatistics n;
 		private SummaryStatistics time;
 
 		public RanjanReconfigurablePool(Application application, int tierID, MonitoringService poolMonitor, List<InstanceDescriptor> vmPool) {
@@ -59,7 +58,6 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 			this.arrived = new SummaryStatistics();
 			this.finished = new SummaryStatistics();
 			this.util = new SummaryStatistics();
-			this.n = new SummaryStatistics();
 			this.time = new SummaryStatistics();
 		}
 
@@ -74,9 +72,8 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 			arrived.addValue( statistics.get("arrival_" + tierID).getMean() );
 			finished.addValue( statistics.get("finish_" + tierID).getMean() );
 			util.addValue( statistics.get("util").getMean() );
-			n.addValue( vmPool.size() );
 
-			if(now % tick == 0 && now > warmup){
+			if(now % tick == 0){
 				int delta = evaluateNumberOfServersForNextInterval();
 
 				if(delta < 0){
@@ -90,7 +87,7 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 				}else{
 					for (int i = 0; i < delta; i++) {
 						if(provider.canAcquire(vmTypePerTier[tierID])){
-							vmPool.add(acquireInstance(application, tierID, poolMonitor));
+							acquireInstance(application, tierID, poolMonitor, vmPool);
 						}
 					}
 				}
@@ -98,7 +95,6 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 				arrived = new SummaryStatistics();
 				finished = new SummaryStatistics();
 				util = new SummaryStatistics();
-				n = new SummaryStatistics();
 				time = new SummaryStatistics();;
 			}
 		}
@@ -117,7 +113,8 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 			
 			double finished_requests = finished.getSum();
 			double arrived_requests = arrived.getSum();
-			int number_of_active_servers = (int) n.getMax();
+//			int number_of_active_servers = (int) n.getMax();
+			int number_of_active_servers = vmPool.size();
 			double u = util.getMean();
 			
 			double d = u / finished_requests;
@@ -191,7 +188,7 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 	private long monitoringtick;
 
 	@Inject
-	public RanjanProvisioningSystem(EventScheduler scheduler, Configuration globalConf, Provider provider, MachineFactory machineFactory, com.google.inject.Provider<MonitoringService> monitoringService, DeprovisioningSystem deprovisioningSystem) {
+	public QuIDOnlineProvisioningSystem(EventScheduler scheduler, Configuration globalConf, Provider provider, MachineFactory machineFactory, com.google.inject.Provider<MonitoringService> monitoringService, DeprovisioningSystem deprovisioningSystem) {
 		this.scheduler = scheduler;
 		this.provider = provider;
 		this.machineFactory = machineFactory;
@@ -208,7 +205,7 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 		this.monitoringtick = globalConf.getLong(MonitoringService.MONITORING_SERVICE_TIMEBETWEENREPORTS);
 				
 				
-		scheduler.queueEvent(new Event(monitoringtick, EventPriority.LOW){
+		scheduler.queueEvent(new Event(warmup, EventPriority.LOW){
 			@Override
 			public void trigger() {
 				evaluate();
@@ -240,7 +237,7 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 				MonitoringService poolMonitor = monitoringServiceProvider.get();
 				poolMonitor.addChildMonitoringService(applicationMonitor);
 				for (int j = 0; j < Integer.valueOf(startNumberOfReplicas[tierID]); j++) {
-					vmPool.add(acquireInstance(application, tierID, poolMonitor));
+					acquireInstance(application, tierID, poolMonitor, vmPool);
 				}
 				if(enable[tierID]){
 					reconfigurableSets.add(new RanjanReconfigurablePool(application, tierID, poolMonitor, vmPool));
@@ -249,23 +246,25 @@ public class RanjanProvisioningSystem implements ProvisioningSystem {
 		}
 	}
 
-	private InstanceDescriptor acquireInstance(final Application application, int tierID, MonitoringService monitoringService) {
-		InstanceDescriptor instance = provider.acquire(vmTypePerTier[tierID]);
+	private InstanceDescriptor acquireInstance(final Application application, final int tierID, final MonitoringService monitoringService, final List<InstanceDescriptor> vmPool) {
+		final InstanceDescriptor instance = provider.acquire(vmTypePerTier[tierID]);
 		
-		Machine machine = machineFactory.create(instance);
+		final Machine machine = machineFactory.create(instance);
 		instance.setApplication(application);
 
-		monitoringService.register((Monitorable) machine);
-		
-		final Configuration config = new Configuration();
-		config.setProperty(Configuration.TIER_ID, tierID);
-		config.setProperty(Configuration.ACTION, Configuration.ACTION_INCREASE);
-		config.setProperty(Configuration.MACHINE, machine);
 
 		scheduler.queueEvent(new Event(scheduler.now() + machine.getStartUpDelay()) {
 			@Override
 			public void trigger() {
+				monitoringService.register((Monitorable) machine);
+				
+				Configuration config = new Configuration();
+				config.setProperty(Configuration.TIER_ID, tierID);
+				config.setProperty(Configuration.ACTION, Configuration.ACTION_INCREASE);
+				config.setProperty(Configuration.MACHINE, machine);
+
 				application.configure(config);
+				vmPool.add(instance);
 			}
 		});
 
