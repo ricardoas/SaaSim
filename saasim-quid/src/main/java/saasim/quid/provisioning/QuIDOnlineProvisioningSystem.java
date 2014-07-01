@@ -48,6 +48,7 @@ public class QuIDOnlineProvisioningSystem implements ProvisioningSystem {
 		private SummaryStatistics finished;
 		private SummaryStatistics util;
 		private SummaryStatistics time;
+		private int number_of_active_servers;
 
 		public RanjanReconfigurablePool(Application application, int tierID, MonitoringService poolMonitor, List<InstanceDescriptor> vmPool) {
 			this.poolMonitor = poolMonitor;
@@ -59,12 +60,12 @@ public class QuIDOnlineProvisioningSystem implements ProvisioningSystem {
 			this.finished = new SummaryStatistics();
 			this.util = new SummaryStatistics();
 			this.time = new SummaryStatistics();
+			this.number_of_active_servers = this.vmPool.size();
 		}
 
 		public void reconfigure() {
 			
 			statistics = poolMonitor.getStatistics();
-			printStatistics();
 		
 			long now = (long) statistics.get("TIME").getMean();
 			
@@ -72,6 +73,7 @@ public class QuIDOnlineProvisioningSystem implements ProvisioningSystem {
 			arrived.addValue( statistics.get("arrival_" + tierID).getMean() );
 			finished.addValue( statistics.get("finish_" + tierID).getMean() );
 			util.addValue( statistics.get("util").getMean() );
+			number_of_active_servers = (int) statistics.get("util").getN();
 
 			if(now % tick == 0){
 				int delta = evaluateNumberOfServersForNextInterval();
@@ -92,6 +94,8 @@ public class QuIDOnlineProvisioningSystem implements ProvisioningSystem {
 					}
 				}
 				
+				printStatistics(vmPool.size(), delta);
+
 				arrived = new SummaryStatistics();
 				finished = new SummaryStatistics();
 				util = new SummaryStatistics();
@@ -113,8 +117,7 @@ public class QuIDOnlineProvisioningSystem implements ProvisioningSystem {
 			
 			double finished_requests = finished.getSum();
 			double arrived_requests = arrived.getSum();
-//			int number_of_active_servers = (int) n.getMax();
-			int number_of_active_servers = vmPool.size();
+//			int number_of_active_servers = vmPool.size();
 			double u = util.getMean();
 			
 			double d = u / finished_requests;
@@ -124,7 +127,7 @@ public class QuIDOnlineProvisioningSystem implements ProvisioningSystem {
 			return Math.max(1, n_dash) - number_of_active_servers;
 		}
 		
-		public void printStatistics(){
+		public void printStatistics(int n, int delta){
 			StringBuilder sb = new StringBuilder();
 			sb.append(application.getID());
 			sb.append(", ");
@@ -145,6 +148,10 @@ public class QuIDOnlineProvisioningSystem implements ProvisioningSystem {
 			sb.append(statistics.get("util").getMean());
 			sb.append(", ");
 			sb.append((long)statistics.get("util").getN());
+//			sb.append(", ");
+//			sb.append(n);
+//			sb.append(", ");
+//			sb.append(delta);
 			
 			LOGGER.info(sb.toString());
 		}
@@ -205,7 +212,7 @@ public class QuIDOnlineProvisioningSystem implements ProvisioningSystem {
 		this.monitoringtick = globalConf.getLong(MonitoringService.MONITORING_SERVICE_TIMEBETWEENREPORTS);
 				
 				
-		scheduler.queueEvent(new Event(warmup, EventPriority.LOW){
+		scheduler.queueEvent(new Event(tick + warmup, EventPriority.LOW){
 			@Override
 			public void trigger() {
 				evaluate();
@@ -274,7 +281,7 @@ public class QuIDOnlineProvisioningSystem implements ProvisioningSystem {
 	
 	private void releaseInstance(Application application, int tierID, final MonitoringService monitoringService, final InstanceDescriptor instance) {
 		
-		Machine machine = instance.getMachine();
+		final Machine machine = instance.getMachine();
 		
 		Configuration config = new Configuration();
 		config.setProperty(Configuration.TIER_ID, tierID);
@@ -282,11 +289,20 @@ public class QuIDOnlineProvisioningSystem implements ProvisioningSystem {
 		config.setProperty(Configuration.MACHINE, machine);
 		application.configure(config);
 		
-		scheduler.queueEvent(new Event(scheduler.now() + machine.getStartUpDelay()) {
+		shutdownIfIdle(monitoringService, instance, machine);
+	}
+
+	private void shutdownIfIdle(final MonitoringService monitoringService,
+			final InstanceDescriptor instance, final Machine machine) {
+		scheduler.queueEvent(new Event(scheduler.now() + 1000) {
 			@Override
 			public void trigger() {
-				provider.release(instance);
-				monitoringService.unregister((Monitorable)  instance.getMachine());
+				if(machine.canShutdown()){
+					provider.release(instance);
+					monitoringService.unregister((Monitorable)  instance.getMachine());
+				}else{
+					shutdownIfIdle(monitoringService, instance, machine);
+				}
 			}
 		});
 	}

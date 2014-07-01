@@ -24,4 +24,6 @@ public interface Machine{
 	long getStartUpDelay();
 	
 	void shutdown();
+
+	boolean canShutdown();
 }

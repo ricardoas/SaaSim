@@ -164,4 +164,9 @@ public class SingleQueueMachine implements Machine, ResponseListener, Monitorabl
 		
 		return info;
 	}
+
+	@Override
+	public boolean canShutdown() {
+		return semaphore.availablePermits() == descriptor.getNumberOfCPUCores();
+	}
 }

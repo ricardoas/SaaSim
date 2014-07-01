@@ -219,4 +219,9 @@ public class RoundRobinMachine implements Machine, ResponseListener, Monitorable
 		
 		return info;
 	}
+
+	@Override
+	public boolean canShutdown() {
+		return processorTokens.availablePermits() == descriptor.getNumberOfCPUCores();
+	}
 }
