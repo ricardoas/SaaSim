@@ -93,14 +93,14 @@ public class QuIDOnlineProvisioningSystem implements ProvisioningSystem {
 						}
 					}
 				}
-				
-				printStatistics(vmPool.size(), delta);
 
 				arrived = new SummaryStatistics();
 				finished = new SummaryStatistics();
 				util = new SummaryStatistics();
 				time = new SummaryStatistics();;
 			}
+
+			printStatistics();
 		}
 
 
@@ -127,7 +127,7 @@ public class QuIDOnlineProvisioningSystem implements ProvisioningSystem {
 			return Math.max(1, n_dash) - number_of_active_servers;
 		}
 		
-		public void printStatistics(int n, int delta){
+		public void printStatistics(){
 			StringBuilder sb = new StringBuilder();
 			sb.append(application.getID());
 			sb.append(", ");
@@ -148,10 +148,6 @@ public class QuIDOnlineProvisioningSystem implements ProvisioningSystem {
 			sb.append(statistics.get("util").getMean());
 			sb.append(", ");
 			sb.append((long)statistics.get("util").getN());
-//			sb.append(", ");
-//			sb.append(n);
-//			sb.append(", ");
-//			sb.append(delta);
 			
 			LOGGER.info(sb.toString());
 		}
@@ -212,7 +208,7 @@ public class QuIDOnlineProvisioningSystem implements ProvisioningSystem {
 		this.monitoringtick = globalConf.getLong(MonitoringService.MONITORING_SERVICE_TIMEBETWEENREPORTS);
 				
 				
-		scheduler.queueEvent(new Event(tick + warmup, EventPriority.LOW){
+		scheduler.queueEvent(new Event(monitoringtick + warmup, EventPriority.LOW){
 			@Override
 			public void trigger() {
 				evaluate();
