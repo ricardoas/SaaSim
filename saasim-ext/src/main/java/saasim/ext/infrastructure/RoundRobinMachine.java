@@ -132,17 +132,20 @@ public class RoundRobinMachine implements Machine, ResponseListener, Monitorable
 		if(request.getCPUTimeDemandInMillis() != 0){
 			processingQueue.add(request);
 			scheduleNext();
-		}else if(shouldForward(request)){
-			request.setResponseListener(this);
-			request.forward();
-			descriptor.getApplication().queue(request);
-			scheduleNext();
 		}else{
 			threadTokens.release();
-			request.getResponseListener().processDone(request, new Response() {});
+			if(shouldForward(request)){
+				request.setResponseListener(this);
+				request.forward();
+				descriptor.getApplication().queue(request);
+				//			scheduleNext();
+			}else{
+				request.getResponseListener().processDone(request, new Response() {});
+			}
 			if(!backlog.isEmpty()){
-				threadTokens.tryAcquire();
-				processingQueue.add(backlog.poll());
+				if(threadTokens.tryAcquire()){
+					processingQueue.add(backlog.poll());
+				}
 			}
 			scheduleNext();
 		}
@@ -166,17 +169,17 @@ public class RoundRobinMachine implements Machine, ResponseListener, Monitorable
 		}
 
 		request.getResponseListener().processDone(request, new Response() {});
-		threadTokens.release();
+//		threadTokens.release();
 		
-		if(!backlog.isEmpty()){
-			if(threadTokens.tryAcquire()){
-				processingQueue.add(backlog.poll());
-				
-				if(processorTokens.tryAcquire()){
-					scheduleNext();
-				}
-			}
-		}
+//		if(!backlog.isEmpty()){
+//			if(threadTokens.tryAcquire()){
+//				processingQueue.add(backlog.poll());
+//				
+//				if(processorTokens.tryAcquire()){
+//					scheduleNext();
+//				}
+//			}
+//		}
 	}
 
 	@Override
@@ -215,6 +218,8 @@ public class RoundRobinMachine implements Machine, ResponseListener, Monitorable
 		info.put("ap", 1.0*processorTokens.availablePermits());
 		info.put("at", 1.0*threadTokens.availablePermits());
 		
+		System.out.print(descriptor + " ");
+		System.out.println(info);
 		resetStatistics(busy_debt);
 		
 		return info;

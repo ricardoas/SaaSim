@@ -251,7 +251,7 @@ public class QuIDOnlineProvisioningSystem implements ProvisioningSystem {
 
 	private InstanceDescriptor acquireInstance(final Application application, final int tierID, final MonitoringService monitoringService, final List<InstanceDescriptor> vmPool) {
 		final InstanceDescriptor instance = provider.acquire(vmTypePerTier[tierID]);
-		
+		System.err.println(tierID + " " + instance);
 		final Machine machine = machineFactory.create(instance);
 		instance.setApplication(application);
 

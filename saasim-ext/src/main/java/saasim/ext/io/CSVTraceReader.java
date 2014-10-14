@@ -28,7 +28,7 @@ public class CSVTraceReader extends LineBasedTraceReader {
 		long requestSizeInBytes = Long.parseLong(tokens[index++]);
 		long responseSizeInBytes = Long.parseLong(tokens[index++]);
 
-		long [] demand = new long[3];
+		long [] demand = new long[tokens.length-4];
 		for (int i = 0; i < demand.length; i++) {
 			demand[i] = Long.parseLong(tokens[index++]);
 		}
