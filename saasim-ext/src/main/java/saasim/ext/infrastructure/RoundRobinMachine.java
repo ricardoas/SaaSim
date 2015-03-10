@@ -133,18 +133,18 @@ public class RoundRobinMachine implements Machine, ResponseListener, Monitorable
 			processingQueue.add(request);
 			scheduleNext();
 		}else{
-			threadTokens.release();
 			if(shouldForward(request)){
 				request.setResponseListener(this);
 				request.forward();
 				descriptor.getApplication().queue(request);
 				//			scheduleNext();
 			}else{
+				threadTokens.release();
 				request.getResponseListener().processDone(request, new Response() {});
-			}
-			if(!backlog.isEmpty()){
-				if(threadTokens.tryAcquire()){
-					processingQueue.add(backlog.poll());
+				if(!backlog.isEmpty()){
+					if(threadTokens.tryAcquire()){
+						processingQueue.add(backlog.poll());
+					}
 				}
 			}
 			scheduleNext();
@@ -169,17 +169,20 @@ public class RoundRobinMachine implements Machine, ResponseListener, Monitorable
 		}
 
 		request.getResponseListener().processDone(request, new Response() {});
-//		threadTokens.release();
+
+		// TRYING OUT
 		
-//		if(!backlog.isEmpty()){
-//			if(threadTokens.tryAcquire()){
-//				processingQueue.add(backlog.poll());
-//				
-//				if(processorTokens.tryAcquire()){
-//					scheduleNext();
-//				}
-//			}
-//		}
+		threadTokens.release();
+		
+		if(!backlog.isEmpty()){
+			if(threadTokens.tryAcquire()){
+				processingQueue.add(backlog.poll());
+				
+				if(processorTokens.tryAcquire()){
+					scheduleNext();
+				}
+			}
+		}
 	}
 
 	@Override
