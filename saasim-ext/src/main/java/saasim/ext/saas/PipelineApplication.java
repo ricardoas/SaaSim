@@ -22,7 +22,7 @@ import com.google.inject.Provider;
  * 
  * @author Ricardo Ara&uacute;jo Santos - ricardo@lsd.ufcg.edu.br
  */
-public class TieredApplication implements Application, Monitorable, ResponseListener {
+public class PipelineApplication implements Application, Monitorable, ResponseListener {
 	
 	private static int idSeed = 0;
 	
@@ -41,7 +41,7 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 	 * @param tiers instances of {@link Tier}.
 	 */
 	@Inject
-	public TieredApplication(Configuration globalConf, EventScheduler scheduler, AdmissionControl control, Provider<Tier> tierFactory, ASP asp) {
+	public PipelineApplication(Configuration globalConf, EventScheduler scheduler, AdmissionControl control, Provider<Tier> tierFactory, ASP asp) {
 		this.scheduler = scheduler;
 		this.control = control;
 		this.asp = asp;
@@ -77,15 +77,19 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 	@Override
 	public void queue(Request request) {
 		
-		arrival_counter[request.getCurrentTier()]++;
-		request.pushArrival(scheduler.now());
-
-		if(control.canAccept(request)){
-			request.setResponseListener(this);
-			this.tiers[request.getCurrentTier()].queue(request);
+		if(request.getCurrentTier() == tiers.length){ // reached last tier
+			request.getResponseListener().processDone(request, new Response() {});
 		}else{
-			rejection_counter[request.getCurrentTier()]++;
-			asp.failed(request);
+			arrival_counter[request.getCurrentTier()]++;
+			request.pushArrival(scheduler.now());
+			
+			if(control.canAccept(request)){
+				request.setResponseListener(this);
+				this.tiers[request.getCurrentTier()].queue(request);
+			}else{
+				rejection_counter[request.getCurrentTier()]++;
+				asp.failed(request);
+			}
 		}
 	}
 
@@ -113,26 +117,22 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 	public void processDone(Request request, Response response) {
 		if(response == null){
 			failure_counter[request.getCurrentTier()]++;
-			asp.failed(request);
-			return;
+			if(request.getCurrentTier() == 0){
+				asp.failed(request);
+			}else{
+				request.getResponseListener().processDone(request, response);
+			}
+		}else{
+			finish_counter[request.getCurrentTier()]++;
+			response_time[request.getCurrentTier()] += (scheduler.now() - request.popArrival());
+			
+			if(request.getCurrentTier() == 0){
+				request.setFinishTime(scheduler.now());
+				asp.finished(request);
+			}else{
+				request.getResponseListener().processDone(request, response);
+			}
 		}
-		
-		int previousTier = request.getCurrentTier();
-
-		ResponseListener listener = request.getResponseListener();
-		
-		if(listener == null){
-			finish_counter[0]++;
-			response_time[0] += (scheduler.now() - request.popArrival());
-			request.setFinishTime(scheduler.now());
-			asp.finished(request);
-			return;
-		}
-
-		finish_counter[previousTier]++;
-		response_time[previousTier] += (scheduler.now() - request.popArrival());
-		
-		listener.processDone(request, new Response() {});
 	}
 	
 	@Override

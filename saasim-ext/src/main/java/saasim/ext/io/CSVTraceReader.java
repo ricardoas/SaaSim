@@ -32,6 +32,12 @@ public class CSVTraceReader extends LineBasedTraceReader {
 		for (int i = 0; i < demand.length; i++) {
 			demand[i] = Long.parseLong(tokens[index++]);
 		}
+		return buildRequest(userID, reqID, arrivalTimeInMillis,
+				requestSizeInBytes, responseSizeInBytes, demand);
+	}
+
+	protected Request buildRequest(int userID, long reqID, long arrivalTimeInMillis,
+			long requestSizeInBytes, long responseSizeInBytes, long[] demand) {
 		return new WebAppRequest(reqID, tenantID, userID, arrivalTimeInMillis,
 				requestSizeInBytes, responseSizeInBytes, demand);
 	}

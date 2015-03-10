@@ -20,7 +20,7 @@ import saasim.core.infrastructure.AdmissionControl;
 import saasim.core.saas.Application;
 import saasim.core.saas.Request;
 import saasim.core.saas.Tier;
-import saasim.ext.saas.TieredApplication;
+import saasim.ext.saas.PipelineApplication;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -70,7 +70,7 @@ public class SingleTierApplicationTest {
 		Guice.createInjector(new AbstractModule() {
 		      @Override 
 		      protected void configure() {
-		    	  bind(Application.class).to(TieredApplication.class);
+		    	  bind(Application.class).to(PipelineApplication.class);
 		          bind(MonitoringService.class).toInstance(monitor);
 		          bind(AdmissionControl.class).toInstance(control);
 		          bind(Tier.class).toInstance(tier);
@@ -90,7 +90,7 @@ public class SingleTierApplicationTest {
 	}
 
 	/**
-	 * Test method for {@link saasim.ext.saas.TieredApplication#queue(saasim.core.saas.Request)}.
+	 * Test method for {@link saasim.ext.saas.PipelineApplication#queue(saasim.core.saas.Request)}.
 	 */
 	@Test
 	public final void testCanQueue() {
@@ -107,7 +107,7 @@ public class SingleTierApplicationTest {
 	}
 
 	/**
-	 * Test method for {@link saasim.ext.saas.TieredApplication#queue(saasim.core.saas.Request)}.
+	 * Test method for {@link saasim.ext.saas.PipelineApplication#queue(saasim.core.saas.Request)}.
 	 */
 	@Test
 	public final void testCannotQueue() {
@@ -123,7 +123,7 @@ public class SingleTierApplicationTest {
 	}
 
 	/**
-	 * Test method for {@link saasim.ext.saas.TieredApplication#configure(saasim.core.provisioning.TierConfiguration)}.
+	 * Test method for {@link saasim.ext.saas.PipelineApplication#configure(saasim.core.provisioning.TierConfiguration)}.
 	 */
 	@Test
 	public final void testConfig() {
@@ -131,7 +131,7 @@ public class SingleTierApplicationTest {
 	}
 
 	/**
-	 * Test method for {@link saasim.ext.saas.TieredApplication#processDone(saasim.core.saas.Request, saasim.core.application.Response)}.
+	 * Test method for {@link saasim.ext.saas.PipelineApplication#processDone(saasim.core.saas.Request, saasim.core.application.Response)}.
 	 */
 	@Test
 	public final void testProcessDone() {
