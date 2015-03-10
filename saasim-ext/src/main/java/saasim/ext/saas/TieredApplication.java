@@ -117,22 +117,18 @@ public class TieredApplication implements Application, Monitorable, ResponseList
 			return;
 		}
 		
-		int previousTier = request.getCurrentTier();
-
-		ResponseListener listener = request.getResponseListener();
-		
-		if(listener == null){
-			finish_counter[0]++;
-			response_time[0] += (scheduler.now() - request.popArrival());
-			request.setFinishTime(scheduler.now());
-			asp.finished(request);
-			return;
-		}
+		int previousTier = request.getPreviousTier();
 
 		finish_counter[previousTier]++;
 		response_time[previousTier] += (scheduler.now() - request.popArrival());
 		
-		listener.processDone(request, new Response() {});
+		if(request.getCurrentTier() == -1){
+			request.setFinishTime(scheduler.now());
+			asp.finished(request);
+			return;
+		}
+		
+		request.getResponseListener().processDone(request, new Response() {});
 	}
 	
 	@Override

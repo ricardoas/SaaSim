@@ -30,6 +30,8 @@ public interface Request {
 
 	int getCurrentTier();
 
+	int getPreviousTier();
+
 	void forward();
 
 	void rollback();

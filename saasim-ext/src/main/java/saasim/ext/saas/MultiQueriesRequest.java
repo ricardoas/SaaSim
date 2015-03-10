@@ -24,8 +24,7 @@ public class MultiQueriesRequest implements Request {
 	private long serviceTimeInMillis[];
 	private long finishTimeInMillis;
 	private Deque<ResponseListener> listeners;
-	private int tier;
-	private long arrival[];
+	private Deque<Long> arrival;
 
 	private int index;
 
@@ -51,12 +50,11 @@ public class MultiQueriesRequest implements Request {
 				this.responseSizeInBytes = responseSizeInBytes;
 				this.demand = demand;
 				this.index = 0;
-				this.tier = 0;
 				
 				this.serviceTimeInMillis = new long[demand.length/2];
 				this.finishTimeInMillis = 0;
 				this.listeners = new LinkedList<>();
-				this.arrival = new long[demand.length];
+				this.arrival = new LinkedList<>();
 	}
 
 	@Override
@@ -111,7 +109,12 @@ public class MultiQueriesRequest implements Request {
 
 	@Override
 	public int getCurrentTier() {
-		return 2*index < demand.length? (int) demand[2*index]: 0;
+		return 2*index < demand.length? (int) demand[2*index]: -1;
+	}
+	
+	@Override
+	public int getPreviousTier() {
+		return (int) demand[2*(index-1)];
 	}
 
 	@Override
@@ -126,12 +129,12 @@ public class MultiQueriesRequest implements Request {
 
 	@Override
 	public void pushArrival(long arrival) {
-		this.arrival[getCurrentTier()] = arrival;
+		this.arrival.addFirst(arrival);
 	}
 
 	@Override
 	public long popArrival() {
-		return this.arrival[getCurrentTier()];
+		return this.arrival.pollFirst();
 	}
 	
 	@Override
@@ -145,4 +148,5 @@ public class MultiQueriesRequest implements Request {
 			return true;
 		return id == ((MultiQueriesRequest) obj).id;
 	}
+
 }

@@ -140,4 +140,9 @@ public class WebAppRequest implements Request {
 			return true;
 		return id == ((WebAppRequest) obj).id;
 	}
+
+	@Override
+	public int getPreviousTier() {
+		return tier - 1;
+	}
 }
