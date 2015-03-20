@@ -28,7 +28,9 @@ public class RoundRobinServer implements Machine, ResponseListener, Monitorable 
 	private static final int DEFAULT_MACHINE_QUANTUM = 20;
 
 	private static final String MACHINE_QUANTUM = "machine.roundrobin.quantum";
-	
+	private static final String MACHINE_NETWORKDELAY = "machine.network.delay";
+	private static final String MACHINE_CONTEXTCHANGEDELAY = "machine.contextchange.delay";
+
 	private InstanceDescriptor descriptor;
 	private long startUpDelay;
 	
@@ -43,6 +45,13 @@ public class RoundRobinServer implements Machine, ResponseListener, Monitorable 
 	private FastSemaphore threadTokens;
 	private Map<Request,  Long> runningNow;
 	private int quantum;
+
+	private int tier;
+
+	private long networkDelay;
+	private long[] contextChangeDelay;
+
+	private int maxThreads;
 	
 	@Inject
 	public RoundRobinServer(@Assisted InstanceDescriptor descriptor, EventScheduler scheduler, Configuration globalConf) {
@@ -59,9 +68,13 @@ public class RoundRobinServer implements Machine, ResponseListener, Monitorable 
 		this.runningNow = new HashMap<>();
 		
 		this.processorTokens = new FastSemaphore(this.descriptor.getNumberOfCPUCores());
-		this.threadTokens = new FastSemaphore(globalConf.getInt(MACHINE_THREADSIZE));
+		maxThreads = globalConf.getInt(MACHINE_THREADSIZE);
+		this.threadTokens = new FastSemaphore(maxThreads);
+		tier = Integer.valueOf(descriptor.toString());
 		
-		
+		this.networkDelay = globalConf.getLong(MACHINE_NETWORKDELAY, 0);
+		this.contextChangeDelay = globalConf.getLongArray(MACHINE_CONTEXTCHANGEDELAY);
+
 		resetStatistics(0);
 	}
 	
@@ -86,7 +99,7 @@ public class RoundRobinServer implements Machine, ResponseListener, Monitorable 
 			processingQueue.add(request);
 			
 			if(processorTokens.tryAcquire()){
-				scheduleNext();
+				scheduleNext(1);
 			}
 		}else if(backlog.size() < maxBacklogSize){
 			backlog.add(request);
@@ -96,7 +109,7 @@ public class RoundRobinServer implements Machine, ResponseListener, Monitorable 
 		}
 	}
 	
-	private void scheduleNext() {
+	private void scheduleNext(final int factor) {
 		if(processingQueue.isEmpty()){
 			processorTokens.release();
 ////			if(processorTokens.availablePermits() > descriptor.getNumberOfCPUCores()){
@@ -108,15 +121,16 @@ public class RoundRobinServer implements Machine, ResponseListener, Monitorable 
 		final Request request = processingQueue.poll();
 		runningNow.put(request, scheduler.now());
 		final long demand = Math.min(quantum, request.getCPUTimeDemandInMillis());
-		scheduler.queueEvent(new Event(scheduler.now() + demand) {
+//		final int factor = maxThreads - threadTokens.availablePermits() > 1? 1: 0;
+		scheduler.queueEvent(new Event(scheduler.now() + demand + factor * contextChangeDelay[tier]) {
 			@Override
 			public void trigger() {
-				preempt(request, demand);
+				preempt(request, demand, factor * contextChangeDelay[tier]);
 			}
 		});
 	}
 
-	protected void preempt(Request request, long demand) {
+	protected void preempt(Request request, long demand, long contextDelay) {
 		
 		if(!descriptor.isOn()){ //machine turned off ( FIXME: maybe all request should be forwarded back together at machine shutdown method)
 			failed++;
@@ -124,18 +138,24 @@ public class RoundRobinServer implements Machine, ResponseListener, Monitorable 
 			return;
 		}
 
-		busy_time += demand;
+		busy_time += demand + contextDelay;
 		request.updateServiceTime(demand);
 		
 		runningNow.remove(request);
 
 		if(request.getCPUTimeDemandInMillis() != 0){
 			processingQueue.add(request);
-			scheduleNext();
+			scheduleNext(0);
 		}else{
 			if(shouldForward(request)){
 				request.setResponseListener(this);
-				descriptor.getApplication().queue(request);
+				scheduler.queueEvent(new Event(scheduler.now() + networkDelay ) {
+					@Override
+					public void trigger() {
+						descriptor.getApplication().queue(request);
+
+					}
+				});
 			}else{
 				threadTokens.release();
 				if(!backlog.isEmpty()){
@@ -145,7 +165,7 @@ public class RoundRobinServer implements Machine, ResponseListener, Monitorable 
 				}
 				request.getResponseListener().processDone(request, new Response() {});
 			}
-			scheduleNext();
+			scheduleNext(0);
 		}
 	}
 
@@ -167,7 +187,7 @@ public class RoundRobinServer implements Machine, ResponseListener, Monitorable 
 		processingQueue.add(request);
 		
 		if(processorTokens.tryAcquire()){
-			scheduleNext();
+			scheduleNext(0);
 		}
 	}
 
