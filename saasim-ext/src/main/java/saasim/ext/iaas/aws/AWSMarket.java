@@ -30,8 +30,10 @@ public class AWSMarket{
 
 	private double[] hourly;
 
+	private long timeBetweenBilling;
 
-	public AWSMarket(EventScheduler scheduler, BillingInfo billingInfo, String name, AWSInstanceType[] types, double[] upfront, double[] hourly, int quota, int[] plan) {
+
+	public AWSMarket(EventScheduler scheduler, BillingInfo billingInfo, String name, AWSInstanceType[] types, double[] upfront, double[] hourly, int quota, int[] plan, long timeBetweenBilling) {
 		this.scheduler = scheduler;
 		this.billingInfo = billingInfo;
 		this.name = name;
@@ -39,6 +41,7 @@ public class AWSMarket{
 		this.hourly = hourly;
 		this.quota = quota;
 		this.typeQuota = plan;
+		this.timeBetweenBilling = timeBetweenBilling;
 		
 		this.running = new HashSet<>();
 		
@@ -67,8 +70,8 @@ public class AWSMarket{
 		
 		typeQuota[indexMapping.get(descriptor.getType())]--;
 		quota--;
-
-		scheduler.queueEvent(new Event(scheduler.now() + 3600000){
+		
+		scheduler.queueEvent(new Event(scheduler.now() + timeBetweenBilling){
 			@Override
 			public void trigger() {
 				accountMachine(descriptor);
@@ -79,12 +82,11 @@ public class AWSMarket{
 	}
 
 	protected void accountMachine(final AWSInstanceDescriptor descriptor) {
-		long uptime = descriptor.isOn()?3600000:3600000 + descriptor.getFinishTime() - scheduler.now();
-		
+		long uptime = descriptor.isOn()?timeBetweenBilling:timeBetweenBilling + descriptor.getFinishTime() - scheduler.now();
 		billingInfo.account(scheduler.now(), name, descriptor.getType().toString(), descriptor.toString(), uptime, hourly[indexMapping.get(descriptor.getType())]);
 		
 		if(descriptor.isOn()){
-			scheduler.queueEvent(new Event(scheduler.now() + 3600000){
+			scheduler.queueEvent(new Event(scheduler.now() + timeBetweenBilling){
 				@Override
 				public void trigger() {
 					accountMachine(descriptor);

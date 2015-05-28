@@ -1,5 +1,8 @@
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
+import saasim.core.iaas.Customer;
 import saasim.core.sim.SaaSim;
 import saasim.core.sim.SaaSimModule;
 
@@ -30,6 +33,7 @@ public class Main {
 		SaaSimModule module = new SaaSimModule(args.length == 1? args[0]: DEFAULT_CONFIG_FILEPATH);
 		
 		Guice.createInjector(module).getInstance(SaaSim.class).start();
+		
+		LogManager.shutdown();
 	}
-
 }

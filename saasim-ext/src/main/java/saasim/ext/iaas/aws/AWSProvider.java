@@ -7,6 +7,7 @@ import java.util.Map;
 
 import saasim.core.config.Configuration;
 import saasim.core.event.Event;
+import saasim.core.event.EventPriority;
 import saasim.core.event.EventScheduler;
 import saasim.core.iaas.BillingInfo;
 import saasim.core.iaas.Customer;
@@ -19,6 +20,7 @@ import com.google.inject.Singleton;
 @Singleton
 public class AWSProvider implements Provider {
 	
+	public static final String IAAS_AWS_RATE = "iaas.aws.rate";
 	public static final String IAAS_AWS_STORAGE = "iaas.aws.storage";
 	public static final String IAAS_AWS_MEMORY = "iaas.aws.memory";
 	public static final String IAAS_AWS_ECU = "iaas.aws.ecu";
@@ -40,12 +42,14 @@ public class AWSProvider implements Provider {
 	
 	private Map<String, AWSInstanceType> typeMapping;
 	private List<AWSMarket> markets;
+	private long accountingRate;
 	
 	@Inject
 	public AWSProvider(Configuration globalConf, EventScheduler scheduler, Customer customer) {
 		this.scheduler = scheduler;
 		this.customer = customer;
 		this.timeBetweenBilling = globalConf.getLong(IAAS_TIMEBETWEENBILLING);
+		this.accountingRate = globalConf.getLong(IAAS_AWS_RATE);
 		
 		this.typeMapping = new HashMap<>();
 		this.markets = new ArrayList<AWSMarket>();
@@ -59,10 +63,10 @@ public class AWSProvider implements Provider {
 			int quota = globalConf.getInt(IAAS_AWS_QUOTA+name, 0);
 			int[] plan = globalConf.getIntegerArray(IAAS_AWS_PLAN+name);
 
-			this.markets.add(new AWSMarket(scheduler, billingInfo, name, types, upfront, hourly, quota, plan));
+			this.markets.add(new AWSMarket(scheduler, billingInfo, name, types, upfront, hourly, quota, plan, accountingRate));
 		}
 
-		this.scheduler.queueEvent(new Event(timeBetweenBilling){
+		this.scheduler.queueEvent(new Event(timeBetweenBilling, EventPriority.VERY_LOW){
 			@Override
 			public void trigger() {
 				reportBilling();
@@ -105,6 +109,7 @@ public class AWSProvider implements Provider {
 
 	@Override
 	public InstanceDescriptor acquire(String instanceType) {
+		
 		AWSInstanceType type = parseType(instanceType);
 
 		for (AWSMarket market: markets) {

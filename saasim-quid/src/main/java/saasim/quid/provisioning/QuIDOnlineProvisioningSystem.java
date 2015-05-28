@@ -122,6 +122,7 @@ public class QuIDOnlineProvisioningSystem implements ProvisioningSystem {
 			
 			double d = u / finished_requests;
 			double u_dash = Math.max(arrived_requests, finished_requests) * d;
+			
 			int n_dash = (int) Math.ceil( u_dash * number_of_active_servers / targetUtilisation[tierID] );
 			
 			return Math.max(1, n_dash) - number_of_active_servers;
@@ -251,6 +252,7 @@ public class QuIDOnlineProvisioningSystem implements ProvisioningSystem {
 
 	private InstanceDescriptor acquireInstance(final Application application, final int tierID, final MonitoringService monitoringService, final List<InstanceDescriptor> vmPool) {
 		final InstanceDescriptor instance = provider.acquire(vmTypePerTier[tierID]);
+		instance.setTier(tierID);
 		System.err.println(tierID + " " + instance);
 		final Machine machine = machineFactory.create(instance);
 		instance.setApplication(application);

@@ -28,4 +28,8 @@ public interface InstanceDescriptor {
 	long getFinishTime();
 
 	long getCreationTime();
+
+	int getTier();
+
+	void setTier(int id);
 }

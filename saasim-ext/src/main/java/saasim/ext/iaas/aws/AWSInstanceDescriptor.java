@@ -21,6 +21,7 @@ public class AWSInstanceDescriptor implements InstanceDescriptor {
 	private static int SEED = 0;
 	private int id;
 	private AWSMarket market;
+	private int tierID;
 
 	public AWSInstanceDescriptor(AWSInstanceType instanceType, AWSMarket market, long creationTime) {
 		this.market = market;
@@ -96,6 +97,17 @@ public class AWSInstanceDescriptor implements InstanceDescriptor {
 	@Override
 	public long getCreationTime() {
 		return creationTime;
+	}
+
+	@Override
+	public int getTier() {
+		return this.tierID;
+	}
+
+	@Override
+	public void setTier(int id) {
+		this.tierID = id;
+		
 	}
 	
 	

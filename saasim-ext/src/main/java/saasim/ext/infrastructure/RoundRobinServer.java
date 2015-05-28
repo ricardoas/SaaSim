@@ -10,6 +10,7 @@ import java.util.TreeMap;
 
 import saasim.core.config.Configuration;
 import saasim.core.event.Event;
+import saasim.core.event.EventPriority;
 import saasim.core.event.EventScheduler;
 import saasim.core.iaas.Monitorable;
 import saasim.core.infrastructure.InstanceDescriptor;
@@ -68,9 +69,9 @@ public class RoundRobinServer implements Machine, ResponseListener, Monitorable 
 		this.runningNow = new HashMap<>();
 		
 		this.processorTokens = new FastSemaphore(this.descriptor.getNumberOfCPUCores());
-		maxThreads = globalConf.getInt(MACHINE_THREADSIZE);
+		tier = descriptor.getTier();
+		maxThreads = globalConf.getIntegerArray(MACHINE_THREADSIZE)[tier];
 		this.threadTokens = new FastSemaphore(maxThreads);
-		tier = Integer.valueOf(descriptor.toString());
 		
 		this.networkDelay = globalConf.getLong(MACHINE_NETWORKDELAY, 0);
 		this.contextChangeDelay = globalConf.getLongArray(MACHINE_CONTEXTCHANGEDELAY);
@@ -122,7 +123,7 @@ public class RoundRobinServer implements Machine, ResponseListener, Monitorable 
 		runningNow.put(request, scheduler.now());
 		final long demand = Math.min(quantum, request.getCPUTimeDemandInMillis());
 		final int factorCS = request.getID() == lastRequestID? 0: 1;
-		scheduler.queueEvent(new Event(scheduler.now() + demand + factorCS * contextChangeDelay[tier]) {
+		scheduler.queueEvent(new Event(scheduler.now() + demand + factorCS * contextChangeDelay[tier], EventPriority.VERY_HIGH) {
 			@Override
 			public void trigger() {
 				preempt(request, demand, factor * contextChangeDelay[tier]);
@@ -151,7 +152,7 @@ public class RoundRobinServer implements Machine, ResponseListener, Monitorable 
 		}else{
 			if(shouldForward(request)){
 				request.setResponseListener(this);
-				scheduler.queueEvent(new Event(scheduler.now() + networkDelay ) {
+				scheduler.queueEvent(new Event(scheduler.now() + networkDelay * (maxThreads - threadTokens.availablePermits()) ) {
 					@Override
 					public void trigger() {
 						descriptor.getApplication().queue(request);
@@ -214,13 +215,13 @@ public class RoundRobinServer implements Machine, ResponseListener, Monitorable 
 		long busy_debt = 0;
 		
 		Set<Entry<Request,Long>> entrySet = runningNow.entrySet();
+		
 		for (Entry<Request, Long> entry : entrySet) {
 			long start = entry.getValue();
-			long d = Math.min(quantum, entry.getKey().getCPUTimeDemandInMillis());
-			busy_time += now - start;
-			busy_debt += (start + d) - now;
+			busy_debt += now - start;
 		}
-
+		busy_time += busy_debt;
+		
 		
 		Map<String, Double> info = new TreeMap<>();
 		info.put("arrived", 1.0*arrived);
