@@ -9,10 +9,12 @@ import saasim.core.iaas.Customer;
 
 @Singleton
 public class LoggerCustomer implements Customer {
+	
+	private Logger logger = Logger.getLogger(Customer.class);
 
 	@Override
 	public void reportIaaSUsage(BillingInfo bill) {
-		Logger.getLogger(Customer.class).info(bill);
+		logger.info(bill);
 	}
 
 }
