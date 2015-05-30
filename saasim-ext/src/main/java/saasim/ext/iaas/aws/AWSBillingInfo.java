@@ -17,10 +17,10 @@ public class AWSBillingInfo implements BillingInfo {
 	@Override
 	public String toString() {
 		
-		sb.append('\n');
-		sb.append("TOTAL=");
-		sb.append(totalFee);
-		sb.append('\n');
+//		sb.append('\n');
+//		sb.append("TOTAL=");
+//		sb.append(totalFee);
+//		sb.append('\n');
 		
 		return sb.toString();
 	}
