@@ -1,0 +1,32 @@
+allprojects  {
+  apply plugin: 'maven'
+  apply plugin: 'eclipse'
+
+  group = 'br.edu.ufcg.lsd'
+  version = '0.0.7-SNAPSHOT'
+}
+
+subprojects {
+  apply plugin: 'java'
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
+
+  
+  repositories {
+    jcenter()
+  }  
+}
+
+task dist(type: Zip) {
+    dependsOn subprojects.jar
+    from 'src/dist'
+    into('libs') {
+        from subprojects.jar
+        from subprojects.configurations.runtime
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    }
+}
+
+artifacts {
+   archives dist
+}

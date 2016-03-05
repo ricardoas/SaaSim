@@ -1,0 +1,6 @@
+
+description = 'saasim-quid'
+dependencies {
+  compile project(':saasim-core')
+    compile group: 'org.apache.commons', name: 'commons-math', version:'2.2'
+}

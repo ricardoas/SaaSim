@@ -1,0 +1,10 @@
+rootProject.name = 'saasim'
+include ':saasim-core'
+include ':saasim-quid'
+include ':saasim-ext'
+include ':saasim-dist'
+
+project(':saasim-core').projectDir = "$rootDir/saasim-core" as File
+project(':saasim-quid').projectDir = "$rootDir/saasim-quid" as File
+project(':saasim-ext').projectDir = "$rootDir/saasim-ext" as File
+project(':saasim-dist').projectDir = "$rootDir/saasim-dist" as File
